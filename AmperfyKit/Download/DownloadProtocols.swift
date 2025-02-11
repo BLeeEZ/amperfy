@@ -51,6 +51,7 @@ public protocol Downloadable: CustomEquatable {
     var objectID: NSManagedObjectID { get }
     var isCached: Bool { get }
     var displayString: String { get }
+    var threadSafeInfo: DownloadInfo? { get }
 }
 
 extension Downloadable {

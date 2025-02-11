@@ -61,21 +61,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var storage = {
         return AmperKit.shared.storage
     }()
-    public lazy var networkMonitor = {
-        return AmperKit.shared.networkMonitor
-    }()
-    public lazy var librarySyncer = {
-        return AmperKit.shared.librarySyncer
-    }()
+    public var networkMonitor: NetworkMonitorFacade {
+        get { return AmperKit.shared.networkMonitor }
+    }
+    public var librarySyncer: LibrarySyncer {
+        get { return AmperKit.shared.librarySyncer }
+    }
     public lazy var duplicateEntitiesResolver = {
         return AmperKit.shared.duplicateEntitiesResolver
     }()
     public lazy var eventLogger: EventLogger = {
         return AmperKit.shared.eventLogger
     }()
-    public lazy var backendApi: BackendProxy = {
-        return AmperKit.shared.backendApi
-    }()
+    public var backendApi: BackendProxy {
+        get { return AmperKit.shared.backendApi }
+    }
     public lazy var notificationHandler: EventNotificationHandler = {
         return AmperKit.shared.notificationHandler
     }()
@@ -91,18 +91,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     public lazy var scrobbleSyncer = {
         return AmperKit.shared.scrobbleSyncer
     }()
-    public lazy var libraryUpdater = {
-        return AmperKit.shared.libraryUpdater
-    }()
+    public var libraryUpdater: LibraryUpdater {
+        get { return AmperKit.shared.libraryUpdater }
+    }
     public lazy var userStatistics = {
         return AmperKit.shared.userStatistics
     }()
     public lazy var localNotificationManager = {
         return AmperKit.shared.localNotificationManager
     }()
-    public lazy var backgroundFetchTriggeredSyncer = {
-        return AmperKit.shared.backgroundFetchTriggeredSyncer
-    }()
+    public var backgroundFetchTriggeredSyncer: BackgroundFetchTriggeredSyncer {
+        get { return AmperKit.shared.backgroundFetchTriggeredSyncer }
+    }
     public lazy var intentManager = {
         return IntentManager(storage: storage, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, library: storage.main.library, player: player, eventLogger: eventLogger)
     }()
@@ -186,12 +186,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func restartByUser() {
-        LocalNotificationManager.notifyDebug(title: "Amperfy Restart", body: "Tap to reopen Amperfy")
-        sleepTimer?.invalidate()
-        sleepTimer = nil
-        player.stop()
-        // Wait some time to let the notification appear
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: 1500000)) {
+        Task {
+            await localNotificationManager.notifyDebugAndWait(title: "Amperfy Restart", body: "Tap to reopen Amperfy")
+            sleepTimer?.invalidate()
+            sleepTimer = nil
+            player.stop()
             // close Amperfy
             exit(0)
         }
@@ -224,7 +223,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             os_log("application launch", log: self.log, type: .info)
         }
 
-        AmperKit.shared.networkMonitor.start()
         configureDefaultNavigationBarStyle()
         configureBatteryMonitoring()
         configureBackgroundFetch()

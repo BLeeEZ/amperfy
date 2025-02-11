@@ -37,7 +37,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     }
     
     override func recreateParserDelegate() {
-        ssParserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), playlist: playlist, library: library, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), playlist: playlist, library: library)
     }
 
     func createTestArtists() {
@@ -149,7 +149,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 4060113)
-        XCTAssertEqual(song.artwork?.url, "www-655")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "655")
         
@@ -171,7 +171,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 7458214)
-        XCTAssertEqual(song.artwork?.url, "www-746")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "746")
         
@@ -192,7 +192,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 3363271)
-        XCTAssertEqual(song.artwork?.url, "www-783")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "783")
     }

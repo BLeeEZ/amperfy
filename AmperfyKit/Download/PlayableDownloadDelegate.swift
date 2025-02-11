@@ -29,7 +29,6 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     private let backendApi: BackendApi
     private let artworkExtractor: EmbeddedArtworkExtractor
     private let networkMonitor: NetworkMonitorFacade
-    private let fileManager = CacheFileManager.shared
 
     init(backendApi: BackendApi, artworkExtractor: EmbeddedArtworkExtractor, networkMonitor: NetworkMonitorFacade) {
         self.backendApi = backendApi
@@ -56,7 +55,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
         guard let fileURL = download.fileURL else {
             return ResponseError(type: .api, message: "Invalid download", cleansedURL: download.url?.asCleansedURL(cleanser: backendApi))
         }
-        guard let data = fileManager.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
+        guard let data = CacheFileManager.shared.getFileDataIfNotToBig(url: fileURL, maxFileSize: Self.maxFileSizeOfErrorResponse) else { return nil }
         return backendApi.checkForErrorResponse(response: APIDataResponse(data: data, url: download.url))
     }
 
@@ -76,16 +75,17 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     
     /// save downloaded playable async to avoid memory overflow issues due to kept references
     @MainActor func savePlayableDataAsync(playable: AbstractPlayable, downloadUrl: URL, fileURL: URL, fileMimeType: String?, storage: PersistentStorage) async throws {
+        let playableObjectID = playable.objectID
         try await storage.async.perform { companion in
-            guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
+            guard let playableAsyncMO = companion.context.object(with: playableObjectID) as? AbstractPlayableMO else { return }
             let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
             playableAsync.contentTypeTranscoded = fileMimeType
             // transcoding info needs to available to generate a correct file extension
-            guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
-                  let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+            guard let relFilePath = CacheFileManager.shared.createRelPath(for: playableAsync),
+                  let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)
             else { return }
             do {
-                try self.fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
+                try CacheFileManager.shared.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
                 playableAsync.relFilePath = relFilePath
             } catch {
                 playableAsync.relFilePath = nil

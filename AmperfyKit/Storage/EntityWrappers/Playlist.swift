@@ -45,11 +45,6 @@ public class Playlist: Identifyable {
         return name
     }
     
-    public func getManagedObject(in context: NSManagedObjectContext, library: LibraryStorage) -> Playlist {
-        let playlistMO = context.object(with: managedObject.objectID) as! PlaylistMO
-        return Playlist(library: library, managedObject: playlistMO)
-    }
-
     public var items: [PlaylistItem] {
         return managedObject.items.compactMap{ PlaylistItem(library: library, managedObject: $0) }
     }

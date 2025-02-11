@@ -61,13 +61,6 @@ class SsXmlLibParser: SsNotifiableXmlParser {
 
 class SsXmlLibWithArtworkParser: SsXmlLibParser {
     
-    var subsonicUrlCreator: SubsonicUrlCreator
-    
-    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, subsonicUrlCreator: SubsonicUrlCreator, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.subsonicUrlCreator = subsonicUrlCreator
-        super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: parseNotifier)
-    }
-
     func parseArtwork(id: String) -> Artwork? {
         let remoteInfo = ArtworkRemoteInfo(id: id, type: "")
         if let foundArtwork = library.getArtwork(remoteInfo: remoteInfo) {
@@ -75,7 +68,7 @@ class SsXmlLibWithArtworkParser: SsXmlLibParser {
         } else {
             let createdArtwork = library.createArtwork()
             createdArtwork.remoteInfo = remoteInfo
-            createdArtwork.url = subsonicUrlCreator.getArtUrlString(forCoverArtId: id)
+            createdArtwork.status = .NotChecked
             return createdArtwork
         }
     }

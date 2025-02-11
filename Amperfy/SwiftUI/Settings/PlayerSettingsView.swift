@@ -33,9 +33,9 @@ struct PlayerSettingsView: View {
         if let cellular = cellular {
             settings.streamingMaxBitrateCellularPreference = cellular
         }
-        appDelegate.player.streamingMaxBitrates = StreamingMaxBitrates(
+        appDelegate.player.setStreamingMaxBitrates(to:  StreamingMaxBitrates(
             wifi: settings.streamingMaxBitrateWifiPreference,
-            cellular: settings.streamingMaxBitrateCellularPreference
+            cellular: settings.streamingMaxBitrateCellularPreference)
         )
     }
     

@@ -27,7 +27,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
     override func setUp() async throws {
         try await super.setUp()
         xmlData = getTestFileData(name: "artist_example_1")
-        ssParserDelegate = SsAlbumParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsAlbumParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
         createTestPartner()
     }
     
@@ -52,7 +52,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.remoteDuration, 2534)
         XCTAssertEqual(album.remoteSongCount, 10)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "www-al-11047")
+        XCTAssertEqual(album.artwork?.url, "")
         XCTAssertEqual(album.artwork?.type, "")
         XCTAssertEqual(album.artwork?.id, "al-11047")
         
@@ -68,7 +68,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.remoteDuration, 2403)
         XCTAssertEqual(album.remoteSongCount, 10)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "www-al-11052")
+        XCTAssertEqual(album.artwork?.url, "")
         XCTAssertEqual(album.artwork?.type, "")
         XCTAssertEqual(album.artwork?.id, "al-11052")
         
@@ -83,7 +83,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.remoteDuration, 2414)
         XCTAssertEqual(album.remoteSongCount, 8)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "www-al-11053")
+        XCTAssertEqual(album.artwork?.url, "")
         XCTAssertEqual(album.artwork?.type, "")
         XCTAssertEqual(album.artwork?.id, "al-11053")
         
@@ -98,7 +98,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
         XCTAssertEqual(album.remoteDuration, 2291)
         XCTAssertEqual(album.remoteSongCount, 9)
         XCTAssertNil(album.genre)
-        XCTAssertEqual(album.artwork?.url, "www-al-11061")
+        XCTAssertEqual(album.artwork?.url, "")
         XCTAssertEqual(album.artwork?.type, "")
         XCTAssertEqual(album.artwork?.id, "al-11061")
     }

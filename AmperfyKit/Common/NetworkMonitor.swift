@@ -22,99 +22,88 @@
 import OSLog
 import SystemConfiguration
 import Alamofire
+import Network
 
-public typealias ConnectionTypeChangedCallack = (_ isWiFiConnected: Bool) -> Void
+public typealias ConnectionTypeChangedCallack = @Sendable (_ isWiFiConnected: Bool) async -> Void
 
 public protocol NetworkMonitorFacade {
-    var connectionTypeChangedCB: ConnectionTypeChangedCallack?  { get set }
-    var isConnectedToNetwork: Bool { get }
-    var isCellular: Bool { get }
-    var isWifiOrEthernet: Bool { get }
-    func start()
+    @MainActor func getConnectionTypeChangedCB() -> ConnectionTypeChangedCallack?
+    @MainActor func setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?)
+    @MainActor var isConnectedToNetwork: Bool { get }
+    @MainActor var isCellular: Bool { get }
+    @MainActor var isWifiOrEthernet: Bool { get }
 }
 
-public class NetworkMonitor : NetworkMonitorFacade {
+@MainActor
+public class NetworkMonitor: NetworkMonitorFacade {
+    
+    public static let shared = NetworkMonitor().start()
     
     private var reachabilityManager = Alamofire.NetworkReachabilityManager()
     private let queue = DispatchQueue(label: "NetworkMonitor")
     private let log = OSLog(subsystem: "Amperfy", category: "NetworkMonitor")
-    private let accessSemaphore = DispatchSemaphore(value: 1)
-    private var isCellularConnected = false
+    private var connectionTypeChangedCB: ConnectionTypeChangedCallack?
     
-    public var connectionTypeChangedCB: ConnectionTypeChangedCallack?
+    public func getConnectionTypeChangedCB() -> ConnectionTypeChangedCallack? {
+        return connectionTypeChangedCB
+    }
     
-    public var isConnectedToNetwork: Bool {
-        var zeroAddress = sockaddr_in(sin_len: 0, sin_family: 0, sin_port: 0, sin_addr: in_addr(s_addr: 0), sin_zero: (0, 0, 0, 0, 0, 0, 0, 0))
-        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
-        zeroAddress.sin_family = sa_family_t(AF_INET)
+    public func setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?) {
+        _setConnectionTypeChangedCB(newCB: newCB)
+    }
+    
+    private func _setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?) {
+        connectionTypeChangedCB = newCB
+    }
+
+    private let monitor = NWPathMonitor()
+    private var networkPath: NWPath
+    
+    init() {
+        networkPath = monitor.currentPath
+    }
+    
+    private func updateNetworkPath(newPath: NWPath) async {
+        networkPath = newPath
         
-        let defaultRouteReachability = withUnsafePointer(to: &zeroAddress) {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {zeroSockAddress in
-                SCNetworkReachabilityCreateWithAddress(nil, zeroSockAddress)
+        if networkPath.status != .satisfied {
+            os_log("Disconnected: The network is not reachable", log: self.log, type: .info)
+        } else if networkPath.usesInterfaceType(.cellular) {
+            os_log("Connected: The network is reachable over the Cellular connection", log: self.log, type: .info)
+        } else if networkPath.usesInterfaceType(.wifi) {
+            os_log("Connected: The network is reachable over the WiFi connection", log: self.log, type: .info)
+        } else if networkPath.usesInterfaceType(.wiredEthernet) {
+            os_log("Connected: The network is reachable over the Ethernet connection", log: self.log, type: .info)
+        } else if networkPath.usesInterfaceType(.other){
+            os_log("Connected: The network is reachable over Other connection", log: self.log, type: .info)
+        } else if networkPath.usesInterfaceType(.loopback){
+            os_log("Connected: The network is reachable over Loop Back connection", log: self.log, type: .info)
+        }
+        
+        await self.connectionTypeChangedCB?(!self.isCellular)
+    }
+    
+    func start() -> NetworkMonitor {
+        monitor.pathUpdateHandler = { [self] networkPath in
+            Task {
+                await updateNetworkPath(newPath: networkPath)
             }
         }
-        
-        var flags: SCNetworkReachabilityFlags = SCNetworkReachabilityFlags(rawValue: 0)
-        if SCNetworkReachabilityGetFlags(defaultRouteReachability!, &flags) == false {
-            return false
-        }
-        
-        // Working for Cellular and WIFI
-        let isReachable = (flags.rawValue & UInt32(kSCNetworkFlagsReachable)) != 0
-        let needsConnection = (flags.rawValue & UInt32(kSCNetworkFlagsConnectionRequired)) != 0
-        let ret = (isReachable && !needsConnection)
-        
-        return ret
+        monitor.start(queue: queue)
+        return self
+    }
+    
+    public var isConnectedToNetwork: Bool {
+        let isConneted = networkPath.status == .satisfied
+        return isConneted
     }
     
     public var isCellular: Bool {
-        self.accessSemaphore.wait()
-        defer { self.accessSemaphore.signal() }
-        chechForRunningReachabilty()
-        return self.isCellularConnected
+        return networkPath.usesInterfaceType(.cellular)
     }
     
     public var isWifiOrEthernet: Bool {
-        self.accessSemaphore.wait()
-        defer { self.accessSemaphore.signal() }
-        chechForRunningReachabilty()
-        return !isCellularConnected
-    }
-    
-    private func chechForRunningReachabilty() {
-        if reachabilityManager == nil {
-            reachabilityManager = Alamofire.NetworkReachabilityManager()
-            start()
-        }
-    }
-        
-    public func start() {
-        self.accessSemaphore.wait()
-        if let reachabilityManager = reachabilityManager {
-            self.accessSemaphore.signal()
-            
-            os_log("Start listening for network type changes", log: self.log, type: .info)
-            reachabilityManager.startListening()  { [self] status in
-                self.accessSemaphore.wait()
-                switch status {
-                case .notReachable:
-                    os_log("Disconnected: The network is not reachable", log: self.log, type: .info)
-                case .unknown:
-                    os_log("Disconnected: It is unknown whether the network is reachable", log: self.log, type: .info)
-                case .reachable(.ethernetOrWiFi):
-                    self.isCellularConnected = false
-                    os_log("Connected: The network is reachable over the WiFi connection", log: self.log, type: .info)
-                case .reachable(.cellular):
-                    self.isCellularConnected = true
-                    os_log("Connected: The network is reachable over the WWAN connection", log: self.log, type: .info)
-                }
-                self.accessSemaphore.signal()
-                self.connectionTypeChangedCB?(!self.isCellularConnected)
-            }
-        } else {
-            self.accessSemaphore.signal()
-        }
-
+        return !isCellular
     }
     
 }

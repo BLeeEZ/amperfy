@@ -22,7 +22,7 @@
 import Foundation
 import MediaPlayer
 
-public struct StreamingMaxBitrates {
+@MainActor public struct StreamingMaxBitrates {
     public var wifi: StreamingMaxBitratePreference = .noLimit
     public var cellular: StreamingMaxBitratePreference = .noLimit
     
@@ -136,7 +136,8 @@ public struct PlayContext {
     var podcastItemCount: Int { get }
     var playerMode: PlayerMode { get }
     func setPlayerMode(_ newValue: PlayerMode)
-    var streamingMaxBitrates: StreamingMaxBitrates { get set }
+    var streamingMaxBitrates: StreamingMaxBitrates { get }
+    func setStreamingMaxBitrates(to: StreamingMaxBitrates)
 
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
     func seek(toSecond: Double)
@@ -356,13 +357,9 @@ extension PlayerFacade {
         musicPlayer.activateSongContinueProgress()
     }
     
-    var streamingMaxBitrates: StreamingMaxBitrates {
-        get {
-            return backendAudioPlayer.streamingMaxBitrates
-        }
-        set {
-            backendAudioPlayer.streamingMaxBitrates = newValue
-        }
+    var streamingMaxBitrates: StreamingMaxBitrates { return backendAudioPlayer.streamingMaxBitrates }
+    public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
+        backendAudioPlayer.setStreamingMaxBitrates(to: to)
     }
     
     func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler) {

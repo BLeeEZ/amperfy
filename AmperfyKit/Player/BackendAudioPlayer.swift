@@ -75,19 +75,18 @@ enum BackendAudioQueueType {
     public var isAutoCachePlayedItems: Bool = true
     public var nextPlayablePreloadCB: NextPlayablePreloadCallback?
     public var triggerReinsertPlayableCB: TriggerReinsertPlayableCallback?
-    public var streamingMaxBitrates: StreamingMaxBitrates = .init() {
-        didSet {
-            let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
-            os_log(.default, "Update Streaming Max Bitrate: %s %s", streamingMaxBitrate.description, (self.playType == .stream) ? "(active)" : "")
-            if self.playType == .stream {
-                player.currentItem?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
-            }
-        }
-    }
     public private(set) var isPlaying: Bool = false
     public private(set) var isErrorOccured: Bool = false
     public private(set) var playType: PlayType?
-    
+    public private(set) var streamingMaxBitrates = StreamingMaxBitrates()
+    public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
+        let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: self.networkMonitor)
+        os_log(.default, "Update Streaming Max Bitrate: %s %s", streamingMaxBitrate.description, (self.playType == .stream) ? "(active)" : "")
+        if self.playType == .stream {
+            player.currentItem?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
+        }
+    }
+
     var responder: BackendAudioPlayerNotifiable?
     var volume: Float {
         get {
@@ -271,7 +270,10 @@ enum BackendAudioQueueType {
     func requestToPlay(playable: AbstractPlayable, playbackRate: PlaybackRate, autoStartPlayback: Bool) {
         userDefinedPlaybackRate = playbackRate
         isAutoStartPlayback = autoStartPlayback
-        
+        handleRequest(playable: playable)
+    }
+    
+    private func handleRequest(playable: AbstractPlayable) {
         if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable, nextPreloadedPlayable == playable {
             // Do nothing next preloaded playable has already been queued to player
             os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)

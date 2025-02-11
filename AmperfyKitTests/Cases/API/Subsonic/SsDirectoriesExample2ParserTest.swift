@@ -35,7 +35,7 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
     }
     
     override func recreateParserDelegate() {
-        ssParserDelegate = SsDirectoryParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), directory: directory, library: library, subsonicUrlCreator: subsonicUrlCreator)
+        ssParserDelegate = SsDirectoryParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), directory: directory, library: library)
     }
     
     func createTestPartner() {
@@ -94,7 +94,7 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 8421341)
-        XCTAssertEqual(song.artwork?.url, "www-24")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "24")
         
@@ -113,7 +113,7 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/flac")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 4910028)
-        XCTAssertEqual(song.artwork?.url, "www-25")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "25")
         

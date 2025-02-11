@@ -21,7 +21,7 @@
 
 import Foundation
 
-public class LoginCredentials {
+public struct LoginCredentials: Sendable {
 
     public var serverUrl: String
     public var username: String
@@ -45,12 +45,12 @@ public class LoginCredentials {
         self.backendApi = .notDetected
     }
 
-    public convenience init(serverUrl: String, username: String, password: String, backendApi: BackenApiType) {
+    public init(serverUrl: String, username: String, password: String, backendApi: BackenApiType) {
         self.init(serverUrl: serverUrl, username: username, password: password)
         self.backendApi = backendApi
     }
     
-    public func changePasswordAndHash(password newPassword: String) {
+    public mutating func changePasswordAndHash(password newPassword: String) {
         self.password = newPassword
         self.passwordHash = StringHasher.sha256(dataString: newPassword)
     }

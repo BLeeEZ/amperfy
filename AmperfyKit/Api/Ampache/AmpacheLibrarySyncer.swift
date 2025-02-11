@@ -107,15 +107,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     @MainActor func sync(artist: Artist) async throws {
         guard isSyncAllowed else { return }
         let artistResponse = try await ampacheXmlServerApi.requestArtistInfo(id: artist.id)
+        let artistObjectId = artist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
             let parserDelegate = ArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             do {
                 try self.parse(response: artistResponse, delegate: parserDelegate, throwForNotFoundErrors: true)
             } catch {
                 if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
-                    let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                    let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artistObjectId) as! ArtistMO)
                     let reportError = ResponseError(type: .resource, statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: artistResponse.url?.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: artistResponse.data)
-                    artist.remoteStatus = .deleted
+                    artistAsync.remoteStatus = .deleted
                     throw reportError
                 } else {
                     throw error
@@ -125,8 +126,9 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         
         guard artist.remoteStatus == .available else { return }
         let artistAlbumsResponse = try await self.ampacheXmlServerApi.requestArtistAlbums(id: artist.id)
+        
         try await self.storage.async.perform { asyncCompanion in
-            let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+            let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artistObjectId) as! ArtistMO)
             let oldAlbums = Set(artistAsync.albums)
             let parserDelegate = AlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: artistAlbumsResponse, delegate: parserDelegate)
@@ -143,7 +145,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         
         let artistSongsResponse = try await self.ampacheXmlServerApi.requestArtistSongs(id: artist.id)
         try await self.storage.async.perform { asyncCompanion in
-            let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+            let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artistObjectId) as! ArtistMO)
             let oldSongs = Set(artistAsync.songs)
             let parserDelegate = SongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: artistSongsResponse, delegate: parserDelegate)
@@ -158,13 +160,14 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     @MainActor func sync(album: Album) async throws {
         guard isSyncAllowed else { return }
         let albumResponse = try await ampacheXmlServerApi.requestAlbumInfo(id: album.id)
+        let albumObjectId = album.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
             let parserDelegate = AlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             do {
                 try self.parse(response: albumResponse, delegate: parserDelegate, throwForNotFoundErrors: true)
             } catch {
                 if let responseError = error as? ResponseError, let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
-                    let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+                    let albumAsync = Album(managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO)
                     let reportError = ResponseError(type: .resource, statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: albumResponse.url?.asCleansedURL(cleanser: self.ampacheXmlServerApi), data: albumResponse.data)
                     albumAsync.markAsRemoteDeleted()
                     throw reportError
@@ -177,7 +180,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         guard album.remoteStatus == .available else { return }
         let albumSongsResponse = try await self.ampacheXmlServerApi.requestAlbumSongs(id: album.id)
         try await self.storage.async.perform { asyncCompanion in
-            let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+            let albumAsync = Album(managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO)
             let oldSongs = Set(albumAsync.songs)
             let parserDelegate = SongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: albumSongsResponse, delegate: parserDelegate)
@@ -205,9 +208,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         guard isSyncAllowed else { return }
         let isSupported = try await ampacheXmlServerApi.requestServerPodcastSupport()
         guard isSupported else { return }
+        let podcastObjectId = podcast.managedObject.objectID
         let response = try await self.ampacheXmlServerApi.requestPodcastEpisodes(id: podcast.id)
         try await self.storage.async.perform { asyncCompanion in
-            let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+            let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcastObjectId) as! PodcastMO)
             let oldEpisodes = Set(podcastAsync.episodes)
             
             let parserDelegate = PodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library)
@@ -233,10 +237,11 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         let podcasts = self.storage.main.library.getPodcasts().filter{ $0.remoteStatus == .available }
         try await withThrowingTaskGroup(of: Void.self) { taskGroup in
             podcasts.forEach { podcast in
+                let podcastObjectId = podcast.managedObject.objectID
                 taskGroup.addTask { @MainActor @Sendable in
                     let response = try await self.ampacheXmlServerApi.requestPodcastEpisodes(id: podcast.id, limit: 5)
                     try await self.storage.async.perform { asyncCompanion in
-                        let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+                        let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcastObjectId) as! PodcastMO)
                         let parserDelegate = PodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library)
                         try self.parse(response: response, delegate: parserDelegate)
                         parserDelegate.performPostParseOperations()
@@ -259,11 +264,12 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     @MainActor func syncIndexes(musicFolder: MusicFolder) async throws {
         guard isSyncAllowed else { return }
         let response = try await ampacheXmlServerApi.requestArtistWithinCatalog(id: musicFolder.id)
+        let musicFolderObjectId = musicFolder.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
             let parserDelegate = ArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             
-            let musicFolderAsync = MusicFolder(managedObject: asyncCompanion.context.object(with: musicFolder.managedObject.objectID) as! MusicFolderMO)
+            let musicFolderAsync = MusicFolder(managedObject: asyncCompanion.context.object(with: musicFolderObjectId) as! MusicFolderMO)
             let directoriesBeforeFetch = Set(musicFolderAsync.directories)
             var directoriesAfterFetch: Set<Directory> = Set()
             for artist in parserDelegate.artistsParsed {
@@ -300,14 +306,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     
     @MainActor private func sync(directory: Directory, thatIsAlbumId albumId: String) async throws {
         guard let album = storage.main.library.getAlbum(id: albumId, isDetailFaultResolution: true) else { return }
-        let songsBeforeFetch = Set(directory.songs)
+        let songsObjectIdsBeforeFetch = Set(directory.songs).compactMap { $0.managedObject.objectID }
+        let directoryObjectId = directory.managedObject.objectID
+        let albumObjectId = album.managedObject.objectID
         
         try await self.sync(album: album)
         try await self.storage.async.perform { asyncCompanion in
-            let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
-            let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
-            let songsBeforeFetchAsync = Set(songsBeforeFetch.compactMap {
-                Song(managedObject: asyncCompanion.context.object(with: $0.managedObject.objectID) as! SongMO)
+            let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directoryObjectId) as! DirectoryMO)
+            let albumAsync = Album(managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO)
+            let songsBeforeFetchAsync = Set(songsObjectIdsBeforeFetch.compactMap {
+                Song(managedObject: asyncCompanion.context.object(with: $0) as! SongMO)
             })
             
             directoryAsync.songs.forEach { directoryAsync.managedObject.removeFromSongs($0.managedObject) }
@@ -324,14 +332,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     
     @MainActor private func sync(directory: Directory, thatIsArtistId artistId: String) async throws {
         guard let artist = storage.main.library.getArtist(id: artistId) else { return }
-        let directoriesBeforeFetch = Set(directory.subdirectories)
+        let directoriesObjectIdsBeforeFetch = Set(directory.subdirectories).compactMap { $0.managedObject.objectID }
+        let directoryObjectId = directory.managedObject.objectID
+        let artistObjectId = artist.managedObject.objectID
         
         try await self.sync(artist: artist)
         try await self.storage.async.perform { asyncCompanion in
-            let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
-            let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
-            let directoriesBeforeFetchAsync = Set(directoriesBeforeFetch.compactMap {
-                Directory(managedObject: asyncCompanion.context.object(with: $0.managedObject.objectID) as! DirectoryMO)
+            let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directoryObjectId) as! DirectoryMO)
+            let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artistObjectId) as! ArtistMO)
+            let directoriesBeforeFetchAsync = Set(directoriesObjectIdsBeforeFetch.compactMap {
+                Directory(managedObject: asyncCompanion.context.object(with: $0) as! DirectoryMO)
             })
             
             var directoriesAfterFetch: Set<Directory> = Set()
@@ -447,10 +457,12 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     @MainActor func requestRandomSongs(playlist: Playlist, count: Int) async throws {
         guard isSyncAllowed else { return }
         let response = try await ampacheXmlServerApi.requestRandomSongs(count: count)
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
             let parserDelegate = SongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: nil)
             try self.parse(response: response, delegate: parserDelegate)
-            playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library).append(playables: parserDelegate.parsedSongs)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
+            playlistAsync.append(playables: parserDelegate.parsedSongs)
         }
     }
     
@@ -476,8 +488,9 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         os_log("Sync songs of playlist \"%s\"", log: self.log, type: .info, playlist.name)
         
         let response = try await self.ampacheXmlServerApi.requestPlaylistSongs(id: playlist.id)
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
             let parserDelegate = PlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             playlistAsync.isCached = parserDelegate.isCollectionCached
@@ -528,8 +541,9 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     
     @MainActor private func validatePlaylistId(playlist: Playlist) async throws {
         let playlistResponse = try await self.ampacheXmlServerApi.requestPlaylist(id: playlist.id)
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
             let parserDelegate = PlaylistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: nil, playlistToValidate: playlistAsync)
             try self.parse(response: playlistResponse, delegate: parserDelegate)
         }
@@ -538,7 +552,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
         let playlistCreateResponse = try await self.ampacheXmlServerApi.requestPlaylistCreate(name: playlist.name)
         try await self.storage.async.perform { asyncCompanion in
-            let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
             let parserDelegate = PlaylistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: nil, playlistToValidate: playlistAsync)
             try self.parse(response: playlistCreateResponse, delegate: parserDelegate)
         }
@@ -670,7 +684,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         try self.parse(response: response, delegate: parserDelegate)
     }
     
-    private func parse(response: APIDataResponse, delegate: AmpacheXmlParser, throwForNotFoundErrors: Bool = false, isThrowingErrorsAllowed: Bool = true) throws {
+    nonisolated private func parse(response: APIDataResponse, delegate: AmpacheXmlParser, throwForNotFoundErrors: Bool = false, isThrowingErrorsAllowed: Bool = true) throws {
         let parser = XMLParser(data: response.data)
         parser.delegate = delegate
         parser.parse()

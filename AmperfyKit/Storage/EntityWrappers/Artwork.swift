@@ -30,7 +30,7 @@ public enum ImageStatus: Int16 {
     case FetchError = 3
 }
 
-public struct ArtworkRemoteInfo {
+public struct ArtworkRemoteInfo: Sendable {
     public var id: String
     public var type: String
 }
@@ -124,4 +124,5 @@ extension Artwork: Downloadable {
     public var objectID: NSManagedObjectID { return managedObject.objectID }
     public var isCached: Bool { return false }
     public var displayString: String { return "Artwork id: \(id), type: \(type)" }
+    public var threadSafeInfo: DownloadInfo? { return DownloadInfo(objectId: objectID, type: .artwork) }
 }

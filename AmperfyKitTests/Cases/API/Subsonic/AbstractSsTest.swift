@@ -23,12 +23,6 @@ import XCTest
 import CoreData
 @testable import AmperfyKit
 
-class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
-    func getArtUrlString(forCoverArtId: String) -> String {
-        return "www-" + forCoverArtId
-    }
-}
-
 @MainActor class AbstractSsParserTest: XCTestCase {
     
     var context: NSManagedObjectContext!
@@ -36,7 +30,6 @@ class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
     var library: LibraryStorage!
     var xmlData: Data?
     var xmlErrorData: Data!
-    var subsonicUrlCreator: MOCK_SubsonicUrlCreator!
     var ssParserDelegate: SsXmlParser?
 
     override func setUp() async throws {
@@ -45,7 +38,6 @@ class MOCK_SubsonicUrlCreator: SubsonicUrlCreator {
         cdHelper.clearContext(context: context)
         library = LibraryStorage(context: context)
         xmlErrorData = getTestFileData(name: "error_example_1")
-        subsonicUrlCreator = MOCK_SubsonicUrlCreator()
     }
 
     override func tearDown() {

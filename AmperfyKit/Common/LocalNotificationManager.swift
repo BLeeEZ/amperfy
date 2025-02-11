@@ -36,7 +36,7 @@ public struct NotificationUserInfo {
 @MainActor public class LocalNotificationManager {
     
     private static let notificationTimeInterval = 0.1 // time interval in seconds
-    private static let log = OSLog(subsystem: "Amperfy", category: "LocalNotificationManager")
+    private let log = OSLog(subsystem: "Amperfy", category: "LocalNotificationManager")
     
     private let userStatistics: UserStatistics
     private let storage: PersistentStorage
@@ -46,81 +46,91 @@ public struct NotificationUserInfo {
         self.storage = storage
     }
     
-    public func executeIfAuthorizationHasNotBeenAskedYet(askForAuthorizationCallback: @escaping () -> Void) {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
+    nonisolated public func hasAuthorizationNotBeenAskedYet() async -> Bool {
+        return await Task {
+            let settings = await UNUserNotificationCenter.current().notificationSettings()
             switch settings.authorizationStatus {
             case .notDetermined:
-                askForAuthorizationCallback()
+                return true
             default:
                 break
             }
-        }
+            return false
+        }.value
     }
 
-    public func requestAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-            if let error = error {
-                os_log("Authorization Error: %s", log: Self.log, type: .error, error.localizedDescription)
+    nonisolated public func requestAuthorization() {
+        Task {
+            do {
+                let _ = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+            } catch {
+                os_log("Authorization Error: %s", log: self.log, type: .error, error.localizedDescription)
             }
         }
     }
 
-    /// Must be called from main thread
     public func notify(podcastEpisode: PodcastEpisode) {
         userStatistics.localNotificationCreated()
-        let content = UNMutableNotificationContent()
-        content.title = podcastEpisode.creatorName
-        content.body = podcastEpisode.title
-        content.sound = .default
-        let identifier = "podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
-        do {
-            let fileIdentifier = identifier + ".png"
-            let artworkUrl = createLocalUrl(forImage: podcastEpisode.image(theme: storage.settings.themePreference, setting: storage.settings.artworkDisplayPreference), fileIdentifier: fileIdentifier)
-            let attachment = try UNNotificationAttachment(identifier: fileIdentifier, url: artworkUrl, options: nil)
-            content.attachments = [attachment]
-        } catch {
-            os_log("Attachment Error: %s", log: Self.log, type: .error, error.localizedDescription)
+        Task {
+            let content = UNMutableNotificationContent()
+            content.title = podcastEpisode.creatorName
+            content.body = podcastEpisode.title
+            content.sound = .default
+            let identifier = "podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
+            do {
+                let fileIdentifier = identifier + ".png"
+                let artworkUrl = createLocalUrl(forImage: podcastEpisode.image(theme: storage.settings.themePreference, setting: storage.settings.artworkDisplayPreference), fileIdentifier: fileIdentifier)
+                let attachment = try UNNotificationAttachment(identifier: fileIdentifier, url: artworkUrl, options: nil)
+                content.attachments = [attachment]
+            } catch {
+                os_log("Attachment Error: %s", log: self.log, type: .error, error.localizedDescription)
+            }
+            content.userInfo = [
+                NotificationUserInfo.type: NotificationContentType.podcastEpisode.rawValue,
+                NotificationUserInfo.id: podcastEpisode.id
+            ]
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Self.notificationTimeInterval, repeats: false)
+            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+            await self.notify(request: request)
         }
-        content.userInfo = [
-            NotificationUserInfo.type: NotificationContentType.podcastEpisode.rawValue,
-            NotificationUserInfo.id: podcastEpisode.id
-        ]
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Self.notificationTimeInterval, repeats: false)
-        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        Self.notify(request: request)
     }
     
-    /// Must be called from main thread
-    public static func notifyDebug(title: String, body: String) {
+    public func notifyDebug(title: String, body: String) {
+        Task {
+            await self.notifyDebugAndWait(title: title, body: body)
+        }
+    }
+    
+    public func notifyDebugAndWait(title: String, body: String) async {
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: Self.notificationTimeInterval, repeats: false)
         let request = UNNotificationRequest(identifier: String.generateRandomString(ofLength: 15), content: content, trigger: trigger)
-        Self.notify(request: request)
+        await self.notify(request: request)
     }
-
-    public func listPendingNotifications() {
-        UNUserNotificationCenter.current().getPendingNotificationRequests { notifications in
+    
+    nonisolated public func listPendingNotifications() {
+        Task {
+            let notifications = await UNUserNotificationCenter.current().pendingNotificationRequests()
             for notification in notifications {
                 print(notification)
             }
         }
     }
     
-    private static func notify(request: UNNotificationRequest) {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            switch settings.authorizationStatus {
-            case .authorized, .provisional:
-                UNUserNotificationCenter.current().add(request) { error in
-                    if let error = error {
-                        os_log("Request Error: %s", log: self.log, type: .error, error.localizedDescription)
-                    }
-                }
-            default:
-                break
+    nonisolated private func notify(request: UNNotificationRequest) async {
+        let settings = await UNUserNotificationCenter.current().notificationSettings()
+        switch settings.authorizationStatus {
+        case .authorized, .provisional:
+            do {
+                try await UNUserNotificationCenter.current().add(request)
+            } catch {
+                os_log("Request Error: %s", log: self.log, type: .error, error.localizedDescription)
             }
+        default:
+            break
         }
     }
     

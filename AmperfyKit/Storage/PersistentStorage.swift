@@ -238,29 +238,46 @@ public class CoreDataCompanion {
     }
 }
 
-public class AsyncCoreDataAccessWrapper {
+public actor AsyncCoreDataAccessWrapper {
     let persistentContainer: NSPersistentContainer
     
     init(persistentContainer: NSPersistentContainer) {
         self.persistentContainer = persistentContainer
     }
     
-    @MainActor public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) throws -> Void) async throws {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.persistentContainer.performBackgroundTask() { (context) in
-                context.retainsRegisteredObjects = true
-                let library = LibraryStorage(context: context)
-                let asyncCompanion = CoreDataCompanion(context: context)
-                do {
-                    try body(asyncCompanion)
-                    library.saveContext()
-                    continuation.resume()
-                } catch {
-                    library.saveContext()
-                    continuation.resume(throwing: error)
-                }
+    public func perform(body: @escaping @Sendable (_ asyncCompanion: CoreDataCompanion) throws -> Void) async throws {
+        let context = persistentContainer.newBackgroundContext()
+        
+        await context.perform {
+            context.retainsRegisteredObjects = true
+            let library = LibraryStorage(context: context)
+            let asyncCompanion = CoreDataCompanion(context: context)
+            do {
+                try body(asyncCompanion)
+                library.saveContext()
+            } catch {
+                library.saveContext()
             }
         }
+    }
+
+    public func performAndGet<T>(body: @escaping @Sendable (_ asyncCompanion: CoreDataCompanion) throws -> T) async throws -> T where T: Sendable {
+        let context = persistentContainer.newBackgroundContext()
+        
+        let syncRequestedValue = try await context.perform {
+            context.retainsRegisteredObjects = true
+            let library = LibraryStorage(context: context)
+            let asyncCompanion = CoreDataCompanion(context: context)
+            do {
+                let asyncRequestedValue = try body(asyncCompanion)
+                library.saveContext()
+                return asyncRequestedValue
+            } catch {
+                library.saveContext()
+                throw error
+            }
+        }
+        return syncRequestedValue
     }
 }
 
@@ -326,7 +343,7 @@ public class PersistentStorage {
         self.coreDataManager = coreDataManager
     }
     
-    public class Settings {
+    final public class Settings: Sendable {
         public var artworkDownloadSetting: ArtworkDownloadSetting {
             get {
                 let artworkDownloadSettingRaw = UserDefaults.standard.object(forKey: UserDefaultsKey.ArtworkDownloadSetting.rawValue) as? Int ?? ArtworkDownloadSetting.defaultValue.rawValue
@@ -671,27 +688,27 @@ public class PersistentStorage {
             UserDefaults.standard.set(newValue.rawValue, forKey: UserDefaultsKey.LibrarySyncVersion.rawValue)
         }
     }
-    
+
     @MainActor public lazy var main: CoreDataCompanion = {
         return CoreDataCompanion(context: coreDataManager.context)
     }()
     
-    @MainActor public lazy var async: AsyncCoreDataAccessWrapper = {
+    public var async: AsyncCoreDataAccessWrapper {
         return AsyncCoreDataAccessWrapper(persistentContainer: coreDataManager.persistentContainer)
-    }()
+    }
 
 }
 
 // MARK: - Core Data stack
 
-@MainActor protocol CoreDataManagable {
+protocol CoreDataManagable {
     var persistentContainer: NSPersistentContainer { get }
-    var context: NSManagedObjectContext { get }
+    @MainActor var context: NSManagedObjectContext { get }
 }
 
-@MainActor public class CoreDataPersistentManager: CoreDataManagable {
+public class CoreDataPersistentManager: CoreDataManagable {
 
-    public static let managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
+    nonisolated(unsafe) public static let managedObjectModel: NSManagedObjectModel = NSManagedObjectModel.mergedModel(from: [Bundle.main])!
 
     lazy var persistentContainer: NSPersistentContainer = {
         /*

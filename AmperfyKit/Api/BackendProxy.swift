@@ -22,7 +22,7 @@
 import Foundation
 import os.log
 
-public enum BackenApiType: Int {
+public enum BackenApiType: Int, Sendable {
     case notDetected = 0
     case ampache = 1
     case subsonic = 2
@@ -182,26 +182,25 @@ public class BackendProxy {
             return subsonicLegacyApi
         }
     }
- 
-    private lazy var ampacheApi: BackendApi = {
-        return AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, persistentStorage: persistentStorage), networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, eventLogger: eventLogger)
-    }()
-    private lazy var subsonicApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, persistentStorage: persistentStorage), networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, eventLogger: eventLogger)
-        api.authType = .autoDetect
-        return api
-    }()
-    private lazy var subsonicLegacyApi: BackendApi = {
-        let api = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, persistentStorage: persistentStorage), networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, eventLogger: eventLogger)
-        api.authType = .legacy
-        return api
-    }()
+    
+    
+    private var ampacheApi: BackendApi!
+    private var subsonicApi: SubsonicApi!
+    private var subsonicLegacyApi: SubsonicApi!
     
     init(networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
         self.networkMonitor = networkMonitor
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
         self.persistentStorage = persistentStorage
+    }
+    
+    @MainActor public func initialize() {
+        ampacheApi = AmpacheApi(ampacheXmlServerApi: AmpacheXmlServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, settings: self.persistentStorage.settings), networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, eventLogger: eventLogger)
+        subsonicApi = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, settings: persistentStorage.settings), networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, eventLogger: eventLogger)
+        subsonicApi.setAuthType(newAuthType: .autoDetect)
+        subsonicLegacyApi = SubsonicApi(subsonicServerApi: SubsonicServerApi(performanceMonitor: self.performanceMonitor, eventLogger: eventLogger, settings: persistentStorage.settings), networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, eventLogger: eventLogger)
+        subsonicLegacyApi.setAuthType(newAuthType: .legacy)
     }
 
     @MainActor public func login(apiType: BackenApiType, credentials: LoginCredentials) async throws -> BackenApiType {
@@ -266,19 +265,19 @@ public class BackendProxy {
     
 extension BackendProxy: BackendApi {
   
-    public var clientApiVersion: String {
-        return activeApi.clientApiVersion
+    @MainActor public var clientApiVersion: String {
+        get { return activeApi.clientApiVersion }
     }
     
-    public var serverApiVersion: String {
-        return activeApi.serverApiVersion
+    @MainActor public var serverApiVersion: String {
+        get { return activeApi.serverApiVersion }
     }
     
-    public var isStreamingTranscodingActive: Bool {
-        return activeApi.isStreamingTranscodingActive
+    @MainActor public var isStreamingTranscodingActive: Bool {
+        get { return activeApi.isStreamingTranscodingActive }
     }
     
-    public func provideCredentials(credentials: LoginCredentials) {
+    @MainActor public func provideCredentials(credentials: LoginCredentials) {
         activeApi.provideCredentials(credentials: credentials)
     }
 
@@ -298,23 +297,23 @@ extension BackendProxy: BackendApi {
         return try await activeApi.generateUrl(forArtwork: artwork)
     }
     
-    public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+    @MainActor public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         return activeApi.checkForErrorResponse(response: response)
     }
     
-    public func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+    @MainActor public func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
         return activeApi.createLibrarySyncer(storage: storage)
     }
 
-    public func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+    @MainActor public func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
         return activeApi.createArtworkArtworkDownloadDelegate()
     }
     
-    public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+    nonisolated public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
         return activeApi.extractArtworkInfoFromURL(urlString: urlString)
     }
     
-    public func cleanse(url: URL) -> CleansedURL {
+    nonisolated public func cleanse(url: URL?) -> CleansedURL {
         return activeApi.cleanse(url: url)
     }
     

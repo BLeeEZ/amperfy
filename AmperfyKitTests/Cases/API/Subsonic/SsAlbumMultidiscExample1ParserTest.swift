@@ -29,7 +29,7 @@ class SsAlbumMultidiscExample1ParserTest: AbstractSsParserTest {
     override func setUp() async throws {
         try await super.setUp()
         xmlData = getTestFileData(name: "album_multidisc_example_1")
-        ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
         createTestAlbum()
     }
 

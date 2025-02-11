@@ -23,8 +23,12 @@ import Foundation
 import XCTest
 import AmperfyKit
 
-public class MOCK_PerformanceMonitor: ThreadPerformanceMonitor {
-    public var shouldSlowDownExecution = false
+final public class MOCK_PerformanceMonitor: ThreadPerformanceMonitor {
+    nonisolated public var shouldSlowDownExecution: Bool { return false }
+    nonisolated public var isInForeground: Bool {
+        get { return true }
+        set {}
+    }
 }
 
 class Helper {

@@ -31,9 +31,7 @@ import os.log
     let log = OSLog(subsystem: "Amperfy", category: "LibrarySyncer")
     let fileManager = CacheFileManager.shared
     
-    var isSyncAllowed: Bool {
-        return networkMonitor.isConnectedToNetwork
-    }
+    var isSyncAllowed: Bool { return networkMonitor.isConnectedToNetwork }
     
     init(networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, storage: PersistentStorage, eventLogger: EventLogger) {
         self.networkMonitor = networkMonitor
@@ -42,21 +40,20 @@ import os.log
         self.eventLogger = eventLogger
     }
     
-    @MainActor func createCachedItemRepresentationsInCoreData(statusNotifyier: SyncCallbacks?) async throws {
-        let cachedArtworks = fileManager.getCachedArtworks()
-        let cachedEmbeddedArtworks = fileManager.getCachedEmbeddedArtworks()
-        let cachedLyrics = fileManager.getCachedLyrics()
-        let cachedSongs = fileManager.getCachedSongs()
-        let cachedEpisodes = fileManager.getCachedEpisodes()
-
-        let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedLyrics.count + cachedSongs.count + cachedEpisodes.count
-        guard totalCount > 0 else {
-            // nothing to do
-            return
-        }
-        statusNotifyier?.notifySyncStarted(ofType: .cache, totalCount: totalCount)
-        
+    func createCachedItemRepresentationsInCoreData(statusNotifyier: SyncCallbacks?) async throws {
         return try await self.storage.async.perform { asyncCompanion in
+            let cachedArtworks = self.fileManager.getCachedArtworks()
+            let cachedEmbeddedArtworks = self.fileManager.getCachedEmbeddedArtworks()
+            let cachedLyrics = self.fileManager.getCachedLyrics()
+            let cachedSongs = self.fileManager.getCachedSongs()
+            let cachedEpisodes = self.fileManager.getCachedEpisodes()
+
+            let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedLyrics.count + cachedSongs.count + cachedEpisodes.count
+            guard totalCount > 0 else {
+                // nothing to do
+                return
+            }
+            statusNotifyier?.notifySyncStarted(ofType: .cache, totalCount: totalCount)
             for cachedArtwork in cachedArtworks {
                 let artwork = asyncCompanion.library.getArtwork(remoteInfo: ArtworkRemoteInfo(id: cachedArtwork.id, type: cachedArtwork.type)) ?? asyncCompanion.library.createArtwork()
                 artwork.id = cachedArtwork.id

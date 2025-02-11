@@ -35,23 +35,19 @@ import os.log
     
     nonisolated public static let newestElementsFetchCount = 50
     public static let shared = AmperKit()
-    
-    nonisolated(unsafe) private var _isInForeground: Bool = true
-    private let _isInForegroundLock = NSLock()
-    nonisolated public var isInForeground: Bool {
-        get {
-            _isInForegroundLock.withLock { _isInForeground }
-        }
-        set {
-            _isInForegroundLock.withLock { _isInForeground = newValue }
-        }
-    }
 
     public lazy var log = {
         return OSLog(subsystem: "Amperfy", category: "AppDelegate")
     }()
-    public lazy var networkMonitor: NetworkMonitorFacade = {
-        return NetworkMonitor()
+
+    @MainActor public var networkMonitor: NetworkMonitorFacade {
+        get {
+            return NetworkMonitor.shared
+        }
+    }
+    
+    public lazy var threadPerformanceMonitor: ThreadPerformanceMonitor = {
+        return ThreadPerformanceObserver.shared
     }()
     public lazy var coreDataManager = {
         return CoreDataPersistentManager()
@@ -69,13 +65,18 @@ import os.log
         return EventLogger(storage: storage)
     }()
     @MainActor public lazy var backendApi: BackendProxy = {
-        return BackendProxy(networkMonitor: networkMonitor, performanceMonitor: self, eventLogger: eventLogger, persistentStorage: storage)
+        let api = BackendProxy(networkMonitor: NetworkMonitor.shared, performanceMonitor: threadPerformanceMonitor, eventLogger: eventLogger, persistentStorage: storage)
+        api.initialize()
+        return api
     }()
     public lazy var notificationHandler: EventNotificationHandler = {
         return EventNotificationHandler()
     }()
     public private(set) var scrobbleSyncer: ScrobbleSyncer?
     @MainActor public lazy var player: PlayerFacade = {
+        return createPlayer()
+    }()
+    @MainActor private func createPlayer() -> PlayerFacade {
         let audioSessionHandler = AudioSessionHandler()
         let backendAudioPlayer = BackendAudioPlayer(
             createAVPlayerCB: { return AVQueuePlayer() },
@@ -86,10 +87,12 @@ import os.log
             playableDownloader: playableDownloadManager,
             cacheProxy: storage.main.library,
             userStatistics: userStatistics)
-        networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
-            backendAudioPlayer.streamingMaxBitrates = StreamingMaxBitrates(
-                wifi: self.storage.settings.streamingMaxBitrateWifiPreference,
-                cellular: self.storage.settings.streamingMaxBitrateCellularPreference)
+        networkMonitor.setConnectionTypeChangedCB { isWiFiConnected in
+            Task { @MainActor in
+                backendAudioPlayer.setStreamingMaxBitrates(to: StreamingMaxBitrates(
+                    wifi: self.storage.settings.streamingMaxBitrateWifiPreference,
+                    cellular: self.storage.settings.streamingMaxBitrateCellularPreference))
+            }
         }
         let playerData = storage.main.library.getPlayerData()
         let queueHandler = PlayQueueHandler(playerData: playerData)
@@ -117,20 +120,27 @@ import os.log
         curPlayer.addNotifier(notifier: notificationAdapter)
 
         return facadeImpl
-    }()
+    }
+    
     @MainActor public lazy var playableDownloadManager: DownloadManageable = {
+        return createPlayableDownloadManager()
+    }()
+    @MainActor private func createPlayableDownloadManager() -> DownloadManageable {
         let artworkExtractor = EmbeddedArtworkExtractor()
         let dlDelegate = PlayableDownloadDelegate(backendApi: backendApi, artworkExtractor: artworkExtractor, networkMonitor: networkMonitor)
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         let dlManager = DownloadManager(name: "PlayableDownloader", networkMonitor: networkMonitor, storage: storage, requestManager: requestManager, downloadDelegate: dlDelegate, notificationHandler: notificationHandler, eventLogger: eventLogger, urlCleanser: backendApi)
         
         let configuration = URLSessionConfiguration.background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
-        var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
+        let urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
         dlManager.urlSession = urlSession
         
         return dlManager
-    }()
+    }
     @MainActor public lazy var artworkDownloadManager: DownloadManageable = {
+        return createArtworkDownloadManager()
+    }()
+    @MainActor private func createArtworkDownloadManager() -> DownloadManageable {
         let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
         let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
         requestManager.clearAllDownloadsIfAllHaveFinished()
@@ -155,11 +165,11 @@ import os.log
         }
         
         let configuration = URLSessionConfiguration.default
-        var urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
+        let urlSession = URLSession(configuration: configuration, delegate: dlManager, delegateQueue: nil)
         dlManager.urlSession = urlSession
         
         return dlManager
-    }()
+    }
     @MainActor public lazy var backgroundLibrarySyncer = {
         return BackgroundLibrarySyncer(storage: storage, networkMonitor: networkMonitor, librarySyncer: librarySyncer, playableDownloadManager: playableDownloadManager, eventLogger: eventLogger)
     }()
@@ -182,10 +192,4 @@ import os.log
         player.reinit(playerStatus: playerData, queueHandler: queueHandler)
     }
     
-}
-
-extension AmperKit: ThreadPerformanceMonitor {
-    nonisolated public var shouldSlowDownExecution: Bool {
-        return !isInForeground
-    }
 }

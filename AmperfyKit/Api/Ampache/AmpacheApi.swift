@@ -21,7 +21,7 @@
 
 import Foundation
 
-class AmpacheApi: BackendApi {
+@MainActor class AmpacheApi: BackendApi {
 
     private let ampacheXmlServerApi: AmpacheXmlServerApi
     private let networkMonitor: NetworkMonitorFacade
@@ -40,11 +40,11 @@ class AmpacheApi: BackendApi {
     }
     
     public var serverApiVersion: String {
-        return ampacheXmlServerApi.serverApiVersion ?? "-"
+        get { return ampacheXmlServerApi.serverApiVersion ?? "-" }
     }
     
     public var isStreamingTranscodingActive: Bool {
-        return ampacheXmlServerApi.isStreamingTranscodingActive
+        get { return ampacheXmlServerApi.isStreamingTranscodingActive }
     }
 
     func provideCredentials(credentials: LoginCredentials) {
@@ -56,26 +56,26 @@ class AmpacheApi: BackendApi {
     }
 
     @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
-        return try await ampacheXmlServerApi.generateUrl(forDownloadingPlayable: playable)
+        return try await ampacheXmlServerApi.generateUrlForDownloadingPlayable(isSong: playable.isSong, id: playable.id)
     }
 
     @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
-        return try await ampacheXmlServerApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
+        return try await ampacheXmlServerApi.generateUrlForStreamingPlayable(isSong: playable.isSong, id: playable.id, maxBitrate: maxBitrate)
     }
     
     @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
-        return try await ampacheXmlServerApi.generateUrl(forArtwork: artwork)
+        return try await ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artwork.url)
     }
     
     func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
         return ampacheXmlServerApi.checkForErrorResponse(response: response)
     }
 
-    func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+    @MainActor func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
         return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, networkMonitor: networkMonitor, performanceMonitor: self.performanceMonitor, storage: storage, eventLogger: eventLogger)
     }
 
-    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+    @MainActor func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
         return AmpacheArtworkDownloadDelegate(ampacheXmlServerApi: ampacheXmlServerApi, networkMonitor: networkMonitor)
     }
     
@@ -83,7 +83,7 @@ class AmpacheApi: BackendApi {
         AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString)
     }
     
-    func cleanse(url: URL) -> CleansedURL {
+    func cleanse(url: URL?) -> CleansedURL {
         return ampacheXmlServerApi.cleanse(url: url)
     }
 

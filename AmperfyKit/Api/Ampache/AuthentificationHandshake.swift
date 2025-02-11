@@ -21,7 +21,7 @@
 
 import Foundation
 
-public class LibraryChangeDates: Comparable {
+public struct LibraryChangeDates: Comparable, Sendable {
 
     var dateOfLastUpdate = Date()
     var dateOfLastAdd = Date()
@@ -41,7 +41,7 @@ public class LibraryChangeDates: Comparable {
     
 }
 
-class AuthentificationHandshake {
+struct AuthentificationHandshake: Sendable {
     
     var token: String = ""
     var sessionExpire = Date()

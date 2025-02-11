@@ -61,6 +61,7 @@ class SplitVC: UISplitViewController {
         // set min and max sidebar width
         self.minimumPrimaryColumnWidth = Self.sidebarWidth
         self.maximumPrimaryColumnWidth = Self.sidebarWidth
+#else
         displayInfoPopups()
 #endif
     }
@@ -223,20 +224,20 @@ class SplitVC: UISplitViewController {
     }
     
     private func displayNotificationAuthorization() {
-        self.appDelegate.localNotificationManager.executeIfAuthorizationHasNotBeenAskedYet {
-            DispatchQueue.main.async {
-                let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
-                popupVC.setContent(
-                    topic: "Notifications",
-                    detailMessage: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
-                    customIcon: .bell,
-                    customAnimation: .swing,
-                    onClosePressed: { _ in
-                        self.appDelegate.localNotificationManager.requestAuthorization()
-                    }
-                )
-                self.appDelegate.display(popup: popupVC)
-            }
+        Task { @MainActor in
+            let hasAuthorizationNotBeenAskedYet = await self.appDelegate.localNotificationManager.hasAuthorizationNotBeenAskedYet()
+            guard hasAuthorizationNotBeenAskedYet else { return }
+            let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+            popupVC.setContent(
+                topic: "Notifications",
+                detailMessage: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",
+                customIcon: .bell,
+                customAnimation: .swing,
+                onClosePressed: { _ in
+                    self.appDelegate.localNotificationManager.requestAuthorization()
+                }
+            )
+            self.appDelegate.display(popup: popupVC)
         }
     }
     

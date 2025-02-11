@@ -23,7 +23,7 @@ import Foundation
 import CoreData
 import os.log
 
-@MainActor class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
+class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     private let subsonicServerApi: SubsonicServerApi
    
@@ -47,7 +47,7 @@ import os.log
         statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
         let artistsResponse = try await self.subsonicServerApi.requestArtists()
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+            let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
             try self.parse(response: artistsResponse, delegate: parserDelegate, isThrowingErrorsAllowed: false)
         }
         
@@ -63,7 +63,7 @@ import os.log
                 taskGroup.addTask { @MainActor @Sendable in
                     let albumsResponse = try await self.subsonicServerApi.requestAlbums(offset: index*Self.maxItemCountToPollAtOnce, count: Self.maxItemCountToPollAtOnce)
                     try await self.storage.async.perform { asyncCompanion in
-                        let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+                        let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
                         try self.parse(response: albumsResponse, delegate: parserDelegate, isThrowingErrorsAllowed: false)
                     }
                     statusNotifyier?.notifyParsedObject(ofType: .album)
@@ -110,7 +110,7 @@ import os.log
         statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
         let podcastsResponse = try await self.subsonicServerApi.requestPodcasts()
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi, parseNotifier: statusNotifyier)
+            let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, parseNotifier: statusNotifyier)
             try self.parse(response: podcastsResponse, delegate: parserDelegate, isThrowingErrorsAllowed: false)
             parserDelegate.performPostParseOperations()
         }
@@ -131,13 +131,14 @@ import os.log
     @MainActor func sync(artist: Artist) async throws {
         guard isSyncAllowed, !artist.id.isEmpty else { return }
         let response = try await subsonicServerApi.requestArtist(id: artist.id)
+        let artistObjectId = artist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             do {
                 try self.parse(response: response, delegate: parserDelegate)
             } catch {
                 if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
-                    let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artist.managedObject.objectID) as! ArtistMO)
+                    let artistAsync = Artist(managedObject: asyncCompanion.context.object(with: artistObjectId) as! ArtistMO)
                     let reportError = ResponseError(type: .resource, statusCode: responseError.statusCode, message: "Artist \"\(artistAsync.name)\" is no longer available on the server.", cleansedURL: response.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: response.data)
                     artistAsync.remoteStatus = .deleted
                     throw reportError
@@ -160,13 +161,14 @@ import os.log
     @MainActor func sync(album: Album) async throws {
         guard isSyncAllowed else { return }
         let albumsResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+        let albumObjectId = album.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             do {
                 try self.parse(response: albumsResponse, delegate: parserDelegate)
             } catch {
                 if let responseError = error as? ResponseError, let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
-                    let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+                    let albumAsync = Album(managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO)
                     let reportError = ResponseError(type: .resource, statusCode: responseError.statusCode, message: "Album \"\(albumAsync.name)\" is no longer available on the server.", cleansedURL: albumsResponse.url?.asCleansedURL(cleanser: self.subsonicServerApi), data: albumsResponse.data)
                     albumAsync.markAsRemoteDeleted()
                     throw reportError
@@ -179,9 +181,9 @@ import os.log
         guard album.remoteStatus == .available else { return }
         let albumResponse = try await self.subsonicServerApi.requestAlbum(id: album.id)
         try await self.storage.async.perform { asyncCompanion in
-            let albumAsync = Album(managedObject: asyncCompanion.context.object(with: album.managedObject.objectID) as! AlbumMO)
+            let albumAsync = Album(managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO)
             let oldSongs = Set(albumAsync.songs)
-            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: albumResponse, delegate: parserDelegate)
             let removedSongs = oldSongs.subtracting(parserDelegate.parsedSongs)
             removedSongs.lazy.compactMap{$0.asSong}.forEach {
@@ -198,7 +200,7 @@ import os.log
         guard isSyncAllowed else { return }
         let response = try await subsonicServerApi.requestSongInfo(id: song.id)
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
         }
         try await self.syncLyrics(song: song)
@@ -209,8 +211,9 @@ import os.log
             let isSupported = await self.subsonicServerApi.isOpenSubsonicExtensionSupported(extension: .songLyrics)
             guard isSupported else { return }
             let response = try await self.subsonicServerApi.requestLyricsBySongId(id: song.id)
+            let songObjectId = song.managedObject.objectID
             try await self.storage.async.perform { asyncCompanion in
-                guard let songAsyncMO = asyncCompanion.context.object(with: song.objectID) as? SongMO else { return }
+                guard let songAsyncMO = asyncCompanion.context.object(with: songObjectId) as? SongMO else { return }
                 let songAsync = Song(managedObject: songAsyncMO)
                 
                 guard let lyricsRelFilePath = self.fileManager.createRelPath(forLyricsOf: songAsync),
@@ -242,11 +245,12 @@ import os.log
         let isSupported = try await subsonicServerApi.requestServerPodcastSupport()
         guard isSupported else { return }
         let response = try await self.subsonicServerApi.requestPodcastEpisodes(id: podcast.id)
+        let podcastObjectId = podcast.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcast.managedObject.objectID) as! PodcastMO)
+            let podcastAsync = Podcast(managedObject: asyncCompanion.context.object(with: podcastObjectId) as! PodcastMO)
             let oldEpisodes = Set(podcastAsync.episodes)
             
-            let parserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: podcastAsync, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             parserDelegate.performPostParseOperations()
             
@@ -267,7 +271,7 @@ import os.log
         try await self.syncDownPodcastsWithoutEpisodes()
         let response = try await self.subsonicServerApi.requestNewestPodcasts()
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: nil, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsPodcastEpisodeParserDelegate(performanceMonitor: self.performanceMonitor, podcast: nil, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             parserDelegate.performPostParseOperations()
         }
@@ -278,7 +282,7 @@ import os.log
         os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
         let response = try await subsonicServerApi.requestNewestAlbums(offset: offset, count: count)
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             let oldNewestAlbums = asyncCompanion.library.getNewestAlbums(offset: offset, count: count)
             oldNewestAlbums.forEach { $0.markAsNotNewAnymore() }
@@ -293,7 +297,7 @@ import os.log
         os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
         let response = try await subsonicServerApi.requestRecentAlbums(offset: offset, count: count)
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             let oldRecentAlbums = asyncCompanion.library.getRecentAlbums(offset: offset, count: count)
             oldRecentAlbums.forEach { $0.markAsNotRecentAnymore() }
@@ -309,21 +313,21 @@ import os.log
         try await self.storage.async.perform { asyncCompanion in
             os_log("Sync favorite artists", log: self.log, type: .info)
             let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists())
-            let parserDelegateArtist = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegateArtist = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegateArtist)
             let notFavoriteArtistsAnymore = oldFavoriteArtists.subtracting(parserDelegateArtist.parsedArtists)
             notFavoriteArtistsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
 
             os_log("Sync favorite albums", log: self.log, type: .info)
             let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums())
-            let parserDelegateAlbum = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegateAlbum = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegateAlbum)
             let notFavoriteAlbumsAnymore = oldFavoriteAlbums.subtracting(parserDelegateAlbum.parsedAlbums)
             notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
         
             os_log("Sync favorite songs", log: self.log, type: .info)
             let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
-            let parserDelegateSong = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegateSong = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegateSong)
             let notFavoriteSongsAnymore = oldFavoriteSongs.subtracting(parserDelegateSong.parsedSongs)
             notFavoriteSongsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
@@ -359,9 +363,10 @@ import os.log
     @MainActor func syncIndexes(musicFolder: MusicFolder) async throws {
         guard isSyncAllowed else { return }
         let response = try await self.subsonicServerApi.requestIndexes(musicFolderId: musicFolder.id)
+        let musicFolderObjectId = musicFolder.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let musicFolderAsync = MusicFolder(managedObject: asyncCompanion.context.object(with: musicFolder.managedObject.objectID) as! MusicFolderMO)
-            let parserDelegate = SsDirectoryParserDelegate(performanceMonitor: self.performanceMonitor, musicFolder: musicFolderAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let musicFolderAsync = MusicFolder(managedObject: asyncCompanion.context.object(with: musicFolderObjectId) as! MusicFolderMO)
+            let parserDelegate = SsDirectoryParserDelegate(performanceMonitor: self.performanceMonitor, musicFolder: musicFolderAsync, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             musicFolderAsync.isCached = parserDelegate.isCollectionCached
         }
@@ -370,9 +375,10 @@ import os.log
     @MainActor func sync(directory: Directory) async throws {
         guard isSyncAllowed else { return }
         let response = try await self.subsonicServerApi.requestMusicDirectory(id: directory.id)
+        let directoryObjectId = directory.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directory.managedObject.objectID) as! DirectoryMO)
-            let parserDelegate = SsDirectoryParserDelegate(performanceMonitor: self.performanceMonitor, directory: directoryAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let directoryAsync = Directory(managedObject: asyncCompanion.context.object(with: directoryObjectId) as! DirectoryMO)
+            let parserDelegate = SsDirectoryParserDelegate(performanceMonitor: self.performanceMonitor, directory: directoryAsync, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             directoryAsync.isCached = parserDelegate.isCollectionCached
         }
@@ -381,10 +387,12 @@ import os.log
     @MainActor func requestRandomSongs(playlist: Playlist, count: Int) async throws {
         guard isSyncAllowed else { return }
         let response = try await self.subsonicServerApi.requestRandomSongs(count: count)
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
-            playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library).append(playables: parserDelegate.parsedSongs)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
+            playlistAsync.append(playables: parserDelegate.parsedSongs)
         }
     }
     
@@ -407,9 +415,10 @@ import os.log
         guard isSyncAllowed, playlist.id != "" else { return }
         os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
         let response = try await subsonicServerApi.requestPlaylistSongs(id: playlist.id)
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
-            let parserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
+            let parserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             playlistAsync.isCached = parserDelegate.isCollectionCached
         }
@@ -475,7 +484,7 @@ import os.log
         try await self.storage.async.perform { asyncCompanion in
             let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
             
-            let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsPodcastParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
             parserDelegate.performPostParseOperations()
             
@@ -561,7 +570,7 @@ import os.log
         os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
         let response = try await subsonicServerApi.requestSearchArtists(searchText: searchText)
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsArtistParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
         }
     }
@@ -571,7 +580,7 @@ import os.log
         os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
         let response = try await subsonicServerApi.requestSearchAlbums(searchText: searchText)
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsAlbumParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
         }
     }
@@ -581,7 +590,7 @@ import os.log
         os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
         let response = try await subsonicServerApi.requestSearchSongs(searchText: searchText)
         try await self.storage.async.perform { asyncCompanion in
-            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let parserDelegate = SsSongParserDelegate(performanceMonitor: self.performanceMonitor, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
         }
     }
@@ -605,9 +614,10 @@ import os.log
     @MainActor private func createPlaylistRemote(playlist: Playlist) async throws {
         os_log("Create playlist on server", log: log, type: .info)
         let response = try await subsonicServerApi.requestPlaylistCreate(name: playlist.name)
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
-            let parserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library, subsonicUrlCreator: self.subsonicServerApi)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
+            let parserDelegate = SsPlaylistSongsParserDelegate(performanceMonitor: self.performanceMonitor, playlist: playlistAsync, library: asyncCompanion.library)
             try self.parse(response: response, delegate: parserDelegate)
         }
         // Old api version -> need to match the created playlist via name
@@ -615,11 +625,12 @@ import os.log
             try await self.updatePlaylistIdViaItsName(playlist: playlist)
         }
     }
-
+    
     @MainActor private func updatePlaylistIdViaItsName(playlist: Playlist) async throws {
         try await syncDownPlaylistsWithoutSongs()
+        let playlistObjectId = playlist.managedObject.objectID
         try await self.storage.async.perform { asyncCompanion in
-            let playlistAsync = playlist.getManagedObject(in: asyncCompanion.context, library: asyncCompanion.library)
+            let playlistAsync = Playlist(library: asyncCompanion.library, managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO)
             let playlists = asyncCompanion.library.getPlaylists()
             let nameMatchingPlaylists = playlists.filter{ filterPlaylist in
                 return filterPlaylist.name == playlistAsync.name && filterPlaylist.id != ""
@@ -636,7 +647,7 @@ import os.log
         try self.parse(response: response, delegate: parserDelegate)
     }
     
-    private func parse(response: APIDataResponse, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
+    nonisolated private func parse(response: APIDataResponse, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
         let parser = XMLParser(data: response.data)
         parser.delegate = delegate
         parser.parse()
@@ -649,7 +660,7 @@ import os.log
         }
     }
     
-    private func parse(absFilePath: URL, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
+    nonisolated private func parse(absFilePath: URL, delegate: SsXmlParser, isThrowingErrorsAllowed: Bool = true) throws {
         guard let parser = XMLParser(contentsOf: absFilePath) else {
             throw ResponseError(type: .xml)
         }

@@ -75,12 +75,12 @@ class LoginVC: UIViewController {
             return
         }
 
-        let credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
+        var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
         Task { @MainActor in
             do {
-                let authenticatedApi = try await self.appDelegate.backendApi.login(apiType: selectedApiType, credentials: credentials)
-                self.appDelegate.backendApi.selectedApi = authenticatedApi
-                credentials.backendApi = authenticatedApi
+                let authenticatedApiType = try await self.appDelegate.backendApi.login(apiType: selectedApiType, credentials: credentials)
+                self.appDelegate.backendApi.selectedApi = authenticatedApiType
+                credentials.backendApi = authenticatedApiType
                 self.appDelegate.storage.loginCredentials = credentials
                 self.appDelegate.backendApi.provideCredentials(credentials: credentials)
                 self.performSegue(withIdentifier: "toSync", sender: self)

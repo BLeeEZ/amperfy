@@ -65,6 +65,9 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
             if playableManagedObject.embeddedArtwork != newValue?.managedObject { playableManagedObject.embeddedArtwork = newValue?.managedObject }
         }
     }
+    public var threadSafeInfo: DownloadInfo? {
+        return DownloadInfo(objectId: objectID, type: .playable)
+    }
     public var objectID: NSManagedObjectID {
         return playableManagedObject.objectID
     }

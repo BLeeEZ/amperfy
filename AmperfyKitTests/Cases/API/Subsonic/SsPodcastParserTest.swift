@@ -27,11 +27,11 @@ class SsPodcastParserTest: AbstractSsParserTest {
     override func setUp() async throws {
         try await super.setUp()
         xmlData = getTestFileData(name: "podcasts_example_1")
-        ssParserDelegate = SsPodcastParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsPodcastParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
     }
     
     override func recreateParserDelegate() {
-        ssParserDelegate = SsPodcastParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsPodcastParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
     }
 
     override func checkCorrectParsing() {
@@ -43,7 +43,7 @@ class SsPodcastParserTest: AbstractSsParserTest {
         XCTAssertEqual(podcast.id, "1")
         XCTAssertEqual(podcast.title, "Dr Karl and the < Naked Scientist")
         XCTAssertEqual(podcast.depiction, "Dr Chris Smith aka The < Naked Scientist with the latest news from the world of science and Dr Karl answers listeners' science questions.")
-        XCTAssertEqual(podcast.artwork?.url, "www-pod-1")
+        XCTAssertEqual(podcast.artwork?.url, "")
         XCTAssertEqual(podcast.artwork?.type, "")
         XCTAssertEqual(podcast.artwork?.id, "pod-1")
         XCTAssertFalse(podcast.isCached)
@@ -52,7 +52,7 @@ class SsPodcastParserTest: AbstractSsParserTest {
         XCTAssertEqual(podcast.id, "2")
         XCTAssertEqual(podcast.title, "NRK P1 - Herreavdelingen")
         XCTAssertEqual(podcast.depiction, "Et program der herrene Yan Friis og Finn Bjelke møtes og musikk nytes.")
-        XCTAssertEqual(podcast.artwork?.url, "www-pod-2")
+        XCTAssertEqual(podcast.artwork?.url, "")
         XCTAssertEqual(podcast.artwork?.type, "")
         XCTAssertEqual(podcast.artwork?.id, "pod-2")
         XCTAssertFalse(podcast.isCached)

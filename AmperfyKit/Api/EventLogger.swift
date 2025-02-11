@@ -130,10 +130,9 @@ public enum AmperfyLogStatusCode: Int {
                     logEntry.statusCode = statusCode
                     logEntry.message = logMessage
                     asynCompanion.saveContext()
-                    
-                    if displayPopup {
-                        self.displayAlert(topic: topic, shortMessage: popupMessage, detailMessage: detailMessage, logType: logType)
-                    }
+                }
+                if displayPopup {
+                    self.displayAlert(topic: topic, shortMessage: popupMessage, detailMessage: detailMessage, logType: logType)
                 }
             } catch {
                 // do nothing

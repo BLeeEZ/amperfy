@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import CoreData
 import os.log
 
 @MainActor public class ScrobbleSyncer {
@@ -64,7 +65,7 @@ import os.log
         activeDispatchGroup.wait()
     }
     
-    func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) {
+    func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) async {
         func nowPlayingToServerAsync(playedSong: Song, songPosition: NowPlayingSongPosition, finallyCB: ((_: Song, _: Bool) -> Void)? = nil) {
             var success = false
             Task { @MainActor in
@@ -129,15 +130,15 @@ import os.log
         }
     }
     
-     private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
-        var scobbleEntryMain: ScrobbleEntry?
-        try await self.storage.async.perform { asyncCompanion in
+    private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
+        let scobbleObjectId: NSManagedObjectID? = try? await self.storage.async.performAndGet { asyncCompanion in
             guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
-                return
+                return nil
             }
-            scobbleEntryMain = ScrobbleEntry(managedObject: try! self.storage.main.context.existingObject(with: scobbleEntry.managedObject.objectID) as! ScrobbleEntryMO)
+            return scobbleEntry.managedObject.objectID
         }
-        return scobbleEntryMain
+        guard let scobbleObjectId else { return nil }
+        return ScrobbleEntry(managedObject: try! self.storage.main.context.existingObject(with: scobbleObjectId) as! ScrobbleEntryMO)
     }
     
     private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {
@@ -151,8 +152,8 @@ import os.log
         storage.main.saveContext()
     }
     
-    private func startSongPlayed() {
-        syncSongStopped(clearCurPlaying: true)
+    private func startSongPlayed() async {
+        await syncSongStopped(clearCurPlaying: true)
         
         guard let curPlaying = musicPlayer.currentlyPlaying,
               let curPlayingSong = curPlaying.asSong
@@ -179,7 +180,7 @@ import os.log
         }
     }
     
-    private func syncSongStopped(clearCurPlaying: Bool) {
+    private func syncSongStopped(clearCurPlaying: Bool) async {
         func clearingCurPlaying() {
             self.songHasBeenListendEnough = false
             self.songToBeScrobbled = nil
@@ -187,7 +188,7 @@ import os.log
         
         if let oldSong = self.songToBeScrobbled,
            self.songHasBeenListendEnough {
-            self.scrobble(playedSong: oldSong, songPosition: .end)
+            await self.scrobble(playedSong: oldSong, songPosition: .end)
             clearingCurPlaying()
         } else if clearCurPlaying {
             clearingCurPlaying()
@@ -198,19 +199,20 @@ import os.log
 
 extension ScrobbleSyncer: MusicPlayable {
     public func didStartPlayingFromBeginning() {
-        startSongPlayed()
+        Task { await startSongPlayed() }
     }
     public func didStartPlaying() {
         guard let curPlaying = musicPlayer.currentlyPlaying,
               let curPlayingSong = curPlaying.asSong
         else { return }
-        scrobble(playedSong: curPlayingSong, songPosition: .start)
+        Task { await scrobble(playedSong: curPlayingSong, songPosition: .start) }
     }
     public func didPause() {
-        syncSongStopped(clearCurPlaying: false)
+        Task { await syncSongStopped(clearCurPlaying: false) }
+        
     }
     public func didStopPlaying() {
-        syncSongStopped(clearCurPlaying: true)
+        Task { await syncSongStopped(clearCurPlaying: true) }
     }
     public func didElapsedTimeChange() { }
     public func didPlaylistChange() { }

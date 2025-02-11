@@ -24,7 +24,7 @@ import AmperfyKit
 
 struct ArtworkSettingsView: View {
     
-    static let artworkNotCheckedThreshold = 10
+    nonisolated static let artworkNotCheckedThreshold = 10
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     let fileManager = CacheFileManager.shared
@@ -37,12 +37,11 @@ struct ArtworkSettingsView: View {
 
     func updateValues() {
         Task { @MainActor in do {
-            try await appDelegate.storage.async.perform { asyncCompanion in
+            (self.artworkNotCheckedCountText, self.cachedArtworksCountText) = try await appDelegate.storage.async.performAndGet { asyncCompanion in
                 let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
                 let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self.artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
-                self.artworkNotCheckedCountText = String(artworkNotCheckedDisplayCount)
                 let cachedArtworkCount = asyncCompanion.library.cachedArtworkCount
-                    self.cachedArtworksCountText = String(cachedArtworkCount)
+                return (String(artworkNotCheckedDisplayCount), String(cachedArtworkCount))
             }
         } catch {
             // do nothing

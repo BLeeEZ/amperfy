@@ -27,7 +27,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     override func setUp() async throws {
         try await super.setUp()
         xmlData = getTestFileData(name: "album_example_1")
-        ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, subsonicUrlCreator: subsonicUrlCreator, parseNotifier: nil)
+        ssParserDelegate = SsSongParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
         createTestPartner()
     }
 
@@ -69,7 +69,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 5624132)
-        XCTAssertEqual(song.artwork?.url, "www-71381")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "71381")
         let song1Artwork = song.artwork
@@ -95,7 +95,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 5037357)
-        XCTAssertEqual(song.artwork?.url, "www-71381")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "71381")
         XCTAssertEqual(song.artwork, song1Artwork)
@@ -121,7 +121,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
         XCTAssertEqual(song.contentType, "audio/mpeg")
         XCTAssertNil(song.url)
         XCTAssertEqual(song.size, 4651866)
-        XCTAssertEqual(song.artwork?.url, "www-71381")
+        XCTAssertEqual(song.artwork?.url, "")
         XCTAssertEqual(song.artwork?.type, "")
         XCTAssertEqual(song.artwork?.id, "71381")
         XCTAssertEqual(song.artwork, song1Artwork)

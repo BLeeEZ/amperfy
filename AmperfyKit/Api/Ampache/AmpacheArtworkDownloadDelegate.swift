@@ -51,7 +51,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
             throw DownloadError.fetchFailed
         }
         guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-        return try await self.ampacheXmlServerApi.generateUrl(forArtwork: artwork)
+        return try await self.ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artwork.url)
     }
     
     @MainActor public func validateDownloadedData(download: Download) -> ResponseError? {

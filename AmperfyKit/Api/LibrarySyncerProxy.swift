@@ -26,9 +26,7 @@ import Foundation
     let backendApi: BackendApi
     let storage: PersistentStorage
     
-    var activeSyncer: LibrarySyncer {
-        return self.backendApi.createLibrarySyncer(storage: storage)
-    }
+    var activeSyncer: LibrarySyncer { return self.backendApi.createLibrarySyncer(storage: storage) }
     
     init(backendApi: BackendApi, storage: PersistentStorage) {
         self.backendApi = backendApi

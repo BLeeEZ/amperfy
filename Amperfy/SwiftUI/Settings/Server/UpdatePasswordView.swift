@@ -39,7 +39,7 @@ struct UpdatePasswordView: View {
     func updatePassword() {
         resetStatus()
         let newPassword = passwordInput
-        guard let loginCredentials = self.appDelegate.storage.loginCredentials,
+        guard var loginCredentials = self.appDelegate.storage.loginCredentials,
               !newPassword.isEmpty else {
             errorMsg = "Please provide the new password."
             return

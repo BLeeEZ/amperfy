@@ -137,7 +137,7 @@ import os.log
     @MainActor private func startAvailableDownload() async {
         // A free download task is available
         if storage.settings.isOnlineMode &&
-            networkMonitor.isConnectedToNetwork &&
+           networkMonitor.isConnectedToNetwork &&
            self.activeTasks.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
             if let nextDownload = self.requestManager.getNextRequestToDownload() {
                 // There is a download to be started
@@ -158,12 +158,10 @@ import os.log
             }
             self.fetch(url: url)
         } catch {
-            self.storage.main.perform { mainCompanion in
-                if let fetchError = error as? DownloadError {
-                    self.finishDownload(download: download, error: fetchError)
-                } else {
-                    self.finishDownload(download: download, error: .fetchFailed)
-                }
+            if let fetchError = error as? DownloadError {
+                self.finishDownload(download: download, error: fetchError)
+            } else {
+                self.finishDownload(download: download, error: .fetchFailed)
             }
         }
     }

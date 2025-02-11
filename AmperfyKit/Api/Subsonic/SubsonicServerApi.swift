@@ -23,10 +23,6 @@ import Foundation
 import os.log
 import Alamofire
 
-protocol SubsonicUrlCreator {
-    func getArtUrlString(forCoverArtId: String) -> String
-}
-
 enum SubsonicApiAuthType: Int {
     case autoDetect = 0
     case legacy = 1
@@ -60,7 +56,7 @@ struct OpenSubsonicExtensionsSupport {
     var isSupported = false
 }
 
-class SubsonicServerApi: URLCleanser {
+@MainActor class SubsonicServerApi: URLCleanser {
     
     enum SubsonicError: Int {
         case generic = 0 // A generic error.
@@ -88,9 +84,12 @@ class SubsonicServerApi: URLCleanser {
     var serverApiVersion: SubsonicVersion?
     var clientApiVersion: SubsonicVersion?
     var isStreamingTranscodingActive: Bool {
-        return persistentStorage.settings.streamingFormatPreference != .raw
+        return settings.streamingFormatPreference != .raw
     }
     var authType: SubsonicApiAuthType = .autoDetect
+    func setAuthType(newAuthType: SubsonicApiAuthType) {
+        authType = newAuthType
+    }
     private var authTypeBasedClientApiVersion: SubsonicVersion {
         return self.authType == .legacy ? Self.defaultClientApiVersionPreToken : Self.defaultClientApiVersionWithToken
     }
@@ -98,17 +97,17 @@ class SubsonicServerApi: URLCleanser {
     private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
     private let performanceMonitor: ThreadPerformanceMonitor
     private let eventLogger: EventLogger
-    private let persistentStorage: PersistentStorage
+    private let settings: PersistentStorage.Settings
     private var credentials: LoginCredentials?
     private var openSubsonicExtensionsSupport: OpenSubsonicExtensionsSupport?
 
-    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, persistentStorage: PersistentStorage) {
+    init(performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger, settings: PersistentStorage.Settings) {
         self.performanceMonitor = performanceMonitor
         self.eventLogger = eventLogger
-        self.persistentStorage = persistentStorage
+        self.settings = settings
     }
     
-    static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+    nonisolated static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
         guard let url = URL(string: urlString),
             let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
             let id = urlComp.queryItems?.first(where: {$0.name == "id"})?.value
@@ -126,7 +125,7 @@ class SubsonicServerApi: URLCleanser {
         return authenticationToken
     }
     
-    @MainActor private func getCachedServerApiVersionOrRequestIt(providedCredentials: LoginCredentials? = nil) async throws -> SubsonicVersion {
+    private func getCachedServerApiVersionOrRequestIt(providedCredentials: LoginCredentials? = nil) async throws -> SubsonicVersion {
         if let serverVersion = serverApiVersion {
             return serverVersion
         } else {
@@ -134,7 +133,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor private func determineApiVersionToUse(providedCredentials: LoginCredentials? = nil) async throws -> SubsonicVersion {
+    private func determineApiVersionToUse(providedCredentials: LoginCredentials? = nil) async throws -> SubsonicVersion {
         if let clientApiVersion = self.clientApiVersion {
             return clientApiVersion
         }
@@ -196,8 +195,9 @@ class SubsonicServerApi: URLCleanser {
         self.credentials = credentials
     }
     
-    public func cleanse(url: URL) -> CleansedURL {
+    nonisolated public func cleanse(url: URL?) -> CleansedURL {
         guard
+            let url = url,
             var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
             let queryItems = urlComp.queryItems
         else { return CleansedURL(urlString: "") }
@@ -224,7 +224,7 @@ class SubsonicServerApi: URLCleanser {
         return CleansedURL(urlString: urlComp.string ?? "")
     }
     
-    @MainActor public func isAuthenticationValid(credentials: LoginCredentials) async throws {
+    public func isAuthenticationValid(credentials: LoginCredentials) async throws {
         let version = try await self.determineApiVersionToUse(providedCredentials: credentials)
         let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "ping", credentials: credentials)
         let response = try await self.request(url: try self.createUrl(from: urlComp))
@@ -246,34 +246,32 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
+    public func generateUrl(forDownloadingPlayableId apiId: String) async throws -> URL {
         let version = try await self.determineApiVersionToUse()
-        let apiID = playable.asPodcastEpisode?.streamId ?? playable.id
         // If transcoding is selected for caching the subsonic API method 'stream' must be used
         // For raw format subsonic API method 'download' can be used
-        switch self.persistentStorage.settings.cacheTranscodingFormatPreference {
+        switch self.settings.cacheTranscodingFormatPreference {
         case .mp3:
-            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
+            var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
             urlComp.addQueryItem(name: "format", value: "mp3")
             let url = try self.createUrl(from: urlComp)
             return url
         case .serverConfig:
-            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
             // let the server decide which format to use
             let url = try self.createUrl(from: urlComp)
             return url
         case .raw:
-            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "download", id: apiID)
+            let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "download", id: apiId)
             let url = try self.createUrl(from: urlComp)
             return url
         }
     }
     
-    @MainActor public func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
+    public func generateUrl(forStreamingPlayableId apiId: String, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
         let version = try await self.determineApiVersionToUse()
-        let apiID = playable.asPodcastEpisode?.streamId ?? playable.id
-        var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiID)
-        switch self.persistentStorage.settings.streamingFormatPreference {
+        var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
+        switch self.settings.streamingFormatPreference {
         case .mp3:
             urlComp.addQueryItem(name: "format", value: "mp3")
         case .raw:
@@ -290,18 +288,12 @@ class SubsonicServerApi: URLCleanser {
         return try self.createUrl(from: urlComp)
     }
     
-    @MainActor public func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
-        guard let urlComp = URLComponents(string: artwork.url),
-           let queryItems = urlComp.queryItems,
-           let coverArtQuery = queryItems.first(where: {$0.name == "id"}),
-           let coverArtId = coverArtQuery.value
-        else { throw BackendError.invalidUrl }
-        
+    public func generateUrl(forArtworkId id: String) async throws -> URL {
         let version = try await self.determineApiVersionToUse()
-        return try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "getCoverArt", id: coverArtId))
+        return try self.createUrl(from: try self.createAuthApiUrlComponent(version: version, forAction: "getCoverArt", id: id))
     }
     
-    @MainActor private func requestServerApiVersionPromise(providedCredentials: LoginCredentials? = nil) async throws -> SubsonicVersion {
+    private func requestServerApiVersionPromise(providedCredentials: LoginCredentials? = nil) async throws -> SubsonicVersion {
         guard let urlComp = try? createAuthApiUrlComponent(version: authTypeBasedClientApiVersion, forAction: "ping", credentials: providedCredentials) else {
             throw BackendError.invalidUrl
         }
@@ -314,17 +306,17 @@ class SubsonicServerApi: URLCleanser {
         parser.delegate = delegate
         parser.parse()
         guard let serverApiVersionString = delegate.serverApiVersion else {
-            throw ResponseError(type: .xml, cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
+            throw ResponseError(type: .xml, cleansedURL: cleanse(url: response.url), data: response.data)
         }
         guard let serverApiVersion = SubsonicVersion(serverApiVersionString) else {
             os_log("The server API version '%s' could not be parsed to 'SubsonicVersion'", log: self.log, type: .info, serverApiVersionString)
-            throw ResponseError(type: .xml, cleansedURL: response.url?.asCleansedURL(cleanser: self), data: response.data)
+            throw ResponseError(type: .xml, cleansedURL: cleanse(url: response.url), data: response.data)
         }
         self.serverApiVersion = serverApiVersion
         return serverApiVersion
     }
     
-    @MainActor public func requestServerPodcastSupport() async throws -> Bool {
+    public func requestServerPodcastSupport() async throws -> Bool {
         let _ = try await self.determineApiVersionToUse()
         var isPodcastSupported = false
         if let serverApi = self.serverApiVersion {
@@ -342,14 +334,14 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor private func requestOpenSubsonicExtensions() async throws -> APIDataResponse {
+    private func requestOpenSubsonicExtensions() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getOpenSubsonicExtensions")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func isOpenSubsonicExtensionSupported(extension oSsExtention: OpenSubsonicExtension) async -> Bool {
+    public func isOpenSubsonicExtensionSupported(extension oSsExtention: OpenSubsonicExtension) async -> Bool {
         // the member variable will be set after the server has been requested
         // here we already asked the server for its support and use the cached response
         if let oSsExtSupport = self.openSubsonicExtensionsSupport {
@@ -405,56 +397,56 @@ class SubsonicServerApi: URLCleanser {
     }
     
     /// this requires that the server supports OpenSubsonicExtension "songLyrics"
-    @MainActor public func requestLyricsBySongId(id: String) async throws -> APIDataResponse {
+    public func requestLyricsBySongId(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getLyricsBySongId", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
 
-    @MainActor public func requestGenres() async throws -> APIDataResponse {
+    public func requestGenres() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getGenres")
             return try self.createUrl(from: urlComp)
         }
     }
 
-    @MainActor public func requestArtists() async throws -> APIDataResponse {
+    public func requestArtists() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getArtists")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestArtist(id: String) async throws -> APIDataResponse {
+    public func requestArtist(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getArtist", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestAlbum(id: String) async throws -> APIDataResponse {
+    public func requestAlbum(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbum", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestSongInfo(id: String) async throws -> APIDataResponse {
+    public func requestSongInfo(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getSong", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
 
-    @MainActor public func requestFavoriteElements() async throws -> APIDataResponse {
+    public func requestFavoriteElements() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getStarred2")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestNewestAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
+    public func requestNewestAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
             urlComp.addQueryItem(name: "type", value: "newest")
@@ -464,7 +456,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestRecentAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
+    public func requestRecentAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
             urlComp.addQueryItem(name: "type", value: "recent")
@@ -474,7 +466,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
+    public func requestAlbums(offset: Int, count: Int) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getAlbumList2")
             urlComp.addQueryItem(name: "type", value: "alphabeticalByName")
@@ -484,7 +476,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestRandomSongs(count: Int) async throws -> APIDataResponse {
+    public func requestRandomSongs(count: Int) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getRandomSongs")
             urlComp.addQueryItem(name: "size", value: count)
@@ -492,14 +484,14 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestPodcastEpisodeDelete(id: String) async throws -> APIDataResponse  {
+    public func requestPodcastEpisodeDelete(id: String) async throws -> APIDataResponse  {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "deletePodcastEpisode", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestSearchArtists(searchText: String) async throws -> APIDataResponse {
+    public func requestSearchArtists(searchText: String) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
             urlComp.addQueryItem(name: "query", value: searchText)
@@ -514,7 +506,7 @@ class SubsonicServerApi: URLCleanser {
     }
     
     
-    @MainActor public func requestSearchAlbums(searchText: String) async throws -> APIDataResponse {
+    public func requestSearchAlbums(searchText: String) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
             urlComp.addQueryItem(name: "query", value: searchText)
@@ -528,7 +520,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestSearchSongs(searchText: String) async throws -> APIDataResponse {
+    public func requestSearchSongs(searchText: String) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
             urlComp.addQueryItem(name: "query", value: searchText)
@@ -542,21 +534,21 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestPlaylists() async throws -> APIDataResponse {
+    public func requestPlaylists() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPlaylists")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestPlaylistSongs(id: String) async throws -> APIDataResponse {
+    public func requestPlaylistSongs(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPlaylist", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestPlaylistCreate(name: String) async throws -> APIDataResponse {
+    public func requestPlaylistCreate(name: String) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "createPlaylist")
             urlComp.addQueryItem(name: "name", value: name)
@@ -564,7 +556,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestPlaylistDelete(id: String) async throws -> APIDataResponse {
+    public func requestPlaylistDelete(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "deletePlaylist", id: id)
             return try self.createUrl(from: urlComp)
@@ -577,10 +569,10 @@ class SubsonicServerApi: URLCleanser {
         parser.delegate = errorParser
         parser.parse()
         guard let subsonicError = errorParser.error else { return nil }
-        return ResponseError.createFromSubsonicError(cleansedURL: response.url?.asCleansedURL(cleanser: self), error: subsonicError, data: response.data)
+        return ResponseError.createFromSubsonicError(cleansedURL: cleanse(url: response.url), error: subsonicError, data: response.data)
     }
 
-    @MainActor public func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) async throws -> APIDataResponse {
+    public func requestPlaylistUpdate(id: String, name: String, songIndicesToRemove: [Int], songIdsToAdd: [String]) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "updatePlaylist")
             urlComp.addQueryItem(name: "playlistId", value: id)
@@ -595,7 +587,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestPodcasts() async throws -> APIDataResponse {
+    public func requestPodcasts() async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPodcasts")
             urlComp.addQueryItem(name: "includeEpisodes", value: "false")
@@ -603,7 +595,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestPodcastEpisodes(id: String) async throws -> APIDataResponse {
+    public func requestPodcastEpisodes(id: String) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getPodcasts", id: id)
             urlComp.addQueryItem(name: "includeEpisodes", value: "true")
@@ -611,7 +603,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestNewestPodcasts() async throws -> APIDataResponse {
+    public func requestNewestPodcasts() async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getNewestPodcasts")
             urlComp.addQueryItem(name: "count", value: 20)
@@ -619,21 +611,21 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestRadios() async throws -> APIDataResponse {
+    public func requestRadios() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getInternetRadioStations")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestMusicFolders() async throws -> APIDataResponse {
+    public func requestMusicFolders() async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicFolders")
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestIndexes(musicFolderId: String) async throws -> APIDataResponse {
+    public func requestIndexes(musicFolderId: String) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getIndexes")
             urlComp.addQueryItem(name: "musicFolderId", value: musicFolderId)
@@ -641,14 +633,14 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestMusicDirectory(id: String) async throws -> APIDataResponse {
+    public func requestMusicDirectory(id: String) async throws -> APIDataResponse {
         return try await request { version in
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "getMusicDirectory", id: id)
             return try self.createUrl(from: urlComp)
         }
     }
     
-    @MainActor public func requestScrobble(id: String, submission: Bool, date: Date? = nil) async throws -> APIDataResponse {
+    public func requestScrobble(id: String, submission: Bool, date: Date? = nil) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "scrobble", id: id)
             if let date = date {
@@ -660,7 +652,7 @@ class SubsonicServerApi: URLCleanser {
     }
 
     /// Only songs, albums, artists are supported by the subsonic API
-    @MainActor public func requestRating(id: String, rating: Int) async throws -> APIDataResponse {
+    public func requestRating(id: String, rating: Int) async throws -> APIDataResponse {
         return try await request { version in
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "setRating", id: id)
             urlComp.addQueryItem(name: "rating", value: rating)
@@ -668,7 +660,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestSetFavorite(songId: String, isFavorite: Bool) async throws -> APIDataResponse {
+    public func requestSetFavorite(songId: String, isFavorite: Bool) async throws -> APIDataResponse {
         return try await request { version in
             let apiFavoriteAction = isFavorite ? "star" : "unstar"
             let urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction, id: songId)
@@ -676,7 +668,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestSetFavorite(albumId: String, isFavorite: Bool) async throws -> APIDataResponse {
+    public func requestSetFavorite(albumId: String, isFavorite: Bool) async throws -> APIDataResponse {
         return try await request { version in
             let apiFavoriteAction = isFavorite ? "star" : "unstar"
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction)
@@ -685,7 +677,7 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor public func requestSetFavorite(artistId: String, isFavorite: Bool) async throws -> APIDataResponse {
+    public func requestSetFavorite(artistId: String, isFavorite: Bool) async throws -> APIDataResponse {
         return try await request { version in
             let apiFavoriteAction = isFavorite ? "star" : "unstar"
             var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: apiFavoriteAction)
@@ -702,13 +694,13 @@ class SubsonicServerApi: URLCleanser {
         }
     }
     
-    @MainActor private func request(urlCreation: @escaping (_: SubsonicVersion) throws -> URL) async throws -> APIDataResponse {
+    private func request(urlCreation: @escaping (_: SubsonicVersion) throws -> URL) async throws -> APIDataResponse {
         let version = try await self.determineApiVersionToUse()
         let url = try urlCreation(version)
         return try await self.request(url: url)
     }
     
-    @MainActor private func request(url: URL) async throws -> APIDataResponse {
+    private func request(url: URL) async throws -> APIDataResponse {
         return try await withUnsafeThrowingContinuation { continuation in
             AF.request(url, method: .get).validate().responseData { response in
                 if let data = response.data {
@@ -725,17 +717,3 @@ class SubsonicServerApi: URLCleanser {
     }
     
 }
-
-extension SubsonicServerApi: SubsonicUrlCreator {
-    func getArtUrlString(forCoverArtId id: String) -> String {
-        guard let clientVersion = self.clientApiVersion else { return "" }
-        if let apiUrlComponent = try? createAuthApiUrlComponent(version: clientVersion, forAction: "getCoverArt", id: id),
-           let url = apiUrlComponent.url {
-            return url.absoluteString
-        } else {
-            return ""
-        }
-        
-    }
-}
-

@@ -22,6 +22,17 @@
 import Foundation
 import CoreData
 
+public enum DownloadableType: Sendable {
+    case playable
+    case artwork
+    case unknown
+}
+
+public struct DownloadInfo: Sendable {
+    let objectId: NSManagedObjectID
+    let type: DownloadableType
+}
+
 public class Download: NSObject {
     
     public let managedObject: DownloadMO
@@ -130,6 +141,34 @@ public class Download: NSObject {
     public var totalSize: String {
         get { return managedObject.totalSize ?? "" }
         set { if managedObject.totalSize != newValue { managedObject.totalSize = totalSize } }
+    }
+    public var threadSafeInfo: DownloadInfo? {
+        let type = baseType
+        guard type != .unknown else { return nil }
+        return DownloadInfo(objectId: self.managedObject.objectID, type: type)
+    }
+    public var baseType: DownloadableType {
+        if artwork != nil {
+            return .artwork
+        } else if playable != nil {
+            return .playable
+        } else {
+            return .unknown
+        }
+    }
+    static public func createDownloadableObject(inContext context: NSManagedObjectContext, info: DownloadInfo) -> Downloadable {
+        switch info.type {
+        case .playable:
+            let playableMO = context.object(with: info.objectId) as! AbstractPlayableMO
+            let playable = AbstractPlayable(managedObject: playableMO)
+            return playable
+        case .artwork:
+            let artworkMO = context.object(with: info.objectId) as! ArtworkMO
+            let artwork = Artwork(managedObject: artworkMO)
+            return artwork
+        case .unknown:
+            fatalError("Unknown is not available as Downloadable type")
+        }
     }
     public var element: Downloadable? {
         get {

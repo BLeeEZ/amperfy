@@ -94,7 +94,7 @@ class MOCK_AlertDisplayable: AlertDisplayable {
     func createPopupVC(topic: String, shortMessage: String, detailMessage: String, logType: AmperfyKit.LogEntryType) -> UIViewController { return UIViewController() }
 }
 
-class MOCK_LibrarySyncer: LibrarySyncer {
+final class MOCK_LibrarySyncer: LibrarySyncer {
     func syncInitial(statusNotifyier: SyncCallbacks?) async throws { }
     func sync(genre: Genre) async throws { }
     func sync(artist: Artist) async throws { }
@@ -155,15 +155,15 @@ class MOCK_BackendApi: BackendApi {
     func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { return MOCK_LibrarySyncer() }
     func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate { return MOCK_DownloadManagerDelegate() }
     func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { return nil }
-    func cleanse(url: URL) -> CleansedURL { return CleansedURL(urlString: "") }
+    func cleanse(url: URL?) -> CleansedURL { return CleansedURL(urlString: "") }
 }
 
 class MOCK_NetworkMonitor: NetworkMonitorFacade {
-    var connectionTypeChangedCB: ConnectionTypeChangedCallack?
+    func getConnectionTypeChangedCB() -> ConnectionTypeChangedCallack? { return nil }
+    func setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?) {}
     var isConnectedToNetwork: Bool { return true }
     var isCellular: Bool { return false }
     var isWifiOrEthernet: Bool { return true }
-    func start() {}
 }
 
 class MOCK_MusicPlayable: MusicPlayable {

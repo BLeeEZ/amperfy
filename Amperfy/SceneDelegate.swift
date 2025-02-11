@@ -157,7 +157,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
         os_log("sceneWillEnterForeground", log: self.log, type: .info)
-        AmperKit.shared.isInForeground = true
+        AmperKit.shared.threadPerformanceMonitor.isInForeground = true
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
@@ -168,7 +168,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Save changes in the application's managed object context when the application transitions to the background.
         os_log("sceneDidEnterBackground", log: self.log, type: .info)
         self.appDelegate.scheduleAppRefresh()
-        AmperKit.shared.isInForeground = false
+        AmperKit.shared.threadPerformanceMonitor.isInForeground = false
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

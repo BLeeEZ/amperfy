@@ -41,8 +41,10 @@ import CoreData
     
     func add(objects: [Downloadable]) {
         Task { @MainActor in
+            let downloadInfos = objects.compactMap { $0.threadSafeInfo }
             try? await self.storage.async.perform { asyncCompanion in
-                for (n,object) in objects.enumerated() {
+                for (n, downloadInfo) in downloadInfos.enumerated() {
+                    let object = Download.createDownloadableObject(inContext: asyncCompanion.context, info: downloadInfo)
                     self.addLowPrio(object: object, library: asyncCompanion.library)
                     if (n % 500) == 0 {
                         asyncCompanion.saveContext()
@@ -53,7 +55,7 @@ import CoreData
         }
     }
 
-    private func addLowPrio(object: Downloadable, library: LibraryStorage) {
+    nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) {
         let existingDownload = library.getDownload(id: object.uniqueID)
         
         if existingDownload == nil {

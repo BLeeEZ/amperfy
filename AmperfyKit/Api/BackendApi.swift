@@ -37,22 +37,44 @@ public protocol ParsedObjectNotifiable {
     func notifyParsedObject(ofType parsedObjectType: ParsedObjectType)
 }
 
-public protocol SyncCallbacks: ParsedObjectNotifiable {
-    func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int)
+public protocol SyncCallbacks: ParsedObjectNotifiable, Sendable {
+    nonisolated func notifySyncStarted(ofType parsedObjectType: ParsedObjectType, totalCount: Int)
 }
 
-public protocol ThreadPerformanceMonitor {
-    var shouldSlowDownExecution: Bool { get }
+public protocol ThreadPerformanceMonitor: Sendable {
+    nonisolated var shouldSlowDownExecution: Bool { get }
+    nonisolated var isInForeground: Bool { get set }
 }
+
+final public class ThreadPerformanceObserver : ThreadPerformanceMonitor {
+    
+    public static let shared = ThreadPerformanceObserver()
+    
+    nonisolated(unsafe) private var _isInForeground: Bool = true
+    private let _isInForegroundLock = NSLock()
+    nonisolated public var isInForeground: Bool {
+        get {
+            _isInForegroundLock.withLock { _isInForeground }
+        }
+        set {
+            _isInForegroundLock.withLock { _isInForeground = newValue }
+        }
+    }
+
+    nonisolated public var shouldSlowDownExecution: Bool {
+        return !isInForeground
+    }
+}
+
 
 public enum NowPlayingSongPosition {
     case start
     case end
 }
 
-public class APIDataResponse {
-    public var data: Data
-    public var url: URL?
+public final class APIDataResponse: Sendable {
+    public let data: Data
+    public let url: URL?
     
     init(data: Data, url: URL?) {
         self.data = data
@@ -95,7 +117,7 @@ public struct LyricsLine {
     }
 }
 
-public protocol LibrarySyncer {
+public protocol LibrarySyncer: Sendable {
     @MainActor func syncInitial(statusNotifyier: SyncCallbacks?) async throws
     @MainActor func sync(genre: Genre) async throws
     @MainActor func sync(artist: Artist) async throws
@@ -154,13 +176,13 @@ final public class CleansedURL: Sendable {
 }
 
 extension URL {
-    func asCleansedURL(cleanser: URLCleanser) -> CleansedURL {
+    nonisolated func asCleansedURL(cleanser: URLCleanser) -> CleansedURL {
         return cleanser.cleanse(url: self)
     }
 }
 
 public protocol URLCleanser {
-    func cleanse(url: URL) -> CleansedURL
+    nonisolated func cleanse(url: URL?) -> CleansedURL
 }
 
 public struct TranscodingInfo {
@@ -172,17 +194,17 @@ public struct TranscodingInfo {
     }
 }
 
-public protocol BackendApi: URLCleanser {
-    var clientApiVersion: String { get }
-    var serverApiVersion: String { get }
-    var isStreamingTranscodingActive: Bool { get }
-    func provideCredentials(credentials: LoginCredentials)
+ public protocol BackendApi: URLCleanser {
+    @MainActor var clientApiVersion: String { get }
+    @MainActor var serverApiVersion: String { get }
+    @MainActor var isStreamingTranscodingActive: Bool { get }
+    @MainActor func provideCredentials(credentials: LoginCredentials)
     @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws
     @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL
     @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL
     @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL
-    func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
+    @MainActor func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
     @MainActor func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
-    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
-    func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
+    @MainActor func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
+    nonisolated func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
 }

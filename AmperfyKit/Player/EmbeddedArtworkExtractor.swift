@@ -20,25 +20,30 @@
 //
 
 import UIKit
-import ID3TagEditor
+@preconcurrency import ID3TagEditor
 
-class EmbeddedArtworkExtractor  {
+final class EmbeddedArtworkExtractor: Sendable {
 
     private let id3TagEditor = ID3TagEditor()
     private let fileManager = CacheFileManager.shared
-    
+
     @MainActor func extractEmbeddedArtwork(storage: PersistentStorage, playable: AbstractPlayable) async throws {
-        try await storage.async.perform { companion in
-            guard let playableAsyncMO = companion.context.object(with: playable.objectID) as? AbstractPlayableMO else { return }
-            let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
-            
-            guard let relFilePath = playableAsync.relFilePath,
-                  let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
-            else { return }
-            
-            guard let id3Tag = try? self.id3TagEditor.read(from: absFilePath.path) else { return }
+        guard let relFilePath = playable.relFilePath,
+              let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+        else { return }
+        
+        let artworks = await Task {
+            guard let id3Tag = try? self.id3TagEditor.read(from: absFilePath.path) else { return [AttachedPicture]() }
             let tagContentReader = ID3TagContentReader(id3Tag: id3Tag)
             let artworks = tagContentReader.attachedPictures()
+            return artworks
+        }.value
+        
+        let playableObjectId = playable.objectID
+        try await storage.async.perform { companion in
+            guard let playableAsyncMO = companion.context.object(with: playableObjectId) as? AbstractPlayableMO else { return }
+            let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
+            
             // if there is a frontCover artwork take this as embedded artwork
             if let frontCoverArtwork = artworks.lazy.filter({ $0.type == .frontCover }).first,
                let artworkImage = UIImage(data: frontCoverArtwork.picture) {
@@ -54,8 +59,8 @@ class EmbeddedArtworkExtractor  {
         let embeddedArtwork = library.createEmbeddedArtwork()
         embeddedArtwork.owner = playable
         
-        guard let relFilePath = self.fileManager.createRelPath(for: embeddedArtwork),
-              let absFilePath = self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath),
+        guard let relFilePath = fileManager.createRelPath(for: embeddedArtwork),
+              let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath),
               let pngData = embeddedImage.pngData()
         else { return }
         

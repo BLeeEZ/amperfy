@@ -184,10 +184,9 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     private func createOptionsButtonMenu() -> UIMenu {
         let fetchAllPlaylists = UIAction(title: "Sync All Playlists", image: .refresh, handler: { _ in
             Task { @MainActor in do {
-                var playlistsIds = [NSManagedObjectID]()
-                try await self.appDelegate.storage.async.perform { asyncCompanion in
+                let playlistsIds = try await self.appDelegate.storage.async.performAndGet { asyncCompanion in
                     let playlists = asyncCompanion.library.getPlaylists()
-                    playlistsIds = playlists.compactMap{ $0.managedObject.objectID }
+                    return playlists.compactMap{ $0.managedObject.objectID }
                 }
                 for moId in playlistsIds {
                     let playlistMainMO = self.appDelegate.storage.main.context.object(with: moId) as! PlaylistMO

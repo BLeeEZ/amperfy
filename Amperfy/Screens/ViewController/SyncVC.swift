@@ -46,16 +46,16 @@ class SyncVC: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        self.appDelegate.eventLogger.supressAlerts = true
-        self.appDelegate.scrobbleSyncer?.stopAndWait()
-        self.appDelegate.backgroundLibrarySyncer.stopAndWait()
-        self.appDelegate.artworkDownloadManager.stop()
-        self.appDelegate.playableDownloadManager.stop()
-        self.appDelegate.storage.isLibrarySynced = false
-        self.appDelegate.storage.main.library.cleanStorage()
-        self.appDelegate.reinit()
-        
         Task { @MainActor in
+            self.appDelegate.eventLogger.supressAlerts = true
+            self.appDelegate.scrobbleSyncer?.stopAndWait()
+            self.appDelegate.backgroundLibrarySyncer.stopAndWait()
+            self.appDelegate.artworkDownloadManager.stop()
+            self.appDelegate.playableDownloadManager.stop()
+            self.appDelegate.storage.isLibrarySynced = false
+            self.appDelegate.storage.main.library.cleanStorage()
+            self.appDelegate.reinit()
+            
             do {
                 try await self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
                 self.appDelegate.storage.initialSyncCompletionStatus = .completed

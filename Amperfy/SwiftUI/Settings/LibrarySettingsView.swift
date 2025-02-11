@@ -54,30 +54,49 @@ struct LibrarySettingsView: View {
     
     private func updateValues() {
         Task { @MainActor in do {
-            try await appDelegate.storage.async.perform { asyncCompanion in
-                self.playlistCount = asyncCompanion.library.playlistCount
-                self.artistCount = asyncCompanion.library.artistCount
-                self.albumCount = asyncCompanion.library.albumCount
-                self.podcastCount = asyncCompanion.library.podcastCount
-                self.podcastEpisodeCount = asyncCompanion.library.podcastEpisodeCount
-                self.songCount = asyncCompanion.library.songCount
-                self.albumWithSyncedSongsCount = asyncCompanion.library.albumWithSyncedSongsCount
-                if albumCount < 1 {
-                    self.autoSyncProgressText = String(format: "%.1f", 0.0) + "%"
-                } else {
-                    let progress = Float(albumWithSyncedSongsCount) * 100.0 / Float(albumCount)
-                    self.autoSyncProgressText = String(format: "%.1f", progress) + "%"
-                }
-                self.cachedSongCount = asyncCompanion.library.cachedSongCount
-                self.cachedPodcastEpisodesCount = asyncCompanion.library.cachedPodcastEpisodeCount
-                
-                let playableByteSize = fileManager.playableCacheSize
-                self.completeCacheSize = (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0).asByteString
-                
-                let curCacheSizeLimit = Int64(settings.cacheSizeLimit)
-                self.cacheSizeLimit = curCacheSizeLimit > 0 ? curCacheSizeLimit.asByteString : "No Limit"
-                self.cacheSelection = curCacheSizeLimit > 0 ? [curCacheSizeLimit.asByteString.components(separatedBy: " ")[0], " " + curCacheSizeLimit.asByteString.components(separatedBy: " ")[1]] : ["0"," MB"]
+            self.playlistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.playlistCount
             }
+            self.artistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.artistCount
+            }
+            self.albumCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.albumCount
+            }
+            self.podcastCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.podcastCount
+            }
+            self.podcastEpisodeCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.podcastEpisodeCount
+            }
+            self.songCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.songCount
+            }
+            self.albumWithSyncedSongsCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.albumWithSyncedSongsCount
+            }
+            
+            if albumCount < 1 {
+                self.autoSyncProgressText = String(format: "%.1f", 0.0) + "%"
+            } else {
+                let progress = Float(albumWithSyncedSongsCount) * 100.0 / Float(albumCount)
+                self.autoSyncProgressText = String(format: "%.1f", progress) + "%"
+            }
+            
+            self.cachedSongCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.cachedSongCount
+            }
+            self.cachedPodcastEpisodesCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                return asyncCompanion.library.cachedPodcastEpisodeCount
+            }
+            self.completeCacheSize = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+                let playableByteSize = fileManager.playableCacheSize
+                return (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0).asByteString
+            }
+            
+            let curCacheSizeLimit = Int64(settings.cacheSizeLimit)
+            self.cacheSizeLimit = curCacheSizeLimit > 0 ? curCacheSizeLimit.asByteString : "No Limit"
+            self.cacheSelection = curCacheSizeLimit > 0 ? [curCacheSizeLimit.asByteString.components(separatedBy: " ")[0], " " + curCacheSizeLimit.asByteString.components(separatedBy: " ")[1]] : ["0"," MB"]
         } catch {
             // do nothing
         }}

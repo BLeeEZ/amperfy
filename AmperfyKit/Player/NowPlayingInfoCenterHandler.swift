@@ -57,7 +57,7 @@ import MediaPlayer
             MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
             MPNowPlayingInfoPropertyPlaybackRate: NSNumber(value: backendAudioPlayer.playbackRate.asDouble),
             
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: artwork.size, requestHandler: { (size) -> UIImage in
+            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: artwork.size, requestHandler: { @Sendable (size) -> UIImage in
                 // this completion handler is not called in main thread!
                 return artwork
             })

@@ -49,7 +49,7 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     @MainActor func prepareDownload(download: Download) async throws -> URL {
         guard let artwork = download.element as? Artwork else { throw DownloadError.fetchFailed }
         guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-        return try await self.subsonicServerApi.generateUrl(forArtwork: artwork)
+        return try await self.subsonicServerApi.generateUrl(forArtworkId: artwork.id)
     }
     
     @MainActor func validateDownloadedData(download: Download) -> ResponseError? {
