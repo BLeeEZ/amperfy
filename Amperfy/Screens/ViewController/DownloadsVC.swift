@@ -64,6 +64,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         fetchedResultsController.fetch()
+        tableView.reloadData()
     }
 
     func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {

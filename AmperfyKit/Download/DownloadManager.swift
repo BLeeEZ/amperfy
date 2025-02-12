@@ -40,7 +40,7 @@ import os.log
     private let downloadSlotCount: Int
     private let eventLogger: EventLogger
     private let urlCleanser: URLCleanser
-    private let activeTasks: DispatchSemaphore
+    private var activeTaskCount: Int
     private var isRunning = false
     private var sleepTimer: Timer?
     private let timeInterval = TimeInterval(5) // time to check for available downloads to start
@@ -55,7 +55,7 @@ import os.log
         self.eventLogger = eventLogger
         self.urlCleanser = urlCleanser
         self.downloadSlotCount = downloadDelegate.parallelDownloadsCount
-        activeTasks = DispatchSemaphore(value: self.downloadSlotCount)
+        self.activeTaskCount = self.downloadSlotCount
     }
     
     @MainActor func download(object: Downloadable) {
@@ -138,13 +138,12 @@ import os.log
         // A free download task is available
         if storage.settings.isOnlineMode &&
            networkMonitor.isConnectedToNetwork &&
-           self.activeTasks.wait(timeout: DispatchTime(uptimeNanoseconds: 0)) == .success {
+           activeTaskCount > 0 {
             if let nextDownload = self.requestManager.getNextRequestToDownload() {
                 // There is a download to be started
+                activeTaskCount -= 1
                 self.triggerBackgroundDownload() // trigger an additional download
                 await self.manageDownload(download: nextDownload)
-            } else {
-                self.activeTasks.signal()
             }
         }
     }
@@ -168,7 +167,7 @@ import os.log
       
     
     @MainActor func finishDownload(download: Download, error: DownloadError) {
-        self.activeTasks.signal()
+        activeTaskCount += 1
         self.triggerBackgroundDownload()
         
         if !download.isCanceled {
@@ -186,7 +185,7 @@ import os.log
     }
     
     @MainActor func finishDownload(download: Download, fileURL: URL, fileMimeType: String?) async {
-        self.activeTasks.signal()
+        activeTaskCount += 1
         self.triggerBackgroundDownload()
         
         download.fileURL = fileURL
