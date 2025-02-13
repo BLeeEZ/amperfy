@@ -19,45 +19,48 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import Foundation
 import UIKit
-import AmperfyKit
 
-@MainActor enum AppStoryboard : String {
-    
-    case Main = "Main"
+// MARK: - AppStoryboard
 
-    var instance : UIStoryboard {
-        return UIStoryboard(name: self.rawValue, bundle: Bundle.main)
+@MainActor
+enum AppStoryboard: String {
+  case Main
+
+  var instance: UIStoryboard {
+    UIStoryboard(name: rawValue, bundle: Bundle.main)
+  }
+
+  func viewController<T: UIViewController>(viewControllerClass: T.Type) -> T {
+    instance.instantiateViewController(withIdentifier: viewControllerClass.storyboardID) as! T
+  }
+
+  func createAlbumsVC(
+    style: AlbumsDisplayStyle,
+    category: DisplayCategoryFilter
+  )
+    -> UIViewController {
+    switch style {
+    case .table:
+      let vc = AlbumsVC.instantiateFromAppStoryboard()
+      vc.displayFilter = category
+      return vc
+    case .grid:
+      let vc = AlbumsCollectionVC.instantiateFromAppStoryboard()
+      vc.displayFilter = category
+      return vc
     }
-    
-    func viewController<T: UIViewController>(viewControllerClass: T.Type) -> T {
-        return self.instance.instantiateViewController(withIdentifier: viewControllerClass.storyboardID) as! T
-    }
-    
-    func createAlbumsVC(style: AlbumsDisplayStyle, category: DisplayCategoryFilter) -> UIViewController {
-        switch style {
-        case .table:
-            let vc = AlbumsVC.instantiateFromAppStoryboard()
-            vc.displayFilter = category
-            return vc
-        case .grid:
-            let vc = AlbumsCollectionVC.instantiateFromAppStoryboard()
-            vc.displayFilter = category
-            return vc
-        }
-    }
-    
+  }
 }
 
 extension UIViewController {
-    
-    class var storyboardID : String {
-        return "\(self)"
-    }
-    
-    static func instantiateFromAppStoryboard(appStoryboard: AppStoryboard = .Main) -> Self {
-        return appStoryboard.viewController(viewControllerClass: self)
-    }
-    
+  class var storyboardID: String {
+    "\(self)"
+  }
+
+  static func instantiateFromAppStoryboard(appStoryboard: AppStoryboard = .Main) -> Self {
+    appStoryboard.viewController(viewControllerClass: self)
+  }
 }

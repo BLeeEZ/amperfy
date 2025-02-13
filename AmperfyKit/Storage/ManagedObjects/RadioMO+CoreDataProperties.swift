@@ -19,21 +19,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension RadioMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<RadioMO> {
+    NSFetchRequest<RadioMO>(entityName: "Radio")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<RadioMO> {
-        return NSFetchRequest<RadioMO>(entityName: "Radio")
-    }
-    
-    @NSManaged public var siteUrl: String?
-    
-    static let relationshipKeyPathsForPrefetching = [
-        #keyPath(RadioMO.artwork),
-        #keyPath(RadioMO.embeddedArtwork),
-    ]
+  @NSManaged
+  public var siteUrl: String?
 
+  static let relationshipKeyPathsForPrefetching = [
+    #keyPath(RadioMO.artwork),
+    #keyPath(RadioMO.embeddedArtwork),
+  ]
 }

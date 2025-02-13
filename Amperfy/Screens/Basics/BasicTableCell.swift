@@ -22,19 +22,17 @@
 import UIKit
 
 class BasicTableCell: UITableViewCell {
+  static let margin = UIView.defaultMarginCell
 
-    static let margin = UIView.defaultMarginCell
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.layoutMargins = BasicTableCell.margin
-    }
-    
-    override var layoutMargins: UIEdgeInsets { get { return BasicTableCell.margin } set { } }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        self.markAsUnfocused()
-    }
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    self.layoutMargins = BasicTableCell.margin
+  }
 
+  override var layoutMargins: UIEdgeInsets { get { BasicTableCell.margin } set {} }
+
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    markAsUnfocused()
+  }
 }

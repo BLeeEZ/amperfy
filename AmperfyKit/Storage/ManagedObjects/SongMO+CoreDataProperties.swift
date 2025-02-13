@@ -19,28 +19,32 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension SongMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<SongMO> {
+    NSFetchRequest<SongMO>(entityName: "Song")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<SongMO> {
-        return NSFetchRequest<SongMO>(entityName: "Song")
-    }
-    
-    @NSManaged public var lyricsRelFilePath: String?
-    @NSManaged public var album: AlbumMO?
-    @NSManaged public var artist: ArtistMO?
-    @NSManaged public var directory: DirectoryMO?
-    @NSManaged public var genre: GenreMO?
-    @NSManaged public var musicFolder: MusicFolderMO?
-    
-    static let relationshipKeyPathsForPrefetching = [
-        #keyPath(SongMO.album),
-        #keyPath(SongMO.artist),
-        #keyPath(SongMO.artwork),
-        #keyPath(SongMO.embeddedArtwork),
-    ]
+  @NSManaged
+  public var lyricsRelFilePath: String?
+  @NSManaged
+  public var album: AlbumMO?
+  @NSManaged
+  public var artist: ArtistMO?
+  @NSManaged
+  public var directory: DirectoryMO?
+  @NSManaged
+  public var genre: GenreMO?
+  @NSManaged
+  public var musicFolder: MusicFolderMO?
 
+  static let relationshipKeyPathsForPrefetching = [
+    #keyPath(SongMO.album),
+    #keyPath(SongMO.artist),
+    #keyPath(SongMO.artwork),
+    #keyPath(SongMO.embeddedArtwork),
+  ]
 }

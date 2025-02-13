@@ -19,55 +19,64 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 extension LibraryDisplayType {
-    public func controller(settings: PersistentStorage.Settings) -> UIViewController {
-        switch self {
-        case .artists:
-            return ArtistsVC.instantiateFromAppStoryboard()
-        case .albums:
-            let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .all)
-            return vc
-        case .songs:
-            let vc = SongsVC.instantiateFromAppStoryboard()
-            return vc
-        case .genres:
-            let vc = GenresVC.instantiateFromAppStoryboard()
-            return vc
-        case .directories:
-            let vc = MusicFoldersVC.instantiateFromAppStoryboard()
-            return vc
-        case .playlists:
-            let vc = PlaylistsVC.instantiateFromAppStoryboard()
-            return vc
-        case .podcasts:
-            let vc = PodcastsVC.instantiateFromAppStoryboard()
-            return vc
-        case .downloads:
-            let vc = DownloadsVC.instantiateFromAppStoryboard()
-            return vc
-        case .favoriteSongs:
-            let vc = SongsVC.instantiateFromAppStoryboard()
-            vc.displayFilter = .favorites
-            return vc
-        case .favoriteAlbums:
-            let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .favorites)
-            return vc
-        case .favoriteArtists:
-            let vc = ArtistsVC.instantiateFromAppStoryboard()
-            vc.displayFilter = .favorites
-            return vc
-        case .newestAlbums:
-            let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .newest)
-            return vc
-        case .recentAlbums:
-            let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .recent)
-            return vc
-        case .radios:
-            let vc = RadiosVC()
-            return vc
-        }
+  public func controller(settings: PersistentStorage.Settings) -> UIViewController {
+    switch self {
+    case .artists:
+      return ArtistsVC.instantiateFromAppStoryboard()
+    case .albums:
+      let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .all)
+      return vc
+    case .songs:
+      let vc = SongsVC.instantiateFromAppStoryboard()
+      return vc
+    case .genres:
+      let vc = GenresVC.instantiateFromAppStoryboard()
+      return vc
+    case .directories:
+      let vc = MusicFoldersVC.instantiateFromAppStoryboard()
+      return vc
+    case .playlists:
+      let vc = PlaylistsVC.instantiateFromAppStoryboard()
+      return vc
+    case .podcasts:
+      let vc = PodcastsVC.instantiateFromAppStoryboard()
+      return vc
+    case .downloads:
+      let vc = DownloadsVC.instantiateFromAppStoryboard()
+      return vc
+    case .favoriteSongs:
+      let vc = SongsVC.instantiateFromAppStoryboard()
+      vc.displayFilter = .favorites
+      return vc
+    case .favoriteAlbums:
+      let vc = AppStoryboard.Main.createAlbumsVC(
+        style: settings.albumsStyleSetting,
+        category: .favorites
+      )
+      return vc
+    case .favoriteArtists:
+      let vc = ArtistsVC.instantiateFromAppStoryboard()
+      vc.displayFilter = .favorites
+      return vc
+    case .newestAlbums:
+      let vc = AppStoryboard.Main.createAlbumsVC(
+        style: settings.albumsStyleSetting,
+        category: .newest
+      )
+      return vc
+    case .recentAlbums:
+      let vc = AppStoryboard.Main.createAlbumsVC(
+        style: settings.albumsStyleSetting,
+        category: .recent
+      )
+      return vc
+    case .radios:
+      let vc = RadiosVC()
+      return vc
     }
+  }
 }

@@ -24,17 +24,15 @@ import UIKit
 
 #if targetEnvironment(macCatalyst)
 
-class MacSnapshotButton: UIButton {
-
+  class MacSnapshotButton: UIButton {
     /// override this to allow snapshots: this is needed in macOS to show all tabs and create a new tab
     override func drawHierarchy(in rect: CGRect, afterScreenUpdates afterUpdates: Bool) -> Bool {
-        return true
+      true
     }
-    
-}
+  }
 
-// MacOS BarButtonItems can not be disabled. Thats, why we create a custom BarButtonItem.
-class CustomBarButton: UIBarButtonItem, Refreshable {
+  // MacOS BarButtonItems can not be disabled. Thats, why we create a custom BarButtonItem.
+  class CustomBarButton: UIBarButtonItem, Refreshable {
     static let defaultPointSize: CGFloat = 18.0
     static let smallPointSize: CGFloat = 14.0
     static let verySmallPointSize: CGFloat = 12.0
@@ -43,110 +41,118 @@ class CustomBarButton: UIBarButtonItem, Refreshable {
     let pointSize: CGFloat
 
     var inUIButton: UIButton? {
-        self.customView as? UIButton
+      customView as? UIButton
     }
 
     var hovered: Bool = false {
-        didSet {
-            self.updateButtonBackgroundColor()
-        }
+      didSet {
+        updateButtonBackgroundColor()
+      }
     }
 
     var active: Bool = false {
-        didSet{
-            guard let image = self.inUIButton?.configuration?.image else { return }
-            self.updateImage(image: image)
-            self.updateButtonBackgroundColor()
-        }
+      didSet {
+        guard let image = inUIButton?.configuration?.image else { return }
+        updateImage(image: image)
+        updateButtonBackgroundColor()
+      }
     }
 
     var currentTintColor: UIColor {
-        if (self.active) {
-            .label
-        } else {
-            .secondaryLabel
-        }
+      if active {
+        .label
+      } else {
+        .secondaryLabel
+      }
     }
 
     var currentBackgroundColor: UIColor {
-        if (self.hovered || self.active) {
-            .hoveredBackgroundColor
-        } else {
-            .clear
-        }
+      if hovered || active {
+        .hoveredBackgroundColor
+      } else {
+        .clear
+      }
     }
 
     func updateButtonBackgroundColor() {
-        self.inUIButton?.backgroundColor = self.currentBackgroundColor
+      inUIButton?.backgroundColor = currentBackgroundColor
     }
 
     func updateImage(image: UIImage) {
-        self.inUIButton?.configuration?.image = image.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTintColor)
+      inUIButton?.configuration?.image = image.styleForNavigationBar(
+        pointSize: pointSize,
+        tintColor: currentTintColor
+      )
     }
 
     func createInUIButton(config: UIButton.Configuration, size: CGSize) -> UIButton? {
-        let button = MacSnapshotButton(configuration: config)
-        button.imageView?.contentMode = .scaleAspectFit
+      let button = MacSnapshotButton(configuration: config)
+      button.imageView?.contentMode = .scaleAspectFit
 
-        // influence the highlighted area
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.widthAnchor.constraint(equalToConstant: size.width).isActive = true
-        button.heightAnchor.constraint(equalToConstant: size.height).isActive = true
+      // influence the highlighted area
+      button.translatesAutoresizingMaskIntoConstraints = false
+      button.widthAnchor.constraint(equalToConstant: size.width).isActive = true
+      button.heightAnchor.constraint(equalToConstant: size.height).isActive = true
 
-        return button
+      return button
     }
 
     override var isEnabled: Bool {
-        get { super.isEnabled }
-        set(newValue) {
-            super.isEnabled = newValue
-            self.customView?.isUserInteractionEnabled = newValue
-        }
+      get { super.isEnabled }
+      set(newValue) {
+        super.isEnabled = newValue
+        customView?.isUserInteractionEnabled = newValue
+      }
     }
 
     init(image: UIImage?, pointSize: CGFloat = ControlBarButton.defaultPointSize) {
-        self.pointSize = pointSize
-        super.init()
+      self.pointSize = pointSize
+      super.init()
 
-        var config = UIButton.Configuration.gray()
-        config.macIdiomStyle = .borderless
-        config.image = image?.styleForNavigationBar(pointSize: self.pointSize, tintColor: self.currentTintColor)
-        let button = createInUIButton(config: config, size: Self.defaultSize)
-        button?.addTarget(self, action: #selector(self.clicked(_:)), for: .touchUpInside)
-        button?.layer.cornerRadius = 5
-        self.customView = button
+      var config = UIButton.Configuration.gray()
+      config.macIdiomStyle = .borderless
+      config.image = image?.styleForNavigationBar(
+        pointSize: self.pointSize,
+        tintColor: currentTintColor
+      )
+      let button = createInUIButton(config: config, size: Self.defaultSize)
+      button?.addTarget(self, action: #selector(clicked(_:)), for: .touchUpInside)
+      button?.layer.cornerRadius = 5
+      self.customView = button
 
-        // Recreate the system button background highlight
-        self.installHoverGestureRecognizer()
+      // Recreate the system button background highlight
+      installHoverGestureRecognizer()
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+      fatalError("init(coder:) has not been implemented")
     }
 
     private func installHoverGestureRecognizer() {
-        let recognizer = UIHoverGestureRecognizer(target: self, action: #selector(self.hoverButton(_:)))
-        self.inUIButton?.addGestureRecognizer(recognizer)
+      let recognizer = UIHoverGestureRecognizer(target: self, action: #selector(hoverButton(_:)))
+      inUIButton?.addGestureRecognizer(recognizer)
     }
 
-    @objc private func hoverButton(_ recognizer: UIHoverGestureRecognizer) {
-        switch recognizer.state {
-        case .began:
-            self.hovered = true
-        case .ended, .cancelled, .failed:
-            self.hovered = false
-        default:
-            break
-        }
+    @objc
+    private func hoverButton(_ recognizer: UIHoverGestureRecognizer) {
+      switch recognizer.state {
+      case .began:
+        hovered = true
+      case .cancelled, .ended, .failed:
+        hovered = false
+      default:
+        break
+      }
     }
 
-    @objc func clicked(_ sender: UIButton) {}
+    @objc
+    func clicked(_ sender: UIButton) {}
 
     func reload() {
-        self.updateButtonBackgroundColor()
-        guard let image = self.inUIButton?.configuration?.image else { return }
-        self.updateImage(image: image)
+      updateButtonBackgroundColor()
+      guard let image = inUIButton?.configuration?.image else { return }
+      updateImage(image: image)
     }
-}
+  }
 
 #endif

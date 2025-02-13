@@ -19,63 +19,88 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreGraphics
 import Foundation
 import UIKit
-import CoreGraphics
 
 #if targetEnvironment(macCatalyst)
-typealias AppKitController = NSObject
+  typealias AppKitController = NSObject
 
-extension AppKitController {
-    @objc public func updateControlAccentColor(_ color: CGColor) {}
-    @objc public func installControlAccentColorHook() {}
+  extension AppKitController {
+    @objc
+    public func updateControlAccentColor(_ color: CGColor) {}
+    @objc
+    public func installControlAccentColorHook() {}
 
-    @objc public func _catalyst_setupWindow(_ sender:Any) {}
-    @objc public func configureUtilityWindowForSceneIdentifier(_ sceneIdentifier: String, properties: [String: Any]) {}
-    @objc public func saveWindowFrameForSceneIdentifier(_  sceneIdentifier: String, autosaveName: String) {}
-}
+    @objc
+    public func _catalyst_setupWindow(_ sender: Any) {}
+    @objc
+    public func configureUtilityWindowForSceneIdentifier(
+      _ sceneIdentifier: String,
+      properties: [String: Any]
+    ) {}
+    @objc
+    public func saveWindowFrameForSceneIdentifier(
+      _ sceneIdentifier: String,
+      autosaveName: String
+    ) {}
+  }
 
-extension AppDelegate {
+  extension AppDelegate {
     static var appKitController: NSObject?
 
     class func installAppKitColorHooks() {
-        appKitController?.perform(#selector(installControlAccentColorHook))
+      appKitController?.perform(#selector(installControlAccentColorHook))
     }
 
     class func updateAppKitControlColor(_ color: UIColor) {
-        appKitController?.perform(#selector(updateControlAccentColor(_:)), with: color.cgColor)
+      appKitController?.perform(#selector(updateControlAccentColor(_:)), with: color.cgColor)
     }
 
-    class func configureUtilityWindow(persistentIdentifier: String, properties: [String: Any] = [:]) {
-        appKitController?.perform(#selector(configureUtilityWindowForSceneIdentifier(_:properties:)), with: persistentIdentifier, with: properties)
+    class func configureUtilityWindow(
+      persistentIdentifier: String,
+      properties: [String: Any] = [:]
+    ) {
+      appKitController?.perform(
+        #selector(configureUtilityWindowForSceneIdentifier(_:properties:)),
+        with: persistentIdentifier,
+        with: properties
+      )
     }
 
-    class func saveWindowFrame(_  sceneIdentifier: String, autosaveName: String) {
-        appKitController?.perform(#selector(saveWindowFrameForSceneIdentifier(_:autosaveName:)), with: sceneIdentifier, with: autosaveName)
+    class func saveWindowFrame(_ sceneIdentifier: String, autosaveName: String) {
+      appKitController?.perform(
+        #selector(saveWindowFrameForSceneIdentifier(_:autosaveName:)),
+        with: sceneIdentifier,
+        with: autosaveName
+      )
     }
 
     class func loadAppKitIntegrationFramework() {
+      if let frameworksPath = Bundle.main.privateFrameworksPath {
+        let bundlePath = "\(frameworksPath)/AppKitIntegration.framework"
+        do {
+          try Bundle(path: bundlePath)?.loadAndReturnError()
 
-        if let frameworksPath = Bundle.main.privateFrameworksPath {
-            let bundlePath = "\(frameworksPath)/AppKitIntegration.framework"
-            do {
-                try Bundle(path: bundlePath)?.loadAndReturnError()
+          let bundle = Bundle(path: bundlePath)!
 
-                let bundle = Bundle(path: bundlePath)!
+          if let appKitControllerClass = bundle.principalClass as? NSObject.Type {
+            appKitController = appKitControllerClass.init()
+            NSLog("[APPKIT BUNDLE] Loaded Successfully")
 
-                if let appKitControllerClass = bundle.principalClass as? NSObject.Type {
-                    appKitController = appKitControllerClass.init()
-                    NSLog("[APPKIT BUNDLE] Loaded Successfully")
-
-                    NotificationCenter.default.addObserver(appKitController as Any, selector: #selector(_catalyst_setupWindow(_:)), name: NSNotification.Name("UISBHSDidCreateWindowForSceneNotification"), object: nil)
-                } else {
-                    NSLog("[APPKIT BUNDLE] Error loading: Can not load AppKitController")
-                }
-            }
-            catch {
-                NSLog("[APPKIT BUNDLE] Error loading: \(error)")
-            }
+            NotificationCenter.default.addObserver(
+              appKitController as Any,
+              selector: #selector(_catalyst_setupWindow(_:)),
+              name: NSNotification.Name("UISBHSDidCreateWindowForSceneNotification"),
+              object: nil
+            )
+          } else {
+            NSLog("[APPKIT BUNDLE] Error loading: Can not load AppKitController")
+          }
+        } catch {
+          NSLog("[APPKIT BUNDLE] Error loading: \(error)")
         }
+      }
     }
-}
+  }
 #endif

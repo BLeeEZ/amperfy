@@ -19,51 +19,52 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
 import AmperfyKit
+import Foundation
 import MarqueeLabel
+import UIKit
 
 class NotificationDetailVC: UIViewController {
-    
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var descriptionTextView: UITextView!
-    
-    var topic = ""
-    var message = ""
-    var logType = LogEntryType.info
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.view.setBackgroundBlur(style: .prominent)
-        
-        if let presentationController = presentationController as? UISheetPresentationController {
-            presentationController.detents = [
-                .large()
-            ]
-            if traitCollection.horizontalSizeClass == .compact {
-                presentationController.detents.append(.medium())
-            }
-        }
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        refresh()
-    }
+  @IBOutlet
+  weak var titleLabel: UILabel!
+  @IBOutlet
+  weak var descriptionTextView: UITextView!
 
-    func display(title: String, message: String, type: LogEntryType) {
-        self.topic = title
-        self.message = message
-    }
+  var topic = ""
+  var message = ""
+  var logType = LogEntryType.info
 
-    func refresh() {
-        titleLabel.text = self.topic
-        descriptionTextView.text = self.message
-    }
-    
-    @IBAction func pressedClose(_ sender: Any) {
-        self.dismiss(animated: true)
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    view.setBackgroundBlur(style: .prominent)
 
+    if let presentationController = presentationController as? UISheetPresentationController {
+      presentationController.detents = [
+        .large(),
+      ]
+      if traitCollection.horizontalSizeClass == .compact {
+        presentationController.detents.append(.medium())
+      }
+    }
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    refresh()
+  }
+
+  func display(title: String, message: String, type: LogEntryType) {
+    topic = title
+    self.message = message
+  }
+
+  func refresh() {
+    titleLabel.text = topic
+    descriptionTextView.text = message
+  }
+
+  @IBAction
+  func pressedClose(_ sender: Any) {
+    dismiss(animated: true)
+  }
 }

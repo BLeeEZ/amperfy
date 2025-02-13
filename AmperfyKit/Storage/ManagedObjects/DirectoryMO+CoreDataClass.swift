@@ -19,64 +19,76 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - DirectoryMO
 
 @objc(DirectoryMO)
 public final class DirectoryMO: AbstractLibraryEntityMO {
-    
-    override public func willSave() {
-        super.willSave()
-        if hasChangedSongs {
-            updateSongCount()
-        }
-        if hasChangedSubdirectories {
-            updateSubdirectoryCount()
-        }
+  override public func willSave() {
+    super.willSave()
+    if hasChangedSongs {
+      updateSongCount()
     }
+    if hasChangedSubdirectories {
+      updateSubdirectoryCount()
+    }
+  }
 
-    fileprivate var hasChangedSongs: Bool {
-        return changedValue(forKey: #keyPath(songs)) != nil
-    }
+  fileprivate var hasChangedSongs: Bool {
+    changedValue(forKey: #keyPath(songs)) != nil
+  }
 
-    fileprivate func updateSongCount() {
-        guard Int16(songs?.count ?? 0) != songCount else { return }
-        songCount = Int16(songs?.count ?? 0)
-    }
+  fileprivate func updateSongCount() {
+    guard Int16(songs?.count ?? 0) != songCount else { return }
+    songCount = Int16(songs?.count ?? 0)
+  }
 
-    fileprivate var hasChangedSubdirectories: Bool {
-        return changedValue(forKey: #keyPath(subdirectories)) != nil
-    }
+  fileprivate var hasChangedSubdirectories: Bool {
+    changedValue(forKey: #keyPath(subdirectories)) != nil
+  }
 
-    fileprivate func updateSubdirectoryCount() {
-        guard Int16(subdirectories?.count ?? 0) != subdirectoryCount else { return }
-        subdirectoryCount = Int16(subdirectories?.count ?? 0)
-    }
-    
-    static var alphabeticSortedFetchRequest: NSFetchRequest<DirectoryMO> {
-        let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(DirectoryMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
+  fileprivate func updateSubdirectoryCount() {
+    guard Int16(subdirectories?.count ?? 0) != subdirectoryCount else { return }
+    subdirectoryCount = Int16(subdirectories?.count ?? 0)
+  }
 
-    static func getSearchPredicate(searchText: String) -> NSPredicate {
-        var predicate: NSPredicate = NSPredicate.init(value: true)
-        if searchText.count > 0 {
-            predicate = NSPredicate(format: "%K contains[cd] %@", #keyPath(DirectoryMO.name), searchText)
-        }
-        return predicate
-    }
+  static var alphabeticSortedFetchRequest: NSFetchRequest<DirectoryMO> {
+    let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: #keyPath(DirectoryMO.alphabeticSectionInitial),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
 
+  static func getSearchPredicate(searchText: String) -> NSPredicate {
+    var predicate = NSPredicate(value: true)
+    if !searchText.isEmpty {
+      predicate = NSPredicate(format: "%K contains[cd] %@", #keyPath(DirectoryMO.name), searchText)
+    }
+    return predicate
+  }
 }
 
+// MARK: CoreDataIdentifyable
+
 extension DirectoryMO: CoreDataIdentifyable {
-    
-    static var identifierKey: KeyPath<DirectoryMO, String?> {
-        return \DirectoryMO.name
-    }
-    
+  static var identifierKey: KeyPath<DirectoryMO, String?> {
+    \DirectoryMO.name
+  }
 }

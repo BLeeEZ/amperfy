@@ -19,67 +19,83 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import Foundation
 import UIKit
-import AmperfyKit
+
+// MARK: - PopupPlayerDirection
 
 enum PopupPlayerDirection {
-    case open
-    case close
-    case toggle
+  case open
+  case close
+  case toggle
 }
 
-extension AppDelegate: UNUserNotificationCenterDelegate
-{
-    func configureNotificationHandling() {
-        UNUserNotificationCenter.current().delegate = self
-    }
-    
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        return [.list, .banner]
+// MARK: - AppDelegate + UNUserNotificationCenterDelegate
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+  func configureNotificationHandling() {
+    UNUserNotificationCenter.current().delegate = self
+  }
+
+  nonisolated func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification
+  ) async
+    -> UNNotificationPresentationOptions {
+    [.list, .banner]
+  }
+
+  nonisolated func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse
+  ) async {
+    let userInfo = response.notification.request.content.userInfo
+    guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? String,
+          let contentType = NotificationContentType(rawValue: contentTypeRaw),
+          let id = userInfo[NotificationUserInfo.id] as? String else {
+      return
     }
 
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        let userInfo = response.notification.request.content.userInfo
-        guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? String,
-              let contentType = NotificationContentType(rawValue: contentTypeRaw),
-              let id = userInfo[NotificationUserInfo.id] as? String else {
-            return
+    await MainActor.run {
+      userStatistics.appStartedViaNotification()
+      switch contentType {
+      case .podcastEpisode:
+        let episode = storage.main.library.getPodcastEpisode(id: id)
+        if let podcast = episode?.podcast {
+          let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
+          podcastDetailVC.podcast = podcast
+          displayInLibraryTab(vc: podcastDetailVC)
         }
-        
-        await MainActor.run {
-            userStatistics.appStartedViaNotification()
-            switch contentType {
-            case .podcastEpisode:
-                let episode = storage.main.library.getPodcastEpisode(id: id)
-                if let podcast = episode?.podcast {
-                    let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-                    podcastDetailVC.podcast = podcast
-                    displayInLibraryTab(vc: podcastDetailVC)
-                }
-            }
-        }
+      }
     }
-    
-    private func displayInLibraryTab(vc: UIViewController) {
-        hostingSplitVC?.pushNavLibrary(vc: vc)
-    }
-    
-    var hostingSplitVC: SplitVC? {
-        guard let topView = Self.topViewController(),
-              storage.isLibrarySynced,
-              let splitVC = topView as? SplitVC
-        else { return nil }
-        return splitVC
-    }
+  }
 
-    func visualizePopupPlayer(direction: PopupPlayerDirection, animated: Bool, completion completionBlock: (()->Void)? = nil) {
-        hostingSplitVC?.visualizePopupPlayer(direction: direction, animated: animated, completion: completionBlock)
-        
-    }
-    
-    func displaySearchTab() {
-        hostingSplitVC?.displaySearch()
-    }
-    
+  private func displayInLibraryTab(vc: UIViewController) {
+    hostingSplitVC?.pushNavLibrary(vc: vc)
+  }
+
+  var hostingSplitVC: SplitVC? {
+    guard let topView = Self.topViewController(),
+          storage.isLibrarySynced,
+          let splitVC = topView as? SplitVC
+    else { return nil }
+    return splitVC
+  }
+
+  func visualizePopupPlayer(
+    direction: PopupPlayerDirection,
+    animated: Bool,
+    completion completionBlock: (() -> ())? = nil
+  ) {
+    hostingSplitVC?.visualizePopupPlayer(
+      direction: direction,
+      animated: animated,
+      completion: completionBlock
+    )
+  }
+
+  func displaySearchTab() {
+    hostingSplitVC?.displaySearch()
+  }
 }

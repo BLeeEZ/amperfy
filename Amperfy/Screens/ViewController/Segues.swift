@@ -22,13 +22,11 @@
 import Foundation
 
 enum Segues: String {
-    
-    case toLogin
-    case toArtistDetail
-    case toAlbumDetail
-    case toPlaylistDetail
-    case toGenreDetail
-    case toDirectories
-    case toPodcastDetail
-    
+  case toLogin
+  case toArtistDetail
+  case toAlbumDetail
+  case toPlaylistDetail
+  case toGenreDetail
+  case toDirectories
+  case toPodcastDetail
 }

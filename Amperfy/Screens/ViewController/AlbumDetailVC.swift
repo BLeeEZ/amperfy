@@ -19,126 +19,169 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
+
+// MARK: - AlbumDetailDiffableDataSource
 
 class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        return false
-    }
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return true to be enable swipe
-        return true
-    }
+  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    false
+  }
+
+  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    // Return true to be enable swipe
+    true
+  }
 }
 
+// MARK: - AlbumDetailVC
+
 class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
+  override var sceneTitle: String? { album.name }
 
-    override var sceneTitle: String? { album.name }
+  var album: Album!
+  var songToScrollTo: Song?
+  private var fetchedResultsController: AlbumSongsFetchedResultsController!
+  private var optionsButton: UIBarButtonItem!
+  private var detailOperationsView: GenericDetailTableHeader?
 
-    var album: Album!
-    var songToScrollTo: Song?
-    private var fetchedResultsController: AlbumSongsFetchedResultsController!
-    private var optionsButton: UIBarButtonItem!
-    private var detailOperationsView: GenericDetailTableHeader?
-
-    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
-        let source = AlbumDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
-            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
-                  let songMO = object as? SongMO
-            else {
-                fatalError("Managed object should be available")
-            }
-            let song = Song(managedObject: songMO)
-            return self.createCell(tableView, forRowAt: indexPath, song: song)
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+      AlbumDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let songMO = object as? SongMO
+        else {
+          fatalError("Managed object should be available")
         }
-        return source
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        appDelegate.userStatistics.visited(.albumDetail)
+        let song = Song(managedObject: songMO)
+        return self.createCell(tableView, forRowAt: indexPath, song: song)
+      }
+    return source
+  }
 
-        optionsButton = OptionsBarButton()
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    appDelegate.userStatistics.visited(.albumDetail)
 
-        fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        singleFetchedResultsController = fetchedResultsController
-        singleFetchedResultsController?.delegate = self
-        singleFetchedResultsController?.fetch()
-        
-        configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
-        tableView.register(nibName: PlayableTableCell.typeName)
-        tableView.rowHeight = PlayableTableCell.rowHeight
-        // Catalyst also need an estimate to calculate the correct height before scrolling
-        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    optionsButton = OptionsBarButton()
 
-        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-            infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
-            playContextCb: {() in PlayContext(containable: self.album, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
-            player: appDelegate.player,
-            isInfoAlwaysHidden: true)
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: album, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig)
-        detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
+    fetchedResultsController = AlbumSongsFetchedResultsController(
+      forAlbum: album,
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
 
-        optionsButton.menu = UIMenu.lazyMenu {
-            EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
-        }
-        navigationItem.rightBarButtonItem = optionsButton
-        
-        containableAtIndexPathCallback = { (indexPath) in
-            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
-        }
-        playContextAtIndexPathCallback = self.convertIndexPathToPlayContext
-        swipeCallback = { (indexPath, completionHandler) in
-            let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
-            completionHandler(SwipeActionContext(containable: song, playContext: playContext))
-        }
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        
-        Task { @MainActor in
-            do {
-                try await album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            } catch {
-                self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
-            }
-            self.detailOperationsView?.refresh()
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        defer { songToScrollTo = nil }
-        guard let songToScrollTo = songToScrollTo,
-              let indexPath = fetchedResultsController.fetchResultsController.indexPath(forObject: songToScrollTo.managedObject)
-        else { return }
-        tableView.scrollToRow(at: indexPath, at: .top, animated: true)
-    }
+    configureSearchController(
+      placeholder: "Search in \"Album\"",
+      scopeButtonTitles: ["All", "Cached"]
+    )
+    tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.rowHeight = PlayableTableCell.rowHeight
+    // Catalyst also need an estimate to calculate the correct height before scrolling
+    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
 
-    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
-        guard let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode)
-        else { return nil }
-        let selectedSong = self.fetchedResultsController.getWrappedEntity(at: songIndexPath)
-        guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
-        return PlayContext(containable: album, index: playContextIndex, playables: songs)
-    }
-    
-    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell) else { return nil }
-        return convertIndexPathToPlayContext(songIndexPath: indexPath)
-    }
+    let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+      infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
+      playContextCb: { () in PlayContext(
+        containable: self.album,
+        playables: self.fetchedResultsController
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+      ) },
+      player: appDelegate.player,
+      isInfoAlwaysHidden: true
+    )
+    let detailHeaderConfig = DetailHeaderConfiguration(
+      entityContainer: album,
+      rootView: self,
+      tableView: tableView,
+      playShuffleInfoConfig: playShuffleInfoConfig
+    )
+    detailOperationsView = GenericDetailTableHeader
+      .createTableHeader(configuration: detailHeaderConfig)
 
-    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, song: Song) -> UITableViewCell {
-        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-        cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self, isDislayAlbumTrackNumberStyle: true)
-        return cell
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
     }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
-        tableView.reloadData()
+    navigationItem.rightBarButtonItem = optionsButton
+
+    containableAtIndexPathCallback = { indexPath in
+      self.fetchedResultsController.getWrappedEntity(at: indexPath)
     }
+    playContextAtIndexPathCallback = convertIndexPathToPlayContext
+    swipeCallback = { indexPath, completionHandler in
+      let song = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+      completionHandler(SwipeActionContext(containable: song, playContext: playContext))
+    }
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+
+    Task { @MainActor in
+      do {
+        try await album.fetch(
+          storage: self.appDelegate.storage,
+          librarySyncer: self.appDelegate.librarySyncer,
+          playableDownloadManager: self.appDelegate.playableDownloadManager
+        )
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+      }
+      self.detailOperationsView?.refresh()
+    }
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    defer { songToScrollTo = nil }
+    guard let songToScrollTo = songToScrollTo,
+          let indexPath = fetchedResultsController.fetchResultsController
+          .indexPath(forObject: songToScrollTo.managedObject)
+    else { return }
+    tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+  }
+
+  func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+    guard let songs = fetchedResultsController
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+    else { return nil }
+    let selectedSong = fetchedResultsController.getWrappedEntity(at: songIndexPath)
+    guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
+    return PlayContext(containable: album, index: playContextIndex, playables: songs)
+  }
+
+  func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+    guard let indexPath = tableView.indexPath(for: cell) else { return nil }
+    return convertIndexPathToPlayContext(songIndexPath: indexPath)
+  }
+
+  func createCell(
+    _ tableView: UITableView,
+    forRowAt indexPath: IndexPath,
+    song: Song
+  )
+    -> UITableViewCell {
+    let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+    cell.display(
+      playable: song,
+      playContextCb: convertCellViewToPlayContext,
+      rootView: self,
+      isDislayAlbumTrackNumberStyle: true
+    )
+    return cell
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    fetchedResultsController.search(
+      searchText: searchController.searchBar.text ?? "",
+      onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+    )
+    tableView.reloadData()
+  }
 }

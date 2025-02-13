@@ -19,47 +19,62 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 class AlbumCollectionCell: BasicCollectionCell {
-    
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subtitleLabel: UILabel!
-    @IBOutlet weak var entityImage: EntityImageView!
-    @IBOutlet weak var artworkImageWidthConstraint: NSLayoutConstraint!
-    
-    static let maxWidth: CGFloat = 250.0
-    
-    private var container: PlayableContainable?
-    private var rootView: UICollectionViewController?
-    private var rootFlowLayout: UICollectionViewDelegateFlowLayout?
+  @IBOutlet
+  weak var titleLabel: UILabel!
+  @IBOutlet
+  weak var subtitleLabel: UILabel!
+  @IBOutlet
+  weak var entityImage: EntityImageView!
+  @IBOutlet
+  weak var artworkImageWidthConstraint: NSLayoutConstraint!
 
-    func display(container: PlayableContainable, rootView: UICollectionViewController, rootFlowLayout: UICollectionViewDelegateFlowLayout, initialIndexPath: IndexPath) {
-        self.container = container
-        self.rootView = rootView
-        self.rootFlowLayout = rootFlowLayout
-        titleLabel.text = container.name
-        subtitleLabel.text = container.subtitle
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container, cornerRadius: .big)
-        updateArtworkImageConstraint(indexPath: initialIndexPath)
-        layoutIfNeeded()
+  static let maxWidth: CGFloat = 250.0
+
+  private var container: PlayableContainable?
+  private var rootView: UICollectionViewController?
+  private var rootFlowLayout: UICollectionViewDelegateFlowLayout?
+
+  func display(
+    container: PlayableContainable,
+    rootView: UICollectionViewController,
+    rootFlowLayout: UICollectionViewDelegateFlowLayout,
+    initialIndexPath: IndexPath
+  ) {
+    self.container = container
+    self.rootView = rootView
+    self.rootFlowLayout = rootFlowLayout
+    titleLabel.text = container.name
+    subtitleLabel.text = container.subtitle
+    entityImage.display(
+      theme: appDelegate.storage.settings.themePreference,
+      container: container,
+      cornerRadius: .big
+    )
+    updateArtworkImageConstraint(indexPath: initialIndexPath)
+    layoutIfNeeded()
+  }
+
+  override func layoutSubviews() {
+    if let indexPath = rootView?.collectionView.indexPath(for: self) {
+      updateArtworkImageConstraint(indexPath: indexPath)
     }
-    
-    override func layoutSubviews() {
-        if let indexPath = rootView?.collectionView.indexPath(for: self) {
-            updateArtworkImageConstraint(indexPath: indexPath)
-        }
-        super.layoutSubviews()
+    super.layoutSubviews()
+  }
+
+  func updateArtworkImageConstraint(indexPath: IndexPath) {
+    if let rootView = rootView,
+       let rootFlowLayout = rootFlowLayout,
+       let itemSize = rootFlowLayout.collectionView?(
+         rootView.collectionView,
+         layout: rootView.collectionView.collectionViewLayout,
+         sizeForItemAt: indexPath
+       ) {
+      let newImageWidth = min(itemSize.width, itemSize.height)
+      artworkImageWidthConstraint.constant = newImageWidth
     }
-    
-    func updateArtworkImageConstraint(indexPath: IndexPath) {
-        if let rootView = rootView,
-           let rootFlowLayout = rootFlowLayout,
-           let itemSize  = rootFlowLayout.collectionView?(rootView.collectionView, layout: rootView.collectionView.collectionViewLayout, sizeForItemAt: indexPath) {
-            let newImageWidth = min(itemSize.width, itemSize.height)
-            artworkImageWidthConstraint.constant = newImageWidth
-        }
-    }
-    
+  }
 }

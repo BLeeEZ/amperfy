@@ -19,62 +19,67 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - ArtworkDownloadSettingsView
 
 struct ArtworkDownloadSettingsView: View {
-    
-    @State var settingOptions = [ArtworkDownloadSetting]()
-    @State var activeOption = ArtworkDownloadSetting.onlyOnce
-    
-    func updateValues() {
-        settingOptions = ArtworkDownloadSetting.allCases
-        activeOption = appDelegate.storage.settings.artworkDownloadSetting
-    }
-    
-    var body: some View {
-        ZStack {
-            #if targetEnvironment(macCatalyst)
-            Menu(self.activeOption.description) {
-                ForEach(settingOptions, id: \.self) { option in
-                    Button(option.description, action: {
-                        appDelegate.storage.settings.artworkDownloadSetting = option
-                        updateValues()
-                    })
-                }
-            }
-            #else
-            List {
-                Section {
-                    ForEach(settingOptions, id: \.self) { option in
-                        Button(action: {
-                            appDelegate.storage.settings.artworkDownloadSetting = option
-                            updateValues()
-                        }) {
-                            HStack {
-                                Text(option.description)
-                                Spacer()
-                                if option == activeOption {
-                                    Image.checkmark
-                                }
-                            }
-                            .contentShape(Rectangle())
-                            .foregroundColor(.primary)
-                        }
-                    }
-                }
-            }
-            #endif
+  @State
+  var settingOptions = [ArtworkDownloadSetting]()
+  @State
+  var activeOption = ArtworkDownloadSetting.onlyOnce
+
+  func updateValues() {
+    settingOptions = ArtworkDownloadSetting.allCases
+    activeOption = appDelegate.storage.settings.artworkDownloadSetting
+  }
+
+  var body: some View {
+    ZStack {
+      #if targetEnvironment(macCatalyst)
+        Menu(activeOption.description) {
+          ForEach(settingOptions, id: \.self) { option in
+            Button(option.description, action: {
+              appDelegate.storage.settings.artworkDownloadSetting = option
+              updateValues()
+            })
+          }
         }
-        .navigationTitle("Artwork Download")
-        .onAppear {
-            updateValues()
+      #else
+        List {
+          Section {
+            ForEach(settingOptions, id: \.self) { option in
+              Button(action: {
+                appDelegate.storage.settings.artworkDownloadSetting = option
+                updateValues()
+              }) {
+                HStack {
+                  Text(option.description)
+                  Spacer()
+                  if option == activeOption {
+                    Image.checkmark
+                  }
+                }
+                .contentShape(Rectangle())
+                .foregroundColor(.primary)
+              }
+            }
+          }
         }
+      #endif
     }
+    .navigationTitle("Artwork Download")
+    .onAppear {
+      updateValues()
+    }
+  }
 }
 
+// MARK: - ArtworkDownloadSettingsView_Previews
+
 struct ArtworkDownloadSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        ArtworkDownloadSettingsView()
-    }
+  static var previews: some View {
+    ArtworkDownloadSettingsView()
+  }
 }

@@ -24,33 +24,33 @@ import UIKit
 
 #if targetEnvironment(macCatalyst)
 
-// Hack: built-in flexible space navigation bar item is not working, so we use this workaround
-class SpaceBarItem: UIBarButtonItem {
+  // Hack: built-in flexible space navigation bar item is not working, so we use this workaround
+  class SpaceBarItem: UIBarButtonItem {
     convenience init(fixedSpace: CGFloat, priority: UILayoutPriority = .defaultHigh) {
-        self.init(minSpace: fixedSpace, maxSpace: fixedSpace)
+      self.init(minSpace: fixedSpace, maxSpace: fixedSpace)
     }
 
     init(minSpace: CGFloat = 0, maxSpace: CGFloat = 10000) {
-        super.init()
+      super.init()
 
-        let clearView = UIView(frame: .zero)
-        clearView.backgroundColor = .clear
+      let clearView = UIView(frame: .zero)
+      clearView.backgroundColor = .clear
 
-        clearView.translatesAutoresizingMaskIntoConstraints = false
+      clearView.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            clearView.widthAnchor.constraint(lessThanOrEqualToConstant: maxSpace),
-            clearView.widthAnchor.constraint(greaterThanOrEqualToConstant: minSpace),
-            // This allows us to still grab and move the window when clicking the empty space
-            clearView.heightAnchor.constraint(equalToConstant: 0)
-        ])
+      NSLayoutConstraint.activate([
+        clearView.widthAnchor.constraint(lessThanOrEqualToConstant: maxSpace),
+        clearView.widthAnchor.constraint(greaterThanOrEqualToConstant: minSpace),
+        // This allows us to still grab and move the window when clicking the empty space
+        clearView.heightAnchor.constraint(equalToConstant: 0),
+      ])
 
-        self.customView = clearView
+      self.customView = clearView
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+      fatalError("init(coder:) has not been implemented")
     }
-}
+  }
 
 #endif

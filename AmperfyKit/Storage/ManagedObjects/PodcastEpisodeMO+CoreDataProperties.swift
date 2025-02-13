@@ -19,26 +19,29 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension PodcastEpisodeMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<PodcastEpisodeMO> {
+    NSFetchRequest<PodcastEpisodeMO>(entityName: "PodcastEpisode")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<PodcastEpisodeMO> {
-        return NSFetchRequest<PodcastEpisodeMO>(entityName: "PodcastEpisode")
-    }
+  @NSManaged
+  public var depiction: String?
+  @NSManaged
+  public var publishDate: Date?
+  @NSManaged
+  public var status: Int16
+  @NSManaged
+  public var streamId: String?
+  @NSManaged
+  public var podcast: PodcastMO?
 
-    @NSManaged public var depiction: String?
-    @NSManaged public var publishDate: Date?
-    @NSManaged public var status: Int16
-    @NSManaged public var streamId: String?
-    @NSManaged public var podcast: PodcastMO?
-    
-    static let relationshipKeyPathsForPrefetching = [
-        #keyPath(PodcastEpisodeMO.podcast),
-        #keyPath(PodcastEpisodeMO.artwork),
-        #keyPath(PodcastEpisodeMO.embeddedArtwork),
-    ]
-
+  static let relationshipKeyPathsForPrefetching = [
+    #keyPath(PodcastEpisodeMO.podcast),
+    #keyPath(PodcastEpisodeMO.artwork),
+    #keyPath(PodcastEpisodeMO.embeddedArtwork),
+  ]
 }

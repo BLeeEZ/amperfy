@@ -19,18 +19,19 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension EmbeddedArtworkMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<EmbeddedArtworkMO> {
+    NSFetchRequest<EmbeddedArtworkMO>(entityName: "EmbeddedArtwork")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<EmbeddedArtworkMO> {
-        return NSFetchRequest<EmbeddedArtworkMO>(entityName: "EmbeddedArtwork")
-    }
-
-    @NSManaged public var imageData: Data? /// deprecated! use relFilePath instead
-    @NSManaged public var relFilePath: String?
-    @NSManaged public var owner: AbstractPlayableMO?
-
+  @NSManaged
+  public var imageData: Data? /// deprecated! use relFilePath instead
+  @NSManaged
+  public var relFilePath: String?
+  @NSManaged
+  public var owner: AbstractPlayableMO?
 }

@@ -19,52 +19,72 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
 import CoreData
+import Foundation
 import os.log
+import UIKit
 
 class SsRadioParserDelegate: SsXmlLibParser {
-    
-    var radioBuffer: Radio?
-    var parsedRadios = [Radio]()
-    
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        if elementName == "internetRadioStation" {
-            guard let radioId = attributeDict["id"] else {
-                os_log("Found radio with no id", log: log, type: .error)
-                return
-            }
-            if let fetchedRadio = library.getRadio(id: radioId)  {
-                radioBuffer = fetchedRadio
-                radioBuffer?.remoteStatus = .available
-            } else {
-                radioBuffer = library.createRadio()
-                radioBuffer?.id = radioId
-            }
-            
-            if let attributeTitle = attributeDict["name"] {
-                radioBuffer?.title = attributeTitle
-            }
-            if let streamUrl = attributeDict["streamUrl"] {
-                radioBuffer?.url = streamUrl
-            }
-            if let siteUrl = attributeDict["homePageUrl"] {
-                radioBuffer?.siteURL = URL(string: siteUrl)
-            }
-        }
-        
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
+  var radioBuffer: Radio?
+  var parsedRadios = [Radio]()
+
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    if elementName == "internetRadioStation" {
+      guard let radioId = attributeDict["id"] else {
+        os_log("Found radio with no id", log: log, type: .error)
+        return
+      }
+      if let fetchedRadio = library.getRadio(id: radioId) {
+        radioBuffer = fetchedRadio
+        radioBuffer?.remoteStatus = .available
+      } else {
+        radioBuffer = library.createRadio()
+        radioBuffer?.id = radioId
+      }
+
+      if let attributeTitle = attributeDict["name"] {
+        radioBuffer?.title = attributeTitle
+      }
+      if let streamUrl = attributeDict["streamUrl"] {
+        radioBuffer?.url = streamUrl
+      }
+      if let siteUrl = attributeDict["homePageUrl"] {
+        radioBuffer?.siteURL = URL(string: siteUrl)
+      }
     }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
-        
-        if elementName == "internetRadioStation", let radio = radioBuffer {
-            parsedCount += 1
-            parsedRadios.append(radio)
-            radioBuffer = nil
-        }
+
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+
+    if elementName == "internetRadioStation", let radio = radioBuffer {
+      parsedCount += 1
+      parsedRadios.append(radio)
+      radioBuffer = nil
     }
-    
+  }
 }

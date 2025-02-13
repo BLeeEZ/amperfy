@@ -19,20 +19,23 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension LogEntryMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<LogEntryMO> {
+    NSFetchRequest<LogEntryMO>(entityName: "LogEntry")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<LogEntryMO> {
-        return NSFetchRequest<LogEntryMO>(entityName: "LogEntry")
-    }
-
-    @NSManaged public var creationDate: Date
-    @NSManaged public var message: String
-    @NSManaged public var statusCode: Int32
-    @NSManaged public var type: Int16
-    @NSManaged public var suppressionTimeInterval: Int32
-
+  @NSManaged
+  public var creationDate: Date
+  @NSManaged
+  public var message: String
+  @NSManaged
+  public var statusCode: Int32
+  @NSManaged
+  public var type: Int16
+  @NSManaged
+  public var suppressionTimeInterval: Int32
 }

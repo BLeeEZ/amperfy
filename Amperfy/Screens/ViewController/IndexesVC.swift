@@ -19,64 +19,70 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
-import CoreData
 import AmperfyKit
+import CoreData
+import UIKit
 
 class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
-    
-    override var sceneTitle: String? { musicFolder.name }
+  override var sceneTitle: String? { musicFolder.name }
 
-    var musicFolder: MusicFolder!
-    private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        appDelegate.userStatistics.visited(.indexes)
-        
-        fetchedResultsController = MusicFolderDirectoriesFetchedResultsController(for: musicFolder, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        singleFetchedResultsController = fetchedResultsController
-        
-        configureSearchController(placeholder: "Search in \"Directories\"")
-        setNavBarTitle(title: musicFolder.name)
-        tableView.register(nibName: DirectoryTableCell.typeName)
-        tableView.rowHeight = DirectoryTableCell.rowHeight
-        tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        guard appDelegate.storage.settings.isOnlineMode else { return }
-        Task { @MainActor in do {
-            try await self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
-        } catch {
-            self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
-        }}
-    }
+  var musicFolder: MusicFolder!
+  private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
-        let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(directory: directory)
-        return cell
-    }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
-        performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: directory)
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.toDirectories.rawValue {
-            let vc = segue.destination as! DirectoriesVC
-            let directory = sender as! Directory
-            vc.directory = directory
-        }
-    }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
-        tableView.reloadData()
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    appDelegate.userStatistics.visited(.indexes)
 
+    fetchedResultsController = MusicFolderDirectoriesFetchedResultsController(
+      for: musicFolder,
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    singleFetchedResultsController = fetchedResultsController
+
+    configureSearchController(placeholder: "Search in \"Directories\"")
+    setNavBarTitle(title: musicFolder.name)
+    tableView.register(nibName: DirectoryTableCell.typeName)
+    tableView.rowHeight = DirectoryTableCell.rowHeight
+    tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    guard appDelegate.storage.settings.isOnlineMode else { return }
+    Task { @MainActor in do {
+      try await self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
+    } catch {
+      self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
+    }}
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    cellForRowAt indexPath: IndexPath
+  )
+    -> UITableViewCell {
+    let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
+    let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
+    cell.display(directory: directory)
+    return cell
+  }
+
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
+    performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: directory)
+  }
+
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == Segues.toDirectories.rawValue {
+      let vc = segue.destination as! DirectoriesVC
+      let directory = sender as! Directory
+      vc.directory = directory
+    }
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
+    tableView.reloadData()
+  }
 }

@@ -19,41 +19,55 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 import UIKit
-import CoreData
+
+// MARK: - OpenSubsonicExtensionsResponse
 
 public struct OpenSubsonicExtensionsResponse {
-    public var status = ""
-    public var version = ""
-    public var type = ""
-    public var serverVersion = ""
-    public var openSubsonic: Bool?
-    public var supportedExtensions = [String]()
+  public var status = ""
+  public var version = ""
+  public var type = ""
+  public var serverVersion = ""
+  public var openSubsonic: Bool?
+  public var supportedExtensions = [String]()
 }
 
-class SsOpenSubsonicExtensionsParserDelegate: SsXmlParser {
-    
-    public var openSubsonicExtensionsResponse = OpenSubsonicExtensionsResponse()
-    
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-        
-        if elementName == "subsonic-response" {
-            openSubsonicExtensionsResponse.status = attributeDict["status"] ?? ""
-            openSubsonicExtensionsResponse.version = attributeDict["version"] ?? ""
-            openSubsonicExtensionsResponse.type = attributeDict["type"] ?? ""
-            openSubsonicExtensionsResponse.serverVersion = attributeDict["serverVersion"] ?? ""
-            if let isOpenSubsonic = attributeDict["openSubsonic"] {
-                openSubsonicExtensionsResponse.openSubsonic = (isOpenSubsonic == "true")
-            } else {
-                openSubsonicExtensionsResponse.openSubsonic = false
-            }
-        } else if elementName == "openSubsonicExtensions" {
-            if let name = attributeDict["name"] {
-                openSubsonicExtensionsResponse.supportedExtensions.append(name)
-            }
-        }
-    }
+// MARK: - SsOpenSubsonicExtensionsParserDelegate
 
+class SsOpenSubsonicExtensionsParserDelegate: SsXmlParser {
+  public var openSubsonicExtensionsResponse = OpenSubsonicExtensionsResponse()
+
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
+
+    if elementName == "subsonic-response" {
+      openSubsonicExtensionsResponse.status = attributeDict["status"] ?? ""
+      openSubsonicExtensionsResponse.version = attributeDict["version"] ?? ""
+      openSubsonicExtensionsResponse.type = attributeDict["type"] ?? ""
+      openSubsonicExtensionsResponse.serverVersion = attributeDict["serverVersion"] ?? ""
+      if let isOpenSubsonic = attributeDict["openSubsonic"] {
+        openSubsonicExtensionsResponse.openSubsonic = (isOpenSubsonic == "true")
+      } else {
+        openSubsonicExtensionsResponse.openSubsonic = false
+      }
+    } else if elementName == "openSubsonicExtensions" {
+      if let name = attributeDict["name"] {
+        openSubsonicExtensionsResponse.supportedExtensions.append(name)
+      }
+    }
+  }
 }

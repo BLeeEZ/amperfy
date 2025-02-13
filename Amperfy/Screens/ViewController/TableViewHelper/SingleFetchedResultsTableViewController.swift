@@ -19,27 +19,28 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import CoreData
 import AmperfyKit
+import CoreData
 import UIKit
 
-class SingleFetchedResultsTableViewController<ResultType>: BasicFetchedResultsTableViewController<ResultType> where ResultType : NSFetchRequestResult {
-    
-    public var resultUpdateHandler: FetchUpdatePerObjectHandler?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        resultUpdateHandler = FetchUpdatePerObjectHandler(tableView: tableView)
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        singleFetchedResultsController?.delegate = resultUpdateHandler
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        singleFetchedResultsController?.delegate = nil
-    }
-    
+class SingleFetchedResultsTableViewController<ResultType>: BasicFetchedResultsTableViewController<
+  ResultType
+>
+  where ResultType: NSFetchRequestResult {
+  public var resultUpdateHandler: FetchUpdatePerObjectHandler?
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    resultUpdateHandler = FetchUpdatePerObjectHandler(tableView: tableView)
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    singleFetchedResultsController?.delegate = resultUpdateHandler
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    singleFetchedResultsController?.delegate = nil
+  }
 }

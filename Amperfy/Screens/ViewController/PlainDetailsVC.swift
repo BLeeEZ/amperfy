@@ -19,113 +19,119 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
 import AmperfyKit
+import Foundation
 import MarqueeLabel
+import UIKit
 
 class PlainDetailsVC: UIViewController {
-    
-    override var sceneTitle: String? { podcast?.name }
+  override var sceneTitle: String? { podcast?.name }
 
-    @IBOutlet weak var headerLabel: UILabel!
-    @IBOutlet weak var detailsTextView: UITextView!
+  @IBOutlet
+  weak var headerLabel: UILabel!
+  @IBOutlet
+  weak var detailsTextView: UITextView!
 
-    private var rootView: UIViewController?
-    private var podcast: Podcast?
-    private var podcastEpisode: PodcastEpisode?
-    private var player: PlayerFacade?
-    private var lyricsRelFilePath: URL?
+  private var rootView: UIViewController?
+  private var podcast: Podcast?
+  private var podcastEpisode: PodcastEpisode?
+  private var player: PlayerFacade?
+  private var lyricsRelFilePath: URL?
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.view.setBackgroundBlur(style: .prominent)
-        self.detailsTextView.textAlignment = .center
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    view.setBackgroundBlur(style: .prominent)
+    detailsTextView.textAlignment = .center
 
-        if let presentationController = presentationController as? UISheetPresentationController {
-            presentationController.detents = [
-                .large()
-            ]
-            if traitCollection.horizontalSizeClass == .compact {
-                presentationController.detents.append(.medium())
-            }
-        }
+    if let presentationController = presentationController as? UISheetPresentationController {
+      presentationController.detents = [
+        .large(),
+      ]
+      if traitCollection.horizontalSizeClass == .compact {
+        presentationController.detents.append(.medium())
+      }
     }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        refresh()
-    }
+  }
 
-    func display(podcast: Podcast, on rootView: UIViewController) {
-        self.rootView = rootView
-        self.podcast = podcast
-        self.podcastEpisode = nil
-        self.player = nil
-        self.lyricsRelFilePath = nil
-    }
-    func display(podcastEpisode: PodcastEpisode, on rootView: UIViewController) {
-        self.rootView = rootView
-        self.podcast = nil
-        self.podcastEpisode = podcastEpisode
-        self.player = nil
-        self.lyricsRelFilePath = nil
-    }
-    func display(player: PlayerFacade, on rootView: UIViewController) {
-        self.rootView = rootView
-        self.podcast = nil
-        self.podcastEpisode = nil
-        self.player = player
-        self.lyricsRelFilePath = nil
-    }
-    func display(lyricsRelFilePath: URL, on rootView: UIViewController) {
-        self.rootView = rootView
-        self.podcast = nil
-        self.podcastEpisode = nil
-        self.player = nil
-        self.lyricsRelFilePath = lyricsRelFilePath
-    }
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    refresh()
+  }
 
-    func refresh() {
-        if let podcast = podcast {
-            detailsTextView.text = podcast.depiction
-            headerLabel.text = "Description"
-        } else if let podcastEpisode = podcastEpisode {
-            detailsTextView.text = podcastEpisode.depiction
-            headerLabel.text = "Description"
-        } else if let lyricsRelFilePath = lyricsRelFilePath {
-            detailsTextView.text = ""
-            headerLabel.text = "Lyrics"
-            Task { @MainActor in do {
-                let lyricsList = try await appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
-                self.displayLyrics(lyricsList: lyricsList)
-            } catch {
-                self.detailsTextView.text = "Lyrics are not available anymore."
-            }}
-        } else if let player = player {
-            headerLabel.text = "Player Info"
-            var details = ""
-            details += "Play Time\n"
-            details += "Remaining: \(player.remainingPlayDuration.asDurationString)\n"
-            details += "Total: \(player.totalPlayDuration.asDurationString)\n"
-            details += "\n"
-            details += "\n"
-            details += "Queue Items\n"
-            details += "Previous: \(player.prevQueueCount)\n"
-            details += "User: \(player.userQueueCount)\n"
-            details += "Next: \(player.nextQueueCount)\n"
-            detailsTextView.text = details
-        }
-    }
-    
-    private func displayLyrics(lyricsList: LyricsList) {
-        guard let structuredLyrics = lyricsList.lyrics.object(at: 0) else { return }
-        let lyricsLines = structuredLyrics.line.reduce("", { $0 == "" ? $1.value : $0 + "\n" + $1.value })
-        self.detailsTextView.text = lyricsLines
-    }
-    
-    @IBAction func pressedClose(_ sender: Any) {
-        self.dismiss(animated: true)
-    }
+  func display(podcast: Podcast, on rootView: UIViewController) {
+    self.rootView = rootView
+    self.podcast = podcast
+    podcastEpisode = nil
+    player = nil
+    lyricsRelFilePath = nil
+  }
 
+  func display(podcastEpisode: PodcastEpisode, on rootView: UIViewController) {
+    self.rootView = rootView
+    podcast = nil
+    self.podcastEpisode = podcastEpisode
+    player = nil
+    lyricsRelFilePath = nil
+  }
+
+  func display(player: PlayerFacade, on rootView: UIViewController) {
+    self.rootView = rootView
+    podcast = nil
+    podcastEpisode = nil
+    self.player = player
+    lyricsRelFilePath = nil
+  }
+
+  func display(lyricsRelFilePath: URL, on rootView: UIViewController) {
+    self.rootView = rootView
+    podcast = nil
+    podcastEpisode = nil
+    player = nil
+    self.lyricsRelFilePath = lyricsRelFilePath
+  }
+
+  func refresh() {
+    if let podcast = podcast {
+      detailsTextView.text = podcast.depiction
+      headerLabel.text = "Description"
+    } else if let podcastEpisode = podcastEpisode {
+      detailsTextView.text = podcastEpisode.depiction
+      headerLabel.text = "Description"
+    } else if let lyricsRelFilePath = lyricsRelFilePath {
+      detailsTextView.text = ""
+      headerLabel.text = "Lyrics"
+      Task { @MainActor in do {
+        let lyricsList = try await appDelegate.librarySyncer
+          .parseLyrics(relFilePath: lyricsRelFilePath)
+        self.displayLyrics(lyricsList: lyricsList)
+      } catch {
+        self.detailsTextView.text = "Lyrics are not available anymore."
+      }}
+    } else if let player = player {
+      headerLabel.text = "Player Info"
+      var details = ""
+      details += "Play Time\n"
+      details += "Remaining: \(player.remainingPlayDuration.asDurationString)\n"
+      details += "Total: \(player.totalPlayDuration.asDurationString)\n"
+      details += "\n"
+      details += "\n"
+      details += "Queue Items\n"
+      details += "Previous: \(player.prevQueueCount)\n"
+      details += "User: \(player.userQueueCount)\n"
+      details += "Next: \(player.nextQueueCount)\n"
+      detailsTextView.text = details
+    }
+  }
+
+  private func displayLyrics(lyricsList: LyricsList) {
+    guard let structuredLyrics = lyricsList.lyrics.object(at: 0) else { return }
+    let lyricsLines = structuredLyrics.line
+      .reduce("") { $0 == "" ? $1.value : $0 + "\n" + $1.value }
+    detailsTextView.text = lyricsLines
+  }
+
+  @IBAction
+  func pressedClose(_ sender: Any) {
+    dismiss(animated: true)
+  }
 }

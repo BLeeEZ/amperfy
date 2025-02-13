@@ -19,27 +19,25 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
-@MainActor class HelperTest: XCTestCase {
-    
-    var cdHelper: CoreDataHelper!
-    var library: LibraryStorage!
+@MainActor
+class HelperTest: XCTestCase {
+  var cdHelper: CoreDataHelper!
+  var library: LibraryStorage!
 
-    override func setUp() async throws {
-        cdHelper = CoreDataHelper()
-        library = cdHelper.createSeededStorage()
-    }
+  override func setUp() async throws {
+    cdHelper = CoreDataHelper()
+    library = cdHelper.createSeededStorage()
+  }
 
-    override func tearDown() {
-    }
-    
-    func testSeeder() {
-        XCTAssertEqual(library.getArtists().count, cdHelper.seeder.artists.count)
-        XCTAssertEqual(library.getAlbums().count, cdHelper.seeder.albums.count)
-        XCTAssertEqual(library.getSongs().count, cdHelper.seeder.songs.count)
-        XCTAssertEqual(library.getPlaylists().count, cdHelper.seeder.playlists.count)
-    }
+  override func tearDown() {}
 
+  func testSeeder() {
+    XCTAssertEqual(library.getArtists().count, cdHelper.seeder.artists.count)
+    XCTAssertEqual(library.getAlbums().count, cdHelper.seeder.albums.count)
+    XCTAssertEqual(library.getSongs().count, cdHelper.seeder.songs.count)
+    XCTAssertEqual(library.getPlaylists().count, cdHelper.seeder.playlists.count)
+  }
 }

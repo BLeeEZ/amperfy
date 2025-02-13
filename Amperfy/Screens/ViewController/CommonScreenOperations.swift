@@ -23,18 +23,33 @@ import Foundation
 import UIKit
 
 extension UIView {
-    static let defaultMarginX: CGFloat = 25
-    static let defaultMarginY: CGFloat = 11
-    static let defaultMarginTopElement = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginX, bottom: 0.0, right: UIView.defaultMarginX)
-    static let defaultMarginMiddleElement = UIEdgeInsets(top: UIView.defaultMarginY, left: UIView.defaultMarginX, bottom: UIView.defaultMarginY, right: UIView.defaultMarginX)
-    static let defaultMarginCellX: CGFloat = 16
-    static let defaultMarginCellY: CGFloat = 9
-    static let defaultMarginCell = UIEdgeInsets(top: UIView.defaultMarginCellY, left: UIView.defaultMarginCellX, bottom: UIView.defaultMarginCellY, right: UIView.defaultMarginCellX)
+  static let defaultMarginX: CGFloat = 25
+  static let defaultMarginY: CGFloat = 11
+  static let defaultMarginTopElement = UIEdgeInsets(
+    top: 0.0,
+    left: UIView.defaultMarginX,
+    bottom: 0.0,
+    right: UIView.defaultMarginX
+  )
+  static let defaultMarginMiddleElement = UIEdgeInsets(
+    top: UIView.defaultMarginY,
+    left: UIView.defaultMarginX,
+    bottom: UIView.defaultMarginY,
+    right: UIView.defaultMarginX
+  )
+  static let defaultMarginCellX: CGFloat = 16
+  static let defaultMarginCellY: CGFloat = 9
+  static let defaultMarginCell = UIEdgeInsets(
+    top: UIView.defaultMarginCellY,
+    left: UIView.defaultMarginCellX,
+    bottom: UIView.defaultMarginCellY,
+    right: UIView.defaultMarginCellX
+  )
 }
 
+// MARK: - CommonScreenOperations
+
 class CommonScreenOperations {
-    
-    static let tableSectionHeightLarge: CGFloat = 40
-    static let tableSectionHeightFooter: CGFloat = 8
-    
+  static let tableSectionHeightLarge: CGFloat = 40
+  static let tableSectionHeightFooter: CGFloat = 8
 }

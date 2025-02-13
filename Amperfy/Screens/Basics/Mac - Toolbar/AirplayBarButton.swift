@@ -20,54 +20,54 @@
 //
 
 import Foundation
-import UIKit
 import MediaPlayer
+import UIKit
 
 #if targetEnvironment(macCatalyst)
 
-class AirplayBarButton: CustomBarButton {
+  class AirplayBarButton: CustomBarButton {
     override var title: String? {
-        get { return "Airplay" }
-        set { }
+      get { "Airplay" }
+      set {}
     }
 
     private lazy var airplayVolume: MPVolumeView = {
-        let volumeView = MPVolumeView(frame: .zero)
-        volumeView.showsVolumeSlider = false
-        volumeView.isHidden = true
-        return volumeView
+      let volumeView = MPVolumeView(frame: .zero)
+      volumeView.showsVolumeSlider = false
+      volumeView.isHidden = true
+      return volumeView
     }()
 
     init() {
-        super.init(image: .airplayaudio)
+      super.init(image: .airplayaudio)
 
-        guard let customView = self.customView else { return }
-        customView.addSubview(self.airplayVolume)
+      guard let customView = customView else { return }
+      customView.addSubview(airplayVolume)
 
-        self.airplayVolume.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            self.airplayVolume.topAnchor.constraint(equalTo: customView.topAnchor),
-            self.airplayVolume.bottomAnchor.constraint(equalTo: customView.bottomAnchor),
-            self.airplayVolume.leadingAnchor.constraint(equalTo: customView.leadingAnchor),
-            self.airplayVolume.trailingAnchor.constraint(equalTo: customView.trailingAnchor)
-        ])
+      airplayVolume.translatesAutoresizingMaskIntoConstraints = false
+      NSLayoutConstraint.activate([
+        airplayVolume.topAnchor.constraint(equalTo: customView.topAnchor),
+        airplayVolume.bottomAnchor.constraint(equalTo: customView.bottomAnchor),
+        airplayVolume.leadingAnchor.constraint(equalTo: customView.leadingAnchor),
+        airplayVolume.trailingAnchor.constraint(equalTo: customView.trailingAnchor),
+      ])
 
-        // Force a layout since the view is hidden
-        self.airplayVolume.layoutIfNeeded()
+      // Force a layout since the view is hidden
+      airplayVolume.layoutIfNeeded()
     }
 
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+      fatalError("init(coder:) has not been implemented")
     }
 
     override func clicked(_ sender: UIButton) {
-        for view: UIView in airplayVolume.subviews {
-            if let button = view as? UIButton {
-                button.sendActions(for: .touchUpInside)
-                break
-            }
+      for view: UIView in airplayVolume.subviews {
+        if let button = view as? UIButton {
+          button.sendActions(for: .touchUpInside)
+          break
         }
+      }
     }
-}
+  }
 
 #endif

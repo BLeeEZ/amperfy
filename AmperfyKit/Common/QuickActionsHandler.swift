@@ -21,129 +21,143 @@
 
 import UIKit
 
-@MainActor public class QuickActionsHandler {
-    
-    private let storage: PersistentStorage
-    private let player: PlayerFacade
-    private let application: UIApplication
-    private let displaySearchTabCB: () -> Void
-    
-    private var savedShortCutItem: UIApplicationShortcutItem?
-    
-    public init(storage: PersistentStorage, player: PlayerFacade, application: UIApplication, displaySearchTabCB: @escaping @MainActor () -> Void) {
-        self.storage = storage
-        self.player = player
-        self.application = application
-        self.displaySearchTabCB = displaySearchTabCB
-        self.player.addNotifier(notifier: self)
+// MARK: - QuickActionsHandler
+
+@MainActor
+public class QuickActionsHandler {
+  private let storage: PersistentStorage
+  private let player: PlayerFacade
+  private let application: UIApplication
+  private let displaySearchTabCB: () -> ()
+
+  private var savedShortCutItem: UIApplicationShortcutItem?
+
+  public init(
+    storage: PersistentStorage,
+    player: PlayerFacade,
+    application: UIApplication,
+    displaySearchTabCB: @escaping @MainActor () -> ()
+  ) {
+    self.storage = storage
+    self.player = player
+    self.application = application
+    self.displaySearchTabCB = displaySearchTabCB
+    self.player.addNotifier(notifier: self)
+  }
+
+  // List of known shortcut actions.
+  enum QuickActionType: String {
+    case searchAction = "SearchAction"
+    case playMusicAction = "PlayMusicAction"
+    case playPodcastAction = "PlayPodcastAction"
+    case onlineModeAction = "OnlineModeAction"
+    case offlineModeAction = "OfflineModeAction"
+  }
+
+  public func savedShortCutItemForLaterUse(savedShortCutItem: UIApplicationShortcutItem) {
+    self.savedShortCutItem = savedShortCutItem
+  }
+
+  public func handleSavedShortCutItemIfSaved() {
+    if let savedShortCutItem = savedShortCutItem {
+      _ = handleShortCutItem(shortcutItem: savedShortCutItem)
+      self.savedShortCutItem = nil
     }
-    
-    // List of known shortcut actions.
-    enum QuickActionType: String {
-        case searchAction = "SearchAction"
-        case playMusicAction = "PlayMusicAction"
-        case playPodcastAction = "PlayPodcastAction"
-        case onlineModeAction = "OnlineModeAction"
-        case offlineModeAction = "OfflineModeAction"
+  }
+
+  public func configureQuickActions() {
+    var quickActions = [UIApplicationShortcutItem]()
+
+    guard storage.isLibrarySynced else {
+      application.shortcutItems = quickActions
+      return
     }
-    
-    public func savedShortCutItemForLaterUse(savedShortCutItem: UIApplicationShortcutItem) {
-        self.savedShortCutItem = savedShortCutItem
+
+    quickActions.append(UIApplicationShortcutItem(
+      type: QuickActionType.searchAction.rawValue,
+      localizedTitle: "Search",
+      localizedSubtitle: nil,
+      icon: UIApplicationShortcutIcon(systemImageName: "magnifyingglass"),
+      userInfo: nil
+    ))
+
+    if let currentMusicItem = player.currentMusicItem {
+      quickActions.append(UIApplicationShortcutItem(
+        type: QuickActionType.playMusicAction.rawValue,
+        localizedTitle: "Play Song",
+        localizedSubtitle: "\(currentMusicItem.subtitle ?? "Unknown Artist") - \(currentMusicItem.title)",
+        icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
+        userInfo: nil
+      ))
     }
-    
-    public func handleSavedShortCutItemIfSaved() {
-        if let savedShortCutItem = savedShortCutItem {
-            _ = handleShortCutItem(shortcutItem: savedShortCutItem)
-            self.savedShortCutItem = nil
-        }
+    if let currentPodcastItem = player.currentPodcastItem {
+      quickActions.append(UIApplicationShortcutItem(
+        type: QuickActionType.playPodcastAction.rawValue,
+        localizedTitle: "Play Podcast",
+        localizedSubtitle: "\(currentPodcastItem.subtitle ?? "Unknown Podcast") - \(currentPodcastItem.title)",
+        icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
+        userInfo: nil
+      ))
     }
-    
-    public func configureQuickActions() {
-        var quickActions = [UIApplicationShortcutItem]()
-        
-        guard storage.isLibrarySynced else {
-            application.shortcutItems = quickActions
-            return
-        }
-        
-        quickActions.append(UIApplicationShortcutItem(
-            type: QuickActionType.searchAction.rawValue,
-            localizedTitle: "Search",
-            localizedSubtitle: nil,
-            icon: UIApplicationShortcutIcon(systemImageName: "magnifyingglass"),
-            userInfo: nil))
-        
-        if let currentMusicItem = player.currentMusicItem {
-            quickActions.append(UIApplicationShortcutItem(
-                type: QuickActionType.playMusicAction.rawValue,
-                localizedTitle: "Play Song",
-                localizedSubtitle: "\(currentMusicItem.subtitle ?? "Unknown Artist") - \(currentMusicItem.title)",
-                icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
-                userInfo: nil))
-        }
-        if let currentPodcastItem = player.currentPodcastItem {
-            quickActions.append(UIApplicationShortcutItem(
-                type: QuickActionType.playPodcastAction.rawValue,
-                localizedTitle: "Play Podcast",
-                localizedSubtitle: "\(currentPodcastItem.subtitle ?? "Unknown Podcast") - \(currentPodcastItem.title)",
-                icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
-                userInfo: nil))
-        }
-        if storage.settings.isOfflineMode {
-            quickActions.append(UIApplicationShortcutItem(
-                type: QuickActionType.onlineModeAction.rawValue,
-                localizedTitle: "Start in Online Mode",
-                localizedSubtitle: nil,
-                icon: UIApplicationShortcutIcon(systemImageName: "network"),
-                userInfo: nil))
-        } else {
-            quickActions.append(UIApplicationShortcutItem(
-                type: QuickActionType.offlineModeAction.rawValue,
-                localizedTitle: "Start in Offline Mode",
-                localizedSubtitle: nil,
-                icon: UIApplicationShortcutIcon(systemImageName: "network.slash"),
-                userInfo: nil))
-        }
-        application.shortcutItems = quickActions
+    if storage.settings.isOfflineMode {
+      quickActions.append(UIApplicationShortcutItem(
+        type: QuickActionType.onlineModeAction.rawValue,
+        localizedTitle: "Start in Online Mode",
+        localizedSubtitle: nil,
+        icon: UIApplicationShortcutIcon(systemImageName: "network"),
+        userInfo: nil
+      ))
+    } else {
+      quickActions.append(UIApplicationShortcutItem(
+        type: QuickActionType.offlineModeAction.rawValue,
+        localizedTitle: "Start in Offline Mode",
+        localizedSubtitle: nil,
+        icon: UIApplicationShortcutIcon(systemImageName: "network.slash"),
+        userInfo: nil
+      ))
     }
-    
-    public func handleShortCutItem(shortcutItem: UIApplicationShortcutItem) -> Bool {
-        if let actionTypeValue = QuickActionType(rawValue: shortcutItem.type) {
-            switch actionTypeValue {
-            case .searchAction:
-                displaySearchTabCB()
-            case .playMusicAction:
-                if player.playerMode != .music {
-                    player.setPlayerMode(.music)
-                }
-                player.play()
-            case .playPodcastAction:
-                if player.playerMode != .podcast {
-                    player.setPlayerMode(.podcast)
-                }
-                player.play()
-            case .offlineModeAction:
-                storage.settings.isOfflineMode = true
-            case .onlineModeAction:
-                storage.settings.isOfflineMode = false
-            }
+    application.shortcutItems = quickActions
+  }
+
+  public func handleShortCutItem(shortcutItem: UIApplicationShortcutItem) -> Bool {
+    if let actionTypeValue = QuickActionType(rawValue: shortcutItem.type) {
+      switch actionTypeValue {
+      case .searchAction:
+        displaySearchTabCB()
+      case .playMusicAction:
+        if player.playerMode != .music {
+          player.setPlayerMode(.music)
         }
-        return true
+        player.play()
+      case .playPodcastAction:
+        if player.playerMode != .podcast {
+          player.setPlayerMode(.podcast)
+        }
+        player.play()
+      case .offlineModeAction:
+        storage.settings.isOfflineMode = true
+      case .onlineModeAction:
+        storage.settings.isOfflineMode = false
+      }
     }
-    
+    return true
+  }
 }
 
+// MARK: MusicPlayable
+
 extension QuickActionsHandler: MusicPlayable {
-    public func didStartPlayingFromBeginning() { }
-    public func didStartPlaying() {
-        self.configureQuickActions()
-    }
-    public func didPause() { }
-    public func didStopPlaying() { }
-    public func didElapsedTimeChange() { }
-    public func didPlaylistChange() { }
-    public func didArtworkChange() { }
-    public func didShuffleChange() { }
-    public func didRepeatChange() { }
-    public func didPlaybackRateChange() { }
+  public func didStartPlayingFromBeginning() {}
+  public func didStartPlaying() {
+    configureQuickActions()
+  }
+
+  public func didPause() {}
+  public func didStopPlaying() {}
+  public func didElapsedTimeChange() {}
+  public func didPlaylistChange() {}
+  public func didArtworkChange() {}
+  public func didShuffleChange() {}
+  public func didRepeatChange() {}
+  public func didPlaybackRateChange() {}
 }

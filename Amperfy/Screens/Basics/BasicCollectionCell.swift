@@ -22,22 +22,20 @@
 import UIKit
 
 class BasicCollectionCell: UICollectionViewCell {
+  static let margin = UIView.defaultMarginCell
 
-    static let margin = UIView.defaultMarginCell
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.layoutMargins = BasicTableCell.margin
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    self.layoutMargins = BasicTableCell.margin
+  }
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-    
-    override var layoutMargins: UIEdgeInsets { get { return BasicTableCell.margin } set { } }
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
 
+  override func awakeFromNib() {
+    super.awakeFromNib()
+  }
+
+  override var layoutMargins: UIEdgeInsets { get { BasicTableCell.margin } set {} }
 }

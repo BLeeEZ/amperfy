@@ -19,37 +19,53 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - PodcastEpisodeMO
 
 @objc(PodcastEpisodeMO)
-public final class PodcastEpisodeMO: AbstractPlayableMO {
+public final class PodcastEpisodeMO: AbstractPlayableMO {}
 
-}
+// MARK: CoreDataIdentifyable
 
 extension PodcastEpisodeMO: CoreDataIdentifyable {
-   
-    static var identifierKey: KeyPath<PodcastEpisodeMO, String?> {
-        return \PodcastEpisodeMO.title
-    }
-    
-    static var alphabeticSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {
-        let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(PodcastEpisodeMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
-    static var publishedDateSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {
-        let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(PodcastEpisodeMO.publishDate), ascending: false),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
+  static var identifierKey: KeyPath<PodcastEpisodeMO, String?> {
+    \PodcastEpisodeMO.title
+  }
 
+  static var alphabeticSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {
+    let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: #keyPath(PodcastEpisodeMO.alphabeticSectionInitial),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
+
+  static var publishedDateSortedFetchRequest: NSFetchRequest<PodcastEpisodeMO> {
+    let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(PodcastEpisodeMO.publishDate), ascending: false),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
 }

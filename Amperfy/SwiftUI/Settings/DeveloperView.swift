@@ -19,48 +19,59 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - DeveloperView
 
 struct DeveloperView: View {
-    
-    @EnvironmentObject private var settings: Settings
-    
-    func generateDefaultArtworks() {
-        for artworkType in ArtworkType.allCases {
-            for lightDarkMode in LightDarkModeType.allCases {
-                for theme in ThemePreference.allCases {
-                    let name = theme.description + artworkType.description + lightDarkMode.description + ".png"
-                    let img = UIImage.generateArtwork(theme: theme, lightDarkMode: lightDarkMode, artworkType: artworkType)
-                    let fileURL = URL(string: name)!
-                    let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: fileURL)!
-                    try? CacheFileManager.shared.writeDataExcludedFromBackup(data: img.pngData()!, to: absFilePath)
-                }
-            }
+  @EnvironmentObject
+  private var settings: Settings
+
+  func generateDefaultArtworks() {
+    for artworkType in ArtworkType.allCases {
+      for lightDarkMode in LightDarkModeType.allCases {
+        for theme in ThemePreference.allCases {
+          let name = theme.description + artworkType.description + lightDarkMode
+            .description + ".png"
+          let img = UIImage.generateArtwork(
+            theme: theme,
+            lightDarkMode: lightDarkMode,
+            artworkType: artworkType
+          )
+          let fileURL = URL(string: name)!
+          let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: fileURL)!
+          try? CacheFileManager.shared.writeDataExcludedFromBackup(
+            data: img.pngData()!,
+            to: absFilePath
+          )
         }
-        
+      }
     }
-    
-    var body: some View {
-        ZStack{
-            SettingsList {
-                SettingsSection(content: {
-                    SettingsButtonRow(title: "Artwork", label: "Generate Default Artworks") {
-                        generateDefaultArtworks()
-                    }
-                })
-                
-            }
-        }
-        .navigationTitle("Developer")
-        .navigationBarTitleDisplayMode(.inline)
+  }
+
+  var body: some View {
+    ZStack {
+      SettingsList {
+        SettingsSection(content: {
+          SettingsButtonRow(title: "Artwork", label: "Generate Default Artworks") {
+            generateDefaultArtworks()
+          }
+        })
+      }
     }
+    .navigationTitle("Developer")
+    .navigationBarTitleDisplayMode(.inline)
+  }
 }
 
+// MARK: - DeveloperView_Previews
+
 struct DeveloperView_Previews: PreviewProvider {
-    @State static var settings = Settings()
-    
-    static var previews: some View {
-        DeveloperView().environmentObject(settings)
-    }
+  @State
+  static var settings = Settings()
+
+  static var previews: some View {
+    DeveloperView().environmentObject(settings)
+  }
 }

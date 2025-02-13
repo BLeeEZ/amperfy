@@ -19,205 +19,236 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 import os.log
 
-@MainActor public class ScrobbleSyncer {
-    
-    private static let maximumWaitDurationInSec = 20
+// MARK: - ScrobbleSyncer
 
-    private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
-    private let musicPlayer: AudioPlayer
-    private let backendAudioPlayer: BackendAudioPlayer
-    private let networkMonitor: NetworkMonitorFacade
-    private let storage: PersistentStorage
-    private let librarySyncer: LibrarySyncer
-    private let eventLogger: EventLogger
-    private let activeDispatchGroup = DispatchGroup()
-    private var isRunning = false
-    private var isActive = false
-    private var scrobbleTimer: Timer?
-    
-    private var songToBeScrobbled: Song?
-    private var songHasBeenListendEnough = false
-    
-    init(musicPlayer: AudioPlayer, backendAudioPlayer: BackendAudioPlayer, networkMonitor: NetworkMonitorFacade, storage: PersistentStorage, librarySyncer: LibrarySyncer, eventLogger: EventLogger) {
-        self.musicPlayer = musicPlayer
-        self.backendAudioPlayer = backendAudioPlayer
-        self.networkMonitor = networkMonitor
-        self.storage = storage
-        self.librarySyncer = librarySyncer
-        self.eventLogger = eventLogger
+@MainActor
+public class ScrobbleSyncer {
+  private static let maximumWaitDurationInSec = 20
+
+  private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
+  private let musicPlayer: AudioPlayer
+  private let backendAudioPlayer: BackendAudioPlayer
+  private let networkMonitor: NetworkMonitorFacade
+  private let storage: PersistentStorage
+  private let librarySyncer: LibrarySyncer
+  private let eventLogger: EventLogger
+  private let activeDispatchGroup = DispatchGroup()
+  private var isRunning = false
+  private var isActive = false
+  private var scrobbleTimer: Timer?
+
+  private var songToBeScrobbled: Song?
+  private var songHasBeenListendEnough = false
+
+  init(
+    musicPlayer: AudioPlayer,
+    backendAudioPlayer: BackendAudioPlayer,
+    networkMonitor: NetworkMonitorFacade,
+    storage: PersistentStorage,
+    librarySyncer: LibrarySyncer,
+    eventLogger: EventLogger
+  ) {
+    self.musicPlayer = musicPlayer
+    self.backendAudioPlayer = backendAudioPlayer
+    self.networkMonitor = networkMonitor
+    self.storage = storage
+    self.librarySyncer = librarySyncer
+    self.eventLogger = eventLogger
+  }
+
+  public func start() {
+    guard storage.main.library.uploadableScrobbleEntryCount > 0 else { return }
+    isRunning = true
+    if !isActive {
+      isActive = true
+      uploadInBackground()
     }
-    
-    public func start() {
-        guard storage.main.library.uploadableScrobbleEntryCount > 0 else { return }
-        isRunning = true
-        if !isActive {
-            isActive = true
-            uploadInBackground()
+  }
+
+  public func stopAndWait() {
+    isRunning = false
+    activeDispatchGroup.wait()
+  }
+
+  func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) async {
+    func nowPlayingToServerAsync(
+      playedSong: Song,
+      songPosition: NowPlayingSongPosition,
+      finallyCB: ((_: Song, _: Bool) -> ())? = nil
+    ) {
+      var success = false
+      Task { @MainActor in
+        do {
+          try await self.librarySyncer.syncNowPlaying(song: playedSong, songPosition: songPosition)
+          success = true
+        } catch {
+          os_log(
+            "Now Playing Sync Failed: %s",
+            log: self.log,
+            type: .info,
+            playedSong.displayString
+          )
+          self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
         }
+        finallyCB?(playedSong, success)
+      }
     }
-    
-    public func stopAndWait() {
-        isRunning = false
-        activeDispatchGroup.wait()
-    }
-    
-    func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) async {
-        func nowPlayingToServerAsync(playedSong: Song, songPosition: NowPlayingSongPosition, finallyCB: ((_: Song, _: Bool) -> Void)? = nil) {
-            var success = false
-            Task { @MainActor in
-                do {
-                    try await self.librarySyncer.syncNowPlaying(song: playedSong, songPosition: songPosition)
-                    success = true
-                } catch {
-                    os_log("Now Playing Sync Failed: %s", log: self.log, type: .info, playedSong.displayString)
-                    self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
-                }
-                finallyCB?(playedSong, success)
-            }
+
+    switch songPosition {
+    case .start:
+      if storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
+        nowPlayingToServerAsync(playedSong: playedSong, songPosition: .start)
+      }
+    case .end:
+      if storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
+        nowPlayingToServerAsync(playedSong: playedSong, songPosition: .end) { song, success in
+          self.cacheScrobbleRequest(playedSong: song, isUploaded: success)
+          guard success else { return }
+          self.start() // send cached request to server
         }
-        
-        switch songPosition {
-        case .start:
-            if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
-                nowPlayingToServerAsync(playedSong: playedSong, songPosition: .start)
-            }
-        case .end:
-            if self.storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
-                nowPlayingToServerAsync(playedSong: playedSong, songPosition: .end) { song, success in
-                    self.cacheScrobbleRequest(playedSong: song, isUploaded: success)
-                    guard success else { return }
-                    self.start() // send cached request to server
-                }
-            } else {
-                cacheScrobbleRequest(playedSong: playedSong, isUploaded: false)
-            }
-        }
+      } else {
+        cacheScrobbleRequest(playedSong: playedSong, isUploaded: false)
+      }
     }
-    
-    private func uploadInBackground() {
-        Task { @MainActor in
-            self.activeDispatchGroup.enter()
-            os_log("start", log: self.log, type: .info)
-            
-            while self.isRunning, self.storage.settings.isOnlineMode, self.networkMonitor.isConnectedToNetwork {
-                do {
-                    let scobbleEntry = try await self.getNextScrobbleEntry()
-                    guard let entry = scobbleEntry else {
-                        self.isRunning = false
-                        continue
-                    }
-                    guard let song = entry.playable?.asSong, let date = entry.date else {
-                        entry.isUploaded = true;
-                        self.storage.main.saveContext()
-                        continue
-                    }
-                    try await self.librarySyncer.scrobble(song: song, date: date)
-                    entry.isUploaded = true;
-                    self.storage.main.saveContext()
-                } catch {
-                    self.isRunning = false
-                    self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
-                }
-            }
-            
-            os_log("stopped", log: self.log, type: .info)
-            self.isActive = false
-            self.activeDispatchGroup.leave()
+  }
+
+  private func uploadInBackground() {
+    Task { @MainActor in
+      self.activeDispatchGroup.enter()
+      os_log("start", log: self.log, type: .info)
+
+      while self.isRunning, self.storage.settings.isOnlineMode,
+            self.networkMonitor.isConnectedToNetwork {
+        do {
+          let scobbleEntry = try await self.getNextScrobbleEntry()
+          guard let entry = scobbleEntry else {
+            self.isRunning = false
+            continue
+          }
+          guard let song = entry.playable?.asSong, let date = entry.date else {
+            entry.isUploaded = true
+            self.storage.main.saveContext()
+            continue
+          }
+          try await self.librarySyncer.scrobble(song: song, date: date)
+          entry.isUploaded = true
+          self.storage.main.saveContext()
+        } catch {
+          self.isRunning = false
+          self.eventLogger.report(topic: "Scrobble Sync", error: error, displayPopup: false)
         }
+      }
+
+      os_log("stopped", log: self.log, type: .info)
+      self.isActive = false
+      self.activeDispatchGroup.leave()
     }
-    
-    private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
-        let scobbleObjectId: NSManagedObjectID? = try? await self.storage.async.performAndGet { asyncCompanion in
-            guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
-                return nil
-            }
-            return scobbleEntry.managedObject.objectID
+  }
+
+  private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
+    let scobbleObjectId: NSManagedObjectID? = try? await storage.async
+      .performAndGet { asyncCompanion in
+        guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
+          return nil
         }
-        guard let scobbleObjectId else { return nil }
-        return ScrobbleEntry(managedObject: try! self.storage.main.context.existingObject(with: scobbleObjectId) as! ScrobbleEntryMO)
+        return scobbleEntry.managedObject.objectID
+      }
+    guard let scobbleObjectId else { return nil }
+    return ScrobbleEntry(
+      managedObject: try! storage.main.context
+        .existingObject(with: scobbleObjectId) as! ScrobbleEntryMO
+    )
+  }
+
+  private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {
+    if !isUploaded {
+      os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
     }
-    
-    private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {
-        if !isUploaded {
-            os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
-        }
-        let scrobbleEntry = storage.main.library.createScrobbleEntry()
-        scrobbleEntry.date = Date()
-        scrobbleEntry.playable = playedSong
-        scrobbleEntry.isUploaded = isUploaded
-        storage.main.saveContext()
+    let scrobbleEntry = storage.main.library.createScrobbleEntry()
+    scrobbleEntry.date = Date()
+    scrobbleEntry.playable = playedSong
+    scrobbleEntry.isUploaded = isUploaded
+    storage.main.saveContext()
+  }
+
+  private func startSongPlayed() async {
+    await syncSongStopped(clearCurPlaying: true)
+
+    guard let curPlaying = musicPlayer.currentlyPlaying,
+          let curPlayingSong = curPlaying.asSong
+    else { return }
+
+    songToBeScrobbled = curPlayingSong
+
+    var waitDuration = curPlayingSong.duration / 2
+    if waitDuration > Self.maximumWaitDurationInSec {
+      waitDuration = Self.maximumWaitDurationInSec
     }
-    
-    private func startSongPlayed() async {
-        await syncSongStopped(clearCurPlaying: true)
-        
-        guard let curPlaying = musicPlayer.currentlyPlaying,
-              let curPlayingSong = curPlaying.asSong
+    let curPlayingId = curPlayingSong.managedObject.objectID
+
+    scrobbleTimer?.invalidate()
+    scrobbleTimer = Timer.scheduledTimer(
+      withTimeInterval: TimeInterval(waitDuration),
+      repeats: false
+    ) { _ in
+      Task { @MainActor in
+        let curPlayingClosureMO = self.storage.main.context.object(with: curPlayingId) as! SongMO
+        let curPlayingClosure = Song(managedObject: curPlayingClosureMO)
+        guard curPlayingClosure == self.musicPlayer.currentlyPlaying,
+              self.backendAudioPlayer.playType == .cache || self.storage.settings
+              .isScrobbleStreamedItems
         else { return }
-        
-        self.songToBeScrobbled = curPlayingSong
-        
-        var waitDuration = curPlayingSong.duration / 2
-        if waitDuration > Self.maximumWaitDurationInSec {
-            waitDuration = Self.maximumWaitDurationInSec
-        }
-        let curPlayingId = curPlayingSong.managedObject.objectID
-        
-        scrobbleTimer?.invalidate()
-        scrobbleTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(waitDuration), repeats: false) { _ in
-            Task { @MainActor in
-                let curPlayingClosureMO = self.storage.main.context.object(with: curPlayingId) as! SongMO
-                let curPlayingClosure = Song(managedObject: curPlayingClosureMO)
-                guard curPlayingClosure == self.musicPlayer.currentlyPlaying,
-                      self.backendAudioPlayer.playType == .cache || self.storage.settings.isScrobbleStreamedItems
-                else { return }
-                self.songHasBeenListendEnough = true
-            }
-        }
+        self.songHasBeenListendEnough = true
+      }
     }
-    
-    private func syncSongStopped(clearCurPlaying: Bool) async {
-        func clearingCurPlaying() {
-            self.songHasBeenListendEnough = false
-            self.songToBeScrobbled = nil
-        }
-        
-        if let oldSong = self.songToBeScrobbled,
-           self.songHasBeenListendEnough {
-            await self.scrobble(playedSong: oldSong, songPosition: .end)
-            clearingCurPlaying()
-        } else if clearCurPlaying {
-            clearingCurPlaying()
-        }
+  }
+
+  private func syncSongStopped(clearCurPlaying: Bool) async {
+    func clearingCurPlaying() {
+      songHasBeenListendEnough = false
+      songToBeScrobbled = nil
     }
-    
+
+    if let oldSong = songToBeScrobbled,
+       songHasBeenListendEnough {
+      await scrobble(playedSong: oldSong, songPosition: .end)
+      clearingCurPlaying()
+    } else if clearCurPlaying {
+      clearingCurPlaying()
+    }
+  }
 }
 
+// MARK: MusicPlayable
+
 extension ScrobbleSyncer: MusicPlayable {
-    public func didStartPlayingFromBeginning() {
-        Task { await startSongPlayed() }
-    }
-    public func didStartPlaying() {
-        guard let curPlaying = musicPlayer.currentlyPlaying,
-              let curPlayingSong = curPlaying.asSong
-        else { return }
-        Task { await scrobble(playedSong: curPlayingSong, songPosition: .start) }
-    }
-    public func didPause() {
-        Task { await syncSongStopped(clearCurPlaying: false) }
-        
-    }
-    public func didStopPlaying() {
-        Task { await syncSongStopped(clearCurPlaying: true) }
-    }
-    public func didElapsedTimeChange() { }
-    public func didPlaylistChange() { }
-    public func didArtworkChange() { }
-    public func didShuffleChange() { }
-    public func didRepeatChange() { }
-    public func didPlaybackRateChange() { }
+  public func didStartPlayingFromBeginning() {
+    Task { await startSongPlayed() }
+  }
+
+  public func didStartPlaying() {
+    guard let curPlaying = musicPlayer.currentlyPlaying,
+          let curPlayingSong = curPlaying.asSong
+    else { return }
+    Task { await scrobble(playedSong: curPlayingSong, songPosition: .start) }
+  }
+
+  public func didPause() {
+    Task { await syncSongStopped(clearCurPlaying: false) }
+  }
+
+  public func didStopPlaying() {
+    Task { await syncSongStopped(clearCurPlaying: true) }
+  }
+
+  public func didElapsedTimeChange() {}
+  public func didPlaylistChange() {}
+  public func didArtworkChange() {}
+  public func didShuffleChange() {}
+  public func didRepeatChange() {}
+  public func didPlaybackRateChange() {}
 }

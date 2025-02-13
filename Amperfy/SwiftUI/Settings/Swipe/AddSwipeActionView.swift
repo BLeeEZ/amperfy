@@ -19,66 +19,77 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - AddSwipeActionView
 
 struct AddSwipeActionView: View {
-    
-    @EnvironmentObject private var settings: Settings
-    @Binding var isVisible: Bool
+  @EnvironmentObject
+  private var settings: Settings
+  @Binding
+  var isVisible: Bool
 
-    @Binding var swipePosition: SwipePosition
-    @State private var actionNotInUse = [SwipeActionType]()
-    var addCB : (_ swipePosition: SwipePosition, _ elementToAdd: SwipeActionType) -> ()
-    
-    func reload() {
-        actionNotInUse = settings.swipeActionSettings.notUsed
-    }
-    
-    var body: some View {
-        VStack {
-            Text("Add \(swipePosition.description) swipe")
-                .font(.headline)
-                .fontWeight(.bold)
-                .frame(alignment: .center)
-                .padding()
-                .padding([.top], 16)
-            List {
-                ForEach(actionNotInUse, id: \.self) { swipe in
-                    SwipeCellView(swipe: swipe)
-                        .onTapGesture {
-                            addCB(swipePosition, swipe)
-                            self.isVisible = false
-                        }
-                }
+  @Binding
+  var swipePosition: SwipePosition
+  @State
+  private var actionNotInUse = [SwipeActionType]()
+  var addCB: (_ swipePosition: SwipePosition, _ elementToAdd: SwipeActionType) -> ()
+
+  func reload() {
+    actionNotInUse = settings.swipeActionSettings.notUsed
+  }
+
+  var body: some View {
+    VStack {
+      Text("Add \(swipePosition.description) swipe")
+        .font(.headline)
+        .fontWeight(.bold)
+        .frame(alignment: .center)
+        .padding()
+        .padding([.top], 16)
+      List {
+        ForEach(actionNotInUse, id: \.self) { swipe in
+          SwipeCellView(swipe: swipe)
+            .onTapGesture {
+              addCB(swipePosition, swipe)
+              isVisible = false
             }
-            #if targetEnvironment(macCatalyst)
-            .listStyle(.plain)
-            #else
-            .listStyle(.grouped)
-            #endif
-            
-            Button(action: { self.isVisible = false }) {
-                Text("Cancel")
-                    .fontWeight(.bold)
-            }
-            .padding()
         }
-        #if targetEnvironment(macCatalyst)
-        .background { Color.clear }
-        #endif
-        .onAppear {
-            reload()
-        }
+      }
+      #if targetEnvironment(macCatalyst)
+      .listStyle(.plain)
+      #else
+      .listStyle(.grouped)
+      #endif
+
+      Button(action: { isVisible = false }) {
+        Text("Cancel")
+          .fontWeight(.bold)
+      }
+      .padding()
     }
+    #if targetEnvironment(macCatalyst)
+    .background { Color.clear }
+    #endif
+    .onAppear {
+      reload()
+    }
+  }
 }
 
-struct AddSwipeActionView_Previews: PreviewProvider {
-    @State static var settings = Settings()
-    @State static var isVisible = true
-    @State static var swipePosition: SwipePosition = .trailing
+// MARK: - AddSwipeActionView_Previews
 
-    static var previews: some View {
-        AddSwipeActionView(isVisible: $isVisible, swipePosition: $swipePosition, addCB: {_,_ in}).environmentObject(settings)
-    }
+struct AddSwipeActionView_Previews: PreviewProvider {
+  @State
+  static var settings = Settings()
+  @State
+  static var isVisible = true
+  @State
+  static var swipePosition: SwipePosition = .trailing
+
+  static var previews: some View {
+    AddSwipeActionView(isVisible: $isVisible, swipePosition: $swipePosition, addCB: { _, _ in })
+      .environmentObject(settings)
+  }
 }

@@ -19,49 +19,54 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import MarqueeLabel
+import UIKit
 
 class UserQueueSectionHeader: UIView {
+  @IBOutlet
+  weak var nameLabel: MarqueeLabel!
+  @IBOutlet
+  weak var rightButton: UIButton!
 
-    @IBOutlet weak var nameLabel: MarqueeLabel!
-    @IBOutlet weak var rightButton: UIButton!
-    
-    
-    static let frameHeight: CGFloat = 28.0 + margin.top + margin.bottom
-    static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 8, right: UIView.defaultMarginX)
-    
-    private var buttonPressAction: (() -> Void)?
+  static let frameHeight: CGFloat = 28.0 + margin.top + margin.bottom
+  static let margin = UIEdgeInsets(
+    top: 8,
+    left: UIView.defaultMarginX,
+    bottom: 8,
+    right: UIView.defaultMarginX
+  )
 
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.layoutMargins = Self.margin
-    }
-    
-    func hide() {
-        nameLabel.text = ""
-        nameLabel.isHidden = true
-        rightButton.isHidden = true
-        rightButton.isEnabled = false
-    }
-    
-    func display(name: String, buttonPressAction: @escaping (() -> Void)) {
-        nameLabel.text = name
-        nameLabel.isHidden = false
-        nameLabel.applyAmperfyStyle()
-        rightButton.isHidden = false
-        rightButton.isEnabled = true
-        self.buttonPressAction = buttonPressAction
-    }
+  private var buttonPressAction: (() -> ())?
 
-    @IBAction func rightButtonPressed(_ sender: Any) {
-        if let buttonAction = buttonPressAction {
-            buttonAction()
-        }
-    }
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
 
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    self.layoutMargins = Self.margin
+  }
+
+  func hide() {
+    nameLabel.text = ""
+    nameLabel.isHidden = true
+    rightButton.isHidden = true
+    rightButton.isEnabled = false
+  }
+
+  func display(name: String, buttonPressAction: @escaping (() -> ())) {
+    nameLabel.text = name
+    nameLabel.isHidden = false
+    nameLabel.applyAmperfyStyle()
+    rightButton.isHidden = false
+    rightButton.isEnabled = true
+    self.buttonPressAction = buttonPressAction
+  }
+
+  @IBAction
+  func rightButtonPressed(_ sender: Any) {
+    if let buttonAction = buttonPressAction {
+      buttonAction()
+    }
+  }
 }

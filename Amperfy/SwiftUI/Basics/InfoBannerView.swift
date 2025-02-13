@@ -21,24 +21,28 @@
 
 import SwiftUI
 
+// MARK: - InfoBannerView
+
 struct InfoBannerView: View {
-    var message: String
-    var color: Color
-    
-    var body: some View {
-        Text(message)
-            .padding()
-            .frame(maxWidth: .infinity)
-            .foregroundColor(.white)
-            .background(RoundedRectangle(cornerRadius: 10).fill(color.opacity(1)))
-    }
+  var message: String
+  var color: Color
+
+  var body: some View {
+    Text(message)
+      .padding()
+      .frame(maxWidth: .infinity)
+      .foregroundColor(.white)
+      .background(RoundedRectangle(cornerRadius: 10).fill(color.opacity(1)))
+  }
 }
 
+// MARK: - InfoBannerView_Previews
+
 struct InfoBannerView_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack {
-            InfoBannerView(message: "Test error message", color: .error)
-            InfoBannerView(message: "Test success message", color: .success)
-        }
+  static var previews: some View {
+    VStack {
+      InfoBannerView(message: "Test error message", color: .error)
+      InfoBannerView(message: "Test success message", color: .success)
     }
+  }
 }

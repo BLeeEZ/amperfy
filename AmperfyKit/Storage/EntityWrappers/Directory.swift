@@ -22,88 +22,109 @@
 import Foundation
 import UIKit
 
-public class Directory: AbstractLibraryEntity {
-    
-    public let managedObject: DirectoryMO
-    
-    public init(managedObject: DirectoryMO) {
-        self.managedObject = managedObject
-        super.init(managedObject: managedObject)
-    }
-    
-    public var name: String {
-        get { return managedObject.name ?? "" }
-        set {
-            if managedObject.name != newValue {
-                managedObject.name = newValue
-                updateAlphabeticSectionInitial(section: newValue)
-            }
-        }
-    }
-    public var isCached: Bool {
-        get { return managedObject.isCached }
-        set {
-            if managedObject.isCached != newValue {
-                managedObject.isCached = newValue
-            }
-        }
-    }
-    public var songCount: Int {
-        get { return Int(managedObject.songCount) }
-    }
-    public var subdirectoryCount: Int {
-        get { return Int(managedObject.subdirectoryCount) }
-    }
-    public var songs: [Song] {
-        return managedObject.songs?.compactMap{ Song(managedObject: $0 as! SongMO) } ?? [Song]()
-    }
-    public var subdirectories: [Directory] {
-        return managedObject.subdirectories?.compactMap{ Directory(managedObject: $0 as! DirectoryMO) } ?? [Directory]()
-    }
+// MARK: - Directory
 
+public class Directory: AbstractLibraryEntity {
+  public let managedObject: DirectoryMO
+
+  public init(managedObject: DirectoryMO) {
+    self.managedObject = managedObject
+    super.init(managedObject: managedObject)
+  }
+
+  public var name: String {
+    get { managedObject.name ?? "" }
+    set {
+      if managedObject.name != newValue {
+        managedObject.name = newValue
+        updateAlphabeticSectionInitial(section: newValue)
+      }
+    }
+  }
+
+  public var isCached: Bool {
+    get { managedObject.isCached }
+    set {
+      if managedObject.isCached != newValue {
+        managedObject.isCached = newValue
+      }
+    }
+  }
+
+  public var songCount: Int { Int(managedObject.songCount) }
+
+  public var subdirectoryCount: Int { Int(managedObject.subdirectoryCount) }
+
+  public var songs: [Song] {
+    managedObject.songs?.compactMap { Song(managedObject: $0 as! SongMO) } ?? [Song]()
+  }
+
+  public var subdirectories: [Directory] {
+    managedObject.subdirectories?
+      .compactMap { Directory(managedObject: $0 as! DirectoryMO) } ?? [Directory]()
+  }
 }
 
-extension Directory: PlayableContainable  {
-    public var subtitle: String? { return nil }
-    public var subsubtitle: String? { return nil }
-    public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
-        var infoContent = [String]()
-        if subdirectories.count == 1 {
-            infoContent.append("1 Subdirectory")
-        } else if subdirectories.count > 1 {
-            infoContent.append("\(subdirectories.count) Subdirectory")
-        }
-        
-        if songCount == 1 {
-            infoContent.append("1 Song")
-        } else if songCount > 1 {
-            infoContent.append("\(songCount) Songs")
-        }
-        
-        if details.type == .long {
-            if isCached {
-                infoContent.append("Cached")
-            }
-            if details.isShowDetailedInfo {
-                infoContent.append("ID: \(!self.id.isEmpty ? self.id : "-")")
-            }
-        }
-        return infoContent
+// MARK: PlayableContainable
+
+extension Directory: PlayableContainable {
+  public var subtitle: String? { nil }
+  public var subsubtitle: String? { nil }
+  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+    var infoContent = [String]()
+    if subdirectories.count == 1 {
+      infoContent.append("1 Subdirectory")
+    } else if subdirectories.count > 1 {
+      infoContent.append("\(subdirectories.count) Subdirectory")
     }
-    public var playables: [AbstractPlayable] {
-        return songs
+
+    if songCount == 1 {
+      infoContent.append("1 Song")
+    } else if songCount > 1 {
+      infoContent.append("\(songCount) Songs")
     }
-    public var playContextType: PlayerMode { return .music }
-    public var isRateable: Bool { return false }
-    public var isFavoritable: Bool { return false }
-    @MainActor public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
-        throw BackendError.notSupported
+
+    if details.type == .long {
+      if isCached {
+        infoContent.append("Cached")
+      }
+      if details.isShowDetailedInfo {
+        infoContent.append("ID: \(!id.isEmpty ? id : "-")")
+      }
     }
-    @MainActor public func fetchFromServer(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) async throws {
-        try await librarySyncer.sync(directory: self)
-    }
-    public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
-        return ArtworkCollection(defaultImage: .getGeneratedArtwork(theme: theme, artworkType: .folder), singleImageEntity: self)
-    }
-    public var containerIdentifier: PlayableContainerIdentifier { return PlayableContainerIdentifier(type: .directory, objectID: managedObject.objectID.uriRepresentation().absoluteString) }
+    return infoContent
+  }
+
+  public var playables: [AbstractPlayable] {
+    songs
+  }
+
+  public var playContextType: PlayerMode { .music }
+  public var isRateable: Bool { false }
+  public var isFavoritable: Bool { false }
+  @MainActor
+  public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+    throw BackendError.notSupported
+  }
+
+  @MainActor
+  public func fetchFromServer(
+    storage: PersistentStorage,
+    librarySyncer: LibrarySyncer,
+    playableDownloadManager: DownloadManageable
+  ) async throws {
+    try await librarySyncer.sync(directory: self)
+  }
+
+  public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
+    ArtworkCollection(
+      defaultImage: .getGeneratedArtwork(theme: theme, artworkType: .folder),
+      singleImageEntity: self
+    )
+  }
+
+  public var containerIdentifier: PlayableContainerIdentifier { PlayableContainerIdentifier(
+    type: .directory,
+    objectID: managedObject.objectID.uriRepresentation().absoluteString
+  ) }
 }

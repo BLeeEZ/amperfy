@@ -19,43 +19,41 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 public class PlayableFile: NSObject {
-    
-    public let managedObject: PlayableFileMO
+  public let managedObject: PlayableFileMO
 
-    public init(managedObject: PlayableFileMO) {
-        self.managedObject = managedObject
-    }
+  public init(managedObject: PlayableFileMO) {
+    self.managedObject = managedObject
+  }
 
-    public var info: AbstractPlayable? {
-        get {
-            guard let songMO = managedObject.info else { return nil }
-            return AbstractPlayable(managedObject: songMO)
-        }
-        set {
-            guard let playable = newValue else {
-                managedObject.info = nil
-                return
-            }
-            managedObject.info = playable.playableManagedObject
-        }
+  public var info: AbstractPlayable? {
+    get {
+      guard let songMO = managedObject.info else { return nil }
+      return AbstractPlayable(managedObject: songMO)
     }
-    
-    public var data: Data? {
-        get {
-            return managedObject.data
-        }
-        set {
-            managedObject.data = newValue
-        }
+    set {
+      guard let playable = newValue else {
+        managedObject.info = nil
+        return
+      }
+      managedObject.info = playable.playableManagedObject
     }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? PlayableFile else { return false }
-        return managedObject == object.managedObject
-    }
+  }
 
+  public var data: Data? {
+    get {
+      managedObject.data
+    }
+    set {
+      managedObject.data = newValue
+    }
+  }
+
+  override public func isEqual(_ object: Any?) -> Bool {
+    guard let object = object as? PlayableFile else { return false }
+    return managedObject == object.managedObject
+  }
 }

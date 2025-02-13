@@ -19,37 +19,46 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import CoreData
 import AmperfyKit
+import CoreData
 import UIKit
 
-class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewController where ResultType : NSFetchRequestResult {
-    
-    var isIndexTitelsHidden = false
-    
-    private var singleFetchController: BasicFetchedResultsController<ResultType>?
-    var singleFetchedResultsController: BasicFetchedResultsController<ResultType>? {
-        set { singleFetchController = newValue }
-        get { return singleFetchController }
-    }
+class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewController
+  where ResultType: NSFetchRequestResult {
+  var isIndexTitelsHidden = false
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return singleFetchController?.numberOfSections ?? 0
-    }
+  private var singleFetchController: BasicFetchedResultsController<ResultType>?
+  var singleFetchedResultsController: BasicFetchedResultsController<ResultType>? {
+    set { singleFetchController = newValue }
+    get { singleFetchController }
+  }
 
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return singleFetchController?.titleForHeader(inSection: section)
-    }
+  override func numberOfSections(in tableView: UITableView) -> Int {
+    singleFetchController?.numberOfSections ?? 0
+  }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return singleFetchController?.numberOfRows(inSection: section) ?? 0
-    }
-    
-    override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        return isIndexTitelsHidden ? nil : singleFetchController?.sectionIndexTitles
-    }
-    
-    override func tableView(_ tableView: UITableView, sectionForSectionIndexTitle title: String, at index: Int) -> Int {
-        return singleFetchController?.section(forSectionIndexTitle: title, at: index) ?? 0
-    }
+  override func tableView(
+    _ tableView: UITableView,
+    titleForHeaderInSection section: Int
+  )
+    -> String? {
+    singleFetchController?.titleForHeader(inSection: section)
+  }
+
+  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    singleFetchController?.numberOfRows(inSection: section) ?? 0
+  }
+
+  override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+    isIndexTitelsHidden ? nil : singleFetchController?.sectionIndexTitles
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    sectionForSectionIndexTitle title: String,
+    at index: Int
+  )
+    -> Int {
+    singleFetchController?.section(forSectionIndexTitle: title, at: index) ?? 0
+  }
 }

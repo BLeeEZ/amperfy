@@ -20,34 +20,46 @@
 //
 
 import Foundation
-import UIKit
 import os.log
+import UIKit
 
 public class BackgroundFetchTriggeredSyncer {
-    
-    private let storage: PersistentStorage
-    private let librarySyncer: LibrarySyncer
-    private let notificationManager: LocalNotificationManager
-    private let playableDownloadManager: DownloadManageable
-    private let log = OSLog(subsystem: "Amperfy", category: "BackgroundFetchTriggeredSyncer")
-    
-    init(storage: PersistentStorage, librarySyncer: LibrarySyncer, notificationManager: LocalNotificationManager, playableDownloadManager: DownloadManageable) {
-        self.storage = storage
-        self.librarySyncer = librarySyncer
-        self.notificationManager = notificationManager
-        self.playableDownloadManager = playableDownloadManager
-    }
-    
-    @MainActor public func syncAndNotifyPodcastEpisodes() async throws {
-        os_log("Perform podcast episode sync", log: self.log, type: .info)
-        let autoDlLibSyncer = AutoDownloadLibrarySyncer(storage: self.storage,
-                                                        librarySyncer: self.librarySyncer,
-                                                        playableDownloadManager: self.playableDownloadManager)
-        let addedPodcastEpisodes = try await autoDlLibSyncer.syncNewestPodcastEpisodes()
-        for episodeToNotify in addedPodcastEpisodes {
-            os_log("Podcast: %s, New Episode: %s", log: self.log, type: .info, episodeToNotify.podcast?.name ?? "", episodeToNotify.title)
-            self.notificationManager.notify(podcastEpisode: episodeToNotify)
-        }
-    }
+  private let storage: PersistentStorage
+  private let librarySyncer: LibrarySyncer
+  private let notificationManager: LocalNotificationManager
+  private let playableDownloadManager: DownloadManageable
+  private let log = OSLog(subsystem: "Amperfy", category: "BackgroundFetchTriggeredSyncer")
 
+  init(
+    storage: PersistentStorage,
+    librarySyncer: LibrarySyncer,
+    notificationManager: LocalNotificationManager,
+    playableDownloadManager: DownloadManageable
+  ) {
+    self.storage = storage
+    self.librarySyncer = librarySyncer
+    self.notificationManager = notificationManager
+    self.playableDownloadManager = playableDownloadManager
+  }
+
+  @MainActor
+  public func syncAndNotifyPodcastEpisodes() async throws {
+    os_log("Perform podcast episode sync", log: self.log, type: .info)
+    let autoDlLibSyncer = AutoDownloadLibrarySyncer(
+      storage: storage,
+      librarySyncer: librarySyncer,
+      playableDownloadManager: playableDownloadManager
+    )
+    let addedPodcastEpisodes = try await autoDlLibSyncer.syncNewestPodcastEpisodes()
+    for episodeToNotify in addedPodcastEpisodes {
+      os_log(
+        "Podcast: %s, New Episode: %s",
+        log: self.log,
+        type: .info,
+        episodeToNotify.podcast?.name ?? "",
+        episodeToNotify.title
+      )
+      notificationManager.notify(podcastEpisode: episodeToNotify)
+    }
+  }
 }

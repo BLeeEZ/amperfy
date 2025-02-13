@@ -21,70 +21,97 @@
 
 import Foundation
 
-@MainActor class AmpacheApi: BackendApi {
+@MainActor
+class AmpacheApi: BackendApi {
+  private let ampacheXmlServerApi: AmpacheXmlServerApi
+  private let networkMonitor: NetworkMonitorFacade
+  private let performanceMonitor: ThreadPerformanceMonitor
+  private let eventLogger: EventLogger
 
-    private let ampacheXmlServerApi: AmpacheXmlServerApi
-    private let networkMonitor: NetworkMonitorFacade
-    private let performanceMonitor: ThreadPerformanceMonitor
-    private let eventLogger: EventLogger
+  init(
+    ampacheXmlServerApi: AmpacheXmlServerApi,
+    networkMonitor: NetworkMonitorFacade,
+    performanceMonitor: ThreadPerformanceMonitor,
+    eventLogger: EventLogger
+  ) {
+    self.ampacheXmlServerApi = ampacheXmlServerApi
+    self.networkMonitor = networkMonitor
+    self.performanceMonitor = performanceMonitor
+    self.eventLogger = eventLogger
+  }
 
-    init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
-        self.ampacheXmlServerApi = ampacheXmlServerApi
-        self.networkMonitor = networkMonitor
-        self.performanceMonitor = performanceMonitor
-        self.eventLogger = eventLogger
-    }
-    
-    public var clientApiVersion: String {
-        return ampacheXmlServerApi.clientApiVersion
-    }
-    
-    public var serverApiVersion: String {
-        get { return ampacheXmlServerApi.serverApiVersion ?? "-" }
-    }
-    
-    public var isStreamingTranscodingActive: Bool {
-        get { return ampacheXmlServerApi.isStreamingTranscodingActive }
-    }
+  public var clientApiVersion: String {
+    ampacheXmlServerApi.clientApiVersion
+  }
 
-    func provideCredentials(credentials: LoginCredentials) {
-        ampacheXmlServerApi.provideCredentials(credentials: credentials)
-    }
+  public var serverApiVersion: String { ampacheXmlServerApi.serverApiVersion ?? "-" }
 
-    @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws {
-        return try await ampacheXmlServerApi.isAuthenticationValid(credentials: credentials)
-    }
+  public var isStreamingTranscodingActive: Bool { ampacheXmlServerApi.isStreamingTranscodingActive }
 
-    @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
-        return try await ampacheXmlServerApi.generateUrlForDownloadingPlayable(isSong: playable.isSong, id: playable.id)
-    }
+  func provideCredentials(credentials: LoginCredentials) {
+    ampacheXmlServerApi.provideCredentials(credentials: credentials)
+  }
 
-    @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
-        return try await ampacheXmlServerApi.generateUrlForStreamingPlayable(isSong: playable.isSong, id: playable.id, maxBitrate: maxBitrate)
-    }
-    
-    @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
-        return try await ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artwork.url)
-    }
-    
-    func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
-        return ampacheXmlServerApi.checkForErrorResponse(response: response)
-    }
+  @MainActor
+  func isAuthenticationValid(credentials: LoginCredentials) async throws {
+    try await ampacheXmlServerApi.isAuthenticationValid(credentials: credentials)
+  }
 
-    @MainActor func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
-        return AmpacheLibrarySyncer(ampacheXmlServerApi: ampacheXmlServerApi, networkMonitor: networkMonitor, performanceMonitor: self.performanceMonitor, storage: storage, eventLogger: eventLogger)
-    }
+  @MainActor
+  func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws
+    -> URL {
+    try await ampacheXmlServerApi.generateUrlForDownloadingPlayable(
+      isSong: playable.isSong,
+      id: playable.id
+    )
+  }
 
-    @MainActor func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
-        return AmpacheArtworkDownloadDelegate(ampacheXmlServerApi: ampacheXmlServerApi, networkMonitor: networkMonitor)
-    }
-    
-    func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
-        AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString)
-    }
-    
-    func cleanse(url: URL?) -> CleansedURL {
-        return ampacheXmlServerApi.cleanse(url: url)
-    }
+  @MainActor
+  func generateUrl(
+    forStreamingPlayable playable: AbstractPlayable,
+    maxBitrate: StreamingMaxBitratePreference
+  ) async throws
+    -> URL {
+    try await ampacheXmlServerApi.generateUrlForStreamingPlayable(
+      isSong: playable.isSong,
+      id: playable.id,
+      maxBitrate: maxBitrate
+    )
+  }
 
+  @MainActor
+  func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
+    try await ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artwork.url)
+  }
+
+  func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+    ampacheXmlServerApi.checkForErrorResponse(response: response)
+  }
+
+  @MainActor
+  func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+    AmpacheLibrarySyncer(
+      ampacheXmlServerApi: ampacheXmlServerApi,
+      networkMonitor: networkMonitor,
+      performanceMonitor: performanceMonitor,
+      storage: storage,
+      eventLogger: eventLogger
+    )
+  }
+
+  @MainActor
+  func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+    AmpacheArtworkDownloadDelegate(
+      ampacheXmlServerApi: ampacheXmlServerApi,
+      networkMonitor: networkMonitor
+    )
+  }
+
+  func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+    AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString)
+  }
+
+  func cleanse(url: URL?) -> CleansedURL {
+    ampacheXmlServerApi.cleanse(url: url)
+  }
 }

@@ -24,15 +24,15 @@ import Foundation
 import SwiftUI
 
 struct SecondaryText: View {
-    let text: String
+  let text: String
 
-    init(_ text: String) {
-        self.text = text
-    }
+  init(_ text: String) {
+    self.text = text
+  }
 
-    var body: some View {
-        Text(self.text)
-            .foregroundStyle(Color.secondaryLabel)
-            .help(self.text)
-    }
+  var body: some View {
+    Text(text)
+      .foregroundStyle(Color.secondaryLabel)
+      .help(text)
+  }
 }

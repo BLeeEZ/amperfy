@@ -19,10 +19,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(EmbeddedArtworkMO)
-public class EmbeddedArtworkMO: NSManagedObject {
-
-}
+public class EmbeddedArtworkMO: NSManagedObject {}

@@ -19,33 +19,36 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - EventLogSettingsView
 
 struct EventLogSettingsView: View {
-    
-    @FetchRequest(fetchRequest: LogEntryMO.creationDateSortedFetchRequest)
-    var entries: FetchedResults<LogEntryMO>
-    
-    var body: some View {
-        ZStack {
-            List {
-                ForEach(entries, id: \.self) { entry in
-                    EventLogCellView(entry: LogEntry(managedObject: entry))
-                }
-            }
-            #if targetEnvironment(macCatalyst)
-            .listStyle(.plain)
-            #else
-            .listStyle(.grouped)
-            #endif
+  @FetchRequest(fetchRequest: LogEntryMO.creationDateSortedFetchRequest)
+  var entries: FetchedResults<LogEntryMO>
+
+  var body: some View {
+    ZStack {
+      List {
+        ForEach(entries, id: \.self) { entry in
+          EventLogCellView(entry: LogEntry(managedObject: entry))
         }
-        .navigationTitle("Event Log")
+      }
+      #if targetEnvironment(macCatalyst)
+      .listStyle(.plain)
+      #else
+      .listStyle(.grouped)
+      #endif
     }
+    .navigationTitle("Event Log")
+  }
 }
 
+// MARK: - EventLoggerSettingsView_Previews
+
 struct EventLoggerSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        EventLogSettingsView()
-    }
+  static var previews: some View {
+    EventLogSettingsView()
+  }
 }

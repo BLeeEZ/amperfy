@@ -19,18 +19,19 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension SearchHistoryItemMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<SearchHistoryItemMO> {
+    NSFetchRequest<SearchHistoryItemMO>(entityName: "SearchHistoryItem")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<SearchHistoryItemMO> {
-        return NSFetchRequest<SearchHistoryItemMO>(entityName: "SearchHistoryItem")
-    }
-
-    @NSManaged public var date: Date?
-    @NSManaged public var searchedLibraryEntity: AbstractLibraryEntityMO?
-    @NSManaged public var searchedPlaylist: PlaylistMO?
-
+  @NSManaged
+  public var date: Date?
+  @NSManaged
+  public var searchedLibraryEntity: AbstractLibraryEntityMO?
+  @NSManaged
+  public var searchedPlaylist: PlaylistMO?
 }

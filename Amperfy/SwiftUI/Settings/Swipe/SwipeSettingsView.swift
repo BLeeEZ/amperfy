@@ -19,134 +19,155 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - SwipePosition
 
 enum SwipePosition {
-    case leading
-    case trailing
-    
-    var description: String {
-        switch(self) {
-        case .leading:
-            return "leading"
-        case .trailing:
-            return "trailing"
-        }
+  case leading
+  case trailing
+
+  var description: String {
+    switch self {
+    case .leading:
+      return "leading"
+    case .trailing:
+      return "trailing"
     }
+  }
 }
+
+// MARK: - SwipeSettingsView
 
 struct SwipeSettingsView: View {
-    
-    @EnvironmentObject private var settings: Settings
-    @State private var leading = [SwipeActionType]()
-    @State private var trailing = [SwipeActionType]()
-    @State var isShowingAddView = false
-    @State var addPositionType = SwipePosition.leading
-    
-    func reload() {
-        leading = settings.swipeActionSettings.leading
-        trailing = settings.swipeActionSettings.trailing
+  @EnvironmentObject
+  private var settings: Settings
+  @State
+  private var leading = [SwipeActionType]()
+  @State
+  private var trailing = [SwipeActionType]()
+  @State
+  var isShowingAddView = false
+  @State
+  var addPositionType = SwipePosition.leading
+
+  func reload() {
+    leading = settings.swipeActionSettings.leading
+    trailing = settings.swipeActionSettings.trailing
+  }
+
+  func add(swipePosition: SwipePosition, elementToAdd: SwipeActionType) {
+    switch swipePosition {
+    case .leading:
+      leading.append(elementToAdd)
+    case .trailing:
+      trailing.append(elementToAdd)
     }
-    
-    func add(swipePosition: SwipePosition, elementToAdd: SwipeActionType) {
-        switch(swipePosition) {
-        case .leading:
-            leading.append(elementToAdd)
-        case .trailing:
-            trailing.append(elementToAdd)
-        }
-        save()
-    }
-    
-    func save() {
-        settings.swipeActionSettings = SwipeActionSettings(leading: leading, trailing: trailing)
-    }
-    
-    var body: some View {
-        ZStack {
-            SettingsList {
-                Section(header:
-                    HStack {
-                        Text("Leading")
-                        Spacer()
-                        Button(action: {
-                            addPositionType = .leading
-                            isShowingAddView = true
-                        }) {
-                            Image.plus
-                        }
-                    }
-                    #if targetEnvironment(macCatalyst)
-                    .padding(.top, 32)
-                    #endif
-                ) {
-                    ForEach(leading, id: \.self) { swipe in
-                        SwipeCellView(swipe: swipe)
-                    }
-                    .onDelete { index in
-                        self.leading.remove(at: index.first!)
-                        save()
-                    }
-                    .onMove { (fromOffsets, toOffset) in
-                        self.leading.move(fromOffsets: fromOffsets, toOffset: toOffset)
-                        save()
-                    }
-                }
-                Section(header:
-                    HStack {
-                        Text("Trailing")
-                        Spacer()
-                        Button(action: {
-                            addPositionType = .trailing
-                            isShowingAddView = true
-                        }) {
-                            Image.plus
-                        }
-                    }
-                ) {
-                    ForEach(trailing, id: \.self) { swipe in
-                        SwipeCellView(swipe: swipe)
-                    }
-                    .onDelete { index in
-                        self.trailing.remove(at: index.first!)
-                        save()
-                    }
-                    .onMove { (fromOffsets, toOffset) in
-                        self.trailing.move(fromOffsets: fromOffsets, toOffset: toOffset)
-                        save()
-                    }
-                }
-            }.environment(\.editMode, .constant(.active))
-            .listStyle(GroupedListStyle())
-            #if targetEnvironment(macCatalyst)
-            // Set a background color to allow the move gesture to work...
-            // This bug only appears on macOS. If anybody knows a better workaround let me know!
-            .background(Color.white.opacity(0.001))
-            .formSheet(isPresented: $isShowingAddView) {
-                AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: $addPositionType, addCB: self.add)
-                    .frame(width: 400, height: 340)
-                    .environmentObject(settings)
-                    .environment(\.managedObjectContext, appDelegate.storage.main.context)
+    save()
+  }
+
+  func save() {
+    settings.swipeActionSettings = SwipeActionSettings(leading: leading, trailing: trailing)
+  }
+
+  var body: some View {
+    ZStack {
+      SettingsList {
+        Section(
+          header:
+          HStack {
+            Text("Leading")
+            Spacer()
+            Button(action: {
+              addPositionType = .leading
+              isShowingAddView = true
+            }) {
+              Image.plus
             }
-            #else
-            .sheet(isPresented: $isShowingAddView) {
-                AddSwipeActionView(isVisible: $isShowingAddView, swipePosition: $addPositionType, addCB: self.add)
+          }
+          #if targetEnvironment(macCatalyst)
+          .padding(.top, 32)
+          #endif
+        ) {
+          ForEach(leading, id: \.self) { swipe in
+            SwipeCellView(swipe: swipe)
+          }
+          .onDelete { index in
+            leading.remove(at: index.first!)
+            save()
+          }
+          .onMove { fromOffsets, toOffset in
+            leading.move(fromOffsets: fromOffsets, toOffset: toOffset)
+            save()
+          }
+        }
+        Section(
+          header:
+          HStack {
+            Text("Trailing")
+            Spacer()
+            Button(action: {
+              addPositionType = .trailing
+              isShowingAddView = true
+            }) {
+              Image.plus
             }
-            #endif
+          }
+        ) {
+          ForEach(trailing, id: \.self) { swipe in
+            SwipeCellView(swipe: swipe)
+          }
+          .onDelete { index in
+            trailing.remove(at: index.first!)
+            save()
+          }
+          .onMove { fromOffsets, toOffset in
+            trailing.move(fromOffsets: fromOffsets, toOffset: toOffset)
+            save()
+          }
         }
-        .navigationTitle("Swipe")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            reload()
+      }.environment(\.editMode, .constant(.active))
+        .listStyle(GroupedListStyle())
+      #if targetEnvironment(macCatalyst)
+        // Set a background color to allow the move gesture to work...
+        // This bug only appears on macOS. If anybody knows a better workaround let me know!
+        .background(Color.white.opacity(0.001))
+        .formSheet(isPresented: $isShowingAddView) {
+          AddSwipeActionView(
+            isVisible: $isShowingAddView,
+            swipePosition: $addPositionType,
+            addCB: add
+          )
+          .frame(width: 400, height: 340)
+          .environmentObject(settings)
+          .environment(\.managedObjectContext, appDelegate.storage.main.context)
         }
+      #else
+        .sheet(isPresented: $isShowingAddView) {
+            AddSwipeActionView(
+              isVisible: $isShowingAddView,
+              swipePosition: $addPositionType,
+              addCB: add
+            )
+          }
+      #endif
     }
+    .navigationTitle("Swipe")
+    .navigationBarTitleDisplayMode(.inline)
+    .onAppear {
+      reload()
+    }
+  }
 }
 
+// MARK: - SwipeSettingsView_Previews
+
 struct SwipeSettingsView_Previews: PreviewProvider {
-    @State static var settings = Settings()
-    
-    static var previews: some View {
-        SwipeSettingsView().environmentObject(settings)
-    }
+  @State
+  static var settings = Settings()
+
+  static var previews: some View {
+    SwipeSettingsView().environmentObject(settings)
+  }
 }

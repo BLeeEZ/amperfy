@@ -19,50 +19,52 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
-@MainActor extension UICellAccessory.CustomViewConfiguration {
-    
-    public static func createUnSelected() -> UICellAccessory.CustomViewConfiguration {
-        let icon = UIImageView(image: .unSelected)
-        return UICellAccessory.CustomViewConfiguration(
-            customView: icon,
-            placement: .leading(displayed: .whenEditing)
-        )
-    }
-    
-    public static func createIsSelected() -> UICellAccessory.CustomViewConfiguration {
-        let icon = UIImageView(image: .isSelected)
-        return UICellAccessory.CustomViewConfiguration(
-            customView: icon,
-            placement: .leading(displayed: .whenEditing)
-        )
-    }
+@MainActor
+extension UICellAccessory.CustomViewConfiguration {
+  public static func createUnSelected() -> UICellAccessory.CustomViewConfiguration {
+    let icon = UIImageView(image: .unSelected)
+    return UICellAccessory.CustomViewConfiguration(
+      customView: icon,
+      placement: .leading(displayed: .whenEditing)
+    )
+  }
 
-    public static func createEdit(target: Any?, action: Selector?) -> UICellAccessory.CustomViewConfiguration {
-        let label = UILabel()
-        label.text = "Edit"
-        label.textColor = .secondaryLabel
-        label.isUserInteractionEnabled = true
-        let gestureRecognizer = UITapGestureRecognizer(target: target, action: action)
-        label.addGestureRecognizer(gestureRecognizer)
-        return UICellAccessory.CustomViewConfiguration(
-            customView: label,
-            placement: .trailing(displayed: .whenNotEditing)
-        )
-    }
+  public static func createIsSelected() -> UICellAccessory.CustomViewConfiguration {
+    let icon = UIImageView(image: .isSelected)
+    return UICellAccessory.CustomViewConfiguration(
+      customView: icon,
+      placement: .leading(displayed: .whenEditing)
+    )
+  }
 
-    public static func createDone(target: Any?, action: Selector?) -> UICellAccessory.CustomViewConfiguration {
-        let label = UILabel()
-        label.text = "Done"
-        label.textColor = .secondaryLabel
-        label.isUserInteractionEnabled = true
-        let gestureRecognizer = UITapGestureRecognizer(target: target, action: action)
-        label.addGestureRecognizer(gestureRecognizer)
-        return UICellAccessory.CustomViewConfiguration(
-            customView: label,
-            placement: .trailing(displayed: .whenEditing)
-        )
-    }
+  public static func createEdit(target: Any?, action: Selector?) -> UICellAccessory
+    .CustomViewConfiguration {
+    let label = UILabel()
+    label.text = "Edit"
+    label.textColor = .secondaryLabel
+    label.isUserInteractionEnabled = true
+    let gestureRecognizer = UITapGestureRecognizer(target: target, action: action)
+    label.addGestureRecognizer(gestureRecognizer)
+    return UICellAccessory.CustomViewConfiguration(
+      customView: label,
+      placement: .trailing(displayed: .whenNotEditing)
+    )
+  }
+
+  public static func createDone(target: Any?, action: Selector?) -> UICellAccessory
+    .CustomViewConfiguration {
+    let label = UILabel()
+    label.text = "Done"
+    label.textColor = .secondaryLabel
+    label.isUserInteractionEnabled = true
+    let gestureRecognizer = UITapGestureRecognizer(target: target, action: action)
+    label.addGestureRecognizer(gestureRecognizer)
+    return UICellAccessory.CustomViewConfiguration(
+      customView: label,
+      placement: .trailing(displayed: .whenEditing)
+    )
+  }
 }

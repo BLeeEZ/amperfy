@@ -22,68 +22,66 @@
 import Foundation
 
 public class SearchHistoryItem: NSObject {
-    
-    public let managedObject: SearchHistoryItemMO
+  public let managedObject: SearchHistoryItemMO
 
-    public init(managedObject: SearchHistoryItemMO) {
-        self.managedObject = managedObject
-    }
-    
-    public var date: Date? {
-        get { return managedObject.date }
-        set { managedObject.date = newValue }
+  public init(managedObject: SearchHistoryItemMO) {
+    self.managedObject = managedObject
+  }
+
+  public var date: Date? {
+    get { managedObject.date }
+    set { managedObject.date = newValue }
+  }
+
+  public var searchedPlayableContainable: PlayableContainable? {
+    get {
+      if let searchedLibraryEntityMO = managedObject.searchedLibraryEntity {
+        if let songMO = searchedLibraryEntityMO as? SongMO {
+          return Song(managedObject: songMO)
+        } else if let episodeMO = searchedLibraryEntityMO as? PodcastEpisodeMO {
+          return PodcastEpisode(managedObject: episodeMO)
+        } else if let albumMO = searchedLibraryEntityMO as? AlbumMO {
+          return Album(managedObject: albumMO)
+        } else if let artistMO = searchedLibraryEntityMO as? ArtistMO {
+          return Artist(managedObject: artistMO)
+        } else if let podcastMO = searchedLibraryEntityMO as? PodcastMO {
+          return Podcast(managedObject: podcastMO)
+        } else {
+          return nil
+        }
+      } else if let playlistMO = managedObject.searchedPlaylist {
+        guard let context = managedObject.managedObjectContext else { return nil }
+        return Playlist(library: LibraryStorage(context: context), managedObject: playlistMO)
+      } else {
+        return nil
+      }
     }
 
-    public var searchedPlayableContainable: PlayableContainable? {
-        get {
-            if let searchedLibraryEntityMO = managedObject.searchedLibraryEntity {
-                if let songMO = searchedLibraryEntityMO as? SongMO {
-                    return Song(managedObject: songMO)
-                } else if let episodeMO = searchedLibraryEntityMO as? PodcastEpisodeMO {
-                    return PodcastEpisode(managedObject: episodeMO)
-                } else if let albumMO = searchedLibraryEntityMO as? AlbumMO {
-                    return Album(managedObject: albumMO)
-                } else if let artistMO = searchedLibraryEntityMO as? ArtistMO {
-                    return Artist(managedObject: artistMO)
-                } else if let podcastMO = searchedLibraryEntityMO as? PodcastMO {
-                    return Podcast(managedObject: podcastMO)
-                } else {
-                    return nil
-                }
-            } else if let playlistMO = managedObject.searchedPlaylist {
-                guard  let context = managedObject.managedObjectContext else { return nil }
-                return Playlist(library: LibraryStorage(context: context), managedObject: playlistMO)
-            } else {
-                return nil
-            }
-        }
-        
-        set {
-            if let song = newValue as? Song {
-                managedObject.searchedLibraryEntity = song.managedObject
-                managedObject.searchedPlaylist = nil
-            } else if let episode = newValue as? PodcastEpisode {
-                managedObject.searchedLibraryEntity = episode.managedObject
-                managedObject.searchedPlaylist = nil
-            } else if let album = newValue as? Album {
-                managedObject.searchedLibraryEntity = album.managedObject
-                managedObject.searchedPlaylist = nil
-            } else if let artist = newValue as? Artist {
-                managedObject.searchedLibraryEntity = artist.managedObject
-                managedObject.searchedPlaylist = nil
-            } else if let podcast = newValue as? Podcast {
-                managedObject.searchedLibraryEntity = podcast.managedObject
-                managedObject.searchedPlaylist = nil
-            } else if let playlist = newValue as? Playlist {
-                managedObject.searchedLibraryEntity = nil
-                managedObject.searchedPlaylist = playlist.managedObject
-            }
-        }
+    set {
+      if let song = newValue as? Song {
+        managedObject.searchedLibraryEntity = song.managedObject
+        managedObject.searchedPlaylist = nil
+      } else if let episode = newValue as? PodcastEpisode {
+        managedObject.searchedLibraryEntity = episode.managedObject
+        managedObject.searchedPlaylist = nil
+      } else if let album = newValue as? Album {
+        managedObject.searchedLibraryEntity = album.managedObject
+        managedObject.searchedPlaylist = nil
+      } else if let artist = newValue as? Artist {
+        managedObject.searchedLibraryEntity = artist.managedObject
+        managedObject.searchedPlaylist = nil
+      } else if let podcast = newValue as? Podcast {
+        managedObject.searchedLibraryEntity = podcast.managedObject
+        managedObject.searchedPlaylist = nil
+      } else if let playlist = newValue as? Playlist {
+        managedObject.searchedLibraryEntity = nil
+        managedObject.searchedPlaylist = playlist.managedObject
+      }
     }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? SearchHistoryItem else { return false }
-        return managedObject == object.managedObject
-    }
-    
+  }
+
+  override public func isEqual(_ object: Any?) -> Bool {
+    guard let object = object as? SearchHistoryItem else { return false }
+    return managedObject == object.managedObject
+  }
 }

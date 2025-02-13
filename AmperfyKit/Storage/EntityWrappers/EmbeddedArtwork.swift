@@ -23,41 +23,42 @@ import Foundation
 import UIKit
 
 public class EmbeddedArtwork: NSObject {
-    
-    public let managedObject: EmbeddedArtworkMO
-    private let fileManager = CacheFileManager.shared
-    
-    public init(managedObject: EmbeddedArtworkMO) {
-        self.managedObject = managedObject
+  public let managedObject: EmbeddedArtworkMO
+  private let fileManager = CacheFileManager.shared
+
+  public init(managedObject: EmbeddedArtworkMO) {
+    self.managedObject = managedObject
+  }
+
+  public var image: UIImage? {
+    if let relFilePath = relFilePath,
+       let absolutePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
+      return UIImage(named: absolutePath.path)
+    } else {
+      return nil
     }
-    
-    public var image: UIImage? {
-        if let relFilePath = relFilePath,
-           let absolutePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath){
-            return UIImage(named: absolutePath.path)
-        } else {
-            return nil
-        }
+  }
+
+  public var relFilePath: URL? {
+    get {
+      if let relFilePathString = managedObject.relFilePath {
+        return URL(string: relFilePathString)
+      }
+      return nil
     }
-    
-    public var relFilePath: URL? {
-        get {
-            if let relFilePathString = managedObject.relFilePath {
-                return URL(string: relFilePathString)
-            }
-            return nil
-        }
-        set {
-            managedObject.relFilePath = newValue?.path
-        }
+    set {
+      managedObject.relFilePath = newValue?.path
     }
-    
-    public var owner: AbstractPlayable? {
-        get {
-            guard let ownerMO = managedObject.owner else { return nil }
-            return AbstractPlayable(managedObject: ownerMO)
-        }
-        set { if managedObject.owner != newValue?.playableManagedObject { managedObject.owner = newValue?.playableManagedObject } }
+  }
+
+  public var owner: AbstractPlayable? {
+    get {
+      guard let ownerMO = managedObject.owner else { return nil }
+      return AbstractPlayable(managedObject: ownerMO)
     }
-    
+    set {
+      if managedObject.owner != newValue?
+        .playableManagedObject { managedObject.owner = newValue?.playableManagedObject }
+    }
+  }
 }

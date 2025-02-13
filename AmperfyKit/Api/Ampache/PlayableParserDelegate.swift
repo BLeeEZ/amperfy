@@ -19,72 +19,93 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
 import CoreData
+import Foundation
 import os.log
+import UIKit
 
 class PlayableParserDelegate: AmpacheXmlLibParser {
+  var playableBuffer: AbstractPlayable?
+  var rating: Int = 0
+  private var isCached = true
+  private var duration: Int = 0
+  var isCollectionCached: Bool {
+    parsedCount > 0 ? isCached : false
+  }
 
-    var playableBuffer: AbstractPlayable?
-    var rating: Int = 0
-    private var isCached = true
-    private var duration: Int = 0
-    var isCollectionCached: Bool {
-        return parsedCount > 0 ? isCached : false
-    }
-    var collectionDuration: Int {
-        return parsedCount > 0 ? duration : 0
-    }
-    
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-    }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        switch(elementName) {
-        case "title":
-            if let episode = playableBuffer as? PodcastEpisode {
-                episode.titleRawParsed = buffer
-            } else {
-                playableBuffer?.title = buffer
-            }
-        case "rating":
-            rating = Int(buffer) ?? 0
-        case "flag":
-            let flag = Int(buffer) ?? 0
-            playableBuffer?.isFavorite = flag == 1 ? true : false
-        case "track":
-            playableBuffer?.track = Int(buffer) ?? 0
-        case "url":
-            playableBuffer?.url = buffer
-        case "year":
-            playableBuffer?.year = Int(buffer) ?? 0
-        case "time":
-            playableBuffer?.remoteDuration = Int(buffer) ?? 0
-        case "art":
-            playableBuffer?.artwork = parseArtwork(urlString: buffer)
-        case "size":
-            playableBuffer?.size = Int(buffer) ?? 0
-        case "bitrate":
-            playableBuffer?.bitrate = Int(buffer) ?? 0
-        case "mime":
-            playableBuffer?.contentType = buffer
-        case "disk":
-            playableBuffer?.disk = buffer
-        default:
-            break
-        }
+  var collectionDuration: Int {
+    parsedCount > 0 ? duration : 0
+  }
 
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
-    }
-    
-    func resetPlayableBuffer() {
-        if let playable = playableBuffer {
-            isCached = isCached && playable.isCached
-            duration += playable.duration
-        }
-        playableBuffer = nil
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    switch elementName {
+    case "title":
+      if let episode = playableBuffer as? PodcastEpisode {
+        episode.titleRawParsed = buffer
+      } else {
+        playableBuffer?.title = buffer
+      }
+    case "rating":
+      rating = Int(buffer) ?? 0
+    case "flag":
+      let flag = Int(buffer) ?? 0
+      playableBuffer?.isFavorite = flag == 1 ? true : false
+    case "track":
+      playableBuffer?.track = Int(buffer) ?? 0
+    case "url":
+      playableBuffer?.url = buffer
+    case "year":
+      playableBuffer?.year = Int(buffer) ?? 0
+    case "time":
+      playableBuffer?.remoteDuration = Int(buffer) ?? 0
+    case "art":
+      playableBuffer?.artwork = parseArtwork(urlString: buffer)
+    case "size":
+      playableBuffer?.size = Int(buffer) ?? 0
+    case "bitrate":
+      playableBuffer?.bitrate = Int(buffer) ?? 0
+    case "mime":
+      playableBuffer?.contentType = buffer
+    case "disk":
+      playableBuffer?.disk = buffer
+    default:
+      break
     }
 
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+  }
+
+  func resetPlayableBuffer() {
+    if let playable = playableBuffer {
+      isCached = isCached && playable.isCached
+      duration += playable.duration
+    }
+    playableBuffer = nil
+  }
 }

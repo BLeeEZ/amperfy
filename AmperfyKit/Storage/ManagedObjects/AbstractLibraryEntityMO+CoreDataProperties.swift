@@ -19,25 +19,33 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension AbstractLibraryEntityMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<AbstractLibraryEntityMO> {
+    NSFetchRequest<AbstractLibraryEntityMO>(entityName: "AbstractLibraryEntity")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<AbstractLibraryEntityMO> {
-        return NSFetchRequest<AbstractLibraryEntityMO>(entityName: "AbstractLibraryEntity")
-    }
-
-    @NSManaged public var id: String
-    @NSManaged public var alphabeticSectionInitial: String
-    @NSManaged public var isFavorite: Bool
-    @NSManaged public var starredDate: Date?
-    @NSManaged public var rating: Int16
-    @NSManaged public var remoteStatus: Int16
-    @NSManaged public var playCount: Int32
-    @NSManaged public var lastPlayedDate: Date?
-    @NSManaged public var artwork: ArtworkMO?
-    @NSManaged public var searchHistory: SearchHistoryItemMO?
-
+  @NSManaged
+  public var id: String
+  @NSManaged
+  public var alphabeticSectionInitial: String
+  @NSManaged
+  public var isFavorite: Bool
+  @NSManaged
+  public var starredDate: Date?
+  @NSManaged
+  public var rating: Int16
+  @NSManaged
+  public var remoteStatus: Int16
+  @NSManaged
+  public var playCount: Int32
+  @NSManaged
+  public var lastPlayedDate: Date?
+  @NSManaged
+  public var artwork: ArtworkMO?
+  @NSManaged
+  public var searchHistory: SearchHistoryItemMO?
 }

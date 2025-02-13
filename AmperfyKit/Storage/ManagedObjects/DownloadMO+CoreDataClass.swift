@@ -19,31 +19,33 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - DownloadMO
 
 @objc(DownloadMO)
-public class DownloadMO: NSManagedObject {
-
-}
+public class DownloadMO: NSManagedObject {}
 
 extension DownloadMO {
-    
-    static var creationDateSortedFetchRequest: NSFetchRequest<DownloadMO> {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(DownloadMO.creationDate), ascending: true),
-            NSSortDescriptor(key: #keyPath(DownloadMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
-    static var onlyPlayablesPredicate: NSPredicate {
-        return NSPredicate(format: "%K != nil", #keyPath(DownloadMO.playable))
-    }
-    
-    static var onlyArtworksPredicate: NSPredicate {
-        return NSPredicate(format: "%K != nil", #keyPath(DownloadMO.artwork))
-    }
+  static var creationDateSortedFetchRequest: NSFetchRequest<DownloadMO> {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(DownloadMO.creationDate), ascending: true),
+      NSSortDescriptor(
+        key: #keyPath(DownloadMO.id),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
 
+  static var onlyPlayablesPredicate: NSPredicate {
+    NSPredicate(format: "%K != nil", #keyPath(DownloadMO.playable))
+  }
+
+  static var onlyArtworksPredicate: NSPredicate {
+    NSPredicate(format: "%K != nil", #keyPath(DownloadMO.artwork))
+  }
 }

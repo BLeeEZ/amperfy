@@ -19,34 +19,50 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - RadioMO
 
 @objc(RadioMO)
-public final class RadioMO: AbstractPlayableMO {
-    
-}
+public final class RadioMO: AbstractPlayableMO {}
+
+// MARK: CoreDataIdentifyable
 
 extension RadioMO: CoreDataIdentifyable {
-    
-    static var identifierKey: KeyPath<RadioMO, String?> {
-        return \RadioMO.title
-    }
-    
-    static var excludeServerDeleteRadiosFetchPredicate: NSPredicate {
-        return NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == %i", #keyPath(RadioMO.remoteStatus), RemoteStatus.available.rawValue)
-        ])
-    }
+  static var identifierKey: KeyPath<RadioMO, String?> {
+    \RadioMO.title
+  }
 
-    static var alphabeticSortedFetchRequest: NSFetchRequest<RadioMO> {
-        let fetchRequest: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(RadioMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
+  static var excludeServerDeleteRadiosFetchPredicate: NSPredicate {
+    NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(
+        format: "%K == %i",
+        #keyPath(RadioMO.remoteStatus),
+        RemoteStatus.available.rawValue
+      ),
+    ])
+  }
+
+  static var alphabeticSortedFetchRequest: NSFetchRequest<RadioMO> {
+    let fetchRequest: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: #keyPath(RadioMO.alphabeticSectionInitial),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
 }

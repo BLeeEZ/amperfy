@@ -22,83 +22,116 @@
 import Foundation
 import os.log
 
-class SubsonicApi  {
-        
-    private let subsonicServerApi: SubsonicServerApi
-    private let networkMonitor: NetworkMonitorFacade
-    private let performanceMonitor: ThreadPerformanceMonitor
-    private let eventLogger: EventLogger
+// MARK: - SubsonicApi
 
-    init(subsonicServerApi: SubsonicServerApi, networkMonitor: NetworkMonitorFacade, performanceMonitor: ThreadPerformanceMonitor, eventLogger: EventLogger) {
-        self.subsonicServerApi = subsonicServerApi
-        self.networkMonitor = networkMonitor
-        self.performanceMonitor = performanceMonitor
-        self.eventLogger = eventLogger
-    }
-    
-    @MainActor var authType: SubsonicApiAuthType {
-        get { return subsonicServerApi.authType }
-    }
-    @MainActor func setAuthType(newAuthType: SubsonicApiAuthType) {
-        subsonicServerApi.setAuthType(newAuthType: newAuthType)
-    }
+class SubsonicApi {
+  private let subsonicServerApi: SubsonicServerApi
+  private let networkMonitor: NetworkMonitorFacade
+  private let performanceMonitor: ThreadPerformanceMonitor
+  private let eventLogger: EventLogger
 
+  init(
+    subsonicServerApi: SubsonicServerApi,
+    networkMonitor: NetworkMonitorFacade,
+    performanceMonitor: ThreadPerformanceMonitor,
+    eventLogger: EventLogger
+  ) {
+    self.subsonicServerApi = subsonicServerApi
+    self.networkMonitor = networkMonitor
+    self.performanceMonitor = performanceMonitor
+    self.eventLogger = eventLogger
+  }
+
+  @MainActor
+  var authType: SubsonicApiAuthType { subsonicServerApi.authType }
+
+  @MainActor
+  func setAuthType(newAuthType: SubsonicApiAuthType) {
+    subsonicServerApi.setAuthType(newAuthType: newAuthType)
+  }
 }
-    
+
+// MARK: BackendApi
+
 extension SubsonicApi: BackendApi {
-    
-    @MainActor public var clientApiVersion: String {
-        get { return subsonicServerApi.clientApiVersion?.description ?? "-" }
-    }
-    
-    @MainActor public var serverApiVersion: String {
-        get { return subsonicServerApi.serverApiVersion?.description ?? "-" }
-    }
-    
-    @MainActor public var isStreamingTranscodingActive: Bool {
-        get { return subsonicServerApi.isStreamingTranscodingActive }
-    }
+  @MainActor
+  public var clientApiVersion: String {
+    subsonicServerApi.clientApiVersion?.description ?? "-"
+  }
 
-    @MainActor func provideCredentials(credentials: LoginCredentials) {
-        subsonicServerApi.provideCredentials(credentials: credentials)
-    }
-    
-    @MainActor func isAuthenticationValid(credentials: LoginCredentials) async throws {
-        return try await subsonicServerApi.isAuthenticationValid(credentials: credentials)
-    }
+  @MainActor
+  public var serverApiVersion: String {
+    subsonicServerApi.serverApiVersion?.description ?? "-"
+  }
 
-    @MainActor func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL {
-        let apiId = playable.asPodcastEpisode?.streamId ?? playable.id
-        return try await subsonicServerApi.generateUrl(forDownloadingPlayableId: apiId)
-    }
+  @MainActor
+  public var isStreamingTranscodingActive: Bool {
+    subsonicServerApi.isStreamingTranscodingActive
+  }
 
-    @MainActor func generateUrl(forStreamingPlayable playable: AbstractPlayable, maxBitrate: StreamingMaxBitratePreference) async throws -> URL {
-        let apiId = playable.asPodcastEpisode?.streamId ?? playable.id
-        return try await subsonicServerApi.generateUrl(forStreamingPlayableId: apiId, maxBitrate: maxBitrate)
-    }
-    
-    @MainActor func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
-        return try await subsonicServerApi.generateUrl(forArtworkId: artwork.id)
-    }
+  @MainActor
+  func provideCredentials(credentials: LoginCredentials) {
+    subsonicServerApi.provideCredentials(credentials: credentials)
+  }
 
-    @MainActor func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
-        return subsonicServerApi.checkForErrorResponse(response: response)
-    }
-    
-    @MainActor func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
-        return SubsonicLibrarySyncer(subsonicServerApi: subsonicServerApi, networkMonitor: networkMonitor, performanceMonitor: performanceMonitor, storage: storage, eventLogger: eventLogger)
-    }
-    
-    func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
-        return SubsonicArtworkDownloadDelegate(subsonicServerApi: subsonicServerApi, networkMonitor: networkMonitor)
-    }
-    
-    func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
-        return SubsonicServerApi.extractArtworkInfoFromURL(urlString: urlString)
-    }
-    
-    func cleanse(url: URL?) -> CleansedURL {
-        return subsonicServerApi.cleanse(url: url)
-    }
+  @MainActor
+  func isAuthenticationValid(credentials: LoginCredentials) async throws {
+    try await subsonicServerApi.isAuthenticationValid(credentials: credentials)
+  }
 
+  @MainActor
+  func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws
+    -> URL {
+    let apiId = playable.asPodcastEpisode?.streamId ?? playable.id
+    return try await subsonicServerApi.generateUrl(forDownloadingPlayableId: apiId)
+  }
+
+  @MainActor
+  func generateUrl(
+    forStreamingPlayable playable: AbstractPlayable,
+    maxBitrate: StreamingMaxBitratePreference
+  ) async throws
+    -> URL {
+    let apiId = playable.asPodcastEpisode?.streamId ?? playable.id
+    return try await subsonicServerApi.generateUrl(
+      forStreamingPlayableId: apiId,
+      maxBitrate: maxBitrate
+    )
+  }
+
+  @MainActor
+  func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
+    try await subsonicServerApi.generateUrl(forArtworkId: artwork.id)
+  }
+
+  @MainActor
+  func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+    subsonicServerApi.checkForErrorResponse(response: response)
+  }
+
+  @MainActor
+  func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+    SubsonicLibrarySyncer(
+      subsonicServerApi: subsonicServerApi,
+      networkMonitor: networkMonitor,
+      performanceMonitor: performanceMonitor,
+      storage: storage,
+      eventLogger: eventLogger
+    )
+  }
+
+  func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+    SubsonicArtworkDownloadDelegate(
+      subsonicServerApi: subsonicServerApi,
+      networkMonitor: networkMonitor
+    )
+  }
+
+  func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+    SubsonicServerApi.extractArtworkInfoFromURL(urlString: urlString)
+  }
+
+  func cleanse(url: URL?) -> CleansedURL {
+    subsonicServerApi.cleanse(url: url)
+  }
 }

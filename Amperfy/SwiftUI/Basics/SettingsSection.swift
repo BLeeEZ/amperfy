@@ -25,35 +25,40 @@ import SwiftUI
 // MacOS ignores sections. That is, content in a Section is directly added to the list.
 // The footer is displayed on mouse hover. Headers are ignored.
 struct SettingsSection<Content: View>: View, BehavioralStylable {
-    let footer: String?
-    let header: String?
-    let content: () -> Content
-    @State var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
+  let footer: String?
+  let header: String?
+  let content: () -> Content
+  @State
+  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
 
-    init(@ViewBuilder content:  @escaping () -> Content, footer: String? = nil, header: String? = nil) {
-        self.content = content
-        self.footer = footer
-        self.header = header
-    }
+  init(
+    @ViewBuilder content: @escaping () -> Content,
+    footer: String? = nil,
+    header: String? = nil
+  ) {
+    self.content = content
+    self.footer = footer
+    self.header = header
+  }
 
-    var body: some View {
-        if self.behavioralStyle == .mac {
-            if let footer = self.footer {
-                self.content()
-                    .help(footer)
-            } else {
-                self.content()
-            }
-        } else {
-            if let footer = self.footer, let header = self.header {
-                Section(content: self.content, header: { Text(header) }, footer: { Text(footer) })
-            }  else if let header = self.header {
-                Section(content: self.content, header: { Text(header) })
-            } else if let footer = self.footer {
-                Section(content: self.content, footer: { Text(footer) })
-            } else {
-                Section(content: self.content)
-            }
-        }
+  var body: some View {
+    if behavioralStyle == .mac {
+      if let footer = footer {
+        content()
+          .help(footer)
+      } else {
+        content()
+      }
+    } else {
+      if let footer = footer, let header = header {
+        Section(content: content, header: { Text(header) }, footer: { Text(footer) })
+      } else if let header = header {
+        Section(content: content, header: { Text(header) })
+      } else if let footer = footer {
+        Section(content: content, footer: { Text(footer) })
+      } else {
+        Section(content: content)
+      }
     }
+  }
 }

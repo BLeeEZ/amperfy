@@ -21,68 +21,95 @@
 
 import Foundation
 
+// MARK: - AmpacheXmlParser
+
 class AmpacheXmlParser: GenericXmlParser {
-    
-    var error: AmpacheResponseError?
-    private var statusCode: Int = 0
-    private var message = ""
+  var error: AmpacheResponseError?
+  private var statusCode: Int = 0
+  private var message = ""
 
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-        
-        switch(elementName) {
-        case "error":
-            statusCode = Int(attributeDict["errorCode"] ?? "0") ?? 0
-        default:
-            break
-        }
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
+
+    switch elementName {
+    case "error":
+      statusCode = Int(attributeDict["errorCode"] ?? "0") ?? 0
+    default:
+      break
     }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        switch(elementName) {
-        case "errorMessage":
-            message = buffer
-        case "error":
-            error = AmpacheResponseError(statusCode: statusCode, message: message)
-        default:
-            break
-        }
-        
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    switch elementName {
+    case "errorMessage":
+      message = buffer
+    case "error":
+      error = AmpacheResponseError(statusCode: statusCode, message: message)
+    default:
+      break
     }
 
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+  }
 }
+
+// MARK: - AmpacheNotifiableXmlParser
 
 class AmpacheNotifiableXmlParser: AmpacheXmlParser {
-    
-    var parseNotifier: ParsedObjectNotifiable?
-    
-    init(performanceMonitor: ThreadPerformanceMonitor, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.parseNotifier = parseNotifier
-        super.init(performanceMonitor: performanceMonitor)
-    }
-    
+  var parseNotifier: ParsedObjectNotifiable?
+
+  init(performanceMonitor: ThreadPerformanceMonitor, parseNotifier: ParsedObjectNotifiable? = nil) {
+    self.parseNotifier = parseNotifier
+    super.init(performanceMonitor: performanceMonitor)
+  }
 }
 
+// MARK: - AmpacheXmlLibParser
+
 class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
-    
-    var library: LibraryStorage
-    
-    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.library = library
-        super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
+  var library: LibraryStorage
+
+  init(
+    performanceMonitor: ThreadPerformanceMonitor,
+    library: LibraryStorage,
+    parseNotifier: ParsedObjectNotifiable? = nil
+  ) {
+    self.library = library
+    super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
+  }
+
+  func parseArtwork(urlString: String) -> Artwork? {
+    guard let artworkRemoteInfo = AmpacheXmlServerApi
+      .extractArtworkInfoFromURL(urlString: urlString) else { return nil }
+    if let foundArtwork = library.getArtwork(remoteInfo: artworkRemoteInfo) {
+      return foundArtwork
+    } else {
+      let createdArtwork = library.createArtwork()
+      createdArtwork.remoteInfo = artworkRemoteInfo
+      createdArtwork.url = urlString
+      return createdArtwork
     }
-    
-    func parseArtwork(urlString: String) -> Artwork? {
-        guard let artworkRemoteInfo = AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: urlString) else { return nil }
-        if let foundArtwork = library.getArtwork(remoteInfo: artworkRemoteInfo) {
-            return foundArtwork
-        } else {
-            let createdArtwork = library.createArtwork()
-            createdArtwork.remoteInfo = artworkRemoteInfo
-            createdArtwork.url = urlString
-            return createdArtwork
-        }
-    }
-    
+  }
 }

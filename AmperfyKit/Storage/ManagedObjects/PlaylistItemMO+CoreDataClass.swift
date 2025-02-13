@@ -19,20 +19,18 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(PlaylistItemMO)
 public class PlaylistItemMO: NSManagedObject {
+  public static let orderDistance: Int32 = 32
 
-    public static let orderDistance : Int32 = 32
-    
-    static var playlistOrderSortedFetchRequest: NSFetchRequest<PlaylistItemMO> {
-        let fetchRequest: NSFetchRequest<PlaylistItemMO> = PlaylistItemMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(PlaylistItemMO.order), ascending: true)
-        ]
-        return fetchRequest
-    }
-
+  static var playlistOrderSortedFetchRequest: NSFetchRequest<PlaylistItemMO> {
+    let fetchRequest: NSFetchRequest<PlaylistItemMO> = PlaylistItemMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(PlaylistItemMO.order), ascending: true),
+    ]
+    return fetchRequest
+  }
 }

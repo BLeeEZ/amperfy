@@ -19,51 +19,63 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - PodcastMO
 
 @objc(PodcastMO)
 public final class PodcastMO: AbstractLibraryEntityMO {
-    
-    override public func willSave() {
-        super.willSave()
-        if hasChangedEpisodes {
-            updateEpisodeCount()
-        }
+  override public func willSave() {
+    super.willSave()
+    if hasChangedEpisodes {
+      updateEpisodeCount()
     }
+  }
 
-    fileprivate var hasChangedEpisodes: Bool {
-        return changedValue(forKey: #keyPath(episodes)) != nil
-    }
+  fileprivate var hasChangedEpisodes: Bool {
+    changedValue(forKey: #keyPath(episodes)) != nil
+  }
 
-    fileprivate func updateEpisodeCount() {
-        guard Int16(episodes?.count ?? 0) != episodeCount else { return }
-        episodeCount = Int16(episodes?.count ?? 0)
-    }
-
+  fileprivate func updateEpisodeCount() {
+    guard Int16(episodes?.count ?? 0) != episodeCount else { return }
+    episodeCount = Int16(episodes?.count ?? 0)
+  }
 }
 
+// MARK: CoreDataIdentifyable
+
 extension PodcastMO: CoreDataIdentifyable {
-    
-    static var identifierKey: KeyPath<PodcastMO, String?> {
-        return \PodcastMO.title
+  static var identifierKey: KeyPath<PodcastMO, String?> {
+    \PodcastMO.title
+  }
+
+  static var alphabeticSortedFetchRequest: NSFetchRequest<PodcastMO> {
+    let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: #keyPath(PodcastMO.alphabeticSectionInitial),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
+
+  func passOwnership(to targetPodcast: PodcastMO) {
+    let episodesCopy = episodes?.compactMap { $0 as? PodcastEpisodeMO }
+    episodesCopy?.forEach {
+      $0.podcast = targetPodcast
     }
-    
-    static var alphabeticSortedFetchRequest: NSFetchRequest<PodcastMO> {
-        let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(PodcastMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
-    func passOwnership(to targetPodcast: PodcastMO) {
-        let episodesCopy = episodes?.compactMap{ $0 as? PodcastEpisodeMO }
-        episodesCopy?.forEach{
-            $0.podcast = targetPodcast
-        }
-    }
-    
+  }
 }

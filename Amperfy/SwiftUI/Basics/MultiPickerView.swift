@@ -19,47 +19,52 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
 import SwiftUI
 
+// MARK: - MultiPickerView
+
 struct MultiPickerView: View {
-    typealias Label = String
-    typealias Entry = String
+  typealias Label = String
+  typealias Entry = String
 
-    let data: [ (Label, [Entry]) ]
-    @Binding var selection: [Entry]
+  let data: [(Label, [Entry])]
+  @Binding
+  var selection: [Entry]
 
-    var body: some View {
-        GeometryReader { geometry in
-            HStack {
-                Spacer()
-                ForEach(0..<self.data.count, id: \.self) { column in
-                    Picker(self.data[column].0, selection: self.$selection[column]) {
-                        ForEach(0..<self.data[column].1.count, id: \.self) { row in
-                            Text(verbatim: self.data[column].1[row])
-                                .tag(self.data[column].1[row])
-                        }
-                    }
-                    // Hack to get the picker to reload its data. Otherwise the picker is not updated with .menu style.
-                    .id(self.data[column].1.firstIndex(where: { entry in self.selection[column] == entry }))
-                    #if targetEnvironment(macCatalyst)
-                    .pickerStyle(.menu)
-                    #else
-                    .pickerStyle(.wheel)
-                    #endif
-                    .frame(width: geometry.size.width / CGFloat(self.data.count), height: geometry.size.height)
-                    .clipped()
-                    Spacer()
-                }
+  var body: some View {
+    GeometryReader { geometry in
+      HStack {
+        Spacer()
+        ForEach(0 ..< data.count, id: \.self) { column in
+          Picker(data[column].0, selection: $selection[column]) {
+            ForEach(0 ..< data[column].1.count, id: \.self) { row in
+              Text(verbatim: data[column].1[row])
+                .tag(data[column].1[row])
             }
+          }
+          // Hack to get the picker to reload its data. Otherwise the picker is not updated with .menu style.
+          .id(data[column].1.firstIndex(where: { entry in selection[column] == entry }))
+          #if targetEnvironment(macCatalyst)
+            .pickerStyle(.menu)
+          #else
+            .pickerStyle(.wheel)
+          #endif
+            .frame(width: geometry.size.width / CGFloat(data.count), height: geometry.size.height)
+            .clipped()
+          Spacer()
         }
+      }
     }
+  }
 }
 
+// MARK: - MultiPickerView_Previews
+
 struct MultiPickerView_Previews: PreviewProvider {
-    @State static var selection = ["", ""]
-    
-    static var previews: some View {
-        MultiPickerView(data: [("One", ["0", "1"]), ("Two", ["0", "1"])], selection: Self.$selection)
-    }
+  @State
+  static var selection = ["", ""]
+
+  static var previews: some View {
+    MultiPickerView(data: [("One", ["0", "1"]), ("Two", ["0", "1"])], selection: Self.$selection)
+  }
 }

@@ -19,54 +19,56 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(MusicFolderMO)
 public class MusicFolderMO: NSManagedObject {
-    
-    override public func willSave() {
-        super.willSave()
-        if hasChangedSongs {
-            updateSongCount()
-        }
-        if hasChangedDirectories {
-            updateDirectoryCount()
-        }
+  override public func willSave() {
+    super.willSave()
+    if hasChangedSongs {
+      updateSongCount()
     }
+    if hasChangedDirectories {
+      updateDirectoryCount()
+    }
+  }
 
-    fileprivate var hasChangedSongs: Bool {
-        return changedValue(forKey: #keyPath(songs)) != nil
-    }
+  fileprivate var hasChangedSongs: Bool {
+    changedValue(forKey: #keyPath(songs)) != nil
+  }
 
-    fileprivate func updateSongCount() {
-        guard Int16(songs?.count ?? 0) != songCount else { return }
-        songCount = Int16(songs?.count ?? 0)
-    }
+  fileprivate func updateSongCount() {
+    guard Int16(songs?.count ?? 0) != songCount else { return }
+    songCount = Int16(songs?.count ?? 0)
+  }
 
-    fileprivate var hasChangedDirectories: Bool {
-        return changedValue(forKey: #keyPath(directories)) != nil
-    }
+  fileprivate var hasChangedDirectories: Bool {
+    changedValue(forKey: #keyPath(directories)) != nil
+  }
 
-    fileprivate func updateDirectoryCount() {
-        guard Int16(directories?.count ?? 0) != directoryCount else { return }
-        directoryCount = Int16(directories?.count ?? 0)
-    }
-    
-    static var idSortedFetchRequest: NSFetchRequest<MusicFolderMO> {
-        let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(MusicFolderMO.id), ascending: true)
-        ]
-        return fetchRequest
-    }
+  fileprivate func updateDirectoryCount() {
+    guard Int16(directories?.count ?? 0) != directoryCount else { return }
+    directoryCount = Int16(directories?.count ?? 0)
+  }
 
-    static func getSearchPredicate(searchText: String) -> NSPredicate {
-        var predicate: NSPredicate = NSPredicate.init(value: true)
-        if searchText.count > 0 {
-            predicate = NSPredicate(format: "%K contains[cd] %@", #keyPath(MusicFolderMO.name), searchText)
-        }
-        return predicate
+  static var idSortedFetchRequest: NSFetchRequest<MusicFolderMO> {
+    let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(MusicFolderMO.id), ascending: true),
+    ]
+    return fetchRequest
+  }
+
+  static func getSearchPredicate(searchText: String) -> NSPredicate {
+    var predicate = NSPredicate(value: true)
+    if !searchText.isEmpty {
+      predicate = NSPredicate(
+        format: "%K contains[cd] %@",
+        #keyPath(MusicFolderMO.name),
+        searchText
+      )
     }
-    
+    return predicate
+  }
 }

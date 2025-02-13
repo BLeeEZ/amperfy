@@ -19,86 +19,109 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
 import CoreData
+import Foundation
 import os.log
+import UIKit
 
 class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
-    
-    var playableBuffer: AbstractPlayable?
-    private var isCached = true
-    var isCollectionCached: Bool {
-        return parsedCount > 0 ? isCached : false
+  var playableBuffer: AbstractPlayable?
+  private var isCached = true
+  var isCollectionCached: Bool {
+    parsedCount > 0 ? isCached : false
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
+
+    if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
+      "episode" {
+      guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir),
+            isDirBool == false else { return }
+
+      if let attributeTitle = attributeDict["title"] {
+        if elementName == "episode" {
+          (playableBuffer as? PodcastEpisode)?.titleRawParsed = attributeTitle
+        } else {
+          playableBuffer?.title = attributeTitle
+        }
+      }
+      if let attributeTrack = attributeDict["track"], let track = Int(attributeTrack) {
+        playableBuffer?.track = track
+      }
+      if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
+        playableBuffer?.year = year
+      }
+      if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
+        playableBuffer?.remoteDuration = duration
+      }
+      if let attributeSize = attributeDict["size"], let size = Int(attributeSize) {
+        playableBuffer?.size = size
+      }
+      if let attributeBitrate = attributeDict["bitRate"], let bitrate = Int(attributeBitrate) {
+        playableBuffer?.bitrate = bitrate * 1000 // kb per second -> save as byte per second
+      }
+      if let contentType = attributeDict["contentType"] {
+        playableBuffer?.contentType = contentType
+      }
+      if let disk = attributeDict["discNumber"] {
+        playableBuffer?.disk = disk
+      }
+      playableBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
+      if let starredDate = attributeDict["starred"] {
+        playableBuffer?.isFavorite = true
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = dateFormatter.date(from: starredDate) {
+          playableBuffer?.starredDate = date
+        } else {
+          playableBuffer?.starredDate = nil
+        }
+      } else {
+        playableBuffer?.isFavorite = false
+        playableBuffer?.starredDate = nil
+      }
+      if let coverArtId = attributeDict["coverArt"] {
+        playableBuffer?.artwork = parseArtwork(id: coverArtId)
+      }
+    }
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
+      "episode", playableBuffer != nil {
+      resetPlayableBuffer()
     }
 
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-        
-        if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode" {
-            guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool == false else { return }
-            
-            if let attributeTitle = attributeDict["title"] {
-                if elementName == "episode" {
-                    (playableBuffer as? PodcastEpisode)?.titleRawParsed = attributeTitle
-                } else {
-                    playableBuffer?.title = attributeTitle
-                }
-            }
-            if let attributeTrack = attributeDict["track"], let track = Int(attributeTrack) {
-                playableBuffer?.track = track
-            }
-            if let attributeYear = attributeDict["year"], let year = Int(attributeYear) {
-                playableBuffer?.year = year
-            }
-            if let attributeDuration = attributeDict["duration"], let duration = Int(attributeDuration) {
-                playableBuffer?.remoteDuration = duration
-            }
-            if let attributeSize = attributeDict["size"], let size = Int(attributeSize) {
-                playableBuffer?.size = size
-            }
-            if let attributeBitrate = attributeDict["bitRate"], let bitrate = Int(attributeBitrate) {
-                playableBuffer?.bitrate = bitrate * 1000 // kb per second -> save as byte per second
-            }
-            if let contentType = attributeDict["contentType"] {
-                playableBuffer?.contentType = contentType
-            }
-            if let disk = attributeDict["discNumber"] {
-                playableBuffer?.disk = disk
-            }
-            playableBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
-            if let starredDate = attributeDict["starred"] {
-                playableBuffer?.isFavorite = true
-                let dateFormatter = ISO8601DateFormatter()
-                dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-                if let date = dateFormatter.date(from: starredDate) {
-                    playableBuffer?.starredDate = date
-                } else {
-                    playableBuffer?.starredDate = nil
-                }
-            } else {
-                playableBuffer?.isFavorite = false
-                playableBuffer?.starredDate = nil
-            }
-            if let coverArtId = attributeDict["coverArt"] {
-                playableBuffer?.artwork = parseArtwork(id: coverArtId)
-            }
-        }
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+  }
+
+  func resetPlayableBuffer() {
+    if let playable = playableBuffer {
+      isCached = isCached && playable.isCached
     }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "song" || elementName == "entry" || elementName == "child" || elementName == "episode", playableBuffer != nil {
-            resetPlayableBuffer()
-        }
-        
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
-    }
-    
-    func resetPlayableBuffer() {
-        if let playable = playableBuffer {
-            isCached = isCached && playable.isCached
-        }
-        playableBuffer = nil
-    }
-    
+    playableBuffer = nil
+  }
 }

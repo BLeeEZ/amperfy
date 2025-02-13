@@ -21,57 +21,72 @@
 
 import Foundation
 
+// MARK: - SsXmlParser
+
 class SsXmlParser: GenericXmlParser {
-    
-    var error: SubsonicResponseError?
-    
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-        
-        if(elementName == "error") {
-            let statusCode = Int(attributeDict["code"] ?? "0") ?? 0
-            let message = attributeDict["message"] ?? ""
-            error = SubsonicResponseError(statusCode: statusCode, message: message)
-        }
+  var error: SubsonicResponseError?
+
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
+
+    if elementName == "error" {
+      let statusCode = Int(attributeDict["code"] ?? "0") ?? 0
+      let message = attributeDict["message"] ?? ""
+      error = SubsonicResponseError(statusCode: statusCode, message: message)
     }
-    
+  }
 }
+
+// MARK: - SsNotifiableXmlParser
 
 class SsNotifiableXmlParser: SsXmlParser {
-    
-    var parseNotifier: ParsedObjectNotifiable?
-    
-    init(performanceMonitor: ThreadPerformanceMonitor, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.parseNotifier = parseNotifier
-        super.init(performanceMonitor: performanceMonitor)
-    }
-    
+  var parseNotifier: ParsedObjectNotifiable?
+
+  init(performanceMonitor: ThreadPerformanceMonitor, parseNotifier: ParsedObjectNotifiable? = nil) {
+    self.parseNotifier = parseNotifier
+    super.init(performanceMonitor: performanceMonitor)
+  }
 }
+
+// MARK: - SsXmlLibParser
 
 class SsXmlLibParser: SsNotifiableXmlParser {
-    
-    var library: LibraryStorage
-    
-    init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage, parseNotifier: ParsedObjectNotifiable? = nil) {
-        self.library = library
-        super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
-    }
-    
+  var library: LibraryStorage
+
+  init(
+    performanceMonitor: ThreadPerformanceMonitor,
+    library: LibraryStorage,
+    parseNotifier: ParsedObjectNotifiable? = nil
+  ) {
+    self.library = library
+    super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
+  }
 }
+
+// MARK: - SsXmlLibWithArtworkParser
 
 class SsXmlLibWithArtworkParser: SsXmlLibParser {
-    
-    func parseArtwork(id: String) -> Artwork? {
-        let remoteInfo = ArtworkRemoteInfo(id: id, type: "")
-        if let foundArtwork = library.getArtwork(remoteInfo: remoteInfo) {
-            return foundArtwork
-        } else {
-            let createdArtwork = library.createArtwork()
-            createdArtwork.remoteInfo = remoteInfo
-            createdArtwork.status = .NotChecked
-            return createdArtwork
-        }
+  func parseArtwork(id: String) -> Artwork? {
+    let remoteInfo = ArtworkRemoteInfo(id: id, type: "")
+    if let foundArtwork = library.getArtwork(remoteInfo: remoteInfo) {
+      return foundArtwork
+    } else {
+      let createdArtwork = library.createArtwork()
+      createdArtwork.remoteInfo = remoteInfo
+      createdArtwork.status = .NotChecked
+      return createdArtwork
     }
-
+  }
 }
-

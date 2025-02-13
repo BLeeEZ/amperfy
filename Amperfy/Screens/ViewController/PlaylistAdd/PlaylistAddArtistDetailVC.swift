@@ -19,210 +19,279 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
-import CoreData
 import AmperfyKit
+import CoreData
+import UIKit
 
 class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddable {
+  override var sceneTitle: String? { artist.name }
 
-    override var sceneTitle: String? { artist.name }
+  public var artist: Artist!
+  public var addToPlaylistManager = AddToPlaylistManager()
 
-    public var artist: Artist!
-    public var addToPlaylistManager = AddToPlaylistManager()
+  private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
+  private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
+  private var doneButton: UIBarButtonItem!
 
-    private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
-    private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
-    private var doneButton: UIBarButtonItem!
+  override func viewDidLoad() {
+    super.viewDidLoad()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        doneButton = addToPlaylistManager.createDoneButton()
-        navigationItem.rightBarButtonItems = [doneButton]
+    doneButton = addToPlaylistManager.createDoneButton()
+    navigationItem.rightBarButtonItems = [doneButton]
 
-        albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(for: artist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        albumsFetchedResultsController.delegate = self
-        songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(for: artist, displayFilter: appDelegate.storage.settings.artistsFilterSetting, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        songsFetchedResultsController.delegate = self
-        tableView.register(nibName: GenericTableCell.typeName)
-        tableView.register(nibName: PlayableTableCell.typeName)
-        tableView.sectionHeaderHeight = 0.0
-        tableView.estimatedSectionHeaderHeight = 0.0
-        tableView.sectionFooterHeight = 0.0
-        tableView.estimatedSectionFooterHeight = 0.0
-        
-        configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        albumsFetchedResultsController?.delegate = self
-        songsFetchedResultsController?.delegate = self
-        updateTitle()
-        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
-        
-        guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        Task { @MainActor in do {
-            try await artist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        } catch {
-            self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
-        }}
-    }
-    
-    func updateTitle() {
-        setNavBarTitle(title: addToPlaylistManager.title)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        albumsFetchedResultsController?.delegate = nil
-        songsFetchedResultsController?.delegate = nil
-        addToPlaylistManager.hideToolbar(viewVC: self)
-    }
-        
-    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
-        if let songs = songsFetchedResultsController?.fetchedObjects?.compactMap({ Song(managedObject: $0) }) {
-            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
-                self.tableView.reloadData()
-                self.updateTitle()
-            })
-        }
-    }
-    
-    // MARK: - Table view data source
+    albumsFetchedResultsController = ArtistAlbumsItemsFetchedResultsController(
+      for: artist,
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    albumsFetchedResultsController.delegate = self
+    songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(
+      for: artist,
+      displayFilter: appDelegate.storage.settings.artistsFilterSetting,
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    songsFetchedResultsController.delegate = self
+    tableView.register(nibName: GenericTableCell.typeName)
+    tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
 
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+    configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    albumsFetchedResultsController?.delegate = self
+    songsFetchedResultsController?.delegate = self
+    updateTitle()
+    addToPlaylistManager.configuteToolbar(
+      viewVC: self,
+      selectButtonSelector: #selector(selectAllButtonPressed)
+    )
+
+    guard appDelegate.storage.settings.isOnlineMode else { return }
+    Task { @MainActor in do {
+      try await artist.fetch(
+        storage: self.appDelegate.storage,
+        librarySyncer: self.appDelegate.librarySyncer,
+        playableDownloadManager: self.appDelegate.playableDownloadManager
+      )
+    } catch {
+      self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
+    }}
+  }
+
+  func updateTitle() {
+    setNavBarTitle(title: addToPlaylistManager.title)
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    albumsFetchedResultsController?.delegate = nil
+    songsFetchedResultsController?.delegate = nil
+    addToPlaylistManager.hideToolbar(viewVC: self)
+  }
+
+  @IBAction
+  func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+    if let songs = songsFetchedResultsController?.fetchedObjects?
+      .compactMap({ Song(managedObject: $0) }) {
+      addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+        self.tableView.reloadData()
+        self.updateTitle()
+      })
     }
-    
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch section+2 {
-        case LibraryElement.Album.rawValue:
-            return "Albums"
-        case LibraryElement.Song.rawValue:
-            return "Songs"
-        default:
-            return ""
+  }
+
+  // MARK: - Table view data source
+
+  override func numberOfSections(in tableView: UITableView) -> Int {
+    2
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    titleForHeaderInSection section: Int
+  )
+    -> String? {
+    switch section + 2 {
+    case LibraryElement.Album.rawValue:
+      return "Albums"
+    case LibraryElement.Song.rawValue:
+      return "Songs"
+    default:
+      return ""
+    }
+  }
+
+  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    switch section + 2 {
+    case LibraryElement.Album.rawValue:
+      return albumsFetchedResultsController.sections?[0].numberOfObjects ?? 0
+    case LibraryElement.Song.rawValue:
+      return songsFetchedResultsController.sections?[0].numberOfObjects ?? 0
+    default:
+      return 0
+    }
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    cellForRowAt indexPath: IndexPath
+  )
+    -> UITableViewCell {
+    switch indexPath.section + 2 {
+    case LibraryElement.Album.rawValue:
+      let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
+      let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(
+        row: indexPath.row,
+        section: 0
+      ))
+      cell.display(container: album, rootView: self)
+      return cell
+    case LibraryElement.Song.rawValue:
+      let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+      let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(
+        row: indexPath.row,
+        section: 0
+      ))
+      cell.display(
+        playable: song,
+        displayMode: .add,
+        playContextCb: nil,
+        rootView: self,
+        isMarked: addToPlaylistManager.contains(playable: song)
+      )
+      return cell
+    default:
+      return UITableViewCell()
+    }
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    heightForHeaderInSection section: Int
+  )
+    -> CGFloat {
+    switch section + 2 {
+    case LibraryElement.Album.rawValue:
+      return albumsFetchedResultsController.sections?[0]
+        .numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+    case LibraryElement.Song.rawValue:
+      return songsFetchedResultsController.sections?[0]
+        .numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
+    default:
+      return 0.0
+    }
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    heightForRowAt indexPath: IndexPath
+  )
+    -> CGFloat {
+    switch indexPath.section + 2 {
+    case LibraryElement.Album.rawValue:
+      return GenericTableCell.rowHeight
+    case LibraryElement.Song.rawValue:
+      return PlayableTableCell.rowHeight
+    default:
+      return 0.0
+    }
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    estimatedHeightForRowAt indexPath: IndexPath
+  )
+    -> CGFloat {
+    switch indexPath.section + 2 {
+    case LibraryElement.Album.rawValue:
+      return GenericTableCell.rowHeight
+    case LibraryElement.Song.rawValue:
+      return PlayableTableCell.rowHeight
+    default:
+      return 0.0
+    }
+  }
+
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    switch indexPath.section + 2 {
+    case LibraryElement.Album.rawValue:
+      let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(
+        row: indexPath.row,
+        section: 0
+      ))
+      let nextVC = PlaylistAddAlbumDetailVC()
+      nextVC.album = album
+      nextVC.addToPlaylistManager = addToPlaylistManager
+      navigationController?.pushViewController(nextVC, animated: true)
+    case LibraryElement.Song.rawValue:
+      tableView.deselectRow(at: indexPath, animated: false)
+      let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(
+        row: indexPath.row,
+        section: 0
+      ))
+      if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
+        addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
+          cell.isMarked = $0
+          cell.refresh()
+          self.updateTitle()
         }
+      }
+    default: break
+    }
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    guard let searchText = searchController.searchBar.text else { return }
+    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+      albumsFetchedResultsController.search(searchText: searchText, onlyCached: false)
+      songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
+    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+      albumsFetchedResultsController.search(searchText: searchText, onlyCached: true)
+      songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
+    } else {
+      albumsFetchedResultsController.showAllResults()
+      songsFetchedResultsController.showAllResults()
+    }
+    tableView.reloadData()
+  }
+
+  override func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
+    var section = 0
+    switch controller {
+    case albumsFetchedResultsController.fetchResultsController:
+      section = LibraryElement.Album.rawValue - 2
+    case songsFetchedResultsController.fetchResultsController:
+      section = LibraryElement.Song.rawValue - 2
+    default:
+      return
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch section+2 {
-        case LibraryElement.Album.rawValue:
-            return albumsFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        case LibraryElement.Song.rawValue:
-            return songsFetchedResultsController.sections?[0].numberOfObjects ?? 0
-        default:
-            return 0
-        }
-    }
+    resultUpdateHandler?.applyChangesOfMultiRowType(
+      controller,
+      didChange: anObject,
+      determinedSection: section,
+      at: indexPath,
+      for: type,
+      newIndexPath: newIndexPath
+    )
+  }
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch indexPath.section+2 {
-        case LibraryElement.Album.rawValue:
-            let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-            let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(container: album, rootView: self)
-            return cell
-        case LibraryElement.Song.rawValue:
-            let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-            let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            cell.display(playable: song,
-                         displayMode: .add,
-                         playContextCb: nil,
-                         rootView: self,
-                         isMarked: addToPlaylistManager.contains(playable: song))
-            return cell
-        default:
-            return UITableViewCell()
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        switch section+2 {
-        case LibraryElement.Album.rawValue:
-            return albumsFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
-        case LibraryElement.Song.rawValue:
-            return songsFetchedResultsController.sections?[0].numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
-        default:
-            return 0.0
-        }
-    }
-    
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch indexPath.section+2 {
-        case LibraryElement.Album.rawValue:
-            return GenericTableCell.rowHeight
-        case LibraryElement.Song.rawValue:
-            return PlayableTableCell.rowHeight
-        default:
-            return 0.0
-        }
-    }
-
-    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        switch indexPath.section+2 {
-        case LibraryElement.Album.rawValue:
-            return GenericTableCell.rowHeight
-        case LibraryElement.Song.rawValue:
-            return PlayableTableCell.rowHeight
-        default:
-            return 0.0
-        }
-    }
-
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch indexPath.section+2 {
-        case LibraryElement.Album.rawValue:
-            let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            let nextVC = PlaylistAddAlbumDetailVC()
-            nextVC.album = album
-            nextVC.addToPlaylistManager = addToPlaylistManager
-            self.navigationController?.pushViewController(nextVC, animated: true)
-        case LibraryElement.Song.rawValue:
-            tableView.deselectRow(at: indexPath, animated: false)
-            let song = songsFetchedResultsController.getWrappedEntity(at: IndexPath(row: indexPath.row, section: 0))
-            if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-                addToPlaylistManager.toggleSelection(playable: song, rootVC: self) {
-                    cell.isMarked = $0
-                    cell.refresh()
-                    self.updateTitle()
-                }
-            }
-        default: break
-        }
-    }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        guard let searchText = searchController.searchBar.text else { return }
-        if searchText.count > 0, searchController.searchBar.selectedScopeButtonIndex == 0 {
-            albumsFetchedResultsController.search(searchText: searchText, onlyCached: false)
-            songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
-        } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
-            albumsFetchedResultsController.search(searchText: searchText, onlyCached: true)
-            songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
-        } else {
-            albumsFetchedResultsController.showAllResults()
-            songsFetchedResultsController.showAllResults()
-        }
-        tableView.reloadData()
-    }
-    
-    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        var section: Int = 0
-        switch controller {
-        case albumsFetchedResultsController.fetchResultsController:
-            section = LibraryElement.Album.rawValue - 2
-        case songsFetchedResultsController.fetchResultsController:
-            section = LibraryElement.Song.rawValue - 2
-        default:
-            return
-        }
-        
-        resultUpdateHandler?.applyChangesOfMultiRowType(controller, didChange: anObject, determinedSection: section, at: indexPath, for: type, newIndexPath: newIndexPath)
-    }
-    
-    override func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-    }
-    
+  override func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange sectionInfo: NSFetchedResultsSectionInfo,
+    atSectionIndex sectionIndex: Int,
+    for type: NSFetchedResultsChangeType
+  ) {}
 }

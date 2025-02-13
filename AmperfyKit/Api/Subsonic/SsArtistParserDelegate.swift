@@ -19,56 +19,77 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 import UIKit
-import CoreData
 
 class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
+  private var artistBuffer: Artist?
+  var parsedArtists = [Artist]()
 
-    private var artistBuffer: Artist?
-    var parsedArtists = [Artist]()
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
 
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
+    if elementName == "artist" {
+      guard let artistId = attributeDict["id"] else { return }
 
-        if elementName == "artist" {
-            guard let artistId = attributeDict["id"] else { return }
-            
-            if let fetchedArtist = library.getArtist(id: artistId)  {
-                artistBuffer = fetchedArtist
-            } else {
-                artistBuffer = library.createArtist()
-                artistBuffer?.id = artistId
-            }
-            artistBuffer?.remoteStatus = .available
-            if let attributeAlbumCount = attributeDict["albumCount"], let albumCount = Int(attributeAlbumCount) {
-                artistBuffer?.remoteAlbumCount = albumCount
-            }
+      if let fetchedArtist = library.getArtist(id: artistId) {
+        artistBuffer = fetchedArtist
+      } else {
+        artistBuffer = library.createArtist()
+        artistBuffer?.id = artistId
+      }
+      artistBuffer?.remoteStatus = .available
+      if let attributeAlbumCount = attributeDict["albumCount"],
+         let albumCount = Int(attributeAlbumCount) {
+        artistBuffer?.remoteAlbumCount = albumCount
+      }
 
-            if let attributeArtistName = attributeDict["name"] {
-                artistBuffer?.name = attributeArtistName
-            }
-            if let attributeCoverArtId = attributeDict["coverArt"] {
-                artistBuffer?.artwork = parseArtwork(id: attributeCoverArtId)
-            }
-            artistBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
-            artistBuffer?.isFavorite = attributeDict["starred"] != nil
-		}
+      if let attributeArtistName = attributeDict["name"] {
+        artistBuffer?.name = attributeArtistName
+      }
+      if let attributeCoverArtId = attributeDict["coverArt"] {
+        artistBuffer?.artwork = parseArtwork(id: attributeCoverArtId)
+      }
+      artistBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
+      artistBuffer?.isFavorite = attributeDict["starred"] != nil
     }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-		switch(elementName) {
-		case "artist":
-            parsedCount += 1
-            if let artist = artistBuffer {
-                parsedArtists.append(artist)
-            }
-            artistBuffer = nil
-		default:
-			break
-		}
-        
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    switch elementName {
+    case "artist":
+      parsedCount += 1
+      if let artist = artistBuffer {
+        parsedArtists.append(artist)
+      }
+      artistBuffer = nil
+    default:
+      break
     }
 
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+  }
 }

@@ -21,40 +21,42 @@
 
 import UIKit
 
+// MARK: - CornerRadius
+
 public enum CornerRadius {
-    case verySmall
-    case small
-    case big
-    
-    public var asCGFloat: CGFloat {
-        switch self {
-        case .verySmall:
-            return 3.0
-        case .small:
-            return 5.0
-        case .big:
-            return 15.0
-        }
+  case verySmall
+  case small
+  case big
+
+  public var asCGFloat: CGFloat {
+    switch self {
+    case .verySmall:
+      return 3.0
+    case .small:
+      return 5.0
+    case .big:
+      return 15.0
     }
+  }
 }
 
-public class RoundedImage: UIImageView {
-    
-    public static let cornerRadius: CGFloat = CornerRadius.small.asCGFloat
+// MARK: - RoundedImage
 
-    required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        configureStyle()
-    }
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        configureStyle()
-    }
-    
-    func configureStyle() {
-        layer.cornerRadius = Self.cornerRadius
-        layer.masksToBounds = true
-    }
-    
+public class RoundedImage: UIImageView {
+  public static let cornerRadius: CGFloat = CornerRadius.small.asCGFloat
+
+  required public init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    configureStyle()
+  }
+
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+    configureStyle()
+  }
+
+  func configureStyle() {
+    layer.cornerRadius = Self.cornerRadius
+    layer.masksToBounds = true
+  }
 }

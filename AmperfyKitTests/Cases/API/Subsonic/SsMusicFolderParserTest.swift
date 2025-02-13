@@ -19,30 +19,31 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
 class SsMusicFolderParserTest: AbstractSsParserTest {
-    
-    override func setUp() async throws {
-        try await super.setUp()
-        xmlData = getTestFileData(name: "musicFolders_example_1")
-        ssParserDelegate = SsMusicFolderParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
-    }
-    
-    override func checkCorrectParsing() {
-        XCTAssertEqual(library.musicFolderCount, 3)
-        
-        let musicFolders = library.getMusicFolders().sorted(by: {Int($0.id)! < Int($1.id)!} )
-        XCTAssertEqual(musicFolders[0].id, "1")
-        XCTAssertEqual(musicFolders[0].name, "Music")
-        XCTAssertFalse(musicFolders[0].isCached)
-        XCTAssertEqual(musicFolders[1].id, "2")
-        XCTAssertEqual(musicFolders[1].name, "Movies")
-        XCTAssertFalse(musicFolders[1].isCached)
-        XCTAssertEqual(musicFolders[2].id, "3")
-        XCTAssertEqual(musicFolders[2].name, "Incoming")
-        XCTAssertFalse(musicFolders[2].isCached)
-    }
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = getTestFileData(name: "musicFolders_example_1")
+    ssParserDelegate = SsMusicFolderParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      library: library
+    )
+  }
 
+  override func checkCorrectParsing() {
+    XCTAssertEqual(library.musicFolderCount, 3)
+
+    let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })
+    XCTAssertEqual(musicFolders[0].id, "1")
+    XCTAssertEqual(musicFolders[0].name, "Music")
+    XCTAssertFalse(musicFolders[0].isCached)
+    XCTAssertEqual(musicFolders[1].id, "2")
+    XCTAssertEqual(musicFolders[1].name, "Movies")
+    XCTAssertFalse(musicFolders[1].isCached)
+    XCTAssertEqual(musicFolders[2].id, "3")
+    XCTAssertEqual(musicFolders[2].name, "Incoming")
+    XCTAssertFalse(musicFolders[2].isCached)
+  }
 }

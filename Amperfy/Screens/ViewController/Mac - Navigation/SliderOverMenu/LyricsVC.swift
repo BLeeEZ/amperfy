@@ -19,115 +19,118 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
-import MediaPlayer
 import AmperfyKit
+import Foundation
+import MediaPlayer
+import UIKit
 
 #if targetEnvironment(macCatalyst)
 
-class LyricsVC: SlideOverItemVC {
+  class LyricsVC: SlideOverItemVC {
     override var title: String? {
-        get { return "Lyrics" }
-        set {}
+      get { "Lyrics" }
+      set {}
     }
 
     var player: PlayerFacade {
-        return self.appDelegate.player
+      appDelegate.player
     }
 
     var lyricsView: LyricsView?
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        let lyricsView = LyricsView()
-        lyricsView.translatesAutoresizingMaskIntoConstraints = false
+      super.viewDidLoad()
 
-        self.view.addSubview(lyricsView)
+      let lyricsView = LyricsView()
+      lyricsView.translatesAutoresizingMaskIntoConstraints = false
 
-        NSLayoutConstraint.activate([
-            lyricsView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            lyricsView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            lyricsView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            lyricsView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
-        ])
+      view.addSubview(lyricsView)
 
-        self.lyricsView = lyricsView
+      NSLayoutConstraint.activate([
+        lyricsView.topAnchor.constraint(equalTo: view.topAnchor),
+        lyricsView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        lyricsView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        lyricsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      ])
 
-        self.player.addNotifier(notifier: self)
+      self.lyricsView = lyricsView
+
+      player.addNotifier(notifier: self)
     }
 
     override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        self.refreshLyrics()
+      super.viewIsAppearing(animated)
+      refreshLyrics()
     }
 
     private func fetchSongInfoAndUpdateLyrics() {
-        guard self.appDelegate.storage.settings.isOnlineMode,
-              let song = player.currentlyPlaying?.asSong
-        else { return }
+      guard appDelegate.storage.settings.isOnlineMode,
+            let song = player.currentlyPlaying?.asSong
+      else { return }
 
-        Task { @MainActor in do {
-            try await self.appDelegate.librarySyncer.sync(song: song)
-            self.refreshLyrics()
-        } catch {
-            self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
-        }}
+      Task { @MainActor in do {
+        try await self.appDelegate.librarySyncer.sync(song: song)
+        self.refreshLyrics()
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
+      }}
     }
 
     private func showLyrics(structuredLyrics: StructuredLyrics) {
-        self.lyricsView?.display(lyrics: structuredLyrics, scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling)
+      lyricsView?.display(
+        lyrics: structuredLyrics,
+        scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling
+      )
     }
 
     private func showLyricsAreNotAvailable() {
-        var notAvailableLyrics = StructuredLyrics()
-        notAvailableLyrics.synced = false
-        var line = LyricsLine()
-        line.value = "No Lyrics"
-        notAvailableLyrics.line.append(line)
-        showLyrics(structuredLyrics: notAvailableLyrics)
-        self.lyricsView?.highlightAllLyrics()
+      var notAvailableLyrics = StructuredLyrics()
+      notAvailableLyrics.synced = false
+      var line = LyricsLine()
+      line.value = "No Lyrics"
+      notAvailableLyrics.line.append(line)
+      showLyrics(structuredLyrics: notAvailableLyrics)
+      lyricsView?.highlightAllLyrics()
     }
 
     func refreshLyrics() {
-        guard let playable = player.currentlyPlaying,
-              let song = playable.asSong,
-              let lyricsRelFilePath = song.lyricsRelFilePath else {
-            self.showLyricsAreNotAvailable()
-            return
-        }
+      guard let playable = player.currentlyPlaying,
+            let song = playable.asSong,
+            let lyricsRelFilePath = song.lyricsRelFilePath else {
+        showLyricsAreNotAvailable()
+        return
+      }
 
-        Task { @MainActor in do {
-            let lyricsList = try await appDelegate.librarySyncer.parseLyrics(relFilePath: lyricsRelFilePath)
-            if song == self.player.currentlyPlaying?.asSong,
-               let structuredLyrics = lyricsList.getFirstSyncedLyricsOrUnsyncedAsDefault() {
-                self.showLyrics(structuredLyrics: structuredLyrics)
-            } else {
-                self.showLyricsAreNotAvailable()
-            }
-        } catch {
-            self.showLyricsAreNotAvailable()
-        }}
+      Task { @MainActor in do {
+        let lyricsList = try await appDelegate.librarySyncer
+          .parseLyrics(relFilePath: lyricsRelFilePath)
+        if song == self.player.currentlyPlaying?.asSong,
+           let structuredLyrics = lyricsList.getFirstSyncedLyricsOrUnsyncedAsDefault() {
+          self.showLyrics(structuredLyrics: structuredLyrics)
+        } else {
+          self.showLyricsAreNotAvailable()
+        }
+      } catch {
+        self.showLyricsAreNotAvailable()
+      }}
     }
 
     func refreshLyricsTime(time: CMTime) {
-        self.lyricsView?.scroll(toTime: time)
+      lyricsView?.scroll(toTime: time)
     }
-}
+  }
 
-
-extension LyricsVC: MusicPlayable {
+  extension LyricsVC: MusicPlayable {
     func didStartPlayingFromBeginning() {
-        self.fetchSongInfoAndUpdateLyrics()
+      fetchSongInfoAndUpdateLyrics()
     }
 
     func didStartPlaying() {
-        self.refreshLyrics()
+      refreshLyrics()
     }
-    
+
     func didLyricsTimeChange(time: CMTime) {
-        self.refreshLyricsTime(time: time)
+      refreshLyricsTime(time: time)
     }
 
     func didPause() {}
@@ -138,5 +141,5 @@ extension LyricsVC: MusicPlayable {
     func didShuffleChange() {}
     func didRepeatChange() {}
     func didPlaybackRateChange() {}
-}
+  }
 #endif

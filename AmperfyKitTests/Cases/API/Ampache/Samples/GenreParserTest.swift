@@ -19,31 +19,33 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
 class GenreParserTest: AbstractAmpacheTest {
-    
-    override func setUp() async throws {
-        try await super.setUp()
-        xmlData = getTestFileData(name: "genres")
-        recreateParserDelegate()
-    }
-    
-    override func recreateParserDelegate() {
-        parserDelegate = GenreParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library, parseNotifier: nil)
-    }
-    
-    override func checkCorrectParsing() {
-        XCTAssertEqual(library.genreCount, 2)
-        
-        guard let genre = library.getGenre(id: "6") else { XCTFail(); return }
-        XCTAssertEqual(genre.id, "6")
-        XCTAssertEqual(genre.name, "Dance")
-        
-        guard let genre = library.getGenre(id: "4") else { XCTFail(); return }
-        XCTAssertEqual(genre.id, "4")
-        XCTAssertEqual(genre.name, "Dark Ambient")
-    }
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = getTestFileData(name: "genres")
+    recreateParserDelegate()
+  }
 
+  override func recreateParserDelegate() {
+    parserDelegate = GenreParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      library: library,
+      parseNotifier: nil
+    )
+  }
+
+  override func checkCorrectParsing() {
+    XCTAssertEqual(library.genreCount, 2)
+
+    guard let genre = library.getGenre(id: "6") else { XCTFail(); return }
+    XCTAssertEqual(genre.id, "6")
+    XCTAssertEqual(genre.name, "Dance")
+
+    guard let genre = library.getGenre(id: "4") else { XCTFail(); return }
+    XCTAssertEqual(genre.id, "4")
+    XCTAssertEqual(genre.name, "Dark Ambient")
+  }
 }

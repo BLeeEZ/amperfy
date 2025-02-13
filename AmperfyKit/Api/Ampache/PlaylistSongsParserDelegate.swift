@@ -19,58 +19,66 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 import UIKit
-import CoreData
 
 class PlaylistSongsParserDelegate: SongParserDelegate {
+  let playlist: Playlist
+  var items: [PlaylistItem]
+  private var playlistChanged = false
 
-    let playlist: Playlist
-    var items: [PlaylistItem]
-    private var playlistChanged = false
+  init(performanceMonitor: ThreadPerformanceMonitor, playlist: Playlist, library: LibraryStorage) {
+    self.playlist = playlist
+    self.items = playlist.items
+    super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: nil)
+  }
 
-    init(performanceMonitor: ThreadPerformanceMonitor, playlist: Playlist, library: LibraryStorage) {
-        self.playlist = playlist
-        self.items = playlist.items
-        super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: nil)
-    }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        switch(elementName) {
-        case "playlisttrack":
-            let index = Int(parsedCount)
-            var item: PlaylistItem?
-            
-            if let song = songBuffer {
-                if index < items.count {
-                    item = items[index]
-                    if item?.playable.id != song.id {
-                        playlistChanged = true
-                        item?.playable = song
-                    }
-                } else {
-                    playlist.createAndAppendPlaylistItem(for: song)
-                    playlistChanged = true
-                }
-            }
-        case "root":
-            if items.count > parsedCount {
-                for i in Array(parsedCount...items.count-1) {
-                    library.deletePlaylistItem(item: items[i])
-                }
-                playlistChanged = true
-            }
-            if playlistChanged {
-                playlist.updateChangeDate()
-                playlist.updateArtworkItems()
-                playlist.remoteDuration = collectionDuration
-            }
-            playlist.isCached = isCollectionCached
-        default:
-            break
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    switch elementName {
+    case "playlisttrack":
+      let index = Int(parsedCount)
+      var item: PlaylistItem?
+
+      if let song = songBuffer {
+        if index < items.count {
+          item = items[index]
+          if item?.playable.id != song.id {
+            playlistChanged = true
+            item?.playable = song
+          }
+        } else {
+          playlist.createAndAppendPlaylistItem(for: song)
+          playlistChanged = true
         }
-        
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+      }
+    case "root":
+      if items.count > parsedCount {
+        for i in Array(parsedCount ... items.count - 1) {
+          library.deletePlaylistItem(item: items[i])
+        }
+        playlistChanged = true
+      }
+      if playlistChanged {
+        playlist.updateChangeDate()
+        playlist.updateArtworkItems()
+        playlist.remoteDuration = collectionDuration
+      }
+      playlist.isCached = isCollectionCached
+    default:
+      break
     }
-    
+
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+  }
 }

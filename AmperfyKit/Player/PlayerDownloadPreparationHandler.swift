@@ -21,56 +21,70 @@
 
 import Foundation
 
-@MainActor class PlayerDownloadPreparationHandler {
-    
-    static let preDownloadCount = 3
-    
-    private var playerStatus: PlayerStatusPersistent
-    private var queueHandler: PlayQueueHandler
-    private var playableDownloadManager: DownloadManageable
+// MARK: - PlayerDownloadPreparationHandler
 
-    init(playerStatus: PlayerStatusPersistent, queueHandler: PlayQueueHandler, playableDownloadManager: DownloadManageable) {
-        self.playerStatus = playerStatus
-        self.queueHandler = queueHandler
-        self.playableDownloadManager = playableDownloadManager
-    }
-    
-    private func preDownloadNextItems() {
-        let upcomingItemsCount = min(queueHandler.userQueueCount + queueHandler.nextQueueCount, Self.preDownloadCount)
-        guard upcomingItemsCount > 0 else { return }
-        
-        let userQueueRangeEnd = min(queueHandler.userQueueCount, Self.preDownloadCount)
-        if userQueueRangeEnd > 0 {
-            for i in 0...userQueueRangeEnd-1 {
-                let playable = queueHandler.getUserQueueItem(at: i)!
-                if !playable.isCached, !playable.isRadio {
-                    playableDownloadManager.download(object: playable)
-                }
-            }
-        }
-        let nextQueueRangeEnd = min(queueHandler.nextQueueCount, Self.preDownloadCount-userQueueRangeEnd)
-        if nextQueueRangeEnd > 0 {
-            for i in 0...nextQueueRangeEnd-1 {
-                let playable = queueHandler.getNextQueueItem(at: i)!
-                if !playable.isCached, !playable.isRadio {
-                    playableDownloadManager.download(object: playable)
-                }
-            }
-        }
-    }
+@MainActor
+class PlayerDownloadPreparationHandler {
+  static let preDownloadCount = 3
 
+  private var playerStatus: PlayerStatusPersistent
+  private var queueHandler: PlayQueueHandler
+  private var playableDownloadManager: DownloadManageable
+
+  init(
+    playerStatus: PlayerStatusPersistent,
+    queueHandler: PlayQueueHandler,
+    playableDownloadManager: DownloadManageable
+  ) {
+    self.playerStatus = playerStatus
+    self.queueHandler = queueHandler
+    self.playableDownloadManager = playableDownloadManager
+  }
+
+  private func preDownloadNextItems() {
+    let upcomingItemsCount = min(
+      queueHandler.userQueueCount + queueHandler.nextQueueCount,
+      Self.preDownloadCount
+    )
+    guard upcomingItemsCount > 0 else { return }
+
+    let userQueueRangeEnd = min(queueHandler.userQueueCount, Self.preDownloadCount)
+    if userQueueRangeEnd > 0 {
+      for i in 0 ... userQueueRangeEnd - 1 {
+        let playable = queueHandler.getUserQueueItem(at: i)!
+        if !playable.isCached, !playable.isRadio {
+          playableDownloadManager.download(object: playable)
+        }
+      }
+    }
+    let nextQueueRangeEnd = min(
+      queueHandler.nextQueueCount,
+      Self.preDownloadCount - userQueueRangeEnd
+    )
+    if nextQueueRangeEnd > 0 {
+      for i in 0 ... nextQueueRangeEnd - 1 {
+        let playable = queueHandler.getNextQueueItem(at: i)!
+        if !playable.isCached, !playable.isRadio {
+          playableDownloadManager.download(object: playable)
+        }
+      }
+    }
+  }
 }
 
+// MARK: MusicPlayable
+
 extension PlayerDownloadPreparationHandler: MusicPlayable {
-    func didStartPlayingFromBeginning() {
-        if playerStatus.isAutoCachePlayedItems {
-            preDownloadNextItems()
-        }
+  func didStartPlayingFromBeginning() {
+    if playerStatus.isAutoCachePlayedItems {
+      preDownloadNextItems()
     }
-    func didStartPlaying() { }
-    func didPause() { }
-    func didStopPlaying() { }
-    func didElapsedTimeChange() { }
-    func didPlaylistChange() { }
-    func didArtworkChange() { }
+  }
+
+  func didStartPlaying() {}
+  func didPause() {}
+  func didStopPlaying() {}
+  func didElapsedTimeChange() {}
+  func didPlaylistChange() {}
+  func didArtworkChange() {}
 }

@@ -19,26 +19,23 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-
-import Foundation
 import CoreData
+import Foundation
 
 @objc(SearchHistoryItemMO)
 public class SearchHistoryItemMO: NSManagedObject {
-    
-    static var excludeEmptyItemsFetchPredicate: NSPredicate {
-        return NSCompoundPredicate(orPredicateWithSubpredicates: [
-            NSPredicate(format: "%K != nil", #keyPath(SearchHistoryItemMO.searchedLibraryEntity)),
-            NSPredicate(format: "%K != nil", #keyPath(SearchHistoryItemMO.searchedPlaylist))
-        ])
-    }
-    
-    static var searchDateFetchRequest: NSFetchRequest<SearchHistoryItemMO> {
-        let fetchRequest: NSFetchRequest<SearchHistoryItemMO> = SearchHistoryItemMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SearchHistoryItemMO.date), ascending: false)
-        ]
-        return fetchRequest
-    }
-    
+  static var excludeEmptyItemsFetchPredicate: NSPredicate {
+    NSCompoundPredicate(orPredicateWithSubpredicates: [
+      NSPredicate(format: "%K != nil", #keyPath(SearchHistoryItemMO.searchedLibraryEntity)),
+      NSPredicate(format: "%K != nil", #keyPath(SearchHistoryItemMO.searchedPlaylist)),
+    ])
+  }
+
+  static var searchDateFetchRequest: NSFetchRequest<SearchHistoryItemMO> {
+    let fetchRequest: NSFetchRequest<SearchHistoryItemMO> = SearchHistoryItemMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(SearchHistoryItemMO.date), ascending: false),
+    ]
+    return fetchRequest
+  }
 }

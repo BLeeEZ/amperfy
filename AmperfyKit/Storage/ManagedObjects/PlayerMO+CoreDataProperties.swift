@@ -19,42 +19,54 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 extension PlayerMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<PlayerMO> {
+    NSFetchRequest<PlayerMO>(entityName: "Player")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlayerMO> {
-        return NSFetchRequest<PlayerMO>(entityName: "Player")
-    }
+  @NSManaged
+  public var autoCachePlayedItemSetting: Int16
+  @NSManaged
+  public var musicIndex: Int32
+  @NSManaged
+  public var podcastIndex: Int32
+  @NSManaged
+  public var playerMode: Int16
+  @NSManaged
+  public var isUserQueuePlaying: Bool
+  @NSManaged
+  public var repeatSetting: Int16
+  @NSManaged
+  public var shuffleSetting: Int16
+  @NSManaged
+  public var musicPlaybackRate: Double
+  @NSManaged
+  public var podcastPlaybackRate: Double
+  @NSManaged
+  public var contextPlaylist: PlaylistMO?
+  @NSManaged
+  public var shuffledContextPlaylist: PlaylistMO?
+  @NSManaged
+  public var userQueuePlaylist: PlaylistMO?
+  @NSManaged
+  public var podcastPlaylist: PlaylistMO?
 
-    @NSManaged public var autoCachePlayedItemSetting: Int16
-    @NSManaged public var musicIndex: Int32
-    @NSManaged public var podcastIndex: Int32
-    @NSManaged public var playerMode: Int16
-    @NSManaged public var isUserQueuePlaying: Bool
-    @NSManaged public var repeatSetting: Int16
-    @NSManaged public var shuffleSetting: Int16
-    @NSManaged public var musicPlaybackRate: Double
-    @NSManaged public var podcastPlaybackRate: Double
-    @NSManaged public var contextPlaylist: PlaylistMO?
-    @NSManaged public var shuffledContextPlaylist: PlaylistMO?
-    @NSManaged public var userQueuePlaylist: PlaylistMO?
-    @NSManaged public var podcastPlaylist: PlaylistMO?
-
-    static let relationshipKeyPathsForPrefetching = [
-        #keyPath(PlayerMO.contextPlaylist),
-        #keyPath(PlayerMO.contextPlaylist.items),
-        #keyPath(PlayerMO.contextPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
-        #keyPath(PlayerMO.shuffledContextPlaylist),
-        #keyPath(PlayerMO.shuffledContextPlaylist.items),
-        #keyPath(PlayerMO.shuffledContextPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
-        #keyPath(PlayerMO.userQueuePlaylist),
-        #keyPath(PlayerMO.userQueuePlaylist.items),
-        #keyPath(PlayerMO.userQueuePlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
-        #keyPath(PlayerMO.podcastPlaylist),
-        #keyPath(PlayerMO.podcastPlaylist.items),
-        #keyPath(PlayerMO.podcastPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
-    ]
-    
+  static let relationshipKeyPathsForPrefetching = [
+    #keyPath(PlayerMO.contextPlaylist),
+    #keyPath(PlayerMO.contextPlaylist.items),
+    #keyPath(PlayerMO.contextPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+    #keyPath(PlayerMO.shuffledContextPlaylist),
+    #keyPath(PlayerMO.shuffledContextPlaylist.items),
+    #keyPath(PlayerMO.shuffledContextPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+    #keyPath(PlayerMO.userQueuePlaylist),
+    #keyPath(PlayerMO.userQueuePlaylist.items),
+    #keyPath(PlayerMO.userQueuePlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+    #keyPath(PlayerMO.podcastPlaylist),
+    #keyPath(PlayerMO.podcastPlaylist.items),
+    #keyPath(PlayerMO.podcastPlaylist.items) + "." + #keyPath(PlaylistItemMO.playable),
+  ]
 }

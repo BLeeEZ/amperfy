@@ -19,28 +19,31 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - SwipeCellView
 
 struct SwipeCellView: View {
-    
-    @Environment(\.colorScheme) var colorScheme:ColorScheme
-    
-    var swipe: SwipeActionType
-    
-    var body: some View {
-        HStack {
-            Image(uiImage: colorScheme == .light ? swipe.image : swipe.image.invertedImage())
-            Text(swipe.settingsName)
-            Spacer()
-        }
-        .contentShape(Rectangle())
+  @Environment(\.colorScheme)
+  var colorScheme: ColorScheme
+
+  var swipe: SwipeActionType
+
+  var body: some View {
+    HStack {
+      Image(uiImage: colorScheme == .light ? swipe.image : swipe.image.invertedImage())
+      Text(swipe.settingsName)
+      Spacer()
     }
+    .contentShape(Rectangle())
+  }
 }
 
+// MARK: - SwipeCellView_Previews
 
 struct SwipeCellView_Previews: PreviewProvider {
-    static var previews: some View {
-        SwipeCellView(swipe: .addToPlaylist)
-    }
+  static var previews: some View {
+    SwipeCellView(swipe: .addToPlaylist)
+  }
 }

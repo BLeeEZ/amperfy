@@ -19,42 +19,68 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import CoreData
+import UIKit
+
+// MARK: - MultiSourceTableViewController
 
 class MultiSourceTableViewController: BasicTableViewController {
-    
-    public var resultUpdateHandler: FetchUpdatePerObjectHandler?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        resultUpdateHandler = FetchUpdatePerObjectHandler(tableView: tableView)
-    }
-    
+  public var resultUpdateHandler: FetchUpdatePerObjectHandler?
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    resultUpdateHandler = FetchUpdatePerObjectHandler(tableView: tableView)
+  }
 }
 
 extension MultiSourceTableViewController: @preconcurrency NSFetchedResultsControllerDelegate {
-    public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        MainActor.assumeIsolated {
-            resultUpdateHandler?.controllerWillChangeContent(controller)
-        }
+  public func controllerWillChangeContent(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>
+  ) {
+    MainActor.assumeIsolated {
+      resultUpdateHandler?.controllerWillChangeContent(controller)
     }
-    
-    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        MainActor.assumeIsolated {
-            resultUpdateHandler?.controllerDidChangeContent(controller)
-        }
+  }
+
+  public func controllerDidChangeContent(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>
+  ) {
+    MainActor.assumeIsolated {
+      resultUpdateHandler?.controllerDidChangeContent(controller)
     }
-    
-    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        MainActor.assumeIsolated {
-            resultUpdateHandler?.controller(controller, didChange: anObject, at: indexPath, for: type, newIndexPath: newIndexPath)
-        }
+  }
+
+  public func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
+    MainActor.assumeIsolated {
+      resultUpdateHandler?.controller(
+        controller,
+        didChange: anObject,
+        at: indexPath,
+        for: type,
+        newIndexPath: newIndexPath
+      )
     }
-    
-    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        MainActor.assumeIsolated {
-            resultUpdateHandler?.controller(controller, didChange: sectionInfo, atSectionIndex: sectionIndex, for: type)
-        }
+  }
+
+  public func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange sectionInfo: NSFetchedResultsSectionInfo,
+    atSectionIndex sectionIndex: Int,
+    for type: NSFetchedResultsChangeType
+  ) {
+    MainActor.assumeIsolated {
+      resultUpdateHandler?.controller(
+        controller,
+        didChange: sectionInfo,
+        atSectionIndex: sectionIndex,
+        for: type
+      )
     }
+  }
 }

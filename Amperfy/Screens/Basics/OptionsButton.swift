@@ -19,102 +19,102 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
+
+// MARK: - CloseBarButton
 
 class CloseBarButton: UIBarButtonItem {
+  init(target: AnyObject, selector: Selector) {
+    super.init()
+    var config = UIButton.Configuration.gray()
+    config.buttonSize = .small
+    config.cornerStyle = .capsule
+    let button = UIButton(configuration: config)
+    button.addTarget(target, action: selector, for: .primaryActionTriggered)
+    button.setImage(.xmark, for: .normal)
+    button.showsMenuAsPrimaryAction = true
+    button.preferredBehavioralStyle = .pad
+    self.customView = button
+  }
 
-    init(target: AnyObject, selector: Selector) {
-        super.init()
-        var config = UIButton.Configuration.gray()
-        config.buttonSize = .small
-        config.cornerStyle = .capsule
-        let button = UIButton(configuration: config)
-        button.addTarget(target, action: selector, for: .primaryActionTriggered)
-        button.setImage(.xmark, for: .normal)
-        button.showsMenuAsPrimaryAction = true
-        button.preferredBehavioralStyle = .pad
-        self.customView = button
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 }
+
+// MARK: - OptionsBarButton
 
 class OptionsBarButton: UIBarButtonItem {
-    
-    lazy var inUIButton = {
-        var config = UIButton.Configuration.gray()
-        #if targetEnvironment(macCatalyst)
-        config.macIdiomStyle = .borderless
-        config.image = .filter
-        #else
-        config.buttonSize = .small
-        config.cornerStyle = .capsule
-        #endif
-        
-        let button = UIButton(configuration: config)
-        #if targetEnvironment(macCatalyst)
-        button.preferredBehavioralStyle = .mac
-        #else
-        button.setImage(.ellipsis, for: .normal)
-        #endif
-        button.showsMenuAsPrimaryAction = true
-        return button
-    }()
-    
-    override init() {
-        super.init()
-        self.customView = inUIButton
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override var menu: UIMenu? {
-        set { inUIButton.menu = newValue }
-        get { return inUIButton.menu }
-    }
-    
+  lazy var inUIButton = {
+    var config = UIButton.Configuration.gray()
+    #if targetEnvironment(macCatalyst)
+      config.macIdiomStyle = .borderless
+      config.image = .filter
+    #else
+      config.buttonSize = .small
+      config.cornerStyle = .capsule
+    #endif
+
+    let button = UIButton(configuration: config)
+    #if targetEnvironment(macCatalyst)
+      button.preferredBehavioralStyle = .mac
+    #else
+      button.setImage(.ellipsis, for: .normal)
+    #endif
+    button.showsMenuAsPrimaryAction = true
+    return button
+  }()
+
+  override init() {
+    super.init()
+    self.customView = inUIButton
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override var menu: UIMenu? {
+    set { inUIButton.menu = newValue }
+    get { inUIButton.menu }
+  }
 }
 
-class SortBarButton: UIBarButtonItem {
-    
-    lazy var inUIButton = {
-        var config = UIButton.Configuration.gray()
-        #if targetEnvironment(macCatalyst)
-        config.macIdiomStyle = .borderless
-        config.image = .filter
-        #else
-        config.buttonSize = .small
-        config.cornerStyle = .capsule
-        #endif
+// MARK: - SortBarButton
 
-        let button = UIButton(configuration: config)
-        #if targetEnvironment(macCatalyst)
-        button.preferredBehavioralStyle = .mac
-        #else
-        button.setImage(.filter, for: .normal)
-        #endif
-        button.showsMenuAsPrimaryAction = true
-        return button
-    }()
-    
-    override init() {
-        super.init()
-        self.customView = inUIButton
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override var menu: UIMenu? {
-        set { inUIButton.menu = newValue }
-        get { return inUIButton.menu }
-    }
-    
+class SortBarButton: UIBarButtonItem {
+  lazy var inUIButton = {
+    var config = UIButton.Configuration.gray()
+    #if targetEnvironment(macCatalyst)
+      config.macIdiomStyle = .borderless
+      config.image = .filter
+    #else
+      config.buttonSize = .small
+      config.cornerStyle = .capsule
+    #endif
+
+    let button = UIButton(configuration: config)
+    #if targetEnvironment(macCatalyst)
+      button.preferredBehavioralStyle = .mac
+    #else
+      button.setImage(.filter, for: .normal)
+    #endif
+    button.showsMenuAsPrimaryAction = true
+    return button
+  }()
+
+  override init() {
+    super.init()
+    self.customView = inUIButton
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
+  override var menu: UIMenu? {
+    set { inUIButton.menu = newValue }
+    get { inUIButton.menu }
+  }
 }

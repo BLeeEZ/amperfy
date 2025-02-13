@@ -19,62 +19,67 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - ArtworkDisplaySettings
 
 struct ArtworkDisplaySettings: View {
-    
-    @State var settingOptions = [ArtworkDisplayPreference]()
-    @State var activeOption = ArtworkDisplayPreference.serverArtworkOnly
-    
-    func updateValues() {
-        settingOptions = ArtworkDisplayPreference.allCases
-        activeOption = appDelegate.storage.settings.artworkDisplayPreference
-    }
-    
-    var body: some View {
-        ZStack {
-            #if targetEnvironment(macCatalyst)
-            Menu(self.activeOption.description) {
-                ForEach(settingOptions, id: \.self) { option in
-                    Button(option.description, action: {
-                        appDelegate.storage.settings.artworkDisplayPreference = option
-                        updateValues()
-                    })
-                }
-            }
-            #else
-            List {
-                Section {
-                    ForEach(settingOptions, id: \.self) { option in
-                        Button(action: {
-                            appDelegate.storage.settings.artworkDisplayPreference = option
-                            updateValues()
-                        }) {
-                            HStack {
-                                Text(option.description)
-                                Spacer()
-                                if option == activeOption {
-                                    Image.checkmark
-                                }
-                            }
-                            .contentShape(Rectangle())
-                            .foregroundColor(.primary)
-                        }
-                    }
-                }
-            }
-            #endif
+  @State
+  var settingOptions = [ArtworkDisplayPreference]()
+  @State
+  var activeOption = ArtworkDisplayPreference.serverArtworkOnly
+
+  func updateValues() {
+    settingOptions = ArtworkDisplayPreference.allCases
+    activeOption = appDelegate.storage.settings.artworkDisplayPreference
+  }
+
+  var body: some View {
+    ZStack {
+      #if targetEnvironment(macCatalyst)
+        Menu(activeOption.description) {
+          ForEach(settingOptions, id: \.self) { option in
+            Button(option.description, action: {
+              appDelegate.storage.settings.artworkDisplayPreference = option
+              updateValues()
+            })
+          }
         }
-        .navigationTitle("Artwork Display")
-        .onAppear {
-            updateValues()
+      #else
+        List {
+          Section {
+            ForEach(settingOptions, id: \.self) { option in
+              Button(action: {
+                appDelegate.storage.settings.artworkDisplayPreference = option
+                updateValues()
+              }) {
+                HStack {
+                  Text(option.description)
+                  Spacer()
+                  if option == activeOption {
+                    Image.checkmark
+                  }
+                }
+                .contentShape(Rectangle())
+                .foregroundColor(.primary)
+              }
+            }
+          }
         }
+      #endif
     }
+    .navigationTitle("Artwork Display")
+    .onAppear {
+      updateValues()
+    }
+  }
 }
 
+// MARK: - ArtworkDisplaySettings_Previews
+
 struct ArtworkDisplaySettings_Previews: PreviewProvider {
-    static var previews: some View {
-        ArtworkDisplaySettings()
-    }
+  static var previews: some View {
+    ArtworkDisplaySettings()
+  }
 }

@@ -23,8 +23,9 @@ import Foundation
 
 #if targetEnvironment(macCatalyst)
 
-@MainActor protocol Refreshable {
+  @MainActor
+  protocol Refreshable {
     func reload()
-}
+  }
 
 #endif

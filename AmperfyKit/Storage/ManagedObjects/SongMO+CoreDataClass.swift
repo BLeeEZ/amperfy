@@ -19,79 +19,132 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - SongMO
 
 @objc(SongMO)
-public final class SongMO: AbstractPlayableMO {
-    
-}
+public final class SongMO: AbstractPlayableMO {}
+
+// MARK: CoreDataIdentifyable
 
 extension SongMO: CoreDataIdentifyable {
-    
-    static var identifierKey: KeyPath<SongMO, String?> {
-        return \SongMO.title
-    }
-    
-    static var excludeServerDeleteUncachedSongsFetchPredicate: NSPredicate {
-        // see also Song Array extension [Song].filterServerDeleteUncachedSongs()
-        return NSCompoundPredicate(orPredicateWithSubpredicates: [
-            NSCompoundPredicate(andPredicateWithSubpredicates: [
-                NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
-                NSPredicate(format: "%K == %i", #keyPath(SongMO.album.remoteStatus), RemoteStatus.available.rawValue)
-            ]),
-            NSPredicate(format: "%K != nil", #keyPath(SongMO.file)),
-        ])
-    }
-    
-    static var alphabeticSortedFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SongMO.alphabeticSectionInitial), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
-    static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SongMO.disk), ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.track), ascending: true),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
-    static var ratingSortedFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SongMO.rating), ascending: false),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
+  static var identifierKey: KeyPath<SongMO, String?> {
+    \SongMO.title
+  }
 
-    static var durationSortedFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SongMO.combinedDuration), ascending: true),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
-    
-    static var starredDateSortedFetchRequest: NSFetchRequest<SongMO> {
-        let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(SongMO.starredDate), ascending: false),
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: #keyPath(SongMO.id), ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
+  static var excludeServerDeleteUncachedSongsFetchPredicate: NSPredicate {
+    // see also Song Array extension [Song].filterServerDeleteUncachedSongs()
+    NSCompoundPredicate(orPredicateWithSubpredicates: [
+      NSCompoundPredicate(andPredicateWithSubpredicates: [
+        NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
+        NSPredicate(
+          format: "%K == %i",
+          #keyPath(SongMO.album.remoteStatus),
+          RemoteStatus.available.rawValue
+        ),
+      ]),
+      NSPredicate(format: "%K != nil", #keyPath(SongMO.file)),
+    ])
+  }
+
+  static var alphabeticSortedFetchRequest: NSFetchRequest<SongMO> {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: #keyPath(SongMO.alphabeticSectionInitial),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
+
+  static var trackNumberSortedFetchRequest: NSFetchRequest<SongMO> {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: #keyPath(SongMO.disk),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(key: #keyPath(SongMO.track), ascending: true),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: #keyPath(SongMO.id),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
+
+  static var ratingSortedFetchRequest: NSFetchRequest<SongMO> {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(SongMO.rating), ascending: false),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: #keyPath(SongMO.id),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
+
+  static var durationSortedFetchRequest: NSFetchRequest<SongMO> {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(SongMO.combinedDuration), ascending: true),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: #keyPath(SongMO.id),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
+
+  static var starredDateSortedFetchRequest: NSFetchRequest<SongMO> {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(SongMO.starredDate), ascending: false),
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: #keyPath(SongMO.id),
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
 }

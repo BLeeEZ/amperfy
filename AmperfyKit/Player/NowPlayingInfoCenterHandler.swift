@@ -22,80 +22,97 @@
 import Foundation
 import MediaPlayer
 
-@MainActor class NowPlayingInfoCenterHandler {
-    
-    private let musicPlayer: AudioPlayer
-    private let backendAudioPlayer: BackendAudioPlayer
-    private let storage: PersistentStorage
-    private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
+// MARK: - NowPlayingInfoCenterHandler
 
-    init(musicPlayer: AudioPlayer, backendAudioPlayer: BackendAudioPlayer, nowPlayingInfoCenter: MPNowPlayingInfoCenter, storage: PersistentStorage) {
-        self.musicPlayer = musicPlayer
-        self.backendAudioPlayer = backendAudioPlayer
-        self.nowPlayingInfoCenter = nowPlayingInfoCenter
-        self.storage = storage
-        
-        nowPlayingInfoCenter.playbackState = .stopped
-    }
+@MainActor
+class NowPlayingInfoCenterHandler {
+  private let musicPlayer: AudioPlayer
+  private let backendAudioPlayer: BackendAudioPlayer
+  private let storage: PersistentStorage
+  private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
 
-    func updateNowPlayingInfo(playable: AbstractPlayable) {
-        let albumTitle = playable.asSong?.album?.name ?? ""
-        let artwork = playable.image(theme: storage.settings.themePreference, setting: storage.settings.artworkDisplayPreference)
-        nowPlayingInfoCenter.nowPlayingInfo = [
-            MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
-            MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,
-            
-            MPMediaItemPropertyIsCloudItem: !playable.isCached,
-            MPMediaItemPropertyTitle: playable.title,
-            MPMediaItemPropertyAlbumTitle: albumTitle,
-            MPMediaItemPropertyArtist: playable.creatorName,
-            
-            MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
-            MPNowPlayingInfoPropertyIsLiveStream: playable.isRadio,
-            
-            MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
-            MPNowPlayingInfoPropertyPlaybackRate: NSNumber(value: backendAudioPlayer.playbackRate.asDouble),
-            
-            MPMediaItemPropertyArtwork: MPMediaItemArtwork.init(boundsSize: artwork.size, requestHandler: { @Sendable (size) -> UIImage in
-                // this completion handler is not called in main thread!
-                return artwork
-            })
-        ]
-    }
+  init(
+    musicPlayer: AudioPlayer,
+    backendAudioPlayer: BackendAudioPlayer,
+    nowPlayingInfoCenter: MPNowPlayingInfoCenter,
+    storage: PersistentStorage
+  ) {
+    self.musicPlayer = musicPlayer
+    self.backendAudioPlayer = backendAudioPlayer
+    self.nowPlayingInfoCenter = nowPlayingInfoCenter
+    self.storage = storage
 
+    nowPlayingInfoCenter.playbackState = .stopped
+  }
+
+  func updateNowPlayingInfo(playable: AbstractPlayable) {
+    let albumTitle = playable.asSong?.album?.name ?? ""
+    let artwork = playable.image(
+      theme: storage.settings.themePreference,
+      setting: storage.settings.artworkDisplayPreference
+    )
+    nowPlayingInfoCenter.nowPlayingInfo = [
+      MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
+      MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,
+
+      MPMediaItemPropertyIsCloudItem: !playable.isCached,
+      MPMediaItemPropertyTitle: playable.title,
+      MPMediaItemPropertyAlbumTitle: albumTitle,
+      MPMediaItemPropertyArtist: playable.creatorName,
+
+      MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
+      MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
+      MPNowPlayingInfoPropertyIsLiveStream: playable.isRadio,
+
+      MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
+      MPNowPlayingInfoPropertyPlaybackRate: NSNumber(
+        value: backendAudioPlayer.playbackRate
+          .asDouble
+      ),
+
+      MPMediaItemPropertyArtwork: MPMediaItemArtwork(
+        boundsSize: artwork.size,
+        requestHandler: { @Sendable size -> UIImage in
+          // this completion handler is not called in main thread!
+          return artwork
+        }
+      ),
+    ]
+  }
 }
 
+// MARK: MusicPlayable
+
 extension NowPlayingInfoCenterHandler: MusicPlayable {
-    func didStartPlayingFromBeginning() { }
-    
-    func didStartPlaying() {
-        if let curPlayable = musicPlayer.currentlyPlaying {
-            updateNowPlayingInfo(playable: curPlayable)
-        }
-        nowPlayingInfoCenter.playbackState = .playing
+  func didStartPlayingFromBeginning() {}
+
+  func didStartPlaying() {
+    if let curPlayable = musicPlayer.currentlyPlaying {
+      updateNowPlayingInfo(playable: curPlayable)
     }
-    
-    func didPause() {
-        if let curPlayable = musicPlayer.currentlyPlaying {
-            updateNowPlayingInfo(playable: curPlayable)
-        }
-        nowPlayingInfoCenter.nowPlayingInfo = [:]
-        nowPlayingInfoCenter.playbackState = .paused
+    nowPlayingInfoCenter.playbackState = .playing
+  }
+
+  func didPause() {
+    if let curPlayable = musicPlayer.currentlyPlaying {
+      updateNowPlayingInfo(playable: curPlayable)
     }
-    
-    func didStopPlaying() {
-        nowPlayingInfoCenter.nowPlayingInfo = nil
-        nowPlayingInfoCenter.playbackState = .stopped
+    nowPlayingInfoCenter.nowPlayingInfo = [:]
+    nowPlayingInfoCenter.playbackState = .paused
+  }
+
+  func didStopPlaying() {
+    nowPlayingInfoCenter.nowPlayingInfo = nil
+    nowPlayingInfoCenter.playbackState = .stopped
+  }
+
+  func didElapsedTimeChange() {
+    if let curPlayable = musicPlayer.currentlyPlaying {
+      updateNowPlayingInfo(playable: curPlayable)
     }
-    
-    func didElapsedTimeChange() {
-        if let curPlayable = musicPlayer.currentlyPlaying {
-            updateNowPlayingInfo(playable: curPlayable)
-        }
-    }
-    
-    func didPlaylistChange() { }
-    
-    func didArtworkChange() { }
+  }
+
+  func didPlaylistChange() {}
+
+  func didArtworkChange() {}
 }

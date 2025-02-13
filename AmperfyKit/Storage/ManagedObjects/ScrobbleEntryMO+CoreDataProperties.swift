@@ -19,18 +19,19 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension ScrobbleEntryMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<ScrobbleEntryMO> {
+    NSFetchRequest<ScrobbleEntryMO>(entityName: "ScrobbleEntry")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<ScrobbleEntryMO> {
-        return NSFetchRequest<ScrobbleEntryMO>(entityName: "ScrobbleEntry")
-    }
-
-    @NSManaged public var date: Date?
-    @NSManaged public var isUploaded: Bool
-    @NSManaged public var playable: AbstractPlayableMO?
-
+  @NSManaged
+  public var date: Date?
+  @NSManaged
+  public var isUploaded: Bool
+  @NSManaged
+  public var playable: AbstractPlayableMO?
 }

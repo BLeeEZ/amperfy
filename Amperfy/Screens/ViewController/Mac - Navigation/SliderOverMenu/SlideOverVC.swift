@@ -22,28 +22,28 @@ import UIKit
 
 #if targetEnvironment(macCatalyst)
 
-// ViewController representing a single item in the slide over menu
-class SlideOverItemVC: UIViewController {
+  // ViewController representing a single item in the slide over menu
+  class SlideOverItemVC: UIViewController {
     override func viewDidLoad() {
-        super.viewDidLoad()
-        self.view.setBackgroundBlur(style: .prominent)
+      super.viewDidLoad()
+      view.setBackgroundBlur(style: .prominent)
 
-        let backgroundTintView = UIView()
-        backgroundTintView.backgroundColor = .slideOverBackgroundColor
-        backgroundTintView.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(backgroundTintView)
+      let backgroundTintView = UIView()
+      backgroundTintView.backgroundColor = .slideOverBackgroundColor
+      backgroundTintView.translatesAutoresizingMaskIntoConstraints = false
+      view.addSubview(backgroundTintView)
 
-        NSLayoutConstraint.activate([
-            backgroundTintView.topAnchor.constraint(equalTo: self.view.topAnchor),
-            backgroundTintView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
-            backgroundTintView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            backgroundTintView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
-        ])
+      NSLayoutConstraint.activate([
+        backgroundTintView.topAnchor.constraint(equalTo: view.topAnchor),
+        backgroundTintView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        backgroundTintView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        backgroundTintView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      ])
     }
-}
+  }
 
-// ViewController used to manage the slide over menu in macOS.
-class SlideOverVC: UINavigationController {
+  // ViewController used to manage the slide over menu in macOS.
+  class SlideOverVC: UINavigationController {
     lazy var queueVC = QueueVC()
     lazy var lyricsVC = LyricsVC()
 
@@ -55,75 +55,76 @@ class SlideOverVC: UINavigationController {
     private let rootVC: UIViewController
 
     var isLyricsButtonAllowedToDisplay: Bool {
-        return !appDelegate.storage.settings.isAlwaysHidePlayerLyricsButton &&
-            appDelegate.player.playerMode == .music &&
-            appDelegate.backendApi.selectedApi != .ampache
+      !appDelegate.storage.settings.isAlwaysHidePlayerLyricsButton &&
+        appDelegate.player.playerMode == .music &&
+        appDelegate.backendApi.selectedApi != .ampache
     }
 
     init() {
-        self.rootVC = UIViewController()
-        super.init(rootViewController: self.rootVC)
-        
-        if #available(macCatalyst 16.0, *) {
-            self.navigationBar.preferredBehavioralStyle = .pad
-        }
+      self.rootVC = UIViewController()
+      super.init(rootViewController: rootVC)
 
-        // Configure navigation bar appearance
-        let defaultAppearance = UINavigationBarAppearance()
-        defaultAppearance.backgroundColor = .slideOverBackgroundColor
-        defaultAppearance.backgroundEffect = UIBlurEffect(style: .prominent)
-        self.navigationBar.standardAppearance = defaultAppearance
-        self.navigationBar.compactAppearance = defaultAppearance
-        self.navigationBar.scrollEdgeAppearance = defaultAppearance
-        self.navigationBar.compactScrollEdgeAppearance = defaultAppearance
+      if #available(macCatalyst 16.0, *) {
+        self.navigationBar.preferredBehavioralStyle = .pad
+      }
 
-        // Add all view controllers and create the segmented control to select them
-        self.updateNavigationItem()
+      // Configure navigation bar appearance
+      let defaultAppearance = UINavigationBarAppearance()
+      defaultAppearance.backgroundColor = .slideOverBackgroundColor
+      defaultAppearance.backgroundEffect = UIBlurEffect(style: .prominent)
+      navigationBar.standardAppearance = defaultAppearance
+      navigationBar.compactAppearance = defaultAppearance
+      navigationBar.scrollEdgeAppearance = defaultAppearance
+      navigationBar.compactScrollEdgeAppearance = defaultAppearance
+
+      // Add all view controllers and create the segmented control to select them
+      updateNavigationItem()
     }
 
     override func viewDidLoad() {
-        super.viewDidLoad()
-        self.view.addLeftSideBorder()
+      super.viewDidLoad()
+      view.addLeftSideBorder()
     }
 
     private func updateNavigationItem() {
-        var newVC: [SlideOverItemVC] = [self.queueVC]
-        if (self.isLyricsButtonAllowedToDisplay) {
-            newVC += [self.lyricsVC]
-        }
-        
-        guard newVC != self.viewController else { return }
-        self.viewController = newVC
+      var newVC: [SlideOverItemVC] = [queueVC]
+      if isLyricsButtonAllowedToDisplay {
+        newVC += [lyricsVC]
+      }
 
-        self.segmentedControl = UISegmentedControl(items: self.viewController.enumerated().map { (i, vc) in
-            vc.title ?? "View: \(i)"
-        })
-        self.segmentedControl?.addTarget(self, action: #selector(self.selectionChanged(_:)), for: .valueChanged)
-        self.segmentedControl?.selectedSegmentIndex = UISegmentedControl.noSegment
+      guard newVC != viewController else { return }
+      viewController = newVC
 
-        self.segmentedControl?.selectedSegmentIndex = 0
-        self.selectionChanged(self.segmentedControl)
+      segmentedControl = UISegmentedControl(items: viewController.enumerated().map { i, vc in
+        vc.title ?? "View: \(i)"
+      })
+      segmentedControl?.addTarget(self, action: #selector(selectionChanged(_:)), for: .valueChanged)
+      segmentedControl?.selectedSegmentIndex = UISegmentedControl.noSegment
+
+      segmentedControl?.selectedSegmentIndex = 0
+      selectionChanged(segmentedControl)
     }
 
-    @objc private func selectionChanged(_ sender: UISegmentedControl?) {
-        guard let index = sender?.selectedSegmentIndex, index != UISegmentedControl.noSegment else {
-            self.popToRootViewController(animated: false)
-            return
-        }
-        let vc = self.viewController[index]
-        vc.navigationItem.hidesBackButton = true
-        vc.navigationItem.titleView = sender
-        self.popViewController(animated: false)
-        self.pushViewController(vc, animated: false)
+    @objc
+    private func selectionChanged(_ sender: UISegmentedControl?) {
+      guard let index = sender?.selectedSegmentIndex, index != UISegmentedControl.noSegment else {
+        popToRootViewController(animated: false)
+        return
+      }
+      let vc = viewController[index]
+      vc.navigationItem.hidesBackButton = true
+      vc.navigationItem.titleView = sender
+      popViewController(animated: false)
+      pushViewController(vc, animated: false)
     }
 
     required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+      fatalError("init(coder:) has not been implemented")
     }
 
     func settingsDidChange() {
-        self.updateNavigationItem()
+      updateNavigationItem()
     }
-}
+  }
 
 #endif

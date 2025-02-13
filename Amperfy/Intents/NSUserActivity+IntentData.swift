@@ -22,22 +22,21 @@
 import Foundation
 
 extension NSUserActivity {
-    
-    public enum ActivityKeys: String {
-        case searchTerm
-        case searchCategory
-        case id
-        case libraryElementType
-        case shuffleOption
-        case repeatOption
-        case offlineMode
-        case onlyCached
-        case rating
-        case favorite
-    }
-    
-    public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"
-    public static let playIdActivityType = "de.familie-zimba.Amperfy.PlayID"
-    public static let playRandomSongsActivityType = "de.familie-zimba.Amperfy.PlayRandomSongsActivityType"
+  public enum ActivityKeys: String {
+    case searchTerm
+    case searchCategory
+    case id
+    case libraryElementType
+    case shuffleOption
+    case repeatOption
+    case offlineMode
+    case onlyCached
+    case rating
+    case favorite
+  }
 
+  public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"
+  public static let playIdActivityType = "de.familie-zimba.Amperfy.PlayID"
+  public static let playRandomSongsActivityType =
+    "de.familie-zimba.Amperfy.PlayRandomSongsActivityType"
 }

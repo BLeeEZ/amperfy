@@ -22,153 +22,164 @@
 import Foundation
 import UIKit
 
+// MARK: - SwipeActionType
+
 public enum SwipeActionType: Int, CaseIterable {
-    case insertUserQueue = 0
-    case appendUserQueue = 1
-    case insertContextQueue = 2
-    case appendContextQueue = 3
-    case download = 4
-    case removeFromCache = 5
-    case addToPlaylist = 6
-    case play = 7
-    case playShuffled = 8
-    case insertPodcastQueue = 9
-    case appendPodcastQueue = 10
-    case favorite = 11
+  case insertUserQueue = 0
+  case appendUserQueue = 1
+  case insertContextQueue = 2
+  case appendContextQueue = 3
+  case download = 4
+  case removeFromCache = 5
+  case addToPlaylist = 6
+  case play = 7
+  case playShuffled = 8
+  case insertPodcastQueue = 9
+  case appendPodcastQueue = 10
+  case favorite = 11
 
-    public var displayName: String {
-        switch self {
-        case .insertUserQueue:
-            return "Insert User Queue"
-        case .appendUserQueue:
-            return "Append User Queue"
-        case .insertContextQueue:
-            return "Insert Context Queue"
-        case .appendContextQueue:
-            return "Append Context Queue"
-        case .download:
-            return "Download"
-        case .removeFromCache:
-            return "Remove from Cache"
-        case .addToPlaylist:
-            return "Add to Playlist"
-        case .play:
-            return "Play"
-        case .playShuffled:
-            return "Play shuffled"
-        case .insertPodcastQueue:
-            return "Insert Podcast Queue"
-        case .appendPodcastQueue:
-            return "Append Podcast Queue"
-        case .favorite:
-            return "Favorite"
-        }
+  public var displayName: String {
+    switch self {
+    case .insertUserQueue:
+      return "Insert User Queue"
+    case .appendUserQueue:
+      return "Append User Queue"
+    case .insertContextQueue:
+      return "Insert Context Queue"
+    case .appendContextQueue:
+      return "Append Context Queue"
+    case .download:
+      return "Download"
+    case .removeFromCache:
+      return "Remove from Cache"
+    case .addToPlaylist:
+      return "Add to Playlist"
+    case .play:
+      return "Play"
+    case .playShuffled:
+      return "Play shuffled"
+    case .insertPodcastQueue:
+      return "Insert Podcast Queue"
+    case .appendPodcastQueue:
+      return "Append Podcast Queue"
+    case .favorite:
+      return "Favorite"
     }
+  }
 
-    public var settingsName: String {
-        switch self {
-        case .insertUserQueue:
-            return "Insert in User Queue"
-        case .appendUserQueue:
-            return "Append to User Queue"
-        case .insertContextQueue:
-            return "Insert in Context Queue"
-        case .appendContextQueue:
-            return "Append to Context Queue"
-        case .download:
-            return "Download"
-        case .removeFromCache:
-            return "Remove from Cache"
-        case .addToPlaylist:
-            return "Add to Playlist"
-        case .play:
-            return "Play"
-        case .playShuffled:
-            return "Play shuffled"
-        case .insertPodcastQueue:
-            return "Insert in Podcast Queue"
-        case .appendPodcastQueue:
-            return "Append to Podcast Queue"
-        case .favorite:
-            return "Mark as Favorite"
-        }
+  public var settingsName: String {
+    switch self {
+    case .insertUserQueue:
+      return "Insert in User Queue"
+    case .appendUserQueue:
+      return "Append to User Queue"
+    case .insertContextQueue:
+      return "Insert in Context Queue"
+    case .appendContextQueue:
+      return "Append to Context Queue"
+    case .download:
+      return "Download"
+    case .removeFromCache:
+      return "Remove from Cache"
+    case .addToPlaylist:
+      return "Add to Playlist"
+    case .play:
+      return "Play"
+    case .playShuffled:
+      return "Play shuffled"
+    case .insertPodcastQueue:
+      return "Insert in Podcast Queue"
+    case .appendPodcastQueue:
+      return "Append to Podcast Queue"
+    case .favorite:
+      return "Mark as Favorite"
     }
+  }
 
-    @MainActor public var image: UIImage {
-        switch self {
-        case .insertUserQueue:
-            return UIImage.userQueueInsert.withTintColor(.white)
-        case .appendUserQueue:
-            return UIImage.userQueueAppend.withTintColor(.white)
-        case .insertContextQueue:
-            return UIImage.contextQueueInsert.withTintColor(.white)
-        case .appendContextQueue:
-            return UIImage.contextQueueAppend.withTintColor(.white)
-        case .download:
-            return UIImage.download.withTintColor(.white)
-        case .removeFromCache:
-            return UIImage.trash.withTintColor(.white)
-        case .addToPlaylist:
-            return UIImage.playlist.withTintColor(.white)
-        case .play:
-            return UIImage.play.withTintColor(.white)
-        case .playShuffled:
-            return UIImage.shuffle.withTintColor(.white)
-        case .insertPodcastQueue:
-            return UIImage.podcastQueueInsert.withTintColor(.white)
-        case .appendPodcastQueue:
-            return UIImage.podcastQueueAppend.withTintColor(.white)
-        case .favorite:
-            return UIImage.heartFill.withTintColor(.white)
-        }
+  @MainActor
+  public var image: UIImage {
+    switch self {
+    case .insertUserQueue:
+      return UIImage.userQueueInsert.withTintColor(.white)
+    case .appendUserQueue:
+      return UIImage.userQueueAppend.withTintColor(.white)
+    case .insertContextQueue:
+      return UIImage.contextQueueInsert.withTintColor(.white)
+    case .appendContextQueue:
+      return UIImage.contextQueueAppend.withTintColor(.white)
+    case .download:
+      return UIImage.download.withTintColor(.white)
+    case .removeFromCache:
+      return UIImage.trash.withTintColor(.white)
+    case .addToPlaylist:
+      return UIImage.playlist.withTintColor(.white)
+    case .play:
+      return UIImage.play.withTintColor(.white)
+    case .playShuffled:
+      return UIImage.shuffle.withTintColor(.white)
+    case .insertPodcastQueue:
+      return UIImage.podcastQueueInsert.withTintColor(.white)
+    case .appendPodcastQueue:
+      return UIImage.podcastQueueAppend.withTintColor(.white)
+    case .favorite:
+      return UIImage.heartFill.withTintColor(.white)
     }
+  }
 }
+
+// MARK: - SwipeActionSettings
 
 public struct SwipeActionSettings {
-    public var combined: [[SwipeActionType]]
+  public var combined: [[SwipeActionType]]
 
-    public var leading: [SwipeActionType] {
-        return combined[0]
-    }
-    public var trailing: [SwipeActionType] {
-        return combined[1]
-    }
-    public var notUsed: [SwipeActionType] {
-        return combined[2]
-    }
-    
-    public init(leading: [SwipeActionType], trailing: [SwipeActionType]) {
-        let notUsedSet = Set(SwipeActionType.allCases).subtracting(Set(leading)).subtracting(Set(trailing))
-        combined = [ leading, trailing, Array(notUsedSet) ]
-    }
-    
-    public static var defaultSettings: SwipeActionSettings {
-        return SwipeActionSettings(
-            leading: [
-                .appendContextQueue,
-                .insertContextQueue
+  public var leading: [SwipeActionType] {
+    combined[0]
+  }
 
-            ], trailing: [
-                .appendUserQueue,
-                .insertUserQueue,
-                .appendPodcastQueue,
-                .insertPodcastQueue,
-                .download
-        ])
-    }
+  public var trailing: [SwipeActionType] {
+    combined[1]
+  }
+
+  public var notUsed: [SwipeActionType] {
+    combined[2]
+  }
+
+  public init(leading: [SwipeActionType], trailing: [SwipeActionType]) {
+    let notUsedSet = Set(SwipeActionType.allCases).subtracting(Set(leading))
+      .subtracting(Set(trailing))
+    self.combined = [leading, trailing, Array(notUsedSet)]
+  }
+
+  public static var defaultSettings: SwipeActionSettings {
+    SwipeActionSettings(
+      leading: [
+        .appendContextQueue,
+        .insertContextQueue,
+
+      ], trailing: [
+        .appendUserQueue,
+        .insertUserQueue,
+        .appendPodcastQueue,
+        .insertPodcastQueue,
+        .download,
+      ]
+    )
+  }
 }
 
+// MARK: - SwipeActionContext
+
 public struct SwipeActionContext {
-    public let containable: PlayableContainable
-    private let customPlayContext: PlayContext?
+  public let containable: PlayableContainable
+  private let customPlayContext: PlayContext?
 
-    public var playables: [AbstractPlayable] { return containable.playables }
-    public var playContext: PlayContext {
-        return customPlayContext ?? PlayContext(containable: containable)
-    }
+  public var playables: [AbstractPlayable] { containable.playables }
+  public var playContext: PlayContext {
+    customPlayContext ?? PlayContext(containable: containable)
+  }
 
-    public init(containable: PlayableContainable, playContext: PlayContext? = nil) {
-        self.containable = containable
-        self.customPlayContext = playContext
-    }
+  public init(containable: PlayableContainable, playContext: PlayContext? = nil) {
+    self.containable = containable
+    self.customPlayContext = playContext
+  }
 }

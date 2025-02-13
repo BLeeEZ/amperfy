@@ -19,97 +19,121 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
-import CoreData
 import AmperfyKit
+import CoreData
+import UIKit
 
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
+  override var sceneTitle: String? { "Genres" }
 
-    override var sceneTitle: String? { "Genres" }
+  private var fetchedResultsController: GenreFetchedResultsController!
 
-    private var fetchedResultsController: GenreFetchedResultsController!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+  override func viewDidLoad() {
+    super.viewDidLoad()
 
-        #if !targetEnvironment(macCatalyst)
-        self.refreshControl = UIRefreshControl()
-        #endif
+    #if !targetEnvironment(macCatalyst)
+      refreshControl = UIRefreshControl()
+    #endif
 
-        appDelegate.userStatistics.visited(.genres)
-        
-        fetchedResultsController = GenreFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: true)
-        singleFetchedResultsController = fetchedResultsController
-        
-        configureSearchController(placeholder: "Search in \"Genres\"", scopeButtonTitles: ["All", "Cached"], showSearchBarAtEnter: true)
-        setNavBarTitle(title: "Genres")
-        tableView.register(nibName: GenericTableCell.typeName)
-        tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
-        tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
-        self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        
-        containableAtIndexPathCallback = { (indexPath) in
-            return self.fetchedResultsController.getWrappedEntity(at: indexPath)
-        }
-        playContextAtIndexPathCallback = { (indexPath) in
-            let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            return PlayContext(containable: entity)
-        }
-        swipeCallback = { (indexPath, completionHandler) in
-            let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            Task { @MainActor in
-                do {
-                    try await genre.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                } catch {
-                    self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
-                }
-                completionHandler(SwipeActionContext(containable: genre))
-            }
-        }
+    appDelegate.userStatistics.visited(.genres)
+
+    fetchedResultsController = GenreFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: true
+    )
+    singleFetchedResultsController = fetchedResultsController
+
+    configureSearchController(
+      placeholder: "Search in \"Genres\"",
+      scopeButtonTitles: ["All", "Cached"],
+      showSearchBarAtEnter: true
+    )
+    setNavBarTitle(title: "Genres")
+    tableView.register(nibName: GenericTableCell.typeName)
+    tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
+    tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
+    refreshControl?.addTarget(
+      self,
+      action: #selector(Self.handleRefresh),
+      for: UIControl.Event.valueChanged
+    )
+
+    containableAtIndexPathCallback = { indexPath in
+      self.fetchedResultsController.getWrappedEntity(at: indexPath)
     }
-
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-        let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(container: genre, rootView: self)
-        cell.entityImage.isHidden = true
-        return cell
+    playContextAtIndexPathCallback = { indexPath in
+      let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      return PlayContext(containable: entity)
     }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-        performSegue(withIdentifier: Segues.toGenreDetail.rawValue, sender: genre)
-    }
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.toGenreDetail.rawValue {
-            let vc = segue.destination as! GenreDetailVC
-            let genre = sender as? Genre
-            vc.genre = genre
+    swipeCallback = { indexPath, completionHandler in
+      let genre = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      Task { @MainActor in
+        do {
+          try await genre.fetch(
+            storage: self.appDelegate.storage,
+            librarySyncer: self.appDelegate.librarySyncer,
+            playableDownloadManager: self.appDelegate.playableDownloadManager
+          )
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
         }
+        completionHandler(SwipeActionContext(containable: genre))
+      }
     }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        let searchText = searchController.searchBar.text ?? ""
-        fetchedResultsController.search(searchText: searchText, onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1)
-        tableView.reloadData()
-    }
-    
-    @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        guard self.appDelegate.storage.settings.isOnlineMode else {
-            self.refreshControl?.endRefreshing()
-            return
-        }
-        Task { @MainActor in
-            do {
-                try await AutoDownloadLibrarySyncer(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-                    .syncNewestLibraryElements()
-            } catch {
-                self.appDelegate.eventLogger.report(topic: "Genres Newest Elements Sync", error: error)
-            }
-            self.refreshControl?.endRefreshing()
-        }
-    }
+  }
 
+  override func tableView(
+    _ tableView: UITableView,
+    cellForRowAt indexPath: IndexPath
+  )
+    -> UITableViewCell {
+    let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
+    let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
+    cell.display(container: genre, rootView: self)
+    cell.entityImage.isHidden = true
+    return cell
+  }
+
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
+    performSegue(withIdentifier: Segues.toGenreDetail.rawValue, sender: genre)
+  }
+
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == Segues.toGenreDetail.rawValue {
+      let vc = segue.destination as! GenreDetailVC
+      let genre = sender as? Genre
+      vc.genre = genre
+    }
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    let searchText = searchController.searchBar.text ?? ""
+    fetchedResultsController.search(
+      searchText: searchText,
+      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
+    )
+    tableView.reloadData()
+  }
+
+  @objc
+  func handleRefresh(refreshControl: UIRefreshControl) {
+    guard appDelegate.storage.settings.isOnlineMode else {
+      self.refreshControl?.endRefreshing()
+      return
+    }
+    Task { @MainActor in
+      do {
+        try await AutoDownloadLibrarySyncer(
+          storage: self.appDelegate.storage,
+          librarySyncer: self.appDelegate.librarySyncer,
+          playableDownloadManager: self.appDelegate.playableDownloadManager
+        )
+        .syncNewestLibraryElements()
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Genres Newest Elements Sync", error: error)
+      }
+      self.refreshControl?.endRefreshing()
+    }
+  }
 }
-

@@ -19,64 +19,69 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
-import CoreData
 import AmperfyKit
+import CoreData
+import UIKit
 
 class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
-    
-    override var sceneTitle: String? { "Directories" }
+  override var sceneTitle: String? { "Directories" }
 
-    private var fetchedResultsController: MusicFolderFetchedResultsController!
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        appDelegate.userStatistics.visited(.musicFolders)
-        
-        fetchedResultsController = MusicFolderFetchedResultsController(coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        singleFetchedResultsController = fetchedResultsController
-        
-        configureSearchController(placeholder: "Search in \"Directories\"")
-        setNavBarTitle(title: "Directories")
-        tableView.register(nibName: DirectoryTableCell.typeName)
-        tableView.rowHeight = DirectoryTableCell.rowHeight
-        tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        guard appDelegate.storage.settings.isOnlineMode else { return }
-        Task { @MainActor in do {
-            try await self.appDelegate.librarySyncer.syncMusicFolders()
-        } catch {
-            self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
-        }}
-    }
+  private var fetchedResultsController: MusicFolderFetchedResultsController!
 
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
-        let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
-        cell.display(folder: musicFolder)
-        return cell
-    }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
-        performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: musicFolder)
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    appDelegate.userStatistics.visited(.musicFolders)
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == Segues.toDirectories.rawValue {
-            let vc = segue.destination as! IndexesVC
-            let musicFolder = sender as? MusicFolder
-            vc.musicFolder = musicFolder
-        }
-    }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        let searchText = searchController.searchBar.text ?? ""
-        fetchedResultsController.search(searchText: searchText)
-        tableView.reloadData()
-    }
+    fetchedResultsController = MusicFolderFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    singleFetchedResultsController = fetchedResultsController
 
+    configureSearchController(placeholder: "Search in \"Directories\"")
+    setNavBarTitle(title: "Directories")
+    tableView.register(nibName: DirectoryTableCell.typeName)
+    tableView.rowHeight = DirectoryTableCell.rowHeight
+    tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    guard appDelegate.storage.settings.isOnlineMode else { return }
+    Task { @MainActor in do {
+      try await self.appDelegate.librarySyncer.syncMusicFolders()
+    } catch {
+      self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
+    }}
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    cellForRowAt indexPath: IndexPath
+  )
+    -> UITableViewCell {
+    let cell: DirectoryTableCell = dequeueCell(for: tableView, at: indexPath)
+    let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
+    cell.display(folder: musicFolder)
+    return cell
+  }
+
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
+    performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: musicFolder)
+  }
+
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if segue.identifier == Segues.toDirectories.rawValue {
+      let vc = segue.destination as! IndexesVC
+      let musicFolder = sender as? MusicFolder
+      vc.musicFolder = musicFolder
+    }
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    let searchText = searchController.searchBar.text ?? ""
+    fetchedResultsController.search(searchText: searchText)
+    tableView.reloadData()
+  }
 }

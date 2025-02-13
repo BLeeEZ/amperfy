@@ -19,156 +19,188 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import CarPlay
 import AmperfyKit
+import CarPlay
+import Foundation
 
 extension CarPlaySceneDelegate {
-    func configureNowPlayingTemplate() {
-        var buttons: [CPNowPlayingButton] = []
+  func configureNowPlayingTemplate() {
+    var buttons: [CPNowPlayingButton] = []
+    buttons.append(
+      CPNowPlayingRepeatButton(handler: { [weak self] button in
+        guard let self = self else { return }
+        appDelegate.player.setRepeatMode(appDelegate.player.repeatMode.nextMode)
+      })
+    )
+    if appDelegate.player.playerMode == .music {
+      buttons.append(
+        CPNowPlayingShuffleButton(handler: { [weak self] button in
+          guard let self = self else { return }
+          appDelegate.player.toggleShuffle()
+        })
+      )
+      if let currentlyPlaying = appDelegate.player.currentlyPlaying,
+         !currentlyPlaying.isRadio {
+        let isFavorite = appDelegate.player.currentlyPlaying?.isFavorite ?? false
         buttons.append(
-            CPNowPlayingRepeatButton(handler: { [weak self] button in
-                guard let `self` = self else { return }
-                self.appDelegate.player.setRepeatMode(self.appDelegate.player.repeatMode.nextMode)
-            })
-        )
-        if appDelegate.player.playerMode == .music {
-            buttons.append(
-                CPNowPlayingShuffleButton(handler: { [weak self] button in
-                    guard let `self` = self else { return }
-                    self.appDelegate.player.toggleShuffle()
-                })
-            )
-            if let currentlyPlaying = appDelegate.player.currentlyPlaying,
-               !currentlyPlaying.isRadio {
-                let isFavorite = appDelegate.player.currentlyPlaying?.isFavorite ?? false
-                buttons.append(
-                    CPNowPlayingImageButton(image: isFavorite ? .heartFill : .heartEmpty, handler: { [weak self] button in
-                        guard let `self` = self else { return }
-                        guard let playableInfo = appDelegate.player.currentlyPlaying else { return }
-                        Task { @MainActor in
-                            do {
-                                try await playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
-                            } catch {
-                                self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
-                            }
-                            self.configureNowPlayingTemplate()
-                        }
-                    })
-                )
-            }
-        }
-        buttons.append(
-            CPNowPlayingPlaybackRateButton(handler: { [weak self] button in
-                guard let `self` = self else { return }
-                let availablePlaybackRates: [CPListItem] = PlaybackRate.allCases.compactMap { playbackRate in
-                    let listItem = CPListItem(text: playbackRate.description, detailText: nil)
-                    listItem.handler = { [weak self] item, completion in
-                        guard let `self` = self else { completion(); return }
-                        self.appDelegate.player.setPlaybackRate(playbackRate)
-                        self.interfaceController?.popTemplate(animated: true) { _,_ in }
-                        completion()
-                    }
-                    return listItem
+          CPNowPlayingImageButton(
+            image: isFavorite ? .heartFill : .heartEmpty,
+            handler: { [weak self] button in
+              guard let self = self else { return }
+              guard let playableInfo = appDelegate.player.currentlyPlaying else { return }
+              Task { @MainActor in
+                do {
+                  try await playableInfo
+                    .remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                } catch {
+                  self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
                 }
-                let playbackRateTemplate = CPListTemplate(title: "Playback Rate", sections: [
-                    CPListSection(items: availablePlaybackRates)
-                ])
-                self.interfaceController?.pushTemplate(playbackRateTemplate, animated: true, completion: nil)
-                
-            })
+                self.configureNowPlayingTemplate()
+              }
+            }
+          )
         )
-        CPNowPlayingTemplate.shared.updateNowPlayingButtons(buttons)
-        CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText
-        CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
+      }
     }
-    
-    func displayNowPlaying(completion: @escaping (() -> Void)) {
-        configureNowPlayingTemplate()
-        self.interfaceController?.popToRootTemplate(animated: false) { _,_ in
-            self.interfaceController?.pushTemplate(CPNowPlayingTemplate.shared, animated: true) { _,_ in completion() }
-        }
+    buttons.append(
+      CPNowPlayingPlaybackRateButton(handler: { [weak self] button in
+        guard let self = self else { return }
+        let availablePlaybackRates: [CPListItem] = PlaybackRate.allCases
+          .compactMap { playbackRate in
+            let listItem = CPListItem(text: playbackRate.description, detailText: nil)
+            listItem.handler = { [weak self] item, completion in
+              guard let self = self else { completion(); return }
+              appDelegate.player.setPlaybackRate(playbackRate)
+              interfaceController?.popTemplate(animated: true) { _, _ in }
+              completion()
+            }
+            return listItem
+          }
+        let playbackRateTemplate = CPListTemplate(title: "Playback Rate", sections: [
+          CPListSection(items: availablePlaybackRates),
+        ])
+        interfaceController?.pushTemplate(playbackRateTemplate, animated: true, completion: nil)
+
+      })
+    )
+    CPNowPlayingTemplate.shared.updateNowPlayingButtons(buttons)
+    CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText
+    CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
+  }
+
+  func displayNowPlaying(completion: @escaping (() -> ())) {
+    configureNowPlayingTemplate()
+    interfaceController?.popToRootTemplate(animated: false) { _, _ in
+      self.interfaceController?
+        .pushTemplate(CPNowPlayingTemplate.shared, animated: true) { _, _ in completion() }
     }
+  }
 }
+
+// MARK: - CarPlaySceneDelegate + CPNowPlayingTemplateObserver
 
 extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
-    nonisolated func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
-        MainActor.assumeIsolated {
-            self.interfaceController?.pushTemplate(playerQueueSection, animated: true, completion: nil)
-        }
+  nonisolated func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
+    MainActor.assumeIsolated {
+      self.interfaceController?.pushTemplate(playerQueueSection, animated: true, completion: nil)
     }
-    
-    func createPlayerQueueSections() -> [CPListSection] {
-        var queueSection = [CPListSection]()
-        
-        let userQueueCount = appDelegate.player.userQueueCount
-        let userQueueMax = min(userQueueCount-1, CPListTemplate.maximumItemCount-1)
-        let userQueue = appDelegate.player.getUserQueueItems(from: 0, to: userQueueMax)
-        if userQueueCount > 0 {
-            var userQueueItems = [CPListItem]()
-            for (index, userQueueItem) in userQueue.enumerated() {
-                let playerIndex = PlayerIndex(queueType: .user, index: index)
-                let listItem = self.createQueueItem(for: userQueueItem, playerIndex: playerIndex)
-                userQueueItems.append(listItem)
-                if userQueueItems.count >= CPListTemplate.maximumItemCount {
-                    break
-                }
-            }
-            let userQueueSection = CPListSection(items: userQueueItems, header: "Next in Queue", sectionIndexTitle: nil)
-            queueSection.append(userQueueSection)
-        }
+  }
 
-        if userQueueCount < CPListTemplate.maximumItemCount {
-            let nextQueueCount = appDelegate.player.nextQueueCount
-            let nextQueueMax = min(nextQueueCount-1, CPListTemplate.maximumItemCount-1)
-            let nextQueue = appDelegate.player.getNextQueueItems(from: 0, to: nextQueueMax)
-            if nextQueue.count > 0 {
-                var nextQueueItems = [CPListItem]()
-                for (index, nextQueueItem) in nextQueue.enumerated() {
-                    let playerIndex = PlayerIndex(queueType: .next, index: index)
-                    let listItem = self.createQueueItem(for: nextQueueItem, playerIndex: playerIndex)
-                    nextQueueItems.append(listItem)
-                    if (userQueue.count + nextQueueItems.count) >= CPListTemplate.maximumItemCount {
-                        break
-                    }
-                }
-                let nextQueueSection = CPListSection(items: nextQueueItems, header: "Next from: \(appDelegate.player.contextName)", sectionIndexTitle: nil)
-                queueSection.append(nextQueueSection)
-            }
+  func createPlayerQueueSections() -> [CPListSection] {
+    var queueSection = [CPListSection]()
+
+    let userQueueCount = appDelegate.player.userQueueCount
+    let userQueueMax = min(userQueueCount - 1, CPListTemplate.maximumItemCount - 1)
+    let userQueue = appDelegate.player.getUserQueueItems(from: 0, to: userQueueMax)
+    if userQueueCount > 0 {
+      var userQueueItems = [CPListItem]()
+      for (index, userQueueItem) in userQueue.enumerated() {
+        let playerIndex = PlayerIndex(queueType: .user, index: index)
+        let listItem = createQueueItem(for: userQueueItem, playerIndex: playerIndex)
+        userQueueItems.append(listItem)
+        if userQueueItems.count >= CPListTemplate.maximumItemCount {
+          break
         }
-        return queueSection
+      }
+      let userQueueSection = CPListSection(
+        items: userQueueItems,
+        header: "Next in Queue",
+        sectionIndexTitle: nil
+      )
+      queueSection.append(userQueueSection)
     }
-    
-    private func createQueueItem(for playable: AbstractPlayable, playerIndex: PlayerIndex) -> CPListItem {
-        let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
-        let image = playable.image(theme: appDelegate.storage.settings.themePreference, setting: artworkDisplayPreference)
-        let listItem = CPListItem(text: playable.title, detailText: playable.subtitle, image: image.carPlayImage(carTraitCollection: traits), accessoryImage: nil, accessoryType: accessoryType)
-        listItem.handler = { [weak self] item, completion in
-            guard let `self` = self else { completion(); return }
-            self.appDelegate.player.play(playerIndex: playerIndex)
-            self.interfaceController?.popTemplate(animated: true) { _,_ in
-                completion()
-            }
+
+    if userQueueCount < CPListTemplate.maximumItemCount {
+      let nextQueueCount = appDelegate.player.nextQueueCount
+      let nextQueueMax = min(nextQueueCount - 1, CPListTemplate.maximumItemCount - 1)
+      let nextQueue = appDelegate.player.getNextQueueItems(from: 0, to: nextQueueMax)
+      if !nextQueue.isEmpty {
+        var nextQueueItems = [CPListItem]()
+        for (index, nextQueueItem) in nextQueue.enumerated() {
+          let playerIndex = PlayerIndex(queueType: .next, index: index)
+          let listItem = createQueueItem(for: nextQueueItem, playerIndex: playerIndex)
+          nextQueueItems.append(listItem)
+          if (userQueue.count + nextQueueItems.count) >= CPListTemplate.maximumItemCount {
+            break
+          }
         }
-        return listItem
+        let nextQueueSection = CPListSection(
+          items: nextQueueItems,
+          header: "Next from: \(appDelegate.player.contextName)",
+          sectionIndexTitle: nil
+        )
+        queueSection.append(nextQueueSection)
+      }
     }
+    return queueSection
+  }
+
+  private func createQueueItem(
+    for playable: AbstractPlayable,
+    playerIndex: PlayerIndex
+  )
+    -> CPListItem {
+    let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
+    let image = playable.image(
+      theme: appDelegate.storage.settings.themePreference,
+      setting: artworkDisplayPreference
+    )
+    let listItem = CPListItem(
+      text: playable.title,
+      detailText: playable.subtitle,
+      image: image.carPlayImage(carTraitCollection: traits),
+      accessoryImage: nil,
+      accessoryType: accessoryType
+    )
+    listItem.handler = { [weak self] item, completion in
+      guard let self = self else { completion(); return }
+      appDelegate.player.play(playerIndex: playerIndex)
+      interfaceController?.popTemplate(animated: true) { _, _ in
+        completion()
+      }
+    }
+    return listItem
+  }
 }
 
+// MARK: - CarPlaySceneDelegate + MusicPlayable
+
 extension CarPlaySceneDelegate: MusicPlayable {
-    func didStartPlayingFromBeginning() { }
-    func didStartPlaying() {
-        configureNowPlayingTemplate()
-        playerQueueSection.updateSections(createPlayerQueueSections())
-    }
-    func didPause() { }
-    func didStopPlaying() { }
-    func didElapsedTimeChange() { }
-    func didPlaylistChange() {
-        playerQueueSection.updateSections(createPlayerQueueSections())
-    }
-    func didArtworkChange() { }
-    func didShuffleChange() { }
-    func didRepeatChange() { }
-    func didPlaybackRateChange() { }
-    
+  func didStartPlayingFromBeginning() {}
+  func didStartPlaying() {
+    configureNowPlayingTemplate()
+    playerQueueSection.updateSections(createPlayerQueueSections())
+  }
+
+  func didPause() {}
+  func didStopPlaying() {}
+  func didElapsedTimeChange() {}
+  func didPlaylistChange() {
+    playerQueueSection.updateSections(createPlayerQueueSections())
+  }
+
+  func didArtworkChange() {}
+  func didShuffleChange() {}
+  func didRepeatChange() {}
+  func didPlaybackRateChange() {}
 }

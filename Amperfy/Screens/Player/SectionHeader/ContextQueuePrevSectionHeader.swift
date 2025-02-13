@@ -19,29 +19,33 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import MarqueeLabel
+import UIKit
 
 class ContextQueuePrevSectionHeader: UIView {
+  @IBOutlet
+  weak var nameLabel: MarqueeLabel!
 
-    @IBOutlet weak var nameLabel: MarqueeLabel!
-    
-    static let frameHeight: CGFloat = 20.5 + margin.top + margin.bottom
-    static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 8, right: UIView.defaultMarginX)
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.layoutMargins = Self.margin
-    }
-    
-    func display(name: String) {
-        nameLabel.text = name
-        nameLabel.isHidden = name.isEmpty
-        nameLabel.applyAmperfyStyle()
-    }
+  static let frameHeight: CGFloat = 20.5 + margin.top + margin.bottom
+  static let margin = UIEdgeInsets(
+    top: 8,
+    left: UIView.defaultMarginX,
+    bottom: 8,
+    right: UIView.defaultMarginX
+  )
 
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    self.layoutMargins = Self.margin
+  }
+
+  func display(name: String) {
+    nameLabel.text = name
+    nameLabel.isHidden = name.isEmpty
+    nameLabel.applyAmperfyStyle()
+  }
 }

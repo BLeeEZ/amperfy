@@ -19,61 +19,71 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
 import MarqueeLabel
+import UIKit
 
 class CurrentlyPlayingTableCell: BasicTableCell {
-    
-    static let rowHeight: CGFloat = 94.0
-    
-    private var rootView: PopupPlayerVC?
-    
-    @IBOutlet weak var artworkImage: LibraryEntityImage!
-    @IBOutlet weak var titleLabel: MarqueeLabel!
-    @IBOutlet weak var artistLabel: MarqueeLabel!
-    @IBOutlet weak var favoriteButton: UIButton!
-    @IBOutlet weak var optionsButton: UIButton!
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    func prepare(toWorkOnRootView: PopupPlayerVC? ) {
-        self.rootView = toWorkOnRootView
-        titleLabel.applyAmperfyStyle()
-        artistLabel.applyAmperfyStyle()
-        refresh()
-    }
-    
-    func refresh() {
-        rootView?.refreshCurrentlyPlayingInfo(
-            artworkImage: artworkImage,
-            titleLabel: titleLabel,
-            artistLabel: artistLabel)
-        rootView?.refreshFavoriteButton(button: favoriteButton)
-        rootView?.refreshOptionButton(button: optionsButton, rootView: rootView)
-    }
-    
-    func refreshArtwork() {
-        rootView?.refreshArtwork(artworkImage: artworkImage)
-    }
+  static let rowHeight: CGFloat = 94.0
 
-    @IBAction func artworkPressed(_ sender: Any) {
-        rootView?.controlView?.displayPlaylistPressed()
-    }
-    @IBAction func titlePressed(_ sender: Any) {
-        rootView?.displayAlbumDetail()
-        rootView?.displayPodcastDetail()
-    }
-    @IBAction func artistNamePressed(_ sender: Any) {
-        rootView?.displayArtistDetail()
-        rootView?.displayPodcastDetail()
-    }
+  private var rootView: PopupPlayerVC?
 
-    @IBAction func favoritePressed(_ sender: Any) {
-        rootView?.favoritePressed()
-        rootView?.refreshFavoriteButton(button: favoriteButton)
-    }
-    
+  @IBOutlet
+  weak var artworkImage: LibraryEntityImage!
+  @IBOutlet
+  weak var titleLabel: MarqueeLabel!
+  @IBOutlet
+  weak var artistLabel: MarqueeLabel!
+  @IBOutlet
+  weak var favoriteButton: UIButton!
+  @IBOutlet
+  weak var optionsButton: UIButton!
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+  }
+
+  func prepare(toWorkOnRootView: PopupPlayerVC?) {
+    rootView = toWorkOnRootView
+    titleLabel.applyAmperfyStyle()
+    artistLabel.applyAmperfyStyle()
+    refresh()
+  }
+
+  func refresh() {
+    rootView?.refreshCurrentlyPlayingInfo(
+      artworkImage: artworkImage,
+      titleLabel: titleLabel,
+      artistLabel: artistLabel
+    )
+    rootView?.refreshFavoriteButton(button: favoriteButton)
+    rootView?.refreshOptionButton(button: optionsButton, rootView: rootView)
+  }
+
+  func refreshArtwork() {
+    rootView?.refreshArtwork(artworkImage: artworkImage)
+  }
+
+  @IBAction
+  func artworkPressed(_ sender: Any) {
+    rootView?.controlView?.displayPlaylistPressed()
+  }
+
+  @IBAction
+  func titlePressed(_ sender: Any) {
+    rootView?.displayAlbumDetail()
+    rootView?.displayPodcastDetail()
+  }
+
+  @IBAction
+  func artistNamePressed(_ sender: Any) {
+    rootView?.displayArtistDetail()
+    rootView?.displayPodcastDetail()
+  }
+
+  @IBAction
+  func favoritePressed(_ sender: Any) {
+    rootView?.favoritePressed()
+    rootView?.refreshFavoriteButton(button: favoriteButton)
+  }
 }

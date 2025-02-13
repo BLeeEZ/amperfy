@@ -19,42 +19,42 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 public class PlaylistItem: NSObject {
+  public let managedObject: PlaylistItemMO
+  private let library: LibraryStorage
 
-    public let managedObject: PlaylistItemMO
-    private let library: LibraryStorage
-    
-    public init(library: LibraryStorage, managedObject: PlaylistItemMO) {
-        self.library = library
-        self.managedObject = managedObject
-    }
-    
-    public var objectID: NSManagedObjectID {
-        return managedObject.objectID
-    }
+  public init(library: LibraryStorage, managedObject: PlaylistItemMO) {
+    self.library = library
+    self.managedObject = managedObject
+  }
 
-    public var order: Int {
-        get { return Int(managedObject.order) }
-        set {
-            guard Int32.isValid(value: newValue), managedObject.order != Int32(newValue) else { return }
-            managedObject.order = Int32(newValue)
-        }
-     }
-    public var playable: AbstractPlayable {
-        get { return AbstractPlayable(managedObject: managedObject.playable) }
-        set { managedObject.playable = newValue.playableManagedObject }
-    }
-    public var playlist: Playlist {
-        get { return Playlist(library: library, managedObject: managedObject.playlist) }
-        set { managedObject.playlist = newValue.managedObject }
-    }
-    
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? PlaylistItem else { return false }
-        return managedObject == object.managedObject
-    }
+  public var objectID: NSManagedObjectID {
+    managedObject.objectID
+  }
 
+  public var order: Int {
+    get { Int(managedObject.order) }
+    set {
+      guard Int32.isValid(value: newValue), managedObject.order != Int32(newValue) else { return }
+      managedObject.order = Int32(newValue)
+    }
+  }
+
+  public var playable: AbstractPlayable {
+    get { AbstractPlayable(managedObject: managedObject.playable) }
+    set { managedObject.playable = newValue.playableManagedObject }
+  }
+
+  public var playlist: Playlist {
+    get { Playlist(library: library, managedObject: managedObject.playlist) }
+    set { managedObject.playlist = newValue.managedObject }
+  }
+
+  override public func isEqual(_ object: Any?) -> Bool {
+    guard let object = object as? PlaylistItem else { return false }
+    return managedObject == object.managedObject
+  }
 }

@@ -19,13 +19,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 public class MigrationPolicyV4toV5: NSEntityMigrationPolicy {
-
-    @objc func stringId(forIntId:NSNumber) -> NSString {
-        return forIntId.stringValue as NSString
-    }
-
+  @objc
+  func stringId(forIntId: NSNumber) -> NSString {
+    forIntId.stringValue as NSString
+  }
 }

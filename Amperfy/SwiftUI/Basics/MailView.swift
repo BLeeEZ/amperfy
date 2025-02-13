@@ -19,86 +19,101 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import MessageUI
 import SwiftUI
 import UIKit
-import MessageUI
+
+// MARK: - MailAttachment
 
 struct MailAttachment {
-    var data: Data?
-    var mimeType: String
-    var fileName: String
+  var data: Data?
+  var mimeType: String
+  var fileName: String
 }
+
+// MARK: - MailView
 
 struct MailView: UIViewControllerRepresentable {
-    
-    @Environment(\.presentationMode) var presentation
-    @Binding var result: Result<MFMailComposeResult, Error>?
-    var subject: String
-    var messageBody: String
-    var recipients: [String]
-    var attachments: [MailAttachment]
-    
-    class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
-        
-        @Binding var presentation: PresentationMode
-        @Binding var result: Result<MFMailComposeResult, Error>?
-        
-        init(presentation: Binding<PresentationMode>,
-             result: Binding<Result<MFMailComposeResult, Error>?>) {
-            _presentation = presentation
-            _result = result
-        }
-        
-        func mailComposeController(_ controller: MFMailComposeViewController,
-                                   didFinishWith result: MFMailComposeResult,
-                                   error: Error?) {
-            defer {
-                $presentation.wrappedValue.dismiss()
-            }
-            guard error == nil else {
-                self.result = .failure(error!)
-                return
-            }
-            self.result = .success(result)
-        }
+  @Environment(\.presentationMode)
+  var presentation
+  @Binding
+  var result: Result<MFMailComposeResult, Error>?
+  var subject: String
+  var messageBody: String
+  var recipients: [String]
+  var attachments: [MailAttachment]
+
+  class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+    @Binding
+    var presentation: PresentationMode
+    @Binding
+    var result: Result<MFMailComposeResult, Error>?
+
+    init(
+      presentation: Binding<PresentationMode>,
+      result: Binding<Result<MFMailComposeResult, Error>?>
+    ) {
+      _presentation = presentation
+      _result = result
     }
-    
-    func makeCoordinator() -> Coordinator {
-        return Coordinator(presentation: presentation,
-                           result: $result)
+
+    func mailComposeController(
+      _ controller: MFMailComposeViewController,
+      didFinishWith result: MFMailComposeResult,
+      error: Error?
+    ) {
+      defer {
+        $presentation.wrappedValue.dismiss()
+      }
+      guard error == nil else {
+        self.result = .failure(error!)
+        return
+      }
+      self.result = .success(result)
     }
-    
-    func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>) -> MFMailComposeViewController {
-        let vc = MFMailComposeViewController()
-        vc.setSubject(subject)
-        vc.setMessageBody(messageBody, isHTML: false)
-        vc.setToRecipients(recipients)
-        for attachment in attachments {
-            if let data = attachment.data {
-                vc.addAttachmentData(data, mimeType: attachment.mimeType, fileName: attachment.fileName)
-            }
-        }
-        vc.mailComposeDelegate = context.coordinator
-        return vc
+  }
+
+  func makeCoordinator() -> Coordinator {
+    Coordinator(
+      presentation: presentation,
+      result: $result
+    )
+  }
+
+  func makeUIViewController(context: UIViewControllerRepresentableContext<MailView>)
+    -> MFMailComposeViewController {
+    let vc = MFMailComposeViewController()
+    vc.setSubject(subject)
+    vc.setMessageBody(messageBody, isHTML: false)
+    vc.setToRecipients(recipients)
+    for attachment in attachments {
+      if let data = attachment.data {
+        vc.addAttachmentData(data, mimeType: attachment.mimeType, fileName: attachment.fileName)
+      }
     }
-    
-    func updateUIViewController(_ uiViewController: MFMailComposeViewController,
-                                context: UIViewControllerRepresentableContext<MailView>) {
-        
-    }
+    vc.mailComposeDelegate = context.coordinator
+    return vc
+  }
+
+  func updateUIViewController(
+    _ uiViewController: MFMailComposeViewController,
+    context: UIViewControllerRepresentableContext<MailView>
+  ) {}
 }
 
+// MARK: - MailView_Previews
+
 struct MailView_Previews: PreviewProvider {
-    
-    @State static var result: Result<MFMailComposeResult, Error>? = nil
-    
-    static var previews: some View {
-        MailView(
-            result: $result,
-            subject: "",
-            messageBody: "",
-            recipients: [],
-            attachments: []
-        )
-    }
+  @State
+  static var result: Result<MFMailComposeResult, Error>? = nil
+
+  static var previews: some View {
+    MailView(
+      result: $result,
+      subject: "",
+      messageBody: "",
+      recipients: [],
+      attachments: []
+    )
+  }
 }

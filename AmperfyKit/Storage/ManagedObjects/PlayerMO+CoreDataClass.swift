@@ -19,10 +19,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(PlayerMO)
-public class PlayerMO: NSManagedObject {
-
-}
+public class PlayerMO: NSManagedObject {}

@@ -19,110 +19,138 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
-class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO>, PlaylistVCAddable {
+class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO>,
+  PlaylistVCAddable {
+  override var sceneTitle: String? { album.name }
 
-    override var sceneTitle: String? { album.name }
+  public var album: Album!
+  public var addToPlaylistManager = AddToPlaylistManager()
 
-    public var album: Album!
-    public var addToPlaylistManager = AddToPlaylistManager()
+  private var fetchedResultsController: AlbumSongsFetchedResultsController!
+  private var doneButton: UIBarButtonItem!
 
-    private var fetchedResultsController: AlbumSongsFetchedResultsController!
-    private var doneButton: UIBarButtonItem!
-
-    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
-        let source = AlbumDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
-            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
-                  let songMO = object as? SongMO
-            else {
-                fatalError("Managed object should be available")
-            }
-            let song = Song(managedObject: songMO)
-            return self.createCell(tableView, forRowAt: indexPath, song: song)
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+      AlbumDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let songMO = object as? SongMO
+        else {
+          fatalError("Managed object should be available")
         }
-        return source
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        doneButton = addToPlaylistManager.createDoneButton()
-        navigationItem.rightBarButtonItems = [doneButton]
+        let song = Song(managedObject: songMO)
+        return self.createCell(tableView, forRowAt: indexPath, song: song)
+      }
+    return source
+  }
 
-        fetchedResultsController = AlbumSongsFetchedResultsController(forAlbum: album, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        singleFetchedResultsController = fetchedResultsController
-        singleFetchedResultsController?.delegate = self
-        singleFetchedResultsController?.fetch()
-        
-        configureSearchController(placeholder: "Search in \"Album\"", scopeButtonTitles: ["All", "Cached"])
-        tableView.register(nibName: PlayableTableCell.typeName)
-        tableView.rowHeight = PlayableTableCell.rowHeight
-        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
-        tableView.sectionHeaderHeight = 0.0
-        tableView.estimatedSectionHeaderHeight = 0.0
-        tableView.sectionFooterHeight = 0.0
-        tableView.estimatedSectionFooterHeight = 0.0
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        updateTitle()
-        addToPlaylistManager.configuteToolbar(viewVC: self, selectButtonSelector: #selector(selectAllButtonPressed))
-        
-        guard self.appDelegate.storage.settings.isOnlineMode else { return }
-        Task { @MainActor in do {
-            try await album.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-        } catch {
-            self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
-        }}
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        addToPlaylistManager.hideToolbar(viewVC: self)
-    }
-    
-    @IBAction func selectAllButtonPressed(_ sender: UIBarButtonItem) {
-        if let songs = singleFetchedResultsController?.fetchedObjects?.compactMap({ Song(managedObject: $0) }) {
-            addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
-                self.tableView.reloadData()
-                self.updateTitle()
-            })
-        }
-    }
-    
-    func updateTitle() {
-        setNavBarTitle(title: addToPlaylistManager.title)
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
 
-    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, song: Song) -> UITableViewCell {
-        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-        cell.display(playable: song,
-                     displayMode: .add,
-                     playContextCb: nil,
-                     rootView: self,
-                     isDislayAlbumTrackNumberStyle: true,
-                     isMarked: addToPlaylistManager.contains(playable: song))
-        return cell
+    doneButton = addToPlaylistManager.createDoneButton()
+    navigationItem.rightBarButtonItems = [doneButton]
+
+    fetchedResultsController = AlbumSongsFetchedResultsController(
+      forAlbum: album,
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
+
+    configureSearchController(
+      placeholder: "Search in \"Album\"",
+      scopeButtonTitles: ["All", "Cached"]
+    )
+    tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.rowHeight = PlayableTableCell.rowHeight
+    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+  }
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    updateTitle()
+    addToPlaylistManager.configuteToolbar(
+      viewVC: self,
+      selectButtonSelector: #selector(selectAllButtonPressed)
+    )
+
+    guard appDelegate.storage.settings.isOnlineMode else { return }
+    Task { @MainActor in do {
+      try await album.fetch(
+        storage: self.appDelegate.storage,
+        librarySyncer: self.appDelegate.librarySyncer,
+        playableDownloadManager: self.appDelegate.playableDownloadManager
+      )
+    } catch {
+      self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
+    }}
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    addToPlaylistManager.hideToolbar(viewVC: self)
+  }
+
+  @IBAction
+  func selectAllButtonPressed(_ sender: UIBarButtonItem) {
+    if let songs = singleFetchedResultsController?.fetchedObjects?
+      .compactMap({ Song(managedObject: $0) }) {
+      addToPlaylistManager.toggleSelection(playables: songs, rootVC: self, doneCB: {
+        self.tableView.reloadData()
+        self.updateTitle()
+      })
     }
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
-        
-        let item = fetchedResultsController.getWrappedEntity(at: indexPath)
-        if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
-            addToPlaylistManager.toggleSelection(playable: item, rootVC: self) {
-                cell.isMarked = $0
-                cell.refresh()
-                self.updateTitle()
-            }
-        }
+  }
+
+  func updateTitle() {
+    setNavBarTitle(title: addToPlaylistManager.title)
+  }
+
+  func createCell(
+    _ tableView: UITableView,
+    forRowAt indexPath: IndexPath,
+    song: Song
+  )
+    -> UITableViewCell {
+    let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+    cell.display(
+      playable: song,
+      displayMode: .add,
+      playContextCb: nil,
+      rootView: self,
+      isDislayAlbumTrackNumberStyle: true,
+      isMarked: addToPlaylistManager.contains(playable: song)
+    )
+    return cell
+  }
+
+  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.deselectRow(at: indexPath, animated: false)
+
+    let item = fetchedResultsController.getWrappedEntity(at: indexPath)
+    if let cell = tableView.cellForRow(at: indexPath) as? PlayableTableCell {
+      addToPlaylistManager.toggleSelection(playable: item, rootVC: self) {
+        cell.isMarked = $0
+        cell.refresh()
+        self.updateTitle()
+      }
     }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(searchText: searchController.searchBar.text ?? "", onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1 )
-        tableView.reloadData()
-    }
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    fetchedResultsController.search(
+      searchText: searchController.searchBar.text ?? "",
+      onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+    )
+    tableView.reloadData()
+  }
 }

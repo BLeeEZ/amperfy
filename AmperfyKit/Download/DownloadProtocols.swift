@@ -19,41 +19,52 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 public typealias CompleteHandlerBlock = @MainActor () -> ()
 
-@MainActor public protocol DownloadManageable {
-    var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get set }
-    func download(object: Downloadable)
-    func download(objects: [Downloadable])
-    func removeFinishedDownload(for object: Downloadable)
-    func removeFinishedDownload(for objects: [Downloadable])
-    func clearFinishedDownloads()
-    func resetFailedDownloads()
-    func cancelDownloads()
-    func cancelPlayableDownloads()
-    func start()
-    func stop()
+// MARK: - DownloadManageable
+
+@MainActor
+public protocol DownloadManageable {
+  var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get set }
+  func download(object: Downloadable)
+  func download(objects: [Downloadable])
+  func removeFinishedDownload(for object: Downloadable)
+  func removeFinishedDownload(for objects: [Downloadable])
+  func clearFinishedDownloads()
+  func resetFailedDownloads()
+  func cancelDownloads()
+  func cancelPlayableDownloads()
+  func start()
+  func stop()
 }
+
+// MARK: - DownloadManagerDelegate
 
 public protocol DownloadManagerDelegate {
-    var requestPredicate: NSPredicate { get }
-    var parallelDownloadsCount: Int { get }
-    @MainActor func prepareDownload(download: Download) async throws -> URL
-    @MainActor func validateDownloadedData(download: Download) -> ResponseError?
-    @MainActor func completedDownload(download: Download, storage: PersistentStorage) async
-    @MainActor func failedDownload(download: Download, storage: PersistentStorage)
+  var requestPredicate: NSPredicate { get }
+  var parallelDownloadsCount: Int { get }
+  @MainActor
+  func prepareDownload(download: Download) async throws -> URL
+  @MainActor
+  func validateDownloadedData(download: Download) -> ResponseError?
+  @MainActor
+  func completedDownload(download: Download, storage: PersistentStorage) async
+  @MainActor
+  func failedDownload(download: Download, storage: PersistentStorage)
 }
 
+// MARK: - Downloadable
+
 public protocol Downloadable: CustomEquatable {
-    var objectID: NSManagedObjectID { get }
-    var isCached: Bool { get }
-    var displayString: String { get }
-    var threadSafeInfo: DownloadInfo? { get }
+  var objectID: NSManagedObjectID { get }
+  var isCached: Bool { get }
+  var displayString: String { get }
+  var threadSafeInfo: DownloadInfo? { get }
 }
 
 extension Downloadable {
-    public var uniqueID: String { return objectID.uriRepresentation().absoluteString }
+  public var uniqueID: String { objectID.uriRepresentation().absoluteString }
 }

@@ -19,40 +19,45 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 class CommonCollectionSectionHeader: UICollectionReusableView {
-    
-    static let frameHeight: CGFloat = 30.0
-    
-    @IBOutlet weak var titleLabel: UILabel!
-    
-    private var detailHeader: LibraryElementDetailTableHeaderView?
-    
-    func display(title: String?) {
-        titleLabel.text = title
-        titleLabel.isHidden = (title == nil)
+  static let frameHeight: CGFloat = 30.0
+
+  @IBOutlet
+  weak var titleLabel: UILabel!
+
+  private var detailHeader: LibraryElementDetailTableHeaderView?
+
+  func display(title: String?) {
+    titleLabel.text = title
+    titleLabel.isHidden = (title == nil)
+  }
+
+  func displayPlayHeader(configuration: PlayShuffleInfoConfiguration) {
+    detailHeader = ViewCreator<LibraryElementDetailTableHeaderView>
+      .createFromNib(withinFixedFrame: CGRect(
+        x: 0,
+        y: 0,
+        width: bounds.size.width,
+        height: LibraryElementDetailTableHeaderView.frameHeight
+      ))
+    detailHeader?.prepare(configuration: configuration)
+    detailHeader?.traitCollectionDidChange(nil)
+    if let detailHeader = detailHeader {
+      addSubview(detailHeader)
     }
-    
-    func displayPlayHeader(configuration: PlayShuffleInfoConfiguration) {
-        detailHeader = ViewCreator<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: self.bounds.size.width, height: LibraryElementDetailTableHeaderView.frameHeight))
-        detailHeader?.prepare(configuration: configuration)
-        detailHeader?.traitCollectionDidChange(nil)
-        if let detailHeader = detailHeader {
-            self.addSubview(detailHeader)
-        }
-    }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        detailHeader?.traitCollectionDidChange(previousTraitCollection)
-    }
-    
-    override func prepareForReuse() {
-        detailHeader?.removeFromSuperview()
-        detailHeader?.isHidden = true
-        detailHeader = nil
-    }
-    
+  }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    detailHeader?.traitCollectionDidChange(previousTraitCollection)
+  }
+
+  override func prepareForReuse() {
+    detailHeader?.removeFromSuperview()
+    detailHeader?.isHidden = true
+    detailHeader = nil
+  }
 }

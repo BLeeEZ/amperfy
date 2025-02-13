@@ -19,52 +19,56 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
 class SsPlaylistsParserTest: AbstractSsParserTest {
-    
-    override func setUp() async throws {
-        try await super.setUp()
-        xmlData = getTestFileData(name: "playlists_example_1")
-        ssParserDelegate = SsPlaylistParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
-    }
-    
-    override func recreateParserDelegate() {
-        ssParserDelegate = SsPlaylistParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
-    }
-    
-    func testLibraryContainsBeforeMorePlaylistsThenAfter() {
-        for i in 20...30 {
-            let playlist = library.createPlaylist()
-            playlist.id = i.description
-            playlist.name = i.description
-        }
-        recreateParserDelegate()
-        testParsing()
-    }
-    
-    override func checkCorrectParsing() {
-        let playlists = library.getPlaylists()
-        XCTAssertEqual(playlists.count, 2)
-        
-        var playlist = playlists[1]
-        XCTAssertEqual(playlist.id, "15")
-        XCTAssertEqual(playlist.name, "Some random songs")
-        XCTAssertEqual(playlist.songCount, 6)
-        XCTAssertEqual(playlist.remoteSongCount, 6)
-        XCTAssertEqual(playlist.duration, 1391)
-        XCTAssertEqual(playlist.remoteDuration, 1391)
-        XCTAssertFalse(playlist.isCached)
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = getTestFileData(name: "playlists_example_1")
+    ssParserDelegate = SsPlaylistParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      library: library
+    )
+  }
 
-        playlist = playlists[0]
-        XCTAssertEqual(playlist.id, "16")
-        XCTAssertEqual(playlist.name, "More random songs")
-        XCTAssertEqual(playlist.songCount, 5)
-        XCTAssertEqual(playlist.remoteSongCount, 5)
-        XCTAssertEqual(playlist.duration, 1018)
-        XCTAssertEqual(playlist.remoteDuration, 1018)
-        XCTAssertFalse(playlist.isCached)
-    }
+  override func recreateParserDelegate() {
+    ssParserDelegate = SsPlaylistParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      library: library
+    )
+  }
 
+  func testLibraryContainsBeforeMorePlaylistsThenAfter() {
+    for i in 20 ... 30 {
+      let playlist = library.createPlaylist()
+      playlist.id = i.description
+      playlist.name = i.description
+    }
+    recreateParserDelegate()
+    testParsing()
+  }
+
+  override func checkCorrectParsing() {
+    let playlists = library.getPlaylists()
+    XCTAssertEqual(playlists.count, 2)
+
+    var playlist = playlists[1]
+    XCTAssertEqual(playlist.id, "15")
+    XCTAssertEqual(playlist.name, "Some random songs")
+    XCTAssertEqual(playlist.songCount, 6)
+    XCTAssertEqual(playlist.remoteSongCount, 6)
+    XCTAssertEqual(playlist.duration, 1391)
+    XCTAssertEqual(playlist.remoteDuration, 1391)
+    XCTAssertFalse(playlist.isCached)
+
+    playlist = playlists[0]
+    XCTAssertEqual(playlist.id, "16")
+    XCTAssertEqual(playlist.name, "More random songs")
+    XCTAssertEqual(playlist.songCount, 5)
+    XCTAssertEqual(playlist.remoteSongCount, 5)
+    XCTAssertEqual(playlist.duration, 1018)
+    XCTAssertEqual(playlist.remoteDuration, 1018)
+    XCTAssertFalse(playlist.isCached)
+  }
 }

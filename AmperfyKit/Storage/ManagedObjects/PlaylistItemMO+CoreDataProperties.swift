@@ -19,26 +19,28 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension PlaylistItemMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<PlaylistItemMO> {
+    NSFetchRequest<PlaylistItemMO>(entityName: "PlaylistItem")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlaylistItemMO> {
-        return NSFetchRequest<PlaylistItemMO>(entityName: "PlaylistItem")
-    }
+  @NSManaged
+  public var order: Int32
+  @NSManaged
+  public var playable: AbstractPlayableMO
+  @NSManaged
+  public var playlist: PlaylistMO
+  @NSManaged
+  public var playlistArtworkItem: PlaylistMO?
 
-    @NSManaged public var order: Int32
-    @NSManaged public var playable: AbstractPlayableMO
-    @NSManaged public var playlist: PlaylistMO
-    @NSManaged public var playlistArtworkItem: PlaylistMO?
-
-    static let relationshipKeyPathsForPrefetching = [
-        #keyPath(PlaylistItemMO.playlistArtworkItem),
-        #keyPath(PlaylistItemMO.playable),
-        #keyPath(PlaylistItemMO.playable.artwork),
-        #keyPath(PlaylistItemMO.playable.embeddedArtwork),
-    ]
-    
+  static let relationshipKeyPathsForPrefetching = [
+    #keyPath(PlaylistItemMO.playlistArtworkItem),
+    #keyPath(PlaylistItemMO.playable),
+    #keyPath(PlaylistItemMO.playable.artwork),
+    #keyPath(PlaylistItemMO.playable.embeddedArtwork),
+  ]
 }

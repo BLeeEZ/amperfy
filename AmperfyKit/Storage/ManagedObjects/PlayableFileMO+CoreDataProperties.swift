@@ -19,17 +19,17 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension PlayableFileMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<PlayableFileMO> {
+    NSFetchRequest<PlayableFileMO>(entityName: "PlayableFile")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<PlayableFileMO> {
-        return NSFetchRequest<PlayableFileMO>(entityName: "PlayableFile")
-    }
-
-    @NSManaged public var data: Data?
-    @NSManaged public var info: AbstractPlayableMO?
-
+  @NSManaged
+  public var data: Data?
+  @NSManaged
+  public var info: AbstractPlayableMO?
 }

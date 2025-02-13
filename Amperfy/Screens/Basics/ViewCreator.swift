@@ -19,24 +19,23 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
-@MainActor class ViewCreator<ViewType: UIView> {
-    
-    static func createFromNib() -> ViewType? {
-        return UINib(
-            nibName: ViewType.typeName,
-            bundle: nil
-            ).instantiate(withOwner: nil, options: nil)[0] as? ViewType
+@MainActor
+class ViewCreator<ViewType: UIView> {
+  static func createFromNib() -> ViewType? {
+    UINib(
+      nibName: ViewType.typeName,
+      bundle: nil
+    ).instantiate(withOwner: nil, options: nil)[0] as? ViewType
+  }
+
+  static func createFromNib(withinFixedFrame rect: CGRect) -> ViewType? {
+    guard let nibView: ViewType = createFromNib() else {
+      return nil
     }
-    
-    static func createFromNib(withinFixedFrame rect: CGRect) -> ViewType? {
-        guard let nibView: ViewType = createFromNib() else {
-            return nil
-        }
-        nibView.frame = rect
-        return nibView
-    }
-    
+    nibView.frame = rect
+    return nibView
+  }
 }

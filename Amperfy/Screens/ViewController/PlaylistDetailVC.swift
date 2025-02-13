@@ -19,219 +19,274 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
 import CoreData
+import UIKit
+
+// MARK: - PlaylistDetailDiffableDataSource
 
 class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
-    
-    var playlist: Playlist!
-    var isMoveAllowed = false
-    var isEditAllowed = true
+  var playlist: Playlist!
+  var isMoveAllowed = false
+  var isEditAllowed = true
 
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return isMoveAllowed
-    }
-    
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return true to be enable swipe
-        return isEditAllowed
-    }
+  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    // Return false if you do not want the item to be re-orderable.
+    isMoveAllowed
+  }
 
-    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        exectueAfterAnimation {
-            self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
-            
-            guard self.appDelegate.storage.settings.isOnlineMode else { return }
-            Task { @MainActor in do {
-                try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
-            } catch {
-                self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
-            }}
-        }
-        super.tableView(tableView, moveRowAt: sourceIndexPath, to: destinationIndexPath)
+  override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+    // Return true to be enable swipe
+    isEditAllowed
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    moveRowAt sourceIndexPath: IndexPath,
+    to destinationIndexPath: IndexPath
+  ) {
+    exectueAfterAnimation {
+      self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
+
+      guard self.appDelegate.storage.settings.isOnlineMode else { return }
+      Task { @MainActor in do {
+        try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
+      }}
     }
-    
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard editingStyle == .delete else { return }
-        exectueAfterAnimation {
-            self.playlist?.remove(at: indexPath.row)
-            guard self.appDelegate.storage.settings.isOnlineMode else { return }
-            Task { @MainActor in do {
-                try await self.appDelegate.librarySyncer.syncUpload(playlistToDeleteSong: self.playlist, index: indexPath.row)
-            } catch {
-                self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
-            }}
-        }
-        super.tableView(tableView, commit: editingStyle, forRowAt: indexPath)
+    super.tableView(tableView, moveRowAt: sourceIndexPath, to: destinationIndexPath)
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    commit editingStyle: UITableViewCell.EditingStyle,
+    forRowAt indexPath: IndexPath
+  ) {
+    guard editingStyle == .delete else { return }
+    exectueAfterAnimation {
+      self.playlist?.remove(at: indexPath.row)
+      guard self.appDelegate.storage.settings.isOnlineMode else { return }
+      Task { @MainActor in do {
+        try await self.appDelegate.librarySyncer.syncUpload(
+          playlistToDeleteSong: self.playlist,
+          index: indexPath.row
+        )
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
+      }}
     }
-    
+    super.tableView(tableView, commit: editingStyle, forRowAt: indexPath)
+  }
 }
 
+// MARK: - PlaylistDetailVC
+
 class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<PlaylistItemMO> {
+  override var sceneTitle: String? { playlist.name }
 
-    override var sceneTitle: String? { playlist.name }
+  private var fetchedResultsController: PlaylistItemsFetchedResultsController!
+  var playlist: Playlist!
 
-    private var fetchedResultsController: PlaylistItemsFetchedResultsController!
-    var playlist: Playlist!
-    
-    private var editButton: UIBarButtonItem!
-    private var optionsButton: UIBarButtonItem!
-    var detailOperationsView: GenericDetailTableHeader?
-    
-    override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
-        let source = PlaylistDetailDiffableDataSource(tableView: tableView) { (tableView, indexPath, objectID) -> UITableViewCell? in
-            guard let object = try? self.appDelegate.storage.main.context.existingObject(with: objectID),
-                  let playlistItemMO = object as? PlaylistItemMO
-            else {
-                return UITableViewCell()
-            }
-            let playlistItem = PlaylistItem(library: self.appDelegate.storage.main.library, managedObject: playlistItemMO)
-            return self.createCell(tableView, forRowAt: indexPath, playlistItem: playlistItem)
+  private var editButton: UIBarButtonItem!
+  private var optionsButton: UIBarButtonItem!
+  var detailOperationsView: GenericDetailTableHeader?
+
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+      PlaylistDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let playlistItemMO = object as? PlaylistItemMO
+        else {
+          return UITableViewCell()
         }
-        source.playlist = playlist
-        return source
+        let playlistItem = PlaylistItem(
+          library: self.appDelegate.storage.main.library,
+          managedObject: playlistItemMO
+        )
+        return self.createCell(tableView, forRowAt: indexPath, playlistItem: playlistItem)
+      }
+    source.playlist = playlist
+    return source
+  }
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    #if !targetEnvironment(macCatalyst)
+      refreshControl = UIRefreshControl()
+    #endif
+
+    appDelegate.userStatistics.visited(.playlistDetail)
+    fetchedResultsController = PlaylistItemsFetchedResultsController(
+      forPlaylist: playlist,
+      coreDataCompanion: appDelegate.storage.main,
+      isGroupedInAlphabeticSections: false
+    )
+    singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
+
+    tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.rowHeight = PlayableTableCell.rowHeight
+    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+
+    // Use a single button, two buttons don't work on catalyst
+    editButton = UIBarButtonItem(
+      title: "Edit",
+      style: .plain,
+      target: self,
+      action: #selector(openEditView)
+    )
+    optionsButton = OptionsBarButton()
+
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
+      infoCB: { "\(self.playlist.songCount) Song\(self.playlist.songCount == 1 ? "" : "s")" },
+      playContextCb: { () in PlayContext(
+        containable: self.playlist,
+        playables: self.fetchedResultsController
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+      ) },
+      player: appDelegate.player,
+      isInfoAlwaysHidden: true
+    )
+    let detailHeaderConfig = DetailHeaderConfiguration(
+      entityContainer: playlist,
+      rootView: self,
+      tableView: tableView,
+      playShuffleInfoConfig: playShuffleInfoConfig
+    )
+    detailOperationsView = GenericDetailTableHeader
+      .createTableHeader(configuration: detailHeaderConfig)
+    refreshControl?.addTarget(
+      self,
+      action: #selector(Self.handleRefresh),
+      for: UIControl.Event.valueChanged
+    )
 
-        #if !targetEnvironment(macCatalyst)
-        self.refreshControl = UIRefreshControl()
-        #endif
+    snapshotDidChange = detailOperationsView?.refresh
 
-        appDelegate.userStatistics.visited(.playlistDetail)
-        fetchedResultsController = PlaylistItemsFetchedResultsController(forPlaylist: playlist, coreDataCompanion: appDelegate.storage.main, isGroupedInAlphabeticSections: false)
-        singleFetchedResultsController = fetchedResultsController
-        singleFetchedResultsController?.delegate = self
-        singleFetchedResultsController?.fetch()
-        
-        tableView.register(nibName: PlayableTableCell.typeName)
-        tableView.rowHeight = PlayableTableCell.rowHeight
-        tableView.estimatedRowHeight = PlayableTableCell.rowHeight
-
-        // Use a single button, two buttons don't work on catalyst
-        editButton = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(openEditView))
-        optionsButton = OptionsBarButton()
-
-        optionsButton.menu = UIMenu.lazyMenu {
-            EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
-        }
-        
-        let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-            infoCB: { "\(self.playlist.songCount) Song\(self.playlist.songCount == 1 ? "" : "s")" },
-            playContextCb: {() in PlayContext(containable: self.playlist, playables: self.fetchedResultsController.getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? [])},
-            player: appDelegate.player,
-            isInfoAlwaysHidden: true)
-        let detailHeaderConfig = DetailHeaderConfiguration(entityContainer: playlist, rootView: self, tableView: tableView, playShuffleInfoConfig: playShuffleInfoConfig)
-        detailOperationsView = GenericDetailTableHeader.createTableHeader(configuration: detailHeaderConfig)
-        self.refreshControl?.addTarget(self, action: #selector(Self.handleRefresh), for: UIControl.Event.valueChanged)
-        
-        snapshotDidChange = self.detailOperationsView?.refresh
-        
-        containableAtIndexPathCallback = { (indexPath) in
-            return self.fetchedResultsController.getWrappedEntity(at: indexPath).playable
-        }
-        playContextAtIndexPathCallback = { (indexPath) in
-            return self.convertIndexPathToPlayContext(songIndexPath: indexPath)
-        }
-        swipeCallback = { (indexPath, completionHandler) in
-            let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
-            let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
-            completionHandler(SwipeActionContext(containable: playlistItem.playable, playContext: playContext))
-        }
-
-        #if targetEnvironment(macCatalyst)
-            if #available(iOS 16.0, *) {
-                navigationItem.preferredSearchBarPlacement = .inline
-            }
-        #endif
+    containableAtIndexPathCallback = { indexPath in
+      self.fetchedResultsController.getWrappedEntity(at: indexPath).playable
     }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        if appDelegate.storage.settings.isOfflineMode {
-            tableView.isEditing = false
-        }
-        refreshBarButtons()
-        Task { @MainActor in
-            do {
-                try await playlist.fetch(storage: self.appDelegate.storage, librarySyncer: self.appDelegate.librarySyncer, playableDownloadManager: self.appDelegate.playableDownloadManager)
-            } catch {
-                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-            }
-            self.detailOperationsView?.refresh()
-        }
+    playContextAtIndexPathCallback = { indexPath in
+      self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+    }
+    swipeCallback = { indexPath, completionHandler in
+      let playlistItem = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
+      completionHandler(SwipeActionContext(
+        containable: playlistItem.playable,
+        playContext: playContext
+      ))
     }
 
-    func refreshBarButtons() {
-        var edititingBarButton: UIBarButtonItem? = nil
+    #if targetEnvironment(macCatalyst)
+      if #available(iOS 16.0, *) {
+        navigationItem.preferredSearchBarPlacement = .inline
+      }
+    #endif
+  }
 
-        if appDelegate.storage.settings.isOnlineMode {
-            edititingBarButton = editButton
-            edititingBarButton?.title = "Edit"
-            edititingBarButton?.style = .plain
-            if playlist?.isSmartPlaylist ?? false {
-                edititingBarButton?.isEnabled = false
-            }
-        }
-        
-#if targetEnvironment(macCatalyst)
-        navigationItem.leftItemsSupplementBackButton = true
-        navigationItem.rightBarButtonItem = optionsButton
-        navigationItem.leftBarButtonItem = edititingBarButton
-#else
-        navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap{$0}
-#endif
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    if appDelegate.storage.settings.isOfflineMode {
+      tableView.isEditing = false
     }
-    
-    func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
-        guard let songs = fetchedResultsController.getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
-        else { return nil }
-        return PlayContext(containable: playlist, index: songIndexPath.row, playables: songs)
+    refreshBarButtons()
+    Task { @MainActor in
+      do {
+        try await playlist.fetch(
+          storage: self.appDelegate.storage,
+          librarySyncer: self.appDelegate.librarySyncer,
+          playableDownloadManager: self.appDelegate.playableDownloadManager
+        )
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+      }
+      self.detailOperationsView?.refresh()
     }
-    
-    func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
-        guard let indexPath = tableView.indexPath(for: cell)
-        else { return nil }
-        return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
-    }
+  }
 
-    @objc private func openEditView(sender: UIBarButtonItem) {
-        let playlistDetailVC = PlaylistEditVC.instantiateFromAppStoryboard()
-        playlistDetailVC.playlist = self.playlist
-        let playlistDetailNav = UINavigationController(rootViewController: playlistDetailVC)
-        playlistDetailVC.onDoneCB = {
-            self.detailOperationsView?.refresh()
-            self.tableView.reloadData()
-        }
-        self.present(playlistDetailNav, animated: true, completion: nil)
+  func refreshBarButtons() {
+    var edititingBarButton: UIBarButtonItem? = nil
+
+    if appDelegate.storage.settings.isOnlineMode {
+      edititingBarButton = editButton
+      edititingBarButton?.title = "Edit"
+      edititingBarButton?.style = .plain
+      if playlist?.isSmartPlaylist ?? false {
+        edititingBarButton?.isEnabled = false
+      }
     }
 
-    func createCell(_ tableView: UITableView, forRowAt indexPath: IndexPath, playlistItem: PlaylistItem) -> UITableViewCell {
-        let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
-        if let song = playlistItem.playable.asSong {
-            cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self)
-        }
-        return cell
-    }
-    
-    override func updateSearchResults(for searchController: UISearchController) {
-        fetchedResultsController.search(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
-        tableView.reloadData()
-    }
-    
-    @objc func handleRefresh(refreshControl: UIRefreshControl) {
-        Task { @MainActor in
-            do {
-                try await self.appDelegate.librarySyncer.syncDown(playlist: playlist)
-            } catch {
-                self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
-            }
-            self.detailOperationsView?.refresh()
-            self.refreshControl?.endRefreshing()
-        }
-    }
+    #if targetEnvironment(macCatalyst)
+      navigationItem.leftItemsSupplementBackButton = true
+      navigationItem.rightBarButtonItem = optionsButton
+      navigationItem.leftBarButtonItem = edititingBarButton
+    #else
+      navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap { $0 }
+    #endif
+  }
 
+  func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
+    guard let songs = fetchedResultsController
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+    else { return nil }
+    return PlayContext(containable: playlist, index: songIndexPath.row, playables: songs)
+  }
+
+  func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
+    guard let indexPath = tableView.indexPath(for: cell)
+    else { return nil }
+    return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
+  }
+
+  @objc
+  private func openEditView(sender: UIBarButtonItem) {
+    let playlistDetailVC = PlaylistEditVC.instantiateFromAppStoryboard()
+    playlistDetailVC.playlist = playlist
+    let playlistDetailNav = UINavigationController(rootViewController: playlistDetailVC)
+    playlistDetailVC.onDoneCB = {
+      self.detailOperationsView?.refresh()
+      self.tableView.reloadData()
+    }
+    present(playlistDetailNav, animated: true, completion: nil)
+  }
+
+  func createCell(
+    _ tableView: UITableView,
+    forRowAt indexPath: IndexPath,
+    playlistItem: PlaylistItem
+  )
+    -> UITableViewCell {
+    let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
+    if let song = playlistItem.playable.asSong {
+      cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self)
+    }
+    return cell
+  }
+
+  override func updateSearchResults(for searchController: UISearchController) {
+    fetchedResultsController.search(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+    tableView.reloadData()
+  }
+
+  @objc
+  func handleRefresh(refreshControl: UIRefreshControl) {
+    Task { @MainActor in
+      do {
+        try await self.appDelegate.librarySyncer.syncDown(playlist: playlist)
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
+      }
+      self.detailOperationsView?.refresh()
+      self.refreshControl?.endRefreshing()
+    }
+  }
 }

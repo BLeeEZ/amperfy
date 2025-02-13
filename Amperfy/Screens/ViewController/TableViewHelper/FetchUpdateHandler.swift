@@ -22,77 +22,110 @@
 import CoreData
 import UIKit
 
-@MainActor class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate {
-    
-    private let tableView: UITableView
-    
-    public init(tableView: UITableView) {
-        self.tableView = tableView
-    }
-    
-    nonisolated public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        MainActor.assumeIsolated {
-            tableView.beginUpdates()
-        }
-    }
-    
-    nonisolated public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        MainActor.assumeIsolated {
-            tableView.endUpdates()
-        }
-    }
-    
-    nonisolated public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        MainActor.assumeIsolated {
-            self.applyChangesFromFetchedResultsController(at: indexPath, for: type, newIndexPath: newIndexPath)
-        }
-    }
+@MainActor
+class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate {
+  private let tableView: UITableView
 
-    public func applyChangesOfMultiRowType(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, determinedSection section: Int, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        var adjustedIndexPath: IndexPath?
-        if let indexPath = indexPath {
-            adjustedIndexPath = IndexPath(row: indexPath.row, section: section)
-        }
-        var adjustedNewIndexPath: IndexPath?
-        if let newIndexPath = newIndexPath {
-            adjustedNewIndexPath = IndexPath(row: newIndexPath.row, section: section)
-        }
-        self.applyChangesFromFetchedResultsController(at: adjustedIndexPath, for: type, newIndexPath: adjustedNewIndexPath)
+  public init(tableView: UITableView) {
+    self.tableView = tableView
+  }
+
+  nonisolated public func controllerWillChangeContent(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>
+  ) {
+    MainActor.assumeIsolated {
+      tableView.beginUpdates()
     }
-    
-    private func applyChangesFromFetchedResultsController(at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        switch type {
-        case .insert:
-            tableView.insertRows(at: [newIndexPath!], with: .bottom)
-        case .delete:
-            tableView.deleteRows(at: [indexPath!], with: .left)
-        case .move:
-            if indexPath! != newIndexPath! {
-                tableView.insertRows(at: [newIndexPath!], with: .bottom)
-                tableView.deleteRows(at: [indexPath!], with: .left)
-            } else {
-                tableView.insertRows(at: [newIndexPath!], with: .none)
-                tableView.deleteRows(at: [indexPath!], with: .none)
-            }
-        case .update:
-            tableView.reconfigureRows(at: [indexPath!])
-        @unknown default:
-            break
-        }
+  }
+
+  nonisolated public func controllerDidChangeContent(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>
+  ) {
+    MainActor.assumeIsolated {
+      tableView.endUpdates()
     }
-    
-    nonisolated public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange sectionInfo: NSFetchedResultsSectionInfo, atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType) {
-        MainActor.assumeIsolated {
-            let indexSet = IndexSet(integer: sectionIndex)
-            switch type {
-            case .insert:
-                tableView.insertSections(indexSet, with: .automatic)
-            case .delete:
-                tableView.deleteSections(indexSet, with: .automatic)
-            default:
-                break
-            }
-        }
+  }
+
+  nonisolated public func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
+    MainActor.assumeIsolated {
+      self.applyChangesFromFetchedResultsController(
+        at: indexPath,
+        for: type,
+        newIndexPath: newIndexPath
+      )
     }
-    
+  }
+
+  public func applyChangesOfMultiRowType(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    determinedSection section: Int,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
+    var adjustedIndexPath: IndexPath?
+    if let indexPath = indexPath {
+      adjustedIndexPath = IndexPath(row: indexPath.row, section: section)
+    }
+    var adjustedNewIndexPath: IndexPath?
+    if let newIndexPath = newIndexPath {
+      adjustedNewIndexPath = IndexPath(row: newIndexPath.row, section: section)
+    }
+    applyChangesFromFetchedResultsController(
+      at: adjustedIndexPath,
+      for: type,
+      newIndexPath: adjustedNewIndexPath
+    )
+  }
+
+  private func applyChangesFromFetchedResultsController(
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
+    switch type {
+    case .insert:
+      tableView.insertRows(at: [newIndexPath!], with: .bottom)
+    case .delete:
+      tableView.deleteRows(at: [indexPath!], with: .left)
+    case .move:
+      if indexPath! != newIndexPath! {
+        tableView.insertRows(at: [newIndexPath!], with: .bottom)
+        tableView.deleteRows(at: [indexPath!], with: .left)
+      } else {
+        tableView.insertRows(at: [newIndexPath!], with: .none)
+        tableView.deleteRows(at: [indexPath!], with: .none)
+      }
+    case .update:
+      tableView.reconfigureRows(at: [indexPath!])
+    @unknown default:
+      break
+    }
+  }
+
+  nonisolated public func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange sectionInfo: NSFetchedResultsSectionInfo,
+    atSectionIndex sectionIndex: Int,
+    for type: NSFetchedResultsChangeType
+  ) {
+    MainActor.assumeIsolated {
+      let indexSet = IndexSet(integer: sectionIndex)
+      switch type {
+      case .insert:
+        tableView.insertSections(indexSet, with: .automatic)
+      case .delete:
+        tableView.deleteSections(indexSet, with: .automatic)
+      default:
+        break
+      }
+    }
+  }
 }

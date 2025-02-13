@@ -19,22 +19,20 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - LogEntryMO
 
 @objc(LogEntryMO)
-public class LogEntryMO: NSManagedObject {
-
-}
+public class LogEntryMO: NSManagedObject {}
 
 extension LogEntryMO {
-    
-    public static var creationDateSortedFetchRequest: NSFetchRequest<LogEntryMO> {
-        let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: #keyPath(LogEntryMO.creationDate), ascending: false)
-        ]
-        return fetchRequest
-    }
-
+  public static var creationDateSortedFetchRequest: NSFetchRequest<LogEntryMO> {
+    let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(LogEntryMO.creationDate), ascending: false),
+    ]
+    return fetchRequest
+  }
 }

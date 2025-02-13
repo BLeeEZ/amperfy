@@ -21,96 +21,100 @@
 
 import SwiftUI
 
-struct XCallbackURLsSetttingsView: View {
-    
-    var body: some View {
-        ZStack {
-            SettingsList {
-                Section {
-                    Text("Amperfy's X-Callback-URL API can be used to perform actions from other Apps or via Siri Shortcuts. All available actions with their detail information can be found below:")
-                        .font(.caption)
-                }
-                ForEach(appDelegate.intentManager.documentation, id: \.self) { actionDocu in
-                    Section {
-                        VStack(alignment: .leading) {
-                            Text(actionDocu.name)
-                                .font(.subheadline)
-                                .fontWeight(.bold)
-                                .foregroundColor(.accentColor)
-                                .padding([.top], 8)
-                            Text("\(actionDocu.description)")
-                                .font(.caption)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding([.top, .bottom], 8)
-                            Text("Action: \(actionDocu.action)")
-                                .font(.caption)
-                                .padding([.bottom], 8)
-                            Text("Example URLs:")
-                                .font(.caption)
-                                .underline()
-                                .padding([.bottom], 4)
-                            ForEach(actionDocu.exampleURLs, id: \.self) { url in
-                                HStack {
-                                    Text("- " + url)
-                                        .font(.caption)
-                                        .padding([.leading, .bottom], 8)
-                                    Spacer()
-                                    copyToPasteBoardButton(for: url)
-                                }
-                            }
+// MARK: - XCallbackURLsSetttingsView
 
-                            if !actionDocu.parameters.isEmpty {
-                                Text("Parameters:")
-                                    .font(.caption)
-                                    .underline()
-                                    .padding([.top], 8)
-                            }
-                            ForEach(actionDocu.parameters, id: \.self) { para in
-                                Text("\(para.name) \(para.isMandatory ? "(mandatory)" : "")")
-                                    .font(.caption)
-                                    .fontWeight(.bold)
-                                    .padding([.top], 4)
-                                Text("Type: \(para.type)")
-                                    .font(.caption)
-                                    .padding([.leading], 8)
-                                Text("Description: \(para.description)")
-                                    .font(.caption)
-                                    .padding([.leading], 8)
-                                if !para.isMandatory, let defaultValue = para.defaultIfNotGiven {
-                                    Text("Default: \(defaultValue)")
-                                        .font(.caption)
-                                        .padding([.leading], 8)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+struct XCallbackURLsSetttingsView: View {
+  var body: some View {
+    ZStack {
+      SettingsList {
+        Section {
+          Text(
+            "Amperfy's X-Callback-URL API can be used to perform actions from other Apps or via Siri Shortcuts. All available actions with their detail information can be found below:"
+          )
+          .font(.caption)
         }
-        .navigationTitle("X-Callback-URL Documentation")
-        .navigationBarTitleDisplayMode(.inline)
+        ForEach(appDelegate.intentManager.documentation, id: \.self) { actionDocu in
+          Section {
+            VStack(alignment: .leading) {
+              Text(actionDocu.name)
+                .font(.subheadline)
+                .fontWeight(.bold)
+                .foregroundColor(.accentColor)
+                .padding([.top], 8)
+              Text("\(actionDocu.description)")
+                .font(.caption)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding([.top, .bottom], 8)
+              Text("Action: \(actionDocu.action)")
+                .font(.caption)
+                .padding([.bottom], 8)
+              Text("Example URLs:")
+                .font(.caption)
+                .underline()
+                .padding([.bottom], 4)
+              ForEach(actionDocu.exampleURLs, id: \.self) { url in
+                HStack {
+                  Text("- " + url)
+                    .font(.caption)
+                    .padding([.leading, .bottom], 8)
+                  Spacer()
+                  copyToPasteBoardButton(for: url)
+                }
+              }
+
+              if !actionDocu.parameters.isEmpty {
+                Text("Parameters:")
+                  .font(.caption)
+                  .underline()
+                  .padding([.top], 8)
+              }
+              ForEach(actionDocu.parameters, id: \.self) { para in
+                Text("\(para.name) \(para.isMandatory ? "(mandatory)" : "")")
+                  .font(.caption)
+                  .fontWeight(.bold)
+                  .padding([.top], 4)
+                Text("Type: \(para.type)")
+                  .font(.caption)
+                  .padding([.leading], 8)
+                Text("Description: \(para.description)")
+                  .font(.caption)
+                  .padding([.leading], 8)
+                if !para.isMandatory, let defaultValue = para.defaultIfNotGiven {
+                  Text("Default: \(defaultValue)")
+                    .font(.caption)
+                    .padding([.leading], 8)
+                }
+              }
+            }
+          }
+        }
+      }
     }
+    .navigationTitle("X-Callback-URL Documentation")
+    .navigationBarTitleDisplayMode(.inline)
+  }
 }
 
 extension XCallbackURLsSetttingsView {
-    
-    /// Generates a button with an action to set the given URL to the system pasteBoard.
-    func copyToPasteBoardButton(for url: String) -> some View {
-        Button(action: {
-            copyToPasteBoard(url: url)
-        }, label: {
-            Image(systemName: "document.on.document")
-        })
-        .buttonStyle(.borderless)
-    }
-    
-    private func copyToPasteBoard(url: String) {
-        UIPasteboard.general.string = url
-    }
+  /// Generates a button with an action to set the given URL to the system pasteBoard.
+  func copyToPasteBoardButton(for url: String) -> some View {
+    Button(action: {
+      copyToPasteBoard(url: url)
+    }, label: {
+      Image(systemName: "document.on.document")
+    })
+    .buttonStyle(.borderless)
+  }
+
+  private func copyToPasteBoard(url: String) {
+    UIPasteboard.general.string = url
+  }
 }
 
+// MARK: - XCallbackURLsSetttingsView_Previews
+
 struct XCallbackURLsSetttingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        XCallbackURLsSetttingsView()
-    }
+  static var previews: some View {
+    XCallbackURLsSetttingsView()
+  }
 }

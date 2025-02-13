@@ -19,50 +19,57 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 class GenericTableCell: BasicTableCell {
-    
-    @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var subtitleLabel: UILabel!
-    @IBOutlet weak var entityImage: EntityImageView!
-    @IBOutlet weak var infoLabel: UILabel!
-    @IBOutlet weak var favoriteIconImage: UIImageView!
-    
-    @IBOutlet weak var infoLabelWidthConstraint: NSLayoutConstraint!
-    
-    static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
-    static let rowHeightWithoutImage: CGFloat = 28.0 + margin.bottom + margin.top
-    
-    private var container: PlayableContainable?
-    private var rootView: UITableViewController?
-    
-    func display(container: PlayableContainable, rootView: UITableViewController) {
-        self.container = container
-        self.rootView = rootView
-        self.selectionStyle = .none
-        titleLabel.text = container.name
-        subtitleLabel.isHidden = container.subtitle == nil
-        subtitleLabel.text = container.subtitle
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container)
-        let infoText = container.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
-        infoLabel.isHidden = infoText.isEmpty
-        infoLabel.text = infoText
-        infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left
-        favoriteIconImage.isHidden = !container.isFavorite
-        favoriteIconImage.tintColor = .red
-        
-        if container is Album {
-            infoLabelWidthConstraint.constant = 75
-        } else if container is Artist {
-            infoLabelWidthConstraint.constant = 230
-        } else if container is Genre {
-            infoLabelWidthConstraint.constant = 260
-        } else if container is Podcast {
-            infoLabelWidthConstraint.constant = 140
-        }
-        self.accessoryType = .disclosureIndicator
-    }
+  @IBOutlet
+  weak var titleLabel: UILabel!
+  @IBOutlet
+  weak var subtitleLabel: UILabel!
+  @IBOutlet
+  weak var entityImage: EntityImageView!
+  @IBOutlet
+  weak var infoLabel: UILabel!
+  @IBOutlet
+  weak var favoriteIconImage: UIImageView!
 
+  @IBOutlet
+  weak var infoLabelWidthConstraint: NSLayoutConstraint!
+
+  static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
+  static let rowHeightWithoutImage: CGFloat = 28.0 + margin.bottom + margin.top
+
+  private var container: PlayableContainable?
+  private var rootView: UITableViewController?
+
+  func display(container: PlayableContainable, rootView: UITableViewController) {
+    self.container = container
+    self.rootView = rootView
+    selectionStyle = .none
+    titleLabel.text = container.name
+    subtitleLabel.isHidden = container.subtitle == nil
+    subtitleLabel.text = container.subtitle
+    entityImage.display(theme: appDelegate.storage.settings.themePreference, container: container)
+    let infoText = container.info(
+      for: appDelegate.backendApi.selectedApi,
+      details: DetailInfoType(type: .short, settings: appDelegate.storage.settings)
+    )
+    infoLabel.isHidden = infoText.isEmpty
+    infoLabel.text = infoText
+    infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left
+    favoriteIconImage.isHidden = !container.isFavorite
+    favoriteIconImage.tintColor = .red
+
+    if container is Album {
+      infoLabelWidthConstraint.constant = 75
+    } else if container is Artist {
+      infoLabelWidthConstraint.constant = 230
+    } else if container is Genre {
+      infoLabelWidthConstraint.constant = 260
+    } else if container is Podcast {
+      infoLabelWidthConstraint.constant = 140
+    }
+    accessoryType = .disclosureIndicator
+  }
 }

@@ -19,208 +19,238 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
-import OSLog
 import AmperfyKit
+import OSLog
 import SwiftUI
+import UIKit
+
+// MARK: - SettingsSceneDelegate
 
 class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
+  public lazy var log = {
+    AmperKit.shared.log
+  }()
 
-    public lazy var log = {
-        return AmperKit.shared.log
-    }()
+  var window: UIWindow?
 
-    var window: UIWindow?
+  func scene(
+    _ scene: UIScene,
+    willConnectTo session: UISceneSession,
+    options connectionOptions: UIScene.ConnectionOptions
+  ) {
+    os_log("Settings: willConnectTo", log: self.log, type: .info)
 
+    // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
+    // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
+    // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+    guard let windowScene = scene as? UIWindowScene else { return }
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        os_log("Settings: willConnectTo", log: self.log, type: .info)
+    appDelegate.settingsSceneSession = session
 
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let windowScene = scene as? UIWindowScene else { return }
-
-        self.appDelegate.settingsSceneSession = session
-
-        self.window = UIWindow(windowScene: windowScene)
-        self.window?.backgroundColor = .clear
-
-        #if targetEnvironment(macCatalyst)
-        buildMacToolbar()
-
-        AppDelegate.configureUtilityWindow(persistentIdentifier: windowScene.session.persistentIdentifier, properties: ["auxiliary": true])
-
-        selectTarget(.general)
-        #endif
-
-        self.window?.makeKeyAndVisible()
-    }
+    window = UIWindow(windowScene: windowScene)
+    window?.backgroundColor = .clear
 
     #if targetEnvironment(macCatalyst)
-    func buildMacToolbar() {
-        guard let windowScene = window?.windowScene else {
-            return
-        }
+      buildMacToolbar()
 
-        windowScene.title = windowSettingsTitle
+      AppDelegate.configureUtilityWindow(
+        persistentIdentifier: windowScene.session.persistentIdentifier,
+        properties: ["auxiliary": true]
+      )
 
-        if let titleBar = windowScene.titlebar {
-            let toolbar = NSToolbar(identifier: "Settings")
-            toolbar.delegate = self
-            toolbar.selectedItemIdentifier = NavigationTarget.general.toolbarIdentifier
-            titleBar.toolbarStyle = .preference
-            titleBar.toolbar = toolbar
-        }
-    }
+      selectTarget(.general)
     #endif
 
-    /** Called when the user activates your application by selecting a shortcut on the Home Screen,
-        and the window scene is already connected.
-    */
-    /// - Tag: PerformAction
-    func windowScene(_ windowScene: UIWindowScene,
-                     performActionFor shortcutItem: UIApplicationShortcutItem,
-                     completionHandler: @escaping (Bool) -> Void) {
-        os_log("Settings: windowScene shortcutItem", log: self.log, type: .info)
+    window?.makeKeyAndVisible()
+  }
+
+  #if targetEnvironment(macCatalyst)
+    func buildMacToolbar() {
+      guard let windowScene = window?.windowScene else {
+        return
+      }
+
+      windowScene.title = windowSettingsTitle
+
+      if let titleBar = windowScene.titlebar {
+        let toolbar = NSToolbar(identifier: "Settings")
+        toolbar.delegate = self
+        toolbar.selectedItemIdentifier = NavigationTarget.general.toolbarIdentifier
+        titleBar.toolbarStyle = .preference
+        titleBar.toolbar = toolbar
+      }
     }
+  #endif
 
-    func sceneDidDisconnect(_ scene: UIScene) {
-        // Called as the scene is being released by the system.
-        // This occurs shortly after the scene enters the background, or when its session is discarded.
-        // Release any resources associated with this scene that can be re-created the next time the scene connects.
-        // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
-        os_log("Settings: sceneDidDisconnect", log: self.log, type: .info)
-    }
+  /** Called when the user activates your application by selecting a shortcut on the Home Screen,
+       and the window scene is already connected.
+   */
+  /// - Tag: PerformAction
+  func windowScene(
+    _ windowScene: UIWindowScene,
+    performActionFor shortcutItem: UIApplicationShortcutItem,
+    completionHandler: @escaping (Bool) -> ()
+  ) {
+    os_log("Settings: windowScene shortcutItem", log: self.log, type: .info)
+  }
 
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        // Called when the scene has moved from an inactive state to an active state.
-        // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
-        os_log("Settings: sceneDidBecomeActive", log: self.log, type: .info)
-    }
+  func sceneDidDisconnect(_ scene: UIScene) {
+    // Called as the scene is being released by the system.
+    // This occurs shortly after the scene enters the background, or when its session is discarded.
+    // Release any resources associated with this scene that can be re-created the next time the scene connects.
+    // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
+    os_log("Settings: sceneDidDisconnect", log: self.log, type: .info)
+  }
 
-    func sceneWillResignActive(_ scene: UIScene) {
-        // Called when the scene will move from an active state to an inactive state.
-        // This may occur due to temporary interruptions (ex. an incoming phone call).
-        os_log("Settings: sceneWillResignActive", log: self.log, type: .info)
-    }
+  func sceneDidBecomeActive(_ scene: UIScene) {
+    // Called when the scene has moved from an inactive state to an active state.
+    // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+    os_log("Settings: sceneDidBecomeActive", log: self.log, type: .info)
+  }
 
-    func sceneWillEnterForeground(_ scene: UIScene) {
-        // Called as the scene transitions from the background to the foreground.
-        // Use this method to undo the changes made on entering the background.
-        os_log("Settings: sceneWillEnterForeground", log: self.log, type: .info)
-    }
+  func sceneWillResignActive(_ scene: UIScene) {
+    // Called when the scene will move from an active state to an inactive state.
+    // This may occur due to temporary interruptions (ex. an incoming phone call).
+    os_log("Settings: sceneWillResignActive", log: self.log, type: .info)
+  }
 
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        // Called as the scene transitions from the foreground to the background.
-        // Use this method to save data, release shared resources, and store enough scene-specific state information
-        // to restore the scene back to its current state.
+  func sceneWillEnterForeground(_ scene: UIScene) {
+    // Called as the scene transitions from the background to the foreground.
+    // Use this method to undo the changes made on entering the background.
+    os_log("Settings: sceneWillEnterForeground", log: self.log, type: .info)
+  }
 
-        // Save changes in the application's managed object context when the application transitions to the background.
-        os_log("Settings: sceneDidEnterBackground", log: self.log, type: .info)
-    }
+  func sceneDidEnterBackground(_ scene: UIScene) {
+    // Called as the scene transitions from the foreground to the background.
+    // Use this method to save data, release shared resources, and store enough scene-specific state information
+    // to restore the scene back to its current state.
 
-    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        os_log("Settings: openURLContexts", log: self.log, type: .info)
-    }
+    // Save changes in the application's managed object context when the application transitions to the background.
+    os_log("Settings: sceneDidEnterBackground", log: self.log, type: .info)
+  }
 
-    // This is the NSUserActivity that will be used to restore state when the Scene reconnects.
-    // It can be the same activity used for handoff or spotlight, or it can be a separate activity
-    // with a different activity type and/or userInfo.
-    // After this method is called, and before the activity is actually saved in the restoration file,
-    // if the returned NSUserActivity has a delegate (NSUserActivityDelegate), the method
-    // userActivityWillSave is called on the delegate. Additionally, if any UIResponders
-    // have the activity set as their userActivity property, the UIResponder updateUserActivityState
-    // method is called to update the activity. This is done synchronously and ensures the activity
-    // has all info filled in before it is saved.
-    func stateRestorationActivity(for scene: UIScene) -> NSUserActivity? {
-        os_log("Settings: stateRestorationActivity", log: self.log, type: .info)
-        return nil
-    }
+  func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+    os_log("Settings: openURLContexts", log: self.log, type: .info)
+  }
 
-    // This will be called after scene connection, but before activation, and will provide the
-    // activity that was last supplied to the stateRestorationActivityForScene callback, or
-    // set on the UISceneSession.stateRestorationActivity property.
-    // Note that, if it's required earlier, this activity is also already available in the
-    // UISceneSession.stateRestorationActivity at scene connection time.
-    func scene(_ scene: UIScene, restoreInteractionStateWith stateRestorationActivity: NSUserActivity) {
-        os_log("Settings: restoreInteractionStateWith", log: self.log, type: .info)
-    }
+  // This is the NSUserActivity that will be used to restore state when the Scene reconnects.
+  // It can be the same activity used for handoff or spotlight, or it can be a separate activity
+  // with a different activity type and/or userInfo.
+  // After this method is called, and before the activity is actually saved in the restoration file,
+  // if the returned NSUserActivity has a delegate (NSUserActivityDelegate), the method
+  // userActivityWillSave is called on the delegate. Additionally, if any UIResponders
+  // have the activity set as their userActivity property, the UIResponder updateUserActivityState
+  // method is called to update the activity. This is done synchronously and ensures the activity
+  // has all info filled in before it is saved.
+  func stateRestorationActivity(for scene: UIScene) -> NSUserActivity? {
+    os_log("Settings: stateRestorationActivity", log: self.log, type: .info)
+    return nil
+  }
 
-    func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
-        os_log("Settings: willContinueUserActivityWithType", log: self.log, type: .info)
-    }
+  // This will be called after scene connection, but before activation, and will provide the
+  // activity that was last supplied to the stateRestorationActivityForScene callback, or
+  // set on the UISceneSession.stateRestorationActivity property.
+  // Note that, if it's required earlier, this activity is also already available in the
+  // UISceneSession.stateRestorationActivity at scene connection time.
+  func scene(
+    _ scene: UIScene,
+    restoreInteractionStateWith stateRestorationActivity: NSUserActivity
+  ) {
+    os_log("Settings: restoreInteractionStateWith", log: self.log, type: .info)
+  }
 
-    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        os_log("Settings: scene launch via userActivity: %s", log: self.log, type: .info, userActivity.activityType)
-    }
+  func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
+    os_log("Settings: willContinueUserActivityWithType", log: self.log, type: .info)
+  }
 
-    func scene(_ scene: UIScene, didFailToContinueUserActivityWithType userActivityType: String, error: Error) {
-        os_log("Settings: didFailToContinueUserActivityWithType", log: self.log, type: .info)
-    }
+  func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+    os_log(
+      "Settings: scene launch via userActivity: %s",
+      log: self.log,
+      type: .info,
+      userActivity.activityType
+    )
+  }
 
-    func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
-        os_log("Settings: didUpdate userActivity: %s", log: self.log, type: .info, userActivity.activityType)
-    }
+  func scene(
+    _ scene: UIScene,
+    didFailToContinueUserActivityWithType userActivityType: String,
+    error: Error
+  ) {
+    os_log("Settings: didFailToContinueUserActivityWithType", log: self.log, type: .info)
+  }
 
+  func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
+    os_log(
+      "Settings: didUpdate userActivity: %s",
+      log: self.log,
+      type: .info,
+      userActivity.activityType
+    )
+  }
 }
 
 #if targetEnvironment(macCatalyst)
-extension SettingsSceneDelegate: NSToolbarDelegate {
-
+  extension SettingsSceneDelegate: NSToolbarDelegate {
     func toolbarIdentifiers() -> [NSToolbarItem.Identifier] {
-        return NavigationTarget.allCases.map {
-            NSToolbarItem.Identifier($0.rawValue)
-        }
+      NavigationTarget.allCases.map {
+        NSToolbarItem.Identifier($0.rawValue)
+      }
     }
 
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return toolbarIdentifiers()
+      toolbarIdentifiers()
     }
 
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return toolbarIdentifiers()
+      toolbarIdentifiers()
     }
 
     func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        return toolbarIdentifiers()
+      toolbarIdentifiers()
     }
 
-    func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+    func toolbar(
+      _ toolbar: NSToolbar,
+      itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
+      willBeInsertedIntoToolbar flag: Bool
+    )
+      -> NSToolbarItem? {
+      let item = NSToolbarItem(itemIdentifier: itemIdentifier)
 
-        let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-
-        guard let navTarget = NavigationTarget(rawValue: itemIdentifier.rawValue) else {
-            return item
-        }
-
-        item.target = self
-        item.isBordered = false
-        item.image = navTarget.icon
-        item.label = navTarget.displayName
-        item.action = #selector(selectTab(_:))
-
+      guard let navTarget = NavigationTarget(rawValue: itemIdentifier.rawValue) else {
         return item
+      }
+
+      item.target = self
+      item.isBordered = false
+      item.image = navTarget.icon
+      item.label = navTarget.displayName
+      item.action = #selector(selectTab(_:))
+
+      return item
     }
 
-    @objc func selectTab(_ item: NSToolbarItem) {
-        guard let navigationTarget = NavigationTarget(rawValue: item.itemIdentifier.rawValue) else { return }
-        self.selectTarget(navigationTarget)
+    @objc
+    func selectTab(_ item: NSToolbarItem) {
+      guard let navigationTarget = NavigationTarget(rawValue: item.itemIdentifier.rawValue)
+      else { return }
+      selectTarget(navigationTarget)
     }
 
     func selectTarget(_ navigationTarget: NavigationTarget) {
-        let hostingController = SettingsHostVC(target: navigationTarget)
-        self.window?.rootViewController = hostingController
+      let hostingController = SettingsHostVC(target: navigationTarget)
+      window?.rootViewController = hostingController
 
-        // Change the window size for the selected tab
-        let fixedSize = navigationTarget.fittingWindowSize
-        
-        // This line is important to guarantee that the fullscreen option is not enabled after switching a tab
-        if #available(macCatalyst 16.0, *) {
-            self.window?.windowScene?.sizeRestrictions?.allowsFullScreen = false
-        }
-        self.window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
-        self.window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
+      // Change the window size for the selected tab
+      let fixedSize = navigationTarget.fittingWindowSize
+
+      // This line is important to guarantee that the fullscreen option is not enabled after switching a tab
+      if #available(macCatalyst 16.0, *) {
+        self.window?.windowScene?.sizeRestrictions?.allowsFullScreen = false
+      }
+      window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
+      window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
     }
-}
+  }
 #endif

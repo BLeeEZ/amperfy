@@ -21,38 +21,39 @@
 
 import Foundation
 
-public struct LibraryChangeDates: Comparable, Sendable {
+// MARK: - LibraryChangeDates
 
-    var dateOfLastUpdate = Date()
-    var dateOfLastAdd = Date()
-    var dateOfLastClean = Date()
-    
-    public static func < (lhs: LibraryChangeDates, rhs: LibraryChangeDates) -> Bool {
-        switch lhs.dateOfLastAdd.compare(rhs.dateOfLastAdd) {
-        case .orderedAscending: return true
-        case .orderedDescending: return false
-        case .orderedSame: return true
-        }
+public struct LibraryChangeDates: Comparable, Sendable {
+  var dateOfLastUpdate = Date()
+  var dateOfLastAdd = Date()
+  var dateOfLastClean = Date()
+
+  public static func < (lhs: LibraryChangeDates, rhs: LibraryChangeDates) -> Bool {
+    switch lhs.dateOfLastAdd.compare(rhs.dateOfLastAdd) {
+    case .orderedAscending: return true
+    case .orderedDescending: return false
+    case .orderedSame: return true
     }
-    
-    public static func == (lhs: LibraryChangeDates, rhs: LibraryChangeDates) -> Bool {
-        return ((lhs.dateOfLastUpdate == rhs.dateOfLastUpdate) && (lhs.dateOfLastAdd == rhs.dateOfLastAdd) && (lhs.dateOfLastClean == rhs.dateOfLastClean))
-    }
-    
+  }
+
+  public static func == (lhs: LibraryChangeDates, rhs: LibraryChangeDates) -> Bool {
+    (lhs.dateOfLastUpdate == rhs.dateOfLastUpdate) && (lhs.dateOfLastAdd == rhs.dateOfLastAdd) &&
+      (lhs.dateOfLastClean == rhs.dateOfLastClean)
+  }
 }
 
-struct AuthentificationHandshake: Sendable {
-    
-    var token: String = ""
-    var sessionExpire = Date()
-    var reauthenicateTime = Date()
-    var libraryChangeDates = LibraryChangeDates()
-    var songCount: Int = 0
-    var artistCount: Int = 0
-    var albumCount: Int = 0
-    var genreCount: Int = 0
-    var playlistCount: Int = 0
-    var podcastCount: Int = 0
-    var videoCount: Int = 0
+// MARK: - AuthentificationHandshake
 
+struct AuthentificationHandshake: Sendable {
+  var token: String = ""
+  var sessionExpire = Date()
+  var reauthenicateTime = Date()
+  var libraryChangeDates = LibraryChangeDates()
+  var songCount: Int = 0
+  var artistCount: Int = 0
+  var albumCount: Int = 0
+  var genreCount: Int = 0
+  var playlistCount: Int = 0
+  var podcastCount: Int = 0
+  var videoCount: Int = 0
 }

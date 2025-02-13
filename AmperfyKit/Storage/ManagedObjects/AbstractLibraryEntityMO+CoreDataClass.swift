@@ -19,16 +19,18 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
 @objc(AbstractLibraryEntityMO)
 public class AbstractLibraryEntityMO: NSManagedObject {
-
-    static var excludeRemoteDeleteFetchPredicate: NSPredicate {
-        return NSCompoundPredicate(orPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == %i", #keyPath(AbstractLibraryEntityMO.remoteStatus), RemoteStatus.available.rawValue)
-        ])
-    }
-    
+  static var excludeRemoteDeleteFetchPredicate: NSPredicate {
+    NSCompoundPredicate(orPredicateWithSubpredicates: [
+      NSPredicate(
+        format: "%K == %i",
+        #keyPath(AbstractLibraryEntityMO.remoteStatus),
+        RemoteStatus.available.rawValue
+      ),
+    ])
+  }
 }

@@ -20,28 +20,31 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
+import UIKit
 
 extension UIBehavioralStyle {
-    #if targetEnvironment(macCatalyst)
+  #if targetEnvironment(macCatalyst)
     static var defaultStyle: UIBehavioralStyle { .mac }
-    #else
+  #else
     static var defaultStyle: UIBehavioralStyle { .pad }
-    #endif
+  #endif
 }
 
-@MainActor protocol BehavioralStylable {
-    var behavioralStyle: UIBehavioralStyle { get }
-    var preferredBehavioralStyle: UIBehavioralStyle { get set }
+// MARK: - BehavioralStylable
+
+@MainActor
+protocol BehavioralStylable {
+  var behavioralStyle: UIBehavioralStyle { get }
+  var preferredBehavioralStyle: UIBehavioralStyle { get set }
 }
 
 extension BehavioralStylable where Self: View {
-    var behavioralStyle: UIBehavioralStyle { self.preferredBehavioralStyle }
+  var behavioralStyle: UIBehavioralStyle { preferredBehavioralStyle }
 
-    func preferredBehavioralStyle(_ style:  UIBehavioralStyle) -> some View {
-        var copy = self
-        copy.preferredBehavioralStyle = style
-        return copy
-    }
+  func preferredBehavioralStyle(_ style: UIBehavioralStyle) -> some View {
+    var copy = self
+    copy.preferredBehavioralStyle = style
+    return copy
+  }
 }

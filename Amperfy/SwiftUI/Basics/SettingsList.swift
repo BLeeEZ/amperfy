@@ -22,26 +22,27 @@
 import Foundation
 import SwiftUI
 
-struct SettingsList<Content: View>: View, BehavioralStylable {    
-    @State var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
-    let content: () -> Content
-    
-    init(@ViewBuilder content:  @escaping () -> Content) {
-        self.content = content
-    }
+struct SettingsList<Content: View>: View, BehavioralStylable {
+  @State
+  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
+  let content: () -> Content
 
-    var body: some View {
-        if (self.behavioralStyle == .mac), #available(iOS 16, *) {
-            List {
-                self.content()
-            }
-            .background(Color.clear)
-            .scrollContentBackground(.hidden)
-        } else {
-            List {
-                self.content()
-            }
-            .background(Color.clear)
-        }
+  init(@ViewBuilder content: @escaping () -> Content) {
+    self.content = content
+  }
+
+  var body: some View {
+    if behavioralStyle == .mac, #available(iOS 16, *) {
+      List {
+        self.content()
+      }
+      .background(Color.clear)
+      .scrollContentBackground(.hidden)
+    } else {
+      List {
+        content()
+      }
+      .background(Color.clear)
     }
+  }
 }

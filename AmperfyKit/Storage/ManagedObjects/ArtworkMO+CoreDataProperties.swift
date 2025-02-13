@@ -19,40 +19,49 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
-
+import Foundation
 
 extension ArtworkMO {
+  @nonobjc
+  public class func fetchRequest() -> NSFetchRequest<ArtworkMO> {
+    NSFetchRequest<ArtworkMO>(entityName: "Artwork")
+  }
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<ArtworkMO> {
-        return NSFetchRequest<ArtworkMO>(entityName: "Artwork")
-    }
-
-    @NSManaged public var id: String
-    @NSManaged public var imageData: Data? /// deprecated! use relFilePath instead
-    @NSManaged public var relFilePath: String?
-    @NSManaged public var status: Int16
-    @NSManaged public var type: String
-    @NSManaged public var url: String?
-    @NSManaged public var download: DownloadMO?
-    @NSManaged public var owners: NSSet?
-
+  @NSManaged
+  public var id: String
+  @NSManaged
+  public var imageData: Data? /// deprecated! use relFilePath instead
+  @NSManaged
+  public var relFilePath: String?
+  @NSManaged
+  public var status: Int16
+  @NSManaged
+  public var type: String
+  @NSManaged
+  public var url: String?
+  @NSManaged
+  public var download: DownloadMO?
+  @NSManaged
+  public var owners: NSSet?
 }
 
 // MARK: Generated accessors for owners
+
 extension ArtworkMO {
+  @objc(addOwnersObject:)
+  @NSManaged
+  public func addToOwners(_ value: AbstractLibraryEntityMO)
 
-    @objc(addOwnersObject:)
-    @NSManaged public func addToOwners(_ value: AbstractLibraryEntityMO)
+  @objc(removeOwnersObject:)
+  @NSManaged
+  public func removeFromOwners(_ value: AbstractLibraryEntityMO)
 
-    @objc(removeOwnersObject:)
-    @NSManaged public func removeFromOwners(_ value: AbstractLibraryEntityMO)
+  @objc(addOwners:)
+  @NSManaged
+  public func addToOwners(_ values: NSSet)
 
-    @objc(addOwners:)
-    @NSManaged public func addToOwners(_ values: NSSet)
-
-    @objc(removeOwners:)
-    @NSManaged public func removeFromOwners(_ values: NSSet)
-
+  @objc(removeOwners:)
+  @NSManaged
+  public func removeFromOwners(_ values: NSSet)
 }

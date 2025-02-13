@@ -19,176 +19,180 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 
-@MainActor class DownloadRequestManager {
+@MainActor
+class DownloadRequestManager {
+  private let storage: PersistentStorage
+  private let downloadDelegate: DownloadManagerDelegate
 
-    private let storage: PersistentStorage
-    private let downloadDelegate: DownloadManagerDelegate
-    
-    init(storage: PersistentStorage, downloadDelegate: DownloadManagerDelegate) {
-        self.storage = storage
-        self.downloadDelegate = downloadDelegate
-    }
-    
-    func add(object: Downloadable) {
-        Task { @MainActor in
-            self.addLowPrio(object: object, library: self.storage.main.library)
-            self.storage.main.saveContext()
-        }
-    }
-    
-    func add(objects: [Downloadable]) {
-        Task { @MainActor in
-            let downloadInfos = objects.compactMap { $0.threadSafeInfo }
-            try? await self.storage.async.perform { asyncCompanion in
-                for (n, downloadInfo) in downloadInfos.enumerated() {
-                    let object = Download.createDownloadableObject(inContext: asyncCompanion.context, info: downloadInfo)
-                    self.addLowPrio(object: object, library: asyncCompanion.library)
-                    if (n % 500) == 0 {
-                        asyncCompanion.saveContext()
-                    }
-                }
-                asyncCompanion.saveContext()
-            }
-        }
-    }
+  init(storage: PersistentStorage, downloadDelegate: DownloadManagerDelegate) {
+    self.storage = storage
+    self.downloadDelegate = downloadDelegate
+  }
 
-    nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) {
-        let existingDownload = library.getDownload(id: object.uniqueID)
-        
-        if existingDownload == nil {
-            let download = library.createDownload(id: object.uniqueID)
-            download.element = object
-        } else if let existingDownload = existingDownload, existingDownload.errorDate != nil {
-            existingDownload.reset()
-        }
+  func add(object: Downloadable) {
+    Task { @MainActor in
+      self.addLowPrio(object: object, library: self.storage.main.library)
+      self.storage.main.saveContext()
     }
-    
-    func removeFinishedDownload(for object: Downloadable) {
-        guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { return }
-        storage.main.library.deleteDownload(existingDownload)
-        storage.main.saveContext()
-    }
-    
-    func removeFinishedDownload(for objects: [Downloadable]) {
-        for object in objects {
-            guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID), existingDownload.finishDate != nil else { continue }
-            storage.main.library.deleteDownload(existingDownload)
-        }
-        storage.main.saveContext()
-    }
+  }
 
-    func getNextRequestToDownload() -> Download? {
-        var nextDownload: Download?
-        self.storage.main.perform { mainCompanion in
-            let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
-                NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
-                NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
-                self.downloadDelegate.requestPredicate
-            ])
-            fetchRequest.fetchLimit = 1
-            let downloads = try? mainCompanion.context.fetch(fetchRequest)
-            nextDownload = downloads?.lazy.compactMap{ Download(managedObject: $0) }.first
-            nextDownload?.isDownloading = true
+  func add(objects: [Downloadable]) {
+    Task { @MainActor in
+      let downloadInfos = objects.compactMap { $0.threadSafeInfo }
+      try? await self.storage.async.perform { asyncCompanion in
+        for (n, downloadInfo) in downloadInfos.enumerated() {
+          let object = Download.createDownloadableObject(
+            inContext: asyncCompanion.context,
+            info: downloadInfo
+          )
+          self.addLowPrio(object: object, library: asyncCompanion.library)
+          if (n % 500) == 0 {
+            asyncCompanion.saveContext()
+          }
         }
-        return nextDownload
+        asyncCompanion.saveContext()
+      }
     }
-    
-    func clearFinishedDownloads() {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            self.downloadDelegate.requestPredicate,
-            NSCompoundPredicate(orPredicateWithSubpredicates: [
-                NSPredicate(format: "%K != nil", #keyPath(DownloadMO.finishDate)),
-                NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
-            ])
-        ])
-        let results = try? storage.main.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0)}
-        downloads?.forEach{ storage.main.library.deleteDownload($0) }
-        storage.main.saveContext()
-    }
-    
-    var notStartedDownloadCount: Int {
-        let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            self.downloadDelegate.requestPredicate,
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
-        ])
-        return (try? storage.main.context.count(for: request)) ?? 0
-    }
-    
-    func clearAllDownloadsIfAllHaveFinished() {
-        if notStartedDownloadCount == 0 {
-            clearAllDownloads()
-        }
-    }
-    
-    func clearAllDownloads() {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            self.downloadDelegate.requestPredicate,
-        ])
-        let results = try? storage.main.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0)}
-        downloads?.forEach{ storage.main.library.deleteDownload($0) }
-        storage.main.saveContext()
-    }
-    
-    func resetStartedDownloads() {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
-            NSPredicate(format: "%K != nil", #keyPath(DownloadMO.startDate)),
-            self.downloadDelegate.requestPredicate
-        ])
-        let results = try? storage.main.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0) }
-        downloads?.forEach{ $0.startDate = nil }
-        storage.main.saveContext()
-    }
+  }
 
-    func cancelDownloads() {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
-            self.downloadDelegate.requestPredicate
-        ])
-        let results = try? storage.main.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0) }
-        downloads?.forEach{ $0.isCanceled = true }
-        storage.main.saveContext()
-    }
-    
-    func cancelPlayablesDownloads() {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
-            NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
-            self.downloadDelegate.requestPredicate
-        ])
-        let results = try? storage.main.context.fetch(fetchRequest).filter({$0.playable != nil})
-        let downloads = results?.compactMap{ Download(managedObject: $0) }
-        downloads?.forEach{ $0.isCanceled = true }
-        storage.main.saveContext()
-    }
-    
-    func resetFailedDownloads() {
-        let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
-            self.downloadDelegate.requestPredicate
-        ])
-        let results = try? storage.main.context.fetch(fetchRequest)
-        let downloads = results?.compactMap{ Download(managedObject: $0) }
-        downloads?.forEach{ $0.reset() }
-        storage.main.saveContext()
-    }
+  nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) {
+    let existingDownload = library.getDownload(id: object.uniqueID)
 
+    if existingDownload == nil {
+      let download = library.createDownload(id: object.uniqueID)
+      download.element = object
+    } else if let existingDownload = existingDownload, existingDownload.errorDate != nil {
+      existingDownload.reset()
+    }
+  }
+
+  func removeFinishedDownload(for object: Downloadable) {
+    guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID),
+          existingDownload.finishDate != nil else { return }
+    storage.main.library.deleteDownload(existingDownload)
+    storage.main.saveContext()
+  }
+
+  func removeFinishedDownload(for objects: [Downloadable]) {
+    for object in objects {
+      guard let existingDownload = storage.main.library.getDownload(id: object.uniqueID),
+            existingDownload.finishDate != nil else { continue }
+      storage.main.library.deleteDownload(existingDownload)
+    }
+    storage.main.saveContext()
+  }
+
+  func getNextRequestToDownload() -> Download? {
+    var nextDownload: Download?
+    storage.main.perform { mainCompanion in
+      let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
+        NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+        NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
+        self.downloadDelegate.requestPredicate,
+      ])
+      fetchRequest.fetchLimit = 1
+      let downloads = try? mainCompanion.context.fetch(fetchRequest)
+      nextDownload = downloads?.lazy.compactMap { Download(managedObject: $0) }.first
+      nextDownload?.isDownloading = true
+    }
+    return nextDownload
+  }
+
+  func clearFinishedDownloads() {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      downloadDelegate.requestPredicate,
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        NSPredicate(format: "%K != nil", #keyPath(DownloadMO.finishDate)),
+        NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
+      ]),
+    ])
+    let results = try? storage.main.context.fetch(fetchRequest)
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { storage.main.library.deleteDownload($0) }
+    storage.main.saveContext()
+  }
+
+  var notStartedDownloadCount: Int {
+    let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      downloadDelegate.requestPredicate,
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
+    ])
+    return (try? storage.main.context.count(for: request)) ?? 0
+  }
+
+  func clearAllDownloadsIfAllHaveFinished() {
+    if notStartedDownloadCount == 0 {
+      clearAllDownloads()
+    }
+  }
+
+  func clearAllDownloads() {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      downloadDelegate.requestPredicate,
+    ])
+    let results = try? storage.main.context.fetch(fetchRequest)
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { storage.main.library.deleteDownload($0) }
+    storage.main.saveContext()
+  }
+
+  func resetStartedDownloads() {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+      NSPredicate(format: "%K != nil", #keyPath(DownloadMO.startDate)),
+      downloadDelegate.requestPredicate,
+    ])
+    let results = try? storage.main.context.fetch(fetchRequest)
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { $0.startDate = nil }
+    storage.main.saveContext()
+  }
+
+  func cancelDownloads() {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+      downloadDelegate.requestPredicate,
+    ])
+    let results = try? storage.main.context.fetch(fetchRequest)
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { $0.isCanceled = true }
+    storage.main.saveContext()
+  }
+
+  func cancelPlayablesDownloads() {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
+      NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+      downloadDelegate.requestPredicate,
+    ])
+    let results = try? storage.main.context.fetch(fetchRequest).filter { $0.playable != nil }
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { $0.isCanceled = true }
+    storage.main.saveContext()
+  }
+
+  func resetFailedDownloads() {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
+      downloadDelegate.requestPredicate,
+    ])
+    let results = try? storage.main.context.fetch(fetchRequest)
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { $0.reset() }
+    storage.main.saveContext()
+  }
 }

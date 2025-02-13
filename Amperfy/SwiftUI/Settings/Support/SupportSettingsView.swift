@@ -19,77 +19,101 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
 import MessageUI
+import SwiftUI
+
+// MARK: - SupportSettingsView
 
 struct SupportSettingsView: View {
-    let splitPercentage = 0.15
+  let splitPercentage = 0.15
 
-    @State var result: Result<MFMailComposeResult, Error>? = nil
-    @State var isShowingMailView = false
+  @State
+  var result: Result<MFMailComposeResult, Error>? = nil
+  @State
+  var isShowingMailView = false
 
-    var body: some View {
-        ZStack {
-            SettingsList {
-                SettingsSection {
-                    SettingsButtonRow(title: "Contact", label: "Report an issue on GitHub", splitPercentage: splitPercentage) {
-                        if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
-                            UIApplication.shared.open(url)
-                        }
-                    }
-                    SettingsButtonRow(label: "Send issue or feedback to developer", splitPercentage: splitPercentage) {
-                        if MFMailComposeViewController.canSendMail() {
-                            self.isShowingMailView.toggle()
-                        } else {
-                            appDelegate.eventLogger.info(topic: "Email Info", statusCode: .emailError, message: "Email is not configured in settings app or Amperfy is not able to send an email.", displayPopup: true)
-                        }
-                    }
-                }
-
-                SettingsSection() {
-                    #if targetEnvironment(macCatalyst)
-                    SettingsRow(title: "Event Log", splitPercentage: splitPercentage) {
-                        EventLogSettingsView()
-                            .background(Color.white)
-                            .frame(width: 500, height: 200)
-                            .padding(.top, 10)
-                    }
-                    .frame(height: 220)
-                    #else
-                    NavigationLink(destination: EventLogSettingsView()) {
-                        Text("Event Log")
-                    }
-                    #endif
-                }
+  var body: some View {
+    ZStack {
+      SettingsList {
+        SettingsSection {
+          SettingsButtonRow(
+            title: "Contact",
+            label: "Report an issue on GitHub",
+            splitPercentage: splitPercentage
+          ) {
+            if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
+              UIApplication.shared.open(url)
             }
-            .sheet(isPresented: $isShowingMailView) {
-                MailView(result: self.$result,
-                         subject: "Amperfy support",
-                         messageBody: """
-                \nPlease describe your issue.
-                \nFeedback is always welcome too.
-                \n
-                \n
-                --- Please don't remove the attachment ---
-                """,
-                         recipients: ["amperfy@familie-zimba.de"],
-                         attachments: [MailAttachment(data: LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData(), mimeType: "application/json", fileName: "AmperfyLog.json")])
+          }
+          SettingsButtonRow(
+            label: "Send issue or feedback to developer",
+            splitPercentage: splitPercentage
+          ) {
+            if MFMailComposeViewController.canSendMail() {
+              isShowingMailView.toggle()
+            } else {
+              appDelegate.eventLogger.info(
+                topic: "Email Info",
+                statusCode: .emailError,
+                message: "Email is not configured in settings app or Amperfy is not able to send an email.",
+                displayPopup: true
+              )
             }
+          }
         }
-        #if targetEnvironment(macCatalyst)
-        .navigationViewStyle(.stack)
-        #endif
-        .navigationTitle("Support")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            appDelegate.userStatistics.visited(.settingsSupport)
+
+        SettingsSection {
+          #if targetEnvironment(macCatalyst)
+            SettingsRow(title: "Event Log", splitPercentage: splitPercentage) {
+              EventLogSettingsView()
+                .background(Color.white)
+                .frame(width: 500, height: 200)
+                .padding(.top, 10)
+            }
+            .frame(height: 220)
+          #else
+            NavigationLink(destination: EventLogSettingsView()) {
+              Text("Event Log")
+            }
+          #endif
         }
+      }
+      .sheet(isPresented: $isShowingMailView) {
+        MailView(
+          result: $result,
+          subject: "Amperfy support",
+          messageBody: """
+          \nPlease describe your issue.
+          \nFeedback is always welcome too.
+          \n
+          \n
+          --- Please don't remove the attachment ---
+          """,
+          recipients: ["amperfy@familie-zimba.de"],
+          attachments: [MailAttachment(
+            data: LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData(),
+            mimeType: "application/json",
+            fileName: "AmperfyLog.json"
+          )]
+        )
+      }
     }
+    #if targetEnvironment(macCatalyst)
+    .navigationViewStyle(.stack)
+    #endif
+    .navigationTitle("Support")
+    .navigationBarTitleDisplayMode(.inline)
+    .onAppear {
+      appDelegate.userStatistics.visited(.settingsSupport)
+    }
+  }
 }
 
+// MARK: - SupportSettingsView_Previews
+
 struct SupportSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SupportSettingsView()
-    }
+  static var previews: some View {
+    SupportSettingsView()
+  }
 }

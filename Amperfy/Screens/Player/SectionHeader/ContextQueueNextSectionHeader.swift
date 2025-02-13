@@ -19,125 +19,129 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
 import MarqueeLabel
+import UIKit
+
+// MARK: - ContextQueueNextSectionHeader
 
 class ContextQueueNextSectionHeader: UIView {
-    
-    static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
-    static let margin = UIEdgeInsets(top: 8, left: UIView.defaultMarginX, bottom: 8, right: UIView.defaultMarginX)
-    
-    private var player: PlayerFacade!
-    private var rootView: PopupPlayerVC?
-    
-    @IBOutlet weak var queueNameLabel: UILabel!
-    @IBOutlet weak var contextNameLabel: MarqueeLabel!
-    
-    @IBOutlet weak var shuffleButton: UIButton!
-    @IBOutlet weak var repeatButton: UIButton!
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.layoutMargins = Self.margin
-        player = appDelegate.player
-        player.addNotifier(notifier: self)
+  static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
+  static let margin = UIEdgeInsets(
+    top: 8,
+    left: UIView.defaultMarginX,
+    bottom: 8,
+    right: UIView.defaultMarginX
+  )
+
+  private var player: PlayerFacade!
+  private var rootView: PopupPlayerVC?
+
+  @IBOutlet
+  weak var queueNameLabel: UILabel!
+  @IBOutlet
+  weak var contextNameLabel: MarqueeLabel!
+
+  @IBOutlet
+  weak var shuffleButton: UIButton!
+  @IBOutlet
+  weak var repeatButton: UIButton!
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    self.layoutMargins = Self.margin
+    self.player = appDelegate.player
+    player.addNotifier(notifier: self)
+  }
+
+  func prepare(toWorkOnRootView: PopupPlayerVC?) {
+    rootView = toWorkOnRootView
+    contextNameLabel.applyAmperfyStyle()
+    refresh()
+  }
+
+  func refresh() {
+    contextNameLabel.text = "\(player.contextName)"
+    refreshCurrentlyPlayingInfo()
+    refreshRepeatButton()
+    refreshShuffleButton()
+  }
+
+  func refreshCurrentlyPlayingInfo() {
+    switch player.playerMode {
+    case .music:
+      repeatButton.isHidden = false
+      shuffleButton.isHidden = false
+    case .podcast:
+      repeatButton.isHidden = true
+      shuffleButton.isHidden = true
     }
-    
-    func prepare(toWorkOnRootView: PopupPlayerVC? ) {
-        self.rootView = toWorkOnRootView
-        contextNameLabel.applyAmperfyStyle()
-        refresh()
+  }
+
+  func refreshRepeatButton() {
+    repeatButton.isSelected = player.repeatMode != .off
+    var config = UIButton.Configuration.player(isSelected: repeatButton.isSelected)
+    switch player.repeatMode {
+    case .off:
+      config.image = .repeatOff
+    case .all:
+      config.image = .repeatAll
+    case .single:
+      config.image = .repeatOne
     }
-    
-    func refresh() {
-        contextNameLabel.text = "\(player.contextName)"
-        refreshCurrentlyPlayingInfo()
-        refreshRepeatButton()
-        refreshShuffleButton()
-    }
-    
-    func refreshCurrentlyPlayingInfo() {
-        switch player.playerMode {
-        case .music:
-            repeatButton.isHidden = false
-            shuffleButton.isHidden = false
-        case .podcast:
-            repeatButton.isHidden = true
-            shuffleButton.isHidden = true
-        }
-    }
-    
-    func refreshRepeatButton() {
-        repeatButton.isSelected = player.repeatMode != .off
-        var config = UIButton.Configuration.player(isSelected: repeatButton.isSelected)
-        switch player.repeatMode {
-        case .off:
-            config.image = .repeatOff
-        case .all:
-            config.image = .repeatAll
-        case .single:
-            config.image = .repeatOne
-        }
-        repeatButton.configuration = config
-    }
-    
-    func refreshShuffleButton() {
-        shuffleButton.isEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
-        shuffleButton.isSelected = player.isShuffle
-        var config = UIButton.Configuration.player(isSelected: shuffleButton.isSelected)
-        config.image = .shuffle
-        shuffleButton.configuration = config
-    }
-    
-    @IBAction func pressedShuffle(_ sender: Any) {
-        player.toggleShuffle()
-        refreshShuffleButton()
-        rootView?.scrollToCurrentlyPlayingRow()
-    }
-    
-    @IBAction func pressedRepeat(_ sender: Any) {
-        player.setRepeatMode(player.repeatMode.nextMode)
-        refreshRepeatButton()
-    }
-    
+    repeatButton.configuration = config
+  }
+
+  func refreshShuffleButton() {
+    shuffleButton.isEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+    shuffleButton.isSelected = player.isShuffle
+    var config = UIButton.Configuration.player(isSelected: shuffleButton.isSelected)
+    config.image = .shuffle
+    shuffleButton.configuration = config
+  }
+
+  @IBAction
+  func pressedShuffle(_ sender: Any) {
+    player.toggleShuffle()
+    refreshShuffleButton()
+    rootView?.scrollToCurrentlyPlayingRow()
+  }
+
+  @IBAction
+  func pressedRepeat(_ sender: Any) {
+    player.setRepeatMode(player.repeatMode.nextMode)
+    refreshRepeatButton()
+  }
 }
 
+// MARK: MusicPlayable
+
 extension ContextQueueNextSectionHeader: MusicPlayable {
+  func didStartPlayingFromBeginning() {}
 
-    func didStartPlayingFromBeginning() {
-    }
-    
-    func didStartPlaying() {
-    }
-    
-    func didPause() {
-    }
-    
+  func didStartPlaying() {}
 
-    func didStopPlaying() {
-        refreshCurrentlyPlayingInfo()
-    }
+  func didPause() {}
 
-    func didElapsedTimeChange() {
-    }
-    
-    func didPlaylistChange() {
-        refresh()
-    }
-    
-    func didArtworkChange() {
-    }
-    
-    func didShuffleChange() {
-        refreshShuffleButton()
-    }
-    
-    func didRepeatChange() {
-        refreshRepeatButton()
-    }
-    
-    func didPlaybackRateChange() {
-    }
+  func didStopPlaying() {
+    refreshCurrentlyPlayingInfo()
+  }
 
+  func didElapsedTimeChange() {}
+
+  func didPlaylistChange() {
+    refresh()
+  }
+
+  func didArtworkChange() {}
+
+  func didShuffleChange() {
+    refreshShuffleButton()
+  }
+
+  func didRepeatChange() {
+    refreshRepeatButton()
+  }
+
+  func didPlaybackRateChange() {}
 }

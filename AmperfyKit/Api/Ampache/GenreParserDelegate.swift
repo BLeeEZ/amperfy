@@ -19,45 +19,65 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
-import UIKit
 import CoreData
+import Foundation
 import os.log
+import UIKit
 
 class GenreParserDelegate: AmpacheXmlLibParser {
+  var genreBuffer: Genre?
 
-    var genreBuffer: Genre?
+  override func parser(
+    _ parser: XMLParser,
+    didStartElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?,
+    attributes attributeDict: [String: String]
+  ) {
+    super.parser(
+      parser,
+      didStartElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName,
+      attributes: attributeDict
+    )
 
-    override func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
-        super.parser(parser, didStartElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName, attributes: attributeDict)
-
-        if(elementName == "genre") {
-            guard let genreId = attributeDict["id"] else {
-                os_log("Found genre with no id", log: log, type: .error)
-                return
-            }
-            if let fetchedGenre = library.getGenre(id: genreId)  {
-                genreBuffer = fetchedGenre
-            } else {
-                genreBuffer = library.createGenre()
-                genreBuffer?.id = genreId
-            }
-        }
+    if elementName == "genre" {
+      guard let genreId = attributeDict["id"] else {
+        os_log("Found genre with no id", log: log, type: .error)
+        return
+      }
+      if let fetchedGenre = library.getGenre(id: genreId) {
+        genreBuffer = fetchedGenre
+      } else {
+        genreBuffer = library.createGenre()
+        genreBuffer?.id = genreId
+      }
     }
-    
-    override func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        switch(elementName) {
-        case "name":
-            genreBuffer?.name = buffer
-        case "genre":
-            parsedCount += 1
-            parseNotifier?.notifyParsedObject(ofType: .genre)
-            genreBuffer = nil
-        default:
-            break
-        }
-        
-        super.parser(parser, didEndElement: elementName, namespaceURI: namespaceURI, qualifiedName: qName)
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    switch elementName {
+    case "name":
+      genreBuffer?.name = buffer
+    case "genre":
+      parsedCount += 1
+      parseNotifier?.notifyParsedObject(ofType: .genre)
+      genreBuffer = nil
+    default:
+      break
     }
 
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
+  }
 }

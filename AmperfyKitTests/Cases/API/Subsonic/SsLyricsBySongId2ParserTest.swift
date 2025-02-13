@@ -19,58 +19,56 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
 class SsLyricsBySongId2ParserTest: AbstractSsParserTest {
-    
-    override func setUp() async throws {
-        try await super.setUp()
-        xmlData = getTestFileData(name: "getLyricsBySongId_example_2")
-        ssParserDelegate = SsLyricsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
-    }
-    
-    override func recreateParserDelegate() {
-        ssParserDelegate = SsLyricsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
-    }
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = getTestFileData(name: "getLyricsBySongId_example_2")
+    ssParserDelegate = SsLyricsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+  }
 
-    override func checkCorrectParsing() {
-        guard let lyricsParser = ssParserDelegate as? SsLyricsParserDelegate,
-              let lyricsList = lyricsParser.lyricsList
-        else {
-            XCTFail()
-            return
-        }
-        
-        XCTAssertEqual(lyricsList.lyrics.count, 2)
-        
-        var structuredLyrics = lyricsList.lyrics[0]
-        XCTAssertEqual(structuredLyrics.displayArtist, "Muse")
-        XCTAssertEqual(structuredLyrics.displayTitle, "Hysteria")
-        XCTAssertEqual(structuredLyrics.lang, "en")
-        XCTAssertEqual(structuredLyrics.offset, -100)
-        XCTAssertTrue(structuredLyrics.synced)
-        XCTAssertEqual(structuredLyrics.line.count, 3)
-        XCTAssertEqual(structuredLyrics.line[0].start, 0)
-        XCTAssertEqual(structuredLyrics.line[0].value, "It's bugging me")
-        XCTAssertEqual(structuredLyrics.line[1].start, 2000)
-        XCTAssertEqual(structuredLyrics.line[1].value, "Grating me")
-        XCTAssertEqual(structuredLyrics.line[2].start, 3001)
-        XCTAssertEqual(structuredLyrics.line[2].value, "And twisting me around...")
+  override func recreateParserDelegate() {
+    ssParserDelegate = SsLyricsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+  }
 
-        structuredLyrics = lyricsList.lyrics[1]
-        XCTAssertEqual(structuredLyrics.displayArtist, "Mu2se")
-        XCTAssertEqual(structuredLyrics.displayTitle, "Hy2steria")
-        XCTAssertEqual(structuredLyrics.lang, "de")
-        XCTAssertEqual(structuredLyrics.offset, 100)
-        XCTAssertFalse(structuredLyrics.synced)
-        XCTAssertEqual(structuredLyrics.line.count, 3)
-        XCTAssertEqual(structuredLyrics.line[0].start, nil)
-        XCTAssertEqual(structuredLyrics.line[0].value, "It's bugging2 me")
-        XCTAssertEqual(structuredLyrics.line[1].start, nil)
-        XCTAssertEqual(structuredLyrics.line[1].value, "Grating2 me")
-        XCTAssertEqual(structuredLyrics.line[2].start, nil)
-        XCTAssertEqual(structuredLyrics.line[2].value, "And twisting2 me around...")
+  override func checkCorrectParsing() {
+    guard let lyricsParser = ssParserDelegate as? SsLyricsParserDelegate,
+          let lyricsList = lyricsParser.lyricsList
+    else {
+      XCTFail()
+      return
     }
 
+    XCTAssertEqual(lyricsList.lyrics.count, 2)
+
+    var structuredLyrics = lyricsList.lyrics[0]
+    XCTAssertEqual(structuredLyrics.displayArtist, "Muse")
+    XCTAssertEqual(structuredLyrics.displayTitle, "Hysteria")
+    XCTAssertEqual(structuredLyrics.lang, "en")
+    XCTAssertEqual(structuredLyrics.offset, -100)
+    XCTAssertTrue(structuredLyrics.synced)
+    XCTAssertEqual(structuredLyrics.line.count, 3)
+    XCTAssertEqual(structuredLyrics.line[0].start, 0)
+    XCTAssertEqual(structuredLyrics.line[0].value, "It's bugging me")
+    XCTAssertEqual(structuredLyrics.line[1].start, 2000)
+    XCTAssertEqual(structuredLyrics.line[1].value, "Grating me")
+    XCTAssertEqual(structuredLyrics.line[2].start, 3001)
+    XCTAssertEqual(structuredLyrics.line[2].value, "And twisting me around...")
+
+    structuredLyrics = lyricsList.lyrics[1]
+    XCTAssertEqual(structuredLyrics.displayArtist, "Mu2se")
+    XCTAssertEqual(structuredLyrics.displayTitle, "Hy2steria")
+    XCTAssertEqual(structuredLyrics.lang, "de")
+    XCTAssertEqual(structuredLyrics.offset, 100)
+    XCTAssertFalse(structuredLyrics.synced)
+    XCTAssertEqual(structuredLyrics.line.count, 3)
+    XCTAssertEqual(structuredLyrics.line[0].start, nil)
+    XCTAssertEqual(structuredLyrics.line[0].value, "It's bugging2 me")
+    XCTAssertEqual(structuredLyrics.line[1].start, nil)
+    XCTAssertEqual(structuredLyrics.line[1].value, "Grating2 me")
+    XCTAssertEqual(structuredLyrics.line[2].start, nil)
+    XCTAssertEqual(structuredLyrics.line[2].value, "And twisting2 me around...")
+  }
 }

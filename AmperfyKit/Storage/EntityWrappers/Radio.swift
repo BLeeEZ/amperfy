@@ -19,54 +19,51 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 import UIKit
 
 public class Radio: AbstractPlayable, Identifyable {
+  public let managedObject: RadioMO
 
-    public let managedObject: RadioMO
+  public init(managedObject: RadioMO) {
+    self.managedObject = managedObject
+    super.init(managedObject: managedObject)
+  }
 
-    public init(managedObject: RadioMO) {
-        self.managedObject = managedObject
-        super.init(managedObject: managedObject)
+  public var siteURL: URL? {
+    get {
+      guard let siteUrlString = managedObject.siteUrl else { return nil }
+      return URL(string: siteUrlString)
     }
-    
-    public var siteURL: URL? {
-        get {
-            guard let siteUrlString = managedObject.siteUrl else { return nil }
-            return URL(string: siteUrlString)
-        }
-        set {
-            managedObject.siteUrl = newValue?.absoluteString
-        }
+    set {
+      managedObject.siteUrl = newValue?.absoluteString
     }
+  }
 
-    override public var creatorName: String {
-        return ""
-    }
-    
-    override public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
-        var infoContent = [String]()
-        if details.type == .long {
-            if let siteUrl = self.siteURL {
-                infoContent.append("Site \(siteUrl)")
-            }
-            if let urlString = url {
-                infoContent.append("Steam URL \(urlString)")
-            }
-        }
-        return infoContent
-    }
-    
-    public var identifier: String {
-        return title
-    }
-    
-    override public func isAvailableToUser() -> Bool {
-        // See also RadioMO.excludeServerDeleteRadiosFetchPredicate()
-        return (remoteStatus == .available)
-    }
+  override public var creatorName: String {
+    ""
+  }
 
+  override public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+    var infoContent = [String]()
+    if details.type == .long {
+      if let siteUrl = siteURL {
+        infoContent.append("Site \(siteUrl)")
+      }
+      if let urlString = url {
+        infoContent.append("Steam URL \(urlString)")
+      }
+    }
+    return infoContent
+  }
+
+  public var identifier: String {
+    title
+  }
+
+  override public func isAvailableToUser() -> Bool {
+    // See also RadioMO.excludeServerDeleteRadiosFetchPredicate()
+    remoteStatus == .available
+  }
 }
-

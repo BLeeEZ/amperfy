@@ -19,120 +19,162 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 typealias GetInfoCallback = () -> String
 
+// MARK: - PlayShuffleInfoConfiguration
 
 struct PlayShuffleInfoConfiguration {
-    var infoCB: GetInfoCallback?
-    var playContextCb: GetPlayContextCallback?
-    var player: PlayerFacade
-    let isInfoAlwaysHidden: Bool
-    var customPlayName: String? = nil
-    var isShuffleHidden = false
-    var isShuffleOnContextNeccessary: Bool = true
-    var shuffleContextCb: GetPlayContextCallback? = nil
-    var isEmbeddedInOtherView: Bool = false
+  var infoCB: GetInfoCallback?
+  var playContextCb: GetPlayContextCallback?
+  var player: PlayerFacade
+  let isInfoAlwaysHidden: Bool
+  var customPlayName: String?
+  var isShuffleHidden = false
+  var isShuffleOnContextNeccessary: Bool = true
+  var shuffleContextCb: GetPlayContextCallback?
+  var isEmbeddedInOtherView: Bool = false
 }
 
-class LibraryElementDetailTableHeaderView: UIView {
-    
-    @IBOutlet weak var playAllButton: UIButton!
-    @IBOutlet weak var playShuffledButton: UIButton!
-    @IBOutlet weak var infoContainerView: UIView!
-    @IBOutlet weak var infoLabel: UILabel!
+// MARK: - LibraryElementDetailTableHeaderView
 
-    #if targetEnvironment(macCatalyst)
+class LibraryElementDetailTableHeaderView: UIView {
+  @IBOutlet
+  weak var playAllButton: UIButton!
+  @IBOutlet
+  weak var playShuffledButton: UIButton!
+  @IBOutlet
+  weak var infoContainerView: UIView!
+  @IBOutlet
+  weak var infoLabel: UILabel!
+
+  #if targetEnvironment(macCatalyst)
     static let frameHeight: CGFloat = 26.0 + margin.top + margin.bottom
-    #else
+  #else
     static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
-    #endif
-    static let margin = UIView.defaultMarginMiddleElement
-    
-    private var config: PlayShuffleInfoConfiguration?
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        self.layoutMargins = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginX, bottom: 0.0, right: UIView.defaultMarginX)
+  #endif
+  static let margin = UIView.defaultMarginMiddleElement
+
+  private var config: PlayShuffleInfoConfiguration?
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    self.layoutMargins = UIEdgeInsets(
+      top: 0.0,
+      left: UIView.defaultMarginX,
+      bottom: 0.0,
+      right: UIView.defaultMarginX
+    )
+  }
+
+  public static func createTableHeader(
+    rootView: BasicTableViewController,
+    configuration: PlayShuffleInfoConfiguration
+  )
+    -> LibraryElementDetailTableHeaderView? {
+    rootView.tableView.tableHeaderView = UIView(frame: CGRect(
+      x: 0,
+      y: 0,
+      width: rootView.view.bounds.size.width,
+      height: Self.frameHeight
+    ))
+    let genericDetailTableHeaderView = ViewCreator<LibraryElementDetailTableHeaderView>
+      .createFromNib(withinFixedFrame: CGRect(
+        x: 0,
+        y: 0,
+        width: rootView.view.bounds.size.width,
+        height: Self.frameHeight
+      ))!
+    genericDetailTableHeaderView.prepare(configuration: configuration)
+    rootView.tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
+    return genericDetailTableHeaderView
+  }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+    super.traitCollectionDidChange(previousTraitCollection)
+    refresh()
+  }
+
+  func refresh() {
+    guard let config = config else { return }
+    if config.isEmbeddedInOtherView {
+      layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+    } else {
+      if traitCollection.horizontalSizeClass == .compact {
+        layoutMargins = UIEdgeInsets(
+          top: 0.0,
+          left: UIView.defaultMarginCellX,
+          bottom: 0.0,
+          right: UIView.defaultMarginCellX
+        )
+      } else {
+        layoutMargins = UIEdgeInsets(
+          top: 0.0,
+          left: UIView.defaultMarginX,
+          bottom: 0.0,
+          right: UIView.defaultMarginX
+        )
+      }
     }
-    
-    public static func createTableHeader(rootView: BasicTableViewController, configuration: PlayShuffleInfoConfiguration) -> LibraryElementDetailTableHeaderView? {
-        rootView.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))
-        let genericDetailTableHeaderView = ViewCreator<LibraryElementDetailTableHeaderView>.createFromNib(withinFixedFrame: CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: Self.frameHeight))!
-        genericDetailTableHeaderView.prepare(configuration: configuration)
-        rootView.tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
-        return genericDetailTableHeaderView
+    infoContainerView.isHidden = config
+      .isInfoAlwaysHidden || (traitCollection.horizontalSizeClass == .compact)
+    infoLabel.text = config.infoCB?() ?? ""
+  }
+
+  @IBAction
+  func playAllButtonPressed(_ sender: Any) {
+    Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
+    play(isShuffled: false)
+  }
+
+  @IBAction
+  func addAllShuffledButtonPressed(_ sender: Any) {
+    Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
+    shuffle()
+  }
+
+  private func play(isShuffled: Bool) {
+    guard let playContext = config?.playContextCb?(), let player = config?.player else { return }
+    isShuffled ? player.playShuffled(context: playContext) : player.play(context: playContext)
+  }
+
+  private func shuffle() {
+    guard let player = config?.player else { return }
+    if let shuffleContext = config?.shuffleContextCb?() {
+      if config?.isShuffleOnContextNeccessary ?? true {
+        player.playShuffled(context: shuffleContext)
+      } else {
+        player.play(context: shuffleContext)
+      }
+    } else {
+      play(isShuffled: true)
     }
-    
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        refresh()
-    }
-    
-    func refresh() {
-        guard let config = config else { return }
-        if config.isEmbeddedInOtherView {
-            self.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
-        } else {
-            if traitCollection.horizontalSizeClass == .compact {
-                self.layoutMargins = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginCellX, bottom: 0.0, right: UIView.defaultMarginCellX)
-            } else {
-                self.layoutMargins = UIEdgeInsets(top: 0.0, left: UIView.defaultMarginX, bottom: 0.0, right: UIView.defaultMarginX)
-            }
-        }
-        infoContainerView.isHidden = config.isInfoAlwaysHidden || (traitCollection.horizontalSizeClass == .compact)
-        infoLabel.text = config.infoCB?() ?? ""
-    }
-    
-    @IBAction func playAllButtonPressed(_ sender: Any) {
-        Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
-        play(isShuffled: false)
-    }
-    
-    @IBAction func addAllShuffledButtonPressed(_ sender: Any) {
-        Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
-        shuffle()
-    }
-    
-    private func play(isShuffled: Bool) {
-        guard let playContext = config?.playContextCb?(), let player = config?.player else { return }
-        isShuffled ? player.playShuffled(context: playContext) : player.play(context: playContext)
-    }
-    
-    private func shuffle() {
-        guard let player = config?.player else { return }
-        if let shuffleContext = config?.shuffleContextCb?() {
-            if config?.isShuffleOnContextNeccessary ?? true {
-                player.playShuffled(context: shuffleContext)
-            } else {
-                player.play(context: shuffleContext)
-            }
-        } else {
-            play(isShuffled: true)
-        }
-    }
-    
-    /// isShuffleOnContextNeccessary: In AlbumsVC the albums are shuffled, keep the order when shuffle button is pressed
-    func prepare(configuration: PlayShuffleInfoConfiguration) {
-        self.config = configuration
-        playAllButton.setTitle(config?.customPlayName ?? "Play", for: .normal)
-        playAllButton.layer.cornerRadius = 10.0
-        playShuffledButton.setTitle(configuration.isShuffleOnContextNeccessary ? "Shuffle" : "Random", for: .normal)
-        playShuffledButton.layer.cornerRadius = 10.0
-        playShuffledButton.isHidden = configuration.isShuffleHidden
-        activate()
-    }
-    
-    func activate() {
-        playAllButton.isEnabled = true
-        playShuffledButton.isEnabled = (!(self.config?.isShuffleOnContextNeccessary ?? true)) || appDelegate.storage.settings.isPlayerShuffleButtonEnabled
-    }
-    
-    func deactivate() {
-        playAllButton.isEnabled = false
-        playShuffledButton.isEnabled = false
-    }
-    
+  }
+
+  /// isShuffleOnContextNeccessary: In AlbumsVC the albums are shuffled, keep the order when shuffle button is pressed
+  func prepare(configuration: PlayShuffleInfoConfiguration) {
+    config = configuration
+    playAllButton.setTitle(config?.customPlayName ?? "Play", for: .normal)
+    playAllButton.layer.cornerRadius = 10.0
+    playShuffledButton.setTitle(
+      configuration.isShuffleOnContextNeccessary ? "Shuffle" : "Random",
+      for: .normal
+    )
+    playShuffledButton.layer.cornerRadius = 10.0
+    playShuffledButton.isHidden = configuration.isShuffleHidden
+    activate()
+  }
+
+  func activate() {
+    playAllButton.isEnabled = true
+    playShuffledButton.isEnabled = !(config?.isShuffleOnContextNeccessary ?? true) || appDelegate
+      .storage.settings.isPlayerShuffleButtonEnabled
+  }
+
+  func deactivate() {
+    playAllButton.isEnabled = false
+    playShuffledButton.isEnabled = false
+  }
 }

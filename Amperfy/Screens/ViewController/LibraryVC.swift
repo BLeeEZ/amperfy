@@ -19,31 +19,40 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
-@MainActor class LibraryVC: KeyCommandCollectionViewController {
-    
-    private var offsetData = [LibraryNavigatorItem]()
-    
-    lazy var layoutConfig = {
-        var config = UICollectionLayoutListConfiguration(appearance: .sidebarPlain)
-        config.backgroundColor = .systemBackground
-        return config
-    }()
-    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(offsetData: offsetData, librarySettings: appDelegate.storage.settings.libraryDisplaySettings, layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn)
+@MainActor
+class LibraryVC: KeyCommandCollectionViewController {
+  private var offsetData = [LibraryNavigatorItem]()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
-    }
-    
-    public func pushedOn(selectedItem: LibraryNavigatorItem) {
-        guard let splitVC = self.splitViewController as? SplitVC,
-              splitVC.isCollapsed,
-              let libraryItem = selectedItem.library
-        else { return }
-        splitVC.pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
-    }
+  lazy var layoutConfig = {
+    var config = UICollectionLayoutListConfiguration(appearance: .sidebarPlain)
+    config.backgroundColor = .systemBackground
+    return config
+  }()
 
+  lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
+    offsetData: offsetData,
+    librarySettings: appDelegate.storage.settings.libraryDisplaySettings,
+    layoutConfig: self.layoutConfig,
+    pressedOnLibraryItemCB: self.pushedOn
+  )
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    libraryItemConfigurator.viewDidLoad(
+      navigationItem: navigationItem,
+      collectionView: collectionView
+    )
+  }
+
+  public func pushedOn(selectedItem: LibraryNavigatorItem) {
+    guard let splitVC = splitViewController as? SplitVC,
+          splitVC.isCollapsed,
+          let libraryItem = selectedItem.library
+    else { return }
+    splitVC
+      .pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+  }
 }

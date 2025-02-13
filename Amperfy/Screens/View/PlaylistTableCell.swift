@@ -19,28 +19,32 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 class PlaylistTableCell: BasicTableCell {
+  @IBOutlet
+  weak var nameLabel: UILabel!
+  @IBOutlet
+  weak var entityImage: EntityImageView!
+  @IBOutlet
+  weak var infoLabel: UILabel!
 
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var entityImage: EntityImageView!
-    @IBOutlet weak var infoLabel: UILabel!
-    
-    static let rowHeight: CGFloat = 70.0 + margin.bottom + margin.top
-    
-    private var playlist: Playlist?
-    private var rootView: UITableViewController?
-    
-    func display(playlist: Playlist, rootView: UITableViewController?) {
-        self.playlist = playlist
-        self.rootView = rootView
-        nameLabel.text = playlist.name
-        entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playlist)
-        infoLabel.text = playlist.info(for: appDelegate.backendApi.selectedApi, details: DetailInfoType(type: .short, settings: appDelegate.storage.settings))
-        infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left
-        self.accessoryType = .disclosureIndicator
-    }
-    
+  static let rowHeight: CGFloat = 70.0 + margin.bottom + margin.top
+
+  private var playlist: Playlist?
+  private var rootView: UITableViewController?
+
+  func display(playlist: Playlist, rootView: UITableViewController?) {
+    self.playlist = playlist
+    self.rootView = rootView
+    nameLabel.text = playlist.name
+    entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playlist)
+    infoLabel.text = playlist.info(
+      for: appDelegate.backendApi.selectedApi,
+      details: DetailInfoType(type: .short, settings: appDelegate.storage.settings)
+    )
+    infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left
+    accessoryType = .disclosureIndicator
+  }
 }

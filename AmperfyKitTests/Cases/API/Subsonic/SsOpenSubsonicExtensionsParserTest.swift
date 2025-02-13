@@ -19,41 +19,41 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
 class SsOpenSubsonicExtensionsParserTest: AbstractSsParserTest {
-    
-    override func setUp() async throws {
-        try await super.setUp()
-        xmlData = getTestFileData(name: "OpenSubsonicExtensions_example_1")
-        ssParserDelegate = SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
-    }
-    
-    override func recreateParserDelegate() {
-        ssParserDelegate = SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = getTestFileData(name: "OpenSubsonicExtensions_example_1")
+    ssParserDelegate =
+      SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+  }
+
+  override func recreateParserDelegate() {
+    ssParserDelegate =
+      SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+  }
+
+  override func checkCorrectParsing() {
+    guard let extensionsParser = ssParserDelegate as? SsOpenSubsonicExtensionsParserDelegate
+    else {
+      XCTFail()
+      return
     }
 
-    override func checkCorrectParsing() {
-        guard let extensionsParser = ssParserDelegate as? SsOpenSubsonicExtensionsParserDelegate
-        else {
-            XCTFail()
-            return
-        }
-        
-        let response = extensionsParser.openSubsonicExtensionsResponse
-        
-        XCTAssertEqual(response.status, "ok")
-        XCTAssertEqual(response.version, "1.16.1")
-        XCTAssertEqual(response.type, "navidrome")
-        XCTAssertEqual(response.serverVersion, "0.52.5 (c5560888)")
-        XCTAssertEqual(response.openSubsonic, true)
-        
-        XCTAssertEqual(response.supportedExtensions.count, 3)
-        
-        XCTAssertEqual(response.supportedExtensions[0], "transcodeOffset")
-        XCTAssertEqual(response.supportedExtensions[1], "formPost")
-        XCTAssertEqual(response.supportedExtensions[2], "songLyrics")
-    }
+    let response = extensionsParser.openSubsonicExtensionsResponse
 
+    XCTAssertEqual(response.status, "ok")
+    XCTAssertEqual(response.version, "1.16.1")
+    XCTAssertEqual(response.type, "navidrome")
+    XCTAssertEqual(response.serverVersion, "0.52.5 (c5560888)")
+    XCTAssertEqual(response.openSubsonic, true)
+
+    XCTAssertEqual(response.supportedExtensions.count, 3)
+
+    XCTAssertEqual(response.supportedExtensions[0], "transcodeOffset")
+    XCTAssertEqual(response.supportedExtensions[1], "formPost")
+    XCTAssertEqual(response.supportedExtensions[2], "songLyrics")
+  }
 }

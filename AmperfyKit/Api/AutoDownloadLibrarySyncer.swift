@@ -19,74 +19,83 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
 import OSLog
 
-@MainActor public class AutoDownloadLibrarySyncer {
-    
-    private let log = OSLog(subsystem: "Amperfy", category: "AutoDownloadLibrarySyncer")
-    private let storage: PersistentStorage
-    private let librarySyncer: LibrarySyncer
-    private let playableDownloadManager: DownloadManageable
-    
-    public init(storage: PersistentStorage, librarySyncer: LibrarySyncer, playableDownloadManager: DownloadManageable) {
-        self.storage = storage
-        self.librarySyncer = librarySyncer
-        self.playableDownloadManager = playableDownloadManager
-    }
-    
-    @MainActor public func syncNewestLibraryElements(offset: Int = 0, count: Int = AmperKit.newestElementsFetchCount) async throws {
-        let oldNewestAlbums = Set(storage.main.library.getNewestAlbums(offset: 0, count: count))
-        var newNewestAlbums = Set<Album>()
-        var fetchNeededNewestAlbums = Set<Album>()
-        
-        try await self.librarySyncer.syncNewestAlbums(offset: offset, count: count)
-        let updatedNewestAlbums = Set(self.storage.main.library.getNewestAlbums(offset: 0, count: count))
-        newNewestAlbums = updatedNewestAlbums.subtracting(oldNewestAlbums)
-        if offset == 0 {
-            if newNewestAlbums.isEmpty {
-                os_log("No new albums", log: self.log, type: .info)
-            } else {
-                os_log("%i new albums", log: self.log, type: .info, newNewestAlbums.count)
-            }
-        }
-        
-        fetchNeededNewestAlbums = newNewestAlbums.filter { !$0.isSongsMetaDataSynced }
-        try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-            for album in fetchNeededNewestAlbums {
-                taskGroup.addTask { @MainActor @Sendable in
-                    try await self.librarySyncer.sync(album: album)
+@MainActor
+public class AutoDownloadLibrarySyncer {
+  private let log = OSLog(subsystem: "Amperfy", category: "AutoDownloadLibrarySyncer")
+  private let storage: PersistentStorage
+  private let librarySyncer: LibrarySyncer
+  private let playableDownloadManager: DownloadManageable
 
-                }
-            }
-            try await taskGroup.waitForAll()
-        }
-        
-        if offset == 0, !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty, self.storage.settings.isAutoDownloadLatestSongsActive {
-            var newestSongs = [AbstractPlayable]()
-            for album in newNewestAlbums {
-                newestSongs.append(contentsOf: album.songs)
-            }
-            self.playableDownloadManager.download(objects: newestSongs)
-        }
+  public init(
+    storage: PersistentStorage,
+    librarySyncer: LibrarySyncer,
+    playableDownloadManager: DownloadManageable
+  ) {
+    self.storage = storage
+    self.librarySyncer = librarySyncer
+    self.playableDownloadManager = playableDownloadManager
+  }
+
+  @MainActor
+  public func syncNewestLibraryElements(
+    offset: Int = 0,
+    count: Int = AmperKit.newestElementsFetchCount
+  ) async throws {
+    let oldNewestAlbums = Set(storage.main.library.getNewestAlbums(offset: 0, count: count))
+    var newNewestAlbums = Set<Album>()
+    var fetchNeededNewestAlbums = Set<Album>()
+
+    try await librarySyncer.syncNewestAlbums(offset: offset, count: count)
+    let updatedNewestAlbums = Set(storage.main.library.getNewestAlbums(offset: 0, count: count))
+    newNewestAlbums = updatedNewestAlbums.subtracting(oldNewestAlbums)
+    if offset == 0 {
+      if newNewestAlbums.isEmpty {
+        os_log("No new albums", log: self.log, type: .info)
+      } else {
+        os_log("%i new albums", log: self.log, type: .info, newNewestAlbums.count)
+      }
     }
-    
-    /// return: new synced podcast episodes if an initial sync already occued. If this is the initial sync no episods are returned
-    @MainActor public func syncNewestPodcastEpisodes() async throws -> [PodcastEpisode] {
-        let oldNewestEpisodes = Set(storage.main.library.getNewestPodcastEpisode(count: 20))
-        try await self.librarySyncer.syncNewestPodcastEpisodes()
-        
-        let updatedEpisodes = Set(self.storage.main.library.getNewestPodcastEpisode(count: 20))
-        let newAddedNewestEpisodes = updatedEpisodes.subtracting(oldNewestEpisodes)
-        if !oldNewestEpisodes.isEmpty, !newAddedNewestEpisodes.isEmpty, self.storage.settings.isAutoDownloadLatestPodcastEpisodesActive {
-            self.playableDownloadManager.download(objects: Array(newAddedNewestEpisodes))
+
+    fetchNeededNewestAlbums = newNewestAlbums.filter { !$0.isSongsMetaDataSynced }
+    try await withThrowingTaskGroup(of: Void.self) { taskGroup in
+      for album in fetchNeededNewestAlbums {
+        taskGroup.addTask { @MainActor @Sendable in
+          try await self.librarySyncer.sync(album: album)
         }
-        if !oldNewestEpisodes.isEmpty {
-            return Array(newAddedNewestEpisodes)
-        } else {
-            return [PodcastEpisode]()
-        }
+      }
+      try await taskGroup.waitForAll()
     }
-    
+
+    if offset == 0, !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty,
+       storage.settings.isAutoDownloadLatestSongsActive {
+      var newestSongs = [AbstractPlayable]()
+      for album in newNewestAlbums {
+        newestSongs.append(contentsOf: album.songs)
+      }
+      playableDownloadManager.download(objects: newestSongs)
+    }
+  }
+
+  /// return: new synced podcast episodes if an initial sync already occued. If this is the initial sync no episods are returned
+  @MainActor
+  public func syncNewestPodcastEpisodes() async throws -> [PodcastEpisode] {
+    let oldNewestEpisodes = Set(storage.main.library.getNewestPodcastEpisode(count: 20))
+    try await librarySyncer.syncNewestPodcastEpisodes()
+
+    let updatedEpisodes = Set(storage.main.library.getNewestPodcastEpisode(count: 20))
+    let newAddedNewestEpisodes = updatedEpisodes.subtracting(oldNewestEpisodes)
+    if !oldNewestEpisodes.isEmpty, !newAddedNewestEpisodes.isEmpty,
+       storage.settings.isAutoDownloadLatestPodcastEpisodesActive {
+      playableDownloadManager.download(objects: Array(newAddedNewestEpisodes))
+    }
+    if !oldNewestEpisodes.isEmpty {
+      return Array(newAddedNewestEpisodes)
+    } else {
+      return [PodcastEpisode]()
+    }
+  }
 }

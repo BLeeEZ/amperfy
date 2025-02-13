@@ -19,67 +19,76 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 class SideBarVC: KeyCommandCollectionViewController {
+  private var offsetData: [LibraryNavigatorItem] = {
+    #if targetEnvironment(macCatalyst)
+      return [
+        LibraryNavigatorItem(title: "Search", tab: .search),
+        LibraryNavigatorItem(title: "Library", isInteractable: false),
+      ]
+    #else
+      return [
+        LibraryNavigatorItem(title: "Search", tab: .search),
+        LibraryNavigatorItem(title: "Settings", tab: .settings),
+        LibraryNavigatorItem(title: "Library", isInteractable: false),
+      ]
+    #endif
+  }()
 
-    private var offsetData: [LibraryNavigatorItem] = {
-        #if targetEnvironment(macCatalyst)
-        return [LibraryNavigatorItem(title: "Search", tab: .search),
-                LibraryNavigatorItem(title: "Library", isInteractable: false)]
-        #else
-        return [LibraryNavigatorItem(title: "Search", tab: .search),
-                LibraryNavigatorItem(title: "Settings", tab: .settings),
-                LibraryNavigatorItem(title: "Library", isInteractable: false)]
-        #endif
-    }()
+  lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
+  lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
+    offsetData: offsetData,
+    librarySettings: appDelegate.storage.settings.libraryDisplaySettings,
+    layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn
+  )
 
-    lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
-    lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
-        offsetData: offsetData,
-        librarySettings: appDelegate.storage.settings.libraryDisplaySettings,
-        layoutConfig: self.layoutConfig, pressedOnLibraryItemCB: self.pushedOn
+  override func viewDidLoad() {
+    super.viewDidLoad()
+
+    clearsSelectionOnViewWillAppear = false
+    libraryItemConfigurator.viewDidLoad(
+      navigationItem: navigationItem,
+      collectionView: collectionView
     )
+  }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    becomeFirstResponder()
+    libraryItemConfigurator.viewIsAppearing(
+      navigationItem: navigationItem,
+      collectionView: collectionView
+    )
+  }
 
-        self.clearsSelectionOnViewWillAppear = false
-        libraryItemConfigurator.viewDidLoad(navigationItem: navigationItem, collectionView: collectionView)
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    resignFirstResponder()
+  }
+
+  public func pushedOn(selectedItem: LibraryNavigatorItem) {
+    guard let splitVC = splitViewController as? SplitVC,
+          !splitVC.isCollapsed
+    else { return }
+
+    if splitVC.displayMode == .oneOverSecondary {
+      splitVC.hide(.primary)
     }
 
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        self.becomeFirstResponder()
-        libraryItemConfigurator.viewIsAppearing(navigationItem: navigationItem, collectionView: collectionView)
+    if let libraryItem = selectedItem.library {
+      splitVC
+        .pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+    } else if let libraryItem = selectedItem.tab {
+      if libraryItem == .settings {
+        let vc = libraryItem.controller
+        vc.view.backgroundColor = .secondarySystemBackground
+        splitVC.pushReplaceNavLibrary(vc: vc)
+      } else {
+        splitVC.pushReplaceNavLibrary(vc: libraryItem.controller)
+      }
     }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        self.resignFirstResponder()
-    }
-    
-    public func pushedOn(selectedItem: LibraryNavigatorItem) {
-        guard let splitVC = self.splitViewController as? SplitVC,
-              !splitVC.isCollapsed
-        else { return }
-        
-        if splitVC.displayMode == .oneOverSecondary {
-            splitVC.hide(.primary)
-        }
-
-        if let libraryItem = selectedItem.library {
-            splitVC.pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
-        } else if let libraryItem = selectedItem.tab {
-            if libraryItem == .settings {
-                let vc = libraryItem.controller
-                vc.view.backgroundColor = .secondarySystemBackground
-                splitVC.pushReplaceNavLibrary(vc: vc)
-            } else {
-                splitVC.pushReplaceNavLibrary(vc: libraryItem.controller)
-            }
-        }
-    }
-
+  }
 }

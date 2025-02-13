@@ -19,153 +19,183 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import SwiftUI
 import AmperfyKit
+import SwiftUI
+
+// MARK: - AlternativeURLAddDialogView
 
 struct AlternativeURLAddDialogView: View {
+  @Binding
+  var isVisible: Bool
+  @Binding
+  var activeServerURL: String
+  @Binding
+  var serverURLs: [String]
 
-    @Binding var isVisible: Bool
-    @Binding var activeServerURL: String
-    @Binding var serverURLs: [String]
-    
-    @State var urlInput: String = ""
-    @State var usernameInput: String = ""
-    @State var passwordInput: String = ""
-    
-    @State var isValidating = false
-    @State var errorMsg: String = ""
-    @State var successMsg: String = ""
-    
-    func resetStatus() {
-        isValidating = false
-        errorMsg = ""
-        successMsg = ""
+  @State
+  var urlInput: String = ""
+  @State
+  var usernameInput: String = ""
+  @State
+  var passwordInput: String = ""
+
+  @State
+  var isValidating = false
+  @State
+  var errorMsg: String = ""
+  @State
+  var successMsg: String = ""
+
+  func resetStatus() {
+    isValidating = false
+    errorMsg = ""
+    successMsg = ""
+  }
+
+  func handleAdd() {
+    resetStatus()
+    let newAltUrl = urlInput.trimmingCharacters(in: .whitespacesAndNewlines)
+    let password = passwordInput
+    let username = appDelegate.storage.loginCredentials?.username ?? ""
+    guard !newAltUrl.isEmpty,
+          !username.isEmpty,
+          !password.isEmpty,
+          let activeApi = appDelegate.storage.loginCredentials?.backendApi
+    else {
+      errorMsg = "Inputs are not valid."
+      return
     }
-    
-    func handleAdd() {
-        resetStatus()
-        let newAltUrl = urlInput.trimmingCharacters(in: .whitespacesAndNewlines)
-        let password = passwordInput
-        let username = appDelegate.storage.loginCredentials?.username ?? ""
-        guard !newAltUrl.isEmpty,
-              !username.isEmpty,
-              !password.isEmpty,
-              let activeApi = self.appDelegate.storage.loginCredentials?.backendApi
-        else {
-            errorMsg = "Inputs are not valid."
-            return
-        }
-        
-        guard !serverURLs.contains(where: {$0 == newAltUrl}) else {
-            errorMsg = "Provided URL is already in alternative URLs list."
-            return
-        }
-        
-        guard newAltUrl.isHyperTextProtocolProvided else {
-            errorMsg = "Please provide either 'https://' or 'http://' in your server URL."
-            return
-        }
-        
-        let credentials = LoginCredentials(serverUrl: newAltUrl, username: username, password: password, backendApi: activeApi)
 
-        isValidating = true
-        Task { @MainActor in
-            do {
-                try await self.appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
-                if let activeUrl = self.appDelegate.storage.loginCredentials?.serverUrl {
-                    var currentAltUrls = self.appDelegate.storage.alternativeServerURLs
-                    currentAltUrls.append(activeUrl)
-                    self.appDelegate.storage.alternativeServerURLs = currentAltUrls
-                }
-                self.appDelegate.storage.loginCredentials = credentials
-                self.appDelegate.backendApi.provideCredentials(credentials: credentials)
-                activeServerURL = newAltUrl
-                serverURLs.append(newAltUrl)
-                successMsg = "Alternative URL added."
-            } catch {
-                errorMsg = "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added."
+    guard !serverURLs.contains(where: { $0 == newAltUrl }) else {
+      errorMsg = "Provided URL is already in alternative URLs list."
+      return
+    }
+
+    guard newAltUrl.isHyperTextProtocolProvided else {
+      errorMsg = "Please provide either 'https://' or 'http://' in your server URL."
+      return
+    }
+
+    let credentials = LoginCredentials(
+      serverUrl: newAltUrl,
+      username: username,
+      password: password,
+      backendApi: activeApi
+    )
+
+    isValidating = true
+    Task { @MainActor in
+      do {
+        try await appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
+        if let activeUrl = appDelegate.storage.loginCredentials?.serverUrl {
+          var currentAltUrls = appDelegate.storage.alternativeServerURLs
+          currentAltUrls.append(activeUrl)
+          appDelegate.storage.alternativeServerURLs = currentAltUrls
+        }
+        appDelegate.storage.loginCredentials = credentials
+        appDelegate.backendApi.provideCredentials(credentials: credentials)
+        activeServerURL = newAltUrl
+        serverURLs.append(newAltUrl)
+        successMsg = "Alternative URL added."
+      } catch {
+        errorMsg =
+          "Alternative URL could not be verified! Authentication failed! Alternative URL has not been added."
+      }
+      isValidating = false
+    }
+  }
+
+  var body: some View {
+    ZStack {
+      SettingsList {
+        Section {
+          VStack {
+            VStack(spacing: 20) {
+              Text("Add alternative URL").font(.title2).fontWeight(.bold).padding(.all, 10)
+
+              Text(
+                "The URL must reach the same server. Otherwise library inconsistencies will occure."
+              )
+
+              if !successMsg.isEmpty {
+                InfoBannerView(message: successMsg, color: .success)
+              }
+              if !errorMsg.isEmpty {
+                InfoBannerView(message: errorMsg, color: .error)
+              }
+              if isValidating {
+                ProgressView("Please wait...")
+              }
+
+              VStack(spacing: 5) {
+                TextField("https://localhost/ampache", text: $urlInput)
+                  .textFieldStyle(.roundedBorder)
+                TextField(
+                  appDelegate.storage.loginCredentials?.username ?? "",
+                  text: $usernameInput
+                )
+                .disabled(true)
+                .textFieldStyle(.roundedBorder)
+                SecureField("Password", text: $passwordInput)
+                  .textFieldStyle(.roundedBorder)
+              }
             }
-            isValidating = false
-        }
-    }
 
-    var body: some View {
-        ZStack {
-            SettingsList {
-                Section {
-                    VStack {
-                        VStack(spacing: 20) {
-                            Text("Add alternative URL").font(.title2).fontWeight(.bold).padding(.all, 10)
-                        
-                            Text("The URL must reach the same server. Otherwise library inconsistencies will occure.")
-                            
-                            if !successMsg.isEmpty {
-                                InfoBannerView(message: successMsg, color: .success)
-                            }
-                            if !errorMsg.isEmpty {
-                                InfoBannerView(message: errorMsg, color: .error)
-                            }
-                            if isValidating {
-                                ProgressView("Please wait...")
-                            }
-                            
-                            VStack(spacing: 5) {
-                                TextField("https://localhost/ampache", text: $urlInput)
-                                    .textFieldStyle(.roundedBorder)
-                                TextField(appDelegate.storage.loginCredentials?.username ?? "", text: $usernameInput)
-                                    .disabled(true)
-                                    .textFieldStyle(.roundedBorder)
-                                SecureField("Password", text: $passwordInput)
-                                    .textFieldStyle(.roundedBorder)
-                            }
-                        }
-                        
-                        HStack {
-                            Button(action: { self.isVisible = false }) {
-                                HStack {
-                                    Spacer()
-                                    Text("Cancel")
-                                        .fontWeight(.semibold)
-                                    Spacer()
-                                }
-                            }
-                            .buttonStyle(DefaultButtonStyle())
-                            Spacer()
-                            Button(action: { handleAdd() }) {
-                                HStack {
-                                    Spacer()
-                                    Text("Add")
-                                    Spacer()
-                                }
-                            }
-                            .buttonStyle(DefaultButtonStyle())
-                            .disabled(isValidating)
-                        }
-                        .padding([.top], 8)
-                    }
+            HStack {
+              Button(action: { isVisible = false }) {
+                HStack {
+                  Spacer()
+                  Text("Cancel")
+                    .fontWeight(.semibold)
+                  Spacer()
                 }
-                #if targetEnvironment(macCatalyst)
-                .listRowBackground(Color.clear)
-                #else
-                .padding()
-                #endif
+              }
+              .buttonStyle(DefaultButtonStyle())
+              Spacer()
+              Button(action: { handleAdd() }) {
+                HStack {
+                  Spacer()
+                  Text("Add")
+                  Spacer()
+                }
+              }
+              .buttonStyle(DefaultButtonStyle())
+              .disabled(isValidating)
             }
-            #if targetEnvironment(macCatalyst)
-            .listStyle(.plain)
-            #endif
+            .padding([.top], 8)
+          }
         }
-        .onAppear {
-            resetStatus()
-        }
+        #if targetEnvironment(macCatalyst)
+        .listRowBackground(Color.clear)
+        #else
+        .padding()
+        #endif
+      }
+      #if targetEnvironment(macCatalyst)
+      .listStyle(.plain)
+      #endif
     }
+    .onAppear {
+      resetStatus()
+    }
+  }
 }
 
+// MARK: - AlternativeURLAddDialogView_Previews
+
 struct AlternativeURLAddDialogView_Previews: PreviewProvider {
-    @State static var isVisible = true
-    @State static var activeServerURL: String =  ""
-    @State static var serverURLs = [String]()
-    
-    static var previews: some View {
-        AlternativeURLAddDialogView(isVisible: $isVisible, activeServerURL: $activeServerURL, serverURLs: $serverURLs)
-    }
+  @State
+  static var isVisible = true
+  @State
+  static var activeServerURL: String = ""
+  @State
+  static var serverURLs = [String]()
+
+  static var previews: some View {
+    AlternativeURLAddDialogView(
+      isVisible: $isVisible,
+      activeServerURL: $activeServerURL,
+      serverURLs: $serverURLs
+    )
+  }
 }

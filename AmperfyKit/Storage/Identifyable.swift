@@ -19,65 +19,75 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import Foundation
 import CoreData
+import Foundation
+
+// MARK: - Identifyable
 
 protocol Identifyable {
-    var identifier: String { get }
-    associatedtype ManagedObjectType where ManagedObjectType : CoreDataIdentifyable
-    var managedObject: ManagedObjectType { get }
+  var identifier: String { get }
+  associatedtype ManagedObjectType where ManagedObjectType: CoreDataIdentifyable
+  var managedObject: ManagedObjectType { get }
 }
 
+// MARK: - CoreDataIdentifyable
+
 protocol CoreDataIdentifyable where Self: NSFetchRequestResult {
-    static var identifierKey: KeyPath<Self, String?> { get }
-    static var identifierKeyString: String { get }
-    static var identifierSortedFetchRequest: NSFetchRequest<Self> { get }
-    static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate
-    static func fetchRequest() -> NSFetchRequest<Self>
+  static var identifierKey: KeyPath<Self, String?> { get }
+  static var identifierKeyString: String { get }
+  static var identifierSortedFetchRequest: NSFetchRequest<Self> { get }
+  static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate
+  static func fetchRequest() -> NSFetchRequest<Self>
 }
 
 extension CoreDataIdentifyable {
-    static var identifierKeyString: String {
-        return NSExpression(forKeyPath: Self.identifierKey).keyPath
+  static var identifierKeyString: String {
+    NSExpression(forKeyPath: Self.identifierKey).keyPath
+  }
+
+  static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate {
+    var predicate = NSPredicate(value: true)
+    if !searchText.isEmpty {
+      predicate = NSPredicate(format: "%K contains[cd] %@", Self.identifierKeyString, searchText)
     }
-    
-    static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate {
-        var predicate: NSPredicate = NSPredicate.init(value: true)
-        if searchText.count > 0 {
-            predicate = NSPredicate(format: "%K contains[cd] %@", Self.identifierKeyString, searchText)
-        }
-        return predicate
-    }
-    
-    static var identifierSortedFetchRequest: NSFetchRequest<Self> {
-        let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(key: Self.identifierKeyString, ascending: true, selector: #selector(NSString.localizedStandardCompare)),
-            NSSortDescriptor(key: "id", ascending: true, selector: #selector(NSString.localizedStandardCompare))
-        ]
-        return fetchRequest
-    }
+    return predicate
+  }
+
+  static var identifierSortedFetchRequest: NSFetchRequest<Self> {
+    let fetchRequest: NSFetchRequest<Self> = Self.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(
+        key: Self.identifierKeyString,
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+      NSSortDescriptor(
+        key: "id",
+        ascending: true,
+        selector: #selector(NSString.localizedStandardCompare)
+      ),
+    ]
+    return fetchRequest
+  }
 }
 
 extension Array where Element: Identifyable {
-    
-    func filterBy(searchText: String) -> [Element] {
-        let filteredArray = self.filter { element in
-            return element.identifier.isFoundBy(searchText: searchText)
-        }
-        return filteredArray
+  func filterBy(searchText: String) -> [Element] {
+    let filteredArray = filter { element in
+      element.identifier.isFoundBy(searchText: searchText)
     }
-    
-    func sortAlphabeticallyAscending() -> [Element] {
-        return self.sorted{
-            return $0.identifier.localizedStandardCompare($1.identifier) == ComparisonResult.orderedAscending
-        }
+    return filteredArray
+  }
+
+  func sortAlphabeticallyAscending() -> [Element] {
+    sorted {
+      $0.identifier.localizedStandardCompare($1.identifier) == ComparisonResult.orderedAscending
     }
-    
-    func sortAlphabeticallyDescending() -> [Element] {
-        return self.sorted{
-            return $0.identifier.localizedStandardCompare($1.identifier) == ComparisonResult.orderedDescending
-        }
+  }
+
+  func sortAlphabeticallyDescending() -> [Element] {
+    sorted {
+      $0.identifier.localizedStandardCompare($1.identifier) == ComparisonResult.orderedDescending
     }
-    
+  }
 }

@@ -19,27 +19,31 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import Foundation
 import XCTest
-import AmperfyKit
+
+// MARK: - MOCK_PerformanceMonitor
 
 final public class MOCK_PerformanceMonitor: ThreadPerformanceMonitor {
-    nonisolated public var shouldSlowDownExecution: Bool { return false }
-    nonisolated public var isInForeground: Bool {
-        get { return true }
-        set {}
-    }
+  nonisolated public var shouldSlowDownExecution: Bool { false }
+  nonisolated public var isInForeground: Bool {
+    get { true }
+    set {}
+  }
 }
 
+// MARK: - Helper
+
 class Helper {
-    static let testURL = URL(string: "https://github.com/BLeeEZ/amperfy")!
+  static let testURL = URL(string: "https://github.com/BLeeEZ/amperfy")!
 }
 
 extension XCTestCase {
-    func getTestFileData(name: String, withExtension: String = "xml") -> Data {
-        let bundle = Bundle(for: type(of: self))
-        let fileUrl = bundle.url(forResource: name, withExtension: withExtension)
-        let data = try! Data(contentsOf: fileUrl!)
-        return data
-    }
+  func getTestFileData(name: String, withExtension: String = "xml") -> Data {
+    let bundle = Bundle(for: type(of: self))
+    let fileUrl = bundle.url(forResource: name, withExtension: withExtension)
+    let data = try! Data(contentsOf: fileUrl!)
+    return data
+  }
 }

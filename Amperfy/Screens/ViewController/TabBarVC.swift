@@ -19,17 +19,15 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import UIKit
 import AmperfyKit
+import UIKit
 
 class TabBarVC: UITabBarController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
+  override func viewDidLoad() {
+    super.viewDidLoad()
+  }
 
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-    }
-
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+  }
 }

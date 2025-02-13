@@ -19,37 +19,38 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import XCTest
 @testable import AmperfyKit
+import XCTest
 
 class CatalogParserTest: AbstractAmpacheTest {
-    
-    override func setUp() async throws {
-        try await super.setUp()
-        xmlData = getTestFileData(name: "catalogs")
-        recreateParserDelegate()
-    }
-    
-    override func recreateParserDelegate() {
-        parserDelegate = CatalogParserDelegate(performanceMonitor: MOCK_PerformanceMonitor(), library: library)
-    }
-    
-    override func checkCorrectParsing() {
-        XCTAssertEqual(library.musicFolderCount, 4)
-        
-        let musicFolders = library.getMusicFolders().sorted(by: {Int($0.id)! < Int($1.id)!} )
-        XCTAssertEqual(musicFolders[0].id, "1")
-        XCTAssertEqual(musicFolders[0].name, "music")
-        XCTAssertFalse(musicFolders[0].isCached)
-        XCTAssertEqual(musicFolders[1].id, "2")
-        XCTAssertEqual(musicFolders[1].name, "video")
-        XCTAssertFalse(musicFolders[1].isCached)
-        XCTAssertEqual(musicFolders[2].id, "3")
-        XCTAssertEqual(musicFolders[2].name, "podcast")
-        XCTAssertFalse(musicFolders[2].isCached)
-        XCTAssertEqual(musicFolders[3].id, "4")
-        XCTAssertEqual(musicFolders[3].name, "upload")
-        XCTAssertFalse(musicFolders[3].isCached)
-    }
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = getTestFileData(name: "catalogs")
+    recreateParserDelegate()
+  }
 
+  override func recreateParserDelegate() {
+    parserDelegate = CatalogParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      library: library
+    )
+  }
+
+  override func checkCorrectParsing() {
+    XCTAssertEqual(library.musicFolderCount, 4)
+
+    let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })
+    XCTAssertEqual(musicFolders[0].id, "1")
+    XCTAssertEqual(musicFolders[0].name, "music")
+    XCTAssertFalse(musicFolders[0].isCached)
+    XCTAssertEqual(musicFolders[1].id, "2")
+    XCTAssertEqual(musicFolders[1].name, "video")
+    XCTAssertFalse(musicFolders[1].isCached)
+    XCTAssertEqual(musicFolders[2].id, "3")
+    XCTAssertEqual(musicFolders[2].name, "podcast")
+    XCTAssertFalse(musicFolders[2].isCached)
+    XCTAssertEqual(musicFolders[3].id, "4")
+    XCTAssertEqual(musicFolders[3].name, "upload")
+    XCTAssertFalse(musicFolders[3].isCached)
+  }
 }

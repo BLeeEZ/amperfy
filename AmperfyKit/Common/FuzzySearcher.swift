@@ -21,29 +21,36 @@
 
 import Ifrit
 
+// MARK: - MatchResult
+
 public struct MatchResult {
-    public let item: PlayableContainable
-    public let score: Double
+  public let item: PlayableContainable
+  public let score: Double
 }
 
-public class FuzzySearcher {
-    
-    private static let fuzzyMatchThreshold = 0.2 // A score be below this value (0 (exact match) and 1 (not a match)) will result in a match
-    
-    public static func findBestMatch(in items: [PlayableContainable], search: String) -> [PlayableContainable] {
-        let fuse = Fuse()
-        // Improve performance by creating the pattern once
-        let pattern = fuse.createPattern(from: search)
+// MARK: - FuzzySearcher
 
-        var matches = [MatchResult]()
-        items.forEach {
-            let result = fuse.search(pattern, in: $0.name)
-            if let result = result, result.score <= Self.fuzzyMatchThreshold {
-                matches.append(MatchResult(item: $0, score: result.score))
-            }
-        }
-        let sortedMatches = matches.sorted(by: {$0.score < $1.score})
-        return sortedMatches.compactMap { $0.item }
+public class FuzzySearcher {
+  private static let fuzzyMatchThreshold =
+    0.2 // A score be below this value (0 (exact match) and 1 (not a match)) will result in a match
+
+  public static func findBestMatch(
+    in items: [PlayableContainable],
+    search: String
+  )
+    -> [PlayableContainable] {
+    let fuse = Fuse()
+    // Improve performance by creating the pattern once
+    let pattern = fuse.createPattern(from: search)
+
+    var matches = [MatchResult]()
+    items.forEach {
+      let result = fuse.search(pattern, in: $0.name)
+      if let result = result, result.score <= Self.fuzzyMatchThreshold {
+        matches.append(MatchResult(item: $0, score: result.score))
+      }
     }
-    
+    let sortedMatches = matches.sorted(by: { $0.score < $1.score })
+    return sortedMatches.compactMap { $0.item }
+  }
 }
