@@ -199,8 +199,7 @@ class MOCK_BackendApi: BackendApi {
 // MARK: - MOCK_NetworkMonitor
 
 class MOCK_NetworkMonitor: NetworkMonitorFacade {
-  func getConnectionTypeChangedCB() -> ConnectionTypeChangedCallack? { nil }
-  func setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?) {}
+  var connectionTypeChangedCB: ConnectionTypeChangedCallack?
   var isConnectedToNetwork: Bool { true }
   var isCellular: Bool { false }
   var isWifiOrEthernet: Bool { true }

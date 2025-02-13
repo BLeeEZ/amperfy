@@ -42,8 +42,6 @@ class DownloadManager: NSObject, DownloadManageable {
   private let urlCleanser: URLCleanser
   private var activeTaskCount: Int
   private var isRunning = false
-  private var sleepTimer: Timer?
-  private let timeInterval = TimeInterval(5) // time to check for available downloads to start
 
   init(
     name: String,
@@ -65,6 +63,14 @@ class DownloadManager: NSObject, DownloadManageable {
     self.urlCleanser = urlCleanser
     self.downloadSlotCount = downloadDelegate.parallelDownloadsCount
     self.activeTaskCount = downloadSlotCount
+    super.init()
+
+    notificationHandler.register(
+      self,
+      selector: #selector(networkStatusChanged(notification:)),
+      name: .networkStatusChanged,
+      object: nil
+    )
   }
 
   @MainActor
@@ -103,19 +109,11 @@ class DownloadManager: NSObject, DownloadManageable {
 
   func start() {
     isRunning = true
-    sleepTimer?.invalidate()
-    sleepTimer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: true) { _ in
-      Task { @MainActor in
-        self.triggerBackgroundDownload()
-      }
-    }
     triggerBackgroundDownload()
   }
 
   func stop() {
     isRunning = false
-    sleepTimer?.invalidate()
-    sleepTimer = nil
     cancelDownloads()
   }
 
@@ -144,16 +142,17 @@ class DownloadManager: NSObject, DownloadManageable {
   }
 
   private func triggerBackgroundDownload() {
-    Task { @MainActor in
-      await self.startAvailableDownload()
+    if isAllowedToTriggerDownload {
+      Task { @MainActor in
+        await self.startAvailableDownload()
+      }
     }
   }
 
   @MainActor
   private func startAvailableDownload() async {
     // A free download task is available
-    if storage.settings.isOnlineMode,
-       networkMonitor.isConnectedToNetwork,
+    if isAllowedToTriggerDownload,
        activeTaskCount > 0 {
       if let nextDownload = requestManager.getNextRequestToDownload() {
         // There is a download to be started
@@ -262,5 +261,17 @@ class DownloadManager: NSObject, DownloadManageable {
         cancelPlayableDownloads()
       }
     }
+  }
+
+  @MainActor
+  private var isAllowedToTriggerDownload: Bool {
+    isRunning &&
+      storage.settings.isOnlineMode &&
+      networkMonitor.isConnectedToNetwork
+  }
+
+  @objc
+  private func networkStatusChanged(notification: Notification) {
+    triggerBackgroundDownload()
   }
 }

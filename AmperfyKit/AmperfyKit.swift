@@ -42,9 +42,11 @@ public class AmperKit {
   }()
 
   @MainActor
-  public var networkMonitor: NetworkMonitorFacade {
-    NetworkMonitor.shared
-  }
+  public lazy var networkMonitor: NetworkMonitorFacade = {
+    let monitor = NetworkMonitor(notificationHandler: notificationHandler)
+    monitor.start()
+    return monitor
+  }()
 
   public lazy var threadPerformanceMonitor: ThreadPerformanceMonitor = {
     ThreadPerformanceObserver.shared
@@ -76,7 +78,7 @@ public class AmperKit {
   @MainActor
   public lazy var backendApi: BackendProxy = {
     let api = BackendProxy(
-      networkMonitor: NetworkMonitor.shared,
+      networkMonitor: networkMonitor,
       performanceMonitor: threadPerformanceMonitor,
       eventLogger: eventLogger,
       persistentStorage: storage
@@ -108,7 +110,7 @@ public class AmperKit {
       cacheProxy: storage.main.library,
       userStatistics: userStatistics
     )
-    networkMonitor.setConnectionTypeChangedCB { isWiFiConnected in
+    networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
       Task { @MainActor in
         backendAudioPlayer.setStreamingMaxBitrates(to: StreamingMaxBitrates(
           wifi: self.storage.settings.streamingMaxBitrateWifiPreference,

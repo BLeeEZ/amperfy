@@ -30,9 +30,7 @@ public typealias ConnectionTypeChangedCallack = @Sendable (_ isWiFiConnected: Bo
 
 public protocol NetworkMonitorFacade {
   @MainActor
-  func getConnectionTypeChangedCB() -> ConnectionTypeChangedCallack?
-  @MainActor
-  func setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?)
+  var connectionTypeChangedCB: ConnectionTypeChangedCallack? { get set }
   @MainActor
   var isConnectedToNetwork: Bool { get }
   @MainActor
@@ -45,34 +43,24 @@ public protocol NetworkMonitorFacade {
 
 @MainActor
 public class NetworkMonitor: NetworkMonitorFacade {
-  public static let shared = NetworkMonitor().start()
+  public var connectionTypeChangedCB: ConnectionTypeChangedCallack?
 
   private var reachabilityManager = Alamofire.NetworkReachabilityManager()
   private let queue = DispatchQueue(label: "NetworkMonitor")
   private let log = OSLog(subsystem: "Amperfy", category: "NetworkMonitor")
-  private var connectionTypeChangedCB: ConnectionTypeChangedCallack?
-
-  public func getConnectionTypeChangedCB() -> ConnectionTypeChangedCallack? {
-    connectionTypeChangedCB
-  }
-
-  public func setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?) {
-    _setConnectionTypeChangedCB(newCB: newCB)
-  }
-
-  private func _setConnectionTypeChangedCB(newCB: ConnectionTypeChangedCallack?) {
-    connectionTypeChangedCB = newCB
-  }
-
   private let monitor = NWPathMonitor()
   private var networkPath: NWPath
+  private let notificationHandler: EventNotificationHandler
 
-  init() {
+  init(notificationHandler: EventNotificationHandler) {
     self.networkPath = monitor.currentPath
+    self.notificationHandler = notificationHandler
   }
 
   private func updateNetworkPath(newPath: NWPath) async {
+    let isConnectedBeforeChange = isConnectedToNetwork
     networkPath = newPath
+    let isConnectedAfterChange = isConnectedToNetwork
 
     if networkPath.status != .satisfied {
       os_log("Disconnected: The network is not reachable", log: self.log, type: .info)
@@ -108,17 +96,23 @@ public class NetworkMonitor: NetworkMonitorFacade {
       )
     }
 
+    if isConnectedBeforeChange != isConnectedAfterChange {
+      notificationHandler.post(
+        name: .networkStatusChanged,
+        object: self,
+        userInfo: nil
+      )
+    }
     await connectionTypeChangedCB?(!isCellular)
   }
 
-  func start() -> NetworkMonitor {
+  func start() {
     monitor.pathUpdateHandler = { [self] networkPath in
       Task {
         await updateNetworkPath(newPath: networkPath)
       }
     }
     monitor.start(queue: queue)
-    return self
   }
 
   public var isConnectedToNetwork: Bool {
