@@ -206,6 +206,9 @@ public class AmperKit {
       eventLogger: eventLogger,
       urlCleanser: backendApi
     )
+    dlManager.cacheSizeLimitReachedCB = {
+      requestManager.cancelDownloads()
+    }
 
     let configuration = URLSessionConfiguration
       .background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")

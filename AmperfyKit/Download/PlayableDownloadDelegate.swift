@@ -58,12 +58,12 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
   }
 
   @MainActor
-  func validateDownloadedData(download: Download) -> ResponseError? {
-    guard let fileURL = download.fileURL else {
+  func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? {
+    guard let fileURL = fileURL else {
       return ResponseError(
         type: .api,
         message: "Invalid download",
-        cleansedURL: download.url?.asCleansedURL(cleanser: backendApi)
+        cleansedURL: downloadURL?.asCleansedURL(cleanser: backendApi)
       )
     }
     guard let data = CacheFileManager.shared.getFileDataIfNotToBig(
@@ -72,21 +72,18 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     ) else { return nil }
     return backendApi.checkForErrorResponse(response: APIDataResponse(
       data: data,
-      url: download.url
+      url: downloadURL
     ))
   }
 
   @MainActor
   func completedDownload(download: Download, storage: PersistentStorage) async {
     guard let fileURL = download.fileURL,
-          let playable = download.element as? AbstractPlayable,
-          let url = download.url else {
-      return
-    }
+          let playable = download.element as? AbstractPlayable
+    else { return }
     do {
       try await savePlayableDataAsync(
         playable: playable,
-        downloadUrl: url,
         fileURL: fileURL,
         fileMimeType: download.mimeType,
         storage: storage
@@ -101,7 +98,6 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
   @MainActor
   func savePlayableDataAsync(
     playable: AbstractPlayable,
-    downloadUrl: URL,
     fileURL: URL,
     fileMimeType: String?,
     storage: PersistentStorage

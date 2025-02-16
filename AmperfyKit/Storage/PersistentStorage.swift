@@ -292,14 +292,13 @@ public actor AsyncCoreDataAccessWrapper {
 
     let syncRequestedValue = try await context.perform {
       context.retainsRegisteredObjects = true
-      let library = LibraryStorage(context: context)
       let asyncCompanion = CoreDataCompanion(context: context)
       do {
         let asyncRequestedValue = try body(asyncCompanion)
-        library.saveContext()
+        asyncCompanion.saveContext()
         return asyncRequestedValue
       } catch {
-        library.saveContext()
+        asyncCompanion.saveContext()
         throw error
       }
     }

@@ -46,6 +46,7 @@ extension DownloadMO {
   public var totalSize: String?
   @NSManaged
   public var resumeData: Data?
+  @available(*, deprecated, message: "Download URL will not be saved in Core Data anymore.")
   @NSManaged
   public var urlString: String
   @NSManaged

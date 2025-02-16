@@ -90,7 +90,6 @@ class MOCK_SongDownloader: DownloadManageable {
   func cancelDownloads() {}
   func start() {}
   func stop() {}
-  func cancelPlayableDownloads() {}
 }
 
 // MARK: - MOCK_AlertDisplayable
@@ -160,7 +159,7 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
   var parallelDownloadsCount = 2
   func prepareDownload(download: Download) async throws -> URL { throw BackendError.notSupported }
   @MainActor
-  func validateDownloadedData(download: Download) -> ResponseError? { nil }
+  func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? { nil }
   @MainActor
   func completedDownload(download: Download, storage: PersistentStorage) async {}
   @MainActor

@@ -55,12 +55,12 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
   }
 
   @MainActor
-  public func validateDownloadedData(download: Download) -> ResponseError? {
-    guard let fileURL = download.fileURL else {
+  public func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? {
+    guard let fileURL else {
       return ResponseError(
         type: .api,
         message: "Invalid download",
-        cleansedURL: download.url?.asCleansedURL(cleanser: ampacheXmlServerApi),
+        cleansedURL: downloadURL?.asCleansedURL(cleanser: ampacheXmlServerApi),
         data: nil
       )
     }
@@ -70,7 +70,7 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     ) else { return nil }
     return ampacheXmlServerApi.checkForErrorResponse(response: APIDataResponse(
       data: data,
-      url: download.url
+      url: downloadURL
     ))
   }
 

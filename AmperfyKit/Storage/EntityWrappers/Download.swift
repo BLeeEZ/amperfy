@@ -88,19 +88,8 @@ public class Download: NSObject {
     set { newValue ? (startDate = Date()) : (finishDate = Date()) }
   }
 
-  public var url: URL? {
-    URL(string: urlString)
-  }
-
-  public func setURL(_ url: URL) {
-    if managedObject.urlString != url.absoluteString {
-      managedObject.urlString = url.absoluteString
-    }
-  }
-
-  public var urlString: String {
-    get { managedObject.urlString }
-    set { if managedObject.urlString != newValue { managedObject.urlString = newValue } }
+  public func suspend() {
+    if startDate != nil { startDate = nil }
   }
 
   public var creationDate: Date? {

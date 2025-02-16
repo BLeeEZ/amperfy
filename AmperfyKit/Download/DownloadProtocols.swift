@@ -36,7 +36,6 @@ public protocol DownloadManageable {
   func clearFinishedDownloads()
   func resetFailedDownloads()
   func cancelDownloads()
-  func cancelPlayableDownloads()
   func start()
   func stop()
 }
@@ -49,7 +48,7 @@ public protocol DownloadManagerDelegate {
   @MainActor
   func prepareDownload(download: Download) async throws -> URL
   @MainActor
-  func validateDownloadedData(download: Download) -> ResponseError?
+  func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError?
   @MainActor
   func completedDownload(download: Download, storage: PersistentStorage) async
   @MainActor
