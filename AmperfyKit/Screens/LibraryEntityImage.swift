@@ -26,6 +26,7 @@ public class LibraryEntityImage: RoundedImage {
   let appDelegate: AmperKit
   var entity: AbstractLibraryEntity?
   var backupImage: UIImage?
+  var imagePreparationTask: Task<Void, Never>?
 
   required public init?(coder: NSCoder) {
     self.appDelegate = AmperKit.shared
@@ -74,8 +75,17 @@ public class LibraryEntityImage: RoundedImage {
       theme: appDelegate.storage.settings.themePreference,
       setting: appDelegate.storage.settings.artworkDisplayPreference
     ) ?? placeholderImage
-
-    image = imageToDisplay
+    
+    imagePreparationTask?.cancel()
+    imagePreparationTask = Task.detached(priority: .high) { [weak self] in
+      guard let self, !Task.isCancelled else { return }
+      let readyImage = await imageToDisplay.byPreparingForDisplay()
+      guard !Task.isCancelled else { return }
+      Task { @MainActor [weak self] in
+        guard let self else { return }
+        self.image = readyImage
+      }
+    }
   }
 
   @objc
