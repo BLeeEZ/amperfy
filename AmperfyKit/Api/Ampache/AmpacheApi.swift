@@ -58,11 +58,11 @@ class AmpacheApi: BackendApi {
   }
 
   @MainActor
-  func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws
+  func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws
     -> URL {
     try await ampacheXmlServerApi.generateUrlForDownloadingPlayable(
-      isSong: playable.isSong,
-      id: playable.id
+      isSong: playableInfo.type == .song,
+      id: playableInfo.id
     )
   }
 

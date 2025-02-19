@@ -740,7 +740,7 @@ class SubsonicServerApi: URLCleanser {
     }
   }
 
-  public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+  nonisolated public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
     let errorParser = SsXmlParser(performanceMonitor: performanceMonitor)
     let parser = XMLParser(data: response.data)
     parser.delegate = errorParser

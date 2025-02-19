@@ -22,13 +22,6 @@
 import CoreData
 import Foundation
 
-// MARK: - DownloadRequest
-
-struct DownloadRequest: Hashable, Sendable {
-  let objectID: NSManagedObjectID
-  let id: String
-}
-
 // MARK: - DownloadTaskInfo
 
 struct DownloadTaskInfo: Sendable {
@@ -49,21 +42,25 @@ class DownloadRequestManager {
     self.downloadDelegate = downloadDelegate
   }
 
-  func add(object: Downloadable) async -> DownloadRequest? {
-    guard let downloadInfo = object.threadSafeInfo else { return nil }
-    return try? await storage.async.performAndGet { asyncCompanion in
+  func add(downloadInfo: DownloadElementInfo) async -> DownloadRequest? {
+    let request = try? await storage.async.performAndGet { asyncCompanion -> DownloadRequest? in
       let asyncObject = Download.createDownloadableObject(
         inContext: asyncCompanion.context,
         info: downloadInfo
       )
       let download = self.addLowPrio(object: asyncObject, library: asyncCompanion.library)
       guard let download else { return nil }
-      return DownloadRequest(objectID: download.managedObject.objectID, id: asyncObject.uniqueID)
+      return DownloadRequest(
+        objectID: download.managedObject.objectID,
+        id: asyncObject.uniqueID,
+        title: download.title,
+        info: downloadInfo
+      )
     }
+    return request
   }
 
-  func add(objects: [Downloadable]) async -> [DownloadRequest] {
-    let downloadInfos = objects.compactMap { $0.threadSafeInfo }
+  func add(downloadInfos: [DownloadElementInfo]) async -> [DownloadRequest] {
     guard !downloadInfos.isEmpty else { return [] }
     return try! await storage.async.performAndGet { asyncCompanion in
       var asyncRequests = [DownloadRequest]()
@@ -76,7 +73,7 @@ class DownloadRequestManager {
         guard let asyncDownload else { continue }
         asyncRequests.append(DownloadRequest(
           objectID: asyncDownload.managedObject.objectID,
-          id: object.uniqueID
+          id: object.uniqueID, title: asyncDownload.title, info: downloadInfo
         ))
       }
       return asyncRequests
@@ -128,11 +125,17 @@ class DownloadRequestManager {
         // ignore start date -> reset it after fetched
       ])
       let downloadsMO = try? asyncCompanion.context.fetch(fetchRequest)
-      let downloadRequests = downloadsMO?.compactMap {
-        let download = Download(managedObject: $0)
+      let downloadRequests = downloadsMO?.compactMap { downloadMo -> DownloadRequest? in
+        let download = Download(managedObject: downloadMo)
         download.startDate = nil
         let id = download.id
-        return DownloadRequest(objectID: $0.objectID, id: id)
+        guard let element = download.element else { return nil }
+        return DownloadRequest(
+          objectID: downloadMo.objectID,
+          id: id,
+          title: download.title,
+          info: DownloadElementInfo(objectId: element.objectID, type: download.baseType)
+        )
       }
       asyncCompanion.saveContext()
       return downloadRequests
@@ -203,11 +206,17 @@ class DownloadRequestManager {
         NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
       ])
       let downloadsMO = try? asyncCompanion.context.fetch(fetchRequest)
-      let downloadRequests = downloadsMO?.compactMap {
-        let download = Download(managedObject: $0)
+      let downloadRequests = downloadsMO?.compactMap { downloadMo -> DownloadRequest? in
+        let download = Download(managedObject: downloadMo)
         let id = download.id
         download.reset()
-        return DownloadRequest(objectID: $0.objectID, id: id)
+        guard let element = download.element else { return nil }
+        return DownloadRequest(
+          objectID: downloadMo.objectID,
+          id: id,
+          title: download.title,
+          info: DownloadElementInfo(objectId: element.objectID, type: download.baseType)
+        )
       }
       return downloadRequests
     }

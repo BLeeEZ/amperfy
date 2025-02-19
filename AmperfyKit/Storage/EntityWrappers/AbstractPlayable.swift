@@ -26,10 +26,19 @@ import UIKit
 
 // MARK: - DerivedPlayableType
 
-public enum DerivedPlayableType {
+public enum DerivedPlayableType: Sendable {
   case song
   case podcastEpisode
   case radio
+}
+
+// MARK: - AbstractPlayableInfo
+
+public struct AbstractPlayableInfo: Sendable {
+  let id: String
+  let objectID: NSManagedObjectID
+  let type: DerivedPlayableType
+  let streamId: String? // Can vary for Subsonic: Podcast Episode -> streamId
 }
 
 // MARK: - AbstractPlayable
@@ -72,8 +81,8 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     }
   }
 
-  public var threadSafeInfo: DownloadInfo? {
-    DownloadInfo(objectId: objectID, type: .playable)
+  public var threadSafeInfo: DownloadElementInfo? {
+    DownloadElementInfo(objectId: objectID, type: .playable)
   }
 
   public var objectID: NSManagedObjectID {
@@ -271,6 +280,15 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
       isPodcastEpisode ? .podcastEpisode :
       isRadio ? .radio :
       .song
+  }
+
+  public var info: AbstractPlayableInfo {
+    AbstractPlayableInfo(
+      id: id,
+      objectID: objectID,
+      type: derivedType,
+      streamId: asPodcastEpisode?.streamId
+    )
   }
 
   public var isSong: Bool {

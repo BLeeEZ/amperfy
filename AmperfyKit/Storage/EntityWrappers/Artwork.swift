@@ -25,7 +25,7 @@ import UIKit
 
 // MARK: - ImageStatus
 
-public enum ImageStatus: Int16 {
+public enum ImageStatus: Int16, Sendable {
   case IsDefaultImage = 0
   case NotChecked = 1
   case CustomImage = 2
@@ -132,5 +132,8 @@ extension Artwork: Downloadable {
   public var objectID: NSManagedObjectID { managedObject.objectID }
   public var isCached: Bool { false }
   public var displayString: String { "Artwork id: \(id), type: \(type)" }
-  public var threadSafeInfo: DownloadInfo? { DownloadInfo(objectId: objectID, type: .artwork) }
+  public var threadSafeInfo: DownloadElementInfo? { DownloadElementInfo(
+    objectId: objectID,
+    type: .artwork
+  ) }
 }

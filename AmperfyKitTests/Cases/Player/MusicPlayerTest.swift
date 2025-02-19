@@ -80,7 +80,8 @@ class MOCK_SongDownloader: DownloadManageable {
     downloadables.isEmpty
   }
 
-  var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get { nil } set {} }
+  func getBackgroundFetchCompletionHandler() async -> AmperfyKit.CompleteHandlerBlock? { nil }
+  func setBackgroundFetchCompletionHandler(_ newValue: AmperfyKit.CompleteHandlerBlock?) {}
   func download(object: Downloadable) { downloadables.append(object) }
   func download(objects: [Downloadable]) { downloadables.append(contentsOf: objects) }
   func removeFinishedDownload(for object: Downloadable) {}
@@ -157,13 +158,26 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
 class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
   var requestPredicate: NSPredicate { NSPredicate(value: true) }
   var parallelDownloadsCount = 2
-  func prepareDownload(download: Download) async throws -> URL { throw BackendError.notSupported }
-  @MainActor
+  func prepareDownload(
+    downloadInfo: AmperfyKit.DownloadElementInfo,
+    storage: AmperfyKit.AsyncCoreDataAccessWrapper
+  ) async throws
+    -> URL {
+    throw BackendError.notSupported
+  }
+
   func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? { nil }
-  @MainActor
-  func completedDownload(download: Download, storage: PersistentStorage) async {}
-  @MainActor
-  func failedDownload(download: Download, storage: PersistentStorage) {}
+  func completedDownload(
+    downloadInfo: AmperfyKit.DownloadElementInfo,
+    fileURL: URL,
+    fileMimeType: String?,
+    storage: AmperfyKit.AsyncCoreDataAccessWrapper
+  ) async {}
+
+  func failedDownload(
+    downloadInfo: AmperfyKit.DownloadElementInfo,
+    storage: AmperfyKit.AsyncCoreDataAccessWrapper
+  ) async {}
 }
 
 // MARK: - MOCK_BackendApi
@@ -177,8 +191,12 @@ class MOCK_BackendApi: BackendApi {
     throw BackendError.notSupported
   }
 
-  func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL { Helper
-    .testURL
+  func generateUrl(
+    forDownloadingPlayable playableInfo: AmperfyKit
+      .AbstractPlayableInfo
+  ) async throws
+    -> URL {
+    Helper.testURL
   }
 
   func generateUrl(
@@ -186,6 +204,7 @@ class MOCK_BackendApi: BackendApi {
     maxBitrate: StreamingMaxBitratePreference
   ) async throws
     -> URL { Helper.testURL }
+
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL { Helper.testURL }
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { nil }
   func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { MOCK_LibrarySyncer() }

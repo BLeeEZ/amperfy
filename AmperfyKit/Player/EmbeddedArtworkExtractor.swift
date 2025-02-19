@@ -26,42 +26,43 @@ final class EmbeddedArtworkExtractor: Sendable {
   private let id3TagEditor = ID3TagEditor()
   private let fileManager = CacheFileManager.shared
 
-  @MainActor
   func extractEmbeddedArtwork(
-    storage: PersistentStorage,
-    playable: AbstractPlayable
+    playableInfo: AbstractPlayableInfo,
+    storage: AsyncCoreDataAccessWrapper
   ) async throws {
-    guard let relFilePath = playable.relFilePath,
-          let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
-    else { return }
+    let absFilePath: URL? = try await storage.performAndGet { asyncCompanion in
+      let playable = AbstractPlayable(
+        managedObject: asyncCompanion.context
+          .object(with: playableInfo.objectID) as! AbstractPlayableMO
+      )
+      guard let relFilePath = playable.relFilePath else { return nil }
+      return self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+    }
+    guard let absFilePath else { return }
 
-    let artworks = await Task {
-      guard let id3Tag = try? self.id3TagEditor.read(from: absFilePath.path)
-      else { return [AttachedPicture]() }
-      let tagContentReader = ID3TagContentReader(id3Tag: id3Tag)
-      let artworks = tagContentReader.attachedPictures()
-      return artworks
-    }.value
+    guard let id3Tag = try? id3TagEditor.read(from: absFilePath.path) else { return }
+    let tagContentReader = ID3TagContentReader(id3Tag: id3Tag)
+    let artworks = tagContentReader.attachedPictures()
 
-    let playableObjectId = playable.objectID
-    try await storage.async.perform { companion in
-      guard let playableAsyncMO = companion.context
-        .object(with: playableObjectId) as? AbstractPlayableMO else { return }
-      let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
+    try await storage.perform { asyncCompanion in
+      let playable = AbstractPlayable(
+        managedObject: asyncCompanion.context
+          .object(with: playableInfo.objectID) as! AbstractPlayableMO
+      )
 
       // if there is a frontCover artwork take this as embedded artwork
       if let frontCoverArtwork = artworks.lazy.filter({ $0.type == .frontCover }).first,
          let artworkImage = UIImage(data: frontCoverArtwork.picture) {
         self.saveEmbeddedImageInLibrary(
-          library: companion.library,
-          playable: playableAsync,
+          library: asyncCompanion.library,
+          playable: playable,
           embeddedImage: artworkImage
         )
         // take the first other available artwork
       } else if let artworkImage = artworks.lazy.compactMap({ UIImage(data: $0.picture) }).first {
         self.saveEmbeddedImageInLibrary(
-          library: companion.library,
-          playable: playableAsync,
+          library: asyncCompanion.library,
+          playable: playable,
           embeddedImage: artworkImage
         )
       }

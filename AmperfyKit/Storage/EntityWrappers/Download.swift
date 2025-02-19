@@ -30,9 +30,9 @@ public enum DownloadableType: Sendable {
   case unknown
 }
 
-// MARK: - DownloadInfo
+// MARK: - DownloadElementInfo
 
-public struct DownloadInfo: Sendable {
+public struct DownloadElementInfo: Hashable, Sendable {
   let objectId: NSManagedObjectID
   let type: DownloadableType
 }
@@ -49,9 +49,6 @@ public class Download: NSObject {
       self.creationDate = Date()
     }
   }
-
-  public var fileURL: URL? // Will not be saved in CoreData
-  public var mimeType: String? // Will not be saved in CoreData
 
   public var title: String {
     element?.displayString ?? ""
@@ -151,10 +148,9 @@ public class Download: NSObject {
     set { if managedObject.totalSize != newValue { managedObject.totalSize = totalSize } }
   }
 
-  public var threadSafeInfo: DownloadInfo? {
-    let type = baseType
-    guard type != .unknown else { return nil }
-    return DownloadInfo(objectId: managedObject.objectID, type: type)
+  public var threadSafeInfo: DownloadElementInfo? {
+    guard let element = element else { return nil }
+    return DownloadElementInfo(objectId: element.objectID, type: baseType)
   }
 
   public var baseType: DownloadableType {
@@ -169,7 +165,7 @@ public class Download: NSObject {
 
   static public func createDownloadableObject(
     inContext context: NSManagedObjectContext,
-    info: DownloadInfo
+    info: DownloadElementInfo
   )
     -> Downloadable {
     switch info.type {

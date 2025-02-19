@@ -46,13 +46,23 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
   }
 
   @MainActor
-  func prepareDownload(download: Download) async throws -> URL {
-    guard let artwork = download.element as? Artwork else { throw DownloadError.fetchFailed }
+  func prepareDownload(
+    downloadInfo: DownloadElementInfo,
+    storage: AsyncCoreDataAccessWrapper
+  ) async throws
+    -> URL {
+    guard downloadInfo.type == .artwork else { throw DownloadError.fetchFailed }
     guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-    return try await subsonicServerApi.generateUrl(forArtworkId: artwork.id)
+    let artworkId = try await storage.performAndGet { asyncCompanion in
+      let artwork = Artwork(
+        managedObject: asyncCompanion.context
+          .object(with: downloadInfo.objectId) as! ArtworkMO
+      )
+      return artwork.id
+    }
+    return try await subsonicServerApi.generateUrl(forArtworkId: artworkId)
   }
 
-  @MainActor
   func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? {
     guard let fileURL else {
       return ResponseError(
@@ -72,37 +82,56 @@ class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     ))
   }
 
-  @MainActor
-  func completedDownload(download: Download, storage: PersistentStorage) async {
-    guard download.fileURL != nil,
-          let artwork = download.element as? Artwork else {
-      return
+  func completedDownload(
+    downloadInfo: DownloadElementInfo,
+    fileURL: URL,
+    fileMimeType: String?,
+    storage: AsyncCoreDataAccessWrapper
+  ) async {
+    guard downloadInfo.type == .artwork else { return }
+    let artworkRemoteInfo = try? await storage.performAndGet { asyncCompanion in
+      let artwork = Artwork(
+        managedObject: asyncCompanion.context
+          .object(with: downloadInfo.objectId) as! ArtworkMO
+      )
+      return artwork.remoteInfo
     }
-    storage.main.perform { companion in
+    guard let artworkRemoteInfo else { return }
+    let relFilePath = handleCustomImage(fileURL: fileURL, artworkRemoteInfo: artworkRemoteInfo)
+    try? await storage.perform { asyncCompanion in
+      let artwork = Artwork(
+        managedObject: asyncCompanion.context
+          .object(with: downloadInfo.objectId) as! ArtworkMO
+      )
       artwork.status = .CustomImage
-      artwork.relFilePath = self.handleCustomImage(download: download, artwork: artwork)
+      artwork.relFilePath = relFilePath
     }
   }
 
-  func handleCustomImage(download: Download, artwork: Artwork) -> URL? {
-    guard let downloadPath = download.fileURL,
-          let relFilePath = fileManager.createRelPath(for: artwork),
+  func handleCustomImage(fileURL: URL, artworkRemoteInfo: ArtworkRemoteInfo) -> URL? {
+    guard let relFilePath = fileManager.createRelPath(for: artworkRemoteInfo),
           let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
     else { return nil }
     do {
-      try fileManager.moveExcludedFromBackupItem(at: downloadPath, to: absFilePath)
+      try fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
       return relFilePath
     } catch {
       return nil
     }
   }
 
-  @MainActor
-  func failedDownload(download: Download, storage: PersistentStorage) {
-    guard let artwork = download.element as? Artwork else {
-      return
+  func failedDownload(
+    downloadInfo: DownloadElementInfo,
+    storage: AsyncCoreDataAccessWrapper
+  ) async {
+    guard downloadInfo.type == .artwork else { return }
+    try? await storage.perform { asyncCompanion in
+      let artwork = Artwork(
+        managedObject: asyncCompanion.context
+          .object(with: downloadInfo.objectId) as! ArtworkMO
+      )
+      artwork.status = .FetchError
+      asyncCompanion.saveContext()
     }
-    artwork.status = .FetchError
-    storage.main.saveContext()
   }
 }

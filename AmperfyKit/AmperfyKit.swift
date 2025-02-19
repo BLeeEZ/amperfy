@@ -198,17 +198,13 @@ public class AmperKit {
     let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
     let dlManager = DownloadManager(
       name: "PlayableDownloader",
-      networkMonitor: networkMonitor,
-      storage: storage,
+      storage: storage.async,
       requestManager: requestManager,
-      downloadDelegate: dlDelegate,
-      notificationHandler: notificationHandler,
       eventLogger: eventLogger,
-      urlCleanser: backendApi
+      settings: storage.settings,
+      limitCacheSize: true,
+      isFailWithPopupError: true
     )
-    dlManager.cacheSizeLimitReachedCB = {
-      requestManager.cancelDownloads()
-    }
 
     let configuration = URLSessionConfiguration
       .background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
@@ -217,7 +213,14 @@ public class AmperKit {
       delegate: dlManager,
       delegateQueue: nil
     )
-    dlManager.urlSession = urlSession
+    dlManager.initialize(
+      networkMonitor: networkMonitor,
+      downloadDelegate: dlDelegate,
+      urlSession: urlSession,
+      validationCB: nil,
+      notificationHandler: notificationHandler,
+      urlCleanser: backendApi
+    )
 
     return dlManager
   }
@@ -234,32 +237,47 @@ public class AmperKit {
     requestManager.clearAllDownloadsIfAllHaveFinished()
     let dlManager = DownloadManager(
       name: "ArtworkDownloader",
-      networkMonitor: networkMonitor,
-      storage: storage,
+      storage: storage.async,
       requestManager: requestManager,
-      downloadDelegate: dlDelegate,
-      notificationHandler: notificationHandler,
       eventLogger: eventLogger,
-      urlCleanser: backendApi
+      settings: storage.settings,
+      limitCacheSize: false,
+      isFailWithPopupError: false
     )
-    dlManager.isFailWithPopupError = false
 
-    dlManager.preDownloadIsValidCheck = { (object: Downloadable) -> Bool in
-      guard let artwork = object as? Artwork else { return false }
-      switch self.storage.settings.artworkDownloadSetting {
-      case .updateOncePerSession:
-        return true
-      case .onlyOnce:
-        switch artwork.status {
-        case .FetchError, .NotChecked:
-          return true
-        case .CustomImage, .IsDefaultImage:
-          return false
+    let validationCB: PreDownloadIsValidCB =
+      { (downloadInfos: [DownloadElementInfo]) -> [DownloadElementInfo] in
+        let artworkDownloadInfos = downloadInfos.filter { $0.type == .artwork }
+
+        let artworkDownloadSetting = self.storage.settings.artworkDownloadSetting
+        guard artworkDownloadSetting != .never else { return [DownloadElementInfo]() }
+        guard artworkDownloadSetting != .updateOncePerSession else { return artworkDownloadInfos }
+
+        let dlInfos = try? await self.storage.async.performAndGet { asyncCompanion in
+          var validDls = [DownloadElementInfo]()
+          for dlInfo in artworkDownloadInfos {
+            guard dlInfo.type == .artwork else { continue }
+            let artwork = Artwork(
+              managedObject: asyncCompanion.context
+                .object(with: dlInfo.objectId) as! ArtworkMO
+            )
+
+            switch artworkDownloadSetting {
+            case .onlyOnce:
+              switch artwork.status {
+              case .FetchError, .NotChecked:
+                validDls.append(dlInfo)
+              case .CustomImage, .IsDefaultImage:
+                continue
+              }
+            case .never, .updateOncePerSession:
+              continue // already handled above
+            }
+          }
+          return validDls
         }
-      case .never:
-        return false
+        return dlInfos ?? [DownloadElementInfo]()
       }
-    }
 
     let configuration = URLSessionConfiguration.default
     let urlSession = URLSession(
@@ -267,7 +285,14 @@ public class AmperKit {
       delegate: dlManager,
       delegateQueue: nil
     )
-    dlManager.urlSession = urlSession
+    dlManager.initialize(
+      networkMonitor: networkMonitor,
+      downloadDelegate: dlDelegate,
+      urlSession: urlSession,
+      validationCB: validationCB,
+      notificationHandler: notificationHandler,
+      urlCleanser: backendApi
+    )
 
     return dlManager
   }

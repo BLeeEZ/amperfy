@@ -540,14 +540,14 @@ final public class CacheFileManager: Sendable {
     }
   }
 
-  public func createRelPath(for artwork: Artwork) -> URL? {
-    guard !artwork.managedObject.id.isEmpty else { return nil }
-    if !artwork.type.isEmpty {
-      return Self.artworksDir.appendingPathComponent(artwork.type)
-        .appendingPathComponent(artwork.managedObject.id)
+  public func createRelPath(for artworkRemoteInfo: ArtworkRemoteInfo) -> URL? {
+    guard !artworkRemoteInfo.id.isEmpty else { return nil }
+    if !artworkRemoteInfo.type.isEmpty {
+      return Self.artworksDir.appendingPathComponent(artworkRemoteInfo.type)
+        .appendingPathComponent(artworkRemoteInfo.id)
         .appendingPathExtension(Self.artworkFileExtension)
     } else {
-      return Self.artworksDir.appendingPathComponent(artwork.managedObject.id)
+      return Self.artworksDir.appendingPathComponent(artworkRemoteInfo.id)
         .appendingPathExtension(Self.artworkFileExtension)
     }
   }

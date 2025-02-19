@@ -400,7 +400,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     completionHandler: @Sendable @escaping () -> ()
   ) {
     os_log("handleEventsForBackgroundURLSession: %s", log: self.log, type: .info, identifier)
-    playableDownloadManager.backgroundFetchCompletionHandler = completionHandler
+    playableDownloadManager.setBackgroundFetchCompletionHandler(completionHandler)
   }
 
   func application(

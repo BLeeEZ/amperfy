@@ -816,7 +816,7 @@ class AmpacheXmlServerApi: URLCleanser {
     try await updateUrlToken(urlString: artworkUrl)
   }
 
-  public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+  nonisolated public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
     let errorParser = AmpacheXmlParser(performanceMonitor: performanceMonitor)
     let parser = XMLParser(data: response.data)
     parser.delegate = errorParser

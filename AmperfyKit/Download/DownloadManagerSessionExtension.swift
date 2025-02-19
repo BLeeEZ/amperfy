@@ -42,8 +42,8 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
     // A file URL for the temporary file. Because the file is temporary, you must either open the file for
     // reading or move it to a permanent location in your app’s sandbox container directory before returning from this delegate method.
     // If you choose to open the file for reading, you should do the actual reading in another thread to avoid blocking the delegate queue.
-    Task { @MainActor in
-      guard let taskInfo = tasks[downloadTask] else { return }
+    Task {
+      guard let taskInfo = await tasks[downloadTask] else { return }
 
       var downloadError: DownloadError?
       if let filePath = filePath,
@@ -59,7 +59,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
       }
 
       if let activeError = downloadError {
-        self.finishDownload(
+        await self.finishDownload(
           downloadRequest: taskInfo.request,
           task: downloadTask,
           error: activeError
@@ -71,7 +71,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
           fileMimeType: fileMimeType
         )
       } else {
-        self.finishDownload(
+        await self.finishDownload(
           downloadRequest: taskInfo.request,
           task: downloadTask,
           error: .emptyFile
@@ -86,9 +86,9 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
     didCompleteWithError error: Error?
   ) {
     guard error != nil else { return }
-    Task { @MainActor in
-      guard let taskInfo = tasks[task] else { return }
-      self.finishDownload(downloadRequest: taskInfo.request, task: task, error: .fetchFailed)
+    Task {
+      guard let taskInfo = await tasks[task] else { return }
+      await self.finishDownload(downloadRequest: taskInfo.request, task: task, error: .fetchFailed)
     }
   }
 
@@ -105,10 +105,10 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
   nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
     os_log("URLSession urlSessionDidFinishEvents", log: self.log, type: .info)
     Task { @MainActor in
-      guard let completionHandler = backgroundFetchCompletionHandler else { return }
+      guard let completionHandler = await getBackgroundFetchCompletionHandler() else { return }
       os_log("Calling application backgroundFetchCompletionHandler", log: self.log, type: .info)
       completionHandler()
-      backgroundFetchCompletionHandler = nil
+      setBackgroundFetchCompletionHandler(nil)
     }
   }
 }

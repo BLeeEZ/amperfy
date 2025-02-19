@@ -40,7 +40,7 @@ public class UpdateHelper {
       if let imageData = asyncCompanion.library
         .getArtworkData(forArtworkRemoteInfo: artworkRemoteInfo),
         let artwork = asyncCompanion.library.getArtwork(remoteInfo: artworkRemoteInfo),
-        let relFilePath = CacheFileManager.shared.createRelPath(for: artwork),
+        let relFilePath = CacheFileManager.shared.createRelPath(for: artworkRemoteInfo),
         let absFilePath = CacheFileManager.shared
         .getAbsoluteAmperfyPath(relFilePath: relFilePath) {
         do {

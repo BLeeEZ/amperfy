@@ -22,22 +22,35 @@
 import CoreData
 import Foundation
 
-public typealias CompleteHandlerBlock = @MainActor () -> ()
+public typealias CompleteHandlerBlock = @Sendable () -> ()
+
+// MARK: - DownloadRequest
+
+public struct DownloadRequest: Hashable, Sendable {
+  let objectID: NSManagedObjectID
+  let id: String
+  let title: String
+  let info: DownloadElementInfo
+}
 
 // MARK: - DownloadManageable
 
-@MainActor
 public protocol DownloadManageable {
-  var backgroundFetchCompletionHandler: CompleteHandlerBlock? { get set }
+  nonisolated func getBackgroundFetchCompletionHandler() async -> CompleteHandlerBlock?
+  nonisolated func setBackgroundFetchCompletionHandler(_ newValue: CompleteHandlerBlock?)
+  @MainActor
   func download(object: Downloadable)
+  @MainActor
   func download(objects: [Downloadable])
+  @MainActor
   func removeFinishedDownload(for object: Downloadable)
+  @MainActor
   func removeFinishedDownload(for objects: [Downloadable])
-  func clearFinishedDownloads()
-  func resetFailedDownloads()
-  func cancelDownloads()
+  nonisolated func clearFinishedDownloads()
+  nonisolated func resetFailedDownloads()
+  nonisolated func cancelDownloads()
   func start()
-  func stop()
+  nonisolated func stop()
 }
 
 // MARK: - DownloadManagerDelegate
@@ -46,13 +59,18 @@ public protocol DownloadManagerDelegate {
   var requestPredicate: NSPredicate { get }
   var parallelDownloadsCount: Int { get }
   @MainActor
-  func prepareDownload(download: Download) async throws -> URL
-  @MainActor
+  func prepareDownload(
+    downloadInfo: DownloadElementInfo,
+    storage: AsyncCoreDataAccessWrapper
+  ) async throws -> URL
   func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError?
-  @MainActor
-  func completedDownload(download: Download, storage: PersistentStorage) async
-  @MainActor
-  func failedDownload(download: Download, storage: PersistentStorage)
+  func completedDownload(
+    downloadInfo: DownloadElementInfo,
+    fileURL: URL,
+    fileMimeType: String?,
+    storage: AsyncCoreDataAccessWrapper
+  ) async
+  func failedDownload(downloadInfo: DownloadElementInfo, storage: AsyncCoreDataAccessWrapper) async
 }
 
 // MARK: - Downloadable
@@ -61,7 +79,7 @@ public protocol Downloadable: CustomEquatable {
   var objectID: NSManagedObjectID { get }
   var isCached: Bool { get }
   var displayString: String { get }
-  var threadSafeInfo: DownloadInfo? { get }
+  var threadSafeInfo: DownloadElementInfo? { get }
 }
 
 extension Downloadable {

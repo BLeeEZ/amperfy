@@ -29,6 +29,7 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
   private let backendApi: BackendApi
   private let artworkExtractor: EmbeddedArtworkExtractor
   private let networkMonitor: NetworkMonitorFacade
+  private let fileManager = CacheFileManager.shared
 
   init(
     backendApi: BackendApi,
@@ -49,24 +50,37 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
   }
 
   @MainActor
-  func prepareDownload(download: Download) async throws -> URL {
-    guard let playable = download.element as? AbstractPlayable
-    else { throw DownloadError.fetchFailed }
-    guard !playable.isCached else { throw DownloadError.alreadyDownloaded }
+  func prepareDownload(
+    downloadInfo: DownloadElementInfo,
+    storage: AsyncCoreDataAccessWrapper
+  ) async throws
+    -> URL {
+    guard downloadInfo.type == .playable else { throw DownloadError.fetchFailed }
     guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-    return try await backendApi.generateUrl(forDownloadingPlayable: playable)
+
+    let playableInfo = try await storage.performAndGet { asyncCompanion in
+      let playable = AbstractPlayable(
+        managedObject: asyncCompanion.context
+          .object(with: downloadInfo.objectId) as! AbstractPlayableMO
+      )
+      return !playable.isCached ? playable.info : nil
+    }
+    guard let playableInfo else { throw DownloadError.alreadyDownloaded }
+    return try await Task { @MainActor in
+      return try await backendApi.generateUrl(forDownloadingPlayable: playableInfo)
+    }.value
   }
 
-  @MainActor
   func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? {
-    guard let fileURL = fileURL else {
+    guard let fileURL else {
       return ResponseError(
         type: .api,
         message: "Invalid download",
-        cleansedURL: downloadURL?.asCleansedURL(cleanser: backendApi)
+        cleansedURL: downloadURL?.asCleansedURL(cleanser: backendApi),
+        data: nil
       )
     }
-    guard let data = CacheFileManager.shared.getFileDataIfNotToBig(
+    guard let data = fileManager.getFileDataIfNotToBig(
       url: fileURL,
       maxFileSize: Self.maxFileSizeOfErrorResponse
     ) else { return nil }
@@ -76,37 +90,49 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     ))
   }
 
-  @MainActor
-  func completedDownload(download: Download, storage: PersistentStorage) async {
-    guard let fileURL = download.fileURL,
-          let playable = download.element as? AbstractPlayable
-    else { return }
+  func completedDownload(
+    downloadInfo: DownloadElementInfo,
+    fileURL: URL,
+    fileMimeType: String?,
+    storage: AsyncCoreDataAccessWrapper
+  ) async {
+    guard downloadInfo.type == .playable else { return }
+    let playableInfo = try? await storage.performAndGet { asyncCompanion in
+      let playable = AbstractPlayable(
+        managedObject: asyncCompanion.context
+          .object(with: downloadInfo.objectId) as! AbstractPlayableMO
+      )
+      return playable.info
+    }
+    guard let playableInfo else { return }
+
     do {
-      try await savePlayableDataAsync(
-        playable: playable,
+      try await savePlayableData(
+        playableInfo: playableInfo,
         fileURL: fileURL,
-        fileMimeType: download.mimeType,
+        fileMimeType: fileMimeType,
         storage: storage
       )
-      try await artworkExtractor.extractEmbeddedArtwork(storage: storage, playable: playable)
+      try await artworkExtractor.extractEmbeddedArtwork(
+        playableInfo: playableInfo,
+        storage: storage
+      )
     } catch {
       // ignore errors
     }
   }
 
-  /// save downloaded playable async to avoid memory overflow issues due to kept references
-  @MainActor
-  func savePlayableDataAsync(
-    playable: AbstractPlayable,
+  func savePlayableData(
+    playableInfo: AbstractPlayableInfo,
     fileURL: URL,
     fileMimeType: String?,
-    storage: PersistentStorage
+    storage: AsyncCoreDataAccessWrapper
   ) async throws {
-    let playableObjectID = playable.objectID
-    try await storage.async.perform { companion in
-      guard let playableAsyncMO = companion.context
-        .object(with: playableObjectID) as? AbstractPlayableMO else { return }
-      let playableAsync = AbstractPlayable(managedObject: playableAsyncMO)
+    try await storage.perform { asyncCompanion in
+      let playableAsync = AbstractPlayable(
+        managedObject: asyncCompanion.context
+          .object(with: playableInfo.objectID) as! AbstractPlayableMO
+      )
       playableAsync.contentTypeTranscoded = fileMimeType
       // transcoding info needs to available to generate a correct file extension
       guard let relFilePath = CacheFileManager.shared.createRelPath(for: playableAsync),
@@ -122,6 +148,5 @@ class PlayableDownloadDelegate: DownloadManagerDelegate {
     }
   }
 
-  @MainActor
-  func failedDownload(download: Download, storage: PersistentStorage) {}
+  func failedDownload(downloadInfo: DownloadElementInfo, storage: AsyncCoreDataAccessWrapper) {}
 }

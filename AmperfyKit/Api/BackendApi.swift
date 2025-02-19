@@ -274,7 +274,7 @@ public protocol BackendApi: URLCleanser {
   @MainActor
   func isAuthenticationValid(credentials: LoginCredentials) async throws
   @MainActor
-  func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws -> URL
+  func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws -> URL
   @MainActor
   func generateUrl(
     forStreamingPlayable playable: AbstractPlayable,
@@ -282,8 +282,7 @@ public protocol BackendApi: URLCleanser {
   ) async throws -> URL
   @MainActor
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL
-  @MainActor
-  func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
+  nonisolated func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
   @MainActor
   func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
   @MainActor

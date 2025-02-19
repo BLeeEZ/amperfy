@@ -353,9 +353,9 @@ extension BackendProxy: BackendApi {
   }
 
   @MainActor
-  public func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws
+  public func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws
     -> URL {
-    try await activeApi.generateUrl(forDownloadingPlayable: playable)
+    try await activeApi.generateUrl(forDownloadingPlayable: playableInfo)
   }
 
   @MainActor
@@ -372,7 +372,6 @@ extension BackendProxy: BackendApi {
     try await activeApi.generateUrl(forArtwork: artwork)
   }
 
-  @MainActor
   public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
     activeApi.checkForErrorResponse(response: response)
   }

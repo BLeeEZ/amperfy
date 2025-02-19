@@ -80,9 +80,9 @@ extension SubsonicApi: BackendApi {
   }
 
   @MainActor
-  func generateUrl(forDownloadingPlayable playable: AbstractPlayable) async throws
+  func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws
     -> URL {
-    let apiId = playable.asPodcastEpisode?.streamId ?? playable.id
+    let apiId = playableInfo.streamId ?? playableInfo.id
     return try await subsonicServerApi.generateUrl(forDownloadingPlayableId: apiId)
   }
 
@@ -104,7 +104,6 @@ extension SubsonicApi: BackendApi {
     try await subsonicServerApi.generateUrl(forArtworkId: artwork.id)
   }
 
-  @MainActor
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
     subsonicServerApi.checkForErrorResponse(response: response)
   }
