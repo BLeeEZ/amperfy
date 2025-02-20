@@ -81,7 +81,7 @@ public class AmperKit {
       networkMonitor: networkMonitor,
       performanceMonitor: threadPerformanceMonitor,
       eventLogger: eventLogger,
-      persistentStorage: storage
+      settings: storage.settings
     )
     api.initialize()
     return api
@@ -195,7 +195,10 @@ public class AmperKit {
       artworkExtractor: artworkExtractor,
       networkMonitor: networkMonitor
     )
-    let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
+    let requestManager = DownloadRequestManager(
+      storage: storage.async,
+      downloadDelegate: dlDelegate
+    )
     let dlManager = DownloadManager(
       name: "PlayableDownloader",
       storage: storage.async,
@@ -233,8 +236,11 @@ public class AmperKit {
   @MainActor
   private func createArtworkDownloadManager() -> DownloadManageable {
     let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
-    let requestManager = DownloadRequestManager(storage: storage, downloadDelegate: dlDelegate)
-    requestManager.clearAllDownloadsIfAllHaveFinished()
+    let requestManager = DownloadRequestManager(
+      storage: storage.async,
+      downloadDelegate: dlDelegate
+    )
+    requestManager.clearAllDownloadsAsyncIfAllHaveFinished()
     let dlManager = DownloadManager(
       name: "ArtworkDownloader",
       storage: storage.async,

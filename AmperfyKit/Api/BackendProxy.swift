@@ -177,86 +177,87 @@ public struct ResponseErrorInfo: Encodable {
 
 // MARK: - BackendProxy
 
-public class BackendProxy {
+public final class BackendProxy {
   private let log = OSLog(subsystem: "Amperfy", category: "BackendProxy")
   private let networkMonitor: NetworkMonitorFacade
   private let performanceMonitor: ThreadPerformanceMonitor
   private let eventLogger: EventLogger
-  private let persistentStorage: PersistentStorage
-  private var activeApiType = BackenApiType.ampache
+  private let settings: PersistentStorage.Settings
   public var selectedApi: BackenApiType {
     get {
-      activeApiType
+      activeApiType.wrappedValue
     }
     set {
       os_log("%s is active backend api", log: self.log, type: .info, newValue.description)
-      activeApiType = newValue
+      activeApiType.wrappedValue = newValue
     }
   }
+
+  private let activeApiType = Atomic<BackenApiType>(wrappedValue: .ampache)
 
   private var activeApi: BackendApi {
-    switch activeApiType {
+    switch activeApiType.wrappedValue {
     case .notDetected:
-      return ampacheApi
+      return ampacheApi.wrappedValue!
     case .ampache:
-      return ampacheApi
+      return ampacheApi.wrappedValue!
     case .subsonic:
-      return subsonicApi
+      return subsonicApi.wrappedValue!
     case .subsonic_legacy:
-      return subsonicLegacyApi
+      return subsonicLegacyApi.wrappedValue!
     }
   }
 
-  private var ampacheApi: BackendApi!
-  private var subsonicApi: SubsonicApi!
-  private var subsonicLegacyApi: SubsonicApi!
+  private let ampacheApi = Atomic<BackendApi?>(wrappedValue: nil)
+  private let subsonicApi = Atomic<SubsonicApi?>(wrappedValue: nil)
+  private let subsonicLegacyApi = Atomic<SubsonicApi?>(wrappedValue: nil)
 
   init(
     networkMonitor: NetworkMonitorFacade,
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
-    persistentStorage: PersistentStorage
+    settings: PersistentStorage.Settings
   ) {
     self.networkMonitor = networkMonitor
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
-    self.persistentStorage = persistentStorage
+    self.settings = settings
   }
 
   @MainActor
   public func initialize() {
-    ampacheApi = AmpacheApi(
+    ampacheApi.wrappedValue = AmpacheApi(
       ampacheXmlServerApi: AmpacheXmlServerApi(
         performanceMonitor: performanceMonitor,
         eventLogger: eventLogger,
-        settings: persistentStorage.settings
+        settings: settings
       ),
       networkMonitor: networkMonitor,
       performanceMonitor: performanceMonitor,
       eventLogger: eventLogger
     )
-    subsonicApi = SubsonicApi(
+    subsonicApi.wrappedValue = SubsonicApi(
       subsonicServerApi: SubsonicServerApi(
         performanceMonitor: performanceMonitor,
         eventLogger: eventLogger,
-        settings: persistentStorage.settings
+        settings: settings
       ),
       networkMonitor: networkMonitor,
       performanceMonitor: performanceMonitor,
       eventLogger: eventLogger
     )
-    subsonicApi.setAuthType(newAuthType: .autoDetect)
-    subsonicLegacyApi = SubsonicApi(
+    subsonicApi.wrappedValue!.setAuthType(newAuthType: .autoDetect)
+    subsonicLegacyApi.wrappedValue = SubsonicApi(
       subsonicServerApi: SubsonicServerApi(
         performanceMonitor: performanceMonitor,
         eventLogger: eventLogger,
-        settings: persistentStorage.settings
+        settings: settings
       ),
       networkMonitor: networkMonitor,
       performanceMonitor: performanceMonitor,
       eventLogger: eventLogger
     )
-    subsonicLegacyApi.setAuthType(newAuthType: .legacy)
+    subsonicLegacyApi.wrappedValue!.setAuthType(newAuthType: .legacy)
   }
 
   @MainActor
@@ -269,21 +270,21 @@ public class BackendProxy {
 
     if apiType == .notDetected || apiType == .ampache {
       do {
-        try await ampacheApi.isAuthenticationValid(credentials: credentials)
+        try await ampacheApi.wrappedValue!.isAuthenticationValid(credentials: credentials)
         return .ampache
       } catch {} // error -> ignore this api and check the others
     }
 
     if apiType == .notDetected || apiType == .subsonic {
       do {
-        try await subsonicApi.isAuthenticationValid(credentials: credentials)
+        try await subsonicApi.wrappedValue!.isAuthenticationValid(credentials: credentials)
         return .subsonic
       } catch {} // error -> ignore this api and check the others
     }
 
     if apiType == .notDetected || apiType == .subsonic_legacy {
       do {
-        try await subsonicLegacyApi.isAuthenticationValid(credentials: credentials)
+        try await subsonicLegacyApi.wrappedValue!.isAuthenticationValid(credentials: credentials)
         return .subsonic_legacy
       } catch {} // error -> ignore this api and check the others
     }

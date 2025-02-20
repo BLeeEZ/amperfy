@@ -22,7 +22,7 @@
 import CoreData
 import Foundation
 
-class PlayableDownloadDelegate: DownloadManagerDelegate {
+final class PlayableDownloadDelegate: DownloadManagerDelegate {
   /// max file size of an error response from an API
   private static let maxFileSizeOfErrorResponse = 2_000
 

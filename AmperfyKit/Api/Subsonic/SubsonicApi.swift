@@ -24,7 +24,7 @@ import os.log
 
 // MARK: - SubsonicApi
 
-class SubsonicApi {
+final class SubsonicApi {
   private let subsonicServerApi: SubsonicServerApi
   private let networkMonitor: NetworkMonitorFacade
   private let performanceMonitor: ThreadPerformanceMonitor

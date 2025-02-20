@@ -55,7 +55,7 @@ public protocol DownloadManageable {
 
 // MARK: - DownloadManagerDelegate
 
-public protocol DownloadManagerDelegate {
+public protocol DownloadManagerDelegate: Sendable {
   var requestPredicate: NSPredicate { get }
   var parallelDownloadsCount: Int { get }
   @MainActor

@@ -262,7 +262,7 @@ public struct TranscodingInfo {
 
 // MARK: - BackendApi
 
-public protocol BackendApi: URLCleanser {
+public protocol BackendApi: URLCleanser, Sendable {
   @MainActor
   var clientApiVersion: String { get }
   @MainActor

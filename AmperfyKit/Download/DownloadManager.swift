@@ -232,12 +232,16 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   @MainActor
   func removeFinishedDownload(for object: Downloadable) {
-    requestManager.removeFinishedDownload(for: object)
+    Task {
+      await requestManager.removeFinishedDownload(for: object.uniqueID)
+    }
   }
 
   @MainActor
   func removeFinishedDownload(for objects: [Downloadable]) {
-    requestManager.removeFinishedDownload(for: objects)
+    Task {
+      await requestManager.removeFinishedDownload(for: objects.compactMap { $0.uniqueID })
+    }
   }
 
   nonisolated func start() {

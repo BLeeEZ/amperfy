@@ -24,7 +24,7 @@ import Foundation
 import os.log
 import UIKit
 
-class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
+final class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
   /// max file size of an error response from an API
   private static let maxFileSizeOfErrorResponse = 2_000
 

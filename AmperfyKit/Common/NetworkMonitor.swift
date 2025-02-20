@@ -28,7 +28,7 @@ public typealias ConnectionTypeChangedCallack = @Sendable (_ isWiFiConnected: Bo
 
 // MARK: - NetworkMonitorFacade
 
-public protocol NetworkMonitorFacade {
+public protocol NetworkMonitorFacade: Sendable {
   @MainActor
   var connectionTypeChangedCB: ConnectionTypeChangedCallack? { get set }
   @MainActor

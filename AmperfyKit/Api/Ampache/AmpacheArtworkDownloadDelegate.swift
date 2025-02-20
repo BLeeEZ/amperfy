@@ -23,14 +23,14 @@ import CoreData
 import Foundation
 import UIKit
 
-class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
+final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
   /// max file size of an error response from an API
   private static let maxFileSizeOfErrorResponse = 2_000
 
   private let ampacheXmlServerApi: AmpacheXmlServerApi
   private let networkMonitor: NetworkMonitorFacade
-  private var defaultImageData: Data?
   private let fileManager = CacheFileManager.shared
+  private let defaultImageData = Atomic<Data?>(wrappedValue: nil)
 
   init(ampacheXmlServerApi: AmpacheXmlServerApi, networkMonitor: NetworkMonitorFacade) {
     self.ampacheXmlServerApi = ampacheXmlServerApi
@@ -167,11 +167,11 @@ class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
   }
 
   private func requestDefaultImageData() async throws -> Data {
-    if let defaultImageData = defaultImageData {
+    if let defaultImageData = defaultImageData.wrappedValue {
       return defaultImageData
     } else {
       let response = try await ampacheXmlServerApi.requestDefaultArtwork()
-      defaultImageData = response.data
+      defaultImageData.wrappedValue = response.data
       return response.data
     }
   }
