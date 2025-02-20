@@ -58,8 +58,7 @@ extension ResponseError {
 
 // MARK: - AmpacheXmlServerApi
 
-@MainActor
-class AmpacheXmlServerApi: URLCleanser {
+final class AmpacheXmlServerApi: URLCleanser, Sendable {
   enum AmpacheError: Int {
     case empty = 0
     case accessControlNotEnabled =
@@ -89,23 +88,20 @@ class AmpacheXmlServerApi: URLCleanser {
   static let maxItemCountToPollAtOnce: Int = 500
   static let apiPathComponents = ["server", "xml.server.php"]
 
-  var serverApiVersion: String?
-  let clientApiVersion = "500000"
-  var isStreamingTranscodingActive: Bool {
-    settings.streamingFormatPreference != .raw
-  }
+  internal let serverApiVersion = Atomic<String?>(wrappedValue: nil)
+  internal let clientApiVersion = "500000"
 
   private let log = OSLog(subsystem: "Amperfy", category: "Ampache")
   private let performanceMonitor: ThreadPerformanceMonitor
-  let eventLogger: EventLogger
-  private var credentials: LoginCredentials?
-  private var authHandshake: AuthentificationHandshake?
+  private let eventLogger: EventLogger
+  private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
+  private let authHandshake = Atomic<AuthentificationHandshake?>(wrappedValue: nil)
   private let settings: PersistentStorage.Settings
 
   public func requestServerPodcastSupport() async throws -> Bool {
     let _ = try await reauthenticate()
     var isPodcastSupported = false
-    if let serverApi = serverApiVersion, let serverApiInt = Int(serverApi) {
+    if let serverApi = serverApiVersion.wrappedValue, let serverApiInt = Int(serverApi) {
       isPodcastSupported = serverApiInt >= 420000
     }
     return isPodcastSupported
@@ -119,6 +115,10 @@ class AmpacheXmlServerApi: URLCleanser {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
+  }
+
+  var isStreamingTranscodingActive: Bool {
+    settings.streamingFormatPreference != .raw
   }
 
   nonisolated static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
@@ -145,6 +145,7 @@ class AmpacheXmlServerApi: URLCleanser {
 
   private func createApiUrl(providedCredentials: LoginCredentials? = nil) -> URL? {
     let localCredentials = providedCredentials != nil ? providedCredentials : credentials
+      .wrappedValue
     guard let hostname = localCredentials?.serverUrl else { return nil }
     var apiUrl = URL(string: hostname)
     Self.apiPathComponents.forEach { apiUrl?.appendPathComponent($0) }
@@ -160,18 +161,18 @@ class AmpacheXmlServerApi: URLCleanser {
   }
 
   func provideCredentials(credentials: LoginCredentials) {
-    authHandshake = nil
-    self.credentials = credentials
+    authHandshake.wrappedValue = nil
+    self.credentials.wrappedValue = credentials
   }
 
   private func authenticate(credentials: LoginCredentials) async throws
     -> AuthentificationHandshake {
     do {
       let auth = try await requestAuth(credentials: credentials)
-      authHandshake = auth
+      authHandshake.wrappedValue = auth
       return auth
     } catch {
-      authHandshake = nil
+      authHandshake.wrappedValue = nil
       throw error
     }
   }
@@ -249,7 +250,7 @@ class AmpacheXmlServerApi: URLCleanser {
     parser.delegate = curDelegate
     let success = parser.parse()
     if let serverApiVersion = curDelegate.serverApiVersion {
-      self.serverApiVersion = serverApiVersion
+      self.serverApiVersion.wrappedValue = serverApiVersion
     }
     if let error = parser.parserError {
       os_log("Error during AuthPars: %s", log: self.log, type: .error, error.localizedDescription)
@@ -262,7 +263,7 @@ class AmpacheXmlServerApi: URLCleanser {
     if success, let auth = curDelegate.authHandshake {
       return auth
     } else {
-      authHandshake = nil
+      authHandshake.wrappedValue = nil
       os_log("Couldn't get a login token.", log: self.log, type: .error)
       if let apiError = curDelegate.error {
         throw apiError
@@ -272,17 +273,17 @@ class AmpacheXmlServerApi: URLCleanser {
   }
 
   private func reauthenticate() async throws -> AuthentificationHandshake {
-    if let auth = authHandshake, isAuthenticated(auth: auth) {
+    if let auth = authHandshake.wrappedValue, isAuthenticated(auth: auth) {
       return auth
     } else {
-      guard let cred = credentials else { throw BackendError.noCredentials }
+      guard let cred = credentials.wrappedValue else { throw BackendError.noCredentials }
       return try await authenticate(credentials: cred)
     }
   }
 
   public func requestDefaultArtwork() async throws -> APIDataResponse {
     try await request { auth in
-      guard let hostname = self.credentials?.serverUrl,
+      guard let hostname = self.credentials.wrappedValue?.serverUrl,
             var url = URL(string: hostname)
       else { throw BackendError.invalidUrl }
       url.appendPathComponent("image.php")
@@ -621,7 +622,7 @@ class AmpacheXmlServerApi: URLCleanser {
     try await request { auth in
       var urlComp = try self.createAuthApiUrlComponent(auth: auth)
       urlComp.addQueryItem(name: "action", value: "record_play")
-      if let username = self.credentials?.username {
+      if let username = self.credentials.wrappedValue?.username {
         urlComp.addQueryItem(name: "user", value: username)
       }
       if let date = date {

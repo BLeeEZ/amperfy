@@ -245,7 +245,7 @@ extension URL {
 
 // MARK: - URLCleanser
 
-public protocol URLCleanser {
+public protocol URLCleanser: Sendable {
   nonisolated func cleanse(url: URL?) -> CleansedURL
 }
 

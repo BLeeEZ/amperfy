@@ -77,8 +77,7 @@ struct OpenSubsonicExtensionsSupport {
 
 // MARK: - SubsonicServerApi
 
-@MainActor
-class SubsonicServerApi: URLCleanser {
+final class SubsonicServerApi: URLCleanser, Sendable {
   enum SubsonicError: Int {
     case generic = 0 // A generic error.
     case requiredParameterMissing = 10 // Required parameter is missing.
@@ -104,28 +103,17 @@ class SubsonicServerApi: URLCleanser {
   static let defaultClientApiVersionWithToken = SubsonicVersion(major: 1, minor: 13, patch: 0)
   static let defaultClientApiVersionPreToken = SubsonicVersion(major: 1, minor: 11, patch: 0)
 
-  var serverApiVersion: SubsonicVersion?
-  var clientApiVersion: SubsonicVersion?
-  var isStreamingTranscodingActive: Bool {
-    settings.streamingFormatPreference != .raw
-  }
-
-  var authType: SubsonicApiAuthType = .autoDetect
-  func setAuthType(newAuthType: SubsonicApiAuthType) {
-    authType = newAuthType
-  }
-
-  private var authTypeBasedClientApiVersion: SubsonicVersion {
-    authType == .legacy ? Self.defaultClientApiVersionPreToken : Self
-      .defaultClientApiVersionWithToken
-  }
+  internal let serverApiVersion = Atomic<SubsonicVersion?>(wrappedValue: nil)
+  internal let clientApiVersion = Atomic<SubsonicVersion?>(wrappedValue: nil)
+  internal let authType = Atomic<SubsonicApiAuthType>(wrappedValue: .autoDetect)
 
   private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
   private let performanceMonitor: ThreadPerformanceMonitor
   private let eventLogger: EventLogger
   private let settings: PersistentStorage.Settings
-  private var credentials: LoginCredentials?
-  private var openSubsonicExtensionsSupport: OpenSubsonicExtensionsSupport?
+  private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
+  private let openSubsonicExtensionsSupport =
+    Atomic<OpenSubsonicExtensionsSupport?>(wrappedValue: nil)
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
@@ -135,6 +123,19 @@ class SubsonicServerApi: URLCleanser {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
+  }
+
+  func setAuthType(newAuthType: SubsonicApiAuthType) {
+    authType.wrappedValue = newAuthType
+  }
+
+  private var authTypeBasedClientApiVersion: SubsonicVersion {
+    authType.wrappedValue == .legacy ? Self.defaultClientApiVersionPreToken : Self
+      .defaultClientApiVersionWithToken
+  }
+
+  var isStreamingTranscodingActive: Bool {
+    settings.streamingFormatPreference != .raw
   }
 
   nonisolated static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
@@ -160,7 +161,7 @@ class SubsonicServerApi: URLCleanser {
       nil
   ) async throws
     -> SubsonicVersion {
-    if let serverVersion = serverApiVersion {
+    if let serverVersion = serverApiVersion.wrappedValue {
       return serverVersion
     } else {
       return try await requestServerApiVersionPromise(providedCredentials: providedCredentials)
@@ -169,26 +170,26 @@ class SubsonicServerApi: URLCleanser {
 
   private func determineApiVersionToUse(providedCredentials: LoginCredentials? = nil) async throws
     -> SubsonicVersion {
-    if let clientApiVersion = clientApiVersion {
+    if let clientApiVersion = clientApiVersion.wrappedValue {
       return clientApiVersion
     }
     let serverVersion =
       try await getCachedServerApiVersionOrRequestIt(providedCredentials: providedCredentials)
 
     os_log("Server API version is '%s'", log: self.log, type: .info, serverVersion.description)
-    if authType == .legacy {
-      clientApiVersion = Self.defaultClientApiVersionPreToken
+    if authType.wrappedValue == .legacy {
+      clientApiVersion.wrappedValue = Self.defaultClientApiVersionPreToken
       os_log("Client API legacy login", log: self.log, type: .info)
     } else {
-      clientApiVersion = Self.defaultClientApiVersionWithToken
+      clientApiVersion.wrappedValue = Self.defaultClientApiVersionWithToken
       os_log(
         "Client API version is '%s'",
         log: self.log,
         type: .info,
-        self.clientApiVersion!.description
+        self.clientApiVersion.wrappedValue!.description
       )
     }
-    return clientApiVersion!
+    return clientApiVersion.wrappedValue!
   }
 
   private func createBasicApiUrlComponent(
@@ -197,6 +198,7 @@ class SubsonicServerApi: URLCleanser {
   )
     -> URLComponents? {
     let localCredentials = providedCredentials != nil ? providedCredentials : credentials
+      .wrappedValue
     guard let hostname = localCredentials?.serverUrl,
           var apiUrl = URL(string: hostname)
     else { return nil }
@@ -214,6 +216,7 @@ class SubsonicServerApi: URLCleanser {
   ) throws
     -> URLComponents {
     let localCredentials = providedCredentials != nil ? providedCredentials : credentials
+      .wrappedValue
     guard let username = localCredentials?.username,
           let password = localCredentials?.password,
           var urlComp = createBasicApiUrlComponent(
@@ -250,7 +253,7 @@ class SubsonicServerApi: URLCleanser {
   }
 
   public func provideCredentials(credentials: LoginCredentials) {
-    self.credentials = credentials
+    self.credentials.wrappedValue = credentials
   }
 
   nonisolated public func cleanse(url: URL?) -> CleansedURL {
@@ -403,14 +406,14 @@ class SubsonicServerApi: URLCleanser {
       )
       throw ResponseError(type: .xml, cleansedURL: cleanse(url: response.url), data: response.data)
     }
-    self.serverApiVersion = serverApiVersion
+    self.serverApiVersion.wrappedValue = serverApiVersion
     return serverApiVersion
   }
 
   public func requestServerPodcastSupport() async throws -> Bool {
     let _ = try await determineApiVersionToUse()
     var isPodcastSupported = false
-    if let serverApi = serverApiVersion {
+    if let serverApi = serverApiVersion.wrappedValue {
       isPodcastSupported = serverApi >= SubsonicVersion(major: 1, minor: 9, patch: 0)
     }
     if !isPodcastSupported {
@@ -439,7 +442,7 @@ class SubsonicServerApi: URLCleanser {
     -> Bool {
     // the member variable will be set after the server has been requested
     // here we already asked the server for its support and use the cached response
-    if let oSsExtSupport = openSubsonicExtensionsSupport {
+    if let oSsExtSupport = openSubsonicExtensionsSupport.wrappedValue {
       if oSsExtSupport.isSupported == false {
         os_log(
           "No OpenSubsonicExtensions supported (%s)!",
@@ -490,13 +493,14 @@ class SubsonicServerApi: URLCleanser {
             return false
           }
 
-          self.openSubsonicExtensionsSupport = OpenSubsonicExtensionsSupport()
-          self.openSubsonicExtensionsSupport?.isSupported = !parserDelegate
+          self.openSubsonicExtensionsSupport.wrappedValue = OpenSubsonicExtensionsSupport()
+          self.openSubsonicExtensionsSupport.wrappedValue?.isSupported = !parserDelegate
             .openSubsonicExtensionsResponse.supportedExtensions.isEmpty
-          self.openSubsonicExtensionsSupport?.extensionResponse = parserDelegate
+          self.openSubsonicExtensionsSupport.wrappedValue?.extensionResponse = parserDelegate
             .openSubsonicExtensionsResponse
 
-          if let availableExtensions = self.openSubsonicExtensionsSupport?.extensionResponse?
+          if let availableExtensions = self.openSubsonicExtensionsSupport.wrappedValue?
+            .extensionResponse?
             .supportedExtensions {
             let availableExtensionsStr = availableExtensions
               .reduce("") { $0 == "" ? $1 : $0 + ", " + $1 }
@@ -533,8 +537,8 @@ class SubsonicServerApi: URLCleanser {
           type: .info,
           oSsExtention.rawValue
         )
-        openSubsonicExtensionsSupport = OpenSubsonicExtensionsSupport()
-        openSubsonicExtensionsSupport?.isSupported = false
+        openSubsonicExtensionsSupport.wrappedValue = OpenSubsonicExtensionsSupport()
+        openSubsonicExtensionsSupport.wrappedValue?.isSupported = false
         return false
       }
     }

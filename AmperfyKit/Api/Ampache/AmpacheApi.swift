@@ -21,8 +21,7 @@
 
 import Foundation
 
-@MainActor
-class AmpacheApi: BackendApi {
+final class AmpacheApi: BackendApi {
   private let ampacheXmlServerApi: AmpacheXmlServerApi
   private let networkMonitor: NetworkMonitorFacade
   private let performanceMonitor: ThreadPerformanceMonitor
@@ -44,7 +43,7 @@ class AmpacheApi: BackendApi {
     ampacheXmlServerApi.clientApiVersion
   }
 
-  public var serverApiVersion: String { ampacheXmlServerApi.serverApiVersion ?? "-" }
+  public var serverApiVersion: String { ampacheXmlServerApi.serverApiVersion.wrappedValue ?? "-" }
 
   public var isStreamingTranscodingActive: Bool { ampacheXmlServerApi.isStreamingTranscodingActive }
 

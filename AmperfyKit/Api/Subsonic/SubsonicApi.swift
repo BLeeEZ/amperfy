@@ -43,7 +43,7 @@ final class SubsonicApi {
   }
 
   @MainActor
-  var authType: SubsonicApiAuthType { subsonicServerApi.authType }
+  var authType: SubsonicApiAuthType { subsonicServerApi.authType.wrappedValue }
 
   @MainActor
   func setAuthType(newAuthType: SubsonicApiAuthType) {
@@ -56,12 +56,12 @@ final class SubsonicApi {
 extension SubsonicApi: BackendApi {
   @MainActor
   public var clientApiVersion: String {
-    subsonicServerApi.clientApiVersion?.description ?? "-"
+    subsonicServerApi.clientApiVersion.wrappedValue?.description ?? "-"
   }
 
   @MainActor
   public var serverApiVersion: String {
-    subsonicServerApi.serverApiVersion?.description ?? "-"
+    subsonicServerApi.serverApiVersion.wrappedValue?.description ?? "-"
   }
 
   @MainActor
