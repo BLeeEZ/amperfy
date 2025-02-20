@@ -83,7 +83,6 @@ actor DownloadManager: NSObject, DownloadManageable {
   let requestManager: DownloadRequestManager
   @MainActor
   var downloadDelegate: DownloadManagerDelegate!
-  @MainActor
   var notificationHandler: EventNotificationHandler!
   var urlSession: URLSession!
 
@@ -111,6 +110,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     requestManager: DownloadRequestManager,
     eventLogger: EventLogger,
     settings: PersistentStorage.Settings,
+    notificationHandler: EventNotificationHandler,
     limitCacheSize: Bool,
     isFailWithPopupError: Bool
   ) {
@@ -125,22 +125,6 @@ actor DownloadManager: NSObject, DownloadManageable {
     self.taskQueue = OperationQueue()
 
     super.init()
-  }
-
-  @MainActor
-  public func initialize(
-    networkMonitor: NetworkMonitorFacade,
-    downloadDelegate: DownloadManagerDelegate,
-    urlSession: URLSession,
-    validationCB: PreDownloadIsValidCB?,
-
-    notificationHandler: EventNotificationHandler,
-    urlCleanser: URLCleanser
-  ) {
-    self.networkMonitor = networkMonitor
-    self.downloadDelegate = downloadDelegate
-    self.notificationHandler = notificationHandler
-    self.urlCleanser = urlCleanser
 
     notificationHandler.register(
       self,
@@ -154,6 +138,19 @@ actor DownloadManager: NSObject, DownloadManageable {
       name: .networkStatusChanged,
       object: nil
     )
+  }
+
+  @MainActor
+  public func initialize(
+    networkMonitor: NetworkMonitorFacade,
+    downloadDelegate: DownloadManagerDelegate,
+    urlSession: URLSession,
+    validationCB: PreDownloadIsValidCB?,
+    urlCleanser: URLCleanser
+  ) {
+    self.networkMonitor = networkMonitor
+    self.downloadDelegate = downloadDelegate
+    self.urlCleanser = urlCleanser
 
     Task {
       await taskQueue.maxConcurrentOperationCount = downloadDelegate.parallelDownloadsCount
@@ -507,13 +504,11 @@ actor DownloadManager: NSObject, DownloadManageable {
       return download.element?.uniqueID
     }
     if let downloadElementUniqueId {
-      await MainActor.run {
-        notificationHandler.post(
-          name: .downloadFinishedSuccess,
-          object: self,
-          userInfo: DownloadNotification(id: downloadElementUniqueId).asNotificationUserInfo
-        )
-      }
+      notificationHandler.post(
+        name: .downloadFinishedSuccess,
+        object: self,
+        userInfo: DownloadNotification(id: downloadElementUniqueId).asNotificationUserInfo
+      )
     }
     if isCacheSizeLimited, storageExceedsCacheLimit() {
       await requestManager.cancelDownloads()

@@ -29,66 +29,64 @@ public typealias ConnectionTypeChangedCallack = @Sendable (_ isWiFiConnected: Bo
 // MARK: - NetworkMonitorFacade
 
 public protocol NetworkMonitorFacade: Sendable {
-  @MainActor
   var connectionTypeChangedCB: ConnectionTypeChangedCallack? { get set }
-  @MainActor
   var isConnectedToNetwork: Bool { get }
-  @MainActor
   var isCellular: Bool { get }
-  @MainActor
   var isWifiOrEthernet: Bool { get }
 }
 
 // MARK: - NetworkMonitor
 
-@MainActor
-public class NetworkMonitor: NetworkMonitorFacade {
-  public var connectionTypeChangedCB: ConnectionTypeChangedCallack?
-
-  private var reachabilityManager = Alamofire.NetworkReachabilityManager()
+final public class NetworkMonitor: NetworkMonitorFacade {
   private let queue = DispatchQueue(label: "NetworkMonitor")
   private let log = OSLog(subsystem: "Amperfy", category: "NetworkMonitor")
   private let monitor = NWPathMonitor()
-  private var networkPath: NWPath
+  private let networkPath: Atomic<NWPath>
   private let notificationHandler: EventNotificationHandler
+  private let _connectionTypeChangedCB = Atomic<ConnectionTypeChangedCallack?>(wrappedValue: nil)
 
   init(notificationHandler: EventNotificationHandler) {
-    self.networkPath = monitor.currentPath
+    self.networkPath = Atomic<NWPath>(wrappedValue: monitor.currentPath)
     self.notificationHandler = notificationHandler
+  }
+
+  public var connectionTypeChangedCB: ConnectionTypeChangedCallack? {
+    get { _connectionTypeChangedCB.wrappedValue }
+    set { _connectionTypeChangedCB.wrappedValue = newValue }
   }
 
   private func updateNetworkPath(newPath: NWPath) async {
     let isConnectedBeforeChange = isConnectedToNetwork
-    networkPath = newPath
+    networkPath.wrappedValue = newPath
     let isConnectedAfterChange = isConnectedToNetwork
 
-    if networkPath.status != .satisfied {
+    if newPath.status != .satisfied {
       os_log("Disconnected: The network is not reachable", log: self.log, type: .info)
-    } else if networkPath.usesInterfaceType(.cellular) {
+    } else if newPath.usesInterfaceType(.cellular) {
       os_log(
         "Connected: The network is reachable over the Cellular connection",
         log: self.log,
         type: .info
       )
-    } else if networkPath.usesInterfaceType(.wifi) {
+    } else if newPath.usesInterfaceType(.wifi) {
       os_log(
         "Connected: The network is reachable over the WiFi connection",
         log: self.log,
         type: .info
       )
-    } else if networkPath.usesInterfaceType(.wiredEthernet) {
+    } else if newPath.usesInterfaceType(.wiredEthernet) {
       os_log(
         "Connected: The network is reachable over the Ethernet connection",
         log: self.log,
         type: .info
       )
-    } else if networkPath.usesInterfaceType(.other) {
+    } else if newPath.usesInterfaceType(.other) {
       os_log(
         "Connected: The network is reachable over Other connection",
         log: self.log,
         type: .info
       )
-    } else if networkPath.usesInterfaceType(.loopback) {
+    } else if newPath.usesInterfaceType(.loopback) {
       os_log(
         "Connected: The network is reachable over Loop Back connection",
         log: self.log,
@@ -116,12 +114,12 @@ public class NetworkMonitor: NetworkMonitorFacade {
   }
 
   public var isConnectedToNetwork: Bool {
-    let isConneted = networkPath.status == .satisfied
+    let isConneted = networkPath.wrappedValue.status == .satisfied
     return isConneted
   }
 
   public var isCellular: Bool {
-    networkPath.usesInterfaceType(.cellular)
+    networkPath.wrappedValue.usesInterfaceType(.cellular)
   }
 
   public var isWifiOrEthernet: Bool {

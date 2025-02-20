@@ -177,7 +177,7 @@ public struct ResponseErrorInfo: Encodable {
 
 // MARK: - BackendProxy
 
-public final class BackendProxy {
+public final class BackendProxy: Sendable {
   private let log = OSLog(subsystem: "Amperfy", category: "BackendProxy")
   private let networkMonitor: NetworkMonitorFacade
   private let performanceMonitor: ThreadPerformanceMonitor

@@ -54,7 +54,7 @@ public struct DownloadNotification {
 
 // MARK: - EventNotificationHandler
 
-public class EventNotificationHandler {
+final public class EventNotificationHandler: Sendable {
   public func register(
     _ observer: Any,
     selector aSelector: Selector,

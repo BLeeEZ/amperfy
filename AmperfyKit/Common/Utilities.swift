@@ -42,16 +42,16 @@ extension CustomEquatable where Self: Equatable {
 // MARK: - Atomic
 
 @propertyWrapper
-final class Atomic<Value>: Sendable {
+public final class Atomic<Value>: Sendable {
   nonisolated(unsafe) private var value: Value
   private let lock = NSLock()
 
-  var wrappedValue: Value {
+  public var wrappedValue: Value {
     get { lock.withLock { value } }
     set { lock.withLock { value = newValue } }
   }
 
-  init(wrappedValue value: Value) {
+  public init(wrappedValue value: Value) {
     self.value = value
   }
 }

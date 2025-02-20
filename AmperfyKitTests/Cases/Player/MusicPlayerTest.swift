@@ -155,9 +155,9 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
 
 // MARK: - MOCK_DownloadManagerDelegate
 
-class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
+final class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
   var requestPredicate: NSPredicate { NSPredicate(value: true) }
-  var parallelDownloadsCount = 2
+  let parallelDownloadsCount = 2
   func prepareDownload(
     downloadInfo: AmperfyKit.DownloadElementInfo,
     storage: AmperfyKit.AsyncCoreDataAccessWrapper
@@ -182,7 +182,7 @@ class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
 
 // MARK: - MOCK_BackendApi
 
-class MOCK_BackendApi: BackendApi {
+final class MOCK_BackendApi: BackendApi {
   var clientApiVersion: String = ""
   var serverApiVersion: String = ""
   var isStreamingTranscodingActive: Bool = true
@@ -216,8 +216,8 @@ class MOCK_BackendApi: BackendApi {
 
 // MARK: - MOCK_NetworkMonitor
 
-class MOCK_NetworkMonitor: NetworkMonitorFacade {
-  var connectionTypeChangedCB: ConnectionTypeChangedCallack?
+final class MOCK_NetworkMonitor: NetworkMonitorFacade {
+  var connectionTypeChangedCB: ConnectionTypeChangedCallack? { get { nil } set {} }
   var isConnectedToNetwork: Bool { true }
   var isCellular: Bool { false }
   var isWifiOrEthernet: Bool { true }

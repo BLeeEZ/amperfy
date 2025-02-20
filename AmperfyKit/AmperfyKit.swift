@@ -41,7 +41,6 @@ public class AmperKit {
     OSLog(subsystem: "Amperfy", category: "AppDelegate")
   }()
 
-  @MainActor
   public lazy var networkMonitor: NetworkMonitorFacade = {
     let monitor = NetworkMonitor(notificationHandler: notificationHandler)
     monitor.start()
@@ -75,7 +74,6 @@ public class AmperKit {
     EventLogger(storage: storage)
   }()
 
-  @MainActor
   public lazy var backendApi: BackendProxy = {
     let api = BackendProxy(
       networkMonitor: networkMonitor,
@@ -205,6 +203,7 @@ public class AmperKit {
       requestManager: requestManager,
       eventLogger: eventLogger,
       settings: storage.settings,
+      notificationHandler: notificationHandler,
       limitCacheSize: true,
       isFailWithPopupError: true
     )
@@ -221,7 +220,6 @@ public class AmperKit {
       downloadDelegate: dlDelegate,
       urlSession: urlSession,
       validationCB: nil,
-      notificationHandler: notificationHandler,
       urlCleanser: backendApi
     )
 
@@ -247,6 +245,7 @@ public class AmperKit {
       requestManager: requestManager,
       eventLogger: eventLogger,
       settings: storage.settings,
+      notificationHandler: notificationHandler,
       limitCacheSize: false,
       isFailWithPopupError: false
     )
@@ -296,7 +295,6 @@ public class AmperKit {
       downloadDelegate: dlDelegate,
       urlSession: urlSession,
       validationCB: validationCB,
-      notificationHandler: notificationHandler,
       urlCleanser: backendApi
     )
 
