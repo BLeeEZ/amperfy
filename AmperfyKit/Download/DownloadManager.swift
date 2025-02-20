@@ -24,7 +24,7 @@ import Foundation
 import os.log
 
 public typealias VoidAsyncClosure = @MainActor () async -> ()
-public typealias PreDownloadIsValidCB = @MainActor (_ downloadInfos: [DownloadElementInfo]) async
+public typealias PreDownloadIsValidCB = @Sendable (_ downloadInfos: [DownloadElementInfo]) async
   -> [DownloadElementInfo]
 
 // MARK: - DownloadOperation
@@ -77,40 +77,39 @@ class DownloadOperation: AsyncOperation, @unchecked Sendable {
 // MARK: - DownloadManager
 
 actor DownloadManager: NSObject, DownloadManageable {
-  @MainActor
-  var networkMonitor: NetworkMonitorFacade!
-  let storage: AsyncCoreDataAccessWrapper
-  let requestManager: DownloadRequestManager
-  @MainActor
-  var downloadDelegate: DownloadManagerDelegate!
-  var notificationHandler: EventNotificationHandler!
-  var urlSession: URLSession!
-
-  let log: OSLog
-  var isFailWithPopupError: Bool = true
-  var preDownloadIsValidCheck: PreDownloadIsValidCB?
-  let fileManager = CacheFileManager.shared
-  var isCacheSizeLimited: Bool
-
+  internal var urlSession: URLSession!
   internal var tasks = [URLSessionTask: DownloadTaskInfo]()
-  internal var taskQueue: OperationQueue
+  internal let log: OSLog
+  internal let taskQueue: OperationQueue
+  internal let fileManager = CacheFileManager.shared
 
   private let name: String
+  private let networkMonitor: NetworkMonitorFacade
+  private let storage: AsyncCoreDataAccessWrapper
+  private let requestManager: DownloadRequestManager
+  private let downloadDelegate: DownloadManagerDelegate
+  private let notificationHandler: EventNotificationHandler
   private let eventLogger: EventLogger
   private let settings: PersistentStorage.Settings
-  @MainActor
-  private var urlCleanser: URLCleanser!
+  private let urlCleanser: URLCleanser
+
   private var isRunning = false
   private var taskOperations = [DownloadRequest: DownloadOperation]()
   private var backgroundFetchCompletionHandler: CompleteHandlerBlock?
+  private var isFailWithPopupError: Bool = true
+  private var preDownloadIsValidCheck: PreDownloadIsValidCB?
+  private var isCacheSizeLimited: Bool
 
   init(
     name: String,
     storage: AsyncCoreDataAccessWrapper,
     requestManager: DownloadRequestManager,
+    downloadDelegate: DownloadManagerDelegate,
     eventLogger: EventLogger,
     settings: PersistentStorage.Settings,
+    networkMonitor: NetworkMonitorFacade,
     notificationHandler: EventNotificationHandler,
+    urlCleanser: URLCleanser,
     limitCacheSize: Bool,
     isFailWithPopupError: Bool
   ) {
@@ -118,14 +117,25 @@ actor DownloadManager: NSObject, DownloadManageable {
     self.log = OSLog(subsystem: "Amperfy", category: name)
     self.storage = storage
     self.requestManager = requestManager
+    self.downloadDelegate = downloadDelegate
     self.eventLogger = eventLogger
     self.settings = settings
+    self.networkMonitor = networkMonitor
+    self.notificationHandler = notificationHandler
+    self.urlCleanser = urlCleanser
     self.isCacheSizeLimited = limitCacheSize
     self.isFailWithPopupError = isFailWithPopupError
     self.taskQueue = OperationQueue()
+    taskQueue.maxConcurrentOperationCount = downloadDelegate.parallelDownloadsCount
 
     super.init()
+  }
 
+  @MainActor
+  public func initialize(
+    urlSession: URLSession,
+    validationCB: PreDownloadIsValidCB?
+  ) {
     notificationHandler.register(
       self,
       selector: #selector(networkStatusChanged(notification:)),
@@ -138,22 +148,7 @@ actor DownloadManager: NSObject, DownloadManageable {
       name: .networkStatusChanged,
       object: nil
     )
-  }
-
-  @MainActor
-  public func initialize(
-    networkMonitor: NetworkMonitorFacade,
-    downloadDelegate: DownloadManagerDelegate,
-    urlSession: URLSession,
-    validationCB: PreDownloadIsValidCB?,
-    urlCleanser: URLCleanser
-  ) {
-    self.networkMonitor = networkMonitor
-    self.downloadDelegate = downloadDelegate
-    self.urlCleanser = urlCleanser
-
     Task {
-      await taskQueue.maxConcurrentOperationCount = downloadDelegate.parallelDownloadsCount
       await _initialize(urlSession: urlSession, validationCB: validationCB)
     }
   }
@@ -327,7 +322,7 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   func _resetFailedDownloads() async {
     let failedRequests = await requestManager.getAndResetFailedDownloads()
-    guard await isAllowedToTriggerDownload else { return }
+    guard isAllowedToTriggerDownload else { return }
     for failedRequest in failedRequests {
       addDownloadTaskOperation(downloadRequest: failedRequest)
     }
@@ -339,7 +334,7 @@ actor DownloadManager: NSObject, DownloadManageable {
   }
 
   private func setupDownloadQueue() async {
-    guard await isAllowedToTriggerDownload else { return }
+    guard isAllowedToTriggerDownload else { return }
     let downloadRequests = await requestManager.getRequestedDownloads()
     for downloadRequest in downloadRequests {
       addDownloadTaskOperation(downloadRequest: downloadRequest)
@@ -358,7 +353,7 @@ actor DownloadManager: NSObject, DownloadManageable {
   }
 
   private func manageDownload(downloadRequest: DownloadRequest) async {
-    guard await isAllowedToTriggerDownload else {
+    guard isAllowedToTriggerDownload else {
       taskOperations[downloadRequest]?.complete()
       taskOperations.removeValue(forKey: downloadRequest)
       return
@@ -375,12 +370,10 @@ actor DownloadManager: NSObject, DownloadManageable {
     os_log("Fetching %s ...", log: self.log, type: .info, downloadRequest.title)
 
     do {
-      let url = try await Task { @MainActor in
-        return try await downloadDelegate!.prepareDownload(
-          downloadInfo: downloadRequest.info,
-          storage: self.storage
-        )
-      }.value
+      let url = try await downloadDelegate.prepareDownload(
+        downloadInfo: downloadRequest.info,
+        storage: storage
+      )
       let downloadTaskInfo = DownloadTaskInfo(request: downloadRequest, url: url)
       fetch(downloadTaskInfo: downloadTaskInfo)
     } catch {
@@ -410,12 +403,10 @@ actor DownloadManager: NSObject, DownloadManageable {
       return download.isCanceled
     }
     if let isCanceled, !isCanceled {
-      await Task { @MainActor in
-        return await self.downloadDelegate!.failedDownload(
-          downloadInfo: downloadRequest.info,
-          storage: self.storage
-        )
-      }.value
+      await downloadDelegate.failedDownload(
+        downloadInfo: downloadRequest.info,
+        storage: storage
+      )
     }
     if let isCanceled, !isCanceled, error != .apiErrorResponse, error != .alreadyDownloaded {
       os_log(
@@ -427,13 +418,11 @@ actor DownloadManager: NSObject, DownloadManageable {
       )
       let shortMessage =
         "Error \"\(error.description)\" occured while downloading object \"\(downloadRequest.title)\"."
-      let responseError = await MainActor.run {
-        ResponseError(
-          type: .api,
-          message: shortMessage,
-          cleansedURL: task?.originalRequest?.url?.asCleansedURL(cleanser: urlCleanser)
-        )
-      }
+      let responseError = ResponseError(
+        type: .api,
+        message: shortMessage,
+        cleansedURL: task?.originalRequest?.url?.asCleansedURL(cleanser: urlCleanser)
+      )
       await eventLogger.report(
         topic: "Download Error",
         error: responseError,
@@ -452,12 +441,10 @@ actor DownloadManager: NSObject, DownloadManageable {
     fileURL: URL,
     fileMimeType: String?
   ) async {
-    let responseError = await Task { @MainActor in
-      return downloadDelegate!.validateDownloadedData(
-        fileURL: fileURL,
-        downloadURL: task.originalRequest?.url
-      )
-    }.value
+    let responseError = downloadDelegate.validateDownloadedData(
+      fileURL: fileURL,
+      downloadURL: task.originalRequest?.url
+    )
 
     if let responseError {
       os_log(
@@ -485,14 +472,12 @@ actor DownloadManager: NSObject, DownloadManageable {
       fileManager.getFileSize(url: fileURL) ?? 0,
       fileMimeType ?? "no MIME type"
     )
-    await Task { @MainActor in
-      await downloadDelegate!.completedDownload(
-        downloadInfo: downloadRequest.info,
-        fileURL: fileURL,
-        fileMimeType: fileMimeType,
-        storage: self.storage
-      )
-    }.value
+    await downloadDelegate.completedDownload(
+      downloadInfo: downloadRequest.info,
+      fileURL: fileURL,
+      fileMimeType: fileMimeType,
+      storage: storage
+    )
 
     let downloadElementUniqueId = try? await storage.performAndGet { asyncCompanion in
       let download = Download(
@@ -504,7 +489,7 @@ actor DownloadManager: NSObject, DownloadManageable {
       return download.element?.uniqueID
     }
     if let downloadElementUniqueId {
-      notificationHandler.post(
+      await notificationHandler.post(
         name: .downloadFinishedSuccess,
         object: self,
         userInfo: DownloadNotification(id: downloadElementUniqueId).asNotificationUserInfo
@@ -519,16 +504,10 @@ actor DownloadManager: NSObject, DownloadManageable {
   }
 
   private var isAllowedToTriggerDownload: Bool {
-    get async {
-      let isConnectedToNetwork = await Task { @MainActor in
-        return networkMonitor?.isConnectedToNetwork ?? false
-      }.value
-
-      return isRunning &&
-        settings.isOnlineMode &&
-        isConnectedToNetwork &&
-        (!isCacheSizeLimited || !storageExceedsCacheLimit())
-    }
+    isRunning &&
+      settings.isOnlineMode &&
+      networkMonitor.isConnectedToNetwork &&
+      (!isCacheSizeLimited || !storageExceedsCacheLimit())
   }
 
   @objc

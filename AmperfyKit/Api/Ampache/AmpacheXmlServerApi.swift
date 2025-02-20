@@ -121,7 +121,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     settings.streamingFormatPreference != .raw
   }
 
-  nonisolated static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+  static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
           let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
           let objectId = urlComp.queryItems?.first(where: { $0.name == "object_id" })?.value,
@@ -217,7 +217,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     return url
   }
 
-  nonisolated func cleanse(url: URL?) -> CleansedURL {
+  func cleanse(url: URL?) -> CleansedURL {
     guard let url = url,
           var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
           let queryItems = urlComp.queryItems
@@ -817,7 +817,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     try await updateUrlToken(urlString: artworkUrl)
   }
 
-  nonisolated public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+  public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
     let errorParser = AmpacheXmlParser(performanceMonitor: performanceMonitor)
     let parser = XMLParser(data: response.data)
     parser.delegate = errorParser

@@ -65,20 +65,18 @@ final class AmpacheApi: BackendApi {
     )
   }
 
-  @MainActor
   func generateUrl(
-    forStreamingPlayable playable: AbstractPlayable,
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
     maxBitrate: StreamingMaxBitratePreference
   ) async throws
     -> URL {
     try await ampacheXmlServerApi.generateUrlForStreamingPlayable(
-      isSong: playable.isSong,
-      id: playable.id,
+      isSong: playableInfo.type == .song,
+      id: playableInfo.id,
       maxBitrate: maxBitrate
     )
   }
 
-  @MainActor
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
     try await ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artwork.url)
   }
@@ -98,7 +96,6 @@ final class AmpacheApi: BackendApi {
     )
   }
 
-  @MainActor
   func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
     AmpacheArtworkDownloadDelegate(
       ampacheXmlServerApi: ampacheXmlServerApi,

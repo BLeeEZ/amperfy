@@ -54,52 +54,44 @@ final class SubsonicApi {
 // MARK: BackendApi
 
 extension SubsonicApi: BackendApi {
-  @MainActor
   public var clientApiVersion: String {
     subsonicServerApi.clientApiVersion.wrappedValue?.description ?? "-"
   }
 
-  @MainActor
   public var serverApiVersion: String {
     subsonicServerApi.serverApiVersion.wrappedValue?.description ?? "-"
   }
 
-  @MainActor
   public var isStreamingTranscodingActive: Bool {
     subsonicServerApi.isStreamingTranscodingActive
   }
 
-  @MainActor
   func provideCredentials(credentials: LoginCredentials) {
     subsonicServerApi.provideCredentials(credentials: credentials)
   }
 
-  @MainActor
   func isAuthenticationValid(credentials: LoginCredentials) async throws {
     try await subsonicServerApi.isAuthenticationValid(credentials: credentials)
   }
 
-  @MainActor
   func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws
     -> URL {
     let apiId = playableInfo.streamId ?? playableInfo.id
     return try await subsonicServerApi.generateUrl(forDownloadingPlayableId: apiId)
   }
 
-  @MainActor
   func generateUrl(
-    forStreamingPlayable playable: AbstractPlayable,
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
     maxBitrate: StreamingMaxBitratePreference
   ) async throws
     -> URL {
-    let apiId = playable.asPodcastEpisode?.streamId ?? playable.id
+    let apiId = playableInfo.streamId ?? playableInfo.id
     return try await subsonicServerApi.generateUrl(
       forStreamingPlayableId: apiId,
       maxBitrate: maxBitrate
     )
   }
 
-  @MainActor
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
     try await subsonicServerApi.generateUrl(forArtworkId: artwork.id)
   }

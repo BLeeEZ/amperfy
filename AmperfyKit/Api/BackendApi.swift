@@ -50,27 +50,22 @@ public protocol SyncCallbacks: ParsedObjectNotifiable, Sendable {
 // MARK: - ThreadPerformanceMonitor
 
 public protocol ThreadPerformanceMonitor: Sendable {
-  nonisolated var shouldSlowDownExecution: Bool { get }
-  nonisolated var isInForeground: Bool { get set }
+  var shouldSlowDownExecution: Bool { get }
+  var isInForeground: Bool { get set }
 }
 
 // MARK: - ThreadPerformanceObserver
 
-final public class ThreadPerformanceObserver: ThreadPerformanceMonitor {
+final public class ThreadPerformanceObserver: ThreadPerformanceMonitor, Sendable {
   public static let shared = ThreadPerformanceObserver()
 
-  nonisolated(unsafe) private var _isInForeground: Bool = true
-  private let _isInForegroundLock = NSLock()
-  nonisolated public var isInForeground: Bool {
-    get {
-      _isInForegroundLock.withLock { _isInForeground }
-    }
-    set {
-      _isInForegroundLock.withLock { _isInForeground = newValue }
-    }
+  private let _isInForeground = Atomic<Bool>(wrappedValue: true)
+  public var isInForeground: Bool {
+    get { _isInForeground.wrappedValue }
+    set { _isInForeground.wrappedValue = newValue }
   }
 
-  nonisolated public var shouldSlowDownExecution: Bool {
+  public var shouldSlowDownExecution: Bool {
     !isInForeground
   }
 }
@@ -246,7 +241,7 @@ extension URL {
 // MARK: - URLCleanser
 
 public protocol URLCleanser: Sendable {
-  nonisolated func cleanse(url: URL?) -> CleansedURL
+  func cleanse(url: URL?) -> CleansedURL
 }
 
 // MARK: - TranscodingInfo
@@ -263,29 +258,20 @@ public struct TranscodingInfo {
 // MARK: - BackendApi
 
 public protocol BackendApi: URLCleanser, Sendable {
-  @MainActor
   var clientApiVersion: String { get }
-  @MainActor
   var serverApiVersion: String { get }
-  @MainActor
   var isStreamingTranscodingActive: Bool { get }
-  @MainActor
   func provideCredentials(credentials: LoginCredentials)
-  @MainActor
   func isAuthenticationValid(credentials: LoginCredentials) async throws
-  @MainActor
   func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws -> URL
-  @MainActor
   func generateUrl(
-    forStreamingPlayable playable: AbstractPlayable,
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
     maxBitrate: StreamingMaxBitratePreference
   ) async throws -> URL
-  @MainActor
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL
-  nonisolated func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
+  func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
   @MainActor
   func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
-  @MainActor
   func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
-  nonisolated func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
+  func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
 }

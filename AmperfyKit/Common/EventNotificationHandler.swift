@@ -55,6 +55,7 @@ public struct DownloadNotification {
 // MARK: - EventNotificationHandler
 
 final public class EventNotificationHandler: Sendable {
+  @MainActor
   public func register(
     _ observer: Any,
     selector aSelector: Selector,
@@ -69,6 +70,7 @@ final public class EventNotificationHandler: Sendable {
     )
   }
 
+  @MainActor
   public func remove(
     _ observer: Any,
     name aName: NSNotification.Name,
@@ -77,6 +79,7 @@ final public class EventNotificationHandler: Sendable {
     NotificationCenter.default.removeObserver(observer, name: aName, object: anObject)
   }
 
+  @MainActor
   public func post(
     name aName: NSNotification.Name,
     object anObject: Any?,

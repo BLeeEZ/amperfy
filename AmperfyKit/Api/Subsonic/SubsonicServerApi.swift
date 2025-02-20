@@ -138,7 +138,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     settings.streamingFormatPreference != .raw
   }
 
-  nonisolated static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+  static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
           let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
           let id = urlComp.queryItems?.first(where: { $0.name == "id" })?.value
@@ -256,7 +256,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     self.credentials.wrappedValue = credentials
   }
 
-  nonisolated public func cleanse(url: URL?) -> CleansedURL {
+  public func cleanse(url: URL?) -> CleansedURL {
     guard let url = url,
           var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
           let queryItems = urlComp.queryItems
@@ -744,7 +744,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     }
   }
 
-  nonisolated public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
+  public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
     let errorParser = SsXmlParser(performanceMonitor: performanceMonitor)
     let parser = XMLParser(data: response.data)
     parser.delegate = errorParser

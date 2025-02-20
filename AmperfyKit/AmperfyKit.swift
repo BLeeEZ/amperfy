@@ -59,6 +59,14 @@ public class AmperKit {
     PersistentStorage(coreDataManager: coreDataManager)
   }()
 
+  public var settings: PersistentStorage.Settings {
+    storage.settings
+  }
+
+  public var asyncStorage: AsyncCoreDataAccessWrapper {
+    storage.async
+  }
+
   @MainActor
   public lazy var librarySyncer: LibrarySyncer = {
     LibrarySyncerProxy(backendApi: backendApi, storage: storage)
@@ -180,13 +188,7 @@ public class AmperKit {
     return facadeImpl
   }
 
-  @MainActor
   public lazy var playableDownloadManager: DownloadManageable = {
-    createPlayableDownloadManager()
-  }()
-
-  @MainActor
-  private func createPlayableDownloadManager() -> DownloadManageable {
     let artworkExtractor = EmbeddedArtworkExtractor()
     let dlDelegate = PlayableDownloadDelegate(
       backendApi: backendApi,
@@ -201,9 +203,12 @@ public class AmperKit {
       name: "PlayableDownloader",
       storage: storage.async,
       requestManager: requestManager,
+      downloadDelegate: dlDelegate,
       eventLogger: eventLogger,
       settings: storage.settings,
+      networkMonitor: networkMonitor,
       notificationHandler: notificationHandler,
+      urlCleanser: backendApi,
       limitCacheSize: true,
       isFailWithPopupError: true
     )
@@ -216,22 +221,17 @@ public class AmperKit {
       delegateQueue: nil
     )
     dlManager.initialize(
-      networkMonitor: networkMonitor,
-      downloadDelegate: dlDelegate,
       urlSession: urlSession,
-      validationCB: nil,
-      urlCleanser: backendApi
+      validationCB: nil
     )
 
     return dlManager
-  }
+  }()
 
-  @MainActor
   public lazy var artworkDownloadManager: DownloadManageable = {
     createArtworkDownloadManager()
   }()
 
-  @MainActor
   private func createArtworkDownloadManager() -> DownloadManageable {
     let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
     let requestManager = DownloadRequestManager(
@@ -243,9 +243,12 @@ public class AmperKit {
       name: "ArtworkDownloader",
       storage: storage.async,
       requestManager: requestManager,
+      downloadDelegate: dlDelegate,
       eventLogger: eventLogger,
       settings: storage.settings,
+      networkMonitor: networkMonitor,
       notificationHandler: notificationHandler,
+      urlCleanser: backendApi,
       limitCacheSize: false,
       isFailWithPopupError: false
     )
@@ -254,11 +257,11 @@ public class AmperKit {
       { (downloadInfos: [DownloadElementInfo]) -> [DownloadElementInfo] in
         let artworkDownloadInfos = downloadInfos.filter { $0.type == .artwork }
 
-        let artworkDownloadSetting = self.storage.settings.artworkDownloadSetting
+        let artworkDownloadSetting = await self.settings.artworkDownloadSetting
         guard artworkDownloadSetting != .never else { return [DownloadElementInfo]() }
         guard artworkDownloadSetting != .updateOncePerSession else { return artworkDownloadInfos }
 
-        let dlInfos = try? await self.storage.async.performAndGet { asyncCompanion in
+        let dlInfos = try? await self.asyncStorage.performAndGet { asyncCompanion in
           var validDls = [DownloadElementInfo]()
           for dlInfo in artworkDownloadInfos {
             guard dlInfo.type == .artwork else { continue }
@@ -291,11 +294,8 @@ public class AmperKit {
       delegateQueue: nil
     )
     dlManager.initialize(
-      networkMonitor: networkMonitor,
-      downloadDelegate: dlDelegate,
       urlSession: urlSession,
-      validationCB: validationCB,
-      urlCleanser: backendApi
+      validationCB: validationCB
     )
 
     return dlManager

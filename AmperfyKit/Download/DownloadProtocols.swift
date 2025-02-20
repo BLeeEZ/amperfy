@@ -36,8 +36,8 @@ public struct DownloadRequest: Hashable, Sendable {
 // MARK: - DownloadManageable
 
 public protocol DownloadManageable {
-  nonisolated func getBackgroundFetchCompletionHandler() async -> CompleteHandlerBlock?
-  nonisolated func setBackgroundFetchCompletionHandler(_ newValue: CompleteHandlerBlock?)
+  func getBackgroundFetchCompletionHandler() async -> CompleteHandlerBlock?
+  func setBackgroundFetchCompletionHandler(_ newValue: CompleteHandlerBlock?)
   @MainActor
   func download(object: Downloadable)
   @MainActor
@@ -46,11 +46,11 @@ public protocol DownloadManageable {
   func removeFinishedDownload(for object: Downloadable)
   @MainActor
   func removeFinishedDownload(for objects: [Downloadable])
-  nonisolated func clearFinishedDownloads()
-  nonisolated func resetFailedDownloads()
-  nonisolated func cancelDownloads()
+  func clearFinishedDownloads()
+  func resetFailedDownloads()
+  func cancelDownloads()
   func start()
-  nonisolated func stop()
+  func stop()
 }
 
 // MARK: - DownloadManagerDelegate
@@ -58,7 +58,6 @@ public protocol DownloadManageable {
 public protocol DownloadManagerDelegate: Sendable {
   var requestPredicate: NSPredicate { get }
   var parallelDownloadsCount: Int { get }
-  @MainActor
   func prepareDownload(
     downloadInfo: DownloadElementInfo,
     storage: AsyncCoreDataAccessWrapper

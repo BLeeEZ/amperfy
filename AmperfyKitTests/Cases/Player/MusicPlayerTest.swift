@@ -183,24 +183,23 @@ final class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
 // MARK: - MOCK_BackendApi
 
 final class MOCK_BackendApi: BackendApi {
-  var clientApiVersion: String = ""
-  var serverApiVersion: String = ""
-  var isStreamingTranscodingActive: Bool = true
+  let clientApiVersion: String = ""
+  let serverApiVersion: String = ""
+  let isStreamingTranscodingActive: Bool = true
   func provideCredentials(credentials: LoginCredentials) {}
   func isAuthenticationValid(credentials: LoginCredentials) async throws {
     throw BackendError.notSupported
   }
 
   func generateUrl(
-    forDownloadingPlayable playableInfo: AmperfyKit
-      .AbstractPlayableInfo
+    forDownloadingPlayable playableInfo: AbstractPlayableInfo
   ) async throws
     -> URL {
     Helper.testURL
   }
 
   func generateUrl(
-    forStreamingPlayable playable: AbstractPlayable,
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
     maxBitrate: StreamingMaxBitratePreference
   ) async throws
     -> URL { Helper.testURL }

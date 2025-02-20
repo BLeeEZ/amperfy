@@ -333,42 +333,35 @@ public final class BackendProxy: Sendable {
 // MARK: BackendApi
 
 extension BackendProxy: BackendApi {
-  @MainActor
   public var clientApiVersion: String { activeApi.clientApiVersion }
 
-  @MainActor
   public var serverApiVersion: String { activeApi.serverApiVersion }
 
-  @MainActor
-  public var isStreamingTranscodingActive: Bool { activeApi.isStreamingTranscodingActive
+  public var isStreamingTranscodingActive: Bool {
+    activeApi.isStreamingTranscodingActive
   }
 
-  @MainActor
   public func provideCredentials(credentials: LoginCredentials) {
     activeApi.provideCredentials(credentials: credentials)
   }
 
-  @MainActor
   public func isAuthenticationValid(credentials: LoginCredentials) async throws {
     try await activeApi.isAuthenticationValid(credentials: credentials)
   }
 
-  @MainActor
   public func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws
     -> URL {
     try await activeApi.generateUrl(forDownloadingPlayable: playableInfo)
   }
 
-  @MainActor
   public func generateUrl(
-    forStreamingPlayable playable: AbstractPlayable,
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
     maxBitrate: StreamingMaxBitratePreference
   ) async throws
     -> URL {
-    try await activeApi.generateUrl(forStreamingPlayable: playable, maxBitrate: maxBitrate)
+    try await activeApi.generateUrl(forStreamingPlayable: playableInfo, maxBitrate: maxBitrate)
   }
 
-  @MainActor
   public func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
     try await activeApi.generateUrl(forArtwork: artwork)
   }
@@ -377,21 +370,19 @@ extension BackendProxy: BackendApi {
     activeApi.checkForErrorResponse(response: response)
   }
 
-  @MainActor
   public func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
     activeApi.createLibrarySyncer(storage: storage)
   }
 
-  @MainActor
   public func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
     activeApi.createArtworkArtworkDownloadDelegate()
   }
 
-  nonisolated public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
+  public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     activeApi.extractArtworkInfoFromURL(urlString: urlString)
   }
 
-  nonisolated public func cleanse(url: URL?) -> CleansedURL {
+  public func cleanse(url: URL?) -> CleansedURL {
     activeApi.cleanse(url: url)
   }
 }

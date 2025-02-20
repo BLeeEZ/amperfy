@@ -95,7 +95,7 @@ final public class NetworkMonitor: NetworkMonitorFacade {
     }
 
     if isConnectedBeforeChange != isConnectedAfterChange {
-      notificationHandler.post(
+      await notificationHandler.post(
         name: .networkStatusChanged,
         object: self,
         userInfo: nil
