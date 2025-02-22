@@ -122,7 +122,14 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     if isShouldPauseAfterFinishedPlaying {
       isShouldPauseAfterFinishedPlaying = false
       pause()
-    } else if playerStatus.repeatMode == .single {
+    } else if playerStatus
+      .repeatMode == .single ||
+      (
+        // repeat mode all and only one song is in player -> repeat
+        playerStatus.repeatMode == .all && queueHandler.prevQueueCount == 0 && queueHandler
+          .userQueueCount == 0 && queueHandler
+          .nextQueueCount == 0
+      ) {
       replayCurrentItem()
     } else if !settings.isPlaybackStartOnlyOnPlay {
       playNext()

@@ -292,6 +292,7 @@ class MusicPlayerTest: XCTestCase {
   var songCached: Song!
   var songToDownload: Song!
   var playlistThreeCached: Playlist!
+  var playlistAllCached: Playlist!
   let fillCount = 5
 
   override func setUp() async throws {
@@ -344,12 +345,21 @@ class MusicPlayerTest: XCTestCase {
     guard let playlistCached = library.getPlaylist(id: cdHelper.seeder.playlists[1].id)
     else { XCTFail(); return }
     playlistThreeCached = playlistCached
+    guard let playlistAllCachedFetched = library.getPlaylist(id: cdHelper.seeder.playlists[3].id)
+    else { XCTFail(); return }
+    playlistAllCached = playlistAllCachedFetched
   }
 
   override func tearDown() {}
 
   func prepareWithCachedPlaylist() {
     for song in playlistThreeCached.playables {
+      testQueueHandler.appendContextQueue(playables: [song])
+    }
+  }
+
+  func prepareWithAllSongsCached() {
+    for song in playlistAllCached.playables {
       testQueueHandler.appendContextQueue(playables: [song])
     }
   }
@@ -2315,5 +2325,184 @@ class MusicPlayerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0, 1, 2, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [8])
     checkQueueInfoConsistency()
+  }
+
+  func testSongFinishedPlaying_RepeatSingle() {
+    prepareWithAllSongsCached()
+    playerData.currentIndex = 1
+    testPlayer.play()
+    testPlayer.setRepeatMode(.single)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+  }
+
+  func testSongFinishedPlaying_RepeatAll() {
+    prepareWithAllSongsCached()
+    playerData.currentIndex = 1
+    testPlayer.play()
+    testPlayer.setRepeatMode(.all)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[2].id)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[3].id)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+  }
+
+  func testSongFinishedPlaying_RepeatAll_OneSong() {
+    testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+
+    testPlayer.setRepeatMode(.single)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    testPlayer.setRepeatMode(.all)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "playback started")
+    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1
+    backendPlayer.responder?.didItemFinishedPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    testPlayer.setRepeatMode(.off)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertFalse(testPlayer.isPlaying)
+  }
+
+  func testSongFinishedPlaying_RepeatOff() {
+    prepareWithAllSongsCached()
+    playerData.currentIndex = 1
+    testPlayer.play()
+    testPlayer.setRepeatMode(.off)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[2].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[3].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertFalse(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
+  }
+
+  func testSongFinishedPlaying_RepeatSingleOffMix() {
+    prepareWithAllSongsCached()
+    playerData.currentIndex = 1
+    testPlayer.play()
+    testPlayer.setRepeatMode(.single)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    testPlayer.setRepeatMode(.off)
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[2].id)
+
+    testPlayer.setRepeatMode(.single)
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[2].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[2].id)
+
+    testPlayer.setRepeatMode(.off)
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[3].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertFalse(testPlayer.isPlaying) // not playing
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
+  }
+
+  func testSongFinishedPlaying_RepeatSingleAllMix() {
+    prepareWithAllSongsCached()
+    playerData.currentIndex = 1
+    testPlayer.play()
+    testPlayer.setRepeatMode(.single)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[1].id)
+
+    testPlayer.setRepeatMode(.all)
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[2].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[3].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
+
+    testPlayer.setRepeatMode(.single)
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
+
+    backendPlayer.responder?.didItemFinishedPlaying()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
   }
 }

@@ -189,6 +189,7 @@ class CoreDataSeeder {
       songIds: ["3", "5", "10T", "36", "19", "10T", "38", "5", "41"]
     ),
     (id: "dRsa11", name: "No Cached", songIds: ["3", "10T", "19"]),
+    (id: "d23884", name: "All Cached", songIds: ["99", "5a9", "59e", "5e9lll"]),
   ]
   let radios = [
     (id: "12", title: "GoGo Radio", url: "www.blub.de/aaa", siteUrl: "www.blub.de/ddf"),
