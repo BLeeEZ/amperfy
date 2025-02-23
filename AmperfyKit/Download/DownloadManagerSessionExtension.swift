@@ -25,7 +25,8 @@ import os.log
 
 extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
   func fetch(downloadTaskInfo: DownloadTaskInfo) {
-    let task = urlSession.downloadTask(with: downloadTaskInfo.url)
+    let task = urlSession?.downloadTask(with: downloadTaskInfo.url)
+    guard let task else { return }
     tasks[task] = downloadTaskInfo
     task.resume()
   }

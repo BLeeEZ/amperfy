@@ -77,7 +77,7 @@ class DownloadOperation: AsyncOperation, @unchecked Sendable {
 // MARK: - DownloadManager
 
 actor DownloadManager: NSObject, DownloadManageable {
-  internal var urlSession: URLSession!
+  internal var urlSession: URLSession?
   internal var tasks = [URLSessionTask: DownloadTaskInfo]()
   internal let log: OSLog
   internal let taskQueue: OperationQueue
@@ -269,7 +269,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     taskQueue.cancelAllOperations()
     taskOperations.removeAll()
     await requestManager.cancelDownloads()
-    let urlSessionTasks = await urlSession.allTasks
+    guard let urlSessionTasks = await urlSession?.allTasks else { return }
     for task in urlSessionTasks {
       task.cancel()
     }
@@ -298,7 +298,7 @@ actor DownloadManager: NSObject, DownloadManageable {
 
     taskOperations.removeAll()
     taskQueue.cancelAllOperations()
-    let urlSessionTasks = await urlSession.allTasks
+    guard let urlSessionTasks = await urlSession?.allTasks else { return }
     for task in urlSessionTasks {
       task.cancel()
     }
