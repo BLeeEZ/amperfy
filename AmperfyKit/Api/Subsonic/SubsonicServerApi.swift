@@ -945,7 +945,21 @@ final class SubsonicServerApi: URLCleanser, Sendable {
 
   private func request(url: URL) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
-      AF.request(url, method: .get).validate().responseData { response in
+      let afRequest = AF.request(url, method: .get)
+      afRequest.validate().responseData { response in
+        if response.response?.statusCode == 404 {
+          let cleanedURL = self.cleanse(url: response.request?.url)
+          os_log("API 404: Not Found: %s", log: self.log, type: .info, cleanedURL.description)
+          let notFoundError = ResponseError(
+            type: .api,
+            statusCode: SubsonicError.requestedDataNotFound.rawValue,
+            message: "404: Not Found",
+            cleansedURL: cleanedURL,
+            data: response.data
+          )
+          continuation.resume(throwing: notFoundError)
+          return
+        }
         if let data = response.data {
           continuation.resume(returning: APIDataResponse(data: data, url: url))
           return

@@ -193,17 +193,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(artist: Artist) async throws {
-    guard isSyncAllowed, !artist.id.isEmpty else { return }
-    let response = try await subsonicServerApi.requestArtist(id: artist.id)
+    guard isSyncAllowed, !artist.id.isEmpty, artist.remoteStatus != .deleted else { return }
     let artistObjectId = artist.managedObject.objectID
-    try await storage.async.perform { asyncCompanion in
-      let parserDelegate = SsArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
-        library: asyncCompanion.library
-      )
-      do {
-        try self.parse(response: response, delegate: parserDelegate)
-      } catch {
+
+    func handleNotAvailableArtist(error: Error) async throws {
+      try await storage.async.perform { asyncCompanion in
         if let responseError = error as? ResponseError,
            let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
           let artistAsync = Artist(
@@ -214,16 +208,36 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             type: .resource,
             statusCode: responseError.statusCode,
             message: "Artist \"\(artistAsync.name)\" is no longer available on the server.",
-            cleansedURL: response.url?.asCleansedURL(cleanser: self.subsonicServerApi),
-            data: response.data
+            cleansedURL: responseError.cleansedURL,
+            data: responseError.data
           )
           artistAsync.remoteStatus = .deleted
           throw reportError
-        } else {
-          throw error
         }
       }
+      throw error
     }
+
+    var artistResponse: APIDataResponse?
+    do {
+      let artistResponse = try await subsonicServerApi.requestArtist(id: artist.id)
+    } catch {
+      try await handleNotAvailableArtist(error: error)
+    }
+    guard let artistResponse else { return }
+
+    do {
+      try await storage.async.perform { asyncCompanion in
+        let parserDelegate = SsArtistParserDelegate(
+          performanceMonitor: self.performanceMonitor,
+          library: asyncCompanion.library
+        )
+        try self.parse(response: artistResponse, delegate: parserDelegate)
+      }
+    } catch {
+      try await handleNotAvailableArtist(error: error)
+    }
+
     guard artist.remoteStatus == .available else { return }
     try await withThrowingTaskGroup(of: Void.self) { taskGroup in
       artist.albums.forEach { album in
@@ -237,17 +251,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(album: Album) async throws {
-    guard isSyncAllowed else { return }
-    let albumsResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+    guard isSyncAllowed, album.remoteStatus != .deleted else { return }
     let albumObjectId = album.managedObject.objectID
-    try await storage.async.perform { asyncCompanion in
-      let parserDelegate = SsAlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
-        library: asyncCompanion.library
-      )
-      do {
-        try self.parse(response: albumsResponse, delegate: parserDelegate)
-      } catch {
+
+    func handleNotAvailableAlbum(error: Error) async throws {
+      try await storage.async.perform { asyncCompanion in
         if let responseError = error as? ResponseError,
            let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
           let albumAsync = Album(
@@ -258,19 +266,37 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             type: .resource,
             statusCode: responseError.statusCode,
             message: "Album \"\(albumAsync.name)\" is no longer available on the server.",
-            cleansedURL: albumsResponse.url?.asCleansedURL(cleanser: self.subsonicServerApi),
-            data: albumsResponse.data
+            cleansedURL: responseError.cleansedURL,
+            data: responseError.data
           )
           albumAsync.markAsRemoteDeleted()
           throw reportError
-        } else {
-          throw error
         }
       }
+      throw error
+    }
+
+    var albumResponse: APIDataResponse?
+    do {
+      albumResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+    } catch {
+      try await handleNotAvailableAlbum(error: error)
+    }
+    guard let albumResponse else { return }
+
+    do {
+      try await storage.async.perform { asyncCompanion in
+        let parserDelegate = SsAlbumParserDelegate(
+          performanceMonitor: self.performanceMonitor,
+          library: asyncCompanion.library
+        )
+        try self.parse(response: albumResponse, delegate: parserDelegate)
+      }
+    } catch {
+      try await handleNotAvailableAlbum(error: error)
     }
 
     guard album.remoteStatus == .available else { return }
-    let albumResponse = try await subsonicServerApi.requestAlbum(id: album.id)
     try await storage.async.perform { asyncCompanion in
       let albumAsync = Album(
         managedObject: asyncCompanion.context
@@ -361,37 +387,71 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(podcast: Podcast) async throws {
-    guard isSyncAllowed else { return }
+    guard isSyncAllowed, podcast.remoteStatus != .deleted else { return }
     let isSupported = try await subsonicServerApi.requestServerPodcastSupport()
     guard isSupported else { return }
-    let response = try await subsonicServerApi.requestPodcastEpisodes(id: podcast.id)
     let podcastObjectId = podcast.managedObject.objectID
-    try await storage.async.perform { asyncCompanion in
-      let podcastAsync = Podcast(
-        managedObject: asyncCompanion.context
-          .object(with: podcastObjectId) as! PodcastMO
-      )
-      let oldEpisodes = Set(podcastAsync.episodes)
 
-      let parserDelegate = SsPodcastEpisodeParserDelegate(
-        performanceMonitor: self.performanceMonitor,
-        podcast: podcastAsync,
-        library: asyncCompanion.library
-      )
-      try self.parse(response: response, delegate: parserDelegate)
-      parserDelegate.performPostParseOperations()
-
-      let deletedEpisodes = oldEpisodes.subtracting(parserDelegate.parsedEpisodes)
-      deletedEpisodes.forEach {
-        os_log(
-          "Podcast Episode <%s> is remote deleted",
-          log: self.log,
-          type: .info,
-          $0.displayString
-        )
-        $0.podcastStatus = .deleted
+    func handleNotAvailablePodcast(podcastObjectId: NSManagedObjectID, error: Error) async throws {
+      try await storage.async.perform { asyncCompanion in
+        if let responseError = error as? ResponseError,
+           let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
+          let podcastAsync = Podcast(
+            managedObject: asyncCompanion.context
+              .object(with: podcastObjectId) as! PodcastMO
+          )
+          let reportError = ResponseError(
+            type: .resource,
+            statusCode: responseError.statusCode,
+            message: "Podcast \"\(podcastAsync.name)\" is no longer available on the server.",
+            cleansedURL: responseError.cleansedURL,
+            data: responseError.data
+          )
+          podcastAsync.remoteStatus = .deleted
+          throw reportError
+        }
       }
-      podcastAsync.isCached = parserDelegate.isCollectionCached
+      throw error
+    }
+
+    var podcastResponse: APIDataResponse?
+    do {
+      let podcastResponse = try await subsonicServerApi.requestPodcastEpisodes(id: podcast.id)
+    } catch {
+      try await handleNotAvailablePodcast(podcastObjectId: podcastObjectId, error: error)
+    }
+    guard let podcastResponse else { return }
+
+    do {
+      try await storage.async.perform { asyncCompanion in
+        let podcastAsync = Podcast(
+          managedObject: asyncCompanion.context
+            .object(with: podcastObjectId) as! PodcastMO
+        )
+        let oldEpisodes = Set(podcastAsync.episodes)
+
+        let parserDelegate = SsPodcastEpisodeParserDelegate(
+          performanceMonitor: self.performanceMonitor,
+          podcast: podcastAsync,
+          library: asyncCompanion.library
+        )
+        try self.parse(response: podcastResponse, delegate: parserDelegate)
+        parserDelegate.performPostParseOperations()
+
+        let deletedEpisodes = oldEpisodes.subtracting(parserDelegate.parsedEpisodes)
+        deletedEpisodes.forEach {
+          os_log(
+            "Podcast Episode <%s> is remote deleted",
+            log: self.log,
+            type: .info,
+            $0.displayString
+          )
+          $0.podcastStatus = .deleted
+        }
+        podcastAsync.isCached = parserDelegate.isCollectionCached
+      }
+    } catch {
+      try await handleNotAvailablePodcast(podcastObjectId: podcastObjectId, error: error)
     }
   }
 
