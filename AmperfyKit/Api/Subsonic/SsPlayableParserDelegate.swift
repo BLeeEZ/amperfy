@@ -48,8 +48,8 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
 
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
       "episode" {
-      guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir),
-            isDirBool == false else { return }
+      let isDir = attributeDict["isDir"] ?? "false"
+      guard let isDirBool = Bool(isDir), isDirBool == false else { return }
 
       if let attributeTitle = attributeDict["title"] {
         if elementName == "episode" {
