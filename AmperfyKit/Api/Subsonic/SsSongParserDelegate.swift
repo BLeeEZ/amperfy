@@ -41,8 +41,8 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
       "episode" {
       guard let songId = attributeDict["id"] else { return }
-      guard let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir),
-            isDirBool == false else { return }
+      let isDir = attributeDict["isDir"] ?? "false"
+      guard let isDirBool = Bool(isDir), isDirBool == false else { return }
 
       if let fetchedSong = library.getSong(id: songId) {
         songBuffer = fetchedSong
