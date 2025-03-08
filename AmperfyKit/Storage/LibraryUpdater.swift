@@ -242,6 +242,12 @@ public class LibraryUpdater {
       )
     }
     if storage.librarySyncVersion < .v18 {
+      // add radios to libraryDisplaySettings to display it for old users
+      var libraryDisplaySettingsInUse = storage.settings.libraryDisplaySettings.inUse
+      libraryDisplaySettingsInUse.append(.radios)
+      storage.settings
+        .libraryDisplaySettings = LibraryDisplaySettings(inUse: libraryDisplaySettingsInUse)
+
       storage
         .librarySyncVersion =
         .v18 // if App crashes don't do this step again -> This step is only for convenience
