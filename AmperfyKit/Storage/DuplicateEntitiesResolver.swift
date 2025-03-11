@@ -26,7 +26,6 @@ import os.log
 public class DuplicateEntitiesResolver {
   private let log = OSLog(subsystem: "Amperfy", category: "DuplicateEntitiesResolver")
   private let storage: PersistentStorage
-  private let activeDispatchGroup = DispatchGroup()
   private var isRunning = false
   private var isActive = false
 
@@ -42,14 +41,8 @@ public class DuplicateEntitiesResolver {
     }
   }
 
-  public func stopAndWait() {
-    isRunning = false
-    activeDispatchGroup.wait()
-  }
-
   private func resolveDuplicatesInBackground() {
     Task { @MainActor in
-      self.activeDispatchGroup.enter()
       os_log("start", log: self.log, type: .info)
 
       // only check for duplicates on Ampache API, Subsonic does not have genre ids
@@ -111,7 +104,6 @@ public class DuplicateEntitiesResolver {
 
       os_log("stopped", log: self.log, type: .info)
       self.isActive = false
-      self.activeDispatchGroup.leave()
     }
   }
 }

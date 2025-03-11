@@ -211,11 +211,9 @@ public protocol LibrarySyncer: Sendable {
 
 // MARK: - AbstractBackgroundLibrarySyncer
 
-@MainActor
 protocol AbstractBackgroundLibrarySyncer {
   var isActive: Bool { get }
   func stop()
-  func stopAndWait()
 }
 
 // MARK: - CleansedURL

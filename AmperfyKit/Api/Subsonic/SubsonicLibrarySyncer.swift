@@ -220,7 +220,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var artistResponse: APIDataResponse?
     do {
-      let artistResponse = try await subsonicServerApi.requestArtist(id: artist.id)
+      artistResponse = try await subsonicServerApi.requestArtist(id: artist.id)
     } catch {
       try await handleNotAvailableArtist(error: error)
     }
@@ -416,7 +416,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var podcastResponse: APIDataResponse?
     do {
-      let podcastResponse = try await subsonicServerApi.requestPodcastEpisodes(id: podcast.id)
+      podcastResponse = try await subsonicServerApi.requestPodcastEpisodes(id: podcast.id)
     } catch {
       try await handleNotAvailablePodcast(podcastObjectId: podcastObjectId, error: error)
     }

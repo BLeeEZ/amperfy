@@ -303,11 +303,18 @@ public class AmperKit {
 
   @MainActor
   public lazy var backgroundLibrarySyncer = {
-    BackgroundLibrarySyncer(
-      storage: storage,
+    let autoSyncer = AutoDownloadLibrarySyncer(
+                storage: self.storage,
+                librarySyncer: self.librarySyncer,
+                playableDownloadManager: self.playableDownloadManager
+              )
+    return BackgroundLibrarySyncer(
+      storage: storage.async,
+      mainStorage: storage.main,
+      settings: storage.settings,
       networkMonitor: networkMonitor,
       librarySyncer: librarySyncer,
-      playableDownloadManager: playableDownloadManager,
+      playableDownloadManager: playableDownloadManager, autoDownloadLibrarySyncer: autoSyncer,
       eventLogger: eventLogger
     )
   }()

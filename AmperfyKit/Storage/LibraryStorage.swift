@@ -1567,19 +1567,18 @@ public class LibraryStorage: PlayableFileCachable {
     return albums?.compactMap { Album(managedObject: $0) } ?? [Album]()
   }
 
-  func getAlbumWithoutSyncedSongs() -> Album? {
+  func getAlbumWithoutSyncedSongs() -> [Album] {
     let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == FALSE", #keyPath(AlbumMO.isSongsMetaDataSynced)),
       NSPredicate(
         format: "%K == %i",
         #keyPath(AlbumMO.remoteStatus),
         RemoteStatus.available.rawValue
       ),
-      NSPredicate(format: "%K == FALSE", #keyPath(AlbumMO.isSongsMetaDataSynced)),
     ])
-    fetchRequest.fetchLimit = 1
     let albums = try? context.fetch(fetchRequest)
-    return albums?.lazy.compactMap { Album(managedObject: $0) }.first
+    return albums?.lazy.compactMap { Album(managedObject: $0) } ?? [Album]()
   }
 
   public func getPodcast(id: String) -> Podcast? {

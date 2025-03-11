@@ -36,7 +36,6 @@ public class ScrobbleSyncer {
   private let storage: PersistentStorage
   private let librarySyncer: LibrarySyncer
   private let eventLogger: EventLogger
-  private let activeDispatchGroup = DispatchGroup()
   private var isRunning = false
   private var isActive = false
   private var scrobbleTimer: Timer?
@@ -69,9 +68,8 @@ public class ScrobbleSyncer {
     }
   }
 
-  public func stopAndWait() {
+  public func stop() {
     isRunning = false
-    activeDispatchGroup.wait()
   }
 
   func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) async {
@@ -118,7 +116,6 @@ public class ScrobbleSyncer {
 
   private func uploadInBackground() {
     Task { @MainActor in
-      self.activeDispatchGroup.enter()
       os_log("start", log: self.log, type: .info)
 
       while self.isRunning, self.storage.settings.isOnlineMode,
@@ -145,7 +142,6 @@ public class ScrobbleSyncer {
 
       os_log("stopped", log: self.log, type: .info)
       self.isActive = false
-      self.activeDispatchGroup.leave()
     }
   }
 
