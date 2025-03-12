@@ -54,6 +54,7 @@ enum CoreDataMigrationVersion: String, CaseIterable {
   case v42 = "Amperfy v42" // Playlist uses ordered set of items, Adding delete rules for playlists
   case v43 = "Amperfy v43" // Add isCached, Increase duration for collections from Int16 to Int64
   case v44 = "Amperfy v44" // use Fetch Index
+  case v45 = "Amperfy v45" // Download: id has default value "Empty String"
 
   // MARK: - Current
 
@@ -156,6 +157,8 @@ enum CoreDataMigrationVersion: String, CaseIterable {
     case .v43:
       return .v44
     case .v44:
+      return .v45
+    case .v45:
       return nil
     }
   }
