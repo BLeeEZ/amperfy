@@ -85,10 +85,6 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     DownloadElementInfo(objectId: objectID, type: .playable)
   }
 
-  public var objectID: NSManagedObjectID {
-    playableManagedObject.objectID
-  }
-
   public var displayString: String {
     switch derivedType {
     case .podcastEpisode, .song:

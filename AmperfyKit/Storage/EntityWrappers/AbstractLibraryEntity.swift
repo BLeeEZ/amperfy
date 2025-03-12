@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 import UIKit
 
@@ -40,6 +41,10 @@ public class AbstractLibraryEntity {
 
   public init(managedObject: AbstractLibraryEntityMO) {
     self.managedObject = managedObject
+  }
+
+  public var objectID: NSManagedObjectID {
+    managedObject.objectID
   }
 
   public var id: String {

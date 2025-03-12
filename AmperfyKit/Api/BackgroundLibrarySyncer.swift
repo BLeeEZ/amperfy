@@ -22,13 +22,15 @@
 import Foundation
 import os.log
 
+// MARK: - BackgroundSyncOperation
+
 public class BackgroundSyncOperation: AsyncOperation, @unchecked Sendable {
   private let completeBlock: VoidAsyncClosure
-  
+
   public init(completeBlock: @escaping VoidAsyncClosure) {
     self.completeBlock = completeBlock
   }
-  
+
   override public func main() {
     Task {
       await self.completeBlock()
@@ -37,14 +39,19 @@ public class BackgroundSyncOperation: AsyncOperation, @unchecked Sendable {
   }
 }
 
+// MARK: - BackgroundLibrarySyncer
+
 public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sendable {
   private let storage: AsyncCoreDataAccessWrapper
-  @MainActor private let mainStorage: CoreDataCompanion
+  @MainActor
+  private let mainStorage: CoreDataCompanion
   private let settings: PersistentStorage.Settings
   private let networkMonitor: NetworkMonitorFacade
   private let librarySyncer: LibrarySyncer
-  @MainActor private let playableDownloadManager: DownloadManageable
-  @MainActor private let autoDownloadLibrarySyncer: AutoDownloadLibrarySyncer
+  @MainActor
+  private let playableDownloadManager: DownloadManageable
+  @MainActor
+  private let autoDownloadLibrarySyncer: AutoDownloadLibrarySyncer
   private let eventLogger: EventLogger
 
   private let log = OSLog(subsystem: "Amperfy", category: "BackgroundLibrarySyncer")
@@ -100,7 +107,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
          self.networkMonitor.isConnectedToNetwork {
         do {
           try await autoDownloadLibrarySyncer
-          .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
+            .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
         } catch {
           await self.eventLogger.report(
             topic: "Latest Library Elements Background Sync",
@@ -109,7 +116,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
           )
         }
       }
-      
+
       try? await storage.perform { asyncCompanion in
         let albumsToSync = asyncCompanion.library.getAlbumWithoutSyncedSongs()
 
@@ -123,20 +130,24 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
             do {
               try await self.librarySyncer.sync(album: album)
             } catch {
-              self.eventLogger.report(topic: "Album Background Sync", error: error, displayPopup: false)
+              self.eventLogger.report(
+                topic: "Album Background Sync",
+                error: error,
+                displayPopup: false
+              )
               album.isSongsMetaDataSynced = true
             }
           }
           self.taskQueue.addOperation(asyncOperation)
         }
       }
-      
+
       addOperationsEndMessage()
     }
   }
-  
+
   func addOperationsEndMessage() {
-    self.taskQueue.addBarrierBlock {
+    taskQueue.addBarrierBlock {
       self.isRunning.wrappedValue = false
       os_log("stopped", log: self.log, type: .info)
     }

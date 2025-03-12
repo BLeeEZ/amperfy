@@ -19,10 +19,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import UIKit
 
 @MainActor
 public class LibraryEntityImage: RoundedImage {
+  static let cache: NSCache<NSManagedObjectID, UIImage> = NSCache()
+
   let appDelegate: AmperKit
   var entity: AbstractLibraryEntity?
   var backupImage: UIImage?
@@ -66,25 +69,50 @@ public class LibraryEntityImage: RoundedImage {
     refresh()
   }
 
-  private func refresh() {
-    let placeholderImage = backupImage ?? UIImage.getGeneratedArtwork(
+  private var placeholderImage: UIImage {
+    backupImage ?? UIImage.getGeneratedArtwork(
       theme: appDelegate.storage.settings.themePreference,
       artworkType: .song
     )
-    let imageToDisplay = entity?.image(
+  }
+
+  private var entityImageToDisplay: UIImage {
+    entity?.image(
       theme: appDelegate.storage.settings.themePreference,
       setting: appDelegate.storage.settings.artworkDisplayPreference
     ) ?? placeholderImage
+  }
+
+  private func refresh() {
+    let entityToDisplay = entity
+    let imageToDisplay = entityImageToDisplay
+
+    if let objectID = entityToDisplay?.objectID,
+       let cachedImg = Self.cache.object(forKey: objectID) {
+      image = cachedImg
+      return
+    }
+
+    image = placeholderImage
+    guard let objectID = entityToDisplay?.objectID else { return }
 
     imagePreparationTask?.cancel()
     imagePreparationTask = Task.detached(priority: .high) { [weak self] in
-      guard let self, !Task.isCancelled else { return }
-      let readyImage = await imageToDisplay.byPreparingForDisplay()
-      guard !Task.isCancelled else { return }
-      Task { @MainActor [weak self] in
-        guard let self else { return }
-        image = readyImage
-      }
+      await self?.loadImageAndCacheIt(entityObjectID: objectID, imageToDisplay: imageToDisplay)
+    }
+  }
+
+  nonisolated func loadImageAndCacheIt(
+    entityObjectID: NSManagedObjectID,
+    imageToDisplay: UIImage
+  ) async {
+    guard !Task.isCancelled else { return }
+    let readyImage = await imageToDisplay.byPreparingForDisplay()
+    guard !Task.isCancelled else { return }
+    Task { @MainActor [weak self] in
+      guard let self, let readyImage else { return }
+      Self.cache.setObject(readyImage, forKey: entityObjectID)
+      refresh()
     }
   }
 
@@ -95,13 +123,20 @@ public class LibraryEntityImage: RoundedImage {
     if let playable = entity as? AbstractPlayable,
        playable.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refresh()
+        await self.loadImageAndCacheIt(
+          entityObjectID: playable.objectID,
+          imageToDisplay: entityImageToDisplay
+        )
       }
     }
     if let artwork = entity?.artwork,
        artwork.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refresh()
+        guard let entityObjectID = entity?.objectID else { return }
+        await self.loadImageAndCacheIt(
+          entityObjectID: entityObjectID,
+          imageToDisplay: entityImageToDisplay
+        )
       }
     }
   }
