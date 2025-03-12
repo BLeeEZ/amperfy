@@ -100,6 +100,7 @@ public class IntentManager {
   private let playableDownloadManager: DownloadManageable
   private let library: LibraryStorage
   private let player: PlayerFacade
+  private let networkMonitor: NetworkMonitorFacade
   private let eventLogger: EventLogger
   private var lastResult: AmperfyMediaIntentItemResult?
 
@@ -109,6 +110,7 @@ public class IntentManager {
     playableDownloadManager: DownloadManageable,
     library: LibraryStorage,
     player: PlayerFacade,
+    networkMonitor: NetworkMonitorFacade,
     eventLogger: EventLogger
   ) {
     self.storage = storage
@@ -116,6 +118,7 @@ public class IntentManager {
     self.playableDownloadManager = playableDownloadManager
     self.library = library
     self.player = player
+    self.networkMonitor = networkMonitor
     self.eventLogger = eventLogger
     self.documentation = [XCallbackActionDocu]()
   }
@@ -1238,11 +1241,41 @@ public class IntentManager {
     -> Bool {
     guard let container = container else { return false }
     do {
-      try await container.fetch(
-        storage: storage,
-        librarySyncer: librarySyncer,
-        playableDownloadManager: playableDownloadManager
-      )
+      if container is Playlist {
+        if storage.settings.isOnlineMode, networkMonitor.isWifiOrEthernet {
+          os_log(
+            "Fetch playlist start: %s",
+            log: self.log,
+            type: .info,
+            container.name
+          )
+          try await container.fetch(
+            storage: storage,
+            librarySyncer: librarySyncer,
+            playableDownloadManager: playableDownloadManager
+          )
+          os_log(
+            "Fetch playlist done: %s",
+            log: self.log,
+            type: .info,
+            container.name
+          )
+        } else {
+          os_log(
+            "No fetch for playlist needed: %s",
+            log: self.log,
+            type: .info,
+            container.name
+          )
+        }
+      } else {
+        os_log(
+          "No fetch required for: %s",
+          log: self.log,
+          type: .info,
+          container.name
+        )
+      }
     } catch {
       // do nothing
     }

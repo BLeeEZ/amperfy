@@ -123,6 +123,6 @@ final public class NetworkMonitor: NetworkMonitorFacade {
   }
 
   public var isWifiOrEthernet: Bool {
-    !isCellular
+    isConnectedToNetwork && !isCellular
   }
 }
