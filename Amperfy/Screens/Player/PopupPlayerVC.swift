@@ -153,7 +153,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     super.viewIsAppearing(animated)
     appDelegate.userStatistics.visited(.popupPlayer)
     becomeFirstResponder()
-    adjustLayoutMargins()
     changeDisplayStyleVisually(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
     reloadData()
     scrollToCurrentlyPlayingRow()
@@ -164,6 +163,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     resignFirstResponder()
+  }
+  
+  override func viewWillLayoutSubviews() {
+    adjustLayoutMargins()
   }
 
   func fetchSongInfoAndUpdateViews() {
