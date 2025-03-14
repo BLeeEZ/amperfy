@@ -186,25 +186,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func configureBackgroundFetch() {
-    BGTaskScheduler.shared.register(forTaskWithIdentifier: Self.refreshTaskId, using: nil) { task in
-      os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
+    BGTaskScheduler.shared.register(
+      forTaskWithIdentifier: Self.refreshTaskId,
+      using: DispatchQueue.main
+    ) { bgTask in
       Task { @MainActor in
-        do {
-          try await self.backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
-          task.setTaskCompleted(success: true)
-        } catch {
-          task.setTaskCompleted(success: false)
-          self.eventLogger.error(
-            topic: "Background Task",
-            statusCode: .connectionError,
-            message: error.localizedDescription,
-            displayPopup: false
-          )
-        }
-        self.userStatistics.backgroundFetchPerformed(result: UIBackgroundFetchResult.newData)
-        self.scheduleAppRefresh()
+        await self.performBackgroundFetchTask(bgTask: bgTask)
       }
     }
+  }
+
+  @MainActor
+  private func performBackgroundFetchTask(bgTask: BGTask) async {
+    os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
+    do {
+      try await backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+      bgTask.setTaskCompleted(success: true)
+    } catch {
+      bgTask.setTaskCompleted(success: false)
+      eventLogger.error(
+        topic: "Background Task",
+        statusCode: .connectionError,
+        message: error.localizedDescription,
+        displayPopup: false
+      )
+    }
+    userStatistics.backgroundFetchPerformed(result: UIBackgroundFetchResult.newData)
+    scheduleAppRefresh()
   }
 
   func scheduleAppRefresh() {
