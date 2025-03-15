@@ -154,13 +154,13 @@ class PlayIndicator {
          rootSublayers.contains(where: { $0 is VYPlayIndicator }) {
         isAlreadyInSublayers = true
       }
+      willDisplayIndicatorCB?()
       if !isAlreadyInSublayers {
         let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
         indicator.frame = calcIndicatorFrame(rootFrame: rootView.bounds)
         let imageOverlay = PlayIndicatorHandler.shared.getImageOverlay(for: rootViewTypeName)
         imageOverlay.frame = rootView.bounds
 
-        willDisplayIndicatorCB?()
         if isDisplayedOnImage {
           rootView.layer.addSublayer(imageOverlay)
         }
