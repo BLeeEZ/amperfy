@@ -639,7 +639,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             title: "Close Player Window",
             action: #selector(closePlayerWindow),
             input: "W",
-            modifierFlags: .command
+            modifierFlags: .command,
+            attributes: !isMainOrMiniPlayerPlayerOpen ? .disabled : []
           ),
         ]),
         UIMenu(options: .displayInline, children: [
@@ -849,10 +850,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     @objc
     func closePlayerWindow(sender: Any) {
-      if self.isMainWindowOpen {
-        self.closeMainWindow()
-      } else if self.isShowingMiniPlayer {
-        self.closeMiniPlayer()
+      if isMainWindowOpen {
+        closeMainWindow()
+      } else if isShowingMiniPlayer {
+        closeMiniPlayer()
       }
     }
 
