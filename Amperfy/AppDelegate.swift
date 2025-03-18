@@ -635,16 +635,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           ) { _ in
             self.openMainWindow()
           },
-          UIAction(
+          UIKeyCommand(
             title: "Close Player Window",
-            attributes: !isMainOrMiniPlayerPlayerOpen ? .disabled : []
-          ) { _ in
-            if self.isMainWindowOpen {
-              self.closeMainWindow()
-            } else if self.isShowingMiniPlayer {
-              self.closeMiniPlayer()
-            }
-          },
+            action: #selector(closePlayerWindow),
+            input: "W",
+            modifierFlags: .command
+          ),
         ]),
         UIMenu(options: .displayInline, children: [
           UIAction(title: "Switch Library/Mini Player") { _ in
@@ -849,6 +845,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       return UIMenu(title: "Controls", children: sections.reduce([]) { result, section in
         result + [UIMenu(options: .displayInline)] + section
       })
+    }
+
+    @objc
+    func closePlayerWindow(sender: Any) {
+      if self.isMainWindowOpen {
+        self.closeMainWindow()
+      } else if self.isShowingMiniPlayer {
+        self.closeMiniPlayer()
+      }
     }
 
     @objc
