@@ -164,7 +164,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     super.viewWillDisappear(animated)
     resignFirstResponder()
   }
-  
+
   override func viewWillLayoutSubviews() {
     adjustLayoutMargins()
   }
