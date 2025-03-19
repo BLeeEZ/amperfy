@@ -147,9 +147,6 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
       lyricModels.append(model)
     }
     reloadData()
-
-    guard !lyrics.line.isEmpty else { return }
-    scrollToRow(at: IndexPath(row: 0, section: 0), at: .middle, animated: false)
   }
 
   func reloadInsets() {
