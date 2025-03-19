@@ -23,6 +23,10 @@ import AmperfyKit
 import Foundation
 import UIKit
 
+extension UNNotification: @unchecked @retroactive Sendable {}
+extension UNNotificationResponse: @unchecked @retroactive Sendable {}
+extension UNUserNotificationCenter: @unchecked @retroactive Sendable {}
+
 // MARK: - PopupPlayerDirection
 
 enum PopupPlayerDirection {
@@ -38,7 +42,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     UNUserNotificationCenter.current().delegate = self
   }
 
-  nonisolated func userNotificationCenter(
+  func userNotificationCenter(
     _ center: UNUserNotificationCenter,
     willPresent notification: UNNotification
   ) async
@@ -46,7 +50,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     [.list, .banner]
   }
 
-  nonisolated func userNotificationCenter(
+  func userNotificationCenter(
     _ center: UNUserNotificationCenter,
     didReceive response: UNNotificationResponse
   ) async {
@@ -57,7 +61,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
       return
     }
 
-    await MainActor.run {
+    Task { @MainActor in
       userStatistics.appStartedViaNotification()
       switch contentType {
       case .podcastEpisode:
