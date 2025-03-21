@@ -45,19 +45,41 @@ class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewControll
     singleFetchController?.titleForHeader(inSection: section)
   }
 
+  // This fixes a bug where macOS is missing a separator line at the end of a section.
+  // This looks ugly in wiew controller, such as the SongVC, where there is no clear distinction between sections.
+  // iOS onyl removes a separator line at the end of a section if a footer view exists.
+  // macOS always removes the separator. Therefore, we add one manually.
   #if targetEnvironment(macCatalyst)
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        let container = UIView()
-        let x = tableView.separatorInset.left
-        let width = tableView.frame.width - tableView.separatorInset.left - tableView.separatorInset.right
-        let separator = UIView(frame: CGRect(x: x, y: 0, width: width, height: 0.5))
-        separator.backgroundColor = .separator
+        guard tableView.separatorStyle == .singleLine else {
+            return nil
+        }
 
+        let container = UIView()
+        container.backgroundColor = .clear
+
+        let separator = UIView()
+        separator.backgroundColor = tableView.separatorColor ?? .separator
+        separator.translatesAutoresizingMaskIntoConstraints = false
         container.addSubview(separator)
+
+        let leadingX = tableView.separatorInset.left
+        let trailingX = tableView.separatorInset.right
+
+        NSLayoutConstraint.activate([
+            separator.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: leadingX),
+            separator.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -trailingX),
+            separator.topAnchor.constraint(equalTo: container.topAnchor),
+            separator.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+
         return container
     }
 
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        guard tableView.separatorStyle == .singleLine else {
+            return 0.0
+        }
         return 0.5
     }
   #endif
