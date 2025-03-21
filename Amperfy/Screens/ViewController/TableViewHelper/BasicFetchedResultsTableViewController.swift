@@ -47,8 +47,8 @@ class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewControll
 
   // This fixes a bug where macOS is missing a separator line at the end of a section.
   // This looks ugly in wiew controller, such as the SongVC, where there is no clear distinction between sections.
-  // iOS onyl removes a separator line at the end of a section if a footer view exists.
-  // macOS always removes the separator. Therefore, we add one manually.
+  // iOS only removes a separator line at the end of a section if a footer view exists.
+  // macOS always removes the separator, no matter if there is a footer or not. Therefore, we manually add a separator on macOS.
   #if targetEnvironment(macCatalyst)
     override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         guard tableView.separatorStyle == .singleLine else {
