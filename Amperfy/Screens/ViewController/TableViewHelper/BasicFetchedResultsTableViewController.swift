@@ -45,6 +45,23 @@ class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewControll
     singleFetchController?.titleForHeader(inSection: section)
   }
 
+  #if targetEnvironment(macCatalyst)
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let container = UIView()
+        let x = tableView.separatorInset.left
+        let width = tableView.frame.width - tableView.separatorInset.left - tableView.separatorInset.right
+        let separator = UIView(frame: CGRect(x: x, y: 0, width: width, height: 0.5))
+        separator.backgroundColor = .separator
+
+        container.addSubview(separator)
+        return container
+    }
+
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0.5
+    }
+  #endif
+
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     singleFetchController?.numberOfRows(inSection: section) ?? 0
   }
