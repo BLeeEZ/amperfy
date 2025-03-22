@@ -692,25 +692,40 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   @MainActor
   func syncDown(playlist: Playlist) async throws {
     guard isSyncAllowed else { return }
-    os_log("Download playlist \"%s\" from server", log: log, type: .info, playlist.name)
+    os_log("Playlist \"%s\": Validate from server", log: log, type: .info, playlist.name)
     try await validatePlaylistId(playlist: playlist)
-    os_log("Sync songs of playlist \"%s\"", log: self.log, type: .info, playlist.name)
-
+    os_log("Playlist \"%s\": Download songs from server", log: self.log, type: .info, playlist.name)
     let response = try await ampacheXmlServerApi.requestPlaylistSongs(id: playlist.id)
+
+    os_log("Playlist \"%s\": Parse songs start", log: self.log, type: .info, playlist.name)
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
       let playlistAsync = Playlist(
         library: asyncCompanion.library,
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO
       )
+
+      let playlistEntriesParserDelegate = PlaylistSongIDsParserDelegate(
+        performanceMonitor: self.performanceMonitor
+      )
+      try self.parse(response: response, delegate: playlistEntriesParserDelegate)
+      let playlistSongs = asyncCompanion.library
+        .getSongs(ids: playlistEntriesParserDelegate.songIDs)
       let parserDelegate = PlaylistSongsParserDelegate(
         performanceMonitor: self.performanceMonitor,
         playlist: playlistAsync,
-        library: asyncCompanion.library
+        library: asyncCompanion.library, prefetchedSongDict: playlistSongs
       )
       try self.parse(response: response, delegate: parserDelegate)
       playlistAsync.isCached = parserDelegate.isCollectionCached
       playlistAsync.remoteDuration = parserDelegate.collectionDuration
+      os_log(
+        "Playlist \"%s\": Parse songs (%i) done",
+        log: self.log,
+        type: .info,
+        playlistAsync.name,
+        parserDelegate.parsedCount
+      )
     }
   }
 

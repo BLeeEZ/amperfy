@@ -28,10 +28,16 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
   var items: [PlaylistItem]
   private var playlistChanged = false
 
-  init(performanceMonitor: ThreadPerformanceMonitor, playlist: Playlist, library: LibraryStorage) {
+  init(
+    performanceMonitor: ThreadPerformanceMonitor,
+    playlist: Playlist,
+    library: LibraryStorage,
+    prefetchedSongDict: [String: Song]?
+  ) {
     self.playlist = playlist
     self.items = playlist.items
     super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: nil)
+    self.prefetchedSongDict = prefetchedSongDict
   }
 
   override func parser(

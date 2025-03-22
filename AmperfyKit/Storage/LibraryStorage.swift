@@ -1650,6 +1650,24 @@ public class LibraryStorage: PlayableFileCachable {
     return songs?.compactMap { Song(managedObject: $0) } ?? [Song]()
   }
 
+  public func getSongs(ids: Set<String>) -> [String: Song] {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(SongMO.id),
+      ids
+    )
+    let songMOs = try? context.fetch(fetchRequest)
+
+    var songDict = [String: Song]()
+    guard let songMOs else { return songDict }
+    for songMO in songMOs {
+      let song = Song(managedObject: songMO)
+      songDict[song.id] = song
+    }
+    return songDict
+  }
+
   public func getRadio(id: String) -> Radio? {
     let fetchRequest: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
     fetchRequest.predicate = NSPredicate(

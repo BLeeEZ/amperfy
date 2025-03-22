@@ -39,7 +39,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     ssParserDelegate = SsPlaylistSongsParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
       playlist: playlist,
-      library: library
+      library: library, prefetchedSongDict: nil
     )
   }
 
@@ -119,6 +119,76 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     recreateParserDelegate()
     testParsing()
     XCTAssertFalse(playlist.isCached)
+  }
+
+  func testPrefetchSongsButNotExistingYet() {
+    let playlistEntriesParserDelegate = SsPlaylistSongIDsParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(), library: library
+    )
+
+    let parser1 = XMLParser(data: xmlData!)
+    parser1.delegate = playlistEntriesParserDelegate
+    parser1.parse()
+    XCTAssertEqual(playlistEntriesParserDelegate.playlistEntries.count, 6)
+    XCTAssertEqual(playlistEntriesParserDelegate.songIDs.count, 6)
+
+    let playlistSongs = library
+      .getSongs(ids: playlistEntriesParserDelegate.songIDs)
+    // no songs yet in the library -> they need to be created in complete parse
+    XCTAssertEqual(playlistSongs.count, 0)
+
+    let parserDelegate = SsPlaylistSongsParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      playlist: playlist,
+      library: library, prefetchedSongDict: playlistSongs
+    )
+
+    let parser2 = XMLParser(data: xmlData!)
+    parser2.delegate = parserDelegate
+    parser2.parse()
+
+    checkCorrectParsing()
+  }
+
+  func testPrefetchSongsAlreadyExisting() {
+    // parse all to create songs in library
+    let parserDelegate0 = SsPlaylistSongsParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      playlist: playlist,
+      library: library, prefetchedSongDict: nil
+    )
+    let parser0 = XMLParser(data: xmlData!)
+    parser0.delegate = parserDelegate0
+    parser0.parse()
+    playlist.removeAllItems()
+    XCTAssertEqual(playlist.playables.count, 0)
+
+    let playlistEntriesParserDelegate = SsPlaylistSongIDsParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(), library: library
+    )
+
+    let parser1 = XMLParser(data: xmlData!)
+    parser1.delegate = playlistEntriesParserDelegate
+    parser1.parse()
+    XCTAssertEqual(playlistEntriesParserDelegate.playlistEntries.count, 6)
+    XCTAssertEqual(playlistEntriesParserDelegate.songIDs.count, 6)
+
+    let playlistSongs = library
+      .getSongs(ids: playlistEntriesParserDelegate.songIDs)
+    // songs should already be available in library
+    XCTAssertEqual(playlistSongs.count, 6)
+
+    let parserDelegate = SsPlaylistSongsParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      playlist: playlist,
+      library: library, prefetchedSongDict: playlistSongs
+    )
+
+    let parser2 = XMLParser(data: xmlData!)
+    parser2.delegate = parserDelegate
+    parser2.parse()
+
+    checkCorrectParsing()
   }
 
   override func checkCorrectParsing() {

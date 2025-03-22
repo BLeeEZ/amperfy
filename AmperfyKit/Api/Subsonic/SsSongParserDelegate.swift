@@ -25,6 +25,7 @@ import os.log
 import UIKit
 
 class SsSongParserDelegate: SsPlayableParserDelegate {
+  var prefetchedSongDict: [String: Song]?
   var songBuffer: Song?
   var parsedSongs = [Song]()
   var guessedArtist: Artist?
@@ -44,17 +45,31 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       let isDir = attributeDict["isDir"] ?? "false"
       guard let isDirBool = Bool(isDir), isDirBool == false else { return }
 
-      if let fetchedSong = library.getSong(id: songId) {
+      if let prefetchedSongDict,
+         let prefetchedSong = prefetchedSongDict[songId] {
+        songBuffer = prefetchedSong
+        songBuffer?.remoteStatus = .available
+        guessedArtist = prefetchedSong.artist
+        guessedAlbum = prefetchedSong.album
+        guessedGenre = prefetchedSong.genre
+      } else if prefetchedSongDict == nil,
+                let fetchedSong = library.getSong(id: songId) {
         songBuffer = fetchedSong
         songBuffer?.remoteStatus = .available
+        guessedArtist = fetchedSong.artist
+        guessedAlbum = fetchedSong.album
+        guessedGenre = fetchedSong.genre
       } else {
         songBuffer = library.createSong()
         songBuffer?.id = songId
+        guessedArtist = nil
+        guessedAlbum = nil
+        guessedGenre = nil
       }
       playableBuffer = songBuffer
 
       if let artistId = attributeDict["artistId"] {
-        if let guessedArtist = guessedArtist, guessedArtist.id == artistId {
+        if let guessedArtist, guessedArtist.id == artistId {
           songBuffer?.artist = guessedArtist
           songBuffer?.artist?.remoteStatus = .available
         } else if let artist = library.getArtist(id: artistId) {
@@ -74,7 +89,9 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
           songBuffer?.artist = artist
         }
       } else if let songBuffer = songBuffer, let artistName = attributeDict["artist"] {
-        if let existingLocalArtist = library.getArtistLocal(name: artistName) {
+        if let guessedArtist, guessedArtist.name == artistName {
+          songBuffer.artist = guessedArtist
+        } else if let existingLocalArtist = library.getArtistLocal(name: artistName) {
           songBuffer.artist = existingLocalArtist
         } else {
           let artist = library.createArtist()
@@ -85,7 +102,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       }
 
       if let albumId = attributeDict["albumId"] {
-        if let guessedAlbum = guessedAlbum, guessedAlbum.id == albumId {
+        if let guessedAlbum, guessedAlbum.id == albumId {
           songBuffer?.album = guessedAlbum
           songBuffer?.album?.remoteStatus = .available
         } else if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true) {

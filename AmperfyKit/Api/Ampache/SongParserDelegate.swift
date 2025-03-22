@@ -25,11 +25,16 @@ import os.log
 import UIKit
 
 class SongParserDelegate: PlayableParserDelegate {
+  var prefetchedSongDict: [String: Song]?
   var songBuffer: Song?
   var parsedSongs = [Song]()
   var artistIdToCreate: String?
   var albumIdToCreate: String?
   var genreIdToCreate: String?
+
+  var guessedArtist: Artist?
+  var guessedAlbum: Album?
+  var guessedGenre: Genre?
 
   override func parser(
     _ parser: XMLParser,
@@ -52,31 +57,50 @@ class SongParserDelegate: PlayableParserDelegate {
         os_log("Found song with no id", log: log, type: .error)
         return
       }
-      if let fetchedSong = library.getSong(id: songId) {
+      if let prefetchedSongDict,
+         let prefetchedSong = prefetchedSongDict[songId] {
+        songBuffer = prefetchedSong
+        songBuffer?.remoteStatus = .available
+        guessedArtist = prefetchedSong.artist
+        guessedAlbum = prefetchedSong.album
+        guessedGenre = prefetchedSong.genre
+      } else if prefetchedSongDict == nil, let fetchedSong = library.getSong(id: songId) {
         songBuffer = fetchedSong
         songBuffer?.remoteStatus = .available
+        guessedArtist = fetchedSong.artist
+        guessedAlbum = fetchedSong.album
+        guessedGenre = fetchedSong.genre
       } else {
         songBuffer = library.createSong()
         songBuffer?.id = songId
+        guessedArtist = nil
+        guessedAlbum = nil
+        guessedGenre = nil
       }
       playableBuffer = songBuffer
     case "artist":
       guard let song = songBuffer, let artistId = attributeDict["id"] else { return }
-      if let artist = library.getArtist(id: artistId) {
+      if let guessedArtist, guessedArtist.id == artistId {
+        song.artist = guessedArtist
+      } else if let artist = library.getArtist(id: artistId) {
         song.artist = artist
       } else {
         artistIdToCreate = artistId
       }
     case "album":
       guard let song = songBuffer, let albumId = attributeDict["id"] else { return }
-      if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true) {
+      if let guessedAlbum, guessedAlbum.id == albumId {
+        song.album = guessedAlbum
+      } else if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true) {
         song.album = album
       } else {
         albumIdToCreate = albumId
       }
     case "genre":
       guard let song = songBuffer, let genreId = attributeDict["id"] else { return }
-      if let genre = library.getGenre(id: genreId) {
+      if let guessedGenre = guessedGenre, guessedGenre.id == genreId {
+        song.genre = guessedGenre
+      } else if let genre = library.getGenre(id: genreId) {
         song.genre = genre
       } else {
         genreIdToCreate = genreId
