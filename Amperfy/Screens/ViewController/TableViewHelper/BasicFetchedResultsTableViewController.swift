@@ -46,41 +46,52 @@ class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewControll
   }
 
   // This fixes a bug where macOS is missing a separator line at the end of a section.
-  // This looks ugly in wiew controller, such as the SongVC, where there is no clear distinction between sections.
+  // This looks ugly in view controller, such as the SongVC, where there is no clear distinction between sections.
   // iOS only removes a separator line at the end of a section if a footer view exists.
   // macOS always removes the separator, no matter if there is a footer or not. Therefore, we manually add a separator on macOS.
   #if targetEnvironment(macCatalyst)
-    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        guard tableView.separatorStyle == .singleLine else {
-            return nil
-        }
+    override func tableView(
+      _ tableView: UITableView,
+      viewForFooterInSection section: Int
+    )
+      -> UIView? {
+      guard tableView.separatorStyle == .singleLine else {
+        return nil
+      }
 
-        let container = UIView()
-        container.backgroundColor = .clear
+      let container = UIView()
+      container.backgroundColor = .clear
 
-        let separator = UIView()
-        separator.backgroundColor = tableView.separatorColor ?? .separator
-        separator.translatesAutoresizingMaskIntoConstraints = false
-        container.addSubview(separator)
+      let separator = UIView()
+      separator.backgroundColor = tableView.separatorColor ?? .separator
+      separator.translatesAutoresizingMaskIntoConstraints = false
+      container.addSubview(separator)
 
-        let leadingX = tableView.separatorInset.left
-        let trailingX = tableView.separatorInset.right
+      let leadingX = tableView.separatorInset.left
+      let trailingX = tableView.separatorInset.right
 
-        NSLayoutConstraint.activate([
-            separator.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: leadingX),
-            separator.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -trailingX),
-            separator.topAnchor.constraint(equalTo: container.topAnchor),
-            separator.bottomAnchor.constraint(equalTo: container.bottomAnchor)
-        ])
+      NSLayoutConstraint.activate([
+        separator.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: leadingX),
+        separator.trailingAnchor.constraint(
+          equalTo: container.trailingAnchor,
+          constant: -trailingX
+        ),
+        separator.topAnchor.constraint(equalTo: container.topAnchor),
+        separator.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+      ])
 
-        return container
+      return container
     }
 
-    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        guard tableView.separatorStyle == .singleLine else {
-            return 0.0
-        }
-        return 0.5
+    override func tableView(
+      _ tableView: UITableView,
+      heightForFooterInSection section: Int
+    )
+      -> CGFloat {
+      guard tableView.separatorStyle == .singleLine else {
+        return 0.0
+      }
+      return 0.5
     }
   #endif
 
