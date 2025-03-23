@@ -51,10 +51,11 @@ import UIKit
     var tableView: UITableView?
 
     var mainViewController: UIViewController? {
-      let splitVC = self.appDelegate.hostingSplitVC
+      let splitVC = appDelegate.hostingSplitVC
       let detailVC = splitVC?.viewController(for: .secondary) as? UINavigationController
       let slideOverHostingVC = detailVC?.topViewController as? SlideOverHostingController
-      let innerNavigationController = slideOverHostingVC?.primaryViewController as? UINavigationController
+      let innerNavigationController = slideOverHostingVC?
+        .primaryViewController as? UINavigationController
       return innerNavigationController?.topViewController
     }
 
@@ -399,7 +400,8 @@ import UIKit
            let container = self.appDelegate.storage.main.library
            .getContainer(identifier: containerIdentifier),
            let mainController = self.mainViewController {
-          EntityPreviewActionBuilder(container: container, on: mainController).performPreviewTransition()
+          EntityPreviewActionBuilder(container: container, on: mainController)
+            .performPreviewTransition()
         }
       }
     }
