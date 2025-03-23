@@ -65,6 +65,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         guessedArtist = nil
         guessedAlbum = nil
         guessedGenre = nil
+        prefetchedSongDict?[songId] = songBuffer
       }
       playableBuffer = songBuffer
 

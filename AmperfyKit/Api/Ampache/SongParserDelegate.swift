@@ -76,6 +76,7 @@ class SongParserDelegate: PlayableParserDelegate {
         guessedArtist = nil
         guessedAlbum = nil
         guessedGenre = nil
+        prefetchedSongDict?[songId] = songBuffer
       }
       playableBuffer = songBuffer
     case "artist":
