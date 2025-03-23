@@ -50,6 +50,15 @@ import UIKit
 
     var tableView: UITableView?
 
+    var mainViewController: UIViewController? {
+      let splitVC = appDelegate.hostingSplitVC
+      let detailVC = splitVC?.viewController(for: .secondary) as? UINavigationController
+      let slideOverHostingVC = detailVC?.topViewController as? SlideOverHostingController
+      let innerNavigationController = slideOverHostingVC?
+        .primaryViewController as? UINavigationController
+      return innerNavigationController?.topViewController
+    }
+
     override func viewDidLoad() {
       super.viewDidLoad()
 
@@ -372,7 +381,10 @@ import UIKit
         vc.display(container: containable, on: self)
         return vc
       }) { suggestedActions in
-        EntityPreviewActionBuilder(container: containable, on: self).createMenu()
+        guard let mainController = self.mainViewController else {
+          return UIMenu()
+        }
+        return EntityPreviewActionBuilder(container: containable, on: mainController).createMenu()
       }
     }
 
@@ -386,8 +398,10 @@ import UIKit
            let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
            let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
            let container = self.appDelegate.storage.main.library
-           .getContainer(identifier: containerIdentifier) {
-          EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
+           .getContainer(identifier: containerIdentifier),
+           let mainController = self.mainViewController {
+          EntityPreviewActionBuilder(container: container, on: mainController)
+            .performPreviewTransition()
         }
       }
     }

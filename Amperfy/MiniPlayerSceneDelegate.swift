@@ -104,6 +104,7 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     os_log("MiniPlayer: sceneDidDisconnect", log: self.log, type: .info)
     #if targetEnvironment(macCatalyst)
       appDelegate.rebuildMainMenu()
+      appDelegate.openMainWindow()
     #endif
   }
 
