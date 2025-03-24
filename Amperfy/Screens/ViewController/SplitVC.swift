@@ -309,9 +309,13 @@ class SplitVC: UISplitViewController {
         tabBar.selectedIndex = 0
       }
     } else {
-      if let secondaryVC = viewController(for: .secondary) as? UINavigationController {
-        secondaryVC.pushViewController(vc, animated: false)
-      }
+      #if targetEnvironment(macCatalyst)
+        let secondaryVC = slideOverHostingController
+          .primaryViewController as? UINavigationController
+      #else
+        let secondaryVC = viewController(for: .secondary) as? UINavigationController
+      #endif
+      secondaryVC?.pushViewController(vc, animated: false)
     }
   }
 

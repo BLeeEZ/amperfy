@@ -25,14 +25,28 @@ import NotificationBannerSwift
 import UIKit
 
 extension AppDelegate {
-  static func rootViewController() -> UIViewController? {
-    (UIApplication.shared.delegate as! AppDelegate).window?.rootViewController
+  static var window: UIWindow? {
+    #if targetEnvironment(macCatalyst)
+      // Always get the topmost window that corresponds to the active tab
+      return (UIApplication.shared.connectedScenes.first {
+        let isForeground = $0.activationState == .foregroundActive
+        let isMainWindow = ($0.delegate as? SceneDelegate) != nil
+        return isForeground && isMainWindow
+      }?.delegate as? SceneDelegate)?.window
+    #else
+      return (UIApplication.shared.delegate as! AppDelegate).window
+    #endif
   }
 
-  static func topViewController(base: UIViewController? = (
-    UIApplication.shared
-      .delegate as! AppDelegate
-  ).window?.rootViewController) -> UIViewController? {
+  static func rootViewController() -> UIViewController? {
+    Self.window?.rootViewController
+  }
+
+  static func topViewController(
+    base: UIViewController? =
+      window?.rootViewController
+  )
+    -> UIViewController? {
     if base?.presentedViewController is UIAlertController {
       return base
     }
