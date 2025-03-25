@@ -735,6 +735,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     @objc
+    private func keyCommandGoToCurrent() {
+      let playable = player.currentlyPlaying
+      guard let album = playable?.asSong?.album else { return }
+      appDelegate.userStatistics.usedAction(.alertGoToAlbum)
+      let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
+      albumDetailVC.album = album
+      albumDetailVC.songToScrollTo = playable?.asSong
+      displayInLibraryTab(vc: albumDetailVC)
+    }
+
+    @objc
     private func keyCommandShuffleOn() {
       guard !player.isShuffle else { return }
       player.toggleShuffle()
@@ -750,6 +761,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       let isPlaying = player.isPlaying
       let isShuffle = player.isShuffle
       let isSkipAvailable = isPlaying && player.isSkipAvailable
+      let hasAlbum = player.currentlyPlaying?.asSong?.album != nil
 
       let section1 = [
         UIKeyCommand(
@@ -791,6 +803,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           input: UIKeyCommand.inputLeftArrow,
           modifierFlags: [.shift, .command],
           attributes: isSkipAvailable ? [] : [.disabled]
+        ),
+        UIKeyCommand(
+          title: "Go to Current Song",
+          action: #selector(keyCommandGoToCurrent),
+          input: "L",
+          modifierFlags: [.command],
+          attributes: hasAlbum ? [] : [.disabled]
         ),
       ]
 

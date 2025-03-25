@@ -51,7 +51,7 @@ import UIKit
     var tableView: UITableView?
 
     var mainViewController: UIViewController? {
-      let splitVC = appDelegate.hostingSplitVC
+      let splitVC = splitViewController
       let detailVC = splitVC?.viewController(for: .secondary) as? UINavigationController
       let slideOverHostingVC = detailVC?.topViewController as? SlideOverHostingController
       let innerNavigationController = slideOverHostingVC?
