@@ -84,6 +84,13 @@ import UIKit
     }
   }
 
+  class MacOsBarStackView: UIStackView {
+    /// override this to allow snapshots: this is needed in macOS to show all tabs and create a new tab
+    override func drawHierarchy(in rect: CGRect, afterScreenUpdates afterUpdates: Bool) -> Bool {
+      true
+    }
+  }
+
   class VolumeBarItem: UIBarButtonItem, Refreshable {
     fileprivate let volumeSliderView = VolumeSlider()
     var player: PlayerFacade
@@ -92,8 +99,8 @@ import UIKit
     let volumeIconHeightScale = 1.1
     let maxVolumeIconWidthScale = 1.55
 
-    private lazy var detailContainer: UIStackView = {
-      let container = UIStackView(arrangedSubviews: [
+    private lazy var detailContainer: MacOsBarStackView = {
+      let container = MacOsBarStackView(arrangedSubviews: [
         self.minVolumeImage,
         self.volumeSliderView,
         self.maxVolumeImage,
