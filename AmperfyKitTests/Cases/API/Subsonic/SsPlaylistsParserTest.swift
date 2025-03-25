@@ -26,13 +26,9 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "playlists_example_1")
-    ssParserDelegate = SsPlaylistParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
-      library: library
-    )
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
     ssParserDelegate = SsPlaylistParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
       library: library
@@ -45,7 +41,6 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
       playlist.id = i.description
       playlist.name = i.description
     }
-    recreateParserDelegate()
     testParsing()
   }
 

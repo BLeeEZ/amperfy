@@ -24,11 +24,20 @@ import os.log
 
 class SsMusicFolderParserDelegate: SsXmlLibParser {
   let musicFoldersBeforeFetch: Set<MusicFolder>
+  private var musicFoldersDict: [String: MusicFolder]
   var musicFoldersParsed = Set<MusicFolder>()
 
-  init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage) {
+  init(
+    performanceMonitor: ThreadPerformanceMonitor,
+    prefetch: LibraryStorage.PrefetchElementContainer,
+    library: LibraryStorage
+  ) {
     self.musicFoldersBeforeFetch = Set(library.getMusicFolders())
-    super.init(performanceMonitor: performanceMonitor, library: library)
+    self.musicFoldersDict = [String: MusicFolder]()
+    for mf in musicFoldersBeforeFetch {
+      musicFoldersDict[mf.id] = mf
+    }
+    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
   }
 
   override func parser(
@@ -48,12 +57,13 @@ class SsMusicFolderParserDelegate: SsXmlLibParser {
 
     if elementName == "musicFolder", let id = attributeDict["id"],
        let name = attributeDict["name"] {
-      if let musicFolder = library.getMusicFolder(id: id) {
+      if let musicFolder = musicFoldersDict[id] {
         musicFoldersParsed.insert(musicFolder)
       } else {
         let musicFolder = library.createMusicFolder()
         musicFolder.id = id
         musicFolder.name = name
+        musicFoldersDict[id] = musicFolder
         musicFoldersParsed.insert(musicFolder)
       }
     }

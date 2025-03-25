@@ -45,10 +45,11 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
     if elementName == "artist" {
       guard let artistId = attributeDict["id"] else { return }
 
-      if let fetchedArtist = library.getArtist(id: artistId) {
-        artistBuffer = fetchedArtist
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        artistBuffer = prefetchedArtist
       } else {
         artistBuffer = library.createArtist()
+        prefetch.prefetchedArtistDict[artistId] = artistBuffer
         artistBuffer?.id = artistId
       }
       artistBuffer?.remoteStatus = .available

@@ -34,25 +34,27 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     directory: Directory,
+    prefetch: LibraryStorage.PrefetchElementContainer,
     library: LibraryStorage
   ) {
     self.directory = directory
     self.musicFolder = nil
     self.directoriesBeforeFetch = Set(directory.subdirectories)
     self.songsBeforeFetch = Set(directory.songs)
-    super.init(performanceMonitor: performanceMonitor, library: library)
+    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
   }
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     musicFolder: MusicFolder,
+    prefetch: LibraryStorage.PrefetchElementContainer,
     library: LibraryStorage
   ) {
     self.directory = nil
     self.musicFolder = musicFolder
     self.directoriesBeforeFetch = Set(musicFolder.directories)
     self.songsBeforeFetch = Set(musicFolder.songs)
-    super.init(performanceMonitor: performanceMonitor, library: library)
+    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
   }
 
   override func parser(
@@ -74,10 +76,11 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
       if let isDir = attributeDict["isDir"], let isDirBool = Bool(isDir), isDirBool {
         if let id = attributeDict["id"], let title = attributeDict["title"] {
           var parsedDirectory: Directory!
-          if let fetchedDirectory = library.getDirectory(id: id) {
-            parsedDirectory = fetchedDirectory
+          if let prefetchedDirectory = prefetch.prefetchedDirectoryDict[id] {
+            parsedDirectory = prefetchedDirectory
           } else {
             parsedDirectory = library.createDirectory()
+            prefetch.prefetchedDirectoryDict[id] = parsedDirectory
             parsedDirectory.id = id
             parsedDirectory.name = title
             if let coverArtId = attributeDict["coverArt"] {
@@ -105,10 +108,11 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
     if elementName == "artist" {
       if let id = attributeDict["id"], let name = attributeDict["name"] {
         var parsedDirectory: Directory!
-        if let fetchedDirectory = library.getDirectory(id: id) {
-          parsedDirectory = fetchedDirectory
+        if let prefetchedDirectory = prefetch.prefetchedDirectoryDict[id] {
+          parsedDirectory = prefetchedDirectory
         } else {
           parsedDirectory = library.createDirectory()
+          prefetch.prefetchedDirectoryDict[id] = parsedDirectory
           parsedDirectory.id = id
           parsedDirectory.name = name
         }

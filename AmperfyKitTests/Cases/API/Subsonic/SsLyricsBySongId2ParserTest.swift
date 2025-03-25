@@ -29,7 +29,7 @@ class SsLyricsBySongId2ParserTest: AbstractSsParserTest {
     ssParserDelegate = SsLyricsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
     ssParserDelegate = SsLyricsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }
 
@@ -40,6 +40,7 @@ class SsLyricsBySongId2ParserTest: AbstractSsParserTest {
       XCTFail()
       return
     }
+    checkPrefetchIdCounts()
 
     XCTAssertEqual(lyricsList.lyrics.count, 2)
 

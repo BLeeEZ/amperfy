@@ -382,6 +382,10 @@ public class LibraryStorage: PlayableFileCachable {
     (try? context.count(for: PodcastEpisodeMO.fetchRequest())) ?? 0
   }
 
+  public var radioCount: Int {
+    (try? context.count(for: RadioMO.fetchRequest())) ?? 0
+  }
+
   public var cachedPodcastEpisodeCount: Int {
     let request: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
     request.predicate = getFetchPredicate(onlyCachedPodcastEpisodes: true)
@@ -1648,6 +1652,316 @@ public class LibraryStorage: PlayableFileCachable {
     )
     let songs = try? context.fetch(fetchRequest)
     return songs?.compactMap { Song(managedObject: $0) } ?? [Song]()
+  }
+
+  public struct PrefetchIdContainer {
+    public var artworkIDs = Set<ArtworkRemoteInfo>()
+    public var genreIDs = Set<String>()
+    public var genreNames = Set<String>()
+    public var artistIDs = Set<String>()
+    public var localArtistNames = Set<String>()
+    public var albumIDs = Set<String>()
+    public var songIDs = Set<String>()
+    public var podcastEpisodeIDs = Set<String>()
+    public var radioIDs = Set<String>()
+    public var musicFolderIDs = Set<String>()
+    public var directoryIDs = Set<String>()
+    public var podcastIDs = Set<String>()
+
+    public var counts: Int {
+      artworkIDs.count +
+        genreIDs.count +
+        genreNames.count +
+        artistIDs.count +
+        localArtistNames.count +
+        albumIDs.count +
+        songIDs.count +
+        podcastEpisodeIDs.count +
+        radioIDs.count +
+        musicFolderIDs.count +
+        directoryIDs.count +
+        podcastIDs.count
+    }
+  }
+
+  public class PrefetchElementContainer {
+    public var prefetchedArtworkDict = [ArtworkRemoteInfo: Artwork]()
+    public var prefetchedGenreDict = [String: Genre]()
+    public var prefetchedArtistDict = [String: Artist]()
+    public var prefetchedLocalArtistDict = [String: Artist]()
+    public var prefetchedAlbumDict = [String: Album]()
+    public var prefetchedSongDict = [String: Song]()
+    public var prefetchedPodcastEpisodeDict = [String: PodcastEpisode]()
+    public var prefetchedRadioDict = [String: Radio]()
+    public var prefetchedMusicFolderDict = [String: MusicFolder]()
+    public var prefetchedDirectoryDict = [String: Directory]()
+    public var prefetchedPodcastDict = [String: Podcast]()
+
+    public var counts: Int {
+      prefetchedArtworkDict.count +
+        prefetchedGenreDict.count +
+        prefetchedArtistDict.count +
+        prefetchedLocalArtistDict.count +
+        prefetchedAlbumDict.count +
+        prefetchedSongDict.count +
+        prefetchedPodcastEpisodeDict.count +
+        prefetchedRadioDict.count +
+        prefetchedMusicFolderDict.count +
+        prefetchedDirectoryDict.count +
+        prefetchedPodcastDict.count
+    }
+  }
+
+  public func getElements(prefetchIDs: PrefetchIdContainer) -> PrefetchElementContainer {
+    let elementContainer = PrefetchElementContainer()
+
+    if !prefetchIDs.artworkIDs.isEmpty {
+      elementContainer.prefetchedArtworkDict = getArtworks(remoteInfos: prefetchIDs.artworkIDs)
+    }
+
+    if !prefetchIDs.genreIDs.isEmpty {
+      elementContainer.prefetchedGenreDict = getGenres(ids: prefetchIDs.genreIDs)
+    } else if !prefetchIDs.genreNames.isEmpty {
+      elementContainer.prefetchedGenreDict = getGenres(names: prefetchIDs.genreNames)
+    }
+
+    if !prefetchIDs.artistIDs.isEmpty {
+      elementContainer.prefetchedArtistDict = getArtists(ids: prefetchIDs.artistIDs)
+    }
+    if !prefetchIDs.localArtistNames.isEmpty {
+      elementContainer
+        .prefetchedLocalArtistDict = getLocalArtists(names: prefetchIDs.localArtistNames)
+    }
+    if !prefetchIDs.albumIDs.isEmpty {
+      elementContainer.prefetchedAlbumDict = getAlbums(ids: prefetchIDs.albumIDs)
+    }
+    if !prefetchIDs.songIDs.isEmpty {
+      elementContainer.prefetchedSongDict = getSongs(ids: prefetchIDs.songIDs)
+    }
+    if !prefetchIDs.podcastEpisodeIDs.isEmpty {
+      elementContainer
+        .prefetchedPodcastEpisodeDict = getPodcastEpisodes(ids: prefetchIDs.podcastEpisodeIDs)
+    }
+    if !prefetchIDs.radioIDs.isEmpty {
+      elementContainer.prefetchedRadioDict = getRadios(ids: prefetchIDs.radioIDs)
+    }
+    if !prefetchIDs.musicFolderIDs.isEmpty {
+      elementContainer.prefetchedMusicFolderDict = getMusicFolders(ids: prefetchIDs.musicFolderIDs)
+    }
+    if !prefetchIDs.directoryIDs.isEmpty {
+      elementContainer.prefetchedDirectoryDict = getDirectories(ids: prefetchIDs.directoryIDs)
+    }
+    if !prefetchIDs.podcastIDs.isEmpty {
+      elementContainer.prefetchedPodcastDict = getPodcasts(ids: prefetchIDs.podcastIDs)
+    }
+    return elementContainer
+  }
+
+  private func getArtworks(remoteInfos: Set<ArtworkRemoteInfo>) -> [ArtworkRemoteInfo: Artwork] {
+    let allIDsDespiteOfType = remoteInfos.compactMap { $0.id }
+
+    let fetchRequest: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(ArtworkMO.id),
+      allIDsDespiteOfType
+    )
+    let artworkMOs = try? context.fetch(fetchRequest)
+
+    var artworkDict = [ArtworkRemoteInfo: Artwork]()
+    guard let artworkMOs else { return artworkDict }
+    for artworkMO in artworkMOs {
+      let artwork = Artwork(managedObject: artworkMO)
+      let remoteInfo = artwork.remoteInfo
+      artworkDict[remoteInfo] = artwork
+    }
+    return artworkDict
+  }
+
+  private func getPodcasts(ids: Set<String>) -> [String: Podcast] {
+    let fetchRequest: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(PodcastMO.id),
+      ids
+    )
+    let podcastMOs = try? context.fetch(fetchRequest)
+
+    var podcastDict = [String: Podcast]()
+    guard let podcastMOs else { return podcastDict }
+    for podcastMO in podcastMOs {
+      let podcast = Podcast(managedObject: podcastMO)
+      podcastDict[podcast.id] = podcast
+    }
+    return podcastDict
+  }
+
+  private func getMusicFolders(ids: Set<String>) -> [String: MusicFolder] {
+    let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(MusicFolderMO.id),
+      ids
+    )
+    let musicFolderMOs = try? context.fetch(fetchRequest)
+
+    var musicFolderDict = [String: MusicFolder]()
+    guard let musicFolderMOs else { return musicFolderDict }
+    for musicFolderMO in musicFolderMOs {
+      let musicFolder = MusicFolder(managedObject: musicFolderMO)
+      musicFolderDict[musicFolder.id] = musicFolder
+    }
+    return musicFolderDict
+  }
+
+  private func getDirectories(ids: Set<String>) -> [String: Directory] {
+    let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(DirectoryMO.id),
+      ids
+    )
+    let directoryMOs = try? context.fetch(fetchRequest)
+
+    var directoryDict = [String: Directory]()
+    guard let directoryMOs else { return directoryDict }
+    for directoryMO in directoryMOs {
+      let directory = Directory(managedObject: directoryMO)
+      directoryDict[directory.id] = directory
+    }
+    return directoryDict
+  }
+
+  private func getGenres(ids: Set<String>) -> [String: Genre] {
+    let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(GenreMO.id),
+      ids
+    )
+    let genreMOs = try? context.fetch(fetchRequest)
+
+    var genreDict = [String: Genre]()
+    guard let genreMOs else { return genreDict }
+    for genreMO in genreMOs {
+      let genre = Genre(managedObject: genreMO)
+      genreDict[genre.id] = genre
+    }
+    return genreDict
+  }
+
+  private func getGenres(names: Set<String>) -> [String: Genre] {
+    let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == %@", #keyPath(GenreMO.id), ""),
+      NSPredicate(
+        format: "%K IN %@",
+        #keyPath(GenreMO.name),
+        names
+      ),
+    ])
+    let genreMOs = try? context.fetch(fetchRequest)
+
+    var genreDict = [String: Genre]()
+    guard let genreMOs else { return genreDict }
+    for genreMO in genreMOs {
+      let genre = Genre(managedObject: genreMO)
+      genreDict[genre.name] = genre
+    }
+    return genreDict
+  }
+
+  private func getArtists(ids: Set<String>) -> [String: Artist] {
+    let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(ArtistMO.id),
+      ids
+    )
+    let artistMOs = try? context.fetch(fetchRequest)
+
+    var artistDict = [String: Artist]()
+    guard let artistMOs else { return artistDict }
+    for artistMO in artistMOs {
+      let artist = Artist(managedObject: artistMO)
+      artistDict[artist.id] = artist
+    }
+    return artistDict
+  }
+
+  private func getLocalArtists(names: Set<String>) -> [String: Artist] {
+    let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == %@", #keyPath(ArtistMO.id), ""),
+      NSPredicate(
+        format: "%K IN %@",
+        #keyPath(ArtistMO.name),
+        names
+      ),
+    ])
+    let artistMOs = try? context.fetch(fetchRequest)
+
+    var artistDict = [String: Artist]()
+    guard let artistMOs else { return artistDict }
+    for artistMO in artistMOs {
+      let artist = Artist(managedObject: artistMO)
+      artistDict[artist.name] = artist
+    }
+    return artistDict
+  }
+
+  private func getAlbums(ids: Set<String>) -> [String: Album] {
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(AlbumMO.id),
+      ids
+    )
+    let albumMOs = try? context.fetch(fetchRequest)
+
+    var albumDict = [String: Album]()
+    guard let albumMOs else { return albumDict }
+    for albumMO in albumMOs {
+      let album = Album(managedObject: albumMO)
+      albumDict[album.id] = album
+    }
+    return albumDict
+  }
+
+  public func getPodcastEpisodes(ids: Set<String>) -> [String: PodcastEpisode] {
+    let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(PodcastEpisodeMO.id),
+      ids
+    )
+    let podcastEpisodeMOs = try? context.fetch(fetchRequest)
+
+    var podcastEpisodeDict = [String: PodcastEpisode]()
+    guard let podcastEpisodeMOs else { return podcastEpisodeDict }
+    for podcastEpisodeMO in podcastEpisodeMOs {
+      let podcastEpisode = PodcastEpisode(managedObject: podcastEpisodeMO)
+      podcastEpisodeDict[podcastEpisode.id] = podcastEpisode
+    }
+    return podcastEpisodeDict
+  }
+
+  public func getRadios(ids: Set<String>) -> [String: Radio] {
+    let fetchRequest: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K IN %@",
+      #keyPath(RadioMO.id),
+      ids
+    )
+    let radioMOs = try? context.fetch(fetchRequest)
+
+    var radioDict = [String: Radio]()
+    guard let radioMOs else { return radioDict }
+    for radioMO in radioMOs {
+      let radio = Radio(managedObject: radioMO)
+      radioDict[radio.id] = radio
+    }
+    return radioDict
   }
 
   public func getSongs(ids: Set<String>) -> [String: Song] {

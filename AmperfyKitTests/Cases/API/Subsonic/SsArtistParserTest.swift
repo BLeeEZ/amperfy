@@ -26,14 +26,23 @@ class SsArtistParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "artists_example_1")
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsArtistParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      artworkCount: 6,
+      artistCount: 6
+    )
+
     let artists = library.getArtists().sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(artists.count, 6)
 

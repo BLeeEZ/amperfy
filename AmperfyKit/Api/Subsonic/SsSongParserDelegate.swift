@@ -25,7 +25,6 @@ import os.log
 import UIKit
 
 class SsSongParserDelegate: SsPlayableParserDelegate {
-  var prefetchedSongDict: [String: Song]?
   var songBuffer: Song?
   var parsedSongs = [Song]()
   var guessedArtist: Artist?
@@ -45,27 +44,19 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       let isDir = attributeDict["isDir"] ?? "false"
       guard let isDirBool = Bool(isDir), isDirBool == false else { return }
 
-      if let prefetchedSongDict,
-         let prefetchedSong = prefetchedSongDict[songId] {
+      if let prefetchedSong = prefetch.prefetchedSongDict[songId] {
         songBuffer = prefetchedSong
         songBuffer?.remoteStatus = .available
         guessedArtist = prefetchedSong.artist
         guessedAlbum = prefetchedSong.album
         guessedGenre = prefetchedSong.genre
-      } else if prefetchedSongDict == nil,
-                let fetchedSong = library.getSong(id: songId) {
-        songBuffer = fetchedSong
-        songBuffer?.remoteStatus = .available
-        guessedArtist = fetchedSong.artist
-        guessedAlbum = fetchedSong.album
-        guessedGenre = fetchedSong.genre
       } else {
         songBuffer = library.createSong()
+        prefetch.prefetchedSongDict[songId] = songBuffer
         songBuffer?.id = songId
         guessedArtist = nil
         guessedAlbum = nil
         guessedGenre = nil
-        prefetchedSongDict?[songId] = songBuffer
       }
       playableBuffer = songBuffer
 
@@ -73,11 +64,12 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         if let guessedArtist, guessedArtist.id == artistId {
           songBuffer?.artist = guessedArtist
           songBuffer?.artist?.remoteStatus = .available
-        } else if let artist = library.getArtist(id: artistId) {
-          songBuffer?.artist = artist
+        } else if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+          songBuffer?.artist = prefetchedArtist
           songBuffer?.artist?.remoteStatus = .available
         } else if let artistName = attributeDict["artist"] {
           let artist = library.createArtist()
+          prefetch.prefetchedArtistDict[artistId] = artist
           artist.id = artistId
           artist.name = artistName
           os_log(
@@ -92,10 +84,11 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       } else if let songBuffer = songBuffer, let artistName = attributeDict["artist"] {
         if let guessedArtist, guessedArtist.name == artistName {
           songBuffer.artist = guessedArtist
-        } else if let existingLocalArtist = library.getArtistLocal(name: artistName) {
-          songBuffer.artist = existingLocalArtist
+        } else if let prefetchedArtist = prefetch.prefetchedLocalArtistDict[artistName] {
+          songBuffer.artist = prefetchedArtist
         } else {
           let artist = library.createArtist()
+          prefetch.prefetchedLocalArtistDict[artistName] = artist
           artist.name = artistName
           songBuffer.artist = artist
           os_log("Local Artist <%s> has been created (no id)", log: log, type: .error, artistName)
@@ -106,11 +99,12 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         if let guessedAlbum, guessedAlbum.id == albumId {
           songBuffer?.album = guessedAlbum
           songBuffer?.album?.remoteStatus = .available
-        } else if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true) {
-          songBuffer?.album = album
+        } else if let prefetchedAlbum = prefetch.prefetchedAlbumDict[albumId] {
+          songBuffer?.album = prefetchedAlbum
           songBuffer?.album?.remoteStatus = .available
         } else if let albumName = attributeDict["album"] {
           let album = library.createAlbum()
+          prefetch.prefetchedAlbumDict[albumId] = album
           album.id = albumId
           album.name = albumName
           os_log(
@@ -125,12 +119,13 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       }
 
       if let genreName = attributeDict["genre"] {
-        if let guessedGenre = guessedGenre, guessedGenre.name == genreName {
+        if let guessedGenre, guessedGenre.name == genreName {
           songBuffer?.genre = guessedGenre
-        } else if let genre = library.getGenre(name: genreName) {
-          songBuffer?.genre = genre
+        } else if let prefetchedGenre = prefetch.prefetchedGenreDict[genreName] {
+          songBuffer?.genre = prefetchedGenre
         } else {
           let genre = library.createGenre()
+          prefetch.prefetchedGenreDict[genreName] = genre
           genre.name = genreName
           os_log("Genre <%s> has been created", log: log, type: .error, genreName)
           songBuffer?.genre = genre

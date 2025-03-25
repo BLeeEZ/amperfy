@@ -26,12 +26,16 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "album_example_2")
+    createTestPartner()
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsSongParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
-    createTestPartner()
   }
 
   func createTestPartner() {
@@ -46,6 +50,15 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      artworkCount: 2,
+      genreNameCount: 1,
+      artistCount: 1,
+      albumCount: 1,
+      songCount: 2,
+      artworkFetchCount: 1 // the album cover itself is not created and all songs have the same cover
+    )
+
     let songs = library.getSongs().sorted(by: { $0.id > $1.id })
     XCTAssertEqual(songs.count, 2)
 

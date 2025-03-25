@@ -26,14 +26,21 @@ class SsGenreParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "genres_example_1")
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsGenreParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      genreNameCount: 7
+    )
     XCTAssertEqual(library.genreCount, 7)
 
     guard let genre = library.getGenre(name: "Electronic") else { XCTFail(); return }

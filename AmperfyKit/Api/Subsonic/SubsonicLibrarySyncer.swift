@@ -51,8 +51,17 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: 0)
     let genreResponse = try await subsonicServerApi.requestGenres()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: genreResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsGenreParserDelegate(
         performanceMonitor: self.performanceMonitor,
+        prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: statusNotifyier
       )
@@ -66,8 +75,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
     let artistsResponse = try await subsonicServerApi.requestArtists()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: artistsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: statusNotifyier
       )
@@ -96,11 +113,21 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             count: Self.maxItemCountToPollAtOnce
           )
           try await self.storage.async.perform { asyncCompanion in
+            let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+            try self.parse(
+              response: albumsResponse,
+              delegate: idParserDelegate,
+              isThrowingErrorsAllowed: false
+            )
+            let prefetch = asyncCompanion.library
+              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
             let parserDelegate = SsAlbumParserDelegate(
-              performanceMonitor: self.performanceMonitor,
+              performanceMonitor: self.performanceMonitor, prefetch: prefetch,
               library: asyncCompanion.library,
               parseNotifier: statusNotifyier
             )
+            parserDelegate.prefetch = prefetch
             try self.parse(
               response: albumsResponse,
               delegate: parserDelegate,
@@ -164,8 +191,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
     let podcastsResponse = try await subsonicServerApi.requestPodcasts()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: podcastsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsPodcastParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: statusNotifyier
       )
@@ -228,8 +263,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     do {
       try await storage.async.perform { asyncCompanion in
+        let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+        try self.parse(
+          response: artistResponse,
+          delegate: idParserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
         let parserDelegate = SsArtistParserDelegate(
-          performanceMonitor: self.performanceMonitor,
+          performanceMonitor: self.performanceMonitor, prefetch: prefetch,
           library: asyncCompanion.library
         )
         try self.parse(response: artistResponse, delegate: parserDelegate)
@@ -286,8 +329,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     do {
       try await storage.async.perform { asyncCompanion in
+        let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+        try self.parse(
+          response: albumResponse,
+          delegate: idParserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
         let parserDelegate = SsAlbumParserDelegate(
-          performanceMonitor: self.performanceMonitor,
+          performanceMonitor: self.performanceMonitor, prefetch: prefetch,
           library: asyncCompanion.library
         )
         try self.parse(response: albumResponse, delegate: parserDelegate)
@@ -303,8 +354,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           .object(with: albumObjectId) as! AlbumMO
       )
       let oldSongs = Set(albumAsync.songs)
+
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: albumResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
       let parserDelegate = SsSongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: albumResponse, delegate: parserDelegate)
@@ -324,8 +383,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await subsonicServerApi.requestSongInfo(id: song.id)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsSongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -430,9 +497,17 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         )
         let oldEpisodes = Set(podcastAsync.episodes)
 
+        let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+        try self.parse(
+          response: podcastResponse,
+          delegate: idParserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
         let parserDelegate = SsPodcastEpisodeParserDelegate(
           performanceMonitor: self.performanceMonitor,
-          podcast: podcastAsync,
+          podcast: podcastAsync, prefetch: prefetch,
           library: asyncCompanion.library
         )
         try self.parse(response: podcastResponse, delegate: parserDelegate)
@@ -464,9 +539,17 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await syncDownPodcastsWithoutEpisodes()
     let response = try await subsonicServerApi.requestNewestPodcasts()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsPodcastEpisodeParserDelegate(
         performanceMonitor: self.performanceMonitor,
-        podcast: nil,
+        podcast: nil, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -480,8 +563,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await subsonicServerApi.requestNewestAlbums(offset: offset, count: count)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsAlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -499,8 +590,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await subsonicServerApi.requestRecentAlbums(offset: offset, count: count)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsAlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -519,8 +618,15 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await storage.async.perform { asyncCompanion in
       os_log("Sync favorite artists", log: self.log, type: .info)
       let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists())
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
       let parserDelegateArtist = SsArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegateArtist)
@@ -531,7 +637,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       os_log("Sync favorite albums", log: self.log, type: .info)
       let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums())
       let parserDelegateAlbum = SsAlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegateAlbum)
@@ -541,7 +647,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       os_log("Sync favorite songs", log: self.log, type: .info)
       let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
       let parserDelegateSong = SsSongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegateSong)
@@ -557,8 +663,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await storage.async.perform { asyncCompanion in
       let oldRadios = Set(asyncCompanion.library.getRadios())
 
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsRadioParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -576,8 +690,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await subsonicServerApi.requestMusicFolders()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsMusicFolderParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -594,9 +716,17 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         managedObject: asyncCompanion.context
           .object(with: musicFolderObjectId) as! MusicFolderMO
       )
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsDirectoryParserDelegate(
         performanceMonitor: self.performanceMonitor,
-        musicFolder: musicFolderAsync,
+        musicFolder: musicFolderAsync, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -614,9 +744,17 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         managedObject: asyncCompanion.context
           .object(with: directoryObjectId) as! DirectoryMO
       )
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsDirectoryParserDelegate(
         performanceMonitor: self.performanceMonitor,
-        directory: directoryAsync,
+        directory: directoryAsync, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -630,8 +768,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestRandomSongs(count: count)
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsSongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -677,17 +823,17 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO
       )
 
-      let playlistEntriesParserDelegate = SsPlaylistSongIDsParserDelegate(
-        performanceMonitor: self.performanceMonitor,
-        library: asyncCompanion.library
+      let idsParserDelegate = SsIDsParserDelegate(
+        performanceMonitor: self.performanceMonitor
       )
-      try self.parse(response: response, delegate: playlistEntriesParserDelegate)
-      let playlistSongs = asyncCompanion.library
-        .getSongs(ids: playlistEntriesParserDelegate.songIDs)
+      try self.parse(response: response, delegate: idsParserDelegate)
+      let prefetch = asyncCompanion.library
+        .getElements(prefetchIDs: idsParserDelegate.prefetchIDs)
+
       let parserDelegate = SsPlaylistSongsParserDelegate(
         performanceMonitor: self.performanceMonitor,
         playlist: playlistAsync,
-        library: asyncCompanion.library, prefetchedSongDict: playlistSongs
+        library: asyncCompanion.library, prefetch: prefetch
       )
       try self.parse(response: response, delegate: parserDelegate)
       playlistAsync.isCached = parserDelegate.isCollectionCached
@@ -795,8 +941,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await storage.async.perform { asyncCompanion in
       let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
 
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsPodcastParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -913,8 +1067,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchArtists(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -927,8 +1089,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchAlbums(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsAlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -941,8 +1111,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchSongs(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsSongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -976,10 +1154,19 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         library: asyncCompanion.library,
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO
       )
+
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SsPlaylistSongsParserDelegate(
         performanceMonitor: self.performanceMonitor,
         playlist: playlistAsync,
-        library: asyncCompanion.library, prefetchedSongDict: nil
+        library: asyncCompanion.library, prefetch: prefetch
       )
       try self.parse(response: response, delegate: parserDelegate)
     }

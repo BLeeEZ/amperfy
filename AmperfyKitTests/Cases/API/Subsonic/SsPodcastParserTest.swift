@@ -26,16 +26,12 @@ class SsPodcastParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "podcasts_example_1")
-    ssParserDelegate = SsPodcastParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
-      library: library,
-      parseNotifier: nil
-    )
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsPodcastParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
@@ -43,6 +39,16 @@ class SsPodcastParserTest: AbstractSsParserTest {
 
   override func checkCorrectParsing() {
     ssParserDelegate?.performPostParseOperations()
+
+    checkPrefetchIdCounts(
+      artworkCount: 4,
+      podcastEpisodeCount: 2,
+      podcastCount: 3,
+      artworkFetchCount: 2, // the podcast episodes cover itself is not created
+      podcastEpisodeFetchCount: 0, // no episodes are parsed
+      podcastFetchCount: 2 // one podcast has an error
+    )
+
     let podcasts = library.getPodcasts().sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(podcasts.count, 2)
 

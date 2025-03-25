@@ -26,13 +26,20 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "musicFolders_example_1")
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsMusicFolderParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library
     )
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      musicFolderCount: 3
+    )
     XCTAssertEqual(library.musicFolderCount, 3)
 
     let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })

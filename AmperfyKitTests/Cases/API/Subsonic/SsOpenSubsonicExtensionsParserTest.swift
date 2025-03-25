@@ -26,11 +26,9 @@ class SsOpenSubsonicExtensionsParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "OpenSubsonicExtensions_example_1")
-    ssParserDelegate =
-      SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
     ssParserDelegate =
       SsOpenSubsonicExtensionsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }
@@ -41,6 +39,7 @@ class SsOpenSubsonicExtensionsParserTest: AbstractSsParserTest {
       XCTFail()
       return
     }
+    checkPrefetchIdCounts()
 
     let response = extensionsParser.openSubsonicExtensionsResponse
 

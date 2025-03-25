@@ -40,11 +40,12 @@ class SsRadioParserDelegate: SsXmlLibParser {
         os_log("Found radio with no id", log: log, type: .error)
         return
       }
-      if let fetchedRadio = library.getRadio(id: radioId) {
-        radioBuffer = fetchedRadio
+      if let prefetchedRadio = prefetch.prefetchedRadioDict[radioId] {
+        radioBuffer = prefetchedRadio
         radioBuffer?.remoteStatus = .available
       } else {
         radioBuffer = library.createRadio()
+        prefetch.prefetchedRadioDict[radioId] = radioBuffer
         radioBuffer?.id = radioId
       }
 

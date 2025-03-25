@@ -26,13 +26,18 @@ import UIKit
 
 class SsPlaylistParserDelegate: SsXmlParser {
   private var playlist: Playlist?
-  private let oldPlaylists: Set<Playlist>
+  private let allOldPlaylists: Set<Playlist>
+  private var playlistsDict: [String: Playlist]
   private var parsedPlaylists: Set<Playlist>
   private let library: LibraryStorage
 
   init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage) {
     self.library = library
-    self.oldPlaylists = Set(library.getPlaylists())
+    self.allOldPlaylists = Set(library.getPlaylists())
+    self.playlistsDict = [String: Playlist]()
+    for pl in allOldPlaylists {
+      playlistsDict[pl.id] = pl
+    }
     self.parsedPlaylists = Set<Playlist>()
     super.init(performanceMonitor: performanceMonitor)
   }
@@ -61,11 +66,12 @@ class SsPlaylistParserDelegate: SsXmlParser {
       if playlist != nil {
         playlist?.id = playlistId
       } else if playlistId != "" {
-        if let fetchedPlaylist = library.getPlaylist(id: playlistId) {
+        if let fetchedPlaylist = playlistsDict[playlistId] {
           playlist = fetchedPlaylist
         } else {
           playlist = library.createPlaylist()
           playlist?.id = playlistId
+          playlistsDict[playlistId] = playlist!
         }
       } else {
         os_log("Error: Playlist could not be parsed -> id is not given", log: log, type: .error)
@@ -98,7 +104,7 @@ class SsPlaylistParserDelegate: SsXmlParser {
       }
       playlist = nil
     case "playlists":
-      let outdatedPlaylists = oldPlaylists.subtracting(parsedPlaylists)
+      let outdatedPlaylists = allOldPlaylists.subtracting(parsedPlaylists)
       outdatedPlaylists.forEach {
         if $0.id != "" {
           library.deletePlaylist($0)

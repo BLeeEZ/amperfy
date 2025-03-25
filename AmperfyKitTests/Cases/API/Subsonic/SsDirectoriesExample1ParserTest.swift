@@ -29,26 +29,25 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
     try await super.setUp()
     xmlData = getTestFileData(name: "directory_example_1")
     directory = library.createDirectory()
-    ssParserDelegate = SsDirectoryParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
-      directory: directory,
-      library: library
-    )
-    createTestPartner()
   }
 
-  func createTestPartner() {
-    let artist = library.createArtist()
-    artist.id = "5432"
-    artist.name = "ABBA"
-
-    let album = library.createAlbum()
-    album.id = "11053"
-    album.name = "Arrival"
-    album.artwork?.url = "al-11053"
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
+    ssParserDelegate = SsDirectoryParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      directory: directory, prefetch: prefetch,
+      library: library
+    )
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      artworkCount: 2,
+      directoryCount: 2,
+      directoryFetchCount: 2,
+      directoryLibraryCount: 3 // one more -> it's the directory to sync to and created in setup
+    )
+
     XCTAssertEqual(directory.songs.count, 0)
     let directories = directory.subdirectories.sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(directories.count, 2)

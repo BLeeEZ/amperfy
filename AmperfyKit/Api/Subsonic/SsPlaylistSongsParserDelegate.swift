@@ -34,12 +34,11 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
     performanceMonitor: ThreadPerformanceMonitor,
     playlist: Playlist,
     library: LibraryStorage,
-    prefetchedSongDict: [String: Song]?
+    prefetch: LibraryStorage.PrefetchElementContainer
   ) {
     self.playlist = playlist
     self.items = playlist.items
-    super.init(performanceMonitor: performanceMonitor, library: library)
-    self.prefetchedSongDict = prefetchedSongDict
+    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
   }
 
   override func parser(

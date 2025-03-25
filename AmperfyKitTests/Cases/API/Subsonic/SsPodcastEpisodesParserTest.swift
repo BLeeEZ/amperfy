@@ -29,13 +29,14 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     try await super.setUp()
     xmlData = getTestFileData(name: "podcast_example_1")
     testPodcast = library.createPodcast()
-    recreateParserDelegate()
+    testPodcast?.id = "1"
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsPodcastEpisodeParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      podcast: testPodcast!,
+      podcast: testPodcast!, prefetch: prefetch,
       library: library
     )
   }
@@ -50,16 +51,14 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     for episode in podcast.episodes {
       episode.relFilePath = URL(string: "jop")
     }
-    recreateParserDelegate()
     testParsing()
     XCTAssertTrue((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
 
-    // mark all songs cached exect the last one
+    // mark all songs cached execept the last one
     for episode in podcast.episodes {
       episode.relFilePath = URL(string: "jop")
     }
     podcast.episodes.last?.relFilePath = nil
-    recreateParserDelegate()
     testParsing()
     XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
   }
@@ -68,6 +67,14 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     ssParserDelegate?.performPostParseOperations()
     guard let podcast = testPodcast else { XCTFail(); return }
     XCTAssertEqual(podcast.episodes.count, 2)
+
+    checkPrefetchIdCounts(
+      artworkCount: 3,
+      podcastEpisodeCount: 2,
+      podcastCount: 1,
+      artworkFetchCount: 2, // the podcast cover itself is not created
+      podcastLibraryCount: 1 // the podcast for this test created in setup
+    )
 
     // episodes are sorted by publish date
     var episode = podcast.episodes[1]

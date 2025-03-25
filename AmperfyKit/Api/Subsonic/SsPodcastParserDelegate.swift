@@ -30,12 +30,13 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
 
   override init(
     performanceMonitor: ThreadPerformanceMonitor,
+    prefetch: LibraryStorage.PrefetchElementContainer,
     library: LibraryStorage,
     parseNotifier: ParsedObjectNotifiable? = nil
   ) {
     self.parsedPodcasts = Set<Podcast>()
     super.init(
-      performanceMonitor: performanceMonitor,
+      performanceMonitor: performanceMonitor, prefetch: prefetch,
       library: library,
       parseNotifier: parseNotifier
     )
@@ -61,10 +62,11 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
       guard let attributePodcastStatus = attributeDict["status"],
             attributePodcastStatus != "error" else { return }
 
-      if let fetchedPodcast = library.getPodcast(id: podcastId) {
-        podcastBuffer = fetchedPodcast
+      if let prefetchedPodcast = prefetch.prefetchedPodcastDict[podcastId] {
+        podcastBuffer = prefetchedPodcast
       } else {
         podcastBuffer = library.createPodcast()
+        prefetch.prefetchedPodcastDict[podcastId] = podcastBuffer
         podcastBuffer?.id = podcastId
       }
       podcastBuffer?.remoteStatus = .available

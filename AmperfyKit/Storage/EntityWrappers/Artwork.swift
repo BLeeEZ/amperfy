@@ -34,7 +34,7 @@ public enum ImageStatus: Int16, Sendable {
 
 // MARK: - ArtworkRemoteInfo
 
-public struct ArtworkRemoteInfo: Sendable {
+public struct ArtworkRemoteInfo: Sendable, Hashable {
   public var id: String
   public var type: String
 }

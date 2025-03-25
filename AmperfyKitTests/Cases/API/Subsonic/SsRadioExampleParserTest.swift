@@ -26,14 +26,22 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "internetRadioStations_example_1")
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsRadioParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      radioCount: 2
+    )
+
     let radios = library.getRadios().sorted(by: { $0.id < $1.id })
     XCTAssertEqual(radios.count, 2)
 

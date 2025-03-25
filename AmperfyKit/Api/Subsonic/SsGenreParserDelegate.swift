@@ -33,11 +33,12 @@ class SsGenreParserDelegate: SsXmlLibParser {
     switch elementName {
     case "genre":
       let genreName = buffer
-      if let _ = library.getGenre(name: genreName) {
+      if prefetch.prefetchedGenreDict[genreName] != nil {
         // info already synced -> skip
       } else {
         let genre = library.createGenre()
-        genre.name = buffer
+        prefetch.prefetchedGenreDict[genreName] = genre
+        genre.name = genreName
       }
       parsedCount += 1
     default:

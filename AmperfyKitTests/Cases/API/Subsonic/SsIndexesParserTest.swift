@@ -29,13 +29,13 @@ class SsIndexesParserTest: AbstractSsParserTest {
     try await super.setUp()
     xmlData = getTestFileData(name: "indexes_example_1")
     musicFolder = library.createMusicFolder()
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsDirectoryParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      musicFolder: musicFolder,
+      musicFolder: musicFolder, prefetch: prefetch,
       library: library
     )
   }
@@ -48,7 +48,6 @@ class SsIndexesParserTest: AbstractSsParserTest {
     for song in musicFolder.songs {
       song.relFilePath = URL(string: "jop")
     }
-    recreateParserDelegate()
     testParsing()
     XCTAssertTrue((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
 
@@ -57,12 +56,20 @@ class SsIndexesParserTest: AbstractSsParserTest {
       song.relFilePath = URL(string: "jop")
     }
     musicFolder.songs.last?.relFilePath = nil
-    recreateParserDelegate()
     testParsing()
     XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      artworkCount: 2,
+      genreNameCount: 1,
+      localArtistCount: 1,
+      songCount: 2,
+      directoryCount: 4,
+      musicFolderLibraryCount: 1 // it's the one to sync to and created in setup
+    )
+
     let directories = musicFolder.directories.sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(directories.count, 4)
 

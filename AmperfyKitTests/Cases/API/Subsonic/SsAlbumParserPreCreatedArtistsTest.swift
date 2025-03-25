@@ -26,21 +26,25 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "artist_example_1")
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsAlbumParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
-    createTestPartner()
-  }
-
-  func createTestPartner() {
-    let artist = library.createArtist()
-    artist.id = "5432"
-    artist.name = "AC/DC"
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      artworkCount: 16,
+      artistCount: 1,
+      albumCount: 15,
+      artworkFetchCount: 15 // the artist artwork is not created
+    )
+
     let albums = library.getAlbums().sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(albums.count, 15)
 

@@ -28,12 +28,16 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "album_missing_artistId")
+    createTestAlbum()
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsSongParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
-    createTestAlbum()
   }
 
   func createTestAlbum() {
@@ -44,6 +48,15 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
+    checkPrefetchIdCounts(
+      artworkCount: 22,
+      genreNameCount: 1,
+      artistCount: 1,
+      localArtistCount: 20,
+      albumCount: 1,
+      songCount: 22
+    )
+
     let fetchRequest = SongMO.trackNumberSortedFetchRequest
     let album = library.getAlbum(id: albumId, isDetailFaultResolution: true)!
     fetchRequest.predicate = library.getFetchPredicate(forAlbum: album)
