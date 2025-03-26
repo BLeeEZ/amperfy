@@ -144,8 +144,13 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
 
   override public func performPostParseOperations() {
     for episode in parsedEpisodes {
-      episode.title = episode.titleRawParsed.html2String
-      episode.depiction = episode.depictionRawParsed?.html2String
+      // html2String is CPU intensive do it only one when title/depiction is not set yet
+      if episode.playableManagedObject.title == nil {
+        episode.title = episode.titleRawParsed.html2String
+      }
+      if episode.depiction == nil {
+        episode.depiction = episode.depictionRawParsed?.html2String
+      }
     }
   }
 }
