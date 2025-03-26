@@ -31,13 +31,17 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     playlist: Playlist,
-    library: LibraryStorage,
-    prefetchedSongDict: [String: Song]?
+    prefetch: LibraryStorage.PrefetchElementContainer,
+    library: LibraryStorage
   ) {
     self.playlist = playlist
     self.items = playlist.items
-    super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: nil)
-    self.prefetchedSongDict = prefetchedSongDict
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      library: library,
+      parseNotifier: nil
+    )
   }
 
   override func parser(

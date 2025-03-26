@@ -56,24 +56,24 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
         os_log("Found album with no id", log: log, type: .error)
         return
       }
-      if let fetchedAlbum = library.getAlbum(id: albumId, isDetailFaultResolution: true) {
-        albumBuffer = fetchedAlbum
+      if let prefetchedAlbum = prefetch.prefetchedAlbumDict[albumId] {
+        albumBuffer = prefetchedAlbum
       } else {
         albumBuffer = library.createAlbum()
         albumBuffer?.id = albumId
       }
     case "artist":
       guard let album = albumBuffer, let artistId = attributeDict["id"] else { return }
-      if let artist = library.getArtist(id: artistId) {
-        album.artist = artist
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        album.artist = prefetchedArtist
       } else {
         artistIdToCreate = artistId
       }
     case "genre":
       if let album = albumBuffer {
         guard let genreId = attributeDict["id"] else { return }
-        if let genre = library.getGenre(id: genreId) {
-          album.genre = genre
+        if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
+          album.genre = prefetchedGenre
         } else {
           genreIdToCreate = genreId
         }
@@ -94,6 +94,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
       if let artistId = artistIdToCreate {
         os_log("Artist <%s> with id %s has been created", log: log, type: .error, buffer, artistId)
         let artist = library.createArtist()
+        prefetch.prefetchedArtistDict[artistId] = artist
         artist.id = artistId
         artist.name = buffer
         albumBuffer?.artist = artist
@@ -127,6 +128,7 @@ class AlbumParserDelegate: AmpacheXmlLibParser {
       if let genreId = genreIdToCreate {
         os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
         let genre = library.createGenre()
+        prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer
         albumBuffer?.genre = genre

@@ -38,7 +38,7 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       radioCount: 2
     )
 

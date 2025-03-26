@@ -26,10 +26,9 @@ class PlaylistsParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "playlists")
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
     parserDelegate = PlaylistParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
       library: library,
@@ -43,7 +42,6 @@ class PlaylistsParserTest: AbstractAmpacheTest {
       playlist.id = i.description
       playlist.name = i.description
     }
-    recreateParserDelegate()
     testParsing()
   }
 

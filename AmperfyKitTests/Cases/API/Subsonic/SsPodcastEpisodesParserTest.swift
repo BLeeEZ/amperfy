@@ -68,7 +68,7 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     guard let podcast = testPodcast else { XCTFail(); return }
     XCTAssertEqual(podcast.episodes.count, 2)
 
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 3,
       podcastEpisodeCount: 2,
       podcastCount: 1,

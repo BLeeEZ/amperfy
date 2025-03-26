@@ -49,12 +49,13 @@ class RadioParserDelegate: AmpacheXmlLibParser {
         os_log("Found radio with no id", log: log, type: .error)
         return
       }
-      if let fetchedRadio = library.getRadio(id: radioId) {
-        radioBuffer = fetchedRadio
+      if let prefetchedRadio = prefetch.prefetchedRadioDict[radioId] {
+        radioBuffer = prefetchedRadio
         radioBuffer?.remoteStatus = .available
       } else {
         radioBuffer = library.createRadio()
         radioBuffer?.id = radioId
+        prefetch.prefetchedRadioDict[radioId] = radioBuffer
       }
     default:
       break

@@ -38,7 +38,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 2,
       genreNameCount: 1,
       artistCount: 1,

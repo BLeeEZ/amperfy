@@ -25,7 +25,6 @@ import os.log
 import UIKit
 
 class SongParserDelegate: PlayableParserDelegate {
-  var prefetchedSongDict: [String: Song]?
   var songBuffer: Song?
   var parsedSongs = [Song]()
   var artistIdToCreate: String?
@@ -57,34 +56,27 @@ class SongParserDelegate: PlayableParserDelegate {
         os_log("Found song with no id", log: log, type: .error)
         return
       }
-      if let prefetchedSongDict,
-         let prefetchedSong = prefetchedSongDict[songId] {
+      if let prefetchedSong = prefetch.prefetchedSongDict[songId] {
         songBuffer = prefetchedSong
         songBuffer?.remoteStatus = .available
         guessedArtist = prefetchedSong.artist
         guessedAlbum = prefetchedSong.album
         guessedGenre = prefetchedSong.genre
-      } else if prefetchedSongDict == nil, let fetchedSong = library.getSong(id: songId) {
-        songBuffer = fetchedSong
-        songBuffer?.remoteStatus = .available
-        guessedArtist = fetchedSong.artist
-        guessedAlbum = fetchedSong.album
-        guessedGenre = fetchedSong.genre
       } else {
         songBuffer = library.createSong()
         songBuffer?.id = songId
+        prefetch.prefetchedSongDict[songId] = songBuffer
         guessedArtist = nil
         guessedAlbum = nil
         guessedGenre = nil
-        prefetchedSongDict?[songId] = songBuffer
       }
       playableBuffer = songBuffer
     case "artist":
       guard let song = songBuffer, let artistId = attributeDict["id"] else { return }
       if let guessedArtist, guessedArtist.id == artistId {
         song.artist = guessedArtist
-      } else if let artist = library.getArtist(id: artistId) {
-        song.artist = artist
+      } else if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        song.artist = prefetchedArtist
       } else {
         artistIdToCreate = artistId
       }
@@ -92,8 +84,8 @@ class SongParserDelegate: PlayableParserDelegate {
       guard let song = songBuffer, let albumId = attributeDict["id"] else { return }
       if let guessedAlbum, guessedAlbum.id == albumId {
         song.album = guessedAlbum
-      } else if let album = library.getAlbum(id: albumId, isDetailFaultResolution: true) {
-        song.album = album
+      } else if let prefetchedAlbum = prefetch.prefetchedAlbumDict[albumId] {
+        song.album = prefetchedAlbum
       } else {
         albumIdToCreate = albumId
       }
@@ -101,8 +93,8 @@ class SongParserDelegate: PlayableParserDelegate {
       guard let song = songBuffer, let genreId = attributeDict["id"] else { return }
       if let guessedGenre = guessedGenre, guessedGenre.id == genreId {
         song.genre = guessedGenre
-      } else if let genre = library.getGenre(id: genreId) {
-        song.genre = genre
+      } else if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
+        song.genre = prefetchedGenre
       } else {
         genreIdToCreate = genreId
       }
@@ -122,6 +114,7 @@ class SongParserDelegate: PlayableParserDelegate {
       if let artistId = artistIdToCreate {
         os_log("Artist <%s> with id %s has been created", log: log, type: .error, buffer, artistId)
         let artist = library.createArtist()
+        prefetch.prefetchedArtistDict[artistId] = artist
         artist.id = artistId
         artist.name = buffer
         songBuffer?.artist = artist
@@ -131,6 +124,7 @@ class SongParserDelegate: PlayableParserDelegate {
       if let albumId = albumIdToCreate {
         os_log("Album <%s> with id %s has been created", log: log, type: .error, buffer, albumId)
         let album = library.createAlbum()
+        prefetch.prefetchedAlbumDict[albumId] = album
         album.id = albumId
         album.name = buffer
         songBuffer?.album = album
@@ -140,6 +134,7 @@ class SongParserDelegate: PlayableParserDelegate {
       if let genreId = genreIdToCreate {
         os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
         let genre = library.createGenre()
+        prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer
         songBuffer?.genre = genre

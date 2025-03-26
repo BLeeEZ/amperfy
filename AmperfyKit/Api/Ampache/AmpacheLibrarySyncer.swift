@@ -50,8 +50,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: auth.genreCount)
     let genreResponse = try await ampacheXmlServerApi.requestGenres()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: genreResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = GenreParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: statusNotifyier
       )
@@ -73,8 +81,17 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           let artistsResponse = try await self.ampacheXmlServerApi
             .requestArtists(startIndex: index * AmpacheXmlServerApi.maxItemCountToPollAtOnce)
           try await self.storage.async.perform { asyncCompanion in
+            let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+            try self.parse(
+              response: artistsResponse,
+              delegate: idParserDelegate,
+              isThrowingErrorsAllowed: false
+            )
+            let prefetch = asyncCompanion.library
+              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
             let parserDelegate = ArtistParserDelegate(
-              performanceMonitor: self.performanceMonitor,
+              performanceMonitor: self.performanceMonitor, prefetch: prefetch,
               library: asyncCompanion.library,
               parseNotifier: statusNotifyier
             )
@@ -100,8 +117,17 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           let albumsResponse = try await self.ampacheXmlServerApi
             .requestAlbums(startIndex: index * AmpacheXmlServerApi.maxItemCountToPollAtOnce)
           try await self.storage.async.perform { asyncCompanion in
+            let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+            try self.parse(
+              response: albumsResponse,
+              delegate: idParserDelegate,
+              isThrowingErrorsAllowed: false
+            )
+            let prefetch = asyncCompanion.library
+              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
             let parserDelegate = AlbumParserDelegate(
-              performanceMonitor: self.performanceMonitor,
+              performanceMonitor: self.performanceMonitor, prefetch: prefetch,
               library: asyncCompanion.library,
               parseNotifier: statusNotifyier
             )
@@ -136,8 +162,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: auth.podcastCount)
     let podcastsResponse = try await ampacheXmlServerApi.requestPodcasts()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: podcastsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = PodcastParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: statusNotifyier
       )
@@ -169,11 +203,20 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let artistResponse = try await ampacheXmlServerApi.requestArtistInfo(id: artist.id)
     let artistObjectId = artist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let parserDelegate = ArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
-        library: asyncCompanion.library
-      )
       do {
+        let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+        try self.parse(
+          response: artistResponse,
+          delegate: idParserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
+        let parserDelegate = ArtistParserDelegate(
+          performanceMonitor: self.performanceMonitor, prefetch: prefetch,
+          library: asyncCompanion.library
+        )
+
         try self.parse(
           response: artistResponse,
           delegate: parserDelegate,
@@ -210,8 +253,17 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           .object(with: artistObjectId) as! ArtistMO
       )
       let oldAlbums = Set(artistAsync.albums)
+
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: artistAlbumsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = AlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: artistAlbumsResponse, delegate: parserDelegate)
@@ -233,8 +285,17 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           .object(with: artistObjectId) as! ArtistMO
       )
       let oldSongs = Set(artistAsync.songs)
+
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: artistSongsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: artistSongsResponse, delegate: parserDelegate)
@@ -252,11 +313,19 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let albumResponse = try await ampacheXmlServerApi.requestAlbumInfo(id: album.id)
     let albumObjectId = album.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let parserDelegate = AlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
-        library: asyncCompanion.library
-      )
       do {
+        let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+        try self.parse(
+          response: albumResponse,
+          delegate: idParserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
+        let parserDelegate = AlbumParserDelegate(
+          performanceMonitor: self.performanceMonitor, prefetch: prefetch,
+          library: asyncCompanion.library
+        )
         try self.parse(
           response: albumResponse,
           delegate: parserDelegate,
@@ -292,8 +361,17 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           .object(with: albumObjectId) as! AlbumMO
       )
       let oldSongs = Set(albumAsync.songs)
+
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: albumSongsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: albumSongsResponse, delegate: parserDelegate)
@@ -313,8 +391,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await ampacheXmlServerApi.requestSongInfo(id: song.id)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -335,9 +421,17 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       )
       let oldEpisodes = Set(podcastAsync.episodes)
 
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = PodcastEpisodeParserDelegate(
         performanceMonitor: self.performanceMonitor,
-        podcast: podcastAsync,
+        podcast: podcastAsync, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -379,9 +473,19 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
               managedObject: asyncCompanion.context
                 .object(with: podcastObjectId) as! PodcastMO
             )
+
+            let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+            try self.parse(
+              response: response,
+              delegate: idParserDelegate,
+              isThrowingErrorsAllowed: false
+            )
+            let prefetch = asyncCompanion.library
+              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
             let parserDelegate = PodcastEpisodeParserDelegate(
               performanceMonitor: self.performanceMonitor,
-              podcast: podcastAsync,
+              podcast: podcastAsync, prefetch: prefetch,
               library: asyncCompanion.library
             )
             try self.parse(response: response, delegate: parserDelegate)
@@ -398,8 +502,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await ampacheXmlServerApi.requestCatalogs()
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = CatalogParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -412,8 +524,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await ampacheXmlServerApi.requestArtistWithinCatalog(id: musicFolder.id)
     let musicFolderObjectId = musicFolder.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = ArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -545,8 +665,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await ampacheXmlServerApi.requestNewestAlbums(offset: offset, count: count)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = AlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -564,8 +692,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await ampacheXmlServerApi.requestRecentAlbums(offset: offset, count: count)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = AlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -585,8 +721,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       os_log("Sync favorite artists", log: self.log, type: .info)
       let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists())
 
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: artistsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = ArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: artistsResponse, delegate: parserDelegate)
@@ -600,8 +744,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       os_log("Sync favorite albums", log: self.log, type: .info)
       let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums())
 
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: albumsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = AlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: albumsResponse, delegate: parserDelegate)
@@ -615,8 +767,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       os_log("Sync favorite songs", log: self.log, type: .info)
       let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
 
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: songsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: songsResponse, delegate: parserDelegate)
@@ -633,8 +793,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await storage.async.perform { asyncCompanion in
       let oldRadios = Set(asyncCompanion.library.getRadios())
 
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = RadioParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: nil
       )
@@ -654,8 +822,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await ampacheXmlServerApi.requestRandomSongs(count: count)
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library,
         parseNotifier: nil
       )
@@ -705,16 +881,18 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO
       )
 
-      let playlistEntriesParserDelegate = PlaylistSongIDsParserDelegate(
-        performanceMonitor: self.performanceMonitor
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
       )
-      try self.parse(response: response, delegate: playlistEntriesParserDelegate)
-      let playlistSongs = asyncCompanion.library
-        .getSongs(ids: playlistEntriesParserDelegate.songIDs)
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = PlaylistSongsParserDelegate(
         performanceMonitor: self.performanceMonitor,
-        playlist: playlistAsync,
-        library: asyncCompanion.library, prefetchedSongDict: playlistSongs
+        playlist: playlistAsync, prefetch: prefetch,
+        library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
       playlistAsync.isCached = parserDelegate.isCollectionCached
@@ -844,8 +1022,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await storage.async.perform { asyncCompanion in
       let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
 
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = PodcastParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -951,8 +1137,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await ampacheXmlServerApi.requestSearchArtists(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = ArtistParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -965,8 +1159,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await ampacheXmlServerApi.requestSearchAlbums(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = AlbumParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
@@ -979,8 +1181,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await ampacheXmlServerApi.requestSearchSongs(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
+      let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+
       let parserDelegate = SongParserDelegate(
-        performanceMonitor: self.performanceMonitor,
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch,
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)

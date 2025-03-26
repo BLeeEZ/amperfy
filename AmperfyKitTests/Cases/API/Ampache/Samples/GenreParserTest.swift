@@ -26,18 +26,22 @@ class GenreParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "genres")
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = GenreParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
   }
 
   override func checkCorrectParsing() {
+    prefetchIdTester.checkPrefetchIdCounts(
+      genreIdCount: 2
+    )
+
     XCTAssertEqual(library.genreCount, 2)
 
     guard let genre = library.getGenre(id: "6") else { XCTFail(); return }

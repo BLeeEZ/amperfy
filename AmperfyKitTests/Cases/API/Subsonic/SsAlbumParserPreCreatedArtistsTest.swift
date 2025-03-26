@@ -38,7 +38,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 16,
       artistCount: 1,
       albumCount: 15,

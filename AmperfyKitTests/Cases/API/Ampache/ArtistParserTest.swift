@@ -26,18 +26,24 @@ class ArtistParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "artists")
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = ArtistParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
   }
 
   override func checkCorrectParsing() {
+    prefetchIdTester.checkPrefetchIdCounts(
+      artworkCount: 4,
+      genreIdCount: 1,
+      artistCount: 4
+    )
+
     let artists = library.getArtists()
     XCTAssertEqual(artists.count, 4)
     XCTAssertEqual(library.genreCount, 1)

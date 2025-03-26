@@ -97,7 +97,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
   override func checkCorrectParsing() {
     library.saveContext()
 
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 7,
       genreNameCount: 4,
       artistCount: 5,

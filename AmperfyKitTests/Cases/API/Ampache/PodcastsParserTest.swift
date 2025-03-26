@@ -26,12 +26,12 @@ class PodcastsParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "podcasts")
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = PodcastParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library,
       parseNotifier: nil
     )
@@ -39,6 +39,12 @@ class PodcastsParserTest: AbstractAmpacheTest {
 
   override func checkCorrectParsing() {
     parserDelegate?.performPostParseOperations()
+
+    prefetchIdTester.checkPrefetchIdCounts(
+      artworkCount: 3,
+      podcastCount: 3
+    )
+
     let podcasts = library.getPodcasts()
     XCTAssertEqual(podcasts.count, 3)
 

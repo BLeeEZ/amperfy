@@ -50,8 +50,8 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
         os_log("Found artist with no id", log: log, type: .error)
         return
       }
-      if let fetchedArtist = library.getArtist(id: artistId) {
-        artistBuffer = fetchedArtist
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        artistBuffer = prefetchedArtist
       } else {
         artistBuffer = library.createArtist()
         artistBuffer?.id = artistId
@@ -59,8 +59,8 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
     }
     if elementName == "genre", let artist = artistBuffer {
       guard let genreId = attributeDict["id"] else { return }
-      if let genre = library.getGenre(id: genreId) {
-        artist.genre = genre
+      if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
+        artist.genre = prefetchedGenre
       } else {
         genreIdToCreate = genreId
       }
@@ -89,6 +89,7 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
       if let genreId = genreIdToCreate {
         os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
         let genre = library.createGenre()
+        prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer
         artistBuffer?.genre = genre

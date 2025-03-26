@@ -1928,7 +1928,7 @@ public class LibraryStorage: PlayableFileCachable {
     return albumDict
   }
 
-  public func getPodcastEpisodes(ids: Set<String>) -> [String: PodcastEpisode] {
+  private func getPodcastEpisodes(ids: Set<String>) -> [String: PodcastEpisode] {
     let fetchRequest: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
     fetchRequest.predicate = NSPredicate(
       format: "%K IN %@",
@@ -1946,7 +1946,7 @@ public class LibraryStorage: PlayableFileCachable {
     return podcastEpisodeDict
   }
 
-  public func getRadios(ids: Set<String>) -> [String: Radio] {
+  private func getRadios(ids: Set<String>) -> [String: Radio] {
     let fetchRequest: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
     fetchRequest.predicate = NSPredicate(
       format: "%K IN %@",
@@ -1964,7 +1964,7 @@ public class LibraryStorage: PlayableFileCachable {
     return radioDict
   }
 
-  public func getSongs(ids: Set<String>) -> [String: Song] {
+  private func getSongs(ids: Set<String>) -> [String: Song] {
     let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
     fetchRequest.predicate = NSPredicate(
       format: "%K IN %@",

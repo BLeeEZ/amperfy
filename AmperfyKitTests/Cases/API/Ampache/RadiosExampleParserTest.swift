@@ -26,17 +26,21 @@ class RadiosExampleParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "live_streams")
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = RadioParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library
     )
   }
 
   override func checkCorrectParsing() {
+    prefetchIdTester.checkPrefetchIdCounts(
+      radioCount: 3
+    )
+
     let radios = library.getRadios().sorted(by: { $0.id < $1.id })
     XCTAssertEqual(radios.count, 3)
 

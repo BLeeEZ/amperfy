@@ -41,7 +41,7 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 2,
       directoryCount: 2,
       directoryFetchCount: 2,

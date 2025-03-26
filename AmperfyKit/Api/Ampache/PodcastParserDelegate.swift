@@ -25,22 +25,9 @@ import os.log
 import UIKit
 
 class PodcastParserDelegate: AmpacheXmlLibParser {
-  var parsedPodcasts: Set<Podcast>
+  var parsedPodcasts = Set<Podcast>()
   private var podcastBuffer: Podcast?
   var rating: Int = 0
-
-  override init(
-    performanceMonitor: ThreadPerformanceMonitor,
-    library: LibraryStorage,
-    parseNotifier: ParsedObjectNotifiable? = nil
-  ) {
-    self.parsedPodcasts = Set<Podcast>()
-    super.init(
-      performanceMonitor: performanceMonitor,
-      library: library,
-      parseNotifier: parseNotifier
-    )
-  }
 
   override func parser(
     _ parser: XMLParser,
@@ -63,11 +50,12 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
         os_log("Error: Podcast could not be parsed -> id is not given", log: log, type: .error)
         return
       }
-      if let fetchedPodcast = library.getPodcast(id: podcastId) {
-        podcastBuffer = fetchedPodcast
+      if let prefetchedPodcast = prefetch.prefetchedPodcastDict[podcastId] {
+        podcastBuffer = prefetchedPodcast
       } else {
         podcastBuffer = library.createPodcast()
         podcastBuffer?.id = podcastId
+        prefetch.prefetchedPodcastDict[podcastId] = podcastBuffer
       }
       podcastBuffer?.remoteStatus = .available
     default:

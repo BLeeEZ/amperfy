@@ -38,7 +38,7 @@ class SsGenreParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       genreNameCount: 7
     )
     XCTAssertEqual(library.genreCount, 7)

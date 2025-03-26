@@ -61,7 +61,7 @@ class SsIndexesParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 2,
       genreNameCount: 1,
       localArtistCount: 1,

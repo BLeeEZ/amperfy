@@ -29,13 +29,13 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     try await super.setUp()
     xmlData = getTestFileData(name: "podcast_episodes_example_2")
     testPodcast = library.createPodcast()
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = PodcastEpisodeParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      podcast: testPodcast!,
+      podcast: testPodcast!, prefetch: prefetch,
       library: library
     )
   }
@@ -49,7 +49,6 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     for song in podcast.episodes {
       song.relFilePath = URL(string: "jop")
     }
-    recreateParserDelegate()
     testParsing()
     XCTAssertTrue((parserDelegate as! PlayableParserDelegate).isCollectionCached)
 
@@ -58,13 +57,20 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
       song.relFilePath = URL(string: "jop")
     }
     podcast.episodes.last?.relFilePath = nil
-    recreateParserDelegate()
     testParsing()
     XCTAssertFalse((parserDelegate as! PlayableParserDelegate).isCollectionCached)
   }
 
   override func checkCorrectParsing() {
     parserDelegate?.performPostParseOperations()
+
+    prefetchIdTester.checkPrefetchIdCounts(
+      artworkCount: 1,
+      podcastEpisodeCount: 4,
+      podcastCount: 0,
+      podcastLibraryCount: 1 // the one create for this test
+    )
+
     guard let podcast = testPodcast else { XCTFail(); return }
     XCTAssertEqual(podcast.episodes.count, 4)
 

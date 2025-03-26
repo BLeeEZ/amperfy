@@ -39,7 +39,7 @@ class SsOpenSubsonicExtensionsParserTest: AbstractSsParserTest {
       XCTFail()
       return
     }
-    checkPrefetchIdCounts()
+    prefetchIdTester.checkPrefetchIdCounts()
 
     let response = extensionsParser.openSubsonicExtensionsResponse
 

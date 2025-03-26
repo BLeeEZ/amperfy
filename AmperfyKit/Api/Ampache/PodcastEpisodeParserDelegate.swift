@@ -29,9 +29,19 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
   var episodeBuffer: PodcastEpisode?
   var parsedEpisodes = [PodcastEpisode]()
 
-  init(performanceMonitor: ThreadPerformanceMonitor, podcast: Podcast, library: LibraryStorage) {
+  init(
+    performanceMonitor: ThreadPerformanceMonitor,
+    podcast: Podcast,
+    prefetch: LibraryStorage.PrefetchElementContainer,
+    library: LibraryStorage
+  ) {
     self.podcast = podcast
-    super.init(performanceMonitor: performanceMonitor, library: library, parseNotifier: nil)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      library: library,
+      parseNotifier: nil
+    )
   }
 
   override func parser(
@@ -55,11 +65,12 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
         os_log("Found podcast episode with no id", log: log, type: .error)
         return
       }
-      if let fetchedEpisode = library.getPodcastEpisode(id: episodeId) {
-        episodeBuffer = fetchedEpisode
+      if let prefetchedEpisode = prefetch.prefetchedPodcastEpisodeDict[episodeId] {
+        episodeBuffer = prefetchedEpisode
       } else {
         episodeBuffer = library.createPodcastEpisode()
         episodeBuffer?.id = episodeId
+        prefetch.prefetchedPodcastEpisodeDict[episodeId] = episodeBuffer
       }
       playableBuffer = episodeBuffer
       episodeBuffer?.podcast = podcast

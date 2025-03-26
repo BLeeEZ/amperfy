@@ -29,9 +29,13 @@ class CatalogParserDelegate: AmpacheXmlLibParser {
   var musicFoldersParsed = Set<MusicFolder>()
   var musicFolderBuffer: MusicFolder?
 
-  init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage) {
+  init(
+    performanceMonitor: ThreadPerformanceMonitor,
+    prefetch: LibraryStorage.PrefetchElementContainer,
+    library: LibraryStorage
+  ) {
     self.musicFoldersBeforeFetch = Set(library.getMusicFolders())
-    super.init(performanceMonitor: performanceMonitor, library: library)
+    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
   }
 
   override func parser(
@@ -54,11 +58,12 @@ class CatalogParserDelegate: AmpacheXmlLibParser {
         os_log("Found catalog with no id", log: log, type: .error)
         return
       }
-      if let fetchedMusicFolder = library.getMusicFolder(id: id) {
-        musicFolderBuffer = fetchedMusicFolder
+      if let prefetchedMusicFolder = prefetch.prefetchedMusicFolderDict[id] {
+        musicFolderBuffer = prefetchedMusicFolder
       } else {
         musicFolderBuffer = library.createMusicFolder()
         musicFolderBuffer?.id = id
+        prefetch.prefetchedMusicFolderDict[id] = musicFolderBuffer
       }
     }
   }

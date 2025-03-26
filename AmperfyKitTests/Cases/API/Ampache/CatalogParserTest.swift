@@ -26,17 +26,21 @@ class CatalogParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "catalogs")
-    recreateParserDelegate()
   }
 
-  override func recreateParserDelegate() {
+  override func createParserDelegate() {
+    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = CatalogParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
       library: library
     )
   }
 
   override func checkCorrectParsing() {
+    prefetchIdTester.checkPrefetchIdCounts(
+      musicFolderCount: 4
+    )
+
     XCTAssertEqual(library.musicFolderCount, 4)
 
     let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })

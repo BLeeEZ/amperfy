@@ -1,9 +1,9 @@
 //
-//  GenreParserDelegate.swift
+//  IDsParserDelegate.swift
 //  AmperfyKit
 //
-//  Created by Maximilian Bauer on 25.04.21.
-//  Copyright (c) 2021 Maximilian Bauer. All rights reserved.
+//  Created by Maximilian Bauer on 22.03.25.
+//  Copyright (c) 2025 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -21,11 +21,10 @@
 
 import CoreData
 import Foundation
-import os.log
 import UIKit
 
-class GenreParserDelegate: AmpacheXmlLibParser {
-  var genreBuffer: Genre?
+class IDsParserDelegate: AmpacheNotifiableXmlParser {
+  public private(set) var prefetchIDs = LibraryStorage.PrefetchIdContainer()
 
   override func parser(
     _ parser: XMLParser,
@@ -42,18 +41,41 @@ class GenreParserDelegate: AmpacheXmlLibParser {
       attributes: attributeDict
     )
 
-    if elementName == "genre" {
-      guard let genreId = attributeDict["id"] else {
-        os_log("Found genre with no id", log: log, type: .error)
-        return
+    switch elementName {
+    case "genre":
+      if let id = attributeDict["id"] {
+        prefetchIDs.genreIDs.insert(id)
       }
-      if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
-        genreBuffer = prefetchedGenre
-      } else {
-        genreBuffer = library.createGenre()
-        genreBuffer?.id = genreId
-        prefetch.prefetchedGenreDict[genreId] = genreBuffer
+    case "catalog":
+      if let id = attributeDict["id"] {
+        prefetchIDs.musicFolderIDs.insert(id)
       }
+    case "artist":
+      if let id = attributeDict["id"] {
+        prefetchIDs.artistIDs.insert(id)
+      }
+    case "album":
+      if let id = attributeDict["id"] {
+        prefetchIDs.albumIDs.insert(id)
+      }
+    case "song":
+      if let id = attributeDict["id"] {
+        prefetchIDs.songIDs.insert(id)
+      }
+    case "podcast_episode":
+      if let id = attributeDict["id"] {
+        prefetchIDs.podcastEpisodeIDs.insert(id)
+      }
+    case "live_stream":
+      if let id = attributeDict["id"] {
+        prefetchIDs.radioIDs.insert(id)
+      }
+    case "podcast":
+      if let id = attributeDict["id"] {
+        prefetchIDs.podcastIDs.insert(id)
+      }
+    default:
+      break
     }
   }
 
@@ -63,15 +85,9 @@ class GenreParserDelegate: AmpacheXmlLibParser {
     namespaceURI: String?,
     qualifiedName qName: String?
   ) {
-    switch elementName {
-    case "name":
-      genreBuffer?.name = buffer
-    case "genre":
-      parsedCount += 1
-      parseNotifier?.notifyParsedObject(ofType: .genre)
-      genreBuffer = nil
-    default:
-      break
+    if elementName == "art", let artworkRemoteInfo = AmpacheXmlServerApi
+      .extractArtworkInfoFromURL(urlString: buffer) {
+      prefetchIDs.artworkIDs.insert(artworkRemoteInfo)
     }
 
     super.parser(

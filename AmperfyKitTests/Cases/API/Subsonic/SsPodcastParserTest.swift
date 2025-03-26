@@ -40,7 +40,7 @@ class SsPodcastParserTest: AbstractSsParserTest {
   override func checkCorrectParsing() {
     ssParserDelegate?.performPostParseOperations()
 
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 4,
       podcastEpisodeCount: 2,
       podcastCount: 3,

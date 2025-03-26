@@ -37,7 +37,8 @@
 		502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* UserQueueSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */; };
 		50381FCF2D8EE7C6002DD0E7 /* SsIDsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FCE2D8EE7C6002DD0E7 /* SsIDsParserDelegate.swift */; };
-		50381FD12D8F1623002DD0E7 /* PlaylistSongIDsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD02D8F1623002DD0E7 /* PlaylistSongIDsParserDelegate.swift */; };
+		50381FD12D8F1623002DD0E7 /* IDsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */; };
+		50381FD32D9410AE002DD0E7 /* PrefetchIdTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */; };
 		504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */; };
 		504262B12BF5FBDE00B5EF38 /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 50253F7A284A566700BCCFB2 /* Intents.intentdefinition */; settings = {ATTRIBUTES = (codegen, ); }; };
 		504262B22BF5FC3400B5EF38 /* IntentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */; };
@@ -645,7 +646,8 @@
 		502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserQueueSectionHeader.swift; sourceTree = "<group>"; };
 		50377A53266E130300F0C3F3 /* Amperfy v9.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v9.xcdatamodel"; sourceTree = "<group>"; };
 		50381FCE2D8EE7C6002DD0E7 /* SsIDsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsIDsParserDelegate.swift; sourceTree = "<group>"; };
-		50381FD02D8F1623002DD0E7 /* PlaylistSongIDsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistSongIDsParserDelegate.swift; sourceTree = "<group>"; };
+		50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDsParserDelegate.swift; sourceTree = "<group>"; };
+		50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefetchIdTester.swift; sourceTree = "<group>"; };
 		5040B2C2269C451A00911451 /* Amperfy v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v12.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C3269CD19600911451 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
 		5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchTriggeredSyncer.swift; sourceTree = "<group>"; };
@@ -1598,6 +1600,7 @@
 				50BA930721D75C5600E5901D /* AuthentificationHandshake.swift */,
 				501267B8264C187600E13F08 /* AmpacheXmlParser.swift */,
 				5083861921C827E600C4BB32 /* AuthParserDelegate.swift */,
+				50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */,
 				509001C227182A4700A8056D /* CatalogParserDelegate.swift */,
 				507361C72632AB08005F151D /* GenreParserDelegate.swift */,
 				50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */,
@@ -1606,7 +1609,6 @@
 				5083862021C97A1C00C4BB32 /* SongParserDelegate.swift */,
 				5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */,
 				502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */,
-				50381FD02D8F1623002DD0E7 /* PlaylistSongIDsParserDelegate.swift */,
 				501A7D3A2680A9680055A51B /* PodcastParserDelegate.swift */,
 				501A7D4A2681E6DD0055A51B /* PodcastEpisodeParserDelegate.swift */,
 				50CEC6462D1F405500D0E696 /* RadioParserDelegate.swift */,
@@ -1917,6 +1919,7 @@
 		50E964AD25E8E23D00E3210F /* API */ = {
 			isa = PBXGroup;
 			children = (
+				50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */,
 				50DB11A8266536190033BFFA /* Subsonic */,
 				50DB1180266501EC0033BFFA /* Ampache */,
 				50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */,
@@ -2595,7 +2598,7 @@
 				50C9D6EB284FAD51007F18D0 /* PodcastsShowType.swift in Sources */,
 				50C9D71828508005007F18D0 /* CommonString.swift in Sources */,
 				50C9D63F284FA9C7007F18D0 /* ScrobbleSyncer.swift in Sources */,
-				50381FD12D8F1623002DD0E7 /* PlaylistSongIDsParserDelegate.swift in Sources */,
+				50381FD12D8F1623002DD0E7 /* IDsParserDelegate.swift in Sources */,
 				50C9D648284FAA02007F18D0 /* SsPingParserDelegate.swift in Sources */,
 				50C9D6A8284FAA7F007F18D0 /* CoreDataMigrationExtensions.swift in Sources */,
 				50C9D698284FAA6C007F18D0 /* DirectoryMO+CoreDataClass.swift in Sources */,
@@ -2667,6 +2670,7 @@
 				50CA61262D4D191100EEF515 /* PodcastEpisodeTest.swift in Sources */,
 				50BE5D8F2850F50F00156FC6 /* ArtistParserTest.swift in Sources */,
 				50AE79B62C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift in Sources */,
+				50381FD32D9410AE002DD0E7 /* PrefetchIdTester.swift in Sources */,
 				50BE5D492850F4C900156FC6 /* ArtistTest.swift in Sources */,
 				50BE5D952850F51E00156FC6 /* CoreDataHelper.swift in Sources */,
 				50BE5D8D2850F50F00156FC6 /* PodcastsParserTest.swift in Sources */,

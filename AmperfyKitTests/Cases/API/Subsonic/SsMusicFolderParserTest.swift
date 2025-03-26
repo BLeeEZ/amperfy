@@ -37,7 +37,7 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
   }
 
   override func checkCorrectParsing() {
-    checkPrefetchIdCounts(
+    prefetchIdTester.checkPrefetchIdCounts(
       musicFolderCount: 3
     )
     XCTAssertEqual(library.musicFolderCount, 3)

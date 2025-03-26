@@ -89,13 +89,16 @@ class AmpacheNotifiableXmlParser: AmpacheXmlParser {
 // MARK: - AmpacheXmlLibParser
 
 class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
+  var prefetch: LibraryStorage.PrefetchElementContainer
   var library: LibraryStorage
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
+    prefetch: LibraryStorage.PrefetchElementContainer,
     library: LibraryStorage,
     parseNotifier: ParsedObjectNotifiable? = nil
   ) {
+    self.prefetch = prefetch
     self.library = library
     super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
   }
@@ -103,12 +106,13 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
   func parseArtwork(urlString: String) -> Artwork? {
     guard let artworkRemoteInfo = AmpacheXmlServerApi
       .extractArtworkInfoFromURL(urlString: urlString) else { return nil }
-    if let foundArtwork = library.getArtwork(remoteInfo: artworkRemoteInfo) {
-      return foundArtwork
+    if let prefetchedArtwork = prefetch.prefetchedArtworkDict[artworkRemoteInfo] {
+      return prefetchedArtwork
     } else {
       let createdArtwork = library.createArtwork()
       createdArtwork.remoteInfo = artworkRemoteInfo
       createdArtwork.url = urlString
+      prefetch.prefetchedArtworkDict[artworkRemoteInfo] = createdArtwork
       return createdArtwork
     }
   }

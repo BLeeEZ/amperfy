@@ -28,6 +28,7 @@ class AbstractAmpacheTest: XCTestCase {
   var library: LibraryStorage!
   var xmlData: Data?
   var xmlErrorData: Data!
+  var idParserDelegate: IDsParserDelegate!
   var parserDelegate: AmpacheXmlParser?
 
   override func setUp() async throws {
@@ -36,13 +37,20 @@ class AbstractAmpacheTest: XCTestCase {
     cdHelper.clearContext(context: context)
     library = LibraryStorage(context: context)
     xmlErrorData = getTestFileData(name: "error-4700")
+    idParserDelegate = IDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }
 
   override func tearDown() {}
 
+  var prefetchIdTester: PrefetchIdTester {
+    PrefetchIdTester(library: library, prefetchIDs: idParserDelegate.prefetchIDs)
+  }
+
   func testErrorParsing() {
-    guard let parserDelegate = parserDelegate else {
-      if Self.typeName != "AbstractAmpacheTest" { XCTFail() }
+    if Self.typeName == "AbstractAmpacheTest" { return }
+
+    createParserDelegate()
+    guard let parserDelegate else {
       return
     }
     let parser = XMLParser(data: xmlErrorData)
@@ -55,10 +63,31 @@ class AbstractAmpacheTest: XCTestCase {
   }
 
   func testParsing() {
-    guard let data = xmlData, let parserDelegate = parserDelegate else {
-      if Self.typeName != "AbstractAmpacheTest" { XCTFail() }
+    reTestParsing()
+  }
+
+  func testParsingTwice() {
+    reTestParsing()
+    idParserDelegate = IDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+    adjustmentsForSecondParsingDelegate()
+    reTestParsing()
+  }
+
+  func reTestParsing() {
+    if Self.typeName == "AbstractAmpacheTest" { return }
+
+    guard let data = xmlData, let idParserDelegate else {
+      XCTFail()
       return
     }
+    let idParser = XMLParser(data: data)
+    idParser.delegate = idParserDelegate
+    idParser.parse()
+    XCTAssertNil(idParserDelegate.error)
+
+    createParserDelegate()
+    guard let parserDelegate else { return }
+
     let parser = XMLParser(data: data)
     parser.delegate = parserDelegate
     parser.parse()
@@ -66,25 +95,11 @@ class AbstractAmpacheTest: XCTestCase {
     checkCorrectParsing()
   }
 
-  func testParsingTwice() {
-    guard let data = xmlData else {
-      if Self.typeName != "AbstractAmpacheTest" { XCTFail() }
-      return
-    }
-    let parser1 = XMLParser(data: data)
-    parser1.delegate = parserDelegate
-    parser1.parse()
-    checkCorrectParsing()
-
-    recreateParserDelegate()
-    let parser2 = XMLParser(data: data)
-    parser2.delegate = parserDelegate
-    parser2.parse()
-    checkCorrectParsing()
-  }
+  // Override in concrete test class if needed
+  func createParserDelegate() {}
 
   // Override in concrete test class if needed
-  func recreateParserDelegate() {}
+  func adjustmentsForSecondParsingDelegate() {}
 
   // Override in concrete test class
   func checkCorrectParsing() {

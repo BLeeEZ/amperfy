@@ -27,7 +27,8 @@ import UIKit
 class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
   private var playlist: Playlist?
   private var playlistToValidate: Playlist?
-  private let oldPlaylists: Set<Playlist>
+  private var playlistsDict: [String: Playlist]
+  private let allOldPlaylists: Set<Playlist>
   private var parsedPlaylists: Set<Playlist>
   private var library: LibraryStorage
 
@@ -40,7 +41,11 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
     self.library = library
     self.playlist = playlistToValidate
     self.playlistToValidate = playlistToValidate
-    self.oldPlaylists = Set(library.getPlaylists())
+    self.allOldPlaylists = Set(library.getPlaylists())
+    self.playlistsDict = [String: Playlist]()
+    for pl in allOldPlaylists {
+      playlistsDict[pl.id] = pl
+    }
     self.parsedPlaylists = Set<Playlist>()
     super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
   }
@@ -79,11 +84,12 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
       if playlist != nil {
         playlist?.id = playlistId
       } else if playlistId != "" {
-        if let fetchedPlaylist = library.getPlaylist(id: playlistId) {
+        if let fetchedPlaylist = playlistsDict[playlistId] {
           playlist = fetchedPlaylist
         } else {
           playlist = library.createPlaylist()
           playlist?.id = playlistId
+          playlistsDict[playlistId] = playlist
         }
       } else {
         os_log("Error: Playlist could not be parsed -> id is not given", log: log, type: .error)
@@ -112,7 +118,7 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
       parseNotifier?.notifyParsedObject(ofType: .playlist)
     case "root":
       if playlistToValidate == nil {
-        let outdatedPlaylists = oldPlaylists.subtracting(parsedPlaylists)
+        let outdatedPlaylists = allOldPlaylists.subtracting(parsedPlaylists)
         outdatedPlaylists.forEach {
           if $0.id != "" {
             library.deletePlaylist($0)

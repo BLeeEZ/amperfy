@@ -40,7 +40,7 @@ class SsLyricsBySongId1ParserTest: AbstractSsParserTest {
       XCTFail()
       return
     }
-    checkPrefetchIdCounts()
+    prefetchIdTester.checkPrefetchIdCounts()
 
     XCTAssertEqual(lyricsList.lyrics.count, 2)
 
