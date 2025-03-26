@@ -62,11 +62,10 @@ import UIKit
 
     override func trackRect(forBounds bounds: CGRect) -> CGRect {
       let customBounds = CGRect(
-        origin: bounds.origin,
-        size: CGSize(width: bounds.size.width, height: 4.0)
+        origin: CGPoint(x: bounds.origin.x - 1, y: bounds.origin.y),
+        size: CGSize(width: bounds.size.width + 1, height: 4.0)
       )
-      super.trackRect(forBounds: customBounds)
-      return customBounds
+      return super.trackRect(forBounds: customBounds)
     }
 
     // MARK: - Increase touch area for thumb
@@ -75,20 +74,6 @@ import UIKit
       let increasedBounds = bounds.insetBy(dx: -thumbTouchSize.width, dy: -thumbTouchSize.height)
       let containsPoint = increasedBounds.contains(point)
       return containsPoint
-    }
-
-    override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-      let percentage = CGFloat((value - minimumValue) / (maximumValue - minimumValue))
-      let thumbSizeHeight = thumbRect(
-        forBounds: bounds,
-        trackRect: trackRect(forBounds: bounds),
-        value: 0
-      ).size.height
-      let thumbPosition = thumbSizeHeight +
-        (percentage * (bounds.size.width - (2 * thumbSizeHeight)))
-      let touchLocation = touch.location(in: self)
-      return touchLocation.x <= (thumbPosition + thumbTouchSize.width) && touchLocation
-        .x >= (thumbPosition - thumbTouchSize.width)
     }
   }
 
