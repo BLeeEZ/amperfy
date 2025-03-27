@@ -1442,6 +1442,11 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         libraryTab.updateSections(createCachedSections())
       } else if aTemplate == playlistTab {
         os_log("CarPlay: templateWillAppear playlistTab", log: self.log, type: .info)
+        Task { @MainActor in do {
+          try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "CarPlay: Playlists Sync", error: error)
+        }}
         if playlistFetchController == nil { createPlaylistFetchController() }
         playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
       } else if aTemplate == podcastTab {
