@@ -48,9 +48,11 @@ class AlbumTest: XCTestCase {
     XCTAssertEqual(album.songs.count, 0)
     XCTAssertEqual(album.songCount, 0)
     XCTAssertNil(album.artwork)
+    XCTAssertNil(
+      album.imagePath(setting: .serverArtworkOnly)
+    )
     XCTAssertEqual(
-      album.image(theme: .blue, setting: .serverArtworkOnly),
-      UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album)
+      album.getDefaultArtworkType(), .album
     )
     XCTAssertFalse(album.playables.hasCachedItems)
     XCTAssertFalse(album.isOrphaned)
@@ -91,19 +93,17 @@ class AlbumTest: XCTestCase {
 
   func testArtworkAndImage() {
     let testData = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album).pngData()!
-    let testImg = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .album)
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
     testAlbum.artwork = library.createArtwork()
     testAlbum.artwork?.relFilePath = relFilePath
-    XCTAssertNil(testAlbum.artwork?.image)
-    XCTAssertEqual(testAlbum.image(theme: .blue, setting: .serverArtworkOnly), testImg)
+    testAlbum.artwork?.status = .CustomImage
+    XCTAssertNotNil(testAlbum.artwork?.imagePath)
     library.saveContext()
     guard let albumFetched = library.getAlbum(id: testId, isDetailFaultResolution: true)
     else { XCTFail(); return }
-    XCTAssertNil(albumFetched.artwork?.image)
-    XCTAssertEqual(albumFetched.image(theme: .blue, setting: .serverArtworkOnly), testImg)
+    XCTAssertNotNil(albumFetched.artwork?.imagePath)
     try! CacheFileManager.shared.removeItem(at: absFilePath)
   }
 

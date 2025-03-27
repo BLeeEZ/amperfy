@@ -49,9 +49,11 @@ class SongTest: XCTestCase {
     XCTAssertEqual(song.artist, nil)
     XCTAssertEqual(song.displayString, "Unknown Artist - Unknown Title")
     XCTAssertEqual(song.identifier, "Unknown Title")
+    XCTAssertNil(
+      song.imagePath(setting: .serverArtworkOnly)
+    )
     XCTAssertEqual(
-      song.image(theme: .blue, setting: .serverArtworkOnly),
-      UIImage.getGeneratedArtwork(theme: .blue, artworkType: .song)
+      song.getDefaultArtworkType(), .song
     )
     XCTAssertFalse(song.isCached)
   }
@@ -111,18 +113,18 @@ class SongTest: XCTestCase {
 
   func testArtworkAndImage() {
     let testData = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .song).pngData()!
-    let testImg = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .song)
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
     testSong.artwork = library.createArtwork()
     testSong.artwork?.relFilePath = relFilePath
-    XCTAssertNil(testSong.artwork?.image)
-    XCTAssertEqual(testSong.image(theme: .blue, setting: .serverArtworkOnly), testImg)
+    testSong.artwork?.status = .CustomImage
+    XCTAssertNotNil(testSong.artwork?.imagePath)
+    XCTAssertEqual(testSong.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     library.saveContext()
     guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
-    XCTAssertNil(songFetched.artwork?.image)
-    XCTAssertEqual(songFetched.image(theme: .blue, setting: .serverArtworkOnly), testImg)
+    XCTAssertNotNil(songFetched.artwork?.imagePath)
+    XCTAssertEqual(songFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     try! CacheFileManager.shared.removeItem(at: absFilePath)
   }
 

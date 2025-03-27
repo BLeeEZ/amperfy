@@ -90,11 +90,12 @@ public class LocalNotificationManager {
       do {
         let fileIdentifier = identifier + ".png"
         let artworkUrl = createLocalUrl(
-          forImage: podcastEpisode
-            .image(
-              theme: storage.settings.themePreference,
-              setting: storage.settings.artworkDisplayPreference
-            ),
+          forImage: LibraryEntityImage.getImageToDisplayImmediately(
+            libraryEntity: podcastEpisode,
+            themePreference: storage.settings.themePreference,
+            artworkDisplayPreference: storage.settings.artworkDisplayPreference,
+            useCache: false
+          ),
           fileIdentifier: fileIdentifier
         )
         let attachment = try UNNotificationAttachment(

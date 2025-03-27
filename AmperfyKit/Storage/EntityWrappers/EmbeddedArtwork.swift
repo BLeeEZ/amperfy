@@ -30,10 +30,10 @@ public class EmbeddedArtwork: NSObject {
     self.managedObject = managedObject
   }
 
-  public var image: UIImage? {
+  public var imagePath: String? {
     if let relFilePath = relFilePath,
        let absolutePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
-      return UIImage(named: absolutePath.path)
+      return absolutePath.path
     } else {
       return nil
     }

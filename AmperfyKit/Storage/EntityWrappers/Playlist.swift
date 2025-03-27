@@ -465,8 +465,8 @@ public class Playlist: Identifyable {
   }
 
   @MainActor
-  public func getDefaultImage(theme: ThemePreference) -> UIImage {
-    UIImage.getGeneratedArtwork(theme: theme, artworkType: .playlist)
+  public func getDefaultArtworkType() -> ArtworkType {
+    .playlist
   }
 }
 
@@ -521,16 +521,16 @@ extension Playlist: PlayableContainable {
     let artworkItems = artworkItems
 
     if artworkItems.isEmpty {
-      return ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: nil)
+      return ArtworkCollection(defaultArtworkType: getDefaultArtworkType(), singleImageEntity: nil)
     } else if artworkItems.count == 1 {
       return ArtworkCollection(
-        defaultImage: getDefaultImage(theme: theme),
+        defaultArtworkType: getDefaultArtworkType(),
         singleImageEntity: artworkItems[0].playable
       )
     } else {
       let quadImages = artworkItems.compactMap { $0.playable }.prefix(upToAsArray: 4)
       return ArtworkCollection(
-        defaultImage: getDefaultImage(theme: theme),
+        defaultArtworkType: getDefaultArtworkType(),
         singleImageEntity: artworkItems[0].playable,
         quadImageEntity: quadImages
       )

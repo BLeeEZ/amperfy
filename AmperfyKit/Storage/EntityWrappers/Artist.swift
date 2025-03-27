@@ -111,8 +111,8 @@ public class Artist: AbstractLibraryEntity {
     }
   }
 
-  override public func getDefaultImage(theme: ThemePreference) -> UIImage {
-    UIImage.getGeneratedArtwork(theme: theme, artworkType: .artist)
+  override public func getDefaultArtworkType() -> ArtworkType {
+    .artist
   }
 }
 
@@ -192,7 +192,7 @@ extension Artist: PlayableContainable {
   }
 
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
-    ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
+    ArtworkCollection(defaultArtworkType: .artist, singleImageEntity: self)
   }
 
   public var containerIdentifier: PlayableContainerIdentifier { PlayableContainerIdentifier(

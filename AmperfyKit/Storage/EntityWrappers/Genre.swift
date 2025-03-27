@@ -77,8 +77,8 @@ public class Genre: AbstractLibraryEntity {
     }
   }
 
-  override public func getDefaultImage(theme: ThemePreference) -> UIImage {
-    UIImage.getGeneratedArtwork(theme: theme, artworkType: .genre)
+  override public func getDefaultArtworkType() -> ArtworkType {
+    .genre
   }
 }
 
@@ -134,7 +134,7 @@ extension Genre: PlayableContainable {
   }
 
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
-    ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
+    ArtworkCollection(defaultArtworkType: getDefaultArtworkType(), singleImageEntity: self)
   }
 
   public var containerIdentifier: PlayableContainerIdentifier { PlayableContainerIdentifier(

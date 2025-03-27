@@ -47,10 +47,10 @@ class PodcastEpisodeTest: XCTestCase {
     XCTAssertEqual(episode.url, nil)
     XCTAssertEqual(episode.podcast, nil)
     XCTAssertEqual(episode.displayString, "Unknown Podcast - Unknown Title")
-    XCTAssertEqual(
-      episode.image(theme: .blue, setting: .serverArtworkOnly),
-      UIImage.getGeneratedArtwork(theme: .blue, artworkType: .podcastEpisode)
+    XCTAssertNil(
+      episode.imagePath(setting: .serverArtworkOnly)
     )
+    XCTAssertEqual(episode.getDefaultArtworkType(), .podcastEpisode)
     XCTAssertFalse(episode.isCached)
   }
 
@@ -88,18 +88,17 @@ class PodcastEpisodeTest: XCTestCase {
   func testArtworkAndImage() {
     let testData = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .podcastEpisode)
       .pngData()!
-    let testImg = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .podcastEpisode)
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
     testEpisode.artwork = library.createArtwork()
     testEpisode.artwork?.relFilePath = relFilePath
-    XCTAssertNil(testEpisode.artwork?.image)
-    XCTAssertEqual(testEpisode.image(theme: .blue, setting: .serverArtworkOnly), testImg)
+    testEpisode.artwork?.status = .CustomImage
+    XCTAssertNotNil(testEpisode.artwork?.imagePath)
+    XCTAssertEqual(testEpisode.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     library.saveContext()
     guard let episodeFetched = library.getPodcastEpisode(id: testId) else { XCTFail(); return }
-    XCTAssertNil(episodeFetched.artwork?.image)
-    XCTAssertEqual(episodeFetched.image(theme: .blue, setting: .serverArtworkOnly), testImg)
+    XCTAssertEqual(episodeFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     try! CacheFileManager.shared.removeItem(at: absFilePath)
   }
 

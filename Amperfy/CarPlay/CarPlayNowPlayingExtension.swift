@@ -161,9 +161,11 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
   )
     -> CPListItem {
     let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
-    let image = playable.image(
-      theme: appDelegate.storage.settings.themePreference,
-      setting: artworkDisplayPreference
+    let image = LibraryEntityImage.getImageToDisplayImmediately(
+      libraryEntity: playable,
+      themePreference: appDelegate.storage.settings.themePreference,
+      artworkDisplayPreference: artworkDisplayPreference,
+      useCache: false
     )
     let listItem = CPListItem(
       text: playable.title,

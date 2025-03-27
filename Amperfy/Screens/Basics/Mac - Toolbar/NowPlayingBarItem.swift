@@ -540,9 +540,11 @@ import UIKit
     private func refreshArtwork() {
       var artwork: UIImage?
       if let playableInfo = player.currentlyPlaying {
-        artwork = playableInfo.image(
-          theme: appDelegate.storage.settings.themePreference,
-          setting: appDelegate.storage.settings.artworkDisplayPreference
+        artwork = LibraryEntityImage.getImageToDisplayImmediately(
+          libraryEntity: playableInfo,
+          themePreference: appDelegate.storage.settings.themePreference,
+          artworkDisplayPreference: appDelegate.storage.settings.artworkDisplayPreference,
+          useCache: true
         )
       } else {
         switch player.playerMode {

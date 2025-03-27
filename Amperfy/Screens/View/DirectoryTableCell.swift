@@ -81,9 +81,7 @@ class DirectoryTableCell: BasicTableCell {
     if let directory = directory {
       infoLabel.text = directory.name
       artworkImage.display(entity: directory)
-      if let artwork = directory.artwork, let directoryImage = artwork.image,
-         directoryImage != directory
-         .getDefaultImage(theme: appDelegate.storage.settings.themePreference) {
+      if let artwork = directory.artwork, artwork.imagePath != nil {
         artworkImage.isHidden = false
       } else {
         iconImage.isHidden = false

@@ -40,7 +40,7 @@ class ArtworkTest: XCTestCase {
     let artwork = library.createArtwork()
     XCTAssertEqual(artwork.status.rawValue, ImageStatus.IsDefaultImage.rawValue)
     XCTAssertEqual(artwork.url, "")
-    XCTAssertNil(artwork.image)
+    XCTAssertNil(artwork.imagePath)
     XCTAssertEqual(artwork.owners.count, 0)
   }
 
@@ -72,13 +72,12 @@ class ArtworkTest: XCTestCase {
   func testImageWithCorrectStatus() {
     testArtwork.status = ImageStatus.CustomImage
     let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
-    let testImg = UIImage(data: testData)
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
     testArtwork.relFilePath = relFilePath
     XCTAssertEqual(testArtwork.status, ImageStatus.CustomImage)
-    XCTAssertEqual(testArtwork.image, testImg)
+    XCTAssertEqual(testArtwork.imagePath, absFilePath.path)
     try! CacheFileManager.shared.removeItem(at: absFilePath)
   }
 
@@ -90,7 +89,7 @@ class ArtworkTest: XCTestCase {
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
     testArtwork.relFilePath = relFilePath
     XCTAssertEqual(testArtwork.status, ImageStatus.NotChecked)
-    XCTAssertNil(testArtwork.image)
+    XCTAssertNil(testArtwork.imagePath)
     try! CacheFileManager.shared.removeItem(at: absFilePath)
   }
 

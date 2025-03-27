@@ -22,14 +22,41 @@
 import CoreData
 import UIKit
 
+extension LibraryEntityImage {
+  // Cache should not be used between different instances -> iOS and Carplay
+  static public func getImageToDisplayImmediately(
+    libraryEntity: AbstractLibraryEntity,
+    themePreference: ThemePreference,
+    artworkDisplayPreference: ArtworkDisplayPreference,
+    useCache: Bool
+  )
+    -> UIImage {
+    if let artworkImagePath = libraryEntity.imagePath(
+      setting: artworkDisplayPreference
+    ) {
+      if useCache, let cachedImg = Self.cache.object(forKey: artworkImagePath as NSString) {
+        return cachedImg
+      } else if let directlyLoadedImage = UIImage(named: artworkImagePath) {
+        return directlyLoadedImage
+      }
+    }
+    return UIImage.getGeneratedArtwork(
+      theme: themePreference,
+      artworkType: libraryEntity.getDefaultArtworkType()
+    )
+  }
+}
+
+// MARK: - LibraryEntityImage
+
 @MainActor
 public class LibraryEntityImage: RoundedImage {
-  static let cache: NSCache<NSManagedObjectID, UIImage> = NSCache()
+  static private let cache: NSCache<NSString, UIImage> = NSCache()
 
-  let appDelegate: AmperKit
-  var entity: AbstractLibraryEntity?
-  var backupImage: UIImage?
-  var imagePreparationTask: Task<(), Never>?
+  private let appDelegate: AmperKit
+
+  private var entity: AbstractLibraryEntity?
+  private var backupArtworkType: ArtworkType?
 
   required public init?(coder: NSCoder) {
     self.appDelegate = AmperKit.shared
@@ -50,7 +77,7 @@ public class LibraryEntityImage: RoundedImage {
 
   public func display(entity: AbstractLibraryEntity) {
     self.entity = entity
-    backupImage = entity.getDefaultImage(theme: appDelegate.storage.settings.themePreference)
+    backupArtworkType = entity.getDefaultArtworkType()
     refresh()
   }
 
@@ -63,79 +90,83 @@ public class LibraryEntityImage: RoundedImage {
     }
   }
 
-  public func display(image: UIImage) {
-    backupImage = image
+  internal func display(image: UIImage) {
+    self.image = image
+    entity = nil
+  }
+
+  public func display(artworkType: ArtworkType) {
+    backupArtworkType = artworkType
     entity = nil
     refresh()
   }
 
   private var placeholderImage: UIImage {
-    backupImage ?? UIImage.getGeneratedArtwork(
+    UIImage.getGeneratedArtwork(
       theme: appDelegate.storage.settings.themePreference,
-      artworkType: .song
+      artworkType: backupArtworkType ?? .song
     )
   }
 
-  private var entityImageToDisplay: UIImage {
-    entity?.image(
-      theme: appDelegate.storage.settings.themePreference,
+  private var entityImagePathToDisplay: String? {
+    entity?.imagePath(
       setting: appDelegate.storage.settings.artworkDisplayPreference
-    ) ?? placeholderImage
+    )
   }
 
   private func refresh() {
-    let entityToDisplay = entity
-    let imageToDisplay = entityImageToDisplay
+    let imagePathToDisplay = entityImagePathToDisplay
 
-    if let objectID = entityToDisplay?.objectID,
-       let cachedImg = Self.cache.object(forKey: objectID) {
+    if let imagePathToDisplay,
+       let cachedImg = Self.cache.object(forKey: imagePathToDisplay as NSString) {
       image = cachedImg
       return
     }
 
     image = placeholderImage
-    guard let objectID = entityToDisplay?.objectID else { return }
+    guard let imagePathToDisplay else { return }
 
-    imagePreparationTask?.cancel()
-    imagePreparationTask = Task.detached(priority: .high) { [weak self] in
-      await self?.loadImageAndCacheIt(entityObjectID: objectID, imageToDisplay: imageToDisplay)
+    Task.detached(priority: .high) { [weak self] in
+      await self?.loadImageAndCacheIt(imagePath: imagePathToDisplay)
     }
   }
 
   nonisolated func loadImageAndCacheIt(
-    entityObjectID: NSManagedObjectID,
-    imageToDisplay: UIImage
+    imagePath: String
   ) async {
     guard !Task.isCancelled else { return }
-    let readyImage = await imageToDisplay.byPreparingForDisplay()
+    let readyImage = await UIImage(named: imagePath)?.byPreparingForDisplay()
     guard !Task.isCancelled else { return }
     Task { @MainActor [weak self] in
       guard let self, let readyImage else { return }
-      Self.cache.setObject(readyImage, forKey: entityObjectID)
+      Self.cache.setObject(readyImage, forKey: imagePath as NSString)
       refresh()
     }
   }
 
   @objc
   private func downloadFinishedSuccessful(notification: Notification) {
-    guard let downloadNotification = DownloadNotification.fromNotification(notification)
+    guard let downloadNotification = DownloadNotification.fromNotification(notification), let entity
     else { return }
     if let playable = entity as? AbstractPlayable,
        playable.uniqueID == downloadNotification.id {
       Task { @MainActor in
+        guard let imagePath = entity.imagePath(
+          setting: appDelegate.storage.settings.artworkDisplayPreference
+        ) else { return }
         await self.loadImageAndCacheIt(
-          entityObjectID: playable.objectID,
-          imageToDisplay: entityImageToDisplay
+          imagePath: imagePath
         )
       }
     }
-    if let artwork = entity?.artwork,
+    if let artwork = entity.artwork,
        artwork.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        guard let entityObjectID = entity?.objectID else { return }
+        guard let imagePath = entity.imagePath(
+          setting: appDelegate.storage.settings.artworkDisplayPreference
+        ) else { return }
         await self.loadImageAndCacheIt(
-          entityObjectID: entityObjectID,
-          imageToDisplay: entityImageToDisplay
+          imagePath: imagePath
         )
       }
     }

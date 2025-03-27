@@ -57,16 +57,16 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     super.init(managedObject: managedObject)
   }
 
-  override public func image(theme: ThemePreference, setting: ArtworkDisplayPreference) -> UIImage {
+  override public func imagePath(setting: ArtworkDisplayPreference) -> String? {
     switch setting {
     case .id3TagOnly:
-      return embeddedArtwork?.image ?? getDefaultImage(theme: theme)
+      return embeddedArtwork?.imagePath
     case .serverArtworkOnly:
-      return super.image(theme: theme, setting: setting)
+      return super.imagePath(setting: setting)
     case .preferServerArtwork:
-      return artwork?.image ?? embeddedArtwork?.image ?? getDefaultImage(theme: theme)
+      return artwork?.imagePath ?? embeddedArtwork?.imagePath
     case .preferId3Tag:
-      return embeddedArtwork?.image ?? artwork?.image ?? getDefaultImage(theme: theme)
+      return embeddedArtwork?.imagePath ?? artwork?.imagePath
     }
   }
 
@@ -356,14 +356,14 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     return infoContent
   }
 
-  override public func getDefaultImage(theme: ThemePreference) -> UIImage {
+  override public func getDefaultArtworkType() -> ArtworkType {
     switch derivedType {
     case .song:
-      return UIImage.getGeneratedArtwork(theme: theme, artworkType: .song)
+      return .song
     case .podcastEpisode:
-      return UIImage.getGeneratedArtwork(theme: theme, artworkType: .podcastEpisode)
+      return .podcastEpisode
     case .radio:
-      return UIImage.getGeneratedArtwork(theme: theme, artworkType: .radio)
+      return .radio
     }
   }
 
@@ -448,7 +448,7 @@ extension AbstractPlayable: PlayableContainable {
   }
 
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
-    ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
+    ArtworkCollection(defaultArtworkType: getDefaultArtworkType(), singleImageEntity: self)
   }
 
   public var containerIdentifier: PlayableContainerIdentifier {

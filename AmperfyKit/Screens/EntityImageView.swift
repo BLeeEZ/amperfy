@@ -142,12 +142,12 @@ open class EntityImageView: UIView {
       } else if let firstEntity = quadEntities.first {
         singleImage.displayAndUpdate(entity: firstEntity)
       } else {
-        singleImage.display(image: collection.defaultImage)
+        singleImage.display(artworkType: collection.defaultArtworkType)
       }
     } else if let singleEntity = collection.singleImageEntity {
       singleImage.displayAndUpdate(entity: singleEntity)
     } else {
-      singleImage.display(image: collection.defaultImage)
+      singleImage.display(artworkType: collection.defaultArtworkType)
     }
   }
 }

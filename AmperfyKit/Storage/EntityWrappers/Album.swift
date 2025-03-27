@@ -33,12 +33,12 @@ public class Album: AbstractLibraryEntity {
     super.init(managedObject: managedObject)
   }
 
-  override public func image(theme: ThemePreference, setting: ArtworkDisplayPreference) -> UIImage {
-    super.image(theme: theme, setting: setting)
+  override public func imagePath(setting: ArtworkDisplayPreference) -> String? {
+    super.imagePath(setting: setting)
   }
 
-  private var embeddedArtworkImage: UIImage? {
-    songs.lazy.compactMap { $0.embeddedArtwork }.first?.image
+  private var embeddedArtworkImagePath: String? {
+    songs.lazy.compactMap { $0.embeddedArtwork }.first?.imagePath
   }
 
   public var identifier: String {
@@ -164,8 +164,8 @@ public class Album: AbstractLibraryEntity {
     identifier == "Unknown (Orphaned)"
   }
 
-  override public func getDefaultImage(theme: ThemePreference) -> UIImage {
-    UIImage.getGeneratedArtwork(theme: theme, artworkType: .album)
+  override public func getDefaultArtworkType() -> ArtworkType {
+    .album
   }
 
   public func markAsRemoteDeleted() {
@@ -235,7 +235,7 @@ extension Album: PlayableContainable {
   }
 
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
-    ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
+    ArtworkCollection(defaultArtworkType: getDefaultArtworkType(), singleImageEntity: self)
   }
 
   public var containerIdentifier: PlayableContainerIdentifier { PlayableContainerIdentifier(

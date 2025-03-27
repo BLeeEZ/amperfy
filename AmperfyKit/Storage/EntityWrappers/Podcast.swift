@@ -76,8 +76,8 @@ public class Podcast: AbstractLibraryEntity {
   }
 
   @MainActor
-  override public func getDefaultImage(theme: ThemePreference) -> UIImage {
-    UIImage.getGeneratedArtwork(theme: theme, artworkType: .podcast)
+  override public func getDefaultArtworkType() -> ArtworkType {
+    .podcast
   }
 }
 
@@ -128,7 +128,7 @@ extension Podcast: PlayableContainable {
 
   @MainActor
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
-    ArtworkCollection(defaultImage: getDefaultImage(theme: theme), singleImageEntity: self)
+    ArtworkCollection(defaultArtworkType: getDefaultArtworkType(), singleImageEntity: self)
   }
 
   public var containerIdentifier: PlayableContainerIdentifier { PlayableContainerIdentifier(

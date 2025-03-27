@@ -86,18 +86,18 @@ public class Artwork: NSObject {
     }
   }
 
-  public var image: UIImage? {
-    var img: UIImage?
+  public var imagePath: String? {
+    var imgPath: String?
     switch status {
     case .CustomImage:
       if let relFilePath = relFilePath,
          let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) {
-        img = UIImage(named: absFilePath.path)
+        imgPath = absFilePath.path
       }
     default:
       break
     }
-    return img
+    return imgPath
   }
 
   public var owners: [AbstractLibraryEntity] {

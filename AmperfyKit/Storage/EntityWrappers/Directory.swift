@@ -118,7 +118,7 @@ extension Directory: PlayableContainable {
 
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
     ArtworkCollection(
-      defaultImage: .getGeneratedArtwork(theme: theme, artworkType: .folder),
+      defaultArtworkType: .folder,
       singleImageEntity: self
     )
   }

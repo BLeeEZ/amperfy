@@ -628,12 +628,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let section = CPListItem(
       text: artist.name,
       detailText: artist.subtitle,
-      image: artist
-        .image(
-          theme: appDelegate.storage.settings.themePreference,
-          setting: artworkDisplayPreference
-        )
-        .carPlayImage(carTraitCollection: traits),
+      image: LibraryEntityImage.getImageToDisplayImmediately(
+        libraryEntity: artist,
+        themePreference: appDelegate.storage.settings.themePreference,
+        artworkDisplayPreference: artworkDisplayPreference,
+        useCache: false
+      ).carPlayImage(carTraitCollection: traits),
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
     )
@@ -713,12 +713,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let section = CPListItem(
       text: album.name,
       detailText: album.subtitle,
-      image: album
-        .image(
-          theme: appDelegate.storage.settings.themePreference,
-          setting: artworkDisplayPreference
-        )
-        .carPlayImage(carTraitCollection: traits),
+      image: LibraryEntityImage.getImageToDisplayImmediately(
+        libraryEntity: album,
+        themePreference: appDelegate.storage.settings.themePreference,
+        artworkDisplayPreference: artworkDisplayPreference,
+        useCache: false
+      ).carPlayImage(carTraitCollection: traits),
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
     )
@@ -801,11 +801,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       let section = CPListItem(
         text: podcast.title,
         detailText: podcast.subtitle,
-        image: podcast
-          .image(
-            theme: appDelegate.storage.settings.themePreference,
-            setting: artworkDisplayPreference
-          ).carPlayImage(carTraitCollection: traits),
+        image: LibraryEntityImage.getImageToDisplayImmediately(
+          libraryEntity: podcast,
+          themePreference: appDelegate.storage.settings.themePreference,
+          artworkDisplayPreference: artworkDisplayPreference,
+          useCache: false
+        ).carPlayImage(carTraitCollection: traits),
         accessoryImage: nil,
         accessoryType: .disclosureIndicator
       )
@@ -967,10 +968,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }
 
   private func getImage(for playable: AbstractPlayable, isTrackDisplayed: Bool) -> UIImage {
-    isTrackDisplayed ? UIImage.numberToImage(number: playable.track) : playable.image(
-      theme: appDelegate.storage.settings.themePreference,
-      setting: artworkDisplayPreference
-    )
+    isTrackDisplayed ? UIImage.numberToImage(number: playable.track) :
+      LibraryEntityImage.getImageToDisplayImmediately(
+        libraryEntity: playable,
+        themePreference: appDelegate.storage.settings.themePreference,
+        artworkDisplayPreference: artworkDisplayPreference,
+        useCache: false
+      )
   }
 
   @objc
@@ -1058,10 +1062,14 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             if let playable = playable {
               item.setImage(getImage(for: playable, isTrackDisplayed: isTrackDisplayed))
             } else if let entity = entity {
-              item.setImage(entity.image(
-                theme: appDelegate.storage.settings.themePreference,
-                setting: artworkDisplayPreference
-              ).carPlayImage(carTraitCollection: traits))
+              item.setImage(
+                LibraryEntityImage.getImageToDisplayImmediately(
+                  libraryEntity: entity,
+                  themePreference: appDelegate.storage.settings.themePreference,
+                  artworkDisplayPreference: artworkDisplayPreference,
+                  useCache: false
+                ).carPlayImage(carTraitCollection: traits)
+              )
             }
           }
         }
