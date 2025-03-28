@@ -48,56 +48,88 @@ public class DuplicateEntitiesResolver {
       // only check for duplicates on Ampache API, Subsonic does not have genre ids
       if self.isRunning, self.storage.loginCredentials?.backendApi == .ampache {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: Genre.typeName)
-            .filter { $0.id != "" }
-          asyncCompanion.library.resolveGenresDuplicates(duplicates: duplicates)
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Genre.typeName,
+            keyPathString: #keyPath(GenreMO.id)
+          )
+          asyncCompanion.library.resolveGenresDuplicates(duplicates: duplicates, byName: false)
+        }
+      } else if self.isRunning, self.storage.loginCredentials?.backendApi != .ampache {
+        try? await self.storage.async.perform { asyncCompanion in
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Genre.typeName,
+            keyPathString: #keyPath(GenreMO.name)
+          )
+          asyncCompanion.library.resolveGenresDuplicates(duplicates: duplicates, byName: true)
         }
       }
 
       if self.isRunning {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: Artist.typeName)
-            .filter { $0.id != "" }
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Artist.typeName,
+            keyPathString: #keyPath(ArtistMO.id)
+          )
           asyncCompanion.library.resolveArtistsDuplicates(duplicates: duplicates)
         }
       }
 
       if self.isRunning {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: Album.typeName)
-            .filter { $0.id != "" }
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Album.typeName,
+            keyPathString: #keyPath(AlbumMO.id)
+          )
           asyncCompanion.library.resolveAlbumsDuplicates(duplicates: duplicates)
         }
       }
 
       if self.isRunning {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: Song.typeName)
-            .filter { $0.id != "" }
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Song.typeName,
+            keyPathString: #keyPath(SongMO.id)
+          )
           asyncCompanion.library.resolveSongsDuplicates(duplicates: duplicates)
         }
       }
 
       if self.isRunning {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: PodcastEpisode.typeName)
-            .filter { $0.id != "" }
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: PodcastEpisode.typeName,
+            keyPathString: #keyPath(PodcastEpisodeMO.id)
+          )
           asyncCompanion.library.resolvePodcastEpisodesDuplicates(duplicates: duplicates)
         }
       }
 
       if self.isRunning {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: Podcast.typeName)
-            .filter { $0.id != "" }
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Radio.typeName,
+            keyPathString: #keyPath(RadioMO.id)
+          )
+          asyncCompanion.library.resolveRadioDuplicates(duplicates: duplicates)
+        }
+      }
+
+      if self.isRunning {
+        try? await self.storage.async.perform { asyncCompanion in
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Podcast.typeName,
+            keyPathString: #keyPath(PodcastMO.id)
+          )
           asyncCompanion.library.resolvePodcastsDuplicates(duplicates: duplicates)
         }
       }
 
       if self.isRunning {
         try? await self.storage.async.perform { asyncCompanion in
-          let duplicates = asyncCompanion.library.findDuplicates(for: Playlist.typeName)
-            .filter { $0.id != "" }
+          let duplicates = asyncCompanion.library.findDuplicates(
+            for: Playlist.typeName,
+            keyPathString: #keyPath(PlaylistMO.id)
+          )
           asyncCompanion.library.resolvePlaylistsDuplicates(duplicates: duplicates)
         }
       }
