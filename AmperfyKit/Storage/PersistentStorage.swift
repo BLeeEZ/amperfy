@@ -269,9 +269,9 @@ public actor AsyncCoreDataAccessWrapper {
       -> ()
   ) async throws {
     let context = persistentContainer.newBackgroundContext()
+    NSPersistentContainer.configureContext(context)
 
     await context.perform {
-      context.retainsRegisteredObjects = true
       let library = LibraryStorage(context: context)
       let asyncCompanion = CoreDataCompanion(context: context)
       do {
@@ -289,9 +289,9 @@ public actor AsyncCoreDataAccessWrapper {
   ) async throws
     -> T where T: Sendable {
     let context = persistentContainer.newBackgroundContext()
+    NSPersistentContainer.configureContext(context)
 
     let syncRequestedValue = try await context.perform {
-      context.retainsRegisteredObjects = true
       let asyncCompanion = CoreDataCompanion(context: context)
       do {
         let asyncRequestedValue = try body(asyncCompanion)
@@ -1031,8 +1031,16 @@ public class CoreDataPersistentManager: CoreDataManagable {
 
   @MainActor
   lazy var context: NSManagedObjectContext = {
-    persistentContainer.viewContext.automaticallyMergesChangesFromParent = true
-    persistentContainer.viewContext.retainsRegisteredObjects = true
+    NSPersistentContainer.configureContext(persistentContainer.viewContext)
     return persistentContainer.viewContext
   }()
+}
+
+extension NSPersistentContainer {
+  static fileprivate func configureContext(_ contextToConfigure: NSManagedObjectContext) {
+    contextToConfigure.automaticallyMergesChangesFromParent = true
+    contextToConfigure.retainsRegisteredObjects = true
+    contextToConfigure
+      .mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
+  }
 }

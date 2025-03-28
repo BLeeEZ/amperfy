@@ -2484,7 +2484,6 @@ public class LibraryStorage: PlayableFileCachable {
   public func saveContext() {
     if context.hasChanges {
       do {
-        context.mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
         try context.save()
       } catch {
         // Replace this implementation with code to handle the error appropriately.
@@ -2494,7 +2493,7 @@ public class LibraryStorage: PlayableFileCachable {
           "CoreData Save Context Error: %s",
           log: log,
           type: .error,
-          error.localizedDescription
+          nserror.localizedDescription
         )
         #if DEBUG
           fatalError("Unresolved error \(nserror), \(nserror.localizedDescription)")
