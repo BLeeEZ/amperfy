@@ -374,7 +374,9 @@ class PlayerControlView: UIView {
       if !supportTimeInteraction {
         liveLabel.isHidden = false
         timeSlider.setThumbImage(UIImage(), for: .normal)
-        timeSlider.setThumbImage(UIImage(), for: .highlighted)
+        #if !targetEnvironment(macCatalyst)
+          timeSlider.setThumbImage(UIImage(), for: .highlighted)
+        #endif
         timeSlider.minimumValue = 0.0
         timeSlider.maximumValue = 1.0
         timeSlider.value = 0.0
@@ -406,11 +408,13 @@ class PlayerControlView: UIView {
           color: .labelColor,
           for: UIControl.State.normal
         )
-        timeSlider.setUnicolorThumbImage(
-          thumbSize: 30.0,
-          color: .labelColor,
-          for: UIControl.State.highlighted
-        )
+        #if !targetEnvironment(macCatalyst)
+          timeSlider.setUnicolorThumbImage(
+            thumbSize: 30.0,
+            color: .labelColor,
+            for: UIControl.State.highlighted
+          )
+        #endif
         let progress = Float(player.elapsedTime / player.duration)
         rootView?.popupItem.progress = progress.isNormal ? progress : 0.0
       }
@@ -422,11 +426,13 @@ class PlayerControlView: UIView {
         color: .labelColor,
         for: UIControl.State.normal
       )
-      timeSlider.setUnicolorThumbImage(
-        thumbSize: 30.0,
-        color: .labelColor,
-        for: UIControl.State.highlighted
-      )
+      #if !targetEnvironment(macCatalyst)
+        timeSlider.setUnicolorThumbImage(
+          thumbSize: 30.0,
+          color: .labelColor,
+          for: UIControl.State.highlighted
+        )
+      #endif
       elapsedTimeLabel.text = "--:--"
       remainingTimeLabel.text = "--:--"
       timeSlider.minimumValue = 0.0
