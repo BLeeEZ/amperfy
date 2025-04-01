@@ -228,7 +228,7 @@ class MOCK_MusicPlayable: MusicPlayable {
   var thrownError: Error?
 
   var expectationDidStartPlaying: XCTestExpectation?
-  var expectationErrorOccured: XCTestExpectation?
+  var expectationErrorOccurred: XCTestExpectation?
 
   func didStartPlayingFromBeginning() {}
   func didStartPlaying() {
@@ -243,9 +243,9 @@ class MOCK_MusicPlayable: MusicPlayable {
   func didShuffleChange() {}
   func didRepeatChange() {}
 
-  func errorOccured(_ error: Error) {
+  func errorOccurred(_ error: Error) {
     thrownError = error
-    expectationErrorOccured?.fulfill()
+    expectationErrorOccurred?.fulfill()
   }
 }
 

@@ -114,7 +114,7 @@ struct AlternativeURLAddDialogView: View {
               Text("Add alternative URL").font(.title2).fontWeight(.bold).padding(.all, 10)
 
               Text(
-                "The URL must reach the same server. Otherwise library inconsistencies will occure."
+                "The URL must reach the same server. Otherwise library inconsistencies will occur."
               )
 
               if !successMsg.isEmpty {

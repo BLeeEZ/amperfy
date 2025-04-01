@@ -313,7 +313,7 @@ public final class BackendProxy: Sendable {
           if let statusCode = (response as? HTTPURLResponse)?.statusCode {
             if statusCode >= 400,
                // ignore 401 Unauthorized (RFC 7235) status code
-               // -> Can occure if root website requires http basic authentication,
+               // -> Can occur if root website requires http basic authentication,
                //    but the REST API endpoints are reachable without http basic authentication
                statusCode != 401 {
               continuation
