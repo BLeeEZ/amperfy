@@ -82,7 +82,7 @@ struct ArtworkSettingsView: View {
               secondaryButton: .cancel()
             )
           }
-          SettingsButtonRow(label: "Delete all downloaded artworks") {
+          SettingsButtonRow(label: "Delete all downloaded artworks", actionType: .destructive) {
             isShowDeleteArtworksAlert = true
           }
           .alert(isPresented: $isShowDeleteArtworksAlert) {

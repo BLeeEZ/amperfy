@@ -35,7 +35,7 @@ protocol BackendAudioPlayerNotifiable {
   func playNext()
   func didItemFinishedPlaying()
   func notifyItemPreparationFinished()
-  func notifyErrorOccured(error: Error)
+  func notifyErrorOccurred(error: Error)
 }
 
 // MARK: - PlayType
@@ -79,7 +79,7 @@ class BackendAudioPlayer: NSObject {
   private let fileManager = CacheFileManager.shared
   private var audioSessionHandler: AudioSessionHandler
   private var isTriggerReinsertPlayableAllowed = true
-  private var wasPlayingBeforeErrorOccured: Bool = false
+  private var wasPlayingBeforeErrorOccurred: Bool = false
   private var userDefinedPlaybackRate: PlaybackRate = .one
   private var nextPreloadedPlayable: AbstractPlayable?
   private var isPreviousPlaylableFinshed = true
@@ -91,7 +91,7 @@ class BackendAudioPlayer: NSObject {
   public var nextPlayablePreloadCB: NextPlayablePreloadCallback?
   public var triggerReinsertPlayableCB: TriggerReinsertPlayableCallback?
   public private(set) var isPlaying: Bool = false
-  public private(set) var isErrorOccured: Bool = false
+  public private(set) var isErrorOccurred: Bool = false
   public private(set) var playType: PlayType?
   public private(set) var streamingMaxBitrates = StreamingMaxBitrates()
   public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
@@ -265,7 +265,7 @@ class BackendAudioPlayer: NSObject {
             handleError(error: statusError)
           } else {
             isTriggerReinsertPlayableAllowed = true
-            isErrorOccured = false
+            isErrorOccurred = false
           }
         }
       }
@@ -273,14 +273,14 @@ class BackendAudioPlayer: NSObject {
   }
 
   private func handleError(error: Error) {
-    isErrorOccured = true
-    wasPlayingBeforeErrorOccured = isPlaying
+    isErrorOccurred = true
+    wasPlayingBeforeErrorOccurred = isPlaying
     pause()
     nextPreloadedPlayable = nil
     isPreviousPlaylableFinshed = true
     initAVPlayer()
     eventLogger.report(topic: "Player Status", error: error)
-    responder?.notifyErrorOccured(error: error)
+    responder?.notifyErrorOccurred(error: error)
     if isTriggerReinsertPlayableAllowed {
       isTriggerReinsertPlayableAllowed = false
       triggerReinsertPlayableCB?()
@@ -313,7 +313,7 @@ class BackendAudioPlayer: NSObject {
   }
 
   var shouldPlaybackStart: Bool {
-    (!isErrorOccured && isAutoStartPlayback) || (isErrorOccured && wasPlayingBeforeErrorOccured)
+    (!isErrorOccurred && isAutoStartPlayback) || (isErrorOccurred && wasPlayingBeforeErrorOccurred)
   }
 
   func requestToPlay(
@@ -384,7 +384,7 @@ class BackendAudioPlayer: NSObject {
           }
           self.responder?.notifyItemPreparationFinished()
         } catch {
-          self.responder?.notifyErrorOccured(error: error)
+          self.responder?.notifyErrorOccurred(error: error)
           self.responder?.notifyItemPreparationFinished()
           self.eventLogger.report(topic: "Player", error: error)
         }

@@ -48,7 +48,7 @@ extension MusicPlayable {
   func didShuffleChange() {}
   func didRepeatChange() {}
   func didPlaybackRateChange() {}
-  func errorOccured(error: Error) {}
+  func errorOccurred(error: Error) {}
 }
 
 // MARK: - RepeatMode

@@ -417,7 +417,7 @@ actor DownloadManager: NSObject, DownloadManageable {
         error.description
       )
       let shortMessage =
-        "Error \"\(error.description)\" occured while downloading object \"\(downloadRequest.title)\"."
+        "Error \"\(error.description)\" occurred while downloading object \"\(downloadRequest.title)\"."
       let responseError = ResponseError(
         type: .api,
         message: shortMessage,
