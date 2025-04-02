@@ -27,7 +27,7 @@ import UIKit
 
   fileprivate class VolumeSlider: UISlider {
     static var sliderHeight: CGFloat = 3.0
-    static var sliderThumbHeight: CGFloat = 15.0
+    static var sliderThumbHeight: CGFloat = 14.0
 
     private var thumbTouchSize = CGSize(width: 50, height: 20)
 
@@ -43,22 +43,35 @@ import UIKit
 
     fileprivate func refreshSliderDesign() {
       let tint = UIColor.secondaryLabel
-      setUnicolorRectangularMinimumTrackImage(
+      setUnicolorRoundedMinimumTrackImage(
         trackHeight: Self.sliderHeight,
         color: tint,
         for: .normal
       )
-      setUnicolorRectangularMaximumTrackImage(
+      setUnicolorRoundedMaximumTrackImage(
         trackHeight: Self.sliderHeight,
-        color: .systemGray6,
+        color: UIColor(dynamicProvider: { traitCollection in
+          let isDark = traitCollection.userInterfaceStyle == .dark
+          return isDark ? .systemGray2 : .systemGray4
+        }),
         for: .normal
       )
       setUnicolorRoundedThumbImage(
-        thumbSize: CGSize(width: 7, height: Self.sliderThumbHeight),
-        color: .systemGray,
-        for: .normal
+        thumbSize: CGSize(width: Self.sliderThumbHeight, height: Self.sliderThumbHeight),
+        color: .systemBackground,
+        for: .normal,
+        lineWidth: 1.0,
+        strokeColor: UIColor(dynamicProvider: { traitCollection in
+          let isDark = traitCollection.userInterfaceStyle == .dark
+          return isDark ? tint : .systemGray4
+        })
       )
       backgroundColor = .clear
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+      super.traitCollectionDidChange(previousTraitCollection)
+      refreshSliderDesign()
     }
 
     // MARK: - Increase touch area for thumb
@@ -69,18 +82,11 @@ import UIKit
       return containsPoint
     }
 
+    // If we click inside the thumb's extended touch area, no event is registered.
+    // We can fix this by always returning true here. Since this is macOS only, it
+    // is fine to always start tracking.
     override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-      let percentage = CGFloat((value - minimumValue) / (maximumValue - minimumValue))
-      let thumbSizeHeight = thumbRect(
-        forBounds: bounds,
-        trackRect: trackRect(forBounds: bounds),
-        value: 0
-      ).size.height
-      let thumbPosition = thumbSizeHeight +
-        (percentage * (bounds.size.width - (2 * thumbSizeHeight)))
-      let touchLocation = touch.location(in: self)
-      return touchLocation.x <= (thumbPosition + thumbTouchSize.width) && touchLocation
-        .x >= (thumbPosition - thumbTouchSize.width)
+      true
     }
   }
 

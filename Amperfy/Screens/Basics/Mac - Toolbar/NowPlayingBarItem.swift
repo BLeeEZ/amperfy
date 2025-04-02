@@ -34,6 +34,7 @@ import UIKit
     override init(frame: CGRect) {
       super.init(frame: frame)
       self.preferredBehavioralStyle = .pad
+      self.isContinuous = false
       refreshSliderDesign()
     }
 
@@ -68,12 +69,24 @@ import UIKit
       return super.trackRect(forBounds: customBounds)
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+      super.traitCollectionDidChange(previousTraitCollection)
+      refreshSliderDesign()
+    }
+
     // MARK: - Increase touch area for thumb
 
     override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
       let increasedBounds = bounds.insetBy(dx: -thumbTouchSize.width, dy: -thumbTouchSize.height)
       let containsPoint = increasedBounds.contains(point)
       return containsPoint
+    }
+
+    // If we click inside the thumb's extended touch area, no event is registered.
+    // We can fix this by always returning true here. Since this is macOS only, it
+    // is fine to always start tracking.
+    override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+      true
     }
   }
 
