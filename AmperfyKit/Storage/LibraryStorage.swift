@@ -1893,7 +1893,7 @@ public class LibraryStorage: PlayableFileCachable {
     return musicFolderDict
   }
 
-  private func getDirectories(ids: Set<String>) -> [String: Directory] {
+  public func getDirectories(ids: Set<String>) -> [String: Directory] {
     let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
     fetchRequest.predicate = NSPredicate(
       format: "%K IN %@",
