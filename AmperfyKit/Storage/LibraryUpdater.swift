@@ -244,12 +244,11 @@ public class LibraryUpdater {
     if storage.librarySyncVersion < .v18 {
       // add radios to libraryDisplaySettings to display it for old users
       var libraryDisplaySettingsInUse = storage.settings.libraryDisplaySettings.inUse
-      if !libraryDisplaySettingsInUse.contains(where: { $0 == .radios}) {
+      if !libraryDisplaySettingsInUse.contains(where: { $0 == .radios }) {
         libraryDisplaySettingsInUse.append(.radios)
         storage.settings
           .libraryDisplaySettings = LibraryDisplaySettings(inUse: libraryDisplaySettingsInUse)
       }
-      
 
       storage
         .librarySyncVersion =

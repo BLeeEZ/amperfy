@@ -36,9 +36,9 @@ class PlayQueueHandlerTest: XCTestCase {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
     testPlayer = library.getPlayerData()
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
     testShuffledPlaylist = testPlayer.contextQueue
-    testPlayer.isShuffle = false
+    testPlayer.setShuffle(false)
     testNormalPlaylist = testPlayer.contextQueue
     testQueueHandler = PlayQueueHandler(playerData: testPlayer)
   }
@@ -48,12 +48,12 @@ class PlayQueueHandlerTest: XCTestCase {
   func prepareNoWaitingQueuePlaying() {
     testPlayer.removeAllItems()
     fillPlayerWithSomeSongsAndWaitingQueue()
-    testPlayer.isUserQueuePlaying = false
+    testPlayer.setUserQueuePlaying(false)
   }
 
   func prepareWithWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.isUserQueuePlaying = true
+    testPlayer.setUserQueuePlaying(true)
   }
 
   func fillPlayerWithSomeSongs() {
@@ -271,7 +271,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testRemoveSongFromPlaylist() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
     XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount - 1)
     XCTAssertEqual(testPlayer.currentIndex, 1)
@@ -279,7 +279,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
 
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 0))
     XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount - 2)
     XCTAssertEqual(testPlayer.currentIndex, 2)
@@ -287,7 +287,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 1, seedIndex: 3)
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 4)
 
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 1))
     XCTAssertEqual(testPlayer.contextQueue.playables.count, fillCount - 3)
     XCTAssertEqual(testPlayer.currentIndex, 1)
@@ -303,7 +303,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testQueue_accessInputValidcation() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
     let prevQueueCount = testQueueHandler.prevQueueCount
     XCTAssertEqual(prevQueueCount, 2)
@@ -363,7 +363,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func testWaitingQueueInsertFirst_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
     guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -379,7 +379,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func testWaitingQueueInsertFirst_noWaitingQueuePlaying2() {
     prepareNoWaitingQueuePlaying()
     guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -400,7 +400,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func testWaitingQueueInsertFirst_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
     guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -416,7 +416,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func testWaitingQueueInsertFirst_withWaitingQueuePlaying2() {
     prepareWithWaitingQueuePlaying()
     guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -436,7 +436,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func testWaitingQueueInsertLast_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
     guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -452,7 +452,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func testWaitingQueueInsertLast_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
     guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -531,7 +531,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMovePlaylistSong() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -545,7 +545,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -559,7 +559,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .next, index: 4)
@@ -574,7 +574,7 @@ class PlayQueueHandlerTest: XCTestCase {
     testPlayer.removeAllItems()
     fillPlayerWithSomeSongs()
 
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 2),
       to: PlayerIndex(queueType: .next, index: 3)
@@ -588,7 +588,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -602,7 +602,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 2)
@@ -616,7 +616,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -629,7 +629,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 2),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -643,7 +643,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -659,28 +659,28 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testQueueCreation_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     checkCurrentlyPlaying(idToBe: 0)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     checkCurrentlyPlaying(idToBe: 3)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     checkCurrentlyPlaying(idToBe: 4)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
@@ -690,35 +690,35 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testQueueCreation_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [0, 1, 2, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [1, 2, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
 
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [Int]())
@@ -728,7 +728,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testRemovePlayable_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 0))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [1])
@@ -737,7 +737,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 1))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0])
@@ -746,7 +746,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -755,7 +755,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 1))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -764,7 +764,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -773,7 +773,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 1))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -782,7 +782,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 3))
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -793,7 +793,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testRemovePlayable_noWaitingQueuePlaying_edgeCases() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 0))
     checkCurrentlyPlaying(idToBe: 1)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -802,7 +802,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
     checkCurrentlyPlaying(idToBe: 0)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -811,7 +811,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 3))
     checkCurrentlyPlaying(idToBe: 4)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -820,7 +820,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
     checkCurrentlyPlaying(idToBe: 3)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -831,7 +831,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testRemovePlayable_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 0))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [1, 2])
@@ -840,7 +840,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 1))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 2])
@@ -849,7 +849,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 2))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -858,7 +858,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -867,7 +867,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 1))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -876,7 +876,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -885,7 +885,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 1))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -894,7 +894,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 2))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -905,7 +905,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testRemovePlayable_withWaitingQueuePlaying_edgeCases() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 0))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -914,7 +914,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 4))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
@@ -923,7 +923,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .next, index: 0))
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2, 3])
@@ -932,7 +932,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 2))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -943,7 +943,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 2))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .prev, index: 1))
@@ -962,7 +962,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_PrevPrev_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -974,7 +974,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -986,7 +986,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .prev, index: 2)
@@ -998,7 +998,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 2),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1010,7 +1010,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 3),
       to: PlayerIndex(queueType: .prev, index: 2)
@@ -1022,7 +1022,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 3),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1036,7 +1036,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_PrevPrev_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -1048,7 +1048,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1060,7 +1060,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .prev, index: 3)
@@ -1072,7 +1072,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 3),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1084,7 +1084,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 3),
       to: PlayerIndex(queueType: .prev, index: 2)
@@ -1096,7 +1096,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 4),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1110,7 +1110,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_NextNext_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1122,7 +1122,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1134,7 +1134,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .next, index: 2)
@@ -1146,7 +1146,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 2),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1158,7 +1158,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .next, index: 2)
@@ -1170,7 +1170,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1184,7 +1184,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_NextNext_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1196,7 +1196,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1208,7 +1208,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .next, index: 2)
@@ -1220,7 +1220,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 2),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1232,7 +1232,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .next, index: 2)
@@ -1244,7 +1244,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 4),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1256,7 +1256,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .next, index: 3)
@@ -1270,7 +1270,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_WaitWait_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -1282,7 +1282,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1294,7 +1294,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .user, index: 2)
@@ -1306,7 +1306,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1318,7 +1318,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 3),
       to: PlayerIndex(queueType: .user, index: 2)
@@ -1330,7 +1330,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 3),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1342,7 +1342,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 3),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1356,7 +1356,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_WaitWait_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -1368,7 +1368,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1380,7 +1380,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .user, index: 2)
@@ -1392,7 +1392,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1404,7 +1404,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -1416,7 +1416,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -1430,7 +1430,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_PrevNext_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1442,7 +1442,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1454,7 +1454,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .next, index: 2)
@@ -1466,7 +1466,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1478,7 +1478,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1490,7 +1490,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1504,7 +1504,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_PrevNext_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1516,7 +1516,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1528,7 +1528,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1540,7 +1540,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1552,7 +1552,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 3),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1564,7 +1564,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1578,7 +1578,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_NextPrev_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -1590,7 +1590,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1602,7 +1602,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 2)
@@ -1614,7 +1614,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1626,7 +1626,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -1638,7 +1638,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1650,7 +1650,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1664,7 +1664,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_NextPrev_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -1676,7 +1676,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1688,7 +1688,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1700,7 +1700,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 4)
@@ -1712,7 +1712,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 3)
@@ -1724,7 +1724,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1736,7 +1736,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -1748,7 +1748,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1760,7 +1760,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 4),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -1774,7 +1774,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_WaitNext_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1786,7 +1786,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1798,7 +1798,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 3),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1810,7 +1810,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1822,7 +1822,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -1837,7 +1837,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
@@ -1851,7 +1851,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .next, index: 4)
@@ -1863,7 +1863,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .next, index: 3)
@@ -1877,7 +1877,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_WaitNext_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1889,7 +1889,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1901,7 +1901,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .next, index: 1)
@@ -1913,7 +1913,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1925,7 +1925,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
@@ -1939,7 +1939,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
@@ -1953,7 +1953,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
@@ -1966,7 +1966,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .next, index: 0)
@@ -1980,7 +1980,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_WaitPrev_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -1992,7 +1992,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -2004,7 +2004,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 3),
       to: PlayerIndex(queueType: .prev, index: 2)
@@ -2016,7 +2016,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -2028,7 +2028,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -2045,7 +2045,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_WaitPrev_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 0),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -2057,7 +2057,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -2069,7 +2069,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .prev, index: 1)
@@ -2081,7 +2081,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -2093,7 +2093,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .prev, index: 5)
@@ -2105,7 +2105,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
       to: PlayerIndex(queueType: .prev, index: 4)
@@ -2117,7 +2117,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
@@ -2131,7 +2131,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 1),
@@ -2144,7 +2144,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .user, index: 2),
       to: PlayerIndex(queueType: .prev, index: 0)
@@ -2158,7 +2158,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_PrevWait_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -2170,7 +2170,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2182,7 +2182,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 2),
       to: PlayerIndex(queueType: .user, index: 2)
@@ -2194,7 +2194,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .user, index: 4)
@@ -2206,7 +2206,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -2224,7 +2224,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_PrevWait_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -2236,7 +2236,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2248,7 +2248,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 2),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -2260,7 +2260,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 4),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2272,7 +2272,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 4
+    testPlayer.setCurrentIndex(4)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 4),
       to: PlayerIndex(queueType: .user, index: 3)
@@ -2284,7 +2284,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .prev, index: 0),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2296,7 +2296,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -2313,7 +2313,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_NextWait_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -2325,7 +2325,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2337,7 +2337,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .user, index: 2)
@@ -2349,7 +2349,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 2),
       to: PlayerIndex(queueType: .user, index: 4)
@@ -2361,7 +2361,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -2377,7 +2377,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
@@ -2392,7 +2392,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testMove_NextWait_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -2404,7 +2404,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 1),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2416,7 +2416,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 2),
       to: PlayerIndex(queueType: .user, index: 1)
@@ -2428,7 +2428,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 0
+    testPlayer.setCurrentIndex(0)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 3),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2440,7 +2440,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .user, index: 3)
@@ -2452,7 +2452,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.movePlayable(
       from: PlayerIndex(queueType: .next, index: 0),
       to: PlayerIndex(queueType: .user, index: 0)
@@ -2464,7 +2464,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueInfoConsistency()
 
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -2481,7 +2481,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testInsertPodcastQueue_playerModeMusic_NoWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -2524,7 +2524,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testAppendPodcastQueue_playerModeMusic_NoWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
     testPlayer.appendPodcastQueue(playables: [song9])
     checkCurrentlyPlaying(idToBe: 2)
@@ -2561,8 +2561,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testInsertContextQueue_playerModePodcast_NoWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
-    testPlayer.playerMode = .podcast
+    testPlayer.setCurrentIndex(2)
+    testPlayer.setPlayerMode(.podcast)
 
     checkCurrentlyPlaying(idToBe: nil)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -2578,14 +2578,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 9, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [9, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertContextQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2594,14 +2594,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 10, 9, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [10, 9, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertContextQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2610,20 +2610,20 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 11, 10, 9, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [11, 10, 9, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testAppendContextQueue_playerModePodcast_NoWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
-    testPlayer.playerMode = .podcast
+    testPlayer.setCurrentIndex(2)
+    testPlayer.setPlayerMode(.podcast)
 
     checkCurrentlyPlaying(idToBe: nil)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -2639,14 +2639,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4, 9])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 9])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendContextQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2655,14 +2655,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4, 9, 10])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 9, 10])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendContextQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2671,20 +2671,20 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4, 9, 10, 11])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 9, 10, 11])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testInsertUserQueue_playerModePodcast_NoWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
-    testPlayer.playerMode = .podcast
+    testPlayer.setCurrentIndex(2)
+    testPlayer.setPlayerMode(.podcast)
 
     checkCurrentlyPlaying(idToBe: nil)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -2700,14 +2700,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [9, 5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertUserQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2716,14 +2716,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [10, 9, 5, 6, 7, 8])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertUserQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2732,7 +2732,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -2742,13 +2742,13 @@ class PlayQueueHandlerTest: XCTestCase {
     )
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testAppendUserQueue_playerModePodcast_NoWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
-    testPlayer.playerMode = .podcast
+    testPlayer.setCurrentIndex(2)
+    testPlayer.setPlayerMode(.podcast)
 
     checkCurrentlyPlaying(idToBe: nil)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -2764,14 +2764,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8, 9])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendUserQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2780,14 +2780,14 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [5, 6, 7, 8, 9, 10])
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendUserQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: nil)
@@ -2796,7 +2796,7 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -2806,12 +2806,12 @@ class PlayQueueHandlerTest: XCTestCase {
     )
     checkQueueItems(queue: testPlayer.podcastQueue.playables, seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testInsertPodcastQueue_playerModeMusic_WithWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
@@ -2854,7 +2854,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testAppendPodcastQueue_playerModeMusic_WithWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
     testPlayer.appendPodcastQueue(playables: [song9])
     checkCurrentlyPlaying(idToBe: 5)
@@ -2891,11 +2891,11 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testInsertContextQueue_playerModePodcast_WithWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
     testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
 
     checkCurrentlyPlaying(idToBe: 14)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [13])
@@ -2909,13 +2909,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [9, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertContextQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: 14)
@@ -2923,13 +2923,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [10, 9, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertContextQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: 14)
@@ -2938,22 +2938,22 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueItems(queue: testPlayer.contextQueue.playables, seedIds: [0, 1, 2, 11, 10, 9, 3, 4])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [11, 10, 9, 3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testAppendContextQueue_playerModePodcast_WithWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
     testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
 
     checkCurrentlyPlaying(idToBe: 14)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [13])
@@ -2967,13 +2967,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 9])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendContextQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: 14)
@@ -2981,13 +2981,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 9, 10])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendContextQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: 14)
@@ -2995,22 +2995,22 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4, 9, 10, 11])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testInsertUserQueue_playerModePodcast_WithWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
     testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
 
     checkCurrentlyPlaying(idToBe: 14)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [13])
@@ -3024,13 +3024,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [9, 6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertUserQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: 14)
@@ -3038,13 +3038,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [10, 9, 6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.insertUserQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: 14)
@@ -3052,22 +3052,22 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [11, 10, 9, 6, 7, 8])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 
   func testAppendUserQueue_playerModePodcast_WithWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    testPlayer.currentIndex = 2
+    testPlayer.setCurrentIndex(2)
 
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
     testPlayer.insertPodcastQueue(playables: [songD, songE, songF])
-    testPlayer.currentIndex = 1
+    testPlayer.setCurrentIndex(1)
 
     checkCurrentlyPlaying(idToBe: 14)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [13])
@@ -3081,13 +3081,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8, 9])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendUserQueue(playables: [songA])
     checkCurrentlyPlaying(idToBe: 14)
@@ -3095,13 +3095,13 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8, 9, 10])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
 
     testPlayer.appendUserQueue(playables: [songB])
     checkCurrentlyPlaying(idToBe: 14)
@@ -3109,12 +3109,12 @@ class PlayQueueHandlerTest: XCTestCase {
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [15])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [Int]())
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .music
+    testPlayer.setPlayerMode(.music)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
     checkQueueItems(queue: testQueueHandler.getAllNextQueueItems(), seedIds: [3, 4])
     checkQueueItems(queue: testQueueHandler.getAllUserQueueItems(), seedIds: [6, 7, 8, 9, 10, 11])
     checkQueueInfoConsistency()
-    testPlayer.playerMode = .podcast
+    testPlayer.setPlayerMode(.podcast)
   }
 }

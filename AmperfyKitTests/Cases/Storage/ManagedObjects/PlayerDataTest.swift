@@ -36,9 +36,9 @@ class PlayerDataTest: XCTestCase {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
     testPlayer = library.getPlayerData()
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
     testShuffledPlaylist = testPlayer.activeQueue
-    testPlayer.isShuffle = false
+    testPlayer.setShuffle(false)
     testNormalPlaylist = testPlayer.activeQueue
     testPodcastPlaylist = testPlayer.podcastQueue
   }
@@ -86,65 +86,65 @@ class PlayerDataTest: XCTestCase {
 
     for i in [3, 2, 4, 1, 0] {
       guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
-      testPlayer.currentIndex = i
+      testPlayer.setCurrentIndex(i)
       XCTAssertEqual(testPlayer.currentItem?.id, song.id)
     }
   }
 
   func testShuffle() {
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
     XCTAssertTrue(testPlayer.isShuffle)
     XCTAssertEqual(testPlayer.activeQueue, testShuffledPlaylist)
-    testPlayer.isShuffle = false
+    testPlayer.setShuffle(false)
     XCTAssertFalse(testPlayer.isShuffle)
     XCTAssertEqual(testPlayer.activeQueue, testNormalPlaylist)
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
     XCTAssertEqual(testPlayer.activeQueue, testShuffledPlaylist)
 
     fillPlayerWithSomeSongs()
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
-    testPlayer.isShuffle = false
+    testPlayer.setShuffle(false)
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
     checkCorrectDefaultPlaylist()
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
-    testPlayer.isShuffle = false
+    testPlayer.setShuffle(false)
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
     checkCorrectDefaultPlaylist()
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
   }
 
   func testRepeat() {
-    testPlayer.repeatMode = RepeatMode.all
+    testPlayer.setRepeatMode(RepeatMode.all)
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.all)
-    testPlayer.repeatMode = RepeatMode.single
+    testPlayer.setRepeatMode(RepeatMode.single)
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.single)
-    testPlayer.repeatMode = RepeatMode.off
+    testPlayer.setRepeatMode(RepeatMode.off)
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.off)
   }
 
   func testCurrentSongIndexSet() {
     fillPlayerWithSomeSongs()
     let curIndex = 2
-    testPlayer.currentIndex = curIndex
+    testPlayer.setCurrentIndex(curIndex)
     XCTAssertEqual(testPlayer.currentIndex, curIndex)
-    testPlayer.currentIndex = -1
+    testPlayer.setCurrentIndex(-1)
     XCTAssertEqual(testPlayer.currentIndex, 0)
-    testPlayer.currentIndex = -2
+    testPlayer.setCurrentIndex(-2)
     XCTAssertEqual(testPlayer.currentIndex, 0)
-    testPlayer.isUserQueuePlaying = true
-    testPlayer.currentIndex = -1
+    testPlayer.setUserQueuePlaying(true)
+    testPlayer.setCurrentIndex(-1)
     XCTAssertEqual(testPlayer.currentIndex, -1)
-    testPlayer.currentIndex = -2
+    testPlayer.setCurrentIndex(-2)
     XCTAssertEqual(testPlayer.currentIndex, -1)
-    testPlayer.isUserQueuePlaying = false
-    testPlayer.currentIndex = -10
+    testPlayer.setUserQueuePlaying(false)
+    testPlayer.setCurrentIndex(-10)
     XCTAssertEqual(testPlayer.currentIndex, 0)
-    testPlayer.currentIndex = fillCount - 1
+    testPlayer.setCurrentIndex(fillCount - 1)
     XCTAssertEqual(testPlayer.currentIndex, fillCount - 1)
-    testPlayer.currentIndex = fillCount
+    testPlayer.setCurrentIndex(fillCount)
     XCTAssertEqual(testPlayer.currentIndex, 0)
-    testPlayer.currentIndex = 100
+    testPlayer.setCurrentIndex(100)
     XCTAssertEqual(testPlayer.currentIndex, 0)
   }
 
@@ -154,11 +154,11 @@ class PlayerDataTest: XCTestCase {
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
     testPlayer.appendActiveQueue(playables: [song1])
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 1)
-    testPlayer.isShuffle = true
+    testPlayer.setShuffle(true)
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 1)
     testPlayer.appendActiveQueue(playables: [song2])
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 2)
-    testPlayer.isShuffle = false
+    testPlayer.setShuffle(false)
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 2)
     XCTAssertEqual(testPlayer.activeQueue.playables[fillCount].id, song1.id)
     XCTAssertEqual(testPlayer.activeQueue.playables[fillCount + 1].id, song2.id)
@@ -166,7 +166,7 @@ class PlayerDataTest: XCTestCase {
 
   func testRemoveAllSongs() {
     fillPlayerWithSomeSongs()
-    testPlayer.currentIndex = 3
+    testPlayer.setCurrentIndex(3)
     XCTAssertEqual(testPlayer.currentIndex, 3)
     testPlayer.removeAllItems()
     XCTAssertEqual(testPlayer.currentIndex, 0)

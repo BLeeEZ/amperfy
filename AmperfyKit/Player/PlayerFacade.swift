@@ -347,7 +347,7 @@ class PlayerFacadeImpl: PlayerFacade {
   }
 
   func toggleShuffle() {
-    playerStatus.isShuffle = !isShuffle
+    playerStatus.setShuffle(!isShuffle)
     musicPlayer.notifyShuffleUpdated()
     musicPlayer.notifyPlaylistUpdated()
   }
@@ -357,7 +357,7 @@ class PlayerFacadeImpl: PlayerFacade {
   }
 
   func setPlaybackRate(_ newValue: PlaybackRate) {
-    playerStatus.playbackRate = newValue
+    playerStatus.setPlaybackRate(newValue)
     backendAudioPlayer.setPlaybackRate(newValue)
     musicPlayer.notifyPlaybackRateUpdated()
   }
@@ -367,7 +367,7 @@ class PlayerFacadeImpl: PlayerFacade {
   }
 
   func setRepeatMode(_ newValue: RepeatMode) {
-    playerStatus.repeatMode = newValue
+    playerStatus.setRepeatMode(newValue)
     musicPlayer.notifyRepeatUpdated()
   }
 
@@ -384,7 +384,7 @@ class PlayerFacadeImpl: PlayerFacade {
   var isAutoCachePlayedItems: Bool {
     get { playerStatus.isAutoCachePlayedItems }
     set {
-      playerStatus.isAutoCachePlayedItems = newValue
+      playerStatus.setAutoCachePlayedItems(newValue)
       backendAudioPlayer.isAutoCachePlayedItems = newValue
     }
   }
@@ -407,7 +407,7 @@ class PlayerFacadeImpl: PlayerFacade {
 
   func setPlayerMode(_ newValue: PlayerMode) {
     musicPlayer.stopButRemainIndex()
-    playerStatus.playerMode = newValue
+    playerStatus.setPlayerMode(newValue)
     musicPlayer.notifyPlaylistUpdated()
     musicPlayer.activateSongContinueProgress()
   }
@@ -506,7 +506,7 @@ class PlayerFacadeImpl: PlayerFacade {
   func play(context: PlayContext) {
     setPlayerModeForContextPlay(context.type)
     if playerMode == .music, playerStatus.isShuffle {
-      playerStatus.isShuffle = false
+      playerStatus.setShuffle(false)
       musicPlayer.notifyShuffleUpdated()
     }
     musicPlayer.play(context: context)
@@ -515,16 +515,16 @@ class PlayerFacadeImpl: PlayerFacade {
 
   private func setPlayerModeForContextPlay(_ newValue: PlayerMode) {
     musicPlayer.pause()
-    playerStatus.playerMode = newValue
+    playerStatus.setPlayerMode(newValue)
   }
 
   func playShuffled(context: PlayContext) {
     setPlayerModeForContextPlay(context.type)
     guard !context.playables.isEmpty else { return }
-    if playerStatus.isShuffle { playerStatus.isShuffle = false }
+    if playerStatus.isShuffle { playerStatus.setShuffle(false) }
     let shuffleContext = context.getWithShuffledIndex()
     musicPlayer.play(context: shuffleContext)
-    playerStatus.isShuffle = true
+    playerStatus.setShuffle(true)
     musicPlayer.notifyShuffleUpdated()
     musicPlayer.notifyPlaylistUpdated()
   }

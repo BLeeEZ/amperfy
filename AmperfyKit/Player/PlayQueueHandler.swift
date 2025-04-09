@@ -177,9 +177,10 @@ public class PlayQueueHandler {
     }
   }
 
-  var contextName: String {
-    get { playerQueues.contextName }
-    set { playerQueues.contextName = newValue }
+  var contextName: String { playerQueues.contextName }
+
+  func setContextName(_ newValue: String) {
+    playerQueues.setContextName(newValue)
   }
 
   var isUserQueuePlaying: Bool {
@@ -195,26 +196,26 @@ public class PlayQueueHandler {
   }
 
   func insertContextQueue(playables: [AbstractPlayable]) {
-    playerQueues.contextName = ""
+    playerQueues.setContextName("")
     playerQueues.insertContextQueue(playables: playables)
   }
 
   func appendContextQueue(playables: [AbstractPlayable]) {
-    playerQueues.contextName = ""
+    playerQueues.setContextName("")
     playerQueues.appendContextQueue(playables: playables)
   }
 
   func insertUserQueue(playables: [AbstractPlayable]) {
     playerQueues.insertUserQueue(playables: playables)
     if playerQueues.contextQueue.songCount == 0 {
-      playerQueues.isUserQueuePlaying = true
+      playerQueues.setUserQueuePlaying(true)
     }
   }
 
   func appendUserQueue(playables: [AbstractPlayable]) {
     playerQueues.appendUserQueue(playables: playables)
     if playerQueues.contextQueue.songCount == 0 {
-      playerQueues.isUserQueuePlaying = true
+      playerQueues.setUserQueuePlaying(true)
     }
   }
 
@@ -231,7 +232,7 @@ public class PlayQueueHandler {
   }
 
   func clearContextQueue() {
-    playerQueues.contextName = ""
+    playerQueues.setContextName("")
     playerQueues.clearContextQueue()
   }
 
@@ -245,7 +246,7 @@ public class PlayQueueHandler {
   }
 
   func removeAllItems() {
-    playerQueues.contextName = ""
+    playerQueues.setContextName("")
     playerQueues.removeAllItems()
   }
 
@@ -261,15 +262,15 @@ public class PlayQueueHandler {
           removeItemFromUserQueue(at: 0)
         }
       }
-      playerQueues.isUserQueuePlaying = true
+      playerQueues.setUserQueuePlaying(true)
     } else if playerIndex.queueType == .prev, playerIndex.index >= 0,
               playerIndex.index < prevQueueCount {
       if isUserQueuePlaying {
         removeItemFromUserQueue(at: 0)
       }
       playable = getPrevQueueItem(at: playerIndex.index)
-      currentIndex = playerIndex.index
-      playerQueues.isUserQueuePlaying = false
+      setCurrentIndex(playerIndex.index)
+      playerQueues.setUserQueuePlaying(false)
     } else if playerIndex.queueType == .next, playerIndex.index >= 0,
               playerIndex.index < nextQueueCount {
       if isUserQueuePlaying {
@@ -277,11 +278,11 @@ public class PlayQueueHandler {
       }
       playable = getNextQueueItem(at: playerIndex.index)
       if isUserQueuePlaying {
-        currentIndex = prevQueueCount + playerIndex.index
+        setCurrentIndex(prevQueueCount + playerIndex.index)
       } else {
-        currentIndex = prevQueueCount + 1 + playerIndex.index
+        setCurrentIndex(prevQueueCount + 1 + playerIndex.index)
       }
-      playerQueues.isUserQueuePlaying = false
+      playerQueues.setUserQueuePlaying(false)
     }
     return playable
   }
@@ -338,20 +339,20 @@ public class PlayQueueHandler {
       if !isUserQueuePlaying {
         moveContextItem(fromIndex: from.index, to: offsetToNext + to.index - 1)
       } else if from.index == currentIndex, to.index == 0 {
-        currentIndex -= 1
+        setCurrentIndex(currentIndex - 1)
       } else {
         moveContextItem(fromIndex: from.index, to: offsetToNext + to.index - 1)
-        currentIndex -= 1
+        setCurrentIndex(currentIndex - 1)
       }
       // Next ==> Prev
     } else if from.queueType == .next, to.queueType == .prev {
       if !isUserQueuePlaying {
         moveContextItem(fromIndex: offsetToNext + from.index, to: to.index)
       } else if from.index == 0, to.index == currentIndex + 1 {
-        currentIndex += 1
+        setCurrentIndex(currentIndex + 1)
       } else {
         moveContextItem(fromIndex: offsetToNext + from.index, to: to.index)
-        currentIndex += 1
+        setCurrentIndex(currentIndex + 1)
       }
 
       // User ==> Next
@@ -366,7 +367,7 @@ public class PlayQueueHandler {
       let fromIndex = activeQueue.songCount - 1
       moveContextItem(fromIndex: fromIndex, to: to.index)
       if isUserQueuePlaying {
-        currentIndex += 1
+        setCurrentIndex(currentIndex + 1)
       }
       removeItemFromUserQueue(at: from.index + userQueueOffsetIsUserQueuePlaying)
 
@@ -400,9 +401,10 @@ public class PlayQueueHandler {
     }
   }
 
-  private var currentIndex: Int {
-    get { playerQueues.currentIndex }
-    set { playerQueues.currentIndex = newValue }
+  private var currentIndex: Int { playerQueues.currentIndex }
+
+  func setCurrentIndex(_ newValue: Int) {
+    playerQueues.setCurrentIndex(newValue)
   }
 
   private var activeQueue: Playlist {
@@ -426,9 +428,9 @@ public class PlayQueueHandler {
     guard index < activeQueue.songCount else { return }
     let playableToRemove = activeQueue.getPlayable(at: index)!
     if index < currentIndex {
-      currentIndex -= 1
+      setCurrentIndex(currentIndex - 1)
     } else if isUserQueuePlaying, index == currentIndex {
-      currentIndex -= 1
+      setCurrentIndex(currentIndex - 1)
     }
     activeQueue.remove(at: index)
     playerQueues.inactiveQueue.remove(firstOccurrenceOfPlayable: playableToRemove)
@@ -440,11 +442,11 @@ public class PlayQueueHandler {
     activeQueue.movePlaylistItem(fromIndex: fromIndex, to: to)
     guard !isUserQueuePlaying else { return }
     if currentIndex == fromIndex {
-      currentIndex = to
+      setCurrentIndex(to)
     } else if fromIndex < currentIndex, currentIndex <= to {
-      currentIndex -= 1
+      setCurrentIndex(currentIndex - 1)
     } else if to <= currentIndex, currentIndex < fromIndex {
-      currentIndex += 1
+      setCurrentIndex(currentIndex + 1)
     }
   }
 

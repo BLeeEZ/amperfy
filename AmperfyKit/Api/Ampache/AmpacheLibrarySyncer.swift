@@ -544,16 +544,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       )
       let directoriesBeforeFetch = Set(musicFolderAsync.directories)
       var directoriesAfterFetch: Set<Directory> = Set()
-      
+
       let artistDirectoryIds = parserDelegate.artistsParsed.compactMap {
         "artist-\($0.id)"
       }
       let artistDirectoryIdsSet = Set(artistDirectoryIds)
       let directoriesForArtists = asyncCompanion.library.getDirectories(ids: artistDirectoryIdsSet)
-      
+
       for artist in parserDelegate.artistsParsed {
         let artistDirId = "artist-\(artist.id)"
-        
+
         var curDir: Directory!
         if let foundDir = directoriesForArtists[artistDirId] {
           curDir = foundDir
@@ -645,13 +645,13 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
       var directoriesAfterFetch: Set<Directory> = Set()
       let artistAlbums = asyncCompanion.library.getAlbums(whichContainsSongsWithArtist: artistAsync)
-      
+
       let albumDirectoryIds = artistAlbums.compactMap {
         "album-\($0.id)"
       }
       let albumDirectoryIdsSet = Set(albumDirectoryIds)
       let directoriesForAlbums = asyncCompanion.library.getDirectories(ids: albumDirectoryIdsSet)
-      
+
       for album in artistAlbums {
         let albumDirId = "album-\(album.id)"
         var albumDir: Directory!

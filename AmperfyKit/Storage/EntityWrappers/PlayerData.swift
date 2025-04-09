@@ -28,25 +28,34 @@ import UIKit
 
 protocol PlayerStatusPersistent {
   func stop()
-  var isAutoCachePlayedItems: Bool { get set }
+  var isAutoCachePlayedItems: Bool { get }
+  func setAutoCachePlayedItems(_ newValue: Bool)
   var isPopupBarAllowedToHide: Bool { get }
   var musicItemCount: Int { get }
   var podcastItemCount: Int { get }
-  var playerMode: PlayerMode { get set }
-  var isShuffle: Bool { get set }
-  var repeatMode: RepeatMode { get set }
-  var playbackRate: PlaybackRate { get set }
-  var musicPlaybackRate: PlaybackRate { get set }
-  var podcastPlaybackRate: PlaybackRate { get set }
+  var playerMode: PlayerMode { get }
+  func setPlayerMode(_ newValue: PlayerMode)
+  var isShuffle: Bool { get }
+  func setShuffle(_ newValue: Bool)
+  var repeatMode: RepeatMode { get }
+  func setRepeatMode(_ newValue: RepeatMode)
+  var playbackRate: PlaybackRate { get }
+  func setPlaybackRate(_ newValue: PlaybackRate)
+  var musicPlaybackRate: PlaybackRate { get }
+  func setMusicPlaybackRate(_ newValue: PlaybackRate)
+  var podcastPlaybackRate: PlaybackRate { get }
+  func setPodcastPlaybackRate(_ newValue: PlaybackRate)
 }
 
 // MARK: - PlayerQueuesPersistent
 
 protocol PlayerQueuesPersistent {
-  var isUserQueuePlaying: Bool { get set }
+  var isUserQueuePlaying: Bool { get }
+  func setUserQueuePlaying(_ newValue: Bool)
   var isUserQueueVisible: Bool { get }
 
-  var currentIndex: Int { get set }
+  var currentIndex: Int { get }
+  func setCurrentIndex(_ newValue: Int)
   var currentItem: AbstractPlayable? { get }
   var currentMusicItem: AbstractPlayable? { get }
   var currentPodcastItem: AbstractPlayable? { get }
@@ -54,7 +63,8 @@ protocol PlayerQueuesPersistent {
   var inactiveQueue: Playlist { get }
   var contextQueue: Playlist { get }
   var podcastQueue: Playlist { get }
-  var contextName: String { get set }
+  var contextName: String { get }
+  func setContextName(_ newValue: String)
   var userQueuePlaylist: Playlist { get }
 
   func insertActiveQueue(playables: [AbstractPlayable])
@@ -134,22 +144,22 @@ public class PlayerData: NSObject {
 
 extension PlayerData: PlayerStatusPersistent {
   func stop() {
-    currentIndex = 0
+    setCurrentIndex(0)
     switch playerMode {
     case .music:
-      isUserQueuePlaying = false
+      setUserQueuePlaying(false)
       clearUserQueue()
     case .podcast:
       break
     }
+    library.saveContext()
   }
 
-  var isAutoCachePlayedItems: Bool {
-    get { managedObject.autoCachePlayedItemSetting == 1 }
-    set {
-      managedObject.autoCachePlayedItemSetting = newValue ? 1 : 0
-      library.saveContext()
-    }
+  var isAutoCachePlayedItems: Bool { managedObject.autoCachePlayedItemSetting == 1 }
+
+  func setAutoCachePlayedItems(_ newValue: Bool) {
+    managedObject.autoCachePlayedItemSetting = newValue ? 1 : 0
+    library.saveContext()
   }
 
   var isPopupBarAllowedToHide: Bool {
@@ -165,100 +175,94 @@ extension PlayerData: PlayerStatusPersistent {
     podcastPlaylist.songCount
   }
 
-  var playerMode: PlayerMode {
-    get { PlayerMode(rawValue: managedObject.playerMode) ?? .music }
-    set {
-      managedObject.playerMode = newValue.rawValue
-      library.saveContext()
-    }
+  var playerMode: PlayerMode { PlayerMode(rawValue: managedObject.playerMode) ?? .music }
+
+  func setPlayerMode(_ newValue: PlayerMode) {
+    managedObject.playerMode = newValue.rawValue
+    library.saveContext()
   }
 
   var isShuffle: Bool {
-    get {
-      switch playerMode {
-      case .music:
-        return managedObject.shuffleSetting == 1
-      case .podcast:
-        return false
+    switch playerMode {
+    case .music:
+      return managedObject.shuffleSetting == 1
+    case .podcast:
+      return false
+    }
+  }
+
+  func setShuffle(_ newValue: Bool) {
+    if newValue {
+      shuffledContextPlaylist.shuffle()
+      if let curPlayable = currentItem,
+         let indexOfCurrentItemInShuffledPlaylist = shuffledContextPlaylist
+         .getFirstIndex(playable: curPlayable) {
+        shuffledContextPlaylist.movePlaylistItem(
+          fromIndex: indexOfCurrentItemInShuffledPlaylist,
+          to: 0
+        )
+        setCurrentIndex(0)
+      }
+    } else {
+      if let curPlayable = currentItem,
+         let indexOfCurrentItemInNormalPlaylist = contextPlaylist
+         .getFirstIndex(playable: curPlayable) {
+        setCurrentIndex(indexOfCurrentItemInNormalPlaylist)
       }
     }
-    set {
-      if newValue {
-        shuffledContextPlaylist.shuffle()
-        if let curPlayable = currentItem,
-           let indexOfCurrentItemInShuffledPlaylist = shuffledContextPlaylist
-           .getFirstIndex(playable: curPlayable) {
-          shuffledContextPlaylist.movePlaylistItem(
-            fromIndex: indexOfCurrentItemInShuffledPlaylist,
-            to: 0
-          )
-          currentIndex = 0
-        }
-      } else {
-        if let curPlayable = currentItem,
-           let indexOfCurrentItemInNormalPlaylist = contextPlaylist
-           .getFirstIndex(playable: curPlayable) {
-          currentIndex = indexOfCurrentItemInNormalPlaylist
-        }
-      }
-      managedObject.shuffleSetting = newValue ? 1 : 0
-      library.saveContext()
-    }
+    managedObject.shuffleSetting = newValue ? 1 : 0
+    library.saveContext()
   }
 
   var repeatMode: RepeatMode {
-    get {
-      switch playerMode {
-      case .music:
-        return RepeatMode(rawValue: managedObject.repeatSetting) ?? .off
-      case .podcast:
-        return .off
-      }
+    switch playerMode {
+    case .music:
+      return RepeatMode(rawValue: managedObject.repeatSetting) ?? .off
+    case .podcast:
+      return .off
     }
-    set {
-      managedObject.repeatSetting = newValue.rawValue
-      library.saveContext()
-    }
+  }
+
+  func setRepeatMode(_ newValue: RepeatMode) {
+    managedObject.repeatSetting = newValue.rawValue
+    library.saveContext()
   }
 
   var playbackRate: PlaybackRate {
-    get {
-      switch playerMode {
-      case .music:
-        return PlaybackRate.create(from: managedObject.musicPlaybackRate)
-      case .podcast:
-        return PlaybackRate.create(from: managedObject.podcastPlaybackRate)
-      }
+    switch playerMode {
+    case .music:
+      return PlaybackRate.create(from: managedObject.musicPlaybackRate)
+    case .podcast:
+      return PlaybackRate.create(from: managedObject.podcastPlaybackRate)
     }
-    set {
-      switch playerMode {
-      case .music:
-        managedObject.musicPlaybackRate = newValue.asDouble
-      case .podcast:
-        managedObject.podcastPlaybackRate = newValue.asDouble
-      }
-      library.saveContext()
+  }
+
+  func setPlaybackRate(_ newValue: PlaybackRate) {
+    switch playerMode {
+    case .music:
+      managedObject.musicPlaybackRate = newValue.asDouble
+    case .podcast:
+      managedObject.podcastPlaybackRate = newValue.asDouble
     }
+    library.saveContext()
   }
 
   var musicPlaybackRate: PlaybackRate {
-    get {
-      PlaybackRate.create(from: managedObject.musicPlaybackRate)
-    }
-    set {
-      managedObject.musicPlaybackRate = newValue.asDouble
-      library.saveContext()
-    }
+    PlaybackRate.create(from: managedObject.musicPlaybackRate)
+  }
+
+  func setMusicPlaybackRate(_ newValue: PlaybackRate) {
+    managedObject.musicPlaybackRate = newValue.asDouble
+    library.saveContext()
   }
 
   var podcastPlaybackRate: PlaybackRate {
-    get {
-      PlaybackRate.create(from: managedObject.podcastPlaybackRate)
-    }
-    set {
-      managedObject.podcastPlaybackRate = newValue.asDouble
-      library.saveContext()
-    }
+    PlaybackRate.create(from: managedObject.podcastPlaybackRate)
+  }
+
+  func setPodcastPlaybackRate(_ newValue: PlaybackRate) {
+    managedObject.podcastPlaybackRate = newValue.asDouble
+    library.saveContext()
   }
 }
 
@@ -266,30 +270,28 @@ extension PlayerData: PlayerStatusPersistent {
 
 extension PlayerData: PlayerQueuesPersistent {
   var isUserQueuePlaying: Bool {
-    get {
-      switch playerMode {
-      case .music:
-        return isUserQueuPlayingInternal
-      case .podcast:
-        return false
-      }
-    }
-    set {
-      switch playerMode {
-      case .music:
-        isUserQueuPlayingInternal = newValue
-      case .podcast:
-        break
-      }
+    switch playerMode {
+    case .music:
+      return isUserQueuPlayingInternal
+    case .podcast:
+      return false
     }
   }
 
-  private var isUserQueuPlayingInternal: Bool {
-    get { managedObject.isUserQueuePlaying }
-    set {
-      managedObject.isUserQueuePlaying = newValue
-      library.saveContext()
+  func setUserQueuePlaying(_ newValue: Bool) {
+    switch playerMode {
+    case .music:
+      setUserQueuPlayingInternal(newValue)
+    case .podcast:
+      break
     }
+  }
+
+  private var isUserQueuPlayingInternal: Bool { managedObject.isUserQueuePlaying }
+
+  private func setUserQueuPlayingInternal(_ newValue: Bool) {
+    managedObject.isUserQueuePlaying = newValue
+    library.saveContext()
   }
 
   var isUserQueueVisible: Bool {
@@ -336,36 +338,35 @@ extension PlayerData: PlayerQueuesPersistent {
   var podcastQueue: Playlist { podcastPlaylist }
 
   var contextName: String {
-    get {
-      switch playerMode {
-      case .music:
-        return contextPlaylist.name
-      case .podcast:
-        return "Podcasts"
-      }
-    }
-    set {
-      contextPlaylist.name = newValue
+    switch playerMode {
+    case .music:
+      return contextPlaylist.name
+    case .podcast:
+      return "Podcasts"
     }
   }
 
+  func setContextName(_ newValue: String) {
+    contextPlaylist.name = newValue
+  }
+
   var currentIndex: Int {
-    get {
-      switch playerMode {
-      case .music:
-        return currentMusicIndex
-      case .podcast:
-        return currentPodcastIndex
-      }
+    switch playerMode {
+    case .music:
+      return currentMusicIndex
+    case .podcast:
+      return currentPodcastIndex
     }
-    set {
-      switch playerMode {
-      case .music:
-        currentMusicIndex = newValue
-      case .podcast:
-        currentPodcastIndex = newValue
-      }
+  }
+
+  func setCurrentIndex(_ newValue: Int) {
+    switch playerMode {
+    case .music:
+      currentMusicIndex = newValue
+    case .podcast:
+      currentPodcastIndex = newValue
     }
+    library.saveContext()
   }
 
   private var currentMusicIndex: Int {
@@ -384,7 +385,6 @@ extension PlayerData: PlayerQueuesPersistent {
       } else {
         managedObject.musicIndex = isUserQueuPlayingInternal ? -1 : 0
       }
-      library.saveContext()
     }
   }
 
@@ -406,7 +406,6 @@ extension PlayerData: PlayerQueuesPersistent {
       } else {
         managedObject.podcastIndex = 0
       }
-      library.saveContext()
     }
   }
 
@@ -468,6 +467,7 @@ extension PlayerData: PlayerQueuesPersistent {
     }
     contextPlaylist.insert(playables: playables, index: targetIndex)
     shuffledContextPlaylist.insert(playables: playables, index: targetIndex)
+    library.saveContext()
   }
 
   func appendContextQueue(playables: [AbstractPlayable]) {
@@ -502,20 +502,21 @@ extension PlayerData: PlayerQueuesPersistent {
       clearContextQueue()
     case .podcast:
       podcastPlaylist.removeAllItems()
-      currentIndex = 0
+      setCurrentIndex(0)
     }
   }
 
   func clearContextQueue() {
-    contextName = ""
+    setContextName("")
     contextPlaylist.removeAllItems()
     shuffledContextPlaylist.removeAllItems()
     if userQueuePlaylistInternal.songCount > 0 {
-      isUserQueuPlayingInternal = true
+      setUserQueuPlayingInternal(true)
       currentMusicIndex = -1
     } else {
       currentMusicIndex = 0
     }
+    library.saveContext()
   }
 
   func clearUserQueue() {
@@ -523,11 +524,12 @@ extension PlayerData: PlayerQueuesPersistent {
   }
 
   func removeAllItems() {
-    currentIndex = 0
-    isUserQueuPlayingInternal = false
+    setCurrentIndex(0)
+    setUserQueuPlayingInternal(false)
     contextPlaylist.removeAllItems()
     shuffledContextPlaylist.removeAllItems()
     userQueuePlaylistInternal.removeAllItems()
     podcastPlaylist.removeAllItems()
+    library.saveContext()
   }
 }

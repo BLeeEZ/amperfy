@@ -154,7 +154,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     queueHandler.clearActiveQueue()
     queueHandler.appendActiveQueue(playables: context.playables)
     if context.type == .music {
-      queueHandler.contextName = context.name
+      queueHandler.setContextName(context.name)
     }
 
     if queueHandler.isUserQueuePlaying {
