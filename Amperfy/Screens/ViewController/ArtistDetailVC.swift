@@ -78,7 +78,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
     detailOperationsView = GenericDetailTableHeader
       .createTableHeader(configuration: detailHeaderConfig)
 
-    optionsButton.menu = UIMenu.lazyMenu {
+    optionsButton.menu = UIMenu.lazyMenu(deferredMenuIsBroken: true) {
       EntityPreviewActionBuilder(container: self.artist, on: self).createMenu()
     }
     navigationItem.rightBarButtonItem = optionsButton

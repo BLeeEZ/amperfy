@@ -141,7 +141,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     )
     optionsButton = OptionsBarButton()
 
-    optionsButton.menu = UIMenu.lazyMenu {
+    optionsButton.menu = UIMenu.lazyMenu(deferredMenuIsBroken: true) {
       EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
     }
 
