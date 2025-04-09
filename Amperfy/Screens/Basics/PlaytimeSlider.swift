@@ -46,16 +46,19 @@ class PlaytimeSlider: UISlider {
     return containsPoint
   }
 
-  override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
-    let percentage = CGFloat((value - minimumValue) / (maximumValue - minimumValue))
-    let thumbSizeHeight = thumbRect(
-      forBounds: bounds,
-      trackRect: trackRect(forBounds: bounds),
-      value: 0
-    ).size.height
-    let thumbPosition = thumbSizeHeight + (percentage * (bounds.size.width - (2 * thumbSizeHeight)))
-    let touchLocation = touch.location(in: self)
-    return touchLocation.x <= (thumbPosition + thumbTouchSize.width) && touchLocation
-      .x >= (thumbPosition - thumbTouchSize.width)
-  }
+  #if !targetEnvironment(macCatalyst)
+    override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+      let percentage = CGFloat((value - minimumValue) / (maximumValue - minimumValue))
+      let thumbSizeHeight = thumbRect(
+        forBounds: bounds,
+        trackRect: trackRect(forBounds: bounds),
+        value: 0
+      ).size.height
+      let thumbPosition = thumbSizeHeight +
+        (percentage * (bounds.size.width - (2 * thumbSizeHeight)))
+      let touchLocation = touch.location(in: self)
+      return touchLocation.x <= (thumbPosition + thumbTouchSize.width) && touchLocation
+        .x >= (thumbPosition - thumbTouchSize.width)
+    }
+  #endif
 }

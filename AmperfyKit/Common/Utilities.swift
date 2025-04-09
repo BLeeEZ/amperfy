@@ -547,15 +547,23 @@ extension UISlider {
   public func setUnicolorRoundedThumbImage(
     thumbSize: CGSize,
     color: UIColor,
-    for state: UIControl.State
+    for state: UIControl.State,
+    lineWidth: CGFloat,
+    strokeColor: UIColor? = nil
   ) {
-    let layerFrame = CGRect(origin: .zero, size: thumbSize)
+    let layerFrame = CGRect(origin: .zero, size: thumbSize).insetBy(dx: lineWidth, dy: lineWidth)
     let path = UIBezierPath(
       roundedRect: layerFrame,
       byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight],
       cornerRadii: CGSize(width: thumbSize.width / 2, height: thumbSize.height / 2)
     ).cgPath
-    let thumbImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+    let thumbImage = createImage(
+      path: path,
+      inFrame: layerFrame,
+      color: color,
+      lineWidth: lineWidth,
+      strokeColor: strokeColor
+    )
     setThumbImage(thumbImage, for: state)
   }
 
@@ -572,6 +580,26 @@ extension UISlider {
     ).cgPath
     let thumbImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
     setThumbImage(thumbImage, for: state)
+  }
+
+  public func setUnicolorRoundedMinimumTrackImage(
+    trackHeight: CGFloat,
+    color: UIColor,
+    for state: UIControl.State
+  ) {
+    let layerFrame = CGRect(origin: .zero, size: CGSize(width: trackHeight, height: trackHeight))
+    let radii = trackHeight / 2
+    let path = UIBezierPath(
+      roundedRect: layerFrame,
+      byRoundingCorners: [.topLeft, .bottomLeft],
+      cornerRadii: CGSize(width: radii, height: radii)
+    ).cgPath
+    let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+      .resizableImage(
+        withCapInsets: UIEdgeInsets(top: 0, left: radii, bottom: 0, right: 0),
+        resizingMode: .stretch
+      )
+    setMinimumTrackImage(trackImage, for: .normal)
   }
 
   public func setUnicolorRectangularMinimumTrackImage(
@@ -593,6 +621,26 @@ extension UISlider {
     let layerFrame = CGRect(origin: .zero, size: CGSize(width: 1, height: trackHeight))
     let path = CGPath(rect: layerFrame, transform: nil)
     let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+    setMaximumTrackImage(trackImage, for: .normal)
+  }
+
+  public func setUnicolorRoundedMaximumTrackImage(
+    trackHeight: CGFloat,
+    color: UIColor,
+    for state: UIControl.State
+  ) {
+    let layerFrame = CGRect(origin: .zero, size: CGSize(width: trackHeight, height: trackHeight))
+    let radii = trackHeight / 2
+    let path = UIBezierPath(
+      roundedRect: layerFrame,
+      byRoundingCorners: [.topRight, .bottomRight],
+      cornerRadii: CGSize(width: radii, height: radii)
+    ).cgPath
+    let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
+      .resizableImage(
+        withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: radii),
+        resizingMode: .stretch
+      )
     setMaximumTrackImage(trackImage, for: .normal)
   }
 
