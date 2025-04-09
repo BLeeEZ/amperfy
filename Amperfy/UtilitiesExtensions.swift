@@ -375,16 +375,28 @@ extension UIMenu {
   static func lazyMenu(title: String = "", builder: @escaping () -> UIMenu) -> UIMenu {
     #if targetEnvironment(macCatalyst)
       // https://forums.developer.apple.com/forums/thread/726665
-      // UIDeferredMenuElement is completly broken in catalyst
-      return UIMenu(title: title, children: [builder()])
+      // UIDeferredMenuElement is completly broken in catalyst. Seems to be fixed in 15.x
+      let deferredMenuIsBroken =
+        if #available(iOS 18.0, *) { // >= macOS 15.x
+          false
+        } else {
+          true
+        }
     #else
+      let deferredMenuIsBroken = false
+    #endif
+
+    print("Version : \(deferredMenuIsBroken)")
+    if deferredMenuIsBroken {
+      return UIMenu(title: title, children: [builder()])
+    } else {
       return UIMenu(title: title, children: [
         UIDeferredMenuElement.uncached { completion in
           let menu = builder()
           completion([menu])
         },
       ])
-    #endif
+    }
   }
 }
 

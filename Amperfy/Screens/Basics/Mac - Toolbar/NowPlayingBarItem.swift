@@ -57,9 +57,12 @@ import UIKit
         rounded: false,
         for: .normal
       )
-        let borderWidth = 0.5
+      let borderWidth = 0.5
       setUnicolorThumbImage(
-        thumbSize: CGSize(width: 6 + borderWidth*2, height: Self.sliderHeight * 2 + borderWidth*2),
+        thumbSize: CGSize(
+          width: 6 + borderWidth * 2,
+          height: Self.sliderHeight * 2 + borderWidth * 2
+        ),
         color: .systemGray,
         lineWidth: borderWidth,
         strokeColor: .systemGray6,
