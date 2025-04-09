@@ -53,14 +53,14 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     -> URL {
     guard downloadInfo.type == .artwork else { throw DownloadError.fetchFailed }
     guard networkMonitor.isConnectedToNetwork else { throw DownloadError.noConnectivity }
-    let artworkUrl = try await storage.performAndGet { asyncCompanion in
+    let artworkRemoteInfo = try await storage.performAndGet { asyncCompanion in
       let artwork = Artwork(
         managedObject: asyncCompanion.context
           .object(with: downloadInfo.objectId) as! ArtworkMO
       )
-      return artwork.url
+      return artwork.remoteInfo
     }
-    return try await ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artworkUrl)
+    return try await ampacheXmlServerApi.generateUrlForArtwork(artworkRemoteInfo: artworkRemoteInfo)
   }
 
   func validateDownloadedData(fileURL: URL?, downloadURL: URL?) -> ResponseError? {

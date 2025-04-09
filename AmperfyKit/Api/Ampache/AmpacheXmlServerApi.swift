@@ -813,8 +813,20 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     return url
   }
 
-  public func generateUrlForArtwork(artworkUrl: String) async throws -> URL {
-    try await updateUrlToken(urlString: artworkUrl)
+  public func generateUrlForArtwork(artworkRemoteInfo: ArtworkRemoteInfo) async throws -> URL {
+    guard let hostname = credentials
+      .wrappedValue?.serverUrl else { throw BackendError.noCredentials }
+    guard var apiUrl = URL(string: hostname) else { throw BackendError.invalidUrl }
+    apiUrl.appendPathComponent("image.php")
+
+    guard var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
+    else { throw BackendError.invalidUrl }
+
+    urlComp.addQueryItem(name: "object_id", value: artworkRemoteInfo.id)
+    urlComp.addQueryItem(name: "object_type", value: artworkRemoteInfo.type)
+
+    let url = try createUrl(from: urlComp)
+    return url
   }
 
   public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {

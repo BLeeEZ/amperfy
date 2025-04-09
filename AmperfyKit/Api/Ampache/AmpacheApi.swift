@@ -78,7 +78,7 @@ final class AmpacheApi: BackendApi {
   }
 
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
-    try await ampacheXmlServerApi.generateUrlForArtwork(artworkUrl: artwork.url)
+    try await ampacheXmlServerApi.generateUrlForArtwork(artworkRemoteInfo: artwork.remoteInfo)
   }
 
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
