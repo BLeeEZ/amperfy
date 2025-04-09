@@ -36,6 +36,7 @@ import UIKit
       self.preferredBehavioralStyle = .pad
       self.isContinuous = false
       refreshSliderDesign()
+      installScrollGestureRecognizer(sensitivity: 2)
     }
 
     required init?(coder: NSCoder) {
@@ -504,7 +505,7 @@ import UIKit
         let supportTimeInteraction = !currentlyPlaying.isRadio
         timeSlider.isEnabled = supportTimeInteraction
         timeSlider.maximumValue = Float(player.duration)
-        if !timeSlider.isTracking, supportTimeInteraction {
+        if !timeSlider.isTracking, !timeSlider.isTrackingManually, supportTimeInteraction {
           timeSlider.value = Float(player.elapsedTime)
         }
 

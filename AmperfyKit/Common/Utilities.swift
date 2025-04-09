@@ -673,6 +673,65 @@ extension UISlider {
   }
 }
 
+#if targetEnvironment(macCatalyst)
+  class ScrollGestureRecognizer: UIPanGestureRecognizer {
+    var sensitivity: CGFloat = 100.0
+
+    var isTracking: Bool {
+      state == .began || state == .changed
+    }
+
+    var scrollDelta: CGFloat {
+      let translation = translation(in: view)
+      let deltaX = translation.x / sensitivity
+      let deltaY = translation.y / sensitivity
+      return deltaX - deltaY
+    }
+  }
+
+  extension UISlider {
+    private var scrollGestureRecognizer: ScrollGestureRecognizer? {
+      gestureRecognizers?.first(where: {
+        $0 as? ScrollGestureRecognizer != nil
+      }) as? ScrollGestureRecognizer
+    }
+
+    public var isTrackingManually: Bool {
+      scrollGestureRecognizer?.isTracking ?? false
+    }
+
+    public func installScrollGestureRecognizer(sensitivity: CGFloat) {
+      let panGesture = ScrollGestureRecognizer(target: self, action: #selector(handleScroll(_:)))
+      panGesture.allowedScrollTypesMask = .continuous
+      panGesture.cancelsTouchesInView = false
+      panGesture.sensitivity = sensitivity
+      addGestureRecognizer(panGesture)
+    }
+
+    @objc
+    private func handleScroll(_ gesture: ScrollGestureRecognizer) {
+      let newValue = value + Float(gesture.scrollDelta)
+      value = min(max(newValue, minimumValue), maximumValue)
+
+      switch gesture.state {
+      case .changed:
+        if isContinuous {
+          sendActions(for: .valueChanged)
+        }
+      case .cancelled, .ended, .failed:
+        sendActions(for: .valueChanged)
+      default: break
+      }
+
+      gesture.setTranslation(.zero, in: self)
+    }
+  }
+#else
+  extension UISlider {
+      public var isTrackingManually: Bool { false }
+  }
+#endif
+
 extension UIImage {
   public func averageColor() -> UIColor {
     var bitmap = [UInt8](repeating: 0, count: 4)

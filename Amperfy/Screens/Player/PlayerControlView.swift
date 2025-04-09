@@ -360,7 +360,7 @@ class PlayerControlView: UIView {
       timeSlider.isEnabled = supportTimeInteraction
       timeSlider.minimumValue = 0.0
       timeSlider.maximumValue = Float(player.duration)
-      if !timeSlider.isTracking, supportTimeInteraction {
+      if !timeSlider.isTracking, !timeSlider.isTrackingManually, supportTimeInteraction {
         let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
         elapsedTimeLabel.text = elapsedClockTime.asShortString()
         if let remainingTime = remainingTime {

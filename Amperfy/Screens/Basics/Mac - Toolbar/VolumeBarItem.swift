@@ -35,6 +35,7 @@ import UIKit
       super.init(frame: frame)
       self.preferredBehavioralStyle = .pad
       refreshSliderDesign()
+      installScrollGestureRecognizer(sensitivity: 100)
     }
 
     required init?(coder: NSCoder) {
@@ -148,7 +149,7 @@ import UIKit
           .constraint(equalToConstant: CustomBarButton.verySmallPointSize * volumeIconHeightScale),
 
         // reduce the heigt of the slider to correctly center the slider inside the stack
-        volumeSliderView.heightAnchor.constraint(equalToConstant: height - 10),
+        volumeSliderView.heightAnchor.constraint(equalToConstant: height),
       ])
 
       volumeSliderView.value = player.volume
