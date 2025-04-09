@@ -88,7 +88,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
       action: #selector(Self.handleRefresh),
       for: UIControl.Event.valueChanged
     )
-    optionsButton.menu = UIMenu.lazyMenu(deferredMenuIsBroken: true) {
+    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
       EntityPreviewActionBuilder(container: self.podcast, on: self).createMenu()
     }
     navigationItem.rightBarButtonItem = optionsButton
