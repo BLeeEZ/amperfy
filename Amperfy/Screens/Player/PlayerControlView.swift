@@ -404,14 +404,16 @@ class PlayerControlView: UIView {
         liveLabel.isHidden = true
         timeSlider.layer.mask = nil
         timeSlider.setUnicolorThumbImage(
-          thumbSize: 10.0,
+          thumbSize: CGSize(width: 10.0, height: 10.0),
           color: .labelColor,
+          roundedCorners: .allCorners,
           for: UIControl.State.normal
         )
         #if !targetEnvironment(macCatalyst)
           timeSlider.setUnicolorThumbImage(
-            thumbSize: 30.0,
+            thumbSize: CGSize(width: 30.0, height: 30.0),
             color: .labelColor,
+            roundedCorners: .allCorners,
             for: UIControl.State.highlighted
           )
         #endif
@@ -422,14 +424,16 @@ class PlayerControlView: UIView {
       liveLabel.isHidden = true
       timeSlider.layer.mask = nil
       timeSlider.setUnicolorThumbImage(
-        thumbSize: 10.0,
+        thumbSize: CGSize(width: 10.0, height: 10.0),
         color: .labelColor,
+        roundedCorners: .allCorners,
         for: UIControl.State.normal
       )
       #if !targetEnvironment(macCatalyst)
         timeSlider.setUnicolorThumbImage(
-          thumbSize: 30.0,
+          thumbSize: CGSize(width: 30.0, height: 30.0),
           color: .labelColor,
+          roundedCorners: .allCorners,
           for: UIControl.State.highlighted
         )
       #endif
