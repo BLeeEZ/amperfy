@@ -111,7 +111,6 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
     } else {
       let createdArtwork = library.createArtwork()
       createdArtwork.remoteInfo = artworkRemoteInfo
-      createdArtwork.url = urlString
       prefetch.prefetchedArtworkDict[artworkRemoteInfo] = createdArtwork
       return createdArtwork
     }

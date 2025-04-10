@@ -44,7 +44,6 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     let album = library.createAlbum()
     album.id = albumId
     album.name = "FabricLive 25: High Contrast"
-    album.artwork?.url = "9ad05e5fb1ee14426973cce9fb0036dc"
   }
 
   override func checkCorrectParsing() {

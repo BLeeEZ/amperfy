@@ -130,7 +130,7 @@ final class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
         managedObject: asyncCompanion.context
           .object(with: downloadInfo.objectId) as! ArtworkMO
       )
-      artwork.status = .FetchError
+      artwork.markErrorIfNeeded()
       asyncCompanion.saveContext()
     }
   }

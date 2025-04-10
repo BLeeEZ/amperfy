@@ -73,7 +73,6 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 5624132)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     let song1Artwork = song.artwork
@@ -99,7 +98,6 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 5037357)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     XCTAssertEqual(song.artwork, song1Artwork)
@@ -125,7 +123,6 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 4651866)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     XCTAssertEqual(song.artwork, song1Artwork)

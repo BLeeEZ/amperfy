@@ -54,13 +54,11 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
 
     XCTAssertEqual(directories[0].id, "11")
     XCTAssertEqual(directories[0].name, "Arrival")
-    XCTAssertEqual(directories[0].artwork?.url, "")
     XCTAssertEqual(directories[0].artwork?.type, "")
     XCTAssertEqual(directories[0].artwork?.id, "22")
     XCTAssertFalse(directories[0].isCached)
     XCTAssertEqual(directories[1].id, "12")
     XCTAssertEqual(directories[1].name, "Super Trouper")
-    XCTAssertEqual(directories[1].artwork?.url, "")
     XCTAssertEqual(directories[1].artwork?.type, "")
     XCTAssertEqual(directories[1].artwork?.id, "23")
     XCTAssertFalse(directories[1].isCached)

@@ -39,7 +39,8 @@ class ArtworkTest: XCTestCase {
   func testCreation() {
     let artwork = library.createArtwork()
     XCTAssertEqual(artwork.status.rawValue, ImageStatus.IsDefaultImage.rawValue)
-    XCTAssertEqual(artwork.url, "")
+    XCTAssertEqual(artwork.id, "")
+    XCTAssertEqual(artwork.type, "")
     XCTAssertNil(artwork.imagePath)
     XCTAssertEqual(artwork.owners.count, 0)
   }
@@ -54,19 +55,6 @@ class ArtworkTest: XCTestCase {
     guard let artistFetched = library.getArtist(id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
     XCTAssertEqual(artistFetched.artwork?.status, ImageStatus.FetchError)
-  }
-
-  func testUrl() {
-    let testUrl = "www.test.de"
-    testArtwork.url = testUrl
-    XCTAssertEqual(testArtwork.url, testUrl)
-    guard let artist1 = library.getArtist(id: cdHelper.seeder.artists[0].id)
-    else { XCTFail(); return }
-    artist1.managedObject.artwork = testArtwork.managedObject
-    library.saveContext()
-    guard let artistFetched = library.getArtist(id: cdHelper.seeder.artists[0].id)
-    else { XCTFail(); return }
-    XCTAssertEqual(artistFetched.artwork?.url, testUrl)
   }
 
   func testImageWithCorrectStatus() {

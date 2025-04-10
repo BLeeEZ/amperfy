@@ -161,7 +161,7 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
         managedObject: asyncCompanion.context
           .object(with: downloadInfo.objectId) as! ArtworkMO
       )
-      artwork.status = .FetchError
+      artwork.markErrorIfNeeded()
       asyncCompanion.saveContext()
     }
   }

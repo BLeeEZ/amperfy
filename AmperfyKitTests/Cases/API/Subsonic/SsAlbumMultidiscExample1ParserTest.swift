@@ -44,7 +44,6 @@ class SsAlbumMultidiscExample1ParserTest: AbstractSsParserTest {
     let album = library.createAlbum()
     album.id = albumId
     album.name = "The Analog Botany Collection"
-    album.artwork?.url = "al-11053"
   }
 
   override func checkCorrectParsing() {
