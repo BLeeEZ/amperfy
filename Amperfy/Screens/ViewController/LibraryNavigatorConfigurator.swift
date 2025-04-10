@@ -531,21 +531,33 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
       guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
       var snapshot = dataSource.snapshot()
 
-      // move freshly selected item to end of selected items
-      if !item.isSelected, let lastInUsedItem = snapshot.itemIdentifiers.last(where: \.isSelected),
-         lastInUsedItem != item {
-        snapshot.moveItem(item, afterItem: lastInUsedItem)
-        dataSource.apply(snapshot, animatingDifferences: true)
+      if !item.isSelected {
+        if let lastInUsedItem = snapshot.itemIdentifiers.last(where: \.isSelected),
+           lastInUsedItem != item {
+          // move freshly selected item to end of selected items
+          snapshot.moveItem(item, afterItem: lastInUsedItem)
+          dataSource.apply(snapshot, animatingDifferences: true)
+        } else if let firstItem = snapshot.itemIdentifiers[offsetData.count...].first, firstItem != item {
+          // no active item exists
+          snapshot.moveItem(item, beforeItem: firstItem)
+          dataSource.apply(snapshot, animatingDifferences: true)
+        }
       }
 
-      // move deselected item to its correct position based on the ordering defined in LibraryDisplaySettings
-      if item.isSelected, let lib = item.library,
-         let beforeUnusedInsertionItem = snapshot.itemIdentifiers
-         .filter({ !$0.isSelected && $0.library != nil })
-         .first(where: { $0.library!.rawValue >= lib.rawValue }),
-         beforeUnusedInsertionItem != item {
-        snapshot.moveItem(item, beforeItem: beforeUnusedInsertionItem)
-        dataSource.apply(snapshot, animatingDifferences: true)
+      if item.isSelected, let lib = item.library {
+        if let beforeUnusedInsertionItem = snapshot.itemIdentifiers
+          .filter({ !$0.isSelected && $0.library != nil })
+          .first(where: { $0.library!.rawValue >= lib.rawValue }),
+          beforeUnusedInsertionItem != item
+          {
+            // move deselected item to its correct position based on the ordering defined in LibraryDisplaySettings
+            snapshot.moveItem(item, beforeItem: beforeUnusedInsertionItem)
+            dataSource.apply(snapshot, animatingDifferences: true)
+          } else if let lastItem = snapshot.itemIdentifiers.last, lastItem != item {
+            // no insertion index exists, therefore this must be the last element
+            snapshot.moveItem(item, afterItem: lastItem)
+            dataSource.apply(snapshot, animatingDifferences: true)
+        }
       }
 
       // don't animate selection
