@@ -27,6 +27,10 @@ class PlaytimeSlider: UISlider {
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
     self.preferredBehavioralStyle = .pad
+
+    #if targetEnvironment(macCatalyst)
+      installScrollGestureRecognizer(sensitivity: 2)
+    #endif
   }
 
   override func trackRect(forBounds bounds: CGRect) -> CGRect {

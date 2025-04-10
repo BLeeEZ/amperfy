@@ -163,7 +163,7 @@ public struct LibraryDisplaySettings {
 
   public init(inUse: [LibraryDisplayType]) {
     let notUsedSet = Set(LibraryDisplayType.allCases).subtracting(Set(inUse))
-    self.combined = [inUse, Array(notUsedSet)]
+    self.combined = [inUse, Array(notUsedSet).sorted(by: { $0.rawValue < $1.rawValue })]
   }
 
   public static var defaultSettings: LibraryDisplaySettings {
