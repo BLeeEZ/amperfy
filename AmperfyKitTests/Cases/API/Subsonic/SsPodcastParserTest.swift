@@ -59,7 +59,6 @@ class SsPodcastParserTest: AbstractSsParserTest {
       podcast.depiction,
       "Dr Chris Smith aka The < Naked Scientist with the latest news from the world of science and Dr Karl answers listeners' science questions."
     )
-    XCTAssertEqual(podcast.artwork?.url, "")
     XCTAssertEqual(podcast.artwork?.type, "")
     XCTAssertEqual(podcast.artwork?.id, "pod-1")
     XCTAssertFalse(podcast.isCached)
@@ -71,7 +70,6 @@ class SsPodcastParserTest: AbstractSsParserTest {
       podcast.depiction,
       "Et program der herrene Yan Friis og Finn Bjelke møtes og musikk nytes."
     )
-    XCTAssertEqual(podcast.artwork?.url, "")
     XCTAssertEqual(podcast.artwork?.type, "")
     XCTAssertEqual(podcast.artwork?.id, "pod-2")
     XCTAssertFalse(podcast.isCached)

@@ -46,7 +46,6 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     let album = library.createAlbum()
     album.id = "11053"
     album.name = "High Voltage"
-    album.artwork?.url = "al-11053"
   }
 
   override func checkCorrectParsing() {
@@ -78,7 +77,6 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 5624132)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     let song1Artwork = song.artwork
@@ -100,7 +98,6 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 5037357)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     XCTAssertEqual(song.artwork, song1Artwork)

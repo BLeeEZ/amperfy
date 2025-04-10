@@ -96,7 +96,6 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     XCTAssertEqual(episode.contentType, "audio/mpeg")
     XCTAssertNil(episode.url)
     XCTAssertEqual(episode.size, 78421341)
-    XCTAssertEqual(episode.artwork?.url, "")
     XCTAssertEqual(episode.artwork?.type, "")
     XCTAssertEqual(episode.artwork?.id, "24")
 
@@ -119,7 +118,6 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     XCTAssertEqual(episode.contentType, "audio/mpeg")
     XCTAssertNil(episode.url)
     XCTAssertEqual(episode.size, 45624671)
-    XCTAssertEqual(episode.artwork?.url, "")
     XCTAssertEqual(episode.artwork?.type, "")
     XCTAssertEqual(episode.artwork?.id, "27")
 

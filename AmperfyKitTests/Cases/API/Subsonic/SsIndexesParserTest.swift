@@ -100,7 +100,6 @@ class SsIndexesParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 8421341)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "24")
 
@@ -119,7 +118,6 @@ class SsIndexesParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/flac")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 4910028)
-    XCTAssertEqual(song.artwork?.url, "")
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "25")
   }

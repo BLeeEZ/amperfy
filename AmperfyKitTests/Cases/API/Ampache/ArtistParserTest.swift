@@ -55,10 +55,6 @@ class ArtistParserTest: AbstractAmpacheTest {
     XCTAssertEqual(artist.duration, 4282)
     XCTAssertEqual(artist.remoteDuration, 4282)
     XCTAssertEqual(artist.remoteAlbumCount, 1)
-    XCTAssertEqual(
-      artist.artwork?.url,
-      "https://music.com.au/image.php?object_id=16&object_type=artist&auth=eeb9f1b6056246a7d563f479f518bb34"
-    )
     XCTAssertEqual(artist.artwork?.type, "artist")
     XCTAssertEqual(artist.artwork?.id, "16")
 
@@ -69,10 +65,6 @@ class ArtistParserTest: AbstractAmpacheTest {
     XCTAssertEqual(artist.duration, 433)
     XCTAssertEqual(artist.remoteDuration, 433)
     XCTAssertEqual(artist.remoteAlbumCount, 0)
-    XCTAssertEqual(
-      artist.artwork?.url,
-      "https://music.com.au/image.php?object_id=27&object_type=artist&auth=eeb9f1b6056246a7d563f479f518bb34"
-    )
     XCTAssertEqual(artist.artwork?.type, "artist")
     XCTAssertEqual(artist.artwork?.id, "27")
 
@@ -83,10 +75,6 @@ class ArtistParserTest: AbstractAmpacheTest {
     XCTAssertEqual(artist.duration, 3428)
     XCTAssertEqual(artist.remoteDuration, 3428)
     XCTAssertEqual(artist.remoteAlbumCount, 1)
-    XCTAssertEqual(
-      artist.artwork?.url,
-      "https://music.com.au/image.php?object_id=13&object_type=artist&auth=eeb9f1b6056246a7d563f479f518bb34"
-    )
     XCTAssertEqual(artist.artwork?.type, "artist")
     XCTAssertEqual(artist.artwork?.id, "13")
     XCTAssertEqual(artist.genre?.id, "4")

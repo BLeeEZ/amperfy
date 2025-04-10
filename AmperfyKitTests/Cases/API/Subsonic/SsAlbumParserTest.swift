@@ -60,7 +60,6 @@ class SsAlbumParserTest: AbstractSsParserTest {
     XCTAssertEqual(album.remoteDuration, 2534)
     XCTAssertEqual(album.remoteSongCount, 10)
     XCTAssertNil(album.genre)
-    XCTAssertEqual(album.artwork?.url, "")
     XCTAssertEqual(album.artwork?.type, "")
     XCTAssertEqual(album.artwork?.id, "al-11047")
 
@@ -76,7 +75,6 @@ class SsAlbumParserTest: AbstractSsParserTest {
     XCTAssertEqual(album.remoteDuration, 2403)
     XCTAssertEqual(album.remoteSongCount, 10)
     XCTAssertNil(album.genre)
-    XCTAssertEqual(album.artwork?.url, "")
     XCTAssertEqual(album.artwork?.type, "")
     XCTAssertEqual(album.artwork?.id, "al-11052")
 
@@ -92,7 +90,6 @@ class SsAlbumParserTest: AbstractSsParserTest {
     XCTAssertEqual(album.remoteDuration, 2414)
     XCTAssertEqual(album.remoteSongCount, 8)
     XCTAssertNil(album.genre)
-    XCTAssertEqual(album.artwork?.url, "")
     XCTAssertEqual(album.artwork?.type, "")
     XCTAssertEqual(album.artwork?.id, "al-11053")
 
@@ -108,7 +105,6 @@ class SsAlbumParserTest: AbstractSsParserTest {
     XCTAssertEqual(album.remoteDuration, 2291)
     XCTAssertEqual(album.remoteSongCount, 9)
     XCTAssertNil(album.genre)
-    XCTAssertEqual(album.artwork?.url, "")
     XCTAssertEqual(album.artwork?.type, "")
     XCTAssertEqual(album.artwork?.id, "al-11061")
   }

@@ -62,10 +62,8 @@ class AlbumParserTest: AbstractAmpacheTest {
     XCTAssertEqual(album.remoteSongCount, 9)
     XCTAssertEqual(album.genre?.id, "7")
     XCTAssertEqual(album.genre?.name, "Punk")
-    XCTAssertEqual(
-      album.artwork?.url,
-      "https://music.com.au/image.php?object_id=12&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34"
-    )
+    XCTAssertEqual(album.artwork?.id, "12")
+    XCTAssertEqual(album.artwork?.type, "album")
 
     album = albums[1]
     XCTAssertEqual(album.id, "98")
@@ -79,10 +77,8 @@ class AlbumParserTest: AbstractAmpacheTest {
     XCTAssertEqual(album.remoteDuration, 4621)
     XCTAssertEqual(album.remoteSongCount, 1)
     XCTAssertNil(album.genre)
-    XCTAssertEqual(
-      album.artwork?.url,
-      "https://music.com.au/image.php?object_id=98&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34"
-    )
+    XCTAssertEqual(album.artwork?.id, "98")
+    XCTAssertEqual(album.artwork?.type, "album")
 
     album = albums[2]
     XCTAssertEqual(album.id, "99")
@@ -97,9 +93,7 @@ class AlbumParserTest: AbstractAmpacheTest {
     XCTAssertEqual(album.remoteSongCount, 105)
     XCTAssertEqual(album.genre?.id, "1")
     XCTAssertEqual(album.genre?.name, "Blub")
-    XCTAssertEqual(
-      album.artwork?.url,
-      "https://music.com.au/image.php?object_id=99&object_type=album&auth=eeb9f1b6056246a7d563f479f518bb34"
-    )
+    XCTAssertEqual(album.artwork?.id, "99")
+    XCTAssertEqual(album.artwork?.type, "album")
   }
 }

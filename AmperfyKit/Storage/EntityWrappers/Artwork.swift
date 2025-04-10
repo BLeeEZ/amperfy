@@ -64,13 +64,9 @@ public class Artwork: NSObject {
     set { managedObject.status = newValue.rawValue }
   }
 
-  public var url: String {
-    get { managedObject.url ?? "" }
-    set {
-      if managedObject.url != newValue {
-        status = .NotChecked
-        managedObject.url = newValue
-      }
+  public func markErrorIfNeeded() {
+    if status != .CustomImage {
+      status = .FetchError
     }
   }
 

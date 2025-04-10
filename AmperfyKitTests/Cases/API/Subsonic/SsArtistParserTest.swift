@@ -53,7 +53,6 @@ class SsArtistParserTest: AbstractSsParserTest {
     XCTAssertEqual(artist.duration, 0)
     XCTAssertEqual(artist.remoteDuration, 0)
     XCTAssertEqual(artist.remoteAlbumCount, 6)
-    XCTAssertEqual(artist.artwork?.url, "")
     XCTAssertEqual(artist.artwork?.type, "")
     XCTAssertEqual(artist.artwork?.id, "ar-5421")
 
@@ -64,7 +63,6 @@ class SsArtistParserTest: AbstractSsParserTest {
     XCTAssertEqual(artist.duration, 0)
     XCTAssertEqual(artist.remoteDuration, 0)
     XCTAssertEqual(artist.remoteAlbumCount, 15)
-    XCTAssertEqual(artist.artwork?.url, "")
     XCTAssertEqual(artist.artwork?.type, "")
     XCTAssertEqual(artist.artwork?.id, "ar-5432")
 
@@ -75,7 +73,6 @@ class SsArtistParserTest: AbstractSsParserTest {
     XCTAssertEqual(artist.duration, 0)
     XCTAssertEqual(artist.remoteDuration, 0)
     XCTAssertEqual(artist.remoteAlbumCount, 4)
-    XCTAssertEqual(artist.artwork?.url, "")
     XCTAssertEqual(artist.artwork?.type, "")
     XCTAssertEqual(artist.artwork?.id, "ar-5449")
 
@@ -86,7 +83,6 @@ class SsArtistParserTest: AbstractSsParserTest {
     XCTAssertEqual(artist.duration, 0)
     XCTAssertEqual(artist.remoteDuration, 0)
     XCTAssertEqual(artist.remoteAlbumCount, 8)
-    XCTAssertEqual(artist.artwork?.url, "")
     XCTAssertEqual(artist.artwork?.type, "")
     XCTAssertEqual(artist.artwork?.id, "ar-5950")
 
@@ -97,7 +93,6 @@ class SsArtistParserTest: AbstractSsParserTest {
     XCTAssertEqual(artist.duration, 0)
     XCTAssertEqual(artist.remoteDuration, 0)
     XCTAssertEqual(artist.remoteAlbumCount, 2)
-    XCTAssertEqual(artist.artwork?.url, "")
     XCTAssertEqual(artist.artwork?.type, "")
     XCTAssertEqual(artist.artwork?.id, "ar-5957")
 
@@ -108,7 +103,6 @@ class SsArtistParserTest: AbstractSsParserTest {
     XCTAssertEqual(artist.duration, 0)
     XCTAssertEqual(artist.remoteDuration, 0)
     XCTAssertEqual(artist.remoteAlbumCount, 1)
-    XCTAssertEqual(artist.artwork?.url, "")
     XCTAssertEqual(artist.artwork?.type, "")
     XCTAssertEqual(artist.artwork?.id, "ar-6633")
   }

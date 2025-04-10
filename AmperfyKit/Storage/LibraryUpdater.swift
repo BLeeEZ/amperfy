@@ -149,11 +149,6 @@ public class LibraryUpdater {
   /// Use UpdateVC for longer operations to display progress to user
   @MainActor
   public func performSmallBlockingLibraryUpdatesIfNeeded() {
-    if storage.librarySyncVersion < .v9 {
-      os_log("Perform blocking library update (START): Artwork ids", log: log, type: .info)
-      updateArtworkIdStructure()
-      os_log("Perform blocking library update (DONE): Artwork ids", log: log, type: .info)
-    }
     if storage.librarySyncVersion < .v12 {
       os_log(
         "Perform blocking library update (START): alphabeticSectionInitial",
@@ -281,34 +276,6 @@ public class LibraryUpdater {
         type: .info
       )
     }
-  }
-
-  @MainActor
-  private func updateArtworkIdStructure() {
-    // Extract artwork info from URL
-    var artworks = storage.main.library.getArtworks()
-    for artwork in artworks {
-      if let artworkUrlInfo = backendApi.extractArtworkInfoFromURL(urlString: artwork.url) {
-        artwork.type = artworkUrlInfo.type
-        artwork.id = artworkUrlInfo.id
-      } else {
-        storage.main.library.deleteArtwork(artwork: artwork)
-      }
-    }
-    storage.main.saveContext()
-
-    // Delete duplicate artworks
-    artworks = storage.main.library.getArtworks()
-    var uniqueArtworks: [String: Artwork] = [:]
-    for artwork in artworks {
-      if let existingArtwork = uniqueArtworks[artwork.uniqueID] {
-        artwork.owners.forEach { $0.artwork = existingArtwork }
-        storage.main.library.deleteArtwork(artwork: artwork)
-      } else {
-        uniqueArtworks[artwork.uniqueID] = artwork
-      }
-    }
-    storage.main.saveContext()
   }
 
   @MainActor
