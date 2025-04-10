@@ -365,12 +365,13 @@ class LibraryNavigatorConfigurator: NSObject {
         Self.configureForLibrary(contentView: &content, libraryItem: libraryItem)
 
         #if targetEnvironment(macCatalyst)
-          cell.accessories = [.reorder()]
+          cell.accessories = []
         #else
-          cell.accessories = [.disclosureIndicator(displayed: .whenNotEditing), .reorder()]
+          cell.accessories = [.disclosureIndicator(displayed: .whenNotEditing)]
         #endif
 
         if item.isSelected {
+          cell.accessories.append(.reorder())
           cell.accessories.append(.customView(configuration: .createIsSelected()))
         } else {
           cell.accessories.append(.customView(configuration: .createUnSelected()))
@@ -426,7 +427,7 @@ class LibraryNavigatorConfigurator: NSObject {
     /// 4 - data source reordering
     dataSource.reorderingHandlers.canReorderItem = { [weak self] item in
       let isEdit = self?.collectionView.isEditing ?? false
-      return isEdit && (item.tab == nil)
+      return item.isSelected && isEdit && (item.tab == nil)
     }
 
     // Somehow, this fixes a crash when trying to reorder the sidebar in catalyst. Leave it in.
@@ -509,7 +510,11 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
     toProposedIndexPath proposedIndexPath: IndexPath
   )
     -> IndexPath {
-    if proposedIndexPath.row >= offsetData.count {
+    let selectedRowsCount = dataSource.snapshot().itemIdentifiers.filter(\.isSelected).count
+    if proposedIndexPath.row >= offsetData.count + selectedRowsCount {
+      // don't allow reordering unused items
+      return IndexPath(row: offsetData.count + selectedRowsCount - 1, section: 0)
+    } else if proposedIndexPath.row >= offsetData.count {
       return proposedIndexPath
     } else {
       return IndexPath(row: offsetData.count, section: 0)
@@ -525,9 +530,29 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
       collectionView.deselectItem(at: indexPath, animated: true)
       guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
       var snapshot = dataSource.snapshot()
+
+      // move freshly selected item to end of selected items
+      if !item.isSelected, let lastInUsedItem = snapshot.itemIdentifiers.last(where: \.isSelected),
+         lastInUsedItem != item {
+        snapshot.moveItem(item, afterItem: lastInUsedItem)
+        dataSource.apply(snapshot, animatingDifferences: true)
+      }
+
+      // move deselected item to its correct position based on the ordering defined in LibraryDisplaySettings
+      if item.isSelected, let lib = item.library,
+         let beforeUnusedInsertionItem = snapshot.itemIdentifiers
+         .filter({ !$0.isSelected && $0.library != nil })
+         .first(where: { $0.library!.rawValue >= lib.rawValue }),
+         beforeUnusedInsertionItem != item {
+        snapshot.moveItem(item, beforeItem: beforeUnusedInsertionItem)
+        dataSource.apply(snapshot, animatingDifferences: true)
+      }
+
+      // don't animate selection
       item.isSelected.toggle()
       snapshot.reconfigureItems([item])
       dataSource.apply(snapshot, animatingDifferences: false)
+
       return
     }
     // Retrieve the item identifier using index path.
