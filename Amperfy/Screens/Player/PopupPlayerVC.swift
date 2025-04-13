@@ -141,6 +141,19 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       contextNextQueueSectionHeader = sectionView
       contextNextQueueSectionHeader?.prepare(toWorkOnRootView: self)
     }
+
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful(notification:)),
+      name: .downloadFinishedSuccess,
+      object: appDelegate.artworkDownloadManager
+    )
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful(notification:)),
+      name: .downloadFinishedSuccess,
+      object: appDelegate.playableDownloadManager
+    )
   }
 
   override func viewDidLayoutSubviews() {

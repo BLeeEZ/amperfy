@@ -193,6 +193,24 @@ extension PopupPlayerVC {
     }
   }
 
+  @objc
+  internal func downloadFinishedSuccessful(notification: Notification) {
+    guard let downloadNotification = DownloadNotification.fromNotification(notification),
+          let curPlayable = player.currentlyPlaying
+    else { return }
+    if curPlayable.uniqueID == downloadNotification.id {
+      Task { @MainActor in
+        refreshBackgroundAndPopupItemArtwork()
+      }
+    }
+    if let artwork = curPlayable.artwork,
+       artwork.uniqueID == downloadNotification.id {
+      Task { @MainActor in
+        refreshBackgroundAndPopupItemArtwork()
+      }
+    }
+  }
+
   // handle dark/light mode change
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
