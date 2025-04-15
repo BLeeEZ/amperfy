@@ -533,28 +533,17 @@ extension UIAlertAction {
 
 extension UISlider {
   public func setUnicolorThumbImage(
-    thumbSize: CGFloat,
-    color: UIColor,
-    for state: UIControl.State
-  ) {
-    let layerFrame = CGRect(x: 0, y: 0, width: thumbSize, height: thumbSize)
-    let path = CGPath(ellipseIn: layerFrame, transform: nil)
-
-    let thumbImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
-    setThumbImage(thumbImage, for: state)
-  }
-
-  public func setUnicolorRoundedThumbImage(
     thumbSize: CGSize,
     color: UIColor,
-    for state: UIControl.State,
-    lineWidth: CGFloat,
-    strokeColor: UIColor? = nil
+    lineWidth: CGFloat = 0,
+    strokeColor: UIColor? = nil,
+    roundedCorners: UIRectCorner = [],
+    for state: UIControl.State
   ) {
     let layerFrame = CGRect(origin: .zero, size: thumbSize).insetBy(dx: lineWidth, dy: lineWidth)
     let path = UIBezierPath(
       roundedRect: layerFrame,
-      byRoundingCorners: [.topLeft, .topRight, .bottomLeft, .bottomRight],
+      byRoundingCorners: roundedCorners,
       cornerRadii: CGSize(width: thumbSize.width / 2, height: thumbSize.height / 2)
     ).cgPath
     let thumbImage = createImage(
@@ -567,24 +556,10 @@ extension UISlider {
     setThumbImage(thumbImage, for: state)
   }
 
-  public func setUnicolorRectangularThumbImage(
-    thumbSize: CGSize,
-    color: UIColor,
-    for state: UIControl.State
-  ) {
-    let layerFrame = CGRect(origin: .zero, size: thumbSize)
-    let path = UIBezierPath(
-      roundedRect: layerFrame,
-      byRoundingCorners: [.topLeft, .topRight],
-      cornerRadii: CGSize(width: thumbSize.width / 2, height: thumbSize.height / 2)
-    ).cgPath
-    let thumbImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
-    setThumbImage(thumbImage, for: state)
-  }
-
-  public func setUnicolorRoundedMinimumTrackImage(
+  public func setUnicolorMinimumTrackImage(
     trackHeight: CGFloat,
     color: UIColor,
+    rounded: Bool,
     for state: UIControl.State
   ) {
     let layerFrame = CGRect(origin: .zero, size: CGSize(width: trackHeight, height: trackHeight))
@@ -592,7 +567,7 @@ extension UISlider {
     let path = UIBezierPath(
       roundedRect: layerFrame,
       byRoundingCorners: [.topLeft, .bottomLeft],
-      cornerRadii: CGSize(width: radii, height: radii)
+      cornerRadii: rounded ? CGSize(width: radii, height: radii) : .zero
     ).cgPath
     let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
       .resizableImage(
@@ -602,31 +577,10 @@ extension UISlider {
     setMinimumTrackImage(trackImage, for: .normal)
   }
 
-  public func setUnicolorRectangularMinimumTrackImage(
+  public func setUnicolorMaximumTrackImage(
     trackHeight: CGFloat,
     color: UIColor,
-    for state: UIControl.State
-  ) {
-    let layerFrame = CGRect(origin: .zero, size: CGSize(width: 1, height: trackHeight))
-    let path = CGPath(rect: layerFrame, transform: nil)
-    let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
-    setMinimumTrackImage(trackImage, for: .normal)
-  }
-
-  public func setUnicolorRectangularMaximumTrackImage(
-    trackHeight: CGFloat,
-    color: UIColor,
-    for state: UIControl.State
-  ) {
-    let layerFrame = CGRect(origin: .zero, size: CGSize(width: 1, height: trackHeight))
-    let path = CGPath(rect: layerFrame, transform: nil)
-    let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
-    setMaximumTrackImage(trackImage, for: .normal)
-  }
-
-  public func setUnicolorRoundedMaximumTrackImage(
-    trackHeight: CGFloat,
-    color: UIColor,
+    rounded: Bool,
     for state: UIControl.State
   ) {
     let layerFrame = CGRect(origin: .zero, size: CGSize(width: trackHeight, height: trackHeight))
@@ -634,7 +588,7 @@ extension UISlider {
     let path = UIBezierPath(
       roundedRect: layerFrame,
       byRoundingCorners: [.topRight, .bottomRight],
-      cornerRadii: CGSize(width: radii, height: radii)
+      cornerRadii: rounded ? CGSize(width: radii, height: radii) : .zero
     ).cgPath
     let trackImage = createImage(path: path, inFrame: layerFrame, color: color, lineWidth: 0)
       .resizableImage(
@@ -672,6 +626,65 @@ extension UISlider {
     return outputImage
   }
 }
+
+#if targetEnvironment(macCatalyst)
+  class ScrollGestureRecognizer: UIPanGestureRecognizer {
+    var sensitivity: CGFloat = 100.0
+
+    var isTracking: Bool {
+      state == .began || state == .changed
+    }
+
+    var scrollDelta: CGFloat {
+      let translation = translation(in: view)
+      let deltaX = translation.x / sensitivity
+      let deltaY = translation.y / sensitivity
+      return deltaX - deltaY
+    }
+  }
+
+  extension UISlider {
+    private var scrollGestureRecognizer: ScrollGestureRecognizer? {
+      gestureRecognizers?.first(where: {
+        $0 as? ScrollGestureRecognizer != nil
+      }) as? ScrollGestureRecognizer
+    }
+
+    public var isTrackingManually: Bool {
+      scrollGestureRecognizer?.isTracking ?? false
+    }
+
+    public func installScrollGestureRecognizer(sensitivity: CGFloat) {
+      let panGesture = ScrollGestureRecognizer(target: self, action: #selector(handleScroll(_:)))
+      panGesture.allowedScrollTypesMask = .continuous
+      panGesture.cancelsTouchesInView = false
+      panGesture.sensitivity = sensitivity
+      addGestureRecognizer(panGesture)
+    }
+
+    @objc
+    private func handleScroll(_ gesture: ScrollGestureRecognizer) {
+      let newValue = value + Float(gesture.scrollDelta)
+      value = min(max(newValue, minimumValue), maximumValue)
+
+      switch gesture.state {
+      case .changed:
+        if isContinuous {
+          sendActions(for: .valueChanged)
+        }
+      case .cancelled, .ended, .failed:
+        sendActions(for: .valueChanged)
+      default: break
+      }
+
+      gesture.setTranslation(.zero, in: self)
+    }
+  }
+#else
+  extension UISlider {
+    public var isTrackingManually: Bool { false }
+  }
+#endif
 
 extension UIImage {
   public func averageColor() -> UIColor {

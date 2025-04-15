@@ -95,7 +95,7 @@ class SyncVC: UIViewController {
 
     #if targetEnvironment(macCatalyst)
       AppDelegate.rootViewController()?.dismiss(animated: true) {
-        guard let splitVC = AppDelegate.rootViewController() as? SplitVC else { return }
+        guard let splitVC = AppDelegate.topViewController() as? SplitVC else { return }
         splitVC.displayInfoPopups()
       }
     #else

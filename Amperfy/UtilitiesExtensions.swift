@@ -372,19 +372,30 @@ extension UICollectionViewCell {
 
 extension UIMenu {
   /// rebuilds menu on every access
-  static func lazyMenu(title: String = "", builder: @escaping () -> UIMenu) -> UIMenu {
+  static func lazyMenu(
+    title: String = "",
+    deferredMenuMightBeBroken: Bool = false,
+    builder: @escaping () -> UIMenu
+  )
+    -> UIMenu {
     #if targetEnvironment(macCatalyst)
-      // https://forums.developer.apple.com/forums/thread/726665
-      // UIDeferredMenuElement is completly broken in catalyst
-      return UIMenu(title: title, children: [builder()])
+      let deferredMenuIsBroken = deferredMenuMightBeBroken
+    // https://forums.developer.apple.com/forums/thread/726665
+    // UIDeferredMenuElement is completly broken in catalyst, when using .mac style
+    // for the enclosing button or bar button item.
     #else
+      let deferredMenuIsBroken = false
+    #endif
+    if deferredMenuIsBroken {
+      return UIMenu(title: title, children: [builder()])
+    } else {
       return UIMenu(title: title, children: [
         UIDeferredMenuElement.uncached { completion in
           let menu = builder()
           completion([menu])
         },
       ])
-    #endif
+    }
   }
 }
 

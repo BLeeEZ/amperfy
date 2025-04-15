@@ -360,7 +360,7 @@ class PlayerControlView: UIView {
       timeSlider.isEnabled = supportTimeInteraction
       timeSlider.minimumValue = 0.0
       timeSlider.maximumValue = Float(player.duration)
-      if !timeSlider.isTracking, supportTimeInteraction {
+      if !timeSlider.isTracking, !timeSlider.isTrackingManually, supportTimeInteraction {
         let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
         elapsedTimeLabel.text = elapsedClockTime.asShortString()
         if let remainingTime = remainingTime {
@@ -404,14 +404,16 @@ class PlayerControlView: UIView {
         liveLabel.isHidden = true
         timeSlider.layer.mask = nil
         timeSlider.setUnicolorThumbImage(
-          thumbSize: 10.0,
+          thumbSize: CGSize(width: 10.0, height: 10.0),
           color: .labelColor,
+          roundedCorners: .allCorners,
           for: UIControl.State.normal
         )
         #if !targetEnvironment(macCatalyst)
           timeSlider.setUnicolorThumbImage(
-            thumbSize: 30.0,
+            thumbSize: CGSize(width: 30.0, height: 30.0),
             color: .labelColor,
+            roundedCorners: .allCorners,
             for: UIControl.State.highlighted
           )
         #endif
@@ -422,14 +424,16 @@ class PlayerControlView: UIView {
       liveLabel.isHidden = true
       timeSlider.layer.mask = nil
       timeSlider.setUnicolorThumbImage(
-        thumbSize: 10.0,
+        thumbSize: CGSize(width: 10.0, height: 10.0),
         color: .labelColor,
+        roundedCorners: .allCorners,
         for: UIControl.State.normal
       )
       #if !targetEnvironment(macCatalyst)
         timeSlider.setUnicolorThumbImage(
-          thumbSize: 30.0,
+          thumbSize: CGSize(width: 30.0, height: 30.0),
           color: .labelColor,
+          roundedCorners: .allCorners,
           for: UIControl.State.highlighted
         )
       #endif

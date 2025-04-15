@@ -104,7 +104,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     detailOperationsView = GenericDetailTableHeader
       .createTableHeader(configuration: detailHeaderConfig)
 
-    optionsButton.menu = UIMenu.lazyMenu {
+    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
       EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
     }
     navigationItem.rightBarButtonItem = optionsButton

@@ -36,6 +36,7 @@ import UIKit
       self.preferredBehavioralStyle = .pad
       self.isContinuous = false
       refreshSliderDesign()
+      installScrollGestureRecognizer(sensitivity: 2)
     }
 
     required init?(coder: NSCoder) {
@@ -44,19 +45,28 @@ import UIKit
 
     fileprivate func refreshSliderDesign() {
       let tint = appDelegate.storage.settings.themePreference.asColor
-      setUnicolorRectangularMinimumTrackImage(
+      setUnicolorMinimumTrackImage(
         trackHeight: Self.sliderHeight,
         color: tint,
+        rounded: false,
         for: .normal
       )
-      setUnicolorRectangularMaximumTrackImage(
+      setUnicolorMaximumTrackImage(
         trackHeight: Self.sliderHeight,
         color: .systemGray6,
+        rounded: false,
         for: .normal
       )
-      setUnicolorRectangularThumbImage(
-        thumbSize: CGSize(width: 5, height: Self.sliderHeight * 2),
+      let borderWidth = 0.5
+      setUnicolorThumbImage(
+        thumbSize: CGSize(
+          width: 6 + borderWidth * 2,
+          height: Self.sliderHeight * 2 + borderWidth * 2
+        ),
         color: .systemGray,
+        lineWidth: borderWidth,
+        strokeColor: .systemGray6,
+        roundedCorners: [.topLeft, .topRight],
         for: .normal
       )
     }
@@ -330,6 +340,11 @@ import UIKit
         action: #selector(artworkClicked(_:))
       )
 
+      layer.masksToBounds = true
+      layer.cornerRadius = 5.0
+      layer.borderWidth = 1.0
+      layer.borderColor = UIColor.separator.cgColor
+
       artworkView.isUserInteractionEnabled = true
       artworkView.addGestureRecognizer(miniPlayerHoverGesture)
       artworkView.addGestureRecognizer(miniPlayerTapGesture)
@@ -349,6 +364,11 @@ import UIKit
       ])
       player.addNotifier(notifier: self)
       reload()
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+      super.traitCollectionDidChange(previousTraitCollection)
+      layer.borderColor = UIColor.separator.cgColor
     }
 
     required init?(coder: NSCoder) {
@@ -504,7 +524,7 @@ import UIKit
         let supportTimeInteraction = !currentlyPlaying.isRadio
         timeSlider.isEnabled = supportTimeInteraction
         timeSlider.maximumValue = Float(player.duration)
-        if !timeSlider.isTracking, supportTimeInteraction {
+        if !timeSlider.isTracking, !timeSlider.isTrackingManually, supportTimeInteraction {
           timeSlider.value = Float(player.elapsedTime)
         }
 
@@ -645,11 +665,6 @@ import UIKit
         nowPlayingView.widthAnchor.constraint(equalToConstant: 300),
         nowPlayingView.heightAnchor.constraint(equalToConstant: height),
       ])
-
-      nowPlayingView.layer.masksToBounds = true
-      nowPlayingView.layer.cornerRadius = 5.0
-      nowPlayingView.layer.borderWidth = 1.0
-      nowPlayingView.layer.borderColor = UIColor.separator.cgColor
 
       self.customView = nowPlayingView
     }

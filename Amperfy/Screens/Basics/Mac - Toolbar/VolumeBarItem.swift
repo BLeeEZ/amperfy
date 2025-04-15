@@ -35,6 +35,7 @@ import UIKit
       super.init(frame: frame)
       self.preferredBehavioralStyle = .pad
       refreshSliderDesign()
+      installScrollGestureRecognizer(sensitivity: 100)
     }
 
     required init?(coder: NSCoder) {
@@ -43,28 +44,31 @@ import UIKit
 
     fileprivate func refreshSliderDesign() {
       let tint = UIColor.secondaryLabel
-      setUnicolorRoundedMinimumTrackImage(
+      setUnicolorMinimumTrackImage(
         trackHeight: Self.sliderHeight,
         color: tint,
+        rounded: true,
         for: .normal
       )
-      setUnicolorRoundedMaximumTrackImage(
+      setUnicolorMaximumTrackImage(
         trackHeight: Self.sliderHeight,
         color: UIColor(dynamicProvider: { traitCollection in
           let isDark = traitCollection.userInterfaceStyle == .dark
           return isDark ? .systemGray2 : .systemGray4
         }),
+        rounded: true,
         for: .normal
       )
-      setUnicolorRoundedThumbImage(
+      setUnicolorThumbImage(
         thumbSize: CGSize(width: Self.sliderThumbHeight, height: Self.sliderThumbHeight),
         color: .systemBackground,
-        for: .normal,
         lineWidth: 1.0,
         strokeColor: UIColor(dynamicProvider: { traitCollection in
           let isDark = traitCollection.userInterfaceStyle == .dark
           return isDark ? tint : .systemGray4
-        })
+        }),
+        roundedCorners: .allCorners,
+        for: .normal
       )
       backgroundColor = .clear
     }
@@ -148,7 +152,7 @@ import UIKit
           .constraint(equalToConstant: CustomBarButton.verySmallPointSize * volumeIconHeightScale),
 
         // reduce the heigt of the slider to correctly center the slider inside the stack
-        volumeSliderView.heightAnchor.constraint(equalToConstant: height - 10),
+        volumeSliderView.heightAnchor.constraint(equalToConstant: height),
       ])
 
       volumeSliderView.value = player.volume
