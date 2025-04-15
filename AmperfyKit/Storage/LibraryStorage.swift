@@ -611,7 +611,7 @@ public class LibraryStorage: PlayableFileCachable {
     for artworkMO in artworksMO {
       artworkMO.status = ImageStatus.NotChecked.rawValue
       artworkMO.relFilePath = nil
-      if artworkMO.url == nil {
+      if artworkMO.id.isEmpty {
         artworksToDelete.append(artworkMO)
       }
     }
