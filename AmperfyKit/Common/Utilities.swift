@@ -538,7 +538,7 @@ extension UISlider {
     lineWidth: CGFloat = 0,
     strokeColor: UIColor? = nil,
     roundedCorners: UIRectCorner = [],
-    for state: UIControl.State,
+    for state: UIControl.State
   ) {
     let layerFrame = CGRect(origin: .zero, size: thumbSize).insetBy(dx: lineWidth, dy: lineWidth)
     let path = UIBezierPath(
