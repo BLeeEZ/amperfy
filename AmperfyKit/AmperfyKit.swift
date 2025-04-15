@@ -170,7 +170,9 @@ public class AmperKit {
       musicPlayer: curPlayer,
       backendAudioPlayer: backendAudioPlayer,
       nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(),
-      storage: storage
+      storage: storage, notificationHandler: notificationHandler,
+      artworkDownloadManager: artworkDownloadManager,
+      playableDownloadManager: playableDownloadManager
     )
     curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
     let remoteCommandCenterHandler = RemoteCommandCenterHandler(

@@ -30,30 +30,51 @@ class NowPlayingInfoCenterHandler {
   private let backendAudioPlayer: BackendAudioPlayer
   private let storage: PersistentStorage
   private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
+  private let artworkDownloadManager: DownloadManageable
 
   init(
     musicPlayer: AudioPlayer,
     backendAudioPlayer: BackendAudioPlayer,
     nowPlayingInfoCenter: MPNowPlayingInfoCenter,
-    storage: PersistentStorage
+    storage: PersistentStorage,
+    notificationHandler: EventNotificationHandler,
+    artworkDownloadManager: DownloadManageable,
+    playableDownloadManager: DownloadManageable
   ) {
     self.musicPlayer = musicPlayer
     self.backendAudioPlayer = backendAudioPlayer
     self.nowPlayingInfoCenter = nowPlayingInfoCenter
     self.storage = storage
+    self.artworkDownloadManager = artworkDownloadManager
 
     nowPlayingInfoCenter.playbackState = .stopped
+
+    notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful(notification:)),
+      name: .downloadFinishedSuccess,
+      object: artworkDownloadManager
+    )
+    notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful(notification:)),
+      name: .downloadFinishedSuccess,
+      object: playableDownloadManager
+    )
   }
 
   func updateNowPlayingInfo(playable: AbstractPlayable) {
     let albumTitle = playable.asSong?.album?.name ?? ""
 
-    let artwork = LibraryEntityImage.getImageToDisplayImmediately(
+    let artworkImage = LibraryEntityImage.getImageToDisplayImmediately(
       libraryEntity: playable,
       themePreference: storage.settings.themePreference,
       artworkDisplayPreference: storage.settings.artworkDisplayPreference,
       useCache: true
     )
+    if let artwork = playable.artwork {
+      artworkDownloadManager.download(object: artwork)
+    }
 
     nowPlayingInfoCenter.nowPlayingInfo = [
       MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
@@ -75,13 +96,31 @@ class NowPlayingInfoCenterHandler {
       ),
 
       MPMediaItemPropertyArtwork: MPMediaItemArtwork(
-        boundsSize: artwork.size,
+        boundsSize: artworkImage.size,
         requestHandler: { @Sendable size -> UIImage in
           // this completion handler is not called in main thread!
-          return artwork
+          return artworkImage
         }
       ),
     ]
+  }
+
+  @objc
+  private func downloadFinishedSuccessful(notification: Notification) {
+    guard let downloadNotification = DownloadNotification.fromNotification(notification),
+          let curPlayable = musicPlayer.currentlyPlaying
+    else { return }
+    if curPlayable.uniqueID == downloadNotification.id {
+      Task { @MainActor in
+        updateNowPlayingInfo(playable: curPlayable)
+      }
+    }
+    if let artwork = curPlayable.artwork,
+       artwork.uniqueID == downloadNotification.id {
+      Task { @MainActor in
+        updateNowPlayingInfo(playable: curPlayable)
+      }
+    }
   }
 }
 
