@@ -190,22 +190,28 @@ public class AmperKit {
     return facadeImpl
   }
 
-  public lazy var playableDownloadManager: DownloadManageable = {
+  private lazy var playableDownloadDelegate: DownloadManagerDelegate = {
     let artworkExtractor = EmbeddedArtworkExtractor()
-    let dlDelegate = PlayableDownloadDelegate(
+    return PlayableDownloadDelegate(
       backendApi: backendApi,
       artworkExtractor: artworkExtractor,
       networkMonitor: networkMonitor
     )
+  }()
+
+  public lazy var playableDownloadManager: DownloadManageable = {
+    let getDownloadDelegateCB = { @MainActor in
+      return self.playableDownloadDelegate
+    }
     let requestManager = DownloadRequestManager(
       storage: storage.async,
-      downloadDelegate: dlDelegate
+      getDownloadDelegateCB: getDownloadDelegateCB
     )
     let dlManager = DownloadManager(
       name: "PlayableDownloader",
       storage: storage.async,
       requestManager: requestManager,
-      downloadDelegate: dlDelegate,
+      getDownloadDelegateCB: getDownloadDelegateCB,
       eventLogger: eventLogger,
       settings: storage.settings,
       networkMonitor: networkMonitor,
@@ -235,17 +241,19 @@ public class AmperKit {
   }()
 
   private func createArtworkDownloadManager() -> DownloadManageable {
-    let dlDelegate = backendApi.createArtworkArtworkDownloadDelegate()
+    let getDownloadDelegateCB = { @MainActor in
+      return self.backendApi.getActiveArtworkDownloadDelegate()
+    }
     let requestManager = DownloadRequestManager(
       storage: storage.async,
-      downloadDelegate: dlDelegate
+      getDownloadDelegateCB: getDownloadDelegateCB
     )
     requestManager.clearAllDownloadsAsyncIfAllHaveFinished()
     let dlManager = DownloadManager(
       name: "ArtworkDownloader",
       storage: storage.async,
       requestManager: requestManager,
-      downloadDelegate: dlDelegate,
+      getDownloadDelegateCB: getDownloadDelegateCB,
       eventLogger: eventLogger,
       settings: storage.settings,
       networkMonitor: networkMonitor,

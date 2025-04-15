@@ -87,7 +87,7 @@ actor DownloadManager: NSObject, DownloadManageable {
   private let networkMonitor: NetworkMonitorFacade
   private let storage: AsyncCoreDataAccessWrapper
   private let requestManager: DownloadRequestManager
-  private let downloadDelegate: DownloadManagerDelegate
+  private let getDownloadDelegateCB: GetDownloadManagerDelegateCB
   private let notificationHandler: EventNotificationHandler
   private let eventLogger: EventLogger
   private let settings: PersistentStorage.Settings
@@ -104,7 +104,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     name: String,
     storage: AsyncCoreDataAccessWrapper,
     requestManager: DownloadRequestManager,
-    downloadDelegate: DownloadManagerDelegate,
+    getDownloadDelegateCB: @escaping GetDownloadManagerDelegateCB,
     eventLogger: EventLogger,
     settings: PersistentStorage.Settings,
     networkMonitor: NetworkMonitorFacade,
@@ -117,7 +117,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     self.log = OSLog(subsystem: "Amperfy", category: name)
     self.storage = storage
     self.requestManager = requestManager
-    self.downloadDelegate = downloadDelegate
+    self.getDownloadDelegateCB = getDownloadDelegateCB
     self.eventLogger = eventLogger
     self.settings = settings
     self.networkMonitor = networkMonitor
@@ -126,7 +126,6 @@ actor DownloadManager: NSObject, DownloadManageable {
     self.isCacheSizeLimited = limitCacheSize
     self.isFailWithPopupError = isFailWithPopupError
     self.taskQueue = OperationQueue()
-    taskQueue.maxConcurrentOperationCount = downloadDelegate.parallelDownloadsCount
 
     super.init()
   }
@@ -136,6 +135,8 @@ actor DownloadManager: NSObject, DownloadManageable {
     urlSession: URLSession,
     validationCB: PreDownloadIsValidCB?
   ) {
+    taskQueue.maxConcurrentOperationCount = getDownloadDelegateCB().parallelDownloadsCount
+
     notificationHandler.register(
       self,
       selector: #selector(networkStatusChanged(notification:)),
@@ -370,7 +371,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     os_log("Fetching %s ...", log: self.log, type: .info, downloadRequest.title)
 
     do {
-      let url = try await downloadDelegate.prepareDownload(
+      let url = try await getDownloadDelegateCB().prepareDownload(
         downloadInfo: downloadRequest.info,
         storage: storage
       )
@@ -403,7 +404,7 @@ actor DownloadManager: NSObject, DownloadManageable {
       return download.isCanceled
     }
     if let isCanceled, !isCanceled {
-      await downloadDelegate.failedDownload(
+      await getDownloadDelegateCB().failedDownload(
         downloadInfo: downloadRequest.info,
         storage: storage
       )
@@ -441,7 +442,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     fileURL: URL,
     fileMimeType: String?
   ) async {
-    let responseError = downloadDelegate.validateDownloadedData(
+    let responseError = await getDownloadDelegateCB().validateDownloadedData(
       fileURL: fileURL,
       downloadURL: task.originalRequest?.url
     )
@@ -472,7 +473,7 @@ actor DownloadManager: NSObject, DownloadManageable {
       fileManager.getFileSize(url: fileURL) ?? 0,
       fileMimeType ?? "no MIME type"
     )
-    await downloadDelegate.completedDownload(
+    await getDownloadDelegateCB().completedDownload(
       downloadInfo: downloadRequest.info,
       fileURL: fileURL,
       fileMimeType: fileMimeType,

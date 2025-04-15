@@ -270,6 +270,6 @@ public protocol BackendApi: URLCleanser, Sendable {
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
   @MainActor
   func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer
-  func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate
+  func createArtworkDownloadDelegate() -> DownloadManagerDelegate
   func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo?
 }

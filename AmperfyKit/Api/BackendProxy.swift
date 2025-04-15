@@ -183,6 +183,7 @@ public final class BackendProxy: Sendable {
   private let performanceMonitor: ThreadPerformanceMonitor
   private let eventLogger: EventLogger
   private let settings: PersistentStorage.Settings
+
   public var selectedApi: BackenApiType {
     get {
       activeApiType.wrappedValue
@@ -190,10 +191,12 @@ public final class BackendProxy: Sendable {
     set {
       os_log("%s is active backend api", log: self.log, type: .info, newValue.description)
       activeApiType.wrappedValue = newValue
+      downloadManagerDelegate.wrappedValue = activeApi.createArtworkDownloadDelegate()
     }
   }
 
   private let activeApiType = Atomic<BackenApiType>(wrappedValue: .ampache)
+  private let downloadManagerDelegate = Atomic<DownloadManagerDelegate?>(wrappedValue: nil)
 
   private var activeApi: BackendApi {
     switch activeApiType.wrappedValue {
@@ -374,8 +377,17 @@ extension BackendProxy: BackendApi {
     activeApi.createLibrarySyncer(storage: storage)
   }
 
-  public func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
-    activeApi.createArtworkArtworkDownloadDelegate()
+  public func getActiveArtworkDownloadDelegate() -> DownloadManagerDelegate {
+    var dlDelegate = downloadManagerDelegate.wrappedValue
+    if dlDelegate == nil {
+      dlDelegate = activeApi.createArtworkDownloadDelegate()
+      downloadManagerDelegate.wrappedValue = dlDelegate
+    }
+    return dlDelegate!
+  }
+
+  public func createArtworkDownloadDelegate() -> DownloadManagerDelegate {
+    activeApi.createArtworkDownloadDelegate()
   }
 
   public func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {

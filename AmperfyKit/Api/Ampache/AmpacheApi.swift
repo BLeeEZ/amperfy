@@ -96,7 +96,7 @@ final class AmpacheApi: BackendApi {
     )
   }
 
-  func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+  func createArtworkDownloadDelegate() -> DownloadManagerDelegate {
     AmpacheArtworkDownloadDelegate(
       ampacheXmlServerApi: ampacheXmlServerApi,
       networkMonitor: networkMonitor

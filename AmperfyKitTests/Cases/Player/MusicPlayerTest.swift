@@ -207,7 +207,7 @@ final class MOCK_BackendApi: BackendApi {
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL { Helper.testURL }
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { nil }
   func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { MOCK_LibrarySyncer() }
-  func createArtworkArtworkDownloadDelegate()
+  func createArtworkDownloadDelegate()
     -> DownloadManagerDelegate { MOCK_DownloadManagerDelegate() }
   func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { nil }
   func cleanse(url: URL?) -> CleansedURL { CleansedURL(urlString: "") }

@@ -111,7 +111,7 @@ extension SubsonicApi: BackendApi {
     )
   }
 
-  func createArtworkArtworkDownloadDelegate() -> DownloadManagerDelegate {
+  func createArtworkDownloadDelegate() -> DownloadManagerDelegate {
     SubsonicArtworkDownloadDelegate(
       subsonicServerApi: subsonicServerApi,
       networkMonitor: networkMonitor

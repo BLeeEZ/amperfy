@@ -30,15 +30,20 @@ struct DownloadTaskInfo: Sendable {
   var hasStarted = false
 }
 
+typealias GetDownloadManagerDelegateCB = @MainActor () -> DownloadManagerDelegate
+
 // MARK: - DownloadRequestManager
 
 final class DownloadRequestManager: Sendable {
   private let storage: AsyncCoreDataAccessWrapper
-  private let downloadDelegate: DownloadManagerDelegate
+  private let getDownloadDelegateCB: GetDownloadManagerDelegateCB
 
-  init(storage: AsyncCoreDataAccessWrapper, downloadDelegate: DownloadManagerDelegate) {
+  init(
+    storage: AsyncCoreDataAccessWrapper,
+    getDownloadDelegateCB: @escaping GetDownloadManagerDelegateCB
+  ) {
     self.storage = storage
-    self.downloadDelegate = downloadDelegate
+    self.getDownloadDelegateCB = getDownloadDelegateCB
   }
 
   func add(downloadInfo: DownloadElementInfo) async -> DownloadRequest? {
@@ -118,7 +123,7 @@ final class DownloadRequestManager: Sendable {
   }
 
   func getRequestedDownloads() async -> [DownloadRequest] {
-    let predicateFormat = downloadDelegate.requestPredicate.predicateFormat
+    let predicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     let requestedDownloads = try? await storage.performAndGet { asyncCompanion in
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -147,7 +152,7 @@ final class DownloadRequestManager: Sendable {
   }
 
   func clearFinishedDownloads() async {
-    let downloadPredicateFormat = downloadDelegate.requestPredicate.predicateFormat
+    let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -166,7 +171,7 @@ final class DownloadRequestManager: Sendable {
 
   func clearAllDownloadsAsyncIfAllHaveFinished() {
     Task {
-      let downloadPredicateFormat = downloadDelegate.requestPredicate.predicateFormat
+      let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
       let notStartedDownloadCount = try? await storage.performAndGet { asyncCompanion in
         let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -183,7 +188,7 @@ final class DownloadRequestManager: Sendable {
   }
 
   func clearAllDownloads() async {
-    let downloadPredicateFormat = downloadDelegate.requestPredicate.predicateFormat
+    let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -197,7 +202,7 @@ final class DownloadRequestManager: Sendable {
   }
 
   func cancelDownloads() async {
-    let downloadPredicateFormat = downloadDelegate.requestPredicate.predicateFormat
+    let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -213,7 +218,7 @@ final class DownloadRequestManager: Sendable {
   }
 
   func getAndResetFailedDownloads() async -> [DownloadRequest] {
-    let predicateFormat = downloadDelegate.requestPredicate.predicateFormat
+    let predicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     let failedDownloads = try? await storage.performAndGet { asyncCompanion in
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
