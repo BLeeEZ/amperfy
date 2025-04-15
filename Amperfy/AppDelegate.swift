@@ -318,8 +318,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           UIMenuSystem.main.setNeedsRebuild()
         }
       }
-
-      player.addNotifier(notifier: self)
     #endif
 
     guard let credentials = storage.loginCredentials else {
@@ -357,6 +355,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     playableDownloadManager.start()
     artworkDownloadManager.start()
     backgroundLibrarySyncer.start()
+    #if targetEnvironment(macCatalyst)
+      player.addNotifier(notifier: self)
+    #endif
   }
 
   func startManagerForNormalOperation() {
@@ -367,6 +368,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     playableDownloadManager.start()
     backgroundLibrarySyncer.start()
     scrobbleSyncer?.start()
+    #if targetEnvironment(macCatalyst)
+      player.addNotifier(notifier: self)
+    #endif
   }
 
   func setAppTheme(color: UIColor) {

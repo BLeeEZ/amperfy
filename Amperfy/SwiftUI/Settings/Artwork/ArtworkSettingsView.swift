@@ -31,6 +31,8 @@ struct ArtworkSettingsView: View {
   let fileManager = CacheFileManager.shared
 
   @State
+  var artworkCountText = ""
+  @State
   var artworkNotCheckedCountText = ""
   @State
   var cachedArtworksCountText = ""
@@ -42,13 +44,22 @@ struct ArtworkSettingsView: View {
 
   func updateValues() {
     Task { @MainActor in do {
-      (artworkNotCheckedCountText, cachedArtworksCountText) = try await appDelegate.storage.async
+      (
+        artworkCountText,
+        artworkNotCheckedCountText,
+        cachedArtworksCountText
+      ) = try await appDelegate.storage.async
         .performAndGet { asyncCompanion in
+          let artworkCount = asyncCompanion.library.artworkCount
           let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
           let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self
             .artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
           let cachedArtworkCount = asyncCompanion.library.cachedArtworkCount
-          return (String(artworkNotCheckedDisplayCount), String(cachedArtworkCount))
+          return (
+            String(artworkCount),
+            String(artworkNotCheckedDisplayCount),
+            String(cachedArtworkCount)
+          )
         }
     } catch {
       // do nothing
@@ -59,6 +70,9 @@ struct ArtworkSettingsView: View {
     ZStack {
       SettingsList {
         SettingsSection {
+          SettingsRow(title: "Artworks") {
+            SecondaryText(artworkCountText)
+          }
           SettingsRow(title: "Not checked Artworks") {
             SecondaryText(artworkNotCheckedCountText)
           }

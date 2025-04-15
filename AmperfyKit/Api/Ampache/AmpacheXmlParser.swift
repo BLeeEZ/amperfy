@@ -110,8 +110,9 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
       return prefetchedArtwork
     } else {
       let createdArtwork = library.createArtwork()
-      createdArtwork.remoteInfo = artworkRemoteInfo
       prefetch.prefetchedArtworkDict[artworkRemoteInfo] = createdArtwork
+      createdArtwork.remoteInfo = artworkRemoteInfo
+      createdArtwork.status = .NotChecked
       return createdArtwork
     }
   }
