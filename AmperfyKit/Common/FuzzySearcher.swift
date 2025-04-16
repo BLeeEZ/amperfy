@@ -31,8 +31,6 @@ public struct MatchResult {
 // MARK: - FuzzySearcher
 
 public class FuzzySearcher {
-  private static let fuzzyMatchThreshold =
-    0.2 // A score be below this value (0 (exact match) and 1 (not a match)) will result in a match
 
   public static func findBestMatch(
     in items: [PlayableContainable],
@@ -46,7 +44,7 @@ public class FuzzySearcher {
     var matches = [MatchResult]()
     items.forEach {
       let result = fuse.search(pattern, in: $0.name)
-      if let result = result, result.score <= Self.fuzzyMatchThreshold {
+      if let result = result {
         matches.append(MatchResult(item: $0, score: result.score))
       }
     }
