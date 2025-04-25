@@ -407,7 +407,9 @@ class BasicTableViewController: KeyCommandTableViewController {
     }
     action.backgroundColor = buttonColor
     if actionType == .favorite {
-      action.image = preCbContainable.isFavorite ? UIImage.heartFill : UIImage.heartEmpty
+        action.image = preCbContainable.isFavorite
+            ? UIImage.heartFill.withRenderingMode(.alwaysOriginal)
+            : UIImage.heartEmpty.withRenderingMode(.alwaysOriginal)
     } else {
       action.image = actionType.image.withRenderingMode(.alwaysOriginal)
     }
