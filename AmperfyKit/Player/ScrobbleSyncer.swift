@@ -27,7 +27,7 @@ import os.log
 
 @MainActor
 public class ScrobbleSyncer {
-  private static let maximumWaitDurationInSec = 20
+  private static let maximumWaitDurationInSec = 240 //scrobble at 4 min or 50% of duration
 
   private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
   private let musicPlayer: AudioPlayer
