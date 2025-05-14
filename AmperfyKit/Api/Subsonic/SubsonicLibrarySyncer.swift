@@ -984,7 +984,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private func scrobble(song: Song, submission: Bool, date: Date? = nil) async throws {
     guard isSyncAllowed else { return }
     if !submission {
-      os_log("Now Playing Beginn: %s", log: log, type: .info, song.displayString)
+      os_log("Now Playing Begin: %s", log: log, type: .info, song.displayString)
     } else if let date = date {
       os_log("Scrobbled at %s: %s", log: log, type: .info, date.description, song.displayString)
     } else {
