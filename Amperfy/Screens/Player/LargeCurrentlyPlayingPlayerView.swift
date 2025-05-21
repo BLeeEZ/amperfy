@@ -80,8 +80,39 @@ class LargeCurrentlyPlayingPlayerView: UIView {
 
     upperContainerView.addSubview(lyricsView!)
 
+    addSwipeGesturesToArtwork()
+
     refresh()
     initializeLyrics()
+  }
+    
+  private func addSwipeGesturesToArtwork() {
+    artworkImage.isUserInteractionEnabled = true
+
+    let swipeLeft = UISwipeGestureRecognizer(
+      target: self,
+      action: #selector(handleSwipe(_:))
+    )
+    swipeLeft.direction = .left
+    artworkImage.addGestureRecognizer(swipeLeft)
+
+    let swipeRight = UISwipeGestureRecognizer(
+      target: self,
+      action: #selector(handleSwipe(_:))
+    )
+    swipeRight.direction = .right
+    artworkImage.addGestureRecognizer(swipeRight)
+  }
+
+  @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+    switch gesture.direction {
+    case .left:
+      rootView?.controlView?.nextButtonPushed(self)
+    case .right:
+      rootView?.controlView?.previousButtonPushed(self)
+    default:
+      break
+    }
   }
 
   func refreshLyricsTime(time: CMTime) {
