@@ -133,7 +133,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       }
       if let createdTag = attributeDict["created"] {
         let dateFormatter = ISO8601DateFormatter()
-        dateFormatter.formatOptions.insert(.withFractionalSeconds)
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         songBuffer?.addedDate = dateFormatter.date(from: createdTag)
       }
     }

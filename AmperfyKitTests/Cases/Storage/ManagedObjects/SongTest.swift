@@ -47,6 +47,7 @@ class SongTest: XCTestCase {
     XCTAssertEqual(song.url, nil)
     XCTAssertEqual(song.album, nil)
     XCTAssertEqual(song.artist, nil)
+    XCTAssertNil(song.addedDate)
     XCTAssertEqual(song.displayString, "Unknown Artist - Unknown Title")
     XCTAssertEqual(song.identifier, "Unknown Title")
     XCTAssertNil(
