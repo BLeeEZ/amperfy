@@ -119,6 +119,9 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
 
     XCTAssertEqual(library.songCount, 6 + createdSongCount)
 
+    let dateFormatter = ISO8601DateFormatter()
+    dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
     var song = playlist.playables[0].asSong!
     XCTAssertEqual(song.id, "657")
     XCTAssertEqual(song.title, "Making Me Nervous")
@@ -127,6 +130,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.artist?.name, "Brad Sucks")
     XCTAssertEqual(song.album?.id, "58")
     XCTAssertEqual(song.album?.name, "I Don't Know What I'm Doing")
+    XCTAssertEqual(song.addedDate, dateFormatter.date(from: "2008-04-10T07:10:32"))
     XCTAssertNil(song.disk)
     XCTAssertEqual(song.track, 1)
     XCTAssertNil(song.genre)
@@ -147,6 +151,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.artist?.name, "Maya Filipič")
     XCTAssertEqual(song.album?.id, "68")
     XCTAssertEqual(song.album?.name, "Between two worlds")
+    XCTAssertEqual(song.addedDate, dateFormatter.date(from: "2008-07-30T22:05:40"))
     XCTAssertEqual(song.track, 2)
     XCTAssertEqual(song.genre?.id, "")
     XCTAssertEqual(song.genre?.name, "Classical")
@@ -167,6 +172,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.artist?.name, "PeerGynt Lobogris")
     XCTAssertEqual(song.album?.id, "74") // Album not pre created
     XCTAssertEqual(song.album?.name, "Broken Dreams")
+    XCTAssertEqual(song.addedDate, dateFormatter.date(from: "2008-12-19T14:13:58"))
     XCTAssertEqual(song.track, 1)
     XCTAssertEqual(song.genre?.id, "")
     XCTAssertEqual(song.genre?.name, "Blues")

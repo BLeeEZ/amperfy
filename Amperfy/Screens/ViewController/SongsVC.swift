@@ -183,6 +183,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       return 0.0
     case .rating:
       return CommonScreenOperations.tableSectionHeightLarge
+    case .addedDate:
+      return 0.0
     case .duration:
       return 0.0
     case .starredDate:
@@ -205,6 +207,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       } else {
         return "Not rated"
       }
+    case .addedDate:
+      return nil
     case .duration:
       return nil
     case .starredDate:
@@ -358,12 +362,33 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         )
       }
     )
+    let sortByAddedDate = UIAction(
+      title: "Date Added",
+      image: sortType == .addedDate ? .check : nil,
+      handler: { _ in
+        self.change(sortType: .addedDate)
+        self.saveSortPreference(preference: .addedDate)
+        self.updateSearchResults(for: self.searchController)
+        self.appDelegate.notificationHandler.post(
+          name: .fetchControllerSortChanged,
+          object: nil,
+          userInfo: nil
+        )
+      }
+    )
     if displayFilter == .favorites, appDelegate.backendApi.selectedApi != .ampache {
       return UIMenu(
         title: "Sort",
         image: .sort,
         options: [],
-        children: [sortByName, sortByRating, sortByDuration, sortByStarredDate]
+        children: [sortByName, sortByRating, sortByDuration, sortByStarredDate, sortByAddedDate]
+      )
+    } else if appDelegate.backendApi.selectedApi != .ampache {
+      return UIMenu(
+        title: "Sort",
+        image: .sort,
+        options: [],
+        children: [sortByName, sortByRating, sortByDuration, sortByAddedDate]
       )
     } else {
       return UIMenu(

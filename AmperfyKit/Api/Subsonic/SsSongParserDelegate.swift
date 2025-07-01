@@ -131,6 +131,11 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
           songBuffer?.genre = genre
         }
       }
+      if let createdTag = attributeDict["created"] {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        songBuffer?.addedDate = dateFormatter.date(from: createdTag)
+      }
     }
 
     super.parser(

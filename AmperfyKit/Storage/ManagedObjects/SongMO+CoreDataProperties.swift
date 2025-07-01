@@ -31,6 +31,8 @@ extension SongMO {
   @NSManaged
   public var lyricsRelFilePath: String?
   @NSManaged
+  public var addedDate: Date?
+  @NSManaged
   public var album: AlbumMO?
   @NSManaged
   public var artist: ArtistMO?
@@ -42,6 +44,7 @@ extension SongMO {
   public var musicFolder: MusicFolderMO?
 
   static let relationshipKeyPathsForPrefetching = [
+    #keyPath(SongMO.addedDate),
     #keyPath(SongMO.album),
     #keyPath(SongMO.artist),
     #keyPath(SongMO.artwork),

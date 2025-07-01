@@ -58,6 +58,9 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
       artworkFetchCount: 1 // the album cover itself is not created and all songs have the same cover
     )
 
+    let dateFormatter = ISO8601DateFormatter()
+    dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
     let songs = library.getSongs().sorted(by: { $0.id > $1.id })
     XCTAssertEqual(songs.count, 2)
 
@@ -68,6 +71,7 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.artist?.name, "AC/DC")
     XCTAssertNil(song.album)
     XCTAssertNil(song.disk)
+    XCTAssertEqual(song.addedDate, dateFormatter.date(from: "2004-11-08T23:36:11"))
     XCTAssertEqual(song.track, 0)
     XCTAssertNil(song.genre)
     XCTAssertEqual(song.duration, 352)
@@ -88,6 +92,7 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.artist?.name, "AC/DC")
     XCTAssertNil(song.album)
     XCTAssertNil(song.disk)
+    XCTAssertEqual(song.addedDate, dateFormatter.date(from: "2004-11-27T20:23:32"))
     XCTAssertEqual(song.track, 0)
     XCTAssertEqual(song.genre?.id, "")
     XCTAssertEqual(song.genre?.name, "Rock")

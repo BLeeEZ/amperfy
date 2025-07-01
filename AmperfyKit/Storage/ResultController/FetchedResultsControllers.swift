@@ -108,6 +108,7 @@ public enum PlaylistSortType: Int, Sendable {
 public enum SongElementSortType: Int, Sendable {
   case name = 0
   case rating = 1
+  case addedDate = 2
   case duration = 3
   case starredDate = 4
 
@@ -120,6 +121,8 @@ public enum SongElementSortType: Int, Sendable {
       return .alphabet
     case .rating:
       return .rating
+    case .addedDate:
+      return .newestOrRecent
     case .duration:
       return .durationSong
     case .starredDate:
@@ -133,6 +136,8 @@ public enum SongElementSortType: Int, Sendable {
       return true
     case .rating:
       return true
+    case .addedDate:
+      return false
     case .duration:
       return true
     case .starredDate:
@@ -713,6 +718,8 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
       fetchRequest = SongMO.alphabeticSortedFetchRequest
     case .rating:
       fetchRequest = SongMO.ratingSortedFetchRequest
+    case .addedDate:
+      fetchRequest = SongMO.addedDateSortedFetchRequest
     case .duration:
       fetchRequest = SongMO.durationSortedFetchRequest
     case .starredDate:

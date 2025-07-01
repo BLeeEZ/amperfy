@@ -180,6 +180,8 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
       return 0.0
     case .rating:
       return CommonScreenOperations.tableSectionHeightLarge
+    case .addedDate:
+      return 0.0
     case .duration:
       return 0.0
     case .starredDate:
@@ -202,6 +204,8 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
       } else {
         return "Not rated"
       }
+    case .addedDate:
+      return nil
     case .duration:
       return nil
     case .starredDate:
