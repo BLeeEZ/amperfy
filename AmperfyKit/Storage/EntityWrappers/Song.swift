@@ -76,6 +76,16 @@ public class Song: AbstractPlayable, Identifyable {
     }
   }
 
+  public var addedDate: Date? {
+    get {
+      guard let addedDateMO = managedObject.addedDate else { return nil }
+      return addedDateMO
+    }
+    set {
+      managedObject.addedDate = newValue
+    }
+  }
+
   public var isOrphaned: Bool {
     guard let album = album else { return true }
     return album.isOrphaned

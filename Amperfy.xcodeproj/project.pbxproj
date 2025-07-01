@@ -1050,6 +1050,7 @@
 		63DCDB992C6752F000522F68 /* AppKitController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppKitController.swift; sourceTree = "<group>"; };
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v39.xcdatamodel"; sourceTree = "<group>"; };
+		64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v46.xcdatamodel"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3425,6 +3426,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */,
 				5042B71F2D82FFA50086B9C4 /* Amperfy v45.xcdatamodel */,
 				50CA61272D4D72F600EEF515 /* Amperfy v44.xcdatamodel */,
 				50CA61222D4B658200EEF515 /* Amperfy v43.xcdatamodel */,
@@ -3471,7 +3473,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 5042B71F2D82FFA50086B9C4 /* Amperfy v45.xcdatamodel */;
+			currentVersion = 64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
