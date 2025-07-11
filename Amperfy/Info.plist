@@ -52,6 +52,7 @@
 	</array>
 	<key>INSupportedMediaCategories</key>
 	<array>
+		<string>INMediaCategoryRadio</string>
 		<string>INMediaCategoryPodcasts</string>
 		<string>INMediaCategoryGeneral</string>
 		<string>INMediaCategoryMusic</string>
