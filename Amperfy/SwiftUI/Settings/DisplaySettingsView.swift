@@ -49,6 +49,11 @@ struct DisplaySettingsView: View {
     }
   }
 
+  func setAppearanceMode(style: UIUserInterfaceStyle) {
+    settings.appearanceMode = style
+    appDelegate.setAppAppearanceMode(style: style)
+  }
+
   func tooglePlayerLyricsButtonPreference() {
     settings.isAlwaysHidePlayerLyricsButton.toggle()
     if settings.isAlwaysHidePlayerLyricsButton {
@@ -88,6 +93,25 @@ struct DisplaySettingsView: View {
         }
 
         #if !targetEnvironment(macCatalyst)
+          SettingsSection {
+            SettingsRow(title: "Appearance") {
+              Menu(settings.appearanceMode == .unspecified ? "System" :
+                   (settings.appearanceMode == .light ? "Light" : "Dark")) {
+                Button("System") {
+                  setAppearanceMode(style: .unspecified)
+                }
+                Button("Light") {
+                  setAppearanceMode(style: .light)
+                }
+                Button("Dark") {
+                  setAppearanceMode(style: .dark)
+                }
+              }
+            }
+          }
+        #endif
+
+        #if !targetEnvironment(macCatalyst)
           SettingsSection(
             content: {
               SettingsCheckBoxRow(label: "Haptic Feedback", isOn: $settings.isHapticsEnabled)
@@ -106,7 +130,7 @@ struct DisplaySettingsView: View {
             )
           },
           footer:
-          "Display skip forward button and skip backward button in music player in addition to previous/next buttons."
+          "Add skip forward and skip backward buttons to the music player, along with the previous/next buttons."
         )
 
         if appDelegate.backendApi.selectedApi != .ampache {
@@ -184,7 +208,7 @@ struct DisplaySettingsView: View {
             )
           },
           footer:
-          "Player Shuffle Button is displayed but it can't be interacted with."
+          "The player shuffle button is displayed but non-interactive."
         )
       }
     }

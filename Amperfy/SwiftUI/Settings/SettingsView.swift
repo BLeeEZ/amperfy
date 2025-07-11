@@ -69,7 +69,7 @@ struct SettingsView: View {
             SettingsCheckBoxRow(label: "Offline Mode", isOn: $settings.isOfflineMode)
           },
           footer:
-          "Songs, podcasts and artworks will not be downloaded when you are offline. Searches are restricted to device only. Playlists will not be synced with the server."
+          "Songs, podcasts, and artworks won’t download offline. Searches are limited to the device, and playlists won’t sync with the server."
         )
 
         SettingsSection {

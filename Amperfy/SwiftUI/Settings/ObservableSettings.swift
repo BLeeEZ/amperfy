@@ -71,4 +71,6 @@ final class Settings: ObservableObject {
 
   @Published
   var themePreference: ThemePreference = .defaultValue
+  @Published
+  var appearanceMode: UIUserInterfaceStyle = .unspecified
 }

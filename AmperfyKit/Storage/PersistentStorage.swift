@@ -335,6 +335,7 @@ public class PersistentStorage {
     case ShowMusicPlayerSkipButtons = "showMusicPlayerSkipButtons"
     case AlwaysHidePlayerLyricsButton = "alwaysHidePlayerLyricsButton"
     case IsLyricsSmoothScrolling = "isLyricsSmoothScrolling"
+    case AppearanceMode = "appearanceMode"
 
     case SongActionOnTab = "songActionOnTab"
     case LibraryDisplaySettings = "libraryDisplaySettings"
@@ -422,6 +423,19 @@ public class PersistentStorage {
       set { UserDefaults.standard.set(
         newValue.rawValue,
         forKey: UserDefaultsKey.ThemePreference.rawValue
+      ) }
+    }
+
+    public var appearanceMode: UIUserInterfaceStyle {
+      get {
+        let appearanceModeRaw = UserDefaults.standard
+          .object(forKey: UserDefaultsKey.AppearanceMode.rawValue) as? Int ??
+          UIUserInterfaceStyle.unspecified.rawValue
+        return UIUserInterfaceStyle(rawValue: appearanceModeRaw) ?? .unspecified
+      }
+      set { UserDefaults.standard.set(
+        newValue.rawValue,
+        forKey: UserDefaultsKey.AppearanceMode.rawValue
       ) }
     }
 

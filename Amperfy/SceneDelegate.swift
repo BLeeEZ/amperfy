@@ -111,6 +111,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       window?.rootViewController = initialViewController
       window?.makeKeyAndVisible()
     #endif
+    
+    appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.appearanceMode)
   }
 
   /** Called when the user activates your application by selecting a shortcut on the Home Screen,

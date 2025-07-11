@@ -24,7 +24,7 @@ import BackgroundTasks
 import Intents
 import MediaPlayer
 import os.log
-import UIKit
+@preconcurrency import UIKit
 
 let windowSettingsTitle = "Settings"
 let windowMiniPlayerTitle = "MiniPlayer"
@@ -375,6 +375,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func setAppTheme(color: UIColor) {
     UIView.appearance().tintColor = color
+  }
+
+  func setAppAppearanceMode(style: UIUserInterfaceStyle) {
+    if #available(iOS 13.0, *) {
+      UIApplication.shared.connectedScenes
+        .forEach {
+          if let windowScene = $0 as? UIWindowScene {
+            windowScene.windows.forEach { window in
+              window.overrideUserInterfaceStyle = style
+              window.rootViewController?.overrideUserInterfaceStyle = style
+            }
+          }
+      }
+    }
   }
 
   func applicationWillResignActive(_ application: UIApplication) {

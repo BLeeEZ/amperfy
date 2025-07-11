@@ -193,6 +193,12 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.themePreference = newValue
     }))
+
+    settings.appearanceMode = appDelegate.storage.settings.appearanceMode
+    changesAgent.append(settings.$appearanceMode.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.appearanceMode = newValue
+      self.appDelegate.setAppAppearanceMode(style: newValue)
+    }))
   }
 
   @IBSegueAction
