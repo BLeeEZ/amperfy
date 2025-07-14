@@ -81,7 +81,7 @@ struct PlayerSettingsView: View {
 
         // Streaming Bitrate Settings
         SettingsSection(content: {
-          SettingsRow(title: "Max Bitrate for Streaming (WiFi)") {
+          SettingsRow(title: "WiFi Streaming Bitrate Limit") {
             Menu(settings.streamingMaxBitrateWifiPreference.description) {
               ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
                 Button(bitrate.description) {
@@ -93,7 +93,7 @@ struct PlayerSettingsView: View {
         }, footer: "Set the maximum streaming bitrate for WiFi")
 
         SettingsSection(content: {
-          SettingsRow(title: "Max Bitrate for Streaming (Cellular)") {
+          SettingsRow(title: "Cellular Streaming Bitrate Limit") {
             Menu(settings.streamingMaxBitrateCellularPreference.description) {
               ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
                 Button(bitrate.description) {

@@ -2486,18 +2486,12 @@ public class LibraryStorage: PlayableFileCachable {
       do {
         try context.save()
       } catch {
-        // Replace this implementation with code to handle the error appropriately.
-        // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        // Log the error and attempt recovery instead of crashing
         let nserror = error as NSError
-        os_log(
-          "CoreData Save Context Error: %s",
-          log: log,
-          type: .error,
-          nserror.localizedDescription
-        )
-        #if DEBUG
-          fatalError("Unresolved error \(nserror), \(nserror.localizedDescription)")
-        #endif
+        os_log("CoreData Save Context Error: %s", log: log, type: .error, nserror.localizedDescription)
+        
+        // Attempt to reset the context to a clean state
+        context.rollback()
       }
     }
   }
