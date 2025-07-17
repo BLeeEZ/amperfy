@@ -2488,8 +2488,13 @@ public class LibraryStorage: PlayableFileCachable {
       } catch {
         // Log the error and attempt recovery instead of crashing
         let nserror = error as NSError
-        os_log("CoreData Save Context Error: %s", log: log, type: .error, nserror.localizedDescription)
-        
+        os_log(
+          "CoreData Save Context Error: %s",
+          log: log,
+          type: .error,
+          nserror.localizedDescription
+        )
+
         // Attempt to reset the context to a clean state
         context.rollback()
       }

@@ -95,8 +95,10 @@ struct DisplaySettingsView: View {
         #if !targetEnvironment(macCatalyst)
           SettingsSection {
             SettingsRow(title: "Appearance") {
-              Menu(settings.appearanceMode == .unspecified ? "System" :
-                   (settings.appearanceMode == .light ? "Light" : "Dark")) {
+              Menu(
+                settings.appearanceMode == .unspecified ? "System" :
+                  (settings.appearanceMode == .light ? "Light" : "Dark")
+              ) {
                 Button("System") {
                   setAppearanceMode(style: .unspecified)
                 }

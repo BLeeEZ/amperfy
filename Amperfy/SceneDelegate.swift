@@ -111,7 +111,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       window?.rootViewController = initialViewController
       window?.makeKeyAndVisible()
     #endif
-    
+
     appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.appearanceMode)
   }
 

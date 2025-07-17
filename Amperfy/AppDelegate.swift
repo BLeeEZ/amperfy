@@ -387,7 +387,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
               window.rootViewController?.overrideUserInterfaceStyle = style
             }
           }
-      }
+        }
     }
   }
 

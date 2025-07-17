@@ -31,7 +31,6 @@ public struct MatchResult {
 // MARK: - FuzzySearcher
 
 public class FuzzySearcher {
-
   public static func findBestMatch(
     in items: [PlayableContainable],
     search: String

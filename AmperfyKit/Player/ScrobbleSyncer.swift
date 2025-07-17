@@ -27,7 +27,8 @@ import os.log
 
 @MainActor
 public class ScrobbleSyncer {
-  private static let maximumWaitDurationInSec: TimeInterval = 240 //scrobble at 4 min or 50% of duration
+  private static let maximumWaitDurationInSec: TimeInterval =
+    240 // scrobble at 4 min or 50% of duration
 
   private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
   private let musicPlayer: AudioPlayer
@@ -39,7 +40,7 @@ public class ScrobbleSyncer {
   private var isRunning = false
   private var isActive = false
   private var scrobbleTimer: Timer?
-  
+
   // Track how long the song has actually been played
   private var accumulatedPlayTime: TimeInterval = 0
   private var playStartTimestamp: Date?
@@ -184,25 +185,25 @@ public class ScrobbleSyncer {
     else { return }
 
     songToBeScrobbled = curPlayingSong
-    
+
     // Reset tracking variables
     accumulatedPlayTime = 0
     playStartTimestamp = Date()
 
     // Calculate threshold time (half of duration or maximum)
-    let waitDuration: TimeInterval = TimeInterval(curPlayingSong.duration) / 2
+    let waitDuration = TimeInterval(curPlayingSong.duration) / 2
     if waitDuration > Self.maximumWaitDurationInSec {
       currentSongThreshold = Self.maximumWaitDurationInSec
     } else {
       currentSongThreshold = waitDuration
     }
-    
+
     startScrobbleTimer(forSong: curPlayingSong, withDuration: currentSongThreshold)
   }
-  
+
   private func startScrobbleTimer(forSong song: Song, withDuration duration: TimeInterval) {
     let curPlayingId = song.managedObject.objectID
-    
+
     scrobbleTimer?.invalidate()
     scrobbleTimer = Timer.scheduledTimer(
       withTimeInterval: duration,
@@ -252,12 +253,12 @@ extension ScrobbleSyncer: MusicPlayable {
     guard let curPlaying = musicPlayer.currentlyPlaying,
           let curPlayingSong = curPlaying.asSong
     else { return }
-    
+
     // Check if it's still the same song after a pause
     if let songToBeScrobbled = songToBeScrobbled, songToBeScrobbled == curPlayingSong {
       // Record when we started playing again
       playStartTimestamp = Date()
-      
+
       // Only restart the timer if we haven't already hit the threshold
       if !songHasBeenListendEnough {
         // Calculate remaining time needed
@@ -271,7 +272,7 @@ extension ScrobbleSyncer: MusicPlayable {
         }
       }
     }
-    
+
     Task { await scrobble(playedSong: curPlayingSong, songPosition: .start) }
   }
 
@@ -282,11 +283,11 @@ extension ScrobbleSyncer: MusicPlayable {
       accumulatedPlayTime += playedTime
       playStartTimestamp = nil
     }
-    
+
     // Cancel the current timer
     scrobbleTimer?.invalidate()
     scrobbleTimer = nil
-    
+
     Task { await syncSongStopped(clearCurPlaying: false) }
   }
 

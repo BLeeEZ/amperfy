@@ -85,7 +85,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     refresh()
     initializeLyrics()
   }
-    
+
   private func addSwipeGesturesToArtwork() {
     artworkImage.isUserInteractionEnabled = true
 
@@ -104,7 +104,8 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     artworkImage.addGestureRecognizer(swipeRight)
   }
 
-  @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+  @objc
+  private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
     switch gesture.direction {
     case .left:
       rootView?.controlView?.nextButtonPushed(self)
