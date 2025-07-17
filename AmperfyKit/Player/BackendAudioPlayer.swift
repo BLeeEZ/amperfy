@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AudioStreaming
 import AVFoundation
 import Foundation
 import os.log
@@ -38,6 +39,18 @@ protocol BackendAudioPlayerNotifiable {
   func notifyErrorOccurred(error: Error)
 }
 
+// MARK: - AudioStreamingPlayer
+
+public class AudioStreamingPlayer: AudioStreaming.AudioPlayer {
+  public func elapsedTime() -> Double {
+    progress
+  }
+
+  public func getState() -> AudioStreaming.AudioPlayerState {
+    state
+  }
+}
+
 // MARK: - PlayType
 
 enum PlayType {
@@ -45,7 +58,7 @@ enum PlayType {
   case cache
 }
 
-public typealias CreateAVPlayerCallback = () -> AVQueuePlayer
+public typealias CreateAudioStreamingPlayerCallback = () -> AudioStreamingPlayer
 public typealias TriggerReinsertPlayableCallback = @MainActor () -> ()
 typealias NextPlayablePreloadCallback = () -> AbstractPlayable?
 
@@ -64,8 +77,7 @@ class BackendAudioPlayer: NSObject {
   private let cacheProxy: PlayableFileCachable
   private let backendApi: BackendApi
   private let userStatistics: UserStatistics
-  private let createAVPlayerCB: CreateAVPlayerCallback
-  private var player: AVQueuePlayer
+  private let createAudioStreamingPlayerCB: CreateAudioStreamingPlayerCallback
   private let eventLogger: EventLogger
   private let networkMonitor: NetworkMonitorFacade
   private let updateElapsedTimeInterval = CMTime(
@@ -81,10 +93,32 @@ class BackendAudioPlayer: NSObject {
   private var isTriggerReinsertPlayableAllowed = true
   private var wasPlayingBeforeErrorOccurred: Bool = false
   private var userDefinedPlaybackRate: PlaybackRate = .one
+  private var currentPreparedUrl: String = ""
+  private var currentPlayUrl: String = ""
   private var nextPreloadedPlayable: AbstractPlayable?
+  private var nextPreloadedUrl: String = ""
   private var isPreviousPlaylableFinshed = true
   private var isAutoStartPlayback = true
+  private var seekTimeWhenStarted: Double?
+  private var timerElapsedTimeInterval: Timer?
+  private var timerLyricsTimeInterval: Timer?
   private var volumePlayer: Float = 1.0
+  #if false
+    private var streamingBitrateAdjustmentSeek: Double = 0.0
+    private var streamingBitrateAdjustmentWasPlaying: Bool = false
+  #endif
+
+  private var player: AudioStreamingPlayer?
+  private var equalizer: AVAudioUnitEQ?
+  private var replayGainNode: AVAudioMixerNode?
+
+  // ReplayGain Settings
+  private var isReplayGainEnabled: Bool = true
+  private var currentReplayGainValue: Float = 0.0 // ReplayGain in dB
+  // EQ Settings
+  private var equalizerVolumeCompensation: Float = 1.0
+  private var isEqualizerEnabled: Bool = true
+  private var currentEqualizerConfig: EqualizerConfig = .off
 
   public var isOfflineMode: Bool = false
   public var isAutoCachePlayedItems: Bool = true
@@ -95,17 +129,72 @@ class BackendAudioPlayer: NSObject {
   public private(set) var playType: PlayType?
   public private(set) var streamingMaxBitrates = StreamingMaxBitrates()
   public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
-    let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
+    let oldBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
+    let newBitrate = to.getActive(networkMonitor: networkMonitor)
+
     os_log(
       .default,
-      "Update Streaming Max Bitrate: %s %s",
-      streamingMaxBitrate.description,
-      (self.playType == .stream) ? "(active)" : ""
+      "Update Streaming Max Bitrate: %s -> %s (for next stream)",
+      oldBitrate.description,
+      newBitrate.description
     )
-    if playType == .stream {
-      player.currentItem?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
-    }
+    // Update the stored bitrates
+    streamingMaxBitrates = to
+
+    // change the streaming bitrate for the next playable
+    // the current playing element will not be changed
+    #if false
+      // If currently streaming and bitrate actually changed, restart the stream
+      if playType == .stream, oldBitrate != newBitrate {
+        os_log(.default, "Bitrate changed for active stream, restarting with new bitrate")
+        restartCurrentStreamWithNewBitrate()
+        // Notify the UI to refresh the media type label
+        responder?.didElapsedTimeChange()
+      }
+    #endif
   }
+
+  // if the stream is not available in the requested bitrate the duration will be 0
+  // this will lead to a restart which is not intended
+  #if false
+    private func restartCurrentStreamWithNewBitrate() {
+      guard let currentlyPlaying = responder?.getCurrentlyPlaying(),
+            !currentlyPlaying.isCached else {
+        os_log(.default, "Cannot restart: no streaming item currently playing")
+        return
+      }
+
+      // Store current playback state
+      streamingBitrateAdjustmentSeek = elapsedTime
+      streamingBitrateAdjustmentWasPlaying = isPlaying
+
+      os_log(
+        .default,
+        "Restarting stream for: %s at time: %.2f",
+        currentlyPlaying.displayString,
+        streamingBitrateAdjustmentSeek
+      )
+
+      // Restart the stream with new bitrate
+      Task { @MainActor in
+        do {
+          // Re-insert the same playable with new bitrate
+          try await insertStreamPlayable(playable: currentlyPlaying, queueType: .play)
+          os_log(.default, "Successfully restarted stream with new bitrate")
+        } catch {
+          os_log(
+            .error,
+            "Failed to restart stream with new bitrate: %@",
+            error.localizedDescription
+          )
+          // Try to recover by continuing with current stream
+          if streamingBitrateAdjustmentWasPlaying {
+            continuePlay()
+          }
+        }
+      }
+    }
+  #endif
 
   var responder: BackendAudioPlayerNotifiable?
   var volume: Float {
@@ -114,12 +203,8 @@ class BackendAudioPlayer: NSObject {
     }
     set {
       volumePlayer = newValue
-      player.volume = newValue
+      player?.volume = newValue
     }
-  }
-
-  var isPlayableLoaded: Bool {
-    player.currentItem?.status == AVPlayerItem.Status.readyToPlay
   }
 
   var isStopped: Bool {
@@ -127,19 +212,11 @@ class BackendAudioPlayer: NSObject {
   }
 
   var elapsedTime: Double {
-    guard isPlayableLoaded else { return 0.0 }
-    let elapsedTimeInSeconds = player.currentTime().seconds
-    guard elapsedTimeInSeconds.isFinite else { return 0.0 }
-    return elapsedTimeInSeconds
+    player?.elapsedTime() ?? 0.0
   }
 
   var duration: Double {
-    guard isPlayableLoaded,
-          let duration = player.currentItem?.asset.duration.seconds,
-          duration.isFinite else {
-      return 0.0
-    }
-    return duration
+    player?.duration ?? 0.0
   }
 
   var playbackRate: PlaybackRate {
@@ -147,11 +224,15 @@ class BackendAudioPlayer: NSObject {
   }
 
   var canBeContinued: Bool {
-    player.currentItem != nil
+    currentPlayUrl != "" &&
+      (
+        player?.getState() == .paused || player?.getState() == .playing || player?
+          .getState() == .bufferring
+      )
   }
 
   init(
-    createAVPlayerCB: @escaping CreateAVPlayerCallback,
+    createAudioStreamingPlayerCB: @escaping CreateAudioStreamingPlayerCallback,
     audioSessionHandler: AudioSessionHandler,
     eventLogger: EventLogger,
     backendApi: BackendApi,
@@ -160,8 +241,7 @@ class BackendAudioPlayer: NSObject {
     cacheProxy: PlayableFileCachable,
     userStatistics: UserStatistics
   ) {
-    self.createAVPlayerCB = createAVPlayerCB
-    self.player = createAVPlayerCB()
+    self.createAudioStreamingPlayerCB = createAudioStreamingPlayerCB
     self.audioSessionHandler = audioSessionHandler
     self.backendApi = backendApi
     self.networkMonitor = networkMonitor
@@ -172,32 +252,36 @@ class BackendAudioPlayer: NSObject {
 
     super.init()
 
-    initAVPlayer()
+    initAudioStreamingPlayerAndNodes()
   }
 
-  private func initAVPlayer() {
-    player = createAVPlayerCB()
-    player.volume = volumePlayer
-    player.allowsExternalPlayback = false // Disable video transmission via AirPlay -> only audio
-    player.addPeriodicTimeObserver(
-      forInterval: updateElapsedTimeInterval,
-      queue: DispatchQueue.main
-    ) { [weak self] time in
+  private func startTimers() {
+    stopTimers()
+    timerElapsedTimeInterval = Timer.scheduledTimer(
+      withTimeInterval: updateElapsedTimeInterval.seconds,
+      repeats: true
+    ) { [weak self] timer in
       Task { @MainActor in
         guard let self = self else { return }
         self.checkForPreloadNextPlayerItem()
         self.responder?.didElapsedTimeChange()
       }
     }
-    player.addPeriodicTimeObserver(
-      forInterval: updateLyricsTimeInterval,
-      queue: DispatchQueue.main
-    ) { [weak self] time in
+    timerLyricsTimeInterval = Timer.scheduledTimer(
+      withTimeInterval: updateLyricsTimeInterval.seconds,
+      repeats: true
+    ) { [weak self] timer in
       Task { @MainActor in
         guard let self = self else { return }
-        self.responder?.didLyricsTimeChange(time: time)
+        let cmTime = CMTime(value: Int64(self.elapsedTime * 1_000), timescale: 1_000)
+        self.responder?.didLyricsTimeChange(time: cmTime)
       }
     }
+  }
+
+  private func stopTimers() {
+    timerElapsedTimeInterval?.invalidate()
+    timerLyricsTimeInterval?.invalidate()
   }
 
   private func checkForPreloadNextPlayerItem() {
@@ -228,48 +312,18 @@ class BackendAudioPlayer: NSObject {
     }
   }
 
-  @objc
+  @MainActor
   private func itemFinishedPlaying() {
+    isTriggerReinsertPlayableAllowed = true
     isPreviousPlaylableFinshed = true
     if nextPreloadedPlayable != nil {
       isPlaying = true
+      startTimers()
     } else {
       isPlaying = false
+      stopTimers()
     }
     responder?.didItemFinishedPlaying()
-  }
-
-  @objc
-  private func itemPlaybackStalled(_ notification: Notification) {
-    Task { @MainActor in
-      eventLogger.debug(topic: "Playback stalled", message: "Playback stalled")
-      player.pause()
-      try await Task.sleep(nanoseconds: 1_000_000_000)
-      if self.isPlaying {
-        self.player.play()
-      }
-    }
-  }
-
-  override func observeValue(
-    forKeyPath keyPath: String?,
-    of object: Any?,
-    change: [NSKeyValueChangeKey: Any]?,
-    context: UnsafeMutableRawPointer?
-  ) {
-    if let item = object as? AVPlayerItem {
-      if keyPath == "status" {
-        Task { @MainActor in
-          if item.status == .failed,
-             let statusError = item.error {
-            handleError(error: statusError)
-          } else {
-            isTriggerReinsertPlayableAllowed = true
-            isErrorOccurred = false
-          }
-        }
-      }
-    }
   }
 
   private func handleError(error: Error) {
@@ -277,8 +331,9 @@ class BackendAudioPlayer: NSObject {
     wasPlayingBeforeErrorOccurred = isPlaying
     pause()
     nextPreloadedPlayable = nil
+    nextPreloadedUrl = ""
     isPreviousPlaylableFinshed = true
-    initAVPlayer()
+    restartPlayer()
     eventLogger.report(topic: "Player Status", error: error)
     responder?.notifyErrorOccurred(error: error)
     if isTriggerReinsertPlayableAllowed {
@@ -289,13 +344,15 @@ class BackendAudioPlayer: NSObject {
 
   func continuePlay() {
     isPlaying = true
-    player.play()
-    player.playImmediately(atRate: Float(userDefinedPlaybackRate.asDouble))
+    player?.resume()
+    startTimers()
+    player?.rate = Float(userDefinedPlaybackRate.asDouble)
   }
 
   func pause() {
     isPlaying = false
-    player.pause()
+    player?.pause()
+    stopTimers()
   }
 
   func stop() {
@@ -305,11 +362,44 @@ class BackendAudioPlayer: NSObject {
 
   func setPlaybackRate(_ newValue: PlaybackRate) {
     userDefinedPlaybackRate = newValue
-    player.playImmediately(atRate: Float(newValue.asDouble))
+    player?.rate = Float(newValue.asDouble)
   }
 
   func seek(toSecond: Double) {
-    player.seek(to: CMTime(seconds: toSecond, preferredTimescale: CMTimeScale(NSEC_PER_SEC)))
+    if currentPlayUrl != "", player?.getState() == .playing || player?.getState() == .paused {
+      seekTimeWhenStarted = nil
+      player?.seek(to: toSecond)
+    } else {
+      seekTimeWhenStarted = toSecond
+    }
+  }
+
+  private func restartPlayer() {
+    player = nil
+    initAudioStreamingPlayerAndNodes()
+  }
+
+  private func initAudioStreamingPlayerAndNodes() {
+    guard player == nil else { return }
+    player = createAudioStreamingPlayerCB()
+
+    equalizer = AVAudioUnitEQ(numberOfBands: 10)
+    replayGainNode = AVAudioMixerNode()
+
+    guard let player,
+          let eq = equalizer,
+          let replayGain = replayGainNode
+    else { return }
+
+    player.volume = volumePlayer
+    player.delegate = self
+
+    player.attach(nodes: [eq, replayGain])
+
+    setupEqualizerBands()
+    applyEqualizerConfig(eqConfig: currentEqualizerConfig)
+    applyReplayGain()
+    os_log(.default, "Player setup completed with EQ and ReplayGain support")
   }
 
   var shouldPlaybackStart: Bool {
@@ -322,6 +412,7 @@ class BackendAudioPlayer: NSObject {
     autoStartPlayback: Bool
   ) {
     userDefinedPlaybackRate = playbackRate
+    player?.rate = Float(userDefinedPlaybackRate.asDouble)
     isAutoStartPlayback = autoStartPlayback
     handleRequest(playable: playable)
   }
@@ -331,12 +422,17 @@ class BackendAudioPlayer: NSObject {
        nextPreloadedPlayable == playable {
       // Do nothing next preloaded playable has already been queued to player
       os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)
-      self.nextPreloadedPlayable = nil
+      currentPreparedUrl = ""
+      currentPlayUrl = nextPreloadedUrl
       isPreviousPlaylableFinshed = false
+      self.nextPreloadedPlayable = nil
+      nextPreloadedUrl = ""
       responder?.notifyItemPreparationFinished()
     } else if let relFilePath = playable.relFilePath,
               fileManager.fileExits(relFilePath: relFilePath) {
+      currentPlayUrl = ""
       nextPreloadedPlayable = nil
+      nextPreloadedUrl = ""
       guard playable.isPlayableOniOS else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
@@ -345,14 +441,12 @@ class BackendAudioPlayer: NSObject {
         return
       }
       insertCachedPlayable(playable: playable)
-      if shouldPlaybackStart {
-        continuePlay()
-      } else {
-        isPlaying = false
-      }
+      isPlaying = shouldPlaybackStart
       responder?.notifyItemPreparationFinished()
     } else if !isOfflineMode {
+      currentPlayUrl = ""
       nextPreloadedPlayable = nil
+      nextPreloadedUrl = ""
       guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
@@ -370,17 +464,12 @@ class BackendAudioPlayer: NSObject {
         }
       }
 
-      stop()
       Task { @MainActor in
         do {
           try await insertStreamPlayable(playable: playable)
+          isPlaying = shouldPlaybackStart
           if self.isAutoCachePlayedItems, !playable.isRadio {
             self.playableDownloader.download(object: playable)
-          }
-          if self.shouldPlaybackStart {
-            self.continuePlay()
-          } else {
-            self.isPlaying = false
           }
           self.responder?.notifyItemPreparationFinished()
         } catch {
@@ -419,11 +508,16 @@ class BackendAudioPlayer: NSObject {
 
   private func clearPlayer() {
     isPreviousPlaylableFinshed = true
+    currentPreparedUrl = ""
+    currentPlayUrl = ""
     nextPreloadedPlayable = nil
+    nextPreloadedUrl = ""
+    seekTimeWhenStarted = nil
     isPlaying = false
     playType = nil
-    player.pause()
-    playInPlayer(item: nil, queueType: .play)
+
+    stopTimers()
+    player?.stop()
   }
 
   private func insertCachedPlayable(
@@ -500,54 +594,243 @@ class BackendAudioPlayer: NSObject {
     queueType: BackendAudioQueueType
   ) {
     if queueType == .play {
-      player.pause()
+      seekTimeWhenStarted = nil
+      player?.pause()
       audioSessionHandler.configureBackgroundPlayback()
     }
 
-    var item: AVPlayerItem?
+    var asset: AVURLAsset?
     if let mimeType = playable.iOsCompatibleContentType {
-      let asset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey": mimeType])
-      item = AVPlayerItem(asset: asset)
+      asset = AVURLAsset(url: url, options: ["AVURLAssetOutOfBandMIMETypeKey": mimeType])
     } else {
-      item = AVPlayerItem(url: url)
+      asset = AVURLAsset(url: url)
     }
-    item?.preferredPeakBitRate = streamingMaxBitrate.asBitsPerSecondAV
-    addObservers(playerItem: item)
-    playInPlayer(item: item, queueType: queueType)
-  }
-
-  private func addObservers(playerItem: AVPlayerItem?) {
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(itemFinishedPlaying),
-      name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-      object: playerItem
-    )
-    NotificationCenter.default.addObserver(
-      self,
-      selector: #selector(itemPlaybackStalled(_:)),
-      name: NSNotification.Name.AVPlayerItemPlaybackStalled,
-      object: playerItem
-    )
-    playerItem?.addObserver(self, forKeyPath: "status", options: .new, context: nil)
+    playInPlayer(asset: asset, queueType: queueType)
   }
 
   private func playInPlayer(
-    item: AVPlayerItem?,
+    asset: AVURLAsset?,
     queueType: BackendAudioQueueType
   ) {
+    guard let asset = asset else {
+      clearPlayer()
+      return
+    }
+
     switch queueType {
     case .play:
-      player.removeAllItems()
-      initAVPlayer()
-      player.replaceCurrentItem(with: item)
-      isPreviousPlaylableFinshed = false
+      currentPreparedUrl = asset.url.absoluteString
+      player?.play(url: asset.url)
     case .queue:
-      if let item = item {
-        player.insert(item, after: nil)
-      } else {
-        player.removeAllItems()
+      nextPreloadedUrl = asset.url.absoluteString
+      player?.queue(url: asset.url)
+    }
+  }
+
+  // MARK: - EQ Implementation
+
+  func updateEqualizerEnabled(isEnabled: Bool) {
+    isEqualizerEnabled = isEnabled
+    os_log(.default, "Equalizer enabled: %s", isEnabled.description)
+    applyEqualizerToActiveContent()
+  }
+
+  func updateEqualizerConfig(eqConfig: EqualizerConfig) {
+    let oldConfig = currentEqualizerConfig
+    currentEqualizerConfig = eqConfig
+    os_log(
+      .default,
+      "Equalizer config changed from %s to %s",
+      oldConfig.description,
+      eqConfig.description
+    )
+    applyEqualizerToActiveContent()
+  }
+
+  private func applyEqualizerToActiveContent() {
+    if isEqualizerEnabled {
+      applyEqualizerConfig(eqConfig: currentEqualizerConfig)
+    } else {
+      applyEqualizerConfig(eqConfig: .off)
+    }
+    applyReplayGain()
+  }
+
+  private func setupEqualizerBands() {
+    guard let equalizer else { return }
+
+    for (index, frequency) in EqualizerConfig.frequencies.enumerated() {
+      guard index < equalizer.bands.count else { break }
+
+      let band = equalizer.bands[index]
+      band.frequency = frequency
+      band.bandwidth = 1.0
+      band.filterType = .parametric
+      band.gain = 0.0
+      band.bypass = false
+    }
+  }
+
+  private func applyEqualizerConfig(eqConfig: EqualizerConfig) {
+    guard let equalizer else { return }
+
+    // EQ band gains
+    for (index, gain) in eqConfig.gains.enumerated() {
+      guard index < equalizer.bands.count else { break }
+
+      let band = equalizer.bands[index]
+
+      band.filterType = .parametric
+      band.bandwidth = 1.0
+      band.gain = gain
+      band.bypass = false
+    }
+
+    equalizerVolumeCompensation = isEqualizerEnabled ? eqConfig.compensatedVolume : 1.0
+
+    os_log(.default, "   EQ Config '%s'", eqConfig.description)
+    os_log(
+      .default,
+      "   EQ Gains: [%@] dB",
+      eqConfig.gains.map { String(format: "%.1f", $0) }.joined(separator: ", ")
+    )
+    os_log(.default, "   EQ Gain Compensation: %.1f dB", eqConfig.gainCompensation)
+    os_log(.default, "   EQ linear Volume Compensation: %.2f", eqConfig.compensatedVolume)
+    os_log(.default, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
+  }
+
+  // MARK: - ReplayGain Implementation
+
+  func updateReplayGainEnabled(isEnabled: Bool) {
+    isReplayGainEnabled = isEnabled
+    applyReplayGain()
+  }
+
+  private func applyReplayGain() {
+    guard let replayGain = replayGainNode else { return }
+
+    let eqCompensation = isEqualizerEnabled ? equalizerVolumeCompensation : 1.0
+
+    if isReplayGainEnabled, currentReplayGainValue != 0.0 {
+      // Convert dB to linear scale: gain = pow(10, dB / 20)
+      let linearGain = pow(10.0, currentReplayGainValue / 20.0)
+      replayGain.outputVolume = linearGain * eqCompensation
+      os_log(
+        .default,
+        "ReplayGain: %.2f dB → %.3f linear gain (EQ Compensation: %.2f)",
+        currentReplayGainValue,
+        linearGain,
+        eqCompensation
+      )
+    } else {
+      replayGain.outputVolume = eqCompensation
+      os_log(
+        .default,
+        "ReplayGain: disabled or no gain data (EQ Compensation: %.2f)",
+        eqCompensation
+      )
+    }
+  }
+}
+
+// MARK: AudioStreaming.AudioPlayerDelegate
+
+extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
+  nonisolated func audioPlayerDidStartPlaying(
+    player: AudioStreaming.AudioPlayer,
+    with entryId: AudioStreaming.AudioEntryId
+  ) {
+    let entryID = entryId.id
+    Task { @MainActor in
+      didStartPlaying(url: entryID)
+    }
+  }
+
+  @MainActor
+  public func didStartPlaying(url: String) {
+    if currentPreparedUrl == url {
+      currentPreparedUrl = ""
+      currentPlayUrl = url
+      #if false
+        // seek to the timestamp where we left
+        if streamingBitrateAdjustmentSeek > 0.0 {
+          player?.seek(to: streamingBitrateAdjustmentSeek)
+          streamingBitrateAdjustmentSeek = 0.0
+          if streamingBitrateAdjustmentWasPlaying {
+            continuePlay()
+          } else {
+            pause()
+          }
+          streamingBitrateAdjustmentWasPlaying = false
+        } else {
+          if shouldPlaybackStart {
+            continuePlay()
+          } else {
+            pause()
+          }
+        }
+      #else
+        if shouldPlaybackStart {
+          continuePlay()
+        } else {
+          pause()
+        }
+
+        if let seekTimeWhenStarted {
+          player?.seek(to: seekTimeWhenStarted)
+          self.seekTimeWhenStarted = nil
+        }
+      #endif
+    }
+  }
+
+  nonisolated func audioPlayerDidFinishBuffering(
+    player: AudioStreaming.AudioPlayer,
+    with entryId: AudioStreaming.AudioEntryId
+  ) {}
+
+  nonisolated func audioPlayerStateChanged(
+    player: AudioStreaming.AudioPlayer,
+    with newState: AudioStreaming.AudioPlayerState,
+    previous: AudioStreaming.AudioPlayerState
+  ) {}
+
+  nonisolated func audioPlayerDidFinishPlaying(
+    player: AudioStreaming.AudioPlayer,
+    entryId: AudioStreaming.AudioEntryId,
+    stopReason: AudioStreaming.AudioPlayerStopReason,
+    progress: Double,
+    duration: Double
+  ) {
+    let entryID = entryId.id
+    Task { @MainActor in
+      if self.currentPlayUrl == entryID {
+        self.currentPlayUrl = ""
+        self.itemFinishedPlaying()
       }
     }
   }
+
+  nonisolated func audioPlayerUnexpectedError(
+    player: AudioStreaming.AudioPlayer,
+    error: AudioStreaming.AudioPlayerError
+  ) {
+    Task { @MainActor in
+      self.handleError(error: error)
+    }
+  }
+
+  nonisolated func audioPlayerDidCancel(
+    player: AudioStreaming.AudioPlayer,
+    queuedItems: [AudioStreaming.AudioEntryId]
+  ) {
+    Task { @MainActor in
+      self.currentPlayUrl = ""
+    }
+  }
+
+  nonisolated func audioPlayerDidReadMetadata(
+    player: AudioStreaming.AudioPlayer,
+    metadata: [String: String]
+  ) {}
 }

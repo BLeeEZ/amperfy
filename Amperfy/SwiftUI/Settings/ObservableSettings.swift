@@ -73,4 +73,11 @@ final class Settings: ObservableObject {
   var themePreference: ThemePreference = .defaultValue
   @Published
   var appearanceMode: UIUserInterfaceStyle = .unspecified
+
+  @Published
+  var isEqualizerEnabled = false
+  @Published
+  var equalizerPreset: EqualizerPreset = .defaultValue
+  @Published
+  var isReplayGainEnabled = true
 }

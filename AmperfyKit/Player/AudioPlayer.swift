@@ -69,6 +69,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     self.backendAudioPlayer.responder = self
     self.backendAudioPlayer.nextPlayablePreloadCB = { () in
       guard !self.isShouldPauseAfterFinishedPlaying else { return nil }
+      guard self.playerStatus.repeatMode != .single else { return nil }
       guard let nextPlayerIndex = self.nextPlayerIndex else { return nil }
       return self.queueHandler.getPlayable(at: nextPlayerIndex)
     }

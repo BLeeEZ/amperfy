@@ -1,5 +1,5 @@
 {
-  "originHash" : "2f0805849e6d853c13e1f5c7613d9731a96de93db42ee6dcf96631489e948421",
+  "originHash" : "52a7d8e16ae01f82c9a01354a14a9464cf2e0755eceb60b283fc63df89fafd7d",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "8dd85aee02e39dd280c75eef88ffdb86eed4b07b",
         "version" : "5.6.2"
+      }
+    },
+    {
+      "identity" : "audiostreaming",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/BLeeEZ/AudioStreaming",
+      "state" : {
+        "branch" : "main",
+        "revision" : "fe6321dfc12c1cc83a05f818bd3e4b55d4781162"
       }
     },
     {

@@ -179,6 +179,10 @@ public protocol PlayerFacade {
   func skipBackward(interval: Double)
 
   func addNotifier(notifier: MusicPlayable)
+
+  func updateEqualizerEnabled(isEnabled: Bool)
+  func updateEqualizerConfig(eqConfig: EqualizerConfig)
+  func updateReplayGainEnabled(isEnabled: Bool)
 }
 
 extension PlayerFacade {
@@ -415,6 +419,18 @@ class PlayerFacadeImpl: PlayerFacade {
   var streamingMaxBitrates: StreamingMaxBitrates { backendAudioPlayer.streamingMaxBitrates }
   public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
     backendAudioPlayer.setStreamingMaxBitrates(to: to)
+  }
+
+  public func updateEqualizerEnabled(isEnabled: Bool) {
+    backendAudioPlayer.updateEqualizerEnabled(isEnabled: isEnabled)
+  }
+
+  public func updateEqualizerConfig(eqConfig: EqualizerConfig) {
+    backendAudioPlayer.updateEqualizerConfig(eqConfig: eqConfig)
+  }
+
+  public func updateReplayGainEnabled(isEnabled: Bool) {
+    backendAudioPlayer.updateReplayGainEnabled(isEnabled: isEnabled)
   }
 
   func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler) {

@@ -57,6 +57,47 @@ struct PlayerSettingsView: View {
   var body: some View {
     ZStack {
       SettingsList {
+        // ReplayGain Settings
+        SettingsSection(
+          content: {
+            SettingsCheckBoxRow(
+              label: "Enable ReplayGain",
+              isOn: Binding(
+                get: { settings.isReplayGainEnabled },
+                set: { isEnabled in
+                  settings.isReplayGainEnabled = isEnabled
+                }
+              )
+            )
+          },
+          footer: "Automatically normalize track volume based on ReplayGain metadata for consistent loudness across all tracks."
+        )
+
+        // Equalizer Settings
+        SettingsSection(content: {
+          SettingsCheckBoxRow(
+            label: "Enable Equalizer",
+            isOn: Binding(
+              get: { settings.isEqualizerEnabled },
+              set: { isEnabled in
+                settings.isEqualizerEnabled = isEnabled
+              }
+            )
+          )
+
+          if settings.isEqualizerEnabled {
+            SettingsRow(title: "Preset") {
+              Menu(settings.equalizerPreset.description) {
+                ForEach(EqualizerPreset.allCases, id: \.self) { preset in
+                  Button(preset.description) {
+                    settings.equalizerPreset = preset
+                  }
+                }
+              }
+            }
+          }
+        }, footer: "Enhance your audio experience with presets")
+
         // General Settings
         SettingsSection {
           SettingsCheckBoxRow(

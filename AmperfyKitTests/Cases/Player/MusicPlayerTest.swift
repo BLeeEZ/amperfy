@@ -20,55 +20,84 @@
 //
 
 @testable import AmperfyKit
+@preconcurrency @testable import AudioStreaming
 import AVFoundation
 import CoreData
 import XCTest
 
-// MARK: - MOCK_AVPlayerItem
+// MARK: - MOCK_AudioStreamingPlayer
 
-class MOCK_AVPlayerItem: AVPlayerItem {
-  override var status: AVPlayerItem.Status {
-    AVPlayerItem.Status.readyToPlay
-  }
-}
+class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
+  static nonisolated(unsafe) private var delegateBackup: AudioPlayerDelegate?
 
-// MARK: - MOCK_AVPlayer
-
-class MOCK_AVPlayer: AVQueuePlayer {
-  nonisolated(unsafe) private var _useMockCurrentItem: Bool = false
-  private let _useMockCurrentItemLock = NSLock()
-  nonisolated public var useMockCurrentItem: Bool {
+  nonisolated(unsafe) private var _mockElapsedTime: Double = 0.0
+  private let _mockElapsedTimeLock = NSLock()
+  nonisolated public var mockElapsedTime: Double {
     get {
-      _useMockCurrentItemLock.withLock { _useMockCurrentItem }
+      _mockElapsedTimeLock.withLock { _mockElapsedTime }
     }
     set {
-      _useMockCurrentItemLock.withLock { _useMockCurrentItem = newValue }
+      _mockElapsedTimeLock.withLock { _mockElapsedTime = newValue }
     }
   }
 
-  nonisolated(unsafe) private var mockPlayerItem: AVPlayerItem?
-  nonisolated(unsafe) private var semaphore = DispatchSemaphore(value: 0)
-
-  func useMockPlayerItem() {
-    guard let curItem = super.currentItem else { return }
-    mockPlayerItem = MOCK_AVPlayerItem(asset: curItem.asset)
-  }
-
-  override var currentItem: AVPlayerItem? {
-    guard let curItem = super.currentItem else { return nil }
-    if !useMockCurrentItem {
-      return curItem
-    } else {
-      return mockPlayerItem
+  nonisolated(unsafe) private var _isPlaying = false
+  private let _isPlayingLock = NSLock()
+  nonisolated public var isPlaying: Bool {
+    get {
+      _isPlayingLock.withLock { _isPlaying }
+    }
+    set {
+      _isPlayingLock.withLock { _isPlaying = newValue }
     }
   }
 
-  override func currentTime() -> CMTime {
-    let oldUseMock = useMockCurrentItem
-    useMockCurrentItem = false
-    let curTime = super.currentTime()
-    useMockCurrentItem = oldUseMock
-    return curTime
+  nonisolated(unsafe) private var _isStopped = true
+  private let _isStoppedLock = NSLock()
+  nonisolated public var isStopped: Bool {
+    get {
+      _isStoppedLock.withLock { _isStopped }
+    }
+    set {
+      _isStoppedLock.withLock { _isStopped = newValue }
+    }
+  }
+
+  override func play(url: URL) {
+    Self.delegateBackup = delegate
+    mockElapsedTime = 0.0
+    isPlaying = true
+    isStopped = false
+    let currId = url.absoluteString
+    Task { @MainActor [currId] in
+      let entryID = AudioEntryId(id: currId)
+      Self.delegateBackup?.audioPlayerDidStartPlaying(
+        player: AudioStreaming.AudioPlayer(),
+        with: entryID
+      )
+    }
+  }
+
+  override func pause() {
+    isPlaying = false
+  }
+
+  override func stop(clearQueue: Bool = true) {
+    isPlaying = false
+    isStopped = true
+  }
+
+  override func queue(url: URL) {}
+  override func seek(to time: Double) {
+    mockElapsedTime = time
+  }
+
+  override func elapsedTime() -> Double {
+    mockElapsedTime
+  }
+
+  override func getState() -> AudioStreaming.AudioPlayerState {
+    isStopped ? .stopped : (isPlaying ? .playing : .paused)
   }
 }
 
@@ -287,7 +316,7 @@ class MusicPlayerTest: XCTestCase {
   var testMusicPlayer: AmperfyKit.AudioPlayer!
   var testPlayer: AmperfyKit.PlayerFacade!
   var testQueueHandler: AmperfyKit.PlayQueueHandler!
-  var mockAVPlayer: MOCK_AVPlayer!
+  var mockAudioStreamingPlayer: MOCK_AudioStreamingPlayer!
 
   var songCached: Song!
   var songToDownload: Song!
@@ -299,7 +328,7 @@ class MusicPlayerTest: XCTestCase {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
     songDownloader = MOCK_SongDownloader()
-    mockAVPlayer = MOCK_AVPlayer()
+    mockAudioStreamingPlayer = MOCK_AudioStreamingPlayer()
     mockAlertDisplayer = MOCK_AlertDisplayable()
     mockCoreDataManager = MOCK_CoreDataManager(persistentContainer: cdHelper.persistentContainer)
     storage = PersistentStorage(coreDataManager: mockCoreDataManager)
@@ -308,7 +337,7 @@ class MusicPlayerTest: XCTestCase {
     backendApi = MOCK_BackendApi()
     networkMonitor = MOCK_NetworkMonitor()
     backendPlayer = BackendAudioPlayer(
-      createAVPlayerCB: { self.mockAVPlayer },
+      createAudioStreamingPlayerCB: { self.mockAudioStreamingPlayer },
       audioSessionHandler: AudioSessionHandler(),
       eventLogger: eventLogger,
       backendApi: backendApi,
@@ -605,6 +634,7 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlay_OneSongToDownload_CheckDownloadRequest() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
+    testPlayer.isAutoCachePlayedItems = true
     testPlayer.appendContextQueue(playables: [songToDownload])
     testPlayer.play()
     XCTAssertEqual(songDownloader.downloadables.count, 0)
@@ -1348,11 +1378,13 @@ class MusicPlayerTest: XCTestCase {
   func testSeek_FilledPlaylist() {
     testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
     testPlayer.seek(toSecond: 3.0)
-    mockAVPlayer.useMockCurrentItem = true
-    mockAVPlayer.useMockPlayerItem()
+    backendPlayer
+      .didStartPlaying(
+        url: library.getFileURL(forPlayable: testPlayer.currentlyPlaying!)!
+          .absoluteString
+      )
     let elapsedTime = testPlayer.elapsedTime
     XCTAssertEqual(elapsedTime, 3.0)
-    mockAVPlayer.useMockCurrentItem = false
   }
 
   func testPlayPreviousOrReplay_EmptyPlaylist() {
@@ -1377,10 +1409,14 @@ class MusicPlayerTest: XCTestCase {
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
     XCTAssertFalse(testPlayer.isStopInsteadOfPause)
     testPlayer.seek(toSecond: 10.0)
-    mockAVPlayer.useMockCurrentItem = true
-    mockAVPlayer.useMockPlayerItem()
+
+    backendPlayer
+      .didStartPlaying(
+        url: library.getFileURL(forPlayable: testPlayer.currentlyPlaying!)!
+          .absoluteString
+      )
+
     testPlayer.playPreviousOrReplay()
-    mockAVPlayer.useMockCurrentItem = false
     XCTAssertTrue(testPlayer.isSkipAvailable)
     XCTAssertEqual(playerData.currentIndex, 3)
     XCTAssertEqual(testPlayer.getAllPrevQueueItems().count, 3)
@@ -1396,9 +1432,7 @@ class MusicPlayerTest: XCTestCase {
     testPlayer.play(context: PlayContext(name: "Radios", playables: radios))
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
     testPlayer.seek(toSecond: 10.0)
-    mockAVPlayer.useMockCurrentItem = true
     testPlayer.playPreviousOrReplay()
-    mockAVPlayer.useMockCurrentItem = false
     XCTAssertEqual(playerData.currentIndex, 2)
   }
 

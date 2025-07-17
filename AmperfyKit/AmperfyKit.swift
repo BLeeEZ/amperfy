@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AudioStreaming
 import Foundation
 import MediaPlayer
 import os.log
@@ -107,7 +108,7 @@ public class AmperKit {
   private func createPlayer() -> PlayerFacade {
     let audioSessionHandler = AudioSessionHandler()
     let backendAudioPlayer = BackendAudioPlayer(
-      createAVPlayerCB: { AVQueuePlayer() },
+      createAudioStreamingPlayerCB: { AudioStreamingPlayer() },
       audioSessionHandler: audioSessionHandler,
       eventLogger: eventLogger,
       backendApi: backendApi,
@@ -137,6 +138,10 @@ public class AmperKit {
     audioSessionHandler.eventLogger = eventLogger
     audioSessionHandler.configureObserverForAudioSessionInterruption()
     backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
+    backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.isEqualizerEnabled)
+    backendAudioPlayer
+      .updateEqualizerConfig(eqConfig: storage.settings.equalizerPreset.asEqualizerConfig)
+    backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.isReplayGainEnabled)
     backendAudioPlayer.volume = storage.settings.playerVolume
 
     let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(

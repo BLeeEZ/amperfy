@@ -175,6 +175,25 @@ class SettingsHostVC: UIViewController {
     }))
 
     settings.swipeActionSettings = appDelegate.storage.settings.swipeActionSettings
+
+    settings.isReplayGainEnabled = appDelegate.storage.settings.isReplayGainEnabled
+    changesAgent.append(settings.$isReplayGainEnabled.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.isReplayGainEnabled = newValue
+      self.appDelegate.player.updateReplayGainEnabled(isEnabled: newValue)
+    }))
+
+    settings.isEqualizerEnabled = appDelegate.storage.settings.isEqualizerEnabled
+    changesAgent.append(settings.$isEqualizerEnabled.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.isEqualizerEnabled = newValue
+      self.appDelegate.player.updateEqualizerEnabled(isEnabled: newValue)
+    }))
+
+    settings.equalizerPreset = appDelegate.storage.settings.equalizerPreset
+    changesAgent.append(settings.$equalizerPreset.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.equalizerPreset = newValue
+      self.appDelegate.player.updateEqualizerConfig(eqConfig: newValue.asEqualizerConfig)
+    }))
+
     changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.swipeActionSettings = newValue
     }))

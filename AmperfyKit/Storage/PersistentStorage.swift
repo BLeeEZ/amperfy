@@ -138,6 +138,77 @@ public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
   }
 }
 
+// MARK: - EqualizerConfig
+
+public struct EqualizerConfig: Sendable {
+  public let name: String
+  // EQ gain within 6 dB range
+  public let gains: [Float]
+  // Frequencies in Hz
+  public static let frequencies: [Float] = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+
+  public init(name: String, gains: [Float]) {
+    self.name = name
+    self.gains = gains
+  }
+
+  public var description: String {
+    name
+  }
+
+  public static let off: EqualizerConfig = .init(name: "Off", gains: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+  // Automatic gain compensation to maintain consistent volume levels
+  public var gainCompensation: Float {
+    let positiveGains = gains.filter { $0 > 0 }
+    let avgBoost = positiveGains.isEmpty ? 0 : positiveGains
+      .reduce(0, +) / Float(positiveGains.count)
+    // Conservative compensation: half the average boost, max -6dB
+    return -min(avgBoost / 2.0, 6.0)
+  }
+
+  // Compensated output volume (1.0 = normal, <1.0 = reduced to compensate for EQ boost)
+  public var compensatedVolume: Float {
+    // Convert dB compensation to linear scale
+    let volume = 1.0 + (gainCompensation / 20.0)
+    // Ensure safe range (0.1 to 2.0)
+    return max(0.1, min(2.0, volume))
+  }
+}
+
+// MARK: - EqualizerPreset
+
+public enum EqualizerPreset: Int, CaseIterable, Sendable {
+  case off = 0
+  case increasedBass = 1
+  case reducedBass = 2
+  case increasedTreble = 3
+
+  public static let defaultValue: EqualizerPreset = .off
+
+  public var description: String {
+    switch self {
+    case .off: return "Off"
+    case .increasedBass: return "Increased Bass"
+    case .reducedBass: return "Reduced Bass"
+    case .increasedTreble: return "Increased Treble"
+    }
+  }
+
+  public var gains: [Float] {
+    switch self {
+    case .off: return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    case .increasedBass: return [5, 4, 3, 2, 0, -1, -2, -3, -3, -3]
+    case .reducedBass: return [-3, -2, -1, -1, 0, 0, 0, 0, 0, 0]
+    case .increasedTreble: return [0, 0, 0, 0, 1, 2, 3, 4, 5, 6]
+    }
+  }
+
+  public var asEqualizerConfig: EqualizerConfig {
+    EqualizerConfig(name: description, gains: gains)
+  }
+}
+
 // MARK: - SyncCompletionStatus
 
 public enum SyncCompletionStatus: Int, CaseIterable, Sendable {
@@ -362,6 +433,9 @@ public class PersistentStorage {
 
     case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
     case ThemePreference = "themePreference"
+    case IsEqualizerEnabled = "isEqualizerEnabled"
+    case EqualizerPreset = "equalizerPreset"
+    case IsReplayGainEnabled = "isReplayGainEnabled"
   }
 
   private var coreDataManager: CoreDataManagable
@@ -857,11 +931,43 @@ public class PersistentStorage {
     }
 
     public var isHapticsEnabled: Bool {
+      get { UserDefaults.standard.object(
+        forKey: UserDefaultsKey.IsHapticsEnabled.rawValue
+      ) as? Bool ?? true }
+      set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsHapticsEnabled.rawValue) }
+    }
+
+    public var isEqualizerEnabled: Bool {
       get {
         UserDefaults.standard
-          .object(forKey: UserDefaultsKey.IsHapticsEnabled.rawValue) as? Bool ?? true
+          .object(forKey: UserDefaultsKey.IsEqualizerEnabled.rawValue) as? Bool ?? false
       }
-      set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsHapticsEnabled.rawValue) }
+      set {
+        UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsEqualizerEnabled.rawValue)
+      }
+    }
+
+    public var equalizerPreset: EqualizerPreset {
+      get {
+        let presetRaw = UserDefaults.standard
+          .object(forKey: UserDefaultsKey.EqualizerPreset.rawValue) as? Int ?? EqualizerPreset
+          .defaultValue.rawValue
+        return EqualizerPreset(rawValue: presetRaw) ?? EqualizerPreset.defaultValue
+      }
+      set { UserDefaults.standard.set(
+        newValue.rawValue,
+        forKey: UserDefaultsKey.EqualizerPreset.rawValue
+      ) }
+    }
+
+    public var isReplayGainEnabled: Bool {
+      get {
+        UserDefaults.standard
+          .object(forKey: UserDefaultsKey.IsReplayGainEnabled.rawValue) as? Bool ?? true
+      }
+      set {
+        UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsReplayGainEnabled.rawValue)
+      }
     }
   }
 
