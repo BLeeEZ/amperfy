@@ -103,10 +103,6 @@ class BackendAudioPlayer: NSObject {
   private var timerElapsedTimeInterval: Timer?
   private var timerLyricsTimeInterval: Timer?
   private var volumePlayer: Float = 1.0
-  #if false
-    private var streamingBitrateAdjustmentSeek: Double = 0.0
-    private var streamingBitrateAdjustmentWasPlaying: Bool = false
-  #endif
 
   private var player: AudioStreamingPlayer?
   private var equalizer: AVAudioUnitEQ?
@@ -140,61 +136,7 @@ class BackendAudioPlayer: NSObject {
     )
     // Update the stored bitrates
     streamingMaxBitrates = to
-
-    // change the streaming bitrate for the next playable
-    // the current playing element will not be changed
-    #if false
-      // If currently streaming and bitrate actually changed, restart the stream
-      if playType == .stream, oldBitrate != newBitrate {
-        os_log(.default, "Bitrate changed for active stream, restarting with new bitrate")
-        restartCurrentStreamWithNewBitrate()
-        // Notify the UI to refresh the media type label
-        responder?.didElapsedTimeChange()
-      }
-    #endif
   }
-
-  // if the stream is not available in the requested bitrate the duration will be 0
-  // this will lead to a restart which is not intended
-  #if false
-    private func restartCurrentStreamWithNewBitrate() {
-      guard let currentlyPlaying = responder?.getCurrentlyPlaying(),
-            !currentlyPlaying.isCached else {
-        os_log(.default, "Cannot restart: no streaming item currently playing")
-        return
-      }
-
-      // Store current playback state
-      streamingBitrateAdjustmentSeek = elapsedTime
-      streamingBitrateAdjustmentWasPlaying = isPlaying
-
-      os_log(
-        .default,
-        "Restarting stream for: %s at time: %.2f",
-        currentlyPlaying.displayString,
-        streamingBitrateAdjustmentSeek
-      )
-
-      // Restart the stream with new bitrate
-      Task { @MainActor in
-        do {
-          // Re-insert the same playable with new bitrate
-          try await insertStreamPlayable(playable: currentlyPlaying, queueType: .play)
-          os_log(.default, "Successfully restarted stream with new bitrate")
-        } catch {
-          os_log(
-            .error,
-            "Failed to restart stream with new bitrate: %@",
-            error.localizedDescription
-          )
-          // Try to recover by continuing with current stream
-          if streamingBitrateAdjustmentWasPlaying {
-            continuePlay()
-          }
-        }
-      }
-    }
-  #endif
 
   var responder: BackendAudioPlayerNotifiable?
   var volume: Float {
@@ -425,6 +367,8 @@ class BackendAudioPlayer: NSObject {
       currentPreparedUrl = ""
       currentPlayUrl = nextPreloadedUrl
       isPreviousPlaylableFinshed = false
+      currentReplayGainValue = nextPreloadedPlayable.replayGainTrackGain
+      applyReplayGain()
       self.nextPreloadedPlayable = nil
       nextPreloadedUrl = ""
       responder?.notifyItemPreparationFinished()
@@ -440,6 +384,8 @@ class BackendAudioPlayer: NSObject {
         )
         return
       }
+      currentReplayGainValue = playable.replayGainTrackGain
+      applyReplayGain()
       insertCachedPlayable(playable: playable)
       isPlaying = shouldPlaybackStart
       responder?.notifyItemPreparationFinished()
@@ -466,6 +412,8 @@ class BackendAudioPlayer: NSObject {
 
       Task { @MainActor in
         do {
+          currentReplayGainValue = playable.replayGainTrackGain
+          applyReplayGain()
           try await insertStreamPlayable(playable: playable)
           isPlaying = shouldPlaybackStart
           if self.isAutoCachePlayedItems, !playable.isRadio {
@@ -751,36 +699,16 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
     if currentPreparedUrl == url {
       currentPreparedUrl = ""
       currentPlayUrl = url
-      #if false
-        // seek to the timestamp where we left
-        if streamingBitrateAdjustmentSeek > 0.0 {
-          player?.seek(to: streamingBitrateAdjustmentSeek)
-          streamingBitrateAdjustmentSeek = 0.0
-          if streamingBitrateAdjustmentWasPlaying {
-            continuePlay()
-          } else {
-            pause()
-          }
-          streamingBitrateAdjustmentWasPlaying = false
-        } else {
-          if shouldPlaybackStart {
-            continuePlay()
-          } else {
-            pause()
-          }
-        }
-      #else
-        if shouldPlaybackStart {
-          continuePlay()
-        } else {
-          pause()
-        }
+      if shouldPlaybackStart {
+        continuePlay()
+      } else {
+        pause()
+      }
 
-        if let seekTimeWhenStarted {
-          player?.seek(to: seekTimeWhenStarted)
-          self.seekTimeWhenStarted = nil
-        }
-      #endif
+      if let seekTimeWhenStarted {
+        player?.seek(to: seekTimeWhenStarted)
+        self.seekTimeWhenStarted = nil
+      }
     }
   }
 

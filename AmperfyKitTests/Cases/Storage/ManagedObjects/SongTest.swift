@@ -57,6 +57,10 @@ class SongTest: XCTestCase {
       song.getDefaultArtworkType(), .song
     )
     XCTAssertFalse(song.isCached)
+    XCTAssertEqual(song.replayGainAlbumGain, 0.0)
+    XCTAssertEqual(song.replayGainAlbumPeak, 0.0)
+    XCTAssertEqual(song.replayGainTrackGain, 0.0)
+    XCTAssertEqual(song.replayGainTrackPeak, 0.0)
   }
 
   func testArtist() {

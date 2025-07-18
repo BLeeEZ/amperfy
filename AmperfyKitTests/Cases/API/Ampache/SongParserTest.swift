@@ -63,6 +63,10 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.duration, 433)
     XCTAssertEqual(song.remoteDuration, 433)
     XCTAssertEqual(song.year, 2012)
+    XCTAssertEqual(song.replayGainAlbumGain, 0.0)
+    XCTAssertEqual(song.replayGainAlbumPeak, 0.0)
+    XCTAssertEqual(song.replayGainTrackGain, 0.0)
+    XCTAssertEqual(song.replayGainTrackPeak, 0.0)
     XCTAssertEqual(song.bitrate, 32582)
     XCTAssertEqual(song.contentType, "audio/x-ms-wma")
     XCTAssertEqual(
@@ -90,6 +94,10 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.duration, 96)
     XCTAssertEqual(song.remoteDuration, 96)
     XCTAssertEqual(song.year, 2012)
+    XCTAssertEqual(song.replayGainAlbumGain, 0.0)
+    XCTAssertEqual(song.replayGainAlbumPeak, 0.0)
+    XCTAssertEqual(song.replayGainTrackGain, -1.35)
+    XCTAssertEqual(song.replayGainTrackPeak, 0.881)
     XCTAssertEqual(song.bitrate, 252864)
     XCTAssertEqual(song.contentType, "audio/mp4")
     XCTAssertEqual(
@@ -116,6 +124,10 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.duration, 413)
     XCTAssertEqual(song.remoteDuration, 413)
     XCTAssertEqual(song.year, 0)
+    XCTAssertEqual(song.replayGainAlbumGain, -1.334)
+    XCTAssertEqual(song.replayGainAlbumPeak, 7.91)
+    XCTAssertEqual(song.replayGainTrackGain, 0.94)
+    XCTAssertEqual(song.replayGainTrackPeak, 0.989)
     XCTAssertEqual(song.bitrate, 192000)
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertEqual(
@@ -142,6 +154,10 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.duration, 500)
     XCTAssertEqual(song.remoteDuration, 500)
     XCTAssertEqual(song.year, 2007)
+    XCTAssertEqual(song.replayGainAlbumGain, 9.334)
+    XCTAssertEqual(song.replayGainAlbumPeak, 0.0)
+    XCTAssertEqual(song.replayGainTrackGain, -5.11)
+    XCTAssertEqual(song.replayGainTrackPeak, 1.0)
     XCTAssertEqual(song.bitrate, 64000)
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertEqual(

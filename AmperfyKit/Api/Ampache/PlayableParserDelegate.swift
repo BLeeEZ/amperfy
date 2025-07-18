@@ -89,6 +89,14 @@ class PlayableParserDelegate: AmpacheXmlLibParser {
       playableBuffer?.contentType = buffer
     case "disk":
       playableBuffer?.disk = buffer
+    case "replaygain_album_gain":
+      playableBuffer?.replayGainAlbumGain = Float(buffer) ?? 0.0
+    case "replaygain_album_peak":
+      playableBuffer?.replayGainAlbumPeak = Float(buffer) ?? 0.0
+    case "replaygain_track_gain":
+      playableBuffer?.replayGainTrackGain = Float(buffer) ?? 0.0
+    case "replaygain_track_peak":
+      playableBuffer?.replayGainTrackPeak = Float(buffer) ?? 0.0
     default:
       break
     }

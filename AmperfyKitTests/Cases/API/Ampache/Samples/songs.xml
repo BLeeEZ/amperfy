@@ -122,8 +122,8 @@
     <license><![CDATA[]]></license>
     <publisher><![CDATA[archive.org]]></publisher>
     <language/>
-    <replaygain_album_gain/>
-    <replaygain_album_peak/>
+    <replaygain_album_gain>-1.33400</replaygain_album_gain>
+    <replaygain_album_peak>7.910000</replaygain_album_peak>
     <replaygain_track_gain>0.940000</replaygain_track_gain>
     <replaygain_track_peak>0.989000</replaygain_track_peak>
     <r128_album_gain/>
@@ -165,7 +165,7 @@
     <license><![CDATA[]]></license>
     <publisher><![CDATA[20kbps rec.]]></publisher>
     <language/>
-    <replaygain_album_gain/>
+    <replaygain_album_gain>9.33400</replaygain_album_gain>
     <replaygain_album_peak/>
     <replaygain_track_gain>-5.110000</replaygain_track_gain>
     <replaygain_track_peak>1.000000</replaygain_track_peak>

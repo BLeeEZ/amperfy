@@ -52,6 +52,10 @@ class PodcastEpisodeTest: XCTestCase {
     )
     XCTAssertEqual(episode.getDefaultArtworkType(), .podcastEpisode)
     XCTAssertFalse(episode.isCached)
+    XCTAssertEqual(episode.replayGainAlbumGain, 0.0)
+    XCTAssertEqual(episode.replayGainAlbumPeak, 0.0)
+    XCTAssertEqual(episode.replayGainTrackGain, 0.0)
+    XCTAssertEqual(episode.replayGainTrackPeak, 0.0)
   }
 
   func testPodcast() {

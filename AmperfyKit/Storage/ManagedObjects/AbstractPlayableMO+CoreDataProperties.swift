@@ -57,6 +57,14 @@ extension AbstractPlayableMO {
   @NSManaged
   public var year: Int16
   @NSManaged
+  public var replayGainTrackGain: Float
+  @NSManaged
+  public var replayGainTrackPeak: Float
+  @NSManaged
+  public var replayGainAlbumGain: Float
+  @NSManaged
+  public var replayGainAlbumPeak: Float
+  @NSManaged
   public var download: DownloadMO?
   @NSManaged
   public var embeddedArtwork: EmbeddedArtworkMO?

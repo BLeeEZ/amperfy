@@ -46,6 +46,13 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
       attributes: attributeDict
     )
 
+    if elementName == "replayGain" {
+      playableBuffer?.replayGainAlbumGain = Float(attributeDict["albumGain"] ?? "0.0") ?? 0.0
+      playableBuffer?.replayGainAlbumPeak = Float(attributeDict["albumPeak"] ?? "0.0") ?? 0.0
+      playableBuffer?.replayGainTrackGain = Float(attributeDict["trackGain"] ?? "0.0") ?? 0.0
+      playableBuffer?.replayGainTrackPeak = Float(attributeDict["trackPeak"] ?? "0.0") ?? 0.0
+    }
+
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
       "episode" {
       let isDir = attributeDict["isDir"] ?? "false"

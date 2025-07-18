@@ -133,6 +133,38 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     }
   }
 
+  public var replayGainTrackGain: Float {
+    get { playableManagedObject.replayGainTrackGain }
+    set {
+      guard playableManagedObject.replayGainTrackGain != newValue else { return }
+      playableManagedObject.replayGainTrackGain = newValue
+    }
+  }
+
+  public var replayGainTrackPeak: Float {
+    get { playableManagedObject.replayGainTrackPeak }
+    set {
+      guard playableManagedObject.replayGainTrackPeak != newValue else { return }
+      playableManagedObject.replayGainTrackPeak = newValue
+    }
+  }
+
+  public var replayGainAlbumGain: Float {
+    get { playableManagedObject.replayGainAlbumGain }
+    set {
+      guard playableManagedObject.replayGainAlbumGain != newValue else { return }
+      playableManagedObject.replayGainAlbumGain = newValue
+    }
+  }
+
+  public var replayGainAlbumPeak: Float {
+    get { playableManagedObject.replayGainAlbumPeak }
+    set {
+      guard playableManagedObject.replayGainAlbumPeak != newValue else { return }
+      playableManagedObject.replayGainAlbumPeak = newValue
+    }
+  }
+
   public var duration: Int { Int(playableManagedObject.combinedDuration) }
 
   public func updateDuration() -> Bool {
