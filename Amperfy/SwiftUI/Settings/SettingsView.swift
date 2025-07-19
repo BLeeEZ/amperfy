@@ -97,6 +97,7 @@ struct SettingsView: View {
             navigationLink(.server)
             navigationLink(.library)
             navigationLink(.player)
+            navigationLink(.equalizer)
             navigationLink(.swipe)
             navigationLink(.artwork)
           }

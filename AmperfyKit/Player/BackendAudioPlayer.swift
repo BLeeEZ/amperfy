@@ -114,7 +114,7 @@ class BackendAudioPlayer: NSObject {
   // EQ Settings
   private var equalizerVolumeCompensation: Float = 1.0
   private var isEqualizerEnabled: Bool = true
-  private var currentEqualizerConfig: EqualizerConfig = .off
+  private var currentEqualizerSetting: EqualizerSetting = .off
 
   public var isOfflineMode: Bool = false
   public var isAutoCachePlayedItems: Bool = true
@@ -339,7 +339,7 @@ class BackendAudioPlayer: NSObject {
     player.attach(nodes: [eq, replayGain])
 
     setupEqualizerBands()
-    applyEqualizerConfig(eqConfig: currentEqualizerConfig)
+    applyEqualizerSetting(eqSetting: currentEqualizerSetting)
     applyReplayGain()
     os_log(.default, "Player setup completed with EQ and ReplayGain support")
   }
@@ -583,23 +583,23 @@ class BackendAudioPlayer: NSObject {
     applyEqualizerToActiveContent()
   }
 
-  func updateEqualizerConfig(eqConfig: EqualizerConfig) {
-    let oldConfig = currentEqualizerConfig
-    currentEqualizerConfig = eqConfig
+  func updateEqualizerSetting(eqSetting: EqualizerSetting) {
+    let oldSetting = currentEqualizerSetting
+    currentEqualizerSetting = eqSetting
     os_log(
       .default,
-      "Equalizer config changed from %s to %s",
-      oldConfig.description,
-      eqConfig.description
+      "Equalizer changed from %s to %s",
+      oldSetting.description,
+      eqSetting.description
     )
     applyEqualizerToActiveContent()
   }
 
   private func applyEqualizerToActiveContent() {
     if isEqualizerEnabled {
-      applyEqualizerConfig(eqConfig: currentEqualizerConfig)
+      applyEqualizerSetting(eqSetting: currentEqualizerSetting)
     } else {
-      applyEqualizerConfig(eqConfig: .off)
+      applyEqualizerSetting(eqSetting: .off)
     }
     applyReplayGain()
   }
@@ -607,7 +607,7 @@ class BackendAudioPlayer: NSObject {
   private func setupEqualizerBands() {
     guard let equalizer else { return }
 
-    for (index, frequency) in EqualizerConfig.frequencies.enumerated() {
+    for (index, frequency) in EqualizerSetting.frequencies.enumerated() {
       guard index < equalizer.bands.count else { break }
 
       let band = equalizer.bands[index]
@@ -619,11 +619,11 @@ class BackendAudioPlayer: NSObject {
     }
   }
 
-  private func applyEqualizerConfig(eqConfig: EqualizerConfig) {
+  private func applyEqualizerSetting(eqSetting: EqualizerSetting) {
     guard let equalizer else { return }
 
     // EQ band gains
-    for (index, gain) in eqConfig.gains.enumerated() {
+    for (index, gain) in eqSetting.gains.enumerated() {
       guard index < equalizer.bands.count else { break }
 
       let band = equalizer.bands[index]
@@ -634,16 +634,16 @@ class BackendAudioPlayer: NSObject {
       band.bypass = false
     }
 
-    equalizerVolumeCompensation = isEqualizerEnabled ? eqConfig.compensatedVolume : 1.0
+    equalizerVolumeCompensation = isEqualizerEnabled ? eqSetting.compensatedVolume : 1.0
 
-    os_log(.default, "   EQ Config '%s'", eqConfig.description)
+    os_log(.default, "   EQ '%s'", eqSetting.description)
     os_log(
       .default,
       "   EQ Gains: [%@] dB",
-      eqConfig.gains.map { String(format: "%.1f", $0) }.joined(separator: ", ")
+      eqSetting.gains.map { String(format: "%.1f", $0) }.joined(separator: ", ")
     )
-    os_log(.default, "   EQ Gain Compensation: %.1f dB", eqConfig.gainCompensation)
-    os_log(.default, "   EQ linear Volume Compensation: %.2f", eqConfig.compensatedVolume)
+    os_log(.default, "   EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
+    os_log(.default, "   EQ linear Volume Compensation: %.2f", eqSetting.compensatedVolume)
     os_log(.default, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
   }
 

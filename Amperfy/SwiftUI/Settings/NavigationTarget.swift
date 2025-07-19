@@ -27,6 +27,7 @@ enum NavigationTarget: String, CaseIterable {
   case server
   case library
   case player
+  case equalizer
   case swipe
   case artwork
   case support
@@ -43,6 +44,7 @@ enum NavigationTarget: String, CaseIterable {
     case .server: ServerSettingsView()
     case .library: LibrarySettingsView()
     case .player: PlayerSettingsView()
+    case .equalizer: EqualizerSettingsView()
     case .swipe: SwipeSettingsView()
     case .artwork: ArtworkSettingsView()
     case .support: SupportSettingsView()
@@ -64,6 +66,7 @@ enum NavigationTarget: String, CaseIterable {
     case .artwork: "Artwork"
     case .support: "Support"
     case .license: "License"
+    case .equalizer: "Equalizer"
     #if targetEnvironment(macCatalyst)
       case .player: "Player"
       case .xcallback: "X-Callback"
@@ -85,6 +88,7 @@ enum NavigationTarget: String, CaseIterable {
     case .server: .server
     case .library: .musicLibrary
     case .player: .playCircle
+    case .equalizer: .equalizer
     case .swipe: .arrowRight
     case .artwork: .photo
     case .support: .person
@@ -100,13 +104,14 @@ enum NavigationTarget: String, CaseIterable {
     var toolbarIdentifier: NSToolbarItem.Identifier { NSToolbarItem.Identifier(rawValue) }
 
     var fittingWindowSize: CGSize {
-      let width = 680
+      let width = 740
       let height = switch self {
       case .general: 250
       case .displayAndInteraction: 320
       case .server: 480
       case .library: 620
-      case .player: 350
+      case .player: 370
+      case .equalizer: 450
       case .swipe: 450
       case .artwork: 300
       case .support: 400

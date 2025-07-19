@@ -183,6 +183,7 @@ extension UIImage {
   public static let arrowRight = UIImage.create(systemName: "arrow.right.circle.fill")
   public static let photo = UIImage.create(systemName: "photo.fill")
   public static let person = UIImage.create(systemName: "person.circle")
+  public static let equalizer = UIImage.create(systemName: "chart.bar.xaxis")
   public static let doc = UIImage.create(systemName: "doc.fill")
   public static let arrowTurnUp = UIImage
     .create(systemName: "arrowshape.turn.up.backward.circle.fill")

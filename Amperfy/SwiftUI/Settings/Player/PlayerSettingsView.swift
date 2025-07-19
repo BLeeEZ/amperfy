@@ -70,33 +70,8 @@ struct PlayerSettingsView: View {
               )
             )
           },
-          footer: "Automatically normalize track volume based on ReplayGain metadata for consistent loudness across all tracks."
+          footer: "Automatically normalize track volume based on replay gain information for consistent loudness."
         )
-
-        // Equalizer Settings
-        SettingsSection(content: {
-          SettingsCheckBoxRow(
-            label: "Enable Equalizer",
-            isOn: Binding(
-              get: { settings.isEqualizerEnabled },
-              set: { isEnabled in
-                settings.isEqualizerEnabled = isEnabled
-              }
-            )
-          )
-
-          if settings.isEqualizerEnabled {
-            SettingsRow(title: "Preset") {
-              Menu(settings.equalizerPreset.description) {
-                ForEach(EqualizerPreset.allCases, id: \.self) { preset in
-                  Button(preset.description) {
-                    settings.equalizerPreset = preset
-                  }
-                }
-              }
-            }
-          }
-        }, footer: "Enhance your audio experience with presets")
 
         // General Settings
         SettingsSection {

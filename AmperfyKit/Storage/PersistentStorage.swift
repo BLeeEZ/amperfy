@@ -138,16 +138,21 @@ public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
   }
 }
 
-// MARK: - EqualizerConfig
+// MARK: - EqualizerSetting
 
-public struct EqualizerConfig: Sendable {
-  public let name: String
-  // EQ gain within 6 dB range
-  public let gains: [Float]
+public struct EqualizerSetting: Hashable, Sendable, Encodable, Decodable {
   // Frequencies in Hz
   public static let frequencies: [Float] = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+  public static let defaultGains: [Float] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  public static let rangeFromZero = 6
 
-  public init(name: String, gains: [Float]) {
+  public let id: UUID
+  public var name: String
+  // EQ gain within 6 dB range
+  public var gains: [Float]
+
+  public init(id: UUID = UUID(), name: String, gains: [Float] = Self.defaultGains) {
+    self.id = id
     self.name = name
     self.gains = gains
   }
@@ -156,7 +161,7 @@ public struct EqualizerConfig: Sendable {
     name
   }
 
-  public static let off: EqualizerConfig = .init(name: "Off", gains: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+  public static let off: EqualizerSetting = .init(name: "Off", gains: Self.defaultGains)
 
   // Automatic gain compensation to maintain consistent volume levels
   public var gainCompensation: Float {
@@ -173,6 +178,18 @@ public struct EqualizerConfig: Sendable {
     let volume = 1.0 + (gainCompensation / 20.0)
     // Ensure safe range (0.1 to 2.0)
     return max(0.1, min(2.0, volume))
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  public static func == (
+    lhs: EqualizerSetting,
+    rhs: EqualizerSetting
+  )
+    -> Bool {
+    lhs.id == rhs.id
   }
 }
 
@@ -204,8 +221,8 @@ public enum EqualizerPreset: Int, CaseIterable, Sendable {
     }
   }
 
-  public var asEqualizerConfig: EqualizerConfig {
-    EqualizerConfig(name: description, gains: gains)
+  public var asEqualizerSetting: EqualizerSetting {
+    EqualizerSetting(name: description, gains: gains)
   }
 }
 
@@ -434,7 +451,8 @@ public class PersistentStorage {
     case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
     case ThemePreference = "themePreference"
     case IsEqualizerEnabled = "isEqualizerEnabled"
-    case EqualizerPreset = "equalizerPreset"
+    case EqualizerSettings = "equalizerSettings"
+    case ActiveEqualizerSetting = "activeEqualizerSetting"
     case IsReplayGainEnabled = "isReplayGainEnabled"
   }
 
@@ -947,17 +965,66 @@ public class PersistentStorage {
       }
     }
 
-    public var equalizerPreset: EqualizerPreset {
+    public var activeEqualizerSetting: EqualizerSetting {
       get {
-        let presetRaw = UserDefaults.standard
-          .object(forKey: UserDefaultsKey.EqualizerPreset.rawValue) as? Int ?? EqualizerPreset
-          .defaultValue.rawValue
-        return EqualizerPreset(rawValue: presetRaw) ?? EqualizerPreset.defaultValue
+        let configsRaw = UserDefaults.standard
+          .object(forKey: UserDefaultsKey.ActiveEqualizerSetting.rawValue) as? String
+        guard let configsRaw, let utf8Data = configsRaw.data(using: .utf8) else { return .off }
+
+        let decodedEqualizerSettings = try? JSONDecoder().decode(
+          [EqualizerSetting].self,
+          from: utf8Data
+        )
+        return decodedEqualizerSettings?.first ?? EqualizerSetting.off
       }
-      set { UserDefaults.standard.set(
-        newValue.rawValue,
-        forKey: UserDefaultsKey.EqualizerPreset.rawValue
-      ) }
+      set {
+        guard let encodedEqualizerSettingsData = try? JSONEncoder().encode([newValue]),
+              let encodedEqualizerSettingsString = String(
+                data: encodedEqualizerSettingsData,
+                encoding: .utf8
+              ) else {
+          UserDefaults.standard.set(
+            "",
+            forKey: UserDefaultsKey.ActiveEqualizerSetting.rawValue
+          )
+          return
+        }
+        UserDefaults.standard.set(
+          encodedEqualizerSettingsString,
+          forKey: UserDefaultsKey.ActiveEqualizerSetting.rawValue
+        )
+      }
+    }
+
+    public var equalizerSettings: [EqualizerSetting] {
+      get {
+        let configsRaw = UserDefaults.standard
+          .object(forKey: UserDefaultsKey.EqualizerSettings.rawValue) as? String
+        guard let configsRaw, let utf8Data = configsRaw.data(using: .utf8) else { return [] }
+
+        let decodedEqualizerSettings = try? JSONDecoder().decode(
+          [EqualizerSetting].self,
+          from: utf8Data
+        )
+        return decodedEqualizerSettings ?? []
+      }
+      set {
+        guard let encodedEqualizerSettingsData = try? JSONEncoder().encode(newValue),
+              let encodedEqualizerSettingsString = String(
+                data: encodedEqualizerSettingsData,
+                encoding: .utf8
+              ) else {
+          UserDefaults.standard.set(
+            "",
+            forKey: UserDefaultsKey.EqualizerSettings.rawValue
+          )
+          return
+        }
+        UserDefaults.standard.set(
+          encodedEqualizerSettingsString,
+          forKey: UserDefaultsKey.EqualizerSettings.rawValue
+        )
+      }
     }
 
     public var isReplayGainEnabled: Bool {

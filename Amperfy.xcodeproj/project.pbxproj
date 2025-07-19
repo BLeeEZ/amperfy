@@ -30,6 +30,11 @@
 		501A7D4D26820B080055A51B /* PodcastsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D4C26820B080055A51B /* PodcastsVC.swift */; };
 		501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D4E26820B3F0055A51B /* PodcastDetailVC.swift */; };
 		501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */; };
+		502041982E2A37F2003CE29A /* EqualizerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */; };
+		502041A12E2A3CDB003CE29A /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502041A02E2A3CDB003CE29A /* SliderView.swift */; };
+		502041A22E2A3CDB003CE29A /* EquilizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419F2E2A3CDB003CE29A /* EquilizerView.swift */; };
+		502041A32E2A3CDB003CE29A /* EQPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419E2E2A3CDB003CE29A /* EQPath.swift */; };
+		502041A42E2A3CDB003CE29A /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419D2E2A3CDB003CE29A /* Constants.swift */; };
 		5021B1282BC723F400893C33 /* FuzzySearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5021B1272BC723F400893C33 /* FuzzySearcher.swift */; };
 		5023D9B02BD9A55E00310144 /* CacheFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */; };
 		5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9B12BDAA48200310144 /* UpdateVC.swift */; };
@@ -627,6 +632,11 @@
 		501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreDetailVC.swift; sourceTree = "<group>"; };
 		5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
+		502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerSettingsView.swift; sourceTree = "<group>"; };
+		5020419D2E2A3CDB003CE29A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		5020419E2E2A3CDB003CE29A /* EQPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQPath.swift; sourceTree = "<group>"; };
+		5020419F2E2A3CDB003CE29A /* EquilizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquilizerView.swift; sourceTree = "<group>"; };
+		502041A02E2A3CDB003CE29A /* SliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderView.swift; sourceTree = "<group>"; };
 		5021B1272BC723F400893C33 /* FuzzySearcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzySearcher.swift; sourceTree = "<group>"; };
 		50223EF2264543EA007445BC /* LibrarySyncVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncVersion.swift; sourceTree = "<group>"; };
 		5023D9AE2BD8408B00310144 /* Amperfy v37.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v37.xcdatamodel"; sourceTree = "<group>"; };
@@ -1193,6 +1203,27 @@
 			path = ManagedObjects;
 			sourceTree = "<group>";
 		};
+		502041962E2A37D6003CE29A /* Player */ = {
+			isa = PBXGroup;
+			children = (
+				5020419C2E2A3C77003CE29A /* iOS-SpotifyEquilizerView */,
+				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
+				502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */,
+			);
+			path = Player;
+			sourceTree = "<group>";
+		};
+		5020419C2E2A3C77003CE29A /* iOS-SpotifyEquilizerView */ = {
+			isa = PBXGroup;
+			children = (
+				5020419D2E2A3CDB003CE29A /* Constants.swift */,
+				5020419E2E2A3CDB003CE29A /* EQPath.swift */,
+				5020419F2E2A3CDB003CE29A /* EquilizerView.swift */,
+				502041A02E2A3CDB003CE29A /* SliderView.swift */,
+			);
+			path = "iOS-SpotifyEquilizerView";
+			sourceTree = "<group>";
+		};
 		503E04472B98F42F0091D31E /* Collection */ = {
 			isa = PBXGroup;
 			children = (
@@ -1298,10 +1329,10 @@
 				50E77DB628D2163F00BDF882 /* SettingsView.swift */,
 				5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */,
 				50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */,
-				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
 				50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */,
 				504B441828D6F0920033982C /* LicenseSettingsView.swift */,
 				504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */,
+				502041962E2A37D6003CE29A /* Player */,
 				50CFB59828D5006100A47D44 /* Artwork */,
 				50CFB59528D4848300A47D44 /* Swipe */,
 				50791E8328D36EBD006CE6E5 /* Server */,
@@ -2363,6 +2394,10 @@
 				50791E7A28D31090006CE6E5 /* ServerURLsSettingsView.swift in Sources */,
 				50C9D7092850759B007F18D0 /* PlaytimeSlider.swift in Sources */,
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
+				502041A12E2A3CDB003CE29A /* SliderView.swift in Sources */,
+				502041A22E2A3CDB003CE29A /* EquilizerView.swift in Sources */,
+				502041A32E2A3CDB003CE29A /* EQPath.swift in Sources */,
+				502041A42E2A3CDB003CE29A /* Constants.swift in Sources */,
 				50DE29EF2B90642E00ABA78E /* SelectionAccessory.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */,
@@ -2381,6 +2416,7 @@
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
 				502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */,
 				637A28AD2C77BB9A0082FACC /* ControlBarButton.swift in Sources */,
+				502041982E2A37F2003CE29A /* EqualizerSettingsView.swift in Sources */,
 				50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */,
 				501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */,
 				504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */,

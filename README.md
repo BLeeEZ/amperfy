@@ -27,6 +27,8 @@ Amperfy is an iOS/iPadOS/macOS app written in Swift to interact with an [Ampache
 - Offline support
 - Support for music and podcasts
 - CarPlay support
+- Equalizer
+- Replay gain
 - Syncing the database after first login
 - Update library in background
 - Siri voice commands: "play \<example artist\>"
@@ -77,6 +79,7 @@ Pull requests are always welcome. Please execute `AmperfyKitTests` to ensure cod
 - [Alamofire](https://github.com/Alamofire/Alamofire) by [Alamofire](https://github.com/Alamofire) is licensed under [MIT License](https://github.com/Alamofire/Alamofire/blob/master/LICENSE)
 - [Ifrit](https://github.com/ukushu/Ifrit) by [Andrii Vynnychenko](https://github.com/ukushu) is licensed under [MIT License](https://github.com/ukushu/Ifrit/blob/main/LICENSE.md)
 - [swift-collections](https://github.com/apple/swift-collections) by [Apple](https://github.com/apple) is licensed under [Apache License 2.0](https://github.com/apple/swift-collections/blob/main/LICENSE.txt)
+- [iOS-swiftUI-spotify-equalizer](https://github.com/urvi-k/iOS-swiftUI-spotify-equalizer) by [urvi koladiya](https://github.com/urvi-k) is licensed under [MIT License](https://github.com/urvi-k/iOS-swiftUI-spotify-equalizer/blob/main/LICENSE)
 
 **Amperfy license:** [GPLv3](https://github.com/BLeeEZ/Amperfy/blob/master/LICENSE)
 

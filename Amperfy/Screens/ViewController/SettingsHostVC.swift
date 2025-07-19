@@ -188,10 +188,15 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.player.updateEqualizerEnabled(isEnabled: newValue)
     }))
 
-    settings.equalizerPreset = appDelegate.storage.settings.equalizerPreset
-    changesAgent.append(settings.$equalizerPreset.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.equalizerPreset = newValue
-      self.appDelegate.player.updateEqualizerConfig(eqConfig: newValue.asEqualizerConfig)
+    settings.activeEqualizerSetting = appDelegate.storage.settings.activeEqualizerSetting
+    changesAgent.append(settings.$activeEqualizerSetting.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.activeEqualizerSetting = newValue
+      self.appDelegate.player.updateEqualizerSetting(eqSetting: newValue)
+    }))
+
+    settings.equalizerSettings = appDelegate.storage.settings.equalizerSettings
+    changesAgent.append(settings.$equalizerSettings.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.equalizerSettings = newValue
     }))
 
     changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in

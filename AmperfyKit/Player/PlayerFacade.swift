@@ -181,7 +181,7 @@ public protocol PlayerFacade {
   func addNotifier(notifier: MusicPlayable)
 
   func updateEqualizerEnabled(isEnabled: Bool)
-  func updateEqualizerConfig(eqConfig: EqualizerConfig)
+  func updateEqualizerSetting(eqSetting: EqualizerSetting)
   func updateReplayGainEnabled(isEnabled: Bool)
 }
 
@@ -425,8 +425,8 @@ class PlayerFacadeImpl: PlayerFacade {
     backendAudioPlayer.updateEqualizerEnabled(isEnabled: isEnabled)
   }
 
-  public func updateEqualizerConfig(eqConfig: EqualizerConfig) {
-    backendAudioPlayer.updateEqualizerConfig(eqConfig: eqConfig)
+  public func updateEqualizerSetting(eqSetting: EqualizerSetting) {
+    backendAudioPlayer.updateEqualizerSetting(eqSetting: eqSetting)
   }
 
   public func updateReplayGainEnabled(isEnabled: Bool) {

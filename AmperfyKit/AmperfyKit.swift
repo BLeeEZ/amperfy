@@ -140,7 +140,7 @@ public class AmperKit {
     backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
     backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.isEqualizerEnabled)
     backendAudioPlayer
-      .updateEqualizerConfig(eqConfig: storage.settings.equalizerPreset.asEqualizerConfig)
+      .updateEqualizerSetting(eqSetting: storage.settings.activeEqualizerSetting)
     backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.isReplayGainEnabled)
     backendAudioPlayer.volume = storage.settings.playerVolume
 
