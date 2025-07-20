@@ -103,7 +103,7 @@ public struct PlayContext {
     guard !isKeepIndexDuringShuffle else { return self }
     return PlayContext(
       name: name,
-      index: Int.random(in: 0 ... playables.count - 1),
+      index: (playables.count < 2) ? 0 : Int.random(in: 0 ... playables.count - 1),
       playables: playables
     )
   }

@@ -124,7 +124,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       .compactMap { Radio(managedObject: $0) }
     return PlayContext(
       name: sceneTitle ?? "",
-      index: Int.random(in: 0 ..< radios.count),
+      index: radios.isEmpty ? 0 : Int.random(in: 0 ..< radios.count),
       playables: radios
     )
   }
