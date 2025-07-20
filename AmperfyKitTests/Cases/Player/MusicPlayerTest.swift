@@ -215,6 +215,7 @@ final class MOCK_BackendApi: BackendApi {
   let clientApiVersion: String = ""
   let serverApiVersion: String = ""
   let isStreamingTranscodingActive: Bool = true
+  let streamingTranscodingFormat: AmperfyKit.StreamingFormatPreference = .mp3
   func provideCredentials(credentials: LoginCredentials) {}
   func isAuthenticationValid(credentials: LoginCredentials) async throws {
     throw BackendError.notSupported

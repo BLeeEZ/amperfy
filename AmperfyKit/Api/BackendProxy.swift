@@ -344,6 +344,10 @@ extension BackendProxy: BackendApi {
     activeApi.isStreamingTranscodingActive
   }
 
+  public var streamingTranscodingFormat: StreamingFormatPreference {
+    activeApi.streamingTranscodingFormat
+  }
+
   public func provideCredentials(credentials: LoginCredentials) {
     activeApi.provideCredentials(credentials: credentials)
   }

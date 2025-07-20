@@ -126,6 +126,17 @@ public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
 
   public static let defaultValue: StreamingFormatPreference = .mp3
 
+  public var shortInfo: String {
+    switch self {
+    case .mp3:
+      return "MP3"
+    case .raw:
+      return "RAW"
+    case .serverConfig:
+      return ""
+    }
+  }
+
   public var description: String {
     switch self {
     case .mp3:

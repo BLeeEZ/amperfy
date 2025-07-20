@@ -61,6 +61,10 @@ class PlayerControlView: UIView {
   weak var remainingTimeLabel: UILabel!
   @IBOutlet
   weak var liveLabel: UILabel!
+  @IBOutlet
+  weak var audioInfoLabel: UILabel!
+  @IBOutlet
+  weak var playTypeIcon: UIImageView!
 
   @IBOutlet
   weak var optionsStackView: UIStackView!
@@ -354,6 +358,77 @@ class PlayerControlView: UIView {
     return nil
   }
 
+  private func refreshAudioInfo(currentlyPlaying: AbstractPlayable) {
+    guard let playType = player.playType else {
+      playTypeIcon.image = nil
+      playTypeIcon.isHidden = true
+      audioInfoLabel.isHidden = true
+      return
+    }
+    playTypeIcon.isHidden = false
+    audioInfoLabel.isHidden = false
+    var displayBitrate = ""
+    var formatText = ""
+
+    func getFormat(contentType: String?) -> String {
+      guard let contentType else { return "" }
+      var contentFormatText = ""
+      // Display MIME type: "audio/mp3" -> "MP3"
+      let components = contentType.split(separator: "/")
+      if components.count > 1 {
+        let format = String(components[1]).uppercased()
+        // Format for display
+        switch format {
+        case "MP3", "MPEG":
+          contentFormatText = "MP3"
+        default:
+          if format.contains("LOSSLESS") {
+            contentFormatText = "LOSSLESS"
+          } else if format.hasPrefix("X-"), format.count > "X-".count {
+            contentFormatText = String(format.dropFirst("X-".count))
+          } else {
+            contentFormatText = format
+          }
+        }
+      }
+      return contentFormatText
+    }
+
+    if playType == .cache {
+      playTypeIcon.image = UIImage.cache
+      displayBitrate = "\(currentlyPlaying.bitrate / 1000) kbps"
+      formatText = getFormat(contentType: currentlyPlaying.fileContentType)
+    } else {
+      playTypeIcon.image = UIImage.antenna
+      let streamingBitrate = player.activeStreamingBitrate
+      if let streamingBitrate {
+        if streamingBitrate == .noLimit ||
+          (streamingBitrate.rawValue > (currentlyPlaying.bitrate / 1000)) {
+          displayBitrate = "\(currentlyPlaying.bitrate / 1000) kbps"
+        } else {
+          displayBitrate = "\(streamingBitrate.rawValue) kbps"
+        }
+      } else {
+        displayBitrate = ""
+      }
+
+      let transcodingFormat = player.activeTranscodingFormat
+      if let transcodingFormat {
+        if transcodingFormat == .raw {
+          // it is the format of the streamed file
+          formatText = getFormat(contentType: currentlyPlaying.contentType)
+        } else {
+          formatText = transcodingFormat.shortInfo
+        }
+      } else {
+        formatText = ""
+      }
+    }
+
+    audioInfoLabel.text = "\(formatText) \(displayBitrate)"
+    playTypeIcon.tintColor = .labelColor
+  }
+
   func refreshTimeInfo() {
     if let currentlyPlaying = player.currentlyPlaying {
       let supportTimeInteraction = !currentlyPlaying.isRadio
@@ -372,6 +447,8 @@ class PlayerControlView: UIView {
       }
 
       if !supportTimeInteraction {
+        audioInfoLabel.isHidden = true
+        playTypeIcon.isHidden = true
         liveLabel.isHidden = false
         timeSlider.setThumbImage(UIImage(), for: .normal)
         #if !targetEnvironment(macCatalyst)
@@ -401,6 +478,10 @@ class PlayerControlView: UIView {
         remainingTimeLabel.text = ""
         rootView?.popupItem.progress = 0.0
       } else {
+        audioInfoLabel.isHidden = false
+        playTypeIcon.isHidden = false
+        refreshAudioInfo(currentlyPlaying: currentlyPlaying)
+
         liveLabel.isHidden = true
         timeSlider.layer.mask = nil
         timeSlider.setUnicolorThumbImage(
@@ -421,6 +502,8 @@ class PlayerControlView: UIView {
         rootView?.popupItem.progress = progress.isNormal ? progress : 0.0
       }
     } else {
+      audioInfoLabel.isHidden = true
+      playTypeIcon.isHidden = true
       liveLabel.isHidden = true
       timeSlider.layer.mask = nil
       timeSlider.setUnicolorThumbImage(

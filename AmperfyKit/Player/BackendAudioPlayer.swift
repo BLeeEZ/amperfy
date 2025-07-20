@@ -53,7 +53,7 @@ public class AudioStreamingPlayer: AudioStreaming.AudioPlayer {
 
 // MARK: - PlayType
 
-enum PlayType {
+public enum PlayType {
   case stream
   case cache
 }
@@ -123,6 +123,11 @@ class BackendAudioPlayer: NSObject {
   public private(set) var isPlaying: Bool = false
   public private(set) var isErrorOccurred: Bool = false
   public private(set) var playType: PlayType?
+  private var perloadedPlayType: PlayType?
+  public private(set) var activeStreamingBitrate: StreamingMaxBitratePreference?
+  private var perloadedStreamingBitrate: StreamingMaxBitratePreference?
+  public private(set) var activeTranscodingFormat: StreamingFormatPreference?
+  private var preloadTranscodingFormat: StreamingFormatPreference?
   public private(set) var streamingMaxBitrates = StreamingMaxBitrates()
   public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
     let oldBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
@@ -275,6 +280,10 @@ class BackendAudioPlayer: NSObject {
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
     isPreviousPlaylableFinshed = true
+    activeStreamingBitrate = nil
+    perloadedStreamingBitrate = nil
+    activeTranscodingFormat = nil
+    preloadTranscodingFormat = nil
     restartPlayer()
     eventLogger.report(topic: "Player Status", error: error)
     responder?.notifyErrorOccurred(error: error)
@@ -366,6 +375,12 @@ class BackendAudioPlayer: NSObject {
       os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)
       currentPreparedUrl = ""
       currentPlayUrl = nextPreloadedUrl
+      playType = perloadedPlayType
+      perloadedPlayType = nil
+      activeStreamingBitrate = perloadedStreamingBitrate
+      perloadedStreamingBitrate = nil
+      activeTranscodingFormat = preloadTranscodingFormat
+      preloadTranscodingFormat = nil
       isPreviousPlaylableFinshed = false
       currentReplayGainValue = nextPreloadedPlayable.replayGainTrackGain
       applyReplayGain()
@@ -377,6 +392,10 @@ class BackendAudioPlayer: NSObject {
       currentPlayUrl = ""
       nextPreloadedPlayable = nil
       nextPreloadedUrl = ""
+      activeStreamingBitrate = nil
+      perloadedStreamingBitrate = nil
+      activeTranscodingFormat = nil
+      preloadTranscodingFormat = nil
       guard playable.isPlayableOniOS else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
@@ -393,6 +412,10 @@ class BackendAudioPlayer: NSObject {
       currentPlayUrl = ""
       nextPreloadedPlayable = nil
       nextPreloadedUrl = ""
+      activeStreamingBitrate = nil
+      perloadedStreamingBitrate = nil
+      activeTranscodingFormat = nil
+      preloadTranscodingFormat = nil
       guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
@@ -460,6 +483,12 @@ class BackendAudioPlayer: NSObject {
     currentPlayUrl = ""
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
+    playType = nil
+    perloadedPlayType = nil
+    activeStreamingBitrate = nil
+    perloadedStreamingBitrate = nil
+    activeTranscodingFormat = nil
+    preloadTranscodingFormat = nil
     seekTimeWhenStarted = nil
     isPlaying = false
     playType = nil
@@ -476,11 +505,13 @@ class BackendAudioPlayer: NSObject {
       return
     }
     if queueType == .play {
+      playType = .cache
+      perloadedPlayType = nil
       os_log(.default, "Play Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
     } else {
+      perloadedPlayType = .cache
       os_log(.default, "Insert Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
     }
-    playType = .cache
     if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
     insert(playable: playable, withUrl: fileURL, queueType: queueType)
   }
@@ -500,8 +531,21 @@ class BackendAudioPlayer: NSObject {
         else {
           throw BackendError.invalidUrl
         }
+        playType = .stream
         return streamUrl
       } else {
+        if queueType == .play {
+          playType = .stream
+          perloadedPlayType = nil
+          activeStreamingBitrate = streamingMaxBitrate
+          perloadedStreamingBitrate = nil
+          activeTranscodingFormat = backendApi.streamingTranscodingFormat
+          preloadTranscodingFormat = nil
+        } else {
+          perloadedPlayType = .stream
+          perloadedStreamingBitrate = streamingMaxBitrate
+          preloadTranscodingFormat = backendApi.streamingTranscodingFormat
+        }
         return try await backendApi.generateUrl(
           forStreamingPlayable: playable.info,
           maxBitrate: streamingMaxBitrate
@@ -525,7 +569,6 @@ class BackendAudioPlayer: NSObject {
         streamingMaxBitrate.description
       )
     }
-    playType = .stream
     if playable.isSong { userStatistics.playedSong(isPlayedFromCache: false) }
     insert(
       playable: playable,

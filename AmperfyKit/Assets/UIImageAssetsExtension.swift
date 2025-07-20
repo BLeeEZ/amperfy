@@ -160,6 +160,7 @@ extension UIImage {
   public static let sleep = UIImage.create(systemName: "moon.zzz")
   public static let sleepFill = UIImage.create(systemName: "moon.zzz.fill")
   public static let cache = download
+  public static let antenna = UIImage.create(systemName: "antenna.radiowaves.left.and.right")
   public static let skipForward30 = UIImage.create(systemName: "goforward.30")
   public static let skipBackward15 = UIImage.create(systemName: "gobackward.15")
   public static let repeatAll = UIImage.create(systemName: "repeat")

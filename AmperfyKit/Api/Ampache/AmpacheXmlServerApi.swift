@@ -121,6 +121,8 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     settings.streamingFormatPreference != .raw
   }
 
+  var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
+
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
           let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),

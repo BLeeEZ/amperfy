@@ -201,6 +201,27 @@
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MP3 320kbps" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fic-HG-erH" userLabel="AudioInfo Label">
+                    <rect key="frame" x="157" y="49" width="79" height="20"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="C9Q-ZR-zqL"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <nil key="highlightedColor"/>
+                    <variation key="widthClass=regular">
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    </variation>
+                </label>
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="antenna.radiowaves.left.and.right" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="1aU-Ga-twf">
+                    <rect key="frame" x="136" y="51" width="17" height="15"/>
+                    <color key="tintColor" systemColor="labelColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="14" id="C5j-az-nQB">
+                            <variation key="heightClass=regular" constant="17"/>
+                        </constraint>
+                        <constraint firstAttribute="width" secondItem="1aU-Ga-twf" secondAttribute="height" multiplier="1:1" id="hRM-lb-6Ye"/>
+                    </constraints>
+                </imageView>
             </subviews>
             <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
             <gestureRecognizers/>
@@ -208,10 +229,13 @@
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="4ed-LA-PXc"/>
                 <constraint firstItem="lCe-bR-yIr" firstAttribute="centerX" secondItem="42q-l9-IXM" secondAttribute="centerX" id="5j4-wU-MHY"/>
+                <constraint firstItem="fic-HG-erH" firstAttribute="leading" secondItem="1aU-Ga-twf" secondAttribute="trailing" constant="4" id="6q3-Lu-SIP"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8yb-bt-h2J"/>
                 <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
+                <constraint firstItem="fic-HG-erH" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" constant="-10" id="GkZ-a9-4Ra"/>
                 <constraint firstItem="lCe-bR-yIr" firstAttribute="centerY" secondItem="42q-l9-IXM" secondAttribute="centerY" constant="-13" id="Psw-On-UDt"/>
                 <constraint firstAttribute="trailingMargin" secondItem="t1c-hF-UMw" secondAttribute="trailing" id="QUi-S2-Eme"/>
+                <constraint firstItem="fic-HG-erH" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="9" id="j7a-Es-8zC"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" id="lCh-dw-03A"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
                 <constraint firstItem="xXq-r4-gI6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="nkB-6e-9fV"/>
@@ -220,10 +244,12 @@
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" constant="-159" id="sAk-2J-JEK"/>
                 <constraint firstItem="okd-ac-nGY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="tbM-wh-ia0"/>
                 <constraint firstAttribute="leadingMargin" secondItem="okd-ac-nGY" secondAttribute="trailing" constant="-159" id="vQu-6h-oG4"/>
+                <constraint firstItem="1aU-Ga-twf" firstAttribute="centerY" secondItem="fic-HG-erH" secondAttribute="centerY" id="xoa-iu-CiD"/>
                 <constraint firstItem="xXq-r4-gI6" firstAttribute="top" secondItem="SoI-ny-Hw0" secondAttribute="bottom" constant="20" id="zg3-MD-JbT"/>
             </constraints>
             <connections>
                 <outlet property="airplayButton" destination="l5j-2I-Ltc" id="ENH-UT-6ix"/>
+                <outlet property="audioInfoLabel" destination="fic-HG-erH" id="NjD-Ev-fjR"/>
                 <outlet property="displayPlaylistButton" destination="ZVN-JG-VAA" id="2Rh-6V-CMd"/>
                 <outlet property="elapsedTimeLabel" destination="okd-ac-nGY" id="MFD-Qa-B7r"/>
                 <outlet property="liveLabel" destination="lCe-bR-yIr" id="vcG-AT-BfK"/>
@@ -231,6 +257,7 @@
                 <outlet property="optionsButton" destination="0xq-hb-FZa" id="5AH-yU-Tbd"/>
                 <outlet property="optionsStackView" destination="xXq-r4-gI6" id="52T-2y-bUq"/>
                 <outlet property="playButton" destination="Byk-rx-3Lv" id="03r-73-6Na"/>
+                <outlet property="playTypeIcon" destination="1aU-Ga-twf" id="VTm-39-ARk"/>
                 <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
                 <outlet property="previousButton" destination="Jhy-pc-jwZ" id="3vl-Xj-JHn"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
@@ -249,6 +276,7 @@
     </objects>
     <resources>
         <image name="airplayaudio" catalog="system" width="128" height="123"/>
+        <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="111"/>
         <image name="backward.fill" catalog="system" width="128" height="76"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.fill" catalog="system" width="128" height="76"/>

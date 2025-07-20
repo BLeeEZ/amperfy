@@ -66,6 +66,10 @@ extension SubsonicApi: BackendApi {
     subsonicServerApi.isStreamingTranscodingActive
   }
 
+  public var streamingTranscodingFormat: StreamingFormatPreference {
+    subsonicServerApi.streamingTranscodingFormat
+  }
+
   func provideCredentials(credentials: LoginCredentials) {
     subsonicServerApi.provideCredentials(credentials: credentials)
   }

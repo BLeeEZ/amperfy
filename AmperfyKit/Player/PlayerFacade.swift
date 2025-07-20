@@ -147,6 +147,9 @@ public protocol PlayerFacade {
   var musicItemCount: Int { get }
   var podcastItemCount: Int { get }
   var playerMode: PlayerMode { get }
+  var playType: PlayType? { get }
+  var activeStreamingBitrate: StreamingMaxBitratePreference? { get }
+  var activeTranscodingFormat: StreamingFormatPreference? { get }
   func setPlayerMode(_ newValue: PlayerMode)
   var streamingMaxBitrates: StreamingMaxBitrates { get }
   func setStreamingMaxBitrates(to: StreamingMaxBitrates)
@@ -310,6 +313,18 @@ class PlayerFacadeImpl: PlayerFacade {
 
   var isPlaying: Bool {
     backendAudioPlayer.isPlaying
+  }
+
+  var playType: PlayType? {
+    backendAudioPlayer.playType
+  }
+
+  var activeStreamingBitrate: StreamingMaxBitratePreference? {
+    backendAudioPlayer.activeStreamingBitrate
+  }
+
+  var activeTranscodingFormat: StreamingFormatPreference? {
+    backendAudioPlayer.activeTranscodingFormat
   }
 
   func getPlayable(at playerIndex: PlayerIndex) -> AbstractPlayable? {
