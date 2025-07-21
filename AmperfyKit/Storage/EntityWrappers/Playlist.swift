@@ -80,7 +80,7 @@ public class Playlist: Identifyable {
   }
 
   public func getPlayable(at: Int) -> AbstractPlayable? {
-    guard at < songCount else { return nil }
+    guard at < managedObject.items.count else { return nil }
     return AbstractPlayable(managedObject: managedObject.items[at].playable)
   }
 
