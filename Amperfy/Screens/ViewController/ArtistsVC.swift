@@ -23,7 +23,29 @@ import AmperfyKit
 import CoreData
 import UIKit
 
-class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
+// MARK: - PlaylistsSelectorDiffableDataSource
+
+class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
+
+  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    // Return false if you do not want the item to be re-orderable.
+    return false
+  }
+  
+  func artistAt(indexPath: IndexPath) -> Artist? {
+    let objectID = self.itemIdentifier(for: indexPath)
+    guard let objectID,
+    let object = try? self.appDelegate.storage.main.context
+      .existingObject(with: objectID),
+      let artistMO = object as? ArtistMO
+    else {
+    return nil}
+    return Artist(managedObject: artistMO)
+  }
+
+}
+
+class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   override var sceneTitle: String? {
     switch displayFilter {
     case .albumArtists, .all: "Artists"
@@ -36,6 +58,27 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
   public var displayFilter: ArtistCategoryFilter = .all
   private var sortType: ArtistElementSortType = .name
   private var filterTitle = "Artists"
+  
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+    ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let artistMO = object as? ArtistMO
+        else {
+          return UITableViewCell()
+        }
+      let artist = Artist(
+          managedObject: artistMO
+        )
+        return self.createCell(tableView, forRowAt: indexPath, artist: artist)
+      }
+    return source
+  }
+  
+  func artistAt(indexPath: IndexPath) -> Artist? {
+    (self.diffableDataSource as? ArtistDiffableDataSource)?.artistAt(indexPath: indexPath)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -65,14 +108,16 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     )
 
     containableAtIndexPathCallback = { indexPath in
-      self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      self.artistAt(indexPath: indexPath)
     }
     playContextAtIndexPathCallback = { indexPath in
-      let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      let entity = self.artistAt(indexPath: indexPath)
+      guard let entity else { return nil }
       return PlayContext(containable: entity)
     }
     swipeCallback = { indexPath, completionHandler in
-      let artist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      let artist = self.artistAt(indexPath: indexPath)
+      guard let artist else { return }
       Task { @MainActor in
         do {
           try await artist.fetch(
@@ -112,6 +157,8 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     )
     fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
     singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
     tableView.reloadData()
     updateRightBarButtonItems()
   }
@@ -161,13 +208,13 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
     }
   }
 
-  override func tableView(
+  func createCell(
     _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath
+    forRowAt indexPath: IndexPath,
+    artist: Artist
   )
     -> UITableViewCell {
     let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-    let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
     cell.display(container: artist, rootView: self)
     return cell
   }
@@ -212,7 +259,7 @@ class ArtistsVC: SingleFetchedResultsTableViewController<ArtistMO> {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
+    guard let artist = self.artistAt(indexPath: indexPath) else {return}
     performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
   }
 

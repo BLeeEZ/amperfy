@@ -23,7 +23,7 @@ import AmperfyKit
 import CoreData
 import UIKit
 
-class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, PlaylistVCAddable {
+class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO>, PlaylistVCAddable {
   override var sceneTitle: String? {
     switch displayFilter {
     case .albumArtists, .all: "Artists"
@@ -37,6 +37,27 @@ class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, P
   private var fetchedResultsController: ArtistFetchedResultsController!
   private var sortType: ArtistElementSortType = .name
   private var doneButton: UIBarButtonItem!
+  
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+    ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let artistMO = object as? ArtistMO
+        else {
+          return UITableViewCell()
+        }
+      let artist = Artist(
+          managedObject: artistMO
+        )
+        return self.createCell(tableView, forRowAt: indexPath, artist: artist)
+      }
+    return source
+  }
+  
+  func artistAt(indexPath: IndexPath) -> Artist? {
+    (self.diffableDataSource as? ArtistDiffableDataSource)?.artistAt(indexPath: indexPath)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -81,6 +102,8 @@ class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, P
     )
     fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
     singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
     tableView.reloadData()
   }
 
@@ -92,13 +115,13 @@ class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, P
     updateSearchResults(for: searchController)
   }
 
-  override func tableView(
+  func createCell(
     _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath
+    forRowAt indexPath: IndexPath,
+    artist: Artist
   )
     -> UITableViewCell {
     let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
-    let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
     cell.display(container: artist, rootView: self)
     return cell
   }
@@ -143,7 +166,7 @@ class PlaylistAddArtistsVC: SingleFetchedResultsTableViewController<ArtistMO>, P
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let artist = fetchedResultsController.getWrappedEntity(at: indexPath)
+    guard let artist = artistAt(indexPath: indexPath) else {return}
 
     let nextVC = PlaylistAddArtistDetailVC()
     nextVC.artist = artist

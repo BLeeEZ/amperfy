@@ -319,7 +319,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
-    common.updateSearchResults(for: self.searchController)
+    common.updateSearchResults(for: searchController)
     collectionView.reloadData()
   }
 

@@ -30,9 +30,21 @@ enum AddToPlaylistSelectMode {
   case multi
 }
 
+// MARK: - PlaylistsSelectorDiffableDataSource
+
+class PlaylistsSelectorDiffableDataSource: BasicUITableViewDiffableDataSource {
+
+  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    // Return false if you do not want the item to be re-orderable.
+    return false
+  }
+
+}
+
+
 // MARK: - PlaylistSelectorVC
 
-class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
+class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override var sceneTitle: String? { "Playlists" }
 
   var itemsToAdd: [Song]?
@@ -45,6 +57,24 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
   private var closeButton: UIBarButtonItem!
   private var selectBarButton: UIBarButtonItem!
   private var addBarButton: UIBarButtonItem!
+  
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+    PlaylistsSelectorDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let playlistMO = object as? PlaylistMO
+        else {
+          return UITableViewCell()
+        }
+        let playlist = Playlist(
+          library: self.appDelegate.storage.main.library,
+          managedObject: playlistMO
+        )
+        return self.createCell(tableView, forRowAt: indexPath, playlist: playlist)
+      }
+    return source
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -113,6 +143,8 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
       isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none
     )
     singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
     tableView.reloadData()
     updateRightBarButtonItems()
   }
@@ -248,13 +280,13 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     dismiss(animated: true, completion: nil)
   }
 
-  override func tableView(
+  func createCell(
     _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath
+    forRowAt indexPath: IndexPath,
+    playlist: Playlist
   )
     -> UITableViewCell {
     let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
     cell.display(playlist: playlist, rootView: nil)
 
     if selectMode == .multi {
@@ -276,7 +308,19 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
       dismiss()
       return
     }
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
+    guard let diffableDataSource else { return }
+    let objectID = diffableDataSource.itemIdentifier(for: indexPath)
+    guard let objectID,
+    let object = try? self.appDelegate.storage.main.context
+      .existingObject(with: objectID),
+      let playlistMO = object as? PlaylistMO
+    else {
+    return }
+    
+    let playlist = Playlist(
+      library: self.appDelegate.storage.main.library,
+      managedObject: playlistMO
+    )
 
     func handleSuccessfullSelection(playables: [AbstractPlayable]) {
       let songs = playables.filterSongs()
@@ -285,7 +329,10 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
       } else {
         selectedPlaylits.removeValue(forKey: playlist)
       }
-      self.tableView.reconfigureRows(at: [indexPath])
+      
+      var snap = diffableDataSource.snapshot()
+      snap.reconfigureItems([playlist.managedObject.objectID])
+      diffableDataSource.apply(snap)
 
       if selectMode == .single {
         addSongsToSelectedPlaylists()
@@ -297,7 +344,9 @@ class PlaylistSelectorVC: SingleFetchedResultsTableViewController<PlaylistMO> {
 
     if selectedPlaylits[playlist] != nil {
       selectedPlaylits.removeValue(forKey: playlist)
-      tableView.reconfigureRows(at: [indexPath])
+      var snap = diffableDataSource.snapshot()
+      snap.reconfigureItems([playlist.managedObject.objectID])
+      diffableDataSource.apply(snap)
     } else {
       let itemsNotContained = playlist.notContaines(playables: itemsToAdd)
       if itemsNotContained.count != itemsToAdd.count {

@@ -23,7 +23,33 @@ import AmperfyKit
 import CoreData
 import UIKit
 
-class PlaylistAddPlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO>,
+// MARK: - PlaylistAddPlaylistsDiffableDataSource
+
+class PlaylistAddPlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
+  
+  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    // Return false if you do not want the item to be re-orderable.
+    return false
+  }
+  
+  func playlistAt(indexPath: IndexPath) -> Playlist? {
+    let objectID = self.itemIdentifier(for: indexPath)
+    guard let objectID,
+          let object = try? self.appDelegate.storage.main.context
+      .existingObject(with: objectID),
+          let playlistMO = object as? PlaylistMO
+    else {
+      return nil}
+    
+    let playlist = Playlist(
+      library: self.appDelegate.storage.main.library,
+      managedObject: playlistMO
+    )
+    return playlist
+  }
+}
+
+class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO>,
   PlaylistVCAddable {
   override var sceneTitle: String? { "Playlists" }
 
@@ -32,6 +58,28 @@ class PlaylistAddPlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO
   private var fetchedResultsController: PlaylistFetchedResultsController!
   private var sortType: PlaylistSortType = .name
   private var doneButton: UIBarButtonItem!
+  
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+    PlaylistAddPlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let playlistMO = object as? PlaylistMO
+        else {
+          return UITableViewCell()
+        }
+        let playlist = Playlist(
+          library: self.appDelegate.storage.main.library,
+          managedObject: playlistMO
+        )
+        return self.createCell(tableView, forRowAt: indexPath, playlist: playlist)
+      }
+    return source
+  }
+  
+  func playlistAt(indexPath: IndexPath) -> Playlist? {
+    return (self.diffableDataSource as? PlaylistAddPlaylistsDiffableDataSource)?.playlistAt(indexPath: indexPath)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -89,22 +137,24 @@ class PlaylistAddPlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO
     )
     fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
     singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
     tableView.reloadData()
   }
 
-  override func tableView(
+  func createCell(
     _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath
+    forRowAt indexPath: IndexPath,
+    playlist: Playlist
   )
     -> UITableViewCell {
     let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
     cell.display(playlist: playlist, rootView: self)
     return cell
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
+    guard let playlist = playlistAt(indexPath: indexPath) else {return }
     let nextVC = PlaylistAddPlaylistDetailVC()
     nextVC.playlist = playlist
     nextVC.addToPlaylistManager = addToPlaylistManager

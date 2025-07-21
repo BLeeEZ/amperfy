@@ -23,12 +23,84 @@ import AmperfyKit
 import CoreData
 import UIKit
 
-class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
+// MARK: - PlaylistsDiffableDataSource
+
+class PlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
+
+  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+    // Return false if you do not want the item to be re-orderable.
+    return false
+  }
+  
+  func playlistAt(indexPath: IndexPath) -> Playlist? {
+    let objectID = self.itemIdentifier(for: indexPath)
+    guard let objectID,
+    let object = try? self.appDelegate.storage.main.context
+      .existingObject(with: objectID),
+      let playlistMO = object as? PlaylistMO
+    else {
+    return nil}
+    
+    let playlist = Playlist(
+      library: self.appDelegate.storage.main.library,
+      managedObject: playlistMO
+    )
+    return playlist
+  }
+  
+  // Override to support editing the table view.
+  override func tableView(
+    _ tableView: UITableView,
+    commit editingStyle: UITableViewCell.EditingStyle,
+    forRowAt indexPath: IndexPath
+  ) {
+    guard editingStyle == .delete else { return }
+    
+    guard let playlist = playlistAt(indexPath: indexPath)
+    else {
+    return }
+
+    let playlistId = playlist.id
+    appDelegate.storage.main.library.deletePlaylist(playlist)
+    appDelegate.storage.main.saveContext()
+
+    Task { @MainActor in do {
+      try await self.appDelegate.librarySyncer.syncUpload(playlistIdToDelete: playlistId)
+    } catch {
+      self.appDelegate.eventLogger.report(topic: "Playlist Upload Deletion", error: error)
+    }}
+  }
+
+}
+
+class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override var sceneTitle: String? { "Playlists" }
 
   private var fetchedResultsController: PlaylistFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var sortType: PlaylistSortType = .name
+  
+  override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
+    let source =
+    PlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+        guard let object = try? self.appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let playlistMO = object as? PlaylistMO
+        else {
+          return UITableViewCell()
+        }
+        let playlist = Playlist(
+          library: self.appDelegate.storage.main.library,
+          managedObject: playlistMO
+        )
+        return self.createCell(tableView, forRowAt: indexPath, playlist: playlist)
+      }
+    return source
+  }
+  
+  func playlistAt(indexPath: IndexPath) -> Playlist? {
+    return (self.diffableDataSource as? PlaylistsDiffableDataSource)?.playlistAt(indexPath: indexPath)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -64,14 +136,14 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     )
 
     containableAtIndexPathCallback = { indexPath in
-      self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      self.playlistAt(indexPath: indexPath)
     }
     playContextAtIndexPathCallback = { indexPath in
-      let entity = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      guard let entity = self.playlistAt(indexPath: indexPath) else {return nil}
       return PlayContext(containable: entity)
     }
     swipeCallback = { indexPath, completionHandler in
-      let playlist = self.fetchedResultsController.getWrappedEntity(at: indexPath)
+      guard let playlist = self.playlistAt(indexPath: indexPath) else {return}
       Task { @MainActor in
         do {
           try await playlist.fetch(
@@ -98,6 +170,8 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     )
     fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
     singleFetchedResultsController = fetchedResultsController
+    singleFetchedResultsController?.delegate = self
+    singleFetchedResultsController?.fetch()
     tableView.reloadData()
     updateRightBarButtonItems()
   }
@@ -137,39 +211,20 @@ class PlaylistsVC: SingleFetchedResultsTableViewController<PlaylistMO> {
     #endif
   }
 
-  override func tableView(
+  func createCell(
     _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath
+    forRowAt indexPath: IndexPath,
+    playlist: Playlist
   )
     -> UITableViewCell {
     let cell: PlaylistTableCell = dequeueCell(for: tableView, at: indexPath)
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
     cell.display(playlist: playlist, rootView: self)
     return cell
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
+    guard let playlist = self.playlistAt(indexPath: indexPath) else {return}
     performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
-  }
-
-  // Override to support editing the table view.
-  override func tableView(
-    _ tableView: UITableView,
-    commit editingStyle: UITableViewCell.EditingStyle,
-    forRowAt indexPath: IndexPath
-  ) {
-    guard editingStyle == .delete else { return }
-    let playlist = fetchedResultsController.getWrappedEntity(at: indexPath)
-    let playlistId = playlist.id
-    appDelegate.storage.main.library.deletePlaylist(playlist)
-    appDelegate.storage.main.saveContext()
-
-    Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.syncUpload(playlistIdToDelete: playlistId)
-    } catch {
-      self.appDelegate.eventLogger.report(topic: "Playlist Upload Deletion", error: error)
-    }}
   }
 
   override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

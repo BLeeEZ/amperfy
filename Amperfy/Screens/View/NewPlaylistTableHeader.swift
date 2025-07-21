@@ -53,6 +53,7 @@ class NewPlaylistTableHeader: UIView {
       return
     }
     let playlist = appDelegate.storage.main.library.createPlaylist()
+    appDelegate.storage.main.saveContext()
     playlist.name = playlistName
     nameTextField.text = ""
     appDelegate.storage.main.saveContext()
