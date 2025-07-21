@@ -135,7 +135,8 @@ public class LibraryEntityImage: RoundedImage {
     imagePath: String
   ) async {
     guard !Task.isCancelled else { return }
-    let readyImage = await UIImage(named: imagePath)?.byPreparingForDisplay()
+    let loadedImage = UIImage(contentsOfFile: imagePath)
+    let readyImage = await loadedImage?.byPreparingForDisplay()
     guard !Task.isCancelled else { return }
     Task { @MainActor [weak self] in
       guard let self, let readyImage else { return }
