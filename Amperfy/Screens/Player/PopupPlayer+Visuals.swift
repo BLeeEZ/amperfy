@@ -20,6 +20,7 @@
 //
 
 import AmperfyKit
+import DominantColors
 import UIKit
 
 extension PopupPlayerVC {
@@ -174,6 +175,27 @@ extension PopupPlayerVC {
     guard let artwork = artwork else { return }
     popupItem.image = artwork
     backgroundImage.image = artwork
+    
+    let gradiantColors = (try? artwork.dominantColors(max: 2)) ?? [
+      appDelegate.storage.settings.themePreference.asColor,
+      UIColor.systemBackground
+    ]
+    applyGradientBackground(colors: gradiantColors.compactMap { $0.cgColor})
+  }
+
+  private func applyGradientBackground(colors: [CGColor]) {
+    // remove existing gradient layer
+    backgroundImage.layer.sublayers?.forEach { layer in
+      if layer is CAGradientLayer {
+        layer.removeFromSuperlayer()
+      }
+    }
+    let gradientLayer = CAGradientLayer()
+    gradientLayer.frame = backgroundImage.bounds
+    gradientLayer.colors = colors
+    gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
+    gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+    backgroundImage.layer.insertSublayer(gradientLayer, at: 0)
   }
 
   func refreshArtwork(artworkImage: LibraryEntityImage) {

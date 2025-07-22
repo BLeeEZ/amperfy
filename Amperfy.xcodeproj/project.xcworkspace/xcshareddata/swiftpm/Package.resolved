@@ -1,5 +1,5 @@
 {
-  "originHash" : "52a7d8e16ae01f82c9a01354a14a9464cf2e0755eceb60b283fc63df89fafd7d",
+  "originHash" : "b1488953e726e522ccc5a3356c0f34537a492d8accfef7d3ea98da56b38403fd",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -26,6 +26,15 @@
       "state" : {
         "revision" : "5411bfc17cd0787ac80c46f312c7235783ff9421",
         "version" : "3.0.0"
+      }
+    },
+    {
+      "identity" : "dominantcolors",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/DenDmitriev/DominantColors",
+      "state" : {
+        "revision" : "a05327d36092c47e9ddc77ce565eb35a5b4a4a6e",
+        "version" : "1.2.2"
       }
     },
     {
