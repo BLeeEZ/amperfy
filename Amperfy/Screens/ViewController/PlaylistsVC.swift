@@ -26,28 +26,28 @@ import UIKit
 // MARK: - PlaylistsDiffableDataSource
 
 class PlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
-
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
-    return false
+    false
   }
-  
+
   func playlistAt(indexPath: IndexPath) -> Playlist? {
-    let objectID = self.itemIdentifier(for: indexPath)
+    let objectID = itemIdentifier(for: indexPath)
     guard let objectID,
-    let object = try? self.appDelegate.storage.main.context
-      .existingObject(with: objectID),
-      let playlistMO = object as? PlaylistMO
+          let object = try? appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let playlistMO = object as? PlaylistMO
     else {
-    return nil}
-    
+      return nil
+    }
+
     let playlist = Playlist(
-      library: self.appDelegate.storage.main.library,
+      library: appDelegate.storage.main.library,
       managedObject: playlistMO
     )
     return playlist
   }
-  
+
   // Override to support editing the table view.
   override func tableView(
     _ tableView: UITableView,
@@ -55,10 +55,11 @@ class PlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
     forRowAt indexPath: IndexPath
   ) {
     guard editingStyle == .delete else { return }
-    
+
     guard let playlist = playlistAt(indexPath: indexPath)
     else {
-    return }
+      return
+    }
 
     let playlistId = playlist.id
     appDelegate.storage.main.library.deletePlaylist(playlist)
@@ -70,8 +71,9 @@ class PlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
       self.appDelegate.eventLogger.report(topic: "Playlist Upload Deletion", error: error)
     }}
   }
-
 }
+
+// MARK: - PlaylistsVC
 
 class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override var sceneTitle: String? { "Playlists" }
@@ -79,10 +81,10 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   private var fetchedResultsController: PlaylistFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var sortType: PlaylistSortType = .name
-  
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
-    PlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+      PlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
         guard let object = try? self.appDelegate.storage.main.context
           .existingObject(with: objectID),
           let playlistMO = object as? PlaylistMO
@@ -97,9 +99,9 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
       }
     return source
   }
-  
+
   func playlistAt(indexPath: IndexPath) -> Playlist? {
-    return (self.diffableDataSource as? PlaylistsDiffableDataSource)?.playlistAt(indexPath: indexPath)
+    (diffableDataSource as? PlaylistsDiffableDataSource)?.playlistAt(indexPath: indexPath)
   }
 
   override func viewDidLoad() {
@@ -139,11 +141,11 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
       self.playlistAt(indexPath: indexPath)
     }
     playContextAtIndexPathCallback = { indexPath in
-      guard let entity = self.playlistAt(indexPath: indexPath) else {return nil}
+      guard let entity = self.playlistAt(indexPath: indexPath) else { return nil }
       return PlayContext(containable: entity)
     }
     swipeCallback = { indexPath, completionHandler in
-      guard let playlist = self.playlistAt(indexPath: indexPath) else {return}
+      guard let playlist = self.playlistAt(indexPath: indexPath) else { return }
       Task { @MainActor in
         do {
           try await playlist.fetch(
@@ -223,7 +225,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let playlist = self.playlistAt(indexPath: indexPath) else {return}
+    guard let playlist = playlistAt(indexPath: indexPath) else { return }
     performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
   }
 

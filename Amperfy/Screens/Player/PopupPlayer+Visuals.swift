@@ -175,12 +175,12 @@ extension PopupPlayerVC {
     guard let artwork = artwork else { return }
     popupItem.image = artwork
     backgroundImage.image = artwork
-    
+
     let gradiantColors = (try? artwork.dominantColors(max: 2)) ?? [
       appDelegate.storage.settings.themePreference.asColor,
-      UIColor.systemBackground
+      UIColor.systemBackground,
     ]
-    applyGradientBackground(colors: gradiantColors.compactMap { $0.cgColor})
+    applyGradientBackground(colors: gradiantColors.compactMap { $0.cgColor })
   }
 
   private func applyGradientBackground(colors: [CGColor]) {

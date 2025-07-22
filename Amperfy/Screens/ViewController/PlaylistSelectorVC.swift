@@ -33,14 +33,11 @@ enum AddToPlaylistSelectMode {
 // MARK: - PlaylistsSelectorDiffableDataSource
 
 class PlaylistsSelectorDiffableDataSource: BasicUITableViewDiffableDataSource {
-
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
-    return false
+    false
   }
-
 }
-
 
 // MARK: - PlaylistSelectorVC
 
@@ -57,10 +54,10 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   private var closeButton: UIBarButtonItem!
   private var selectBarButton: UIBarButtonItem!
   private var addBarButton: UIBarButtonItem!
-  
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
-    PlaylistsSelectorDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+      PlaylistsSelectorDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
         guard let object = try? self.appDelegate.storage.main.context
           .existingObject(with: objectID),
           let playlistMO = object as? PlaylistMO
@@ -311,14 +308,15 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     guard let diffableDataSource else { return }
     let objectID = diffableDataSource.itemIdentifier(for: indexPath)
     guard let objectID,
-    let object = try? self.appDelegate.storage.main.context
-      .existingObject(with: objectID),
-      let playlistMO = object as? PlaylistMO
+          let object = try? appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let playlistMO = object as? PlaylistMO
     else {
-    return }
-    
+      return
+    }
+
     let playlist = Playlist(
-      library: self.appDelegate.storage.main.library,
+      library: appDelegate.storage.main.library,
       managedObject: playlistMO
     )
 
@@ -329,7 +327,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
       } else {
         selectedPlaylits.removeValue(forKey: playlist)
       }
-      
+
       var snap = diffableDataSource.snapshot()
       snap.reconfigureItems([playlist.managedObject.objectID])
       diffableDataSource.apply(snap)

@@ -26,28 +26,30 @@ import UIKit
 // MARK: - PlaylistAddPlaylistsDiffableDataSource
 
 class PlaylistAddPlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
-  
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
-    return false
+    false
   }
-  
+
   func playlistAt(indexPath: IndexPath) -> Playlist? {
-    let objectID = self.itemIdentifier(for: indexPath)
+    let objectID = itemIdentifier(for: indexPath)
     guard let objectID,
-          let object = try? self.appDelegate.storage.main.context
-      .existingObject(with: objectID),
+          let object = try? appDelegate.storage.main.context
+          .existingObject(with: objectID),
           let playlistMO = object as? PlaylistMO
     else {
-      return nil}
-    
+      return nil
+    }
+
     let playlist = Playlist(
-      library: self.appDelegate.storage.main.library,
+      library: appDelegate.storage.main.library,
       managedObject: playlistMO
     )
     return playlist
   }
 }
+
+// MARK: - PlaylistAddPlaylistsVC
 
 class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO>,
   PlaylistVCAddable {
@@ -58,10 +60,10 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
   private var fetchedResultsController: PlaylistFetchedResultsController!
   private var sortType: PlaylistSortType = .name
   private var doneButton: UIBarButtonItem!
-  
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
-    PlaylistAddPlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+      PlaylistAddPlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
         guard let object = try? self.appDelegate.storage.main.context
           .existingObject(with: objectID),
           let playlistMO = object as? PlaylistMO
@@ -76,9 +78,10 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
       }
     return source
   }
-  
+
   func playlistAt(indexPath: IndexPath) -> Playlist? {
-    return (self.diffableDataSource as? PlaylistAddPlaylistsDiffableDataSource)?.playlistAt(indexPath: indexPath)
+    (diffableDataSource as? PlaylistAddPlaylistsDiffableDataSource)?
+      .playlistAt(indexPath: indexPath)
   }
 
   override func viewDidLoad() {
@@ -154,7 +157,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let playlist = playlistAt(indexPath: indexPath) else {return }
+    guard let playlist = playlistAt(indexPath: indexPath) else { return }
     let nextVC = PlaylistAddPlaylistDetailVC()
     nextVC.playlist = playlist
     nextVC.addToPlaylistManager = addToPlaylistManager

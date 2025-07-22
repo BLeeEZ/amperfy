@@ -23,27 +23,28 @@ import AmperfyKit
 import CoreData
 import UIKit
 
-// MARK: - PlaylistsSelectorDiffableDataSource
+// MARK: - ArtistDiffableDataSource
 
 class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
-
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
-    return false
-  }
-  
-  func artistAt(indexPath: IndexPath) -> Artist? {
-    let objectID = self.itemIdentifier(for: indexPath)
-    guard let objectID,
-    let object = try? self.appDelegate.storage.main.context
-      .existingObject(with: objectID),
-      let artistMO = object as? ArtistMO
-    else {
-    return nil}
-    return Artist(managedObject: artistMO)
+    false
   }
 
+  func artistAt(indexPath: IndexPath) -> Artist? {
+    let objectID = itemIdentifier(for: indexPath)
+    guard let objectID,
+          let object = try? appDelegate.storage.main.context
+          .existingObject(with: objectID),
+          let artistMO = object as? ArtistMO
+    else {
+      return nil
+    }
+    return Artist(managedObject: artistMO)
+  }
 }
+
+// MARK: - ArtistsVC
 
 class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   override var sceneTitle: String? {
@@ -58,26 +59,26 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   public var displayFilter: ArtistCategoryFilter = .all
   private var sortType: ArtistElementSortType = .name
   private var filterTitle = "Artists"
-  
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
-    ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+      ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
         guard let object = try? self.appDelegate.storage.main.context
           .existingObject(with: objectID),
           let artistMO = object as? ArtistMO
         else {
           return UITableViewCell()
         }
-      let artist = Artist(
+        let artist = Artist(
           managedObject: artistMO
         )
         return self.createCell(tableView, forRowAt: indexPath, artist: artist)
       }
     return source
   }
-  
+
   func artistAt(indexPath: IndexPath) -> Artist? {
-    (self.diffableDataSource as? ArtistDiffableDataSource)?.artistAt(indexPath: indexPath)
+    (diffableDataSource as? ArtistDiffableDataSource)?.artistAt(indexPath: indexPath)
   }
 
   override func viewDidLoad() {
@@ -259,7 +260,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let artist = self.artistAt(indexPath: indexPath) else {return}
+    guard let artist = artistAt(indexPath: indexPath) else { return }
     performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
   }
 

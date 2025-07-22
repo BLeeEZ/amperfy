@@ -23,7 +23,8 @@ import AmperfyKit
 import CoreData
 import UIKit
 
-class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO>, PlaylistVCAddable {
+class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO>,
+  PlaylistVCAddable {
   override var sceneTitle: String? {
     switch displayFilter {
     case .albumArtists, .all: "Artists"
@@ -37,26 +38,26 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
   private var fetchedResultsController: ArtistFetchedResultsController!
   private var sortType: ArtistElementSortType = .name
   private var doneButton: UIBarButtonItem!
-  
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
-    ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
+      ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
         guard let object = try? self.appDelegate.storage.main.context
           .existingObject(with: objectID),
           let artistMO = object as? ArtistMO
         else {
           return UITableViewCell()
         }
-      let artist = Artist(
+        let artist = Artist(
           managedObject: artistMO
         )
         return self.createCell(tableView, forRowAt: indexPath, artist: artist)
       }
     return source
   }
-  
+
   func artistAt(indexPath: IndexPath) -> Artist? {
-    (self.diffableDataSource as? ArtistDiffableDataSource)?.artistAt(indexPath: indexPath)
+    (diffableDataSource as? ArtistDiffableDataSource)?.artistAt(indexPath: indexPath)
   }
 
   override func viewDidLoad() {
@@ -166,7 +167,7 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let artist = artistAt(indexPath: indexPath) else {return}
+    guard let artist = artistAt(indexPath: indexPath) else { return }
 
     let nextVC = PlaylistAddArtistDetailVC()
     nextVC.artist = artist
