@@ -40,6 +40,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   @IBOutlet
   weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
   private let safetyMarginOnBottom = 20.0
+  internal var artworkGradientColors = [UIColor]()
 
   lazy var tableViewKeyCommandsController = TableViewKeyCommandsController(
     tableView: tableView,
@@ -160,6 +161,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     super.viewDidLayoutSubviews()
     refreshCellMasks()
     controlView?.refreshView()
+    applyGradientBackground()
   }
 
   override func viewIsAppearing(_ animated: Bool) {
