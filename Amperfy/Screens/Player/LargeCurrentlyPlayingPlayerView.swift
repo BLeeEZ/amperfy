@@ -24,6 +24,68 @@ import MarqueeLabel
 import MediaPlayer
 import UIKit
 
+import SwiftUI
+
+// MARK: - LargeDisplayElement
+
+enum LargeDisplayElement {
+  case artwork
+  case lyrics
+  case visualizer
+}
+
+// MARK: - AudioAnalyzerView
+
+struct AudioAnalyzerView: View {
+  @EnvironmentObject
+  var audioAnalyzer: AudioAnalyzer
+
+  var body: some View {
+    AmplitudeSpectrumView(
+      shapeType: .ring, // .straight,
+      magnitudes: audioAnalyzer.magnitudes,
+      range: 0 ..< 75,
+      rms: nil // audioAnalyzer.rms
+    )
+    .padding()
+  }
+}
+
+// MARK: - AudioAnalyzerWrapperView
+
+struct AudioAnalyzerWrapperView: View {
+  var body: some View {
+    VStack {
+      AudioAnalyzerView(
+      )
+      .environmentObject(appDelegate.player.audioAnalyzer)
+    }
+  }
+}
+
+// MARK: - SwiftUIContentView
+
+class SwiftUIContentView: UIView {
+  var hostingController: UIHostingController<AudioAnalyzerWrapperView>?
+
+  public func setupSwiftUIView(parentVC: UIViewController, parentView: UIView) {
+    let swiftUIView = AudioAnalyzerWrapperView()
+    let hostingController = UIHostingController(rootView: swiftUIView)
+    self.hostingController = hostingController
+
+    parentVC.addChild(hostingController)
+    parentView.addSubview(hostingController.view)
+
+    hostingController.view.frame = parentView.frame
+    hostingController.view.backgroundColor = .clear
+
+    hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+    hostingController.didMove(toParent: parentVC)
+  }
+}
+
+// MARK: - LargeCurrentlyPlayingPlayerView
+
 class LargeCurrentlyPlayingPlayerView: UIView {
   static let rowHeight: CGFloat = 94.0
   static private let margin = UIEdgeInsets(
@@ -35,6 +97,8 @@ class LargeCurrentlyPlayingPlayerView: UIView {
 
   private var rootView: PopupPlayerVC?
   private var lyricsView: LyricsView?
+  private var visualizerHostingView: SwiftUIContentView?
+  private var displayElement: LargeDisplayElement = .artwork
 
   @IBOutlet
   weak var upperContainerView: UIView!
@@ -68,6 +132,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     upperContainerView.layoutIfNeeded()
 
     lyricsView?.frame = upperContainerView.bounds
+    visualizerHostingView?.hostingController?.view.frame = upperContainerView.bounds
   }
 
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
@@ -75,33 +140,48 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     titleLabel.applyAmperfyStyle()
     albumLabel.applyAmperfyStyle()
     artistLabel.applyAmperfyStyle()
+
     lyricsView = LyricsView()
     lyricsView!.frame = upperContainerView.bounds
-
     upperContainerView.addSubview(lyricsView!)
+
+    visualizerHostingView = SwiftUIContentView()
+    visualizerHostingView!.hostingController?.view.frame = upperContainerView.bounds
+    if let toWorkOnRootView {
+      visualizerHostingView!.setupSwiftUIView(parentVC: toWorkOnRootView, parentView: self)
+    }
 
     addSwipeGesturesToArtwork()
 
+    displayElement = getDisplayElementBasedOnConfig()
     refresh()
-    initializeLyrics()
   }
 
   private func addSwipeGesturesToArtwork() {
+    func createLeftSwipe() -> UISwipeGestureRecognizer {
+      let swipeLeft = UISwipeGestureRecognizer(
+        target: self,
+        action: #selector(handleSwipe(_:))
+      )
+      swipeLeft.direction = .left
+      return swipeLeft
+    }
+
+    func createRightSwipe() -> UISwipeGestureRecognizer {
+      let swipeRight = UISwipeGestureRecognizer(
+        target: self,
+        action: #selector(handleSwipe(_:))
+      )
+      swipeRight.direction = .right
+      return swipeRight
+    }
+
     artworkImage.isUserInteractionEnabled = true
-
-    let swipeLeft = UISwipeGestureRecognizer(
-      target: self,
-      action: #selector(handleSwipe(_:))
-    )
-    swipeLeft.direction = .left
-    artworkImage.addGestureRecognizer(swipeLeft)
-
-    let swipeRight = UISwipeGestureRecognizer(
-      target: self,
-      action: #selector(handleSwipe(_:))
-    )
-    swipeRight.direction = .right
-    artworkImage.addGestureRecognizer(swipeRight)
+    artworkImage.addGestureRecognizer(createLeftSwipe())
+    artworkImage.addGestureRecognizer(createRightSwipe())
+    visualizerHostingView?.hostingController?.view.isUserInteractionEnabled = true
+    visualizerHostingView?.hostingController?.view.addGestureRecognizer(createRightSwipe())
+    visualizerHostingView?.hostingController?.view.addGestureRecognizer(createLeftSwipe())
   }
 
   @objc
@@ -158,7 +238,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   }
 
   var isLyricsViewAllowedToDisplay: Bool {
-    appDelegate.storage.settings.isPlayerLyricsDisplayed &&
+    displayElement == .lyrics &&
       appDelegate.player.playerMode == .music &&
       appDelegate.backendApi.selectedApi != .ampache
   }
@@ -169,10 +249,57 @@ class LargeCurrentlyPlayingPlayerView: UIView {
       appDelegate.backendApi.selectedApi != .ampache
   }
 
+  public func getDisplayElementBasedOnConfig() -> LargeDisplayElement {
+    if appDelegate.storage.settings.isPlayerLyricsDisplayed {
+      return .lyrics
+    } else if appDelegate.storage.settings.isPlayerVisualizerDisplayed {
+      return .visualizer
+    } else {
+      return .artwork
+    }
+  }
+
+  public func display(element: LargeDisplayElement) {
+    displayElement = element
+
+    switch element {
+    case .artwork:
+      hideVisualizer()
+      hideLyrics()
+      showArtwork()
+    case .lyrics:
+      hideVisualizer()
+      almostHideArtwork()
+      initializeLyrics()
+    case .visualizer:
+      hideLyrics()
+      almostHideArtwork()
+      showVisualizer()
+    }
+  }
+
+  public func almostHideArtwork() {
+    artworkImage.alpha = 0.1
+  }
+
+  public func showArtwork() {
+    artworkImage.alpha = 1
+  }
+
+  public func hideVisualizer() {
+    visualizerHostingView?.hostingController?.view.isHidden = true
+    appDelegate.player.audioAnalyzer.isActive = false
+  }
+
+  public func showVisualizer() {
+    visualizerHostingView?.hostingController?.view.isHidden = false
+    appDelegate.player.audioAnalyzer
+      .isActive = (appDelegate.storage.settings.playerDisplayStyle == .large)
+  }
+
   private func hideLyrics() {
     lyricsView?.clear()
     lyricsView?.isHidden = true
-    artworkImage.alpha = 1
   }
 
   private func showLyricsAreNotAvailable() {
@@ -191,7 +318,6 @@ class LargeCurrentlyPlayingPlayerView: UIView {
       scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling
     )
     lyricsView?.isHidden = false
-    artworkImage.alpha = 0.1
   }
 
   func refresh() {
@@ -205,7 +331,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     )
     rootView?.refreshFavoriteButton(button: favoriteButton)
     rootView?.refreshOptionButton(button: optionsButton, rootView: rootView)
-    initializeLyrics()
+    display(element: displayElement)
   }
 
   func refreshArtwork() {

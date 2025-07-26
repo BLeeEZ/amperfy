@@ -290,6 +290,8 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
   }
 
+  var audioAnalyzer: AudioAnalyzer { backendAudioPlayer.audioAnalyzer }
+
   func addNotifier(notifier: MusicPlayable) {
     notifierList.append(notifier)
   }

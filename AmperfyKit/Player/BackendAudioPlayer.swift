@@ -107,6 +107,7 @@ class BackendAudioPlayer: NSObject {
   private var player: AudioStreamingPlayer?
   private var equalizer: AVAudioUnitEQ?
   private var replayGainNode: AVAudioMixerNode?
+  public private(set) var audioAnalyzer: AudioAnalyzer
 
   // ReplayGain Settings
   private var isReplayGainEnabled: Bool = true
@@ -196,6 +197,7 @@ class BackendAudioPlayer: NSObject {
     self.playableDownloader = playableDownloader
     self.cacheProxy = cacheProxy
     self.userStatistics = userStatistics
+    self.audioAnalyzer = AudioAnalyzer()
 
     super.init()
 
@@ -298,17 +300,20 @@ class BackendAudioPlayer: NSObject {
     player?.resume()
     startTimers()
     player?.rate = Float(userDefinedPlaybackRate.asDouble)
+    audioAnalyzer.play()
   }
 
   func pause() {
     isPlaying = false
     player?.pause()
     stopTimers()
+    audioAnalyzer.stop()
   }
 
   func stop() {
     isPlaying = false
     clearPlayer()
+    audioAnalyzer.stop()
   }
 
   func setPlaybackRate(_ newValue: PlaybackRate) {
@@ -336,6 +341,7 @@ class BackendAudioPlayer: NSObject {
 
     equalizer = AVAudioUnitEQ(numberOfBands: 10)
     replayGainNode = AVAudioMixerNode()
+    audioAnalyzer = AudioAnalyzer()
 
     guard let player,
           let eq = equalizer,
@@ -346,6 +352,8 @@ class BackendAudioPlayer: NSObject {
     player.delegate = self
 
     player.attach(nodes: [eq, replayGain])
+
+    audioAnalyzer.install(on: equalizer!)
 
     setupEqualizerBands()
     applyEqualizerSetting(eqSetting: currentEqualizerSetting)
@@ -494,6 +502,7 @@ class BackendAudioPlayer: NSObject {
     playType = nil
 
     stopTimers()
+    audioAnalyzer.stop()
     player?.stop()
   }
 
@@ -740,12 +749,18 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
   @MainActor
   public func didStartPlaying(url: String) {
     if currentPreparedUrl == url {
+      if let sampleRate = player?.mainMixerNode.outputFormat(forBus: 0).sampleRate {
+        audioAnalyzer.playing(sampleRate: Float(sampleRate))
+      }
+
       currentPreparedUrl = ""
       currentPlayUrl = url
       if shouldPlaybackStart {
         continuePlay()
+        audioAnalyzer.play()
       } else {
         pause()
+        audioAnalyzer.stop()
       }
 
       if let seekTimeWhenStarted {

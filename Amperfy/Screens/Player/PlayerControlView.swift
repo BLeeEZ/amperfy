@@ -595,7 +595,8 @@ class PlayerControlView: UIView {
         let showLyricsAction = UIAction(title: "Show Lyrics", image: .lyrics, handler: { _ in
           if !self.appDelegate.storage.settings.isPlayerLyricsDisplayed {
             self.appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
-            self.rootView?.largeCurrentlyPlayingView?.initializeLyrics()
+            self.appDelegate.storage.settings.isPlayerVisualizerDisplayed = false
+            self.rootView?.largeCurrentlyPlayingView?.display(element: .lyrics)
           }
           if self.appDelegate.storage.settings.playerDisplayStyle != .large {
             self.displayPlaylistPressed()
@@ -605,10 +606,39 @@ class PlayerControlView: UIView {
       } else {
         let hideLyricsAction = UIAction(title: "Hide Lyrics", image: .lyrics, handler: { _ in
           self.appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
-          self.rootView?.largeCurrentlyPlayingView?.initializeLyrics()
+          self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
         })
         menuActions.append(hideLyricsAction)
       }
+    }
+
+    if !appDelegate.storage.settings.isPlayerVisualizerDisplayed ||
+      appDelegate.storage.settings.playerDisplayStyle != .large {
+      let showVisualizerAction = UIAction(
+        title: "Show Audio Visualizer",
+        image: .audioVisualizer,
+        handler: { _ in
+          if !self.appDelegate.storage.settings.isPlayerVisualizerDisplayed {
+            self.appDelegate.storage.settings.isPlayerVisualizerDisplayed = true
+            self.appDelegate.storage.settings.isPlayerLyricsDisplayed = false
+            self.rootView?.largeCurrentlyPlayingView?.display(element: .visualizer)
+          }
+          if self.appDelegate.storage.settings.playerDisplayStyle != .large {
+            self.displayPlaylistPressed()
+          }
+        }
+      )
+      menuActions.append(showVisualizerAction)
+    } else {
+      let hideVisualizerAction = UIAction(
+        title: "Hide Audio Visualizer",
+        image: .audioVisualizer,
+        handler: { _ in
+          self.appDelegate.storage.settings.isPlayerVisualizerDisplayed = false
+          self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
+        }
+      )
+      menuActions.append(hideVisualizerAction)
     }
 
     switch player.playerMode {

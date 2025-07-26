@@ -181,6 +181,8 @@ public protocol PlayerFacade {
   func skipForward(interval: Double)
   func skipBackward(interval: Double)
 
+  var audioAnalyzer: AudioAnalyzer { get }
+
   func addNotifier(notifier: MusicPlayable)
 
   func updateEqualizerEnabled(isEnabled: Bool)
@@ -590,6 +592,10 @@ class PlayerFacadeImpl: PlayerFacade {
 
   func skipBackward(interval: Double) {
     seek(toSecond: elapsedTime - interval)
+  }
+
+  var audioAnalyzer: AudioAnalyzer {
+    musicPlayer.audioAnalyzer
   }
 
   func addNotifier(notifier: MusicPlayable) {

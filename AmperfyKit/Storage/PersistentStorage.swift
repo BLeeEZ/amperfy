@@ -451,6 +451,7 @@ public class PersistentStorage {
     case PodcastsShowSetting = "podcastsShowSetting"
     case PlayerDisplayStyle = "playerDisplayStyle"
     case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed"
+    case IsPlayerVisualizerDisplayed = "isPlayerVisualizerDisplayed"
     case IsOfflineMode = "isOfflineMode"
     case IsAutoDownloadLatestSongsActive = "isAutoDownloadLatestSongsActive"
     case IsAutoDownloadLatestPodcastEpisodesActive = "isAutoDownloadLatestPodcastEpisodesActive"
@@ -896,6 +897,17 @@ public class PersistentStorage {
       set { UserDefaults.standard.set(
         newValue,
         forKey: UserDefaultsKey.IsPlayerLyricsDisplayed.rawValue
+      ) }
+    }
+
+    public var isPlayerVisualizerDisplayed: Bool {
+      get {
+        UserDefaults.standard
+          .object(forKey: UserDefaultsKey.IsPlayerVisualizerDisplayed.rawValue) as? Bool ?? false
+      }
+      set { UserDefaults.standard.set(
+        newValue,
+        forKey: UserDefaultsKey.IsPlayerVisualizerDisplayed.rawValue
       ) }
     }
 
