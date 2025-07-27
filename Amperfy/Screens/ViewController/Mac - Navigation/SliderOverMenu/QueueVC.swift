@@ -128,12 +128,10 @@ import UIKit
     }
 
     override var traitCollection: UITraitCollection {
-      let compactHorizontalCollection = UITraitCollection(horizontalSizeClass: .compact)
-      let compactVerticalCollection = UITraitCollection(verticalSizeClass: .compact)
-      let newCollection = UITraitCollection(traitsFrom: [
-        super.traitCollection, compactHorizontalCollection, compactVerticalCollection,
-      ])
-      return newCollection
+      super.traitCollection.modifyingTraits { traits in
+        traits.horizontalSizeClass = .compact
+        traits.verticalSizeClass = .compact
+      }
     }
   }
 

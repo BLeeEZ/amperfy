@@ -155,6 +155,13 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       name: .downloadFinishedSuccess,
       object: appDelegate.playableDownloadManager
     )
+
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.refresh()
+      }
+    )
   }
 
   override func viewDidLayoutSubviews() {
@@ -200,12 +207,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   #if targetEnvironment(macCatalyst)
     // Fix the mini player on macOS
     override var traitCollection: UITraitCollection {
-      let compactHorizontalCollection = UITraitCollection(horizontalSizeClass: .compact)
-      let compactVerticalCollection = UITraitCollection(verticalSizeClass: .compact)
-      let newCollection = UITraitCollection(traitsFrom: [
-        super.traitCollection, compactHorizontalCollection, compactVerticalCollection,
-      ])
-      return newCollection
+      super.traitCollection.modifyingTraits { traits in
+        traits.horizontalSizeClass = .compact
+        traits.verticalSizeClass = .compact
+      }
     }
   #endif
 

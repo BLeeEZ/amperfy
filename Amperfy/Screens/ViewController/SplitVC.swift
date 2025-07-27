@@ -44,6 +44,13 @@ class SplitVC: UISplitViewController {
       // hides the 'Hide Sidebar' button
       presentsWithGesture = false
     #endif
+
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.applyTraitCollectionChange(previousTraitCollection: previousTraitCollection)
+      }
+    )
   }
 
   override func viewWillLayoutSubviews() {
@@ -112,8 +119,7 @@ class SplitVC: UISplitViewController {
     embeddInNavigation(vc: TabNavigatorItem.search.controller)
   }
 
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
+  func applyTraitCollectionChange(previousTraitCollection: UITraitCollection?) {
     guard traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass
     else { return }
     if isCompact {

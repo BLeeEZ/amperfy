@@ -189,12 +189,12 @@ struct LibrarySettingsView: View {
         }, header: "Auto Cache")
 
         SettingsSection(content: {
-          let changeHandler: ([String]) -> () = { cacheString in
-            if cacheString[1] == "" {
+          let changeHandler: ([String], [String]) -> () = { oldCacheString, newCacheString in
+            if newCacheString[1] == "" {
               settings.cacheSizeLimit = 0
               cacheSelection = ["0", " MB"]
             }
-            if let cacheInByte = (cacheString[0] + cacheString[1]).asByteCount {
+            if let cacheInByte = (newCacheString[0] + newCacheString[1]).asByteCount {
               settings.cacheSizeLimit = cacheInByte
             }
           }
@@ -214,7 +214,7 @@ struct LibrarySettingsView: View {
               .alignmentGuide(.top, computeValue: { _ in 0 })
             }
             .frame(height: 25)
-            .onChange(of: cacheSelection, perform: changeHandler)
+            .onChange(of: cacheSelection, changeHandler)
             .padding(.bottom, 10)
           #else
             SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
@@ -236,7 +236,7 @@ struct LibrarySettingsView: View {
                 SecondaryText(cacheSizeLimit.description)
               }
             }
-            .onChange(of: cacheSelection, perform: changeHandler)
+            .onChange(of: cacheSelection, changeHandler)
           #endif
 
           SettingsButtonRow(title: "Downloads", label: "Download all songs in library") {

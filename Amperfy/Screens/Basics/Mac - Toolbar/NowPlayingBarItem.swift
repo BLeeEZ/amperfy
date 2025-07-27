@@ -37,6 +37,13 @@ import UIKit
       self.isContinuous = false
       refreshSliderDesign()
       installScrollGestureRecognizer(sensitivity: 2)
+
+      registerForTraitChanges(
+        [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+        handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+          self.refreshSliderDesign()
+        }
+      )
     }
 
     required init?(coder: NSCoder) {
@@ -77,11 +84,6 @@ import UIKit
         size: CGSize(width: bounds.size.width + 1, height: 4.0)
       )
       return super.trackRect(forBounds: customBounds)
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-      super.traitCollectionDidChange(previousTraitCollection)
-      refreshSliderDesign()
     }
 
     // MARK: - Increase touch area for thumb
@@ -345,6 +347,13 @@ import UIKit
       layer.borderWidth = 1.0
       layer.borderColor = UIColor.separator.cgColor
 
+      registerForTraitChanges(
+        [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+        handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+          self.layer.borderColor = UIColor.separator.cgColor
+        }
+      )
+
       artworkView.isUserInteractionEnabled = true
       artworkView.addGestureRecognizer(miniPlayerHoverGesture)
       artworkView.addGestureRecognizer(miniPlayerTapGesture)
@@ -364,11 +373,6 @@ import UIKit
       ])
       player.addNotifier(notifier: self)
       reload()
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-      super.traitCollectionDidChange(previousTraitCollection)
-      layer.borderColor = UIColor.separator.cgColor
     }
 
     required init?(coder: NSCoder) {

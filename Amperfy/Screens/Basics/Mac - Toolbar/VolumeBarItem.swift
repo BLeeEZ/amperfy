@@ -36,6 +36,13 @@ import UIKit
       self.preferredBehavioralStyle = .pad
       refreshSliderDesign()
       installScrollGestureRecognizer(sensitivity: 100)
+
+      registerForTraitChanges(
+        [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+        handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+          self.refreshSliderDesign()
+        }
+      )
     }
 
     required init?(coder: NSCoder) {
@@ -71,11 +78,6 @@ import UIKit
         for: .normal
       )
       backgroundColor = .clear
-    }
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-      super.traitCollectionDidChange(previousTraitCollection)
-      refreshSliderDesign()
     }
 
     // MARK: - Increase touch area for thumb

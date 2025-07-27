@@ -106,6 +106,14 @@ class PlayerControlView: UIView {
     optionsButton.imageView?.tintColor = .label
     refreshPlayer()
     refreshPlayerOptions()
+
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.refreshTimeInfo()
+        self.refreshPopupBarButtonItmes()
+      }
+    )
   }
 
   @IBAction
@@ -221,13 +229,6 @@ class PlayerControlView: UIView {
 
   func refreshView() {
     refreshPlayer()
-  }
-
-  // handle dark/light mode change
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    refreshTimeInfo()
-    refreshPopupBarButtonItmes()
   }
 
   func refreshPlayButton() {

@@ -367,7 +367,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     )
     item.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
-      interfaceController?.pushTemplate(sectionToDisplay, animated: true) { _, _ in
+      Task { @MainActor in
+        guard let _ = try? await interfaceController?
+          .pushTemplate(sectionToDisplay, animated: true) else { return }
         completion()
       }
     }
