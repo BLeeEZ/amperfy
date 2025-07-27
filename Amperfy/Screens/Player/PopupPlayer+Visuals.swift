@@ -233,12 +233,6 @@ extension PopupPlayerVC {
     }
   }
 
-  // handle dark/light mode change
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    refresh()
-  }
-
   func adjustLayoutMargins() {
     view.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
   }

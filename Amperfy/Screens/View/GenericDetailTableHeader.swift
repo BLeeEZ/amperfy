@@ -124,6 +124,12 @@ class GenericDetailTableHeader: UIView {
       descriptionLabel.isHidden = true
     }
     refresh()
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.applyTraitCollectionChange()
+      }
+    )
   }
 
   func refresh() {
@@ -170,8 +176,7 @@ class GenericDetailTableHeader: UIView {
     playShuffleInfoView?.refresh()
   }
 
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
+  func applyTraitCollectionChange() {
     guard let config = config else { return }
     let rootView = config.rootView
 

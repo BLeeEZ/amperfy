@@ -92,11 +92,6 @@ class LibraryElementDetailTableHeaderView: UIView {
     return genericDetailTableHeaderView
   }
 
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    refresh()
-  }
-
   func refresh() {
     guard let config = config else { return }
     if config.isEmbeddedInOtherView {
@@ -165,6 +160,12 @@ class LibraryElementDetailTableHeaderView: UIView {
     playShuffledButton.layer.cornerRadius = 10.0
     playShuffledButton.isHidden = configuration.isShuffleHidden
     activate()
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.refresh()
+      }
+    )
   }
 
   func activate() {

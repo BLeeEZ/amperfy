@@ -92,7 +92,7 @@ struct ServerURLsSettingsView: View {
           deleteURL(url: serverURLs[index])
           serverURLs.remove(atOffsets: indexSet)
         }
-        .onChange(of: selection) { newSelection in
+        .onChange(of: selection) { oldSelection, newSelection in
           #if targetEnvironment(macCatalyst)
             // Disable selection of the active element
             if newSelection == activeServerURL {
