@@ -34,29 +34,27 @@ public struct EqualizerView: View {
   }
 
   public var body: some View {
-    let sliderWidth: CGFloat = (viewWidth - 35) / CGFloat(frequency + 2)
-    let spacing: CGFloat = 0
-    HStack(alignment: .top, spacing: 0) {
-      addScale(sliderWidth: sliderWidth)
-        .frame(width: 35, height: 200)
-      VStack {
-        ZStack(alignment: .top) {
-          addScaleLines(sliderWidth: sliderWidth)
-          addEqPath(spacing: spacing, sliderWidth: sliderWidth)
-          setSlider(sliderWidth: sliderWidth)
-        }
-        .frame(height: 200)
-        setSliderLabel(sliderWidth: sliderWidth)
-      }
-    }
-    .background(
-      GeometryReader { geometry in
-        Color.clear
-          .onAppear {
-            viewWidth = geometry.size.width
+    GeometryReader { geometry in
+      let sliderWidth: CGFloat = (geometry.size.width - 35) / CGFloat(frequency + 2)
+      let spacing: CGFloat = 0
+      HStack(alignment: .top, spacing: 0) {
+        addScale(sliderWidth: sliderWidth)
+          .frame(width: 35, height: 200)
+        VStack {
+          ZStack(alignment: .top) {
+            addScaleLines(sliderWidth: sliderWidth)
+            addEqPath(spacing: spacing, sliderWidth: sliderWidth)
+            setSlider(sliderWidth: sliderWidth)
           }
+          .frame(height: 200)
+          setSliderLabel(sliderWidth: sliderWidth)
+        }
       }
-    )
+      .background(
+        Color.clear
+      )
+    }
+    .frame(height: 220)
   }
 }
 

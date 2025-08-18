@@ -64,19 +64,9 @@ struct SupportSettingsView: View {
         }
 
         SettingsSection {
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Event Log", splitPercentage: splitPercentage) {
-              EventLogSettingsView()
-                .background(Color.white)
-                .frame(width: 500, height: 200)
-                .padding(.top, 10)
-            }
-            .frame(height: 220)
-          #else
-            NavigationLink(destination: EventLogSettingsView()) {
-              Text("Event Log")
-            }
-          #endif
+          NavigationLink(destination: EventLogSettingsView()) {
+            Text("Event Log")
+          }
         }
       }
       .sheet(isPresented: $isShowingMailView) {
@@ -99,9 +89,6 @@ struct SupportSettingsView: View {
         )
       }
     }
-    #if targetEnvironment(macCatalyst)
-    .navigationViewStyle(.stack)
-    #endif
     .navigationTitle("Support")
     .navigationBarTitleDisplayMode(.inline)
     .onAppear {

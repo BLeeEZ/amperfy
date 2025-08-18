@@ -47,6 +47,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncMusicFolders()

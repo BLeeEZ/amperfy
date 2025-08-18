@@ -147,6 +147,7 @@ extension UIImage {
   public static let folder = UIImage.create(systemName: "folder.fill")
   public static let radio = UIImage.create(systemName: "dot.radiowaves.left.and.right")
   public static let playlist = UIImage.create(systemName: "music.note.list")
+  public static let lyrics = UIImage.create(systemName: "quote.bubble")
   public static let musicLibrary = UIImage.create(systemName: "music.note.house")
   public static let musicalNotes = UIImage.create(systemName: "music.note")
   public static let download = UIImage.create(systemName: "arrow.down.circle")
@@ -216,8 +217,6 @@ extension UIImage {
       .create("context_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward
     public static let contextQueueAppend = UIImage
       .create("context_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward
-    public static let lyrics = UIImage
-      .create(systemName: "book.pages") // SF-Symbols 5 Regular: book.pages (available in system catalog with iOS 17.0 and upwards)
   #endif
   public static let podcastEpisode: UIImage = podcast
   public static let podcastQueueInsert = contextQueueInsert
@@ -512,7 +511,7 @@ extension UIImage {
     let textFont = UIFont(name: "Helvetica Bold", size: fontSize)!
 
     let image = createEmptyImage(with: CGSize(width: 100.0, height: 100.0)) ?? UIImage()
-    let scale = UIScreen.main.scale
+    let scale = UITraitCollection.current.displayScale
     UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
 
     let paragraphStyle = NSMutableParagraphStyle()

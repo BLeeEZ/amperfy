@@ -108,7 +108,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.playlists)
 
-    optionsButton = SortBarButton()
+    optionsButton = UIBarButtonItem.createSortBarButton()
 
     change(sortType: appDelegate.storage.settings.playlistsSortSetting)
 
@@ -180,6 +180,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     if appDelegate.storage.settings.isOfflineMode {
       isEditing = false
     }
@@ -196,21 +197,14 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     var actions = [UIMenu]()
     actions.append(createSortButtonMenu())
     actions.append(createOptionsButtonMenu())
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: actions)
-    #if targetEnvironment(macCatalyst)
-      navigationItem.leftItemsSupplementBackButton = true
-      navigationItem.rightBarButtonItem = optionsButton
-      if appDelegate.storage.settings.isOnlineMode {
-        navigationItem.leftBarButtonItem = editButtonItem
-      }
-    #else
-      var barButtons = [UIBarButtonItem]()
-      barButtons.append(optionsButton)
-      if appDelegate.storage.settings.isOnlineMode {
-        barButtons.append(editButtonItem)
-      }
-      navigationItem.rightBarButtonItems = barButtons
-    #endif
+    var barButtons = [UIBarButtonItem]()
+    barButtons.append(optionsButton)
+    if appDelegate.storage.settings.isOnlineMode {
+      barButtons.append(editButtonItem)
+    }
+    navigationItem.rightBarButtonItems = barButtons
   }
 
   func createCell(

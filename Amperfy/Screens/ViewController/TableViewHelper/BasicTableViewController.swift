@@ -224,9 +224,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
 
     #if targetEnvironment(macCatalyst)
-      if #available(iOS 16.0, *) {
-        navigationItem.preferredSearchBarPlacement = .inline
-      }
+      navigationItem.preferredSearchBarPlacement = .integrated
     #endif
 
     searchController.delegate = self

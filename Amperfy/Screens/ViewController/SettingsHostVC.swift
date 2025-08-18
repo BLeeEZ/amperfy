@@ -31,37 +31,43 @@ class SettingsHostVC: UIViewController {
   }()
 
   var changesAgent: [AnyCancellable] = []
+  private var isForOwnWindow = false
 
   override var sceneTitle: String { windowSettingsTitle }
 
-  #if targetEnvironment(macCatalyst)
-    init(target: NavigationTarget) {
-      super.init(nibName: nil, bundle: nil)
-      self.title = target.displayName
+  init(isForOwnWindow: Bool) {
+    super.init(nibName: nil, bundle: nil)
+    self.isForOwnWindow = true
 
-      let hostingVC = target.hostingController(
-        settings: settings,
-        managedObjectContext: appDelegate.storage.main.context
+    let hostingVC = UIHostingController(
+      rootView: AnyView(
+        SettingsTabView()
+          .environmentObject(settings)
+          .environment(\.managedObjectContext, appDelegate.storage.main.context)
       )
-      view.backgroundColor = .clear
-      hostingVC.view.frame = view.bounds
-      hostingVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-      hostingVC.view.backgroundColor = .clear
+    )
+    view.backgroundColor = .clear
+    hostingVC.view.frame = view.bounds
+    hostingVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    hostingVC.view.backgroundColor = .clear
 
-      hostingVC.willMove(toParent: self)
-      addChild(hostingVC)
-      view.addSubview(hostingVC.view)
-      hostingVC.didMove(toParent: self)
-    }
+    hostingVC.willMove(toParent: self)
+    addChild(hostingVC)
+    view.addSubview(hostingVC.view)
+    hostingVC.didMove(toParent: self)
+  }
 
-    required init?(coder: NSCoder) {
-      super.init(coder: coder)
-    }
-  #endif
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     changesAgent = [AnyCancellable]()
+
+    if !isForOwnWindow {
+      extendSafeAreaToAccountForMiniPlayer()
+    }
 
     settings.isOfflineMode = appDelegate.storage.settings.isOfflineMode
     changesAgent.append(settings.$isOfflineMode.sink(receiveValue: { newValue in

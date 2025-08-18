@@ -65,7 +65,7 @@ extension PopupPlayerVC {
        let rootView = rootView {
       button.showsMenuAsPrimaryAction = true
       button.menu = UIMenu.lazyMenu {
-        EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenu()
+        EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenuActions()
       }
       button.isEnabled = true
     } else {
@@ -120,35 +120,6 @@ extension PopupPlayerVC {
     }
   }
 
-  func refreshCurrentlyPlayingInfo(
-    artworkImage: LibraryEntityImage,
-    titleLabel: UILabel,
-    artistLabel: UILabel,
-    albumLabel: UILabel? = nil,
-    albumButton: UIButton? = nil,
-    albumContainerView: UIView? = nil
-  ) {
-    refreshArtwork(artworkImage: artworkImage)
-    if let playableInfo = player.currentlyPlaying {
-      titleLabel.text = playableInfo.title
-      albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
-      albumButton?.isEnabled = playableInfo.isSong
-      albumContainerView?.isHidden = !playableInfo.isSong
-      artistLabel.text = playableInfo.creatorName
-    } else {
-      switch player.playerMode {
-      case .music:
-        titleLabel.text = "No music playing"
-      case .podcast:
-        titleLabel.text = "No podcast playing"
-      }
-      albumLabel?.text = ""
-      albumButton?.isEnabled = false
-      albumContainerView?.isHidden = true
-      artistLabel.text = ""
-    }
-  }
-
   func refreshBackgroundAndPopupItemArtwork() {
     var artwork: UIImage?
     if let playableInfo = player.currentlyPlaying {
@@ -196,23 +167,6 @@ extension PopupPlayerVC {
     gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
     gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
     backgroundImage.layer.insertSublayer(gradientLayer, at: 0)
-  }
-
-  func refreshArtwork(artworkImage: LibraryEntityImage) {
-    if let playableInfo = player.currentlyPlaying {
-      artworkImage.display(entity: playableInfo)
-    } else {
-      switch player.playerMode {
-      case .music:
-        artworkImage.display(
-          artworkType: .song
-        )
-      case .podcast:
-        artworkImage.display(
-          artworkType: .podcastEpisode
-        )
-      }
-    }
   }
 
   @objc

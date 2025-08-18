@@ -26,16 +26,12 @@ import UIKit
 
 extension AppDelegate {
   static var window: UIWindow? {
-    #if targetEnvironment(macCatalyst)
-      // Always get the topmost window that corresponds to the active tab
-      return (UIApplication.shared.connectedScenes.first {
-        let isForeground = $0.activationState == .foregroundActive
-        let isMainWindow = ($0.delegate as? SceneDelegate) != nil
-        return isForeground && isMainWindow
-      }?.delegate as? SceneDelegate)?.window
-    #else
-      return (UIApplication.shared.delegate as! AppDelegate).window
-    #endif
+    // Always get the topmost window that corresponds to the active tab
+    (UIApplication.shared.connectedScenes.first {
+      let isForeground = $0.activationState == .foregroundActive
+      let isMainWindow = ($0.delegate as? SceneDelegate) != nil
+      return isForeground && isMainWindow
+    }?.delegate as? SceneDelegate)?.window
   }
 
   static func rootViewController() -> UIViewController? {
@@ -54,7 +50,7 @@ extension AppDelegate {
       return topViewController(base: nav.visibleViewController)
     }
     if let tab = base as? TabBarVC {
-      return tab.parent
+      return tab
     }
     if let splitVC = base as? SplitVC {
       return splitVC
@@ -63,6 +59,26 @@ extension AppDelegate {
       return topViewController(base: presented)
     }
     return base
+  }
+
+  static func createMainWindowTopViewController() -> UIViewController {
+    #if targetEnvironment(macCatalyst) // ok
+      SplitVC.instantiateFromAppStoryboard()
+    #else
+      TabBarVC()
+    #endif
+  }
+
+  static var mainWindowHostVC: MainSceneHostingViewController? {
+    guard let topView = Self.topViewController(),
+          (UIApplication.shared.delegate as! AppDelegate).storage.isLibrarySynced
+    else { return nil }
+
+    #if targetEnvironment(macCatalyst) // ok
+      return topView as? SplitVC
+    #else
+      return topView as? TabBarVC
+    #endif
   }
 }
 
@@ -95,32 +111,29 @@ extension AppDelegate: AlertDisplayable {
       topView.present(popupVC, animated: true, completion: nil)
     }
 
-    #if targetEnvironment(macCatalyst)
-      banner.bannerHeight = 120
-      let topViewInset = UIEdgeInsets(
-        top: 40,
-        left: topView.view.frame.width - 400,
-        bottom: 24,
-        right: 24
-      )
-      banner.show(
-        queuePosition: QueuePosition.back,
-        bannerPosition: BannerPosition.top,
-        on: topView,
-        edgeInsets: topViewInset,
-        cornerRadius: 10,
-        shadowOpacity: 0.5,
-        shadowBlurRadius: 5
-      )
-    #else
-      banner.show(
-        queuePosition: QueuePosition.back,
-        bannerPosition: BannerPosition.top,
-        on: topView,
-        cornerRadius: 15,
-        shadowBlurRadius: 10
-      )
-    #endif
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      banner.bannerHeight = 80
+    } else if UIDevice.current.userInterfaceIdiom == .phone {
+      banner.bannerHeight = 180
+    } else { // mac
+      banner.bannerHeight = 140
+    }
+
+    let topViewInset = UIEdgeInsets(
+      top: 40,
+      left: 24,
+      bottom: 24,
+      right: 24
+    )
+    banner.show(
+      queuePosition: QueuePosition.back,
+      bannerPosition: BannerPosition.top,
+      on: topView,
+      edgeInsets: topViewInset,
+      cornerRadius: 10,
+      shadowOpacity: 0.5,
+      shadowBlurRadius: 5
+    )
   }
 
   func display(popup popupVC: UIViewController) {

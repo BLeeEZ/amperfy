@@ -44,6 +44,12 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
   case recentAlbums = 13
   case radios = 14
 
+  public static func createByDisplayName(name: String) -> LibraryDisplayType? {
+    .allCases.first {
+      $0.displayName == name
+    }
+  }
+
   public var displayName: String {
     switch self {
     case .artists:

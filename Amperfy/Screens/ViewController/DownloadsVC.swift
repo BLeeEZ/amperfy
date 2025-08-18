@@ -45,7 +45,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = createActionButtonMenu()
     navigationItem.rightBarButtonItem = optionsButton
   }
@@ -81,6 +81,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     fetchedResultsController.fetch()
     tableView.reloadData()
   }

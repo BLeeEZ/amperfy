@@ -92,7 +92,7 @@ class PlayableTableCell: BasicTableCell {
   private var playIndicator: PlayIndicator?
   private var isDislayAlbumTrackNumberStyle: Bool = false
   private var displayMode: DisplayMode = .normal
-  #if targetEnvironment(macCatalyst)
+  #if targetEnvironment(macCatalyst) // ok
     private var hoverGestureRecognizer: UIHoverGestureRecognizer!
     private var doubleTapGestureRecognizer: UITapGestureRecognizer!
     private var isHovered = false
@@ -111,7 +111,7 @@ class PlayableTableCell: BasicTableCell {
     // This must be called in Main thread
     MainActor.assumeIsolated {
       playContextCb = nil
-      #if targetEnvironment(macCatalyst)
+      #if targetEnvironment(macCatalyst) // ok
         hoverGestureRecognizer = UIHoverGestureRecognizer(
           target: self,
           action: #selector(hovering(_:))
@@ -157,7 +157,7 @@ class PlayableTableCell: BasicTableCell {
     resetForReuse()
   }
 
-  #if targetEnvironment(macCatalyst)
+  #if targetEnvironment(macCatalyst) // ok
     private func register() {
       guard !isNotificationRegistered else { return }
       appDelegate.notificationHandler.register(
@@ -205,7 +205,7 @@ class PlayableTableCell: BasicTableCell {
     self.download = download
     self.isMarked = isMarked
 
-    #if targetEnvironment(macCatalyst)
+    #if targetEnvironment(macCatalyst) // ok
       hoverGestureRecognizer.isEnabled = (displayMode == .normal)
       isHovered = false
       doubleTapGestureRecognizer.isEnabled = (displayMode == .normal)
@@ -233,13 +233,13 @@ class PlayableTableCell: BasicTableCell {
       }
       trackNumberLabel.isHidden = false
       entityImage.isHidden = true
-      titleContainerLeadingConstraint.constant = 21 + 16 // track lable width + offset
+      titleContainerLeadingConstraint.constant = 10 + 21 + 16 // heart + track lable width + offset
     case .artwork:
       playIndicator?.willDisplayIndicatorCB = nil
       playIndicator?.willHideIndicatorCB = nil
       trackNumberLabel.isHidden = true
       entityImage.isHidden = false
-      titleContainerLeadingConstraint.constant = 48 + 8 // artwork width + offset
+      titleContainerLeadingConstraint.constant = 10 + 48 + 8 // heart + artwork width + offset
     case .none:
       break // do nothing
     }
@@ -350,7 +350,7 @@ class PlayableTableCell: BasicTableCell {
             on: rootView,
             playContextCb: playContext,
             playerIndexCb: playIndex
-          ).createMenu()
+          ).createMenuActions()
         }
       }
     }
@@ -422,7 +422,7 @@ class PlayableTableCell: BasicTableCell {
     playIndicator?.applyStyle()
   }
 
-  #if targetEnvironment(macCatalyst)
+  #if targetEnvironment(macCatalyst) // ok
     @IBAction
     func deleteButtonPressed(_ sender: Any) {
       if let playerIndexCb = playerIndexCb,

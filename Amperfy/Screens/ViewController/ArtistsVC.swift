@@ -85,7 +85,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.artists)
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     applyFilter()
     change(sortType: appDelegate.storage.settings.artistsSortSetting)
@@ -175,6 +175,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     updateRightBarButtonItems()
     updateFromRemote()
   }
@@ -188,6 +189,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     if appDelegate.storage.settings.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: actions)
     navigationItem.rightBarButtonItems = [optionsButton]
   }

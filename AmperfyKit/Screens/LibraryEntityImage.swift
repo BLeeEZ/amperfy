@@ -75,6 +75,23 @@ public class LibraryEntityImage: RoundedImage {
     )
   }
 
+  override public init(frame: CGRect) {
+    self.appDelegate = AmperKit.shared
+    super.init(frame: .zero)
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful(notification:)),
+      name: .downloadFinishedSuccess,
+      object: appDelegate.artworkDownloadManager
+    )
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful(notification:)),
+      name: .downloadFinishedSuccess,
+      object: appDelegate.playableDownloadManager
+    )
+  }
+
   public func display(entity: AbstractLibraryEntity) {
     self.entity = entity
     backupArtworkType = entity.getDefaultArtworkType()

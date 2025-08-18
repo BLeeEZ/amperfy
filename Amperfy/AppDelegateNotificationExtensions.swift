@@ -76,15 +76,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
   }
 
   func displayInLibraryTab(vc: UIViewController) {
-    hostingSplitVC?.pushNavLibrary(vc: vc)
-  }
-
-  var hostingSplitVC: SplitVC? {
-    guard let topView = Self.topViewController(),
-          storage.isLibrarySynced,
-          let splitVC = topView as? SplitVC
-    else { return nil }
-    return splitVC
+    Self.mainWindowHostVC?.pushNavLibrary(vc: vc)
   }
 
   func visualizePopupPlayer(
@@ -92,7 +84,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     animated: Bool,
     completion completionBlock: (() -> ())? = nil
   ) {
-    hostingSplitVC?.visualizePopupPlayer(
+    Self.mainWindowHostVC?.visualizePopupPlayer(
       direction: direction,
       animated: animated,
       completion: completionBlock
@@ -100,6 +92,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
   }
 
   func displaySearchTab() {
-    hostingSplitVC?.displaySearch()
+    Self.mainWindowHostVC?.displaySearch()
   }
 }

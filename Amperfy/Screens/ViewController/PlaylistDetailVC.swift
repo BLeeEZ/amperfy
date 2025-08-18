@@ -139,10 +139,9 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       target: self,
       action: #selector(openEditView)
     )
-    optionsButton = OptionsBarButton()
-
-    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
-      EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.playlist, on: self).createMenuActions()
     }
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
@@ -185,16 +184,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         playContext: playContext
       ))
     }
-
-    #if targetEnvironment(macCatalyst)
-      if #available(iOS 16.0, *) {
-        navigationItem.preferredSearchBarPlacement = .inline
-      }
-    #endif
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     if appDelegate.storage.settings.isOfflineMode {
       tableView.isEditing = false
     }
@@ -225,13 +219,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       }
     }
 
-    #if targetEnvironment(macCatalyst)
-      navigationItem.leftItemsSupplementBackButton = true
-      navigationItem.rightBarButtonItem = optionsButton
-      navigationItem.leftBarButtonItem = edititingBarButton
-    #else
-      navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap { $0 }
-    #endif
+    navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap { $0 }
   }
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {

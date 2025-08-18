@@ -35,7 +35,7 @@ class PodcastsVC: MultiSourceTableViewController {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.podcasts)
 
-    optionsButton = SortBarButton()
+    optionsButton = UIBarButtonItem.createSortBarButton()
 
     podcastsFetchedResultsController = PodcastFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main,
@@ -101,6 +101,7 @@ class PodcastsVC: MultiSourceTableViewController {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     switch showType {
     case .podcasts:
       podcastsFetchedResultsController?.delegate = self
@@ -119,6 +120,7 @@ class PodcastsVC: MultiSourceTableViewController {
   }
 
   func updateRightBarButtonItems() {
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = createSortButtonMenu()
     navigationItem.rightBarButtonItem = optionsButton
   }

@@ -51,9 +51,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   )
 
   var player: PlayerFacade!
+  var playerHandler: PlayerUIHandler?
   var controlView: PlayerControlView?
   var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
-  var hostingSplitVC: SplitVC?
 
   var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
   var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -78,6 +78,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
     player = appDelegate.player
     player.addNotifier(notifier: self)
+    playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
 
     backgroundImage.setBackgroundBlur(style: .prominent)
 
@@ -204,16 +205,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }}
   }
 
-  #if targetEnvironment(macCatalyst)
-    // Fix the mini player on macOS
-    override var traitCollection: UITraitCollection {
-      super.traitCollection.modifyingTraits { traits in
-        traits.horizontalSizeClass = .compact
-        traits.verticalSizeClass = .compact
-      }
-    }
-  #endif
-
   func reloadData() {
     tableView.reloadData()
     scrollToCurrentlyPlayingRow()
@@ -281,14 +272,14 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   }
 
   func closePopupPlayer() {
-    guard let hostingSplitVC = hostingSplitVC else { return }
+    guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true)
   }
 
   func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
-    guard let hostingSplitVC = hostingSplitVC else { return }
+    guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true, completion: { () in
-      hostingSplitVC.push(vc: vc)
+      hostingSplitVC.pushNavLibrary(vc: vc)
     })
   }
 

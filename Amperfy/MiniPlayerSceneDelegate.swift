@@ -48,40 +48,8 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     window = UIWindow(windowScene: windowScene)
     window?.backgroundColor = .secondarySystemBackground
 
-    #if targetEnvironment(macCatalyst)
-      windowScene.title = windowMiniPlayerTitle
-
-      if let titleBar = windowScene.titlebar {
-        titleBar.toolbarStyle = .automatic
-        titleBar.titleVisibility = .hidden
-        titleBar.toolbar = nil
-      }
-
-      let minSize = CGSize(width: 400, height: 620)
-
-      AppDelegate.configureUtilityWindow(
-        persistentIdentifier: windowScene.session.persistentIdentifier,
-        properties: [
-          "auxiliary": true,
-          "fullSizeContentView": true,
-          "miniaturizable": true,
-          "resizable": true,
-          "aspectRatio": minSize,
-        ]
-      )
-
-      if #available(macCatalyst 16.0, *) {
-        windowScene.sizeRestrictions?.allowsFullScreen = false
-      }
-      windowScene.sizeRestrictions?.minimumSize = minSize
-    #endif
-
     window?.rootViewController = PopupPlayerVC()
     window?.makeKeyAndVisible()
-
-    #if targetEnvironment(macCatalyst)
-      appDelegate.closeMainWindow()
-    #endif
   }
 
   /** Called when the user activates your application by selecting a shortcut on the Home Screen,
@@ -102,19 +70,15 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Release any resources associated with this scene that can be re-created the next time the scene connects.
     // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
     os_log("MiniPlayer: sceneDidDisconnect", log: self.log, type: .info)
-    #if targetEnvironment(macCatalyst)
-      appDelegate.rebuildMainMenu()
-      appDelegate.openMainWindow()
-    #endif
+    appDelegate.rebuildMainMenu()
+    appDelegate.openMainWindow()
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {
     // Called when the scene has moved from an inactive state to an active state.
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     os_log("MiniPlayer: sceneDidBecomeActive", log: self.log, type: .info)
-    #if targetEnvironment(macCatalyst)
-      appDelegate.rebuildMainMenu()
-    #endif
+    appDelegate.rebuildMainMenu()
   }
 
   func sceneWillResignActive(_ scene: UIScene) {

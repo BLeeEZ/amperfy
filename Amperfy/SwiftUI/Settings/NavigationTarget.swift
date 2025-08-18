@@ -21,7 +21,7 @@
 import SwiftUI
 
 @MainActor
-enum NavigationTarget: String, CaseIterable {
+enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
   case general
   case displayAndInteraction
   case server
@@ -36,6 +36,8 @@ enum NavigationTarget: String, CaseIterable {
   #if DEBUG
     case developer = "developer"
   #endif
+
+  var id: String { rawValue }
 
   func view() -> any View {
     switch self {
@@ -67,13 +69,8 @@ enum NavigationTarget: String, CaseIterable {
     case .support: "Support"
     case .license: "License"
     case .equalizer: "Equalizer"
-    #if targetEnvironment(macCatalyst)
-      case .player: "Player"
-      case .xcallback: "X-Callback"
-    #else
-      case .player: "Player, Stream & Scrobble"
-      case .xcallback: "X-Callback-URL Documentation"
-    #endif
+    case .player: "Player, Stream & Scrobble"
+    case .xcallback: "X-Callback-URL Documentation"
     #if DEBUG
       case .developer: "Developer"
     #endif
@@ -100,38 +97,22 @@ enum NavigationTarget: String, CaseIterable {
     }
   }
 
-  #if targetEnvironment(macCatalyst)
-    var toolbarIdentifier: NSToolbarItem.Identifier { NSToolbarItem.Identifier(rawValue) }
-
-    var fittingWindowSize: CGSize {
-      let width = 740
-      let height = switch self {
-      case .general: 250
-      case .displayAndInteraction: 320
-      case .server: 480
-      case .library: 620
-      case .player: 370
-      case .equalizer: 450
-      case .swipe: 450
-      case .artwork: 300
-      case .support: 400
-      default: 400
-      }
-      return CGSize(width: width, height: height)
+  var systemImage: String {
+    switch self {
+    case .general: "gear"
+    case .displayAndInteraction: "display"
+    case .server: "server.rack"
+    case .library: "music.note.house"
+    case .player: "play.circle.fill"
+    case .equalizer: "chart.bar.xaxis"
+    case .swipe: "arrow.right.circle.fill"
+    case .artwork: "photo.fill"
+    case .support: "person.circle"
+    case .license: "doc.fill"
+    case .xcallback: "arrowshape.turn.up.backward.circle.fill"
+    #if DEBUG
+      case .developer: "hammer.circle.fill"
+    #endif
     }
-
-    func hostingController(
-      settings: Settings,
-      managedObjectContext: NSManagedObjectContext
-    )
-      -> UIHostingController<AnyView> {
-      UIHostingController(
-        rootView: AnyView(
-          view()
-            .environmentObject(settings)
-            .environment(\.managedObjectContext, managedObjectContext)
-        )
-      )
-    }
-  #endif
+  }
 }

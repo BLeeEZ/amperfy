@@ -113,13 +113,13 @@ struct UpdatePasswordView: View {
             .padding([.top], 8)
           }
         }
-        #if targetEnvironment(macCatalyst)
+        #if targetEnvironment(macCatalyst) /// ok
         .listRowBackground(Color.clear)
         #else
         .padding()
         #endif
       }
-      #if targetEnvironment(macCatalyst)
+      #if targetEnvironment(macCatalyst) // ok
       .listStyle(.plain)
       #endif
     }
