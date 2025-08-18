@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -19,10 +18,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="TxE-Fh-ozu">
-                        <rect key="frame" x="94" y="27" width="431" height="38"/>
+                        <rect key="frame" x="110" y="27" width="415" height="38"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Playlist Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MMM-Yr-IkZ">
-                                <rect key="frame" x="0.0" y="0.0" width="431" height="20"/>
+                                <rect key="frame" x="0.0" y="0.0" width="415" height="20"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="MBe-4a-Yhx"/>
                                 </constraints>
@@ -34,7 +33,7 @@
                                 </variation>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4aC-eY-cVv" userLabel="Info Label">
-                                <rect key="frame" x="0.0" y="22" width="431" height="16"/>
+                                <rect key="frame" x="0.0" y="22" width="415" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="180" id="6qd-Cl-jB4"/>
                                     <constraint firstAttribute="height" constant="16" id="NkY-6C-FCB">
@@ -60,7 +59,7 @@
                         <variation key="widthClass=regular" alignment="center" axis="horizontal" spacing="8"/>
                     </stackView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TkT-gC-6LF" customClass="EntityImageView" customModule="AmperfyKit">
-                        <rect key="frame" x="16" y="11" width="70" height="70"/>
+                        <rect key="frame" x="32" y="11" width="70" height="70"/>
                         <color key="backgroundColor" systemColor="systemRedColor"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="TkT-gC-6LF" secondAttribute="height" multiplier="1:1" id="E8b-Kt-N2B"/>
@@ -69,7 +68,7 @@
                     </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="TkT-gC-6LF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" id="2vG-6C-BAk"/>
+                    <constraint firstItem="TkT-gC-6LF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leadingMargin" constant="16" id="2vG-6C-BAk"/>
                     <constraint firstItem="TkT-gC-6LF" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="HCl-M9-BrL"/>
                     <constraint firstItem="TxE-Fh-ozu" firstAttribute="leading" secondItem="TkT-gC-6LF" secondAttribute="trailing" constant="8" id="OcW-Ql-tV0"/>
                     <constraint firstAttribute="trailingMargin" secondItem="TxE-Fh-ozu" secondAttribute="trailing" id="bfa-IE-DcM">
@@ -89,10 +88,10 @@
     </objects>
     <resources>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

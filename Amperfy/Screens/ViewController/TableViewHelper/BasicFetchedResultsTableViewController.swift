@@ -49,7 +49,7 @@ class BasicFetchedResultsTableViewController<ResultType>: BasicTableViewControll
   // This looks ugly in view controller, such as the SongVC, where there is no clear distinction between sections.
   // iOS only removes a separator line at the end of a section if a footer view exists.
   // macOS always removes the separator, no matter if there is a footer or not. Therefore, we manually add a separator on macOS.
-  #if targetEnvironment(macCatalyst)
+  #if targetEnvironment(macCatalyst) // ok
     override func tableView(
       _ tableView: UITableView,
       viewForFooterInSection section: Int

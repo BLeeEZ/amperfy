@@ -75,18 +75,9 @@ struct ServerSettingsView: View {
         }
 
         SettingsSection {
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Manage Server URLs", splitPercentage: splitPercentage) {
-              ServerURLsSettingsView()
-                .frame(width: 450, height: 150)
-            }
-            .frame(height: 150)
-            .padding(.bottom, 10)
-          #else
-            NavigationLink(destination: ServerURLsSettingsView()) {
-              Text("Manage Server URLs")
-            }
-          #endif
+          NavigationLink(destination: ServerURLsSettingsView()) {
+            Text("Manage Server URLs")
+          }
         }
 
         SettingsSection {
@@ -113,17 +104,9 @@ struct ServerSettingsView: View {
     }
     .navigationTitle("Server")
     .navigationBarTitleDisplayMode(.inline)
-    #if targetEnvironment(macCatalyst)
-      .formSheet(isPresented: $isPwUpdateDialogVisible) {
-        UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
-          .frame(width: 400, height: 150)
-          .environment(\.managedObjectContext, appDelegate.storage.main.context)
-      }
-    #else
-      .sheet(isPresented: $isPwUpdateDialogVisible) {
-          UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
-        }
-    #endif
+    .sheet(isPresented: $isPwUpdateDialogVisible) {
+      UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
+    }
   }
 }
 

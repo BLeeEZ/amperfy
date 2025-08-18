@@ -37,37 +37,26 @@ struct ArtworkDownloadSettingsView: View {
 
   var body: some View {
     ZStack {
-      #if targetEnvironment(macCatalyst)
-        Menu(activeOption.description) {
+      List {
+        Section {
           ForEach(settingOptions, id: \.self) { option in
-            Button(option.description, action: {
+            Button(action: {
               appDelegate.storage.settings.artworkDownloadSetting = option
               updateValues()
-            })
-          }
-        }
-      #else
-        List {
-          Section {
-            ForEach(settingOptions, id: \.self) { option in
-              Button(action: {
-                appDelegate.storage.settings.artworkDownloadSetting = option
-                updateValues()
-              }) {
-                HStack {
-                  Text(option.description)
-                  Spacer()
-                  if option == activeOption {
-                    Image.checkmark
-                  }
+            }) {
+              HStack {
+                Text(option.description)
+                Spacer()
+                if option == activeOption {
+                  Image.checkmark
                 }
-                .contentShape(Rectangle())
-                .foregroundColor(.primary)
               }
+              .contentShape(Rectangle())
+              .foregroundColor(.primary)
             }
           }
         }
-      #endif
+      }
     }
     .navigationTitle("Artwork Download")
     .onAppear {

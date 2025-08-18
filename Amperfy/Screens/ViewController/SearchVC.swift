@@ -78,7 +78,7 @@ class SearchVC: BasicTableViewController {
   fileprivate var playlists: [Playlist] = []
   fileprivate var songs: [Song] = []
 
-  private var optionsButton: UIBarButtonItem = OptionsBarButton()
+  private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   private var isSearchActive = false
 
   func createDiffableDataSource() -> SearchDiffableDataSource {
@@ -187,11 +187,8 @@ class SearchVC: BasicTableViewController {
   }
 
   override func viewIsAppearing(_ animated: Bool) {
-    #if targetEnvironment(macCatalyst)
-      // Request a search update (in case we navigated back to the search)
-      NotificationCenter.default.post(name: .RequestSearchUpdate, object: view.window)
-    #endif
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     appDelegate.userStatistics.visited(.search)
     configureSearchController(
       placeholder: "Playlists, Songs and more",
@@ -219,6 +216,7 @@ class SearchVC: BasicTableViewController {
     )
 
     // Install the options button
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: [
       UIAction(title: "Clear Search History", image: .clear, handler: { _ in
         self.appDelegate.storage.main.library.deleteSearchHistory()
@@ -228,45 +226,8 @@ class SearchVC: BasicTableViewController {
       }),
     ])
 
-    #if targetEnvironment(macCatalyst)
-      let scopeButtonSegmentedControl = UISegmentedControl(
-        items:
-        (scopeButtonTitles ?? [])?.enumerated().map { i, title in
-          UIAction(title: title, handler: { [weak self] action in
-            self?.searchController.searchBar.selectedScopeButtonIndex = i
-          })
-        }
-      )
-      scopeButtonSegmentedControl.selectedSegmentIndex = searchController.searchBar
-        .selectedScopeButtonIndex
-
-      // Remove the search bar from the navigationbar on macOS
-      navigationItem.searchController = nil
-      navigationItem.rightBarButtonItems = [
-        optionsButton,
-        UIBarButtonItem(customView: scopeButtonSegmentedControl),
-      ]
-
-      // Listen for search changes from the sidebar
-      NotificationCenter.default.addObserver(
-        self,
-        selector: #selector(handleSearchUpdate(notification:)),
-        name: .SearchChanged,
-        object: nil
-      )
-    #else
-      navigationItem.rightBarButtonItem = optionsButton
-    #endif
+    navigationItem.rightBarButtonItem = optionsButton
   }
-
-  #if targetEnvironment(macCatalyst)
-    @objc
-    func handleSearchUpdate(notification: Notification) {
-      // only update the search in this tab
-      guard notification.object as? UIWindow == view.window else { return }
-      searchController.searchBar.text = notification.userInfo?["searchText"] as? String
-    }
-  #endif
 
   func determSwipeActionContext(
     at indexPath: IndexPath,

@@ -24,11 +24,7 @@ import SwiftUI
 import UIKit
 
 extension UIBehavioralStyle {
-  #if targetEnvironment(macCatalyst)
-    static var defaultStyle: UIBehavioralStyle { .mac }
-  #else
-    static var defaultStyle: UIBehavioralStyle { .pad }
-  #endif
+  static var defaultStyle: UIBehavioralStyle { .pad }
 }
 
 // MARK: - BehavioralStylable

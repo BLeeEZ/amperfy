@@ -38,7 +38,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
       refreshControl = UIRefreshControl()
     #endif
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     appDelegate.userStatistics.visited(.podcastDetail)
     fetchedResultsController = PodcastEpisodesFetchedResultsController(
@@ -88,8 +88,9 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
       action: #selector(Self.handleRefresh),
       for: UIControl.Event.valueChanged
     )
-    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
-      EntityPreviewActionBuilder(container: self.podcast, on: self).createMenu()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.podcast, on: self).createMenuActions()
     }
     navigationItem.rightBarButtonItem = optionsButton
 
@@ -109,6 +110,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     Task { @MainActor in
       do {
         try await podcast.fetch(

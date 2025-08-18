@@ -143,6 +143,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
   }
 
   override func viewDidDisappear(_ animated: Bool) {

@@ -150,16 +150,12 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
   }
 
   func reloadInsets() {
-    #if targetEnvironment(macCatalyst)
-      contentInset = UIEdgeInsets(top: 40, left: 0, bottom: frame.height / 2, right: 0)
-    #else
-      contentInset = UIEdgeInsets(
-        top: frame.height / 2,
-        left: 0,
-        bottom: frame.height / 2,
-        right: 0
-      )
-    #endif
+    contentInset = UIEdgeInsets(
+      top: frame.height / 2,
+      left: 0,
+      bottom: frame.height / 2,
+      right: 0
+    )
   }
 
   func scroll(toTime time: CMTime) {

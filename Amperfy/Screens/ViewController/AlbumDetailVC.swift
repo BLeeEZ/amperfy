@@ -65,7 +65,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.albumDetail)
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     fetchedResultsController = AlbumSongsFetchedResultsController(
       forAlbum: album,
@@ -104,8 +104,9 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     detailOperationsView = GenericDetailTableHeader
       .createTableHeader(configuration: detailHeaderConfig)
 
-    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
-      EntityPreviewActionBuilder(container: self.album, on: self).createMenu()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.album, on: self).createMenuActions()
     }
     navigationItem.rightBarButtonItem = optionsButton
 
@@ -122,6 +123,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
 
     Task { @MainActor in
       do {

@@ -374,28 +374,15 @@ extension UIMenu {
   /// rebuilds menu on every access
   static func lazyMenu(
     title: String = "",
-    deferredMenuMightBeBroken: Bool = false,
-    builder: @escaping () -> UIMenu
+    builder: @escaping () -> [UIMenuElement]
   )
     -> UIMenu {
-    #if targetEnvironment(macCatalyst)
-      let deferredMenuIsBroken = deferredMenuMightBeBroken
-    // https://forums.developer.apple.com/forums/thread/726665
-    // UIDeferredMenuElement is completly broken in catalyst, when using .mac style
-    // for the enclosing button or bar button item.
-    #else
-      let deferredMenuIsBroken = false
-    #endif
-    if deferredMenuIsBroken {
-      return UIMenu(title: title, children: [builder()])
-    } else {
-      return UIMenu(title: title, children: [
-        UIDeferredMenuElement.uncached { completion in
-          let menu = builder()
-          completion([menu])
-        },
-      ])
-    }
+    UIMenu(title: title, children: [
+      UIDeferredMenuElement.uncached { completion in
+        let actions = builder()
+        completion(actions)
+      },
+    ])
   }
 }
 
@@ -432,42 +419,21 @@ extension UIPickerView {
   }
 }
 
-#if targetEnvironment(macCatalyst)
-  let toolbarSafeAreaTop: CGFloat = 52.0
+extension Notification.Name {
+  static let LibraryItemsChanged = Notification.Name("de.familie-zimba.Amperfy.LibraryItemsChanged")
+}
 
-  extension Notification.Name {
-    static let SearchChanged = Notification.Name("de.familie-zimba.Amperfy.SearchChanged")
-    static let RequestSearchUpdate = Notification
-      .Name("de.familie-zimba.Amperfy.RequestSearchUpdate")
+extension UIViewController {
+  @objc
+  var sceneTitle: String? { nil }
+
+  func extendSafeAreaToAccountForMiniPlayer() {
+    guard let hostVC = AppDelegate.mainWindowHostVC else { return }
+    additionalSafeAreaInsets = UIEdgeInsets(
+      top: 0,
+      left: 0,
+      bottom: hostVC.getSafeAreaExtension(),
+      right: 0
+    )
   }
-
-  extension UIViewController {
-    func extendSafeAreaToAccountForTabbar() {
-      let currentInsetTop = view.window?.safeAreaInsets.top ?? toolbarSafeAreaTop
-      additionalSafeAreaInsets = UIEdgeInsets(
-        top: currentInsetTop - toolbarSafeAreaTop,
-        left: 0,
-        bottom: 0,
-        right: 0
-      )
-    }
-
-    func shrinkSafeAreaToAccountForTabbar() {
-      let currentInsetTop = view.window?.safeAreaInsets.top ?? toolbarSafeAreaTop
-      additionalSafeAreaInsets = UIEdgeInsets(
-        top: toolbarSafeAreaTop - currentInsetTop,
-        left: 0,
-        bottom: 0,
-        right: 0
-      )
-    }
-  }
-
-#else
-
-  extension UIViewController {
-    func extendSafeAreaToAccountForTabbar() {}
-    func shrinkSafeAreaToAccountForTabbar() {}
-  }
-
-#endif
+}

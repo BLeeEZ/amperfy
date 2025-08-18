@@ -57,7 +57,9 @@ class DirectoriesVC: MultiSourceTableViewController {
     tableView.register(nibName: PlayableTableCell.typeName)
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-      infoCB: { "\(self.directory.songCount) Song\(self.directory.songCount == 1 ? "" : "s")" },
+      infoCB: {
+        "\(self.songsFetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.songsFetchedResultsController.fetchedObjects?.count) == 1 ? "" : "s")"
+      },
       playContextCb: { () in PlayContext(
         containable: self.directory,
         playables: self.songsFetchedResultsController
@@ -156,6 +158,7 @@ class DirectoriesVC: MultiSourceTableViewController {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     subdirectoriesFetchedResultsController?.delegate = self
     songsFetchedResultsController?.delegate = self
 
@@ -309,6 +312,7 @@ class DirectoriesVC: MultiSourceTableViewController {
       songsFetchedResultsController.showAllResults()
     }
     tableView.reloadData()
+    headerView?.refresh()
   }
 
   override func controller(

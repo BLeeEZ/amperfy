@@ -89,6 +89,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     updateFromRemote()
   }
 
@@ -177,14 +178,13 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       fetchedResultsController.showAllResults()
     }
     tableView.reloadData()
+    detailHeaderView?.refresh()
   }
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
     guard appDelegate.storage.settings.isOnlineMode else {
-      #if !targetEnvironment(macCatalyst)
-        self.refreshControl?.endRefreshing()
-      #endif
+      self.refreshControl?.endRefreshing()
       return
     }
     Task { @MainActor in
@@ -195,9 +195,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       }
       self.detailHeaderView?.refresh()
       self.updateSearchResults(for: self.searchController)
-      #if !targetEnvironment(macCatalyst)
-        self.refreshControl?.endRefreshing()
-      #endif
+      self.refreshControl?.endRefreshing()
     }
   }
 }

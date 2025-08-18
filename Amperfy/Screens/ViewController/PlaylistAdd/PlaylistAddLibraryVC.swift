@@ -318,7 +318,10 @@ class PlaylistAddLibraryVC: KeyCommandTableViewController {
 
     addToPlaylistManager.rootView = self
     doneButton = addToPlaylistManager.createDoneButton()
-    closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
+    closeButton = UIBarButtonItem.createCloseBarButton(
+      target: self,
+      selector: #selector(cancelBarButtonPressed)
+    )
     navigationItem.leftItemsSupplementBackButton = true
     navigationItem.leftBarButtonItem = closeButton
     navigationItem.rightBarButtonItem = doneButton

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="mac" appearance="light" renderMode="macOS"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -19,7 +18,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="sEM-ZY-PBA" userLabel="VStack View">
-                        <rect key="frame" x="16" y="10" width="629" height="48"/>
+                        <rect key="frame" x="36" y="10" width="605" height="48"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kaN-9u-M2i" userLabel="EntityImage" customClass="EntityImageView" customModule="AmperfyKit">
                                 <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
@@ -30,13 +29,13 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="55a-sm-8cR" userLabel="HStack View">
-                                <rect key="frame" x="56" y="7" width="573" height="35"/>
+                                <rect key="frame" x="56" y="7" width="549" height="35"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HDj-Db-Qbv">
-                                        <rect key="frame" x="0.0" y="0.0" width="365" height="35"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="341" height="35"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label">
-                                                <rect key="frame" x="0.0" y="9" width="179.5" height="18"/>
+                                                <rect key="frame" x="0.0" y="9" width="167.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1">
                                                         <variation key="widthClass=regular" constant="18"/>
@@ -60,7 +59,7 @@
                                                 </variation>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label">
-                                                <rect key="frame" x="186" y="9" width="179.5" height="18"/>
+                                                <rect key="frame" x="174" y="9" width="167.5" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="15" id="dnN-rs-XET">
                                                         <variation key="widthClass=regular" constant="18"/>
@@ -101,7 +100,7 @@
                                         <variation key="userInterfaceIdiom=mac-widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually"/>
                                     </stackView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
-                                        <rect key="frame" x="373" y="9" width="200" height="18"/>
+                                        <rect key="frame" x="349" y="9" width="200" height="18"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="15" id="1Hs-Po-1o2">
                                                 <variation key="widthClass=regular" constant="18"/>
@@ -132,7 +131,7 @@
                         </subviews>
                     </stackView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JAm-cG-f5H">
-                        <rect key="frame" x="0.0" y="19" width="16" height="30"/>
+                        <rect key="frame" x="20" y="19" width="16" height="30"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="suit.heart.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="aXK-mg-9Bz" userLabel="Favorite Icon">
                                 <rect key="frame" x="2" y="11" width="12" height="9.5"/>
@@ -147,13 +146,13 @@
                         <constraints>
                             <constraint firstAttribute="height" constant="30" id="B1E-RI-vPB"/>
                             <constraint firstItem="aXK-mg-9Bz" firstAttribute="centerY" secondItem="JAm-cG-f5H" secondAttribute="centerY" id="YXv-qr-Hfp"/>
+                            <constraint firstAttribute="width" constant="16" id="mC3-I6-LeE"/>
                             <constraint firstItem="aXK-mg-9Bz" firstAttribute="centerX" secondItem="JAm-cG-f5H" secondAttribute="centerX" id="mJP-Dy-acS"/>
                         </constraints>
                     </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="sEM-ZY-PBA" firstAttribute="leading" secondItem="OYQ-xE-eM6" secondAttribute="leadingMargin" id="5zc-L3-4I9"/>
-                    <constraint firstItem="JAm-cG-f5H" firstAttribute="leading" secondItem="OYQ-xE-eM6" secondAttribute="leading" id="A3m-JT-84r"/>
+                    <constraint firstItem="JAm-cG-f5H" firstAttribute="left" secondItem="OYQ-xE-eM6" secondAttribute="leftMargin" id="A3m-JT-84r"/>
                     <constraint firstAttribute="trailingMargin" secondItem="sEM-ZY-PBA" secondAttribute="trailing" id="ACJ-ab-eiH">
                         <variation key="widthClass=regular" constant="8"/>
                     </constraint>
@@ -176,10 +175,10 @@
     <resources>
         <image name="suit.heart.fill" catalog="system" width="128" height="107"/>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

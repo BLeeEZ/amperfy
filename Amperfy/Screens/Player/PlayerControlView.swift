@@ -37,9 +37,9 @@ class PlayerControlView: UIView {
 
   private var player: PlayerFacade!
   private var rootView: PopupPlayerVC?
-
-  #if targetEnvironment(macCatalyst)
-    private var airplayVolume: MPVolumeView
+  private var playerHandler: PlayerUIHandler?
+  #if targetEnvironment(macCatalyst) // ok
+    var airplayVolume: MPVolumeView?
   #endif
 
   @IBOutlet
@@ -78,10 +78,10 @@ class PlayerControlView: UIView {
   weak var optionsButton: UIButton!
 
   required init?(coder aDecoder: NSCoder) {
-    #if targetEnvironment(macCatalyst)
+    #if targetEnvironment(macCatalyst) // ok
       self.airplayVolume = MPVolumeView(frame: .zero)
-      airplayVolume.showsVolumeSlider = false
-      airplayVolume.isHidden = true
+      airplayVolume!.showsVolumeSlider = false
+      airplayVolume!.isHidden = true
     #endif
 
     super.init(coder: aDecoder)
@@ -89,13 +89,16 @@ class PlayerControlView: UIView {
     self.player = appDelegate.player
     player.addNotifier(notifier: self)
 
-    #if targetEnvironment(macCatalyst)
-      addSubview(airplayVolume)
+    #if targetEnvironment(macCatalyst) // ok
+      addSubview(airplayVolume!)
     #endif
   }
 
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
     rootView = toWorkOnRootView
+
+    playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
+
     playButton.imageView?.tintColor = .label
     previousButton.tintColor = .label
     nextButton.tintColor = .label
@@ -105,13 +108,22 @@ class PlayerControlView: UIView {
     playerModeButton.tintColor = .label
     optionsButton.imageView?.tintColor = .label
     refreshPlayer()
-    refreshPlayerOptions()
+    playerHandler?.refreshPlayerOptions(
+      optionsButton: optionsButton,
+      menuCreateCB: createPlayerOptionsMenu
+    )
 
     registerForTraitChanges(
       [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
       handler: { (self: Self, previousTraitCollection: UITraitCollection) in
-        self.refreshTimeInfo()
-        self.refreshPopupBarButtonItmes()
+        self.playerHandler?.refreshTimeInfo(
+          timeSlider: self.timeSlider,
+          elapsedTimeLabel: self.elapsedTimeLabel,
+          remainingTimeLabel: self.remainingTimeLabel,
+          audioInfoLabel: self.audioInfoLabel,
+          playTypeIcon: self.playTypeIcon,
+          liveLabel: self.liveLabel
+        )
       }
     )
   }
@@ -125,95 +137,65 @@ class PlayerControlView: UIView {
 
   @IBAction
   func playButtonPushed(_ sender: Any) {
-    player.togglePlayPause()
-    refreshPlayButton()
-    refreshPopupBarButtonItmes()
+    playerHandler?.playButtonPushed()
+    playerHandler?.refreshPlayButton(playButton)
   }
 
   @IBAction
   func previousButtonPushed(_ sender: Any) {
-    switch player.playerMode {
-    case .music:
-      player.playPreviousOrReplay()
-    case .podcast:
-      player.skipBackward(interval: player.skipBackwardPodcastInterval)
-    }
+    playerHandler?.previousButtonPushed()
   }
 
   @IBAction
   func nextButtonPushed(_ sender: Any) {
-    switch player.playerMode {
-    case .music:
-      player.playNext()
-    case .podcast:
-      player.skipForward(interval: player.skipForwardPodcastInterval)
-    }
+    playerHandler?.nextButtonPushed()
   }
 
   @IBAction
   func skipBackwardButtonPushed(_ sender: Any) {
-    player.skipBackward(interval: player.skipBackwardMusicInterval)
+    playerHandler?.skipBackwardButtonPushed()
   }
 
   @IBAction
   func skipForwardButtonPushed(_ sender: Any) {
-    player.skipForward(interval: player.skipForwardMusicInterval)
+    playerHandler?.skipForwardButtonPushed()
   }
 
   @IBAction
   func timeSliderChanged(_ sender: Any) {
-    if let timeSliderValue = timeSlider?.value {
-      player.seek(toSecond: Double(timeSliderValue))
-    }
+    playerHandler?.timeSliderChanged(timeSlider: timeSlider)
   }
 
   @IBAction
   func timeSliderIsChanging(_ sender: Any) {
-    if let timeSliderValue = timeSlider?.value {
-      let elapsedClockTime = ClockTime(timeInSeconds: Int(timeSliderValue))
-      elapsedTimeLabel.text = elapsedClockTime.asShortString()
-      let remainingTime =
-        ClockTime(timeInSeconds: Int(Double(timeSliderValue) - ceil(player.duration)))
-      remainingTimeLabel.text = remainingTime.asShortString()
-    }
+    playerHandler?.timeSliderIsChanging(
+      timeSlider: timeSlider,
+      elapsedTimeLabel: elapsedTimeLabel,
+      remainingTimeLabel: remainingTimeLabel
+    )
   }
 
   @IBAction
   func airplayButtonPushed(_ sender: UIButton) {
-    appDelegate.userStatistics.usedAction(.airplay)
-
-    #if targetEnvironment(macCatalyst)
-      // Position the popup correctly on macOS
-      if let buttonCenter = sender.superview?.convert(sender.center, to: self) {
-        airplayVolume.center = buttonCenter
-      }
-
-      for view: UIView in airplayVolume.subviews {
-        if let button = view as? UIButton {
-          button.sendActions(for: .touchUpInside)
-          break
-        }
-      }
+    #if targetEnvironment(macCatalyst) // ok
+      playerHandler?.airplayButtonPushed(
+        rootView: self,
+        airplayButton: airplayButton,
+        airplayVolume: airplayVolume
+      )
     #else
-      let rect = CGRect(x: -100, y: 0, width: 0, height: 0)
-      let airplayVolume = MPVolumeView(frame: rect)
-      airplayVolume.showsVolumeSlider = false
-      addSubview(airplayVolume)
-      for view: UIView in airplayVolume.subviews {
-        if let button = view as? UIButton {
-          button.sendActions(for: .touchUpInside)
-          break
-        }
-      }
-      airplayVolume.removeFromSuperview()
+      playerHandler?.airplayButtonPushed(rootView: self, airplayButton: airplayButton)
     #endif
   }
 
   @IBAction
   func displayPlaylistPressed() {
     rootView?.switchDisplayStyleOptionPersistent()
-    refreshDisplayPlaylistButton()
-    refreshPlayerOptions()
+    playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton)
+    playerHandler?.refreshPlayerOptions(
+      optionsButton: optionsButton,
+      menuCreateCB: createPlayerOptionsMenu
+    )
   }
 
   @IBAction
@@ -231,326 +213,23 @@ class PlayerControlView: UIView {
     refreshPlayer()
   }
 
-  func refreshPlayButton() {
-    var buttonImg = UIImage()
-    if player.isPlaying {
-      if player.isStopInsteadOfPause {
-        buttonImg = UIImage.stop
-      } else {
-        buttonImg = UIImage.pause
-      }
-    } else {
-      buttonImg = UIImage.play
-    }
-    playButton.setImage(buttonImg, for: UIControl.State.normal)
-  }
-
-  func refreshPopupBarButtonItmes() {
-    var barButtonItems = [UIBarButtonItem]()
-    if player.currentlyPlaying != nil {
-      var buttonImg = UIImage()
-      if traitCollection.horizontalSizeClass == .regular {
-        switch player.playerMode {
-        case .music:
-          let shuffleButton = UIBarButtonItem(
-            image: .shuffle,
-            style: .plain,
-            target: rootView?.contextNextQueueSectionHeader,
-            action: #selector(ContextQueueNextSectionHeader.pressedShuffle)
-          )
-          shuffleButton.isSelected = player.isShuffle
-          barButtonItems.append(shuffleButton)
-          barButtonItems.append(UIBarButtonItem(
-            image: .backwardFill,
-            style: .plain,
-            target: self,
-            action: #selector(PlayerControlView.previousButtonPushed)
-          ))
-        case .podcast:
-          barButtonItems.append(UIBarButtonItem(
-            image: .goBackward15,
-            style: .plain,
-            target: self,
-            action: #selector(PlayerControlView.previousButtonPushed)
-          ))
-        }
-      }
-
-      if player.isPlaying {
-        if player.isStopInsteadOfPause {
-          buttonImg = .stop
-        } else {
-          buttonImg = .pause
-        }
-      } else {
-        buttonImg = .play
-      }
-      barButtonItems.append(UIBarButtonItem(
-        image: buttonImg,
-        style: .plain,
-        target: self,
-        action: #selector(PlayerControlView.playButtonPushed)
-      ))
-
-      switch player.playerMode {
-      case .music:
-        buttonImg = .forwardFill
-      case .podcast:
-        buttonImg = .goForward30
-      }
-      barButtonItems.append(UIBarButtonItem(
-        image: buttonImg,
-        style: .plain,
-        target: self,
-        action: #selector(PlayerControlView.nextButtonPushed)
-      ))
-
-      if traitCollection.horizontalSizeClass == .regular {
-        switch player.playerMode {
-        case .music:
-          switch player.repeatMode {
-          case .off:
-            buttonImg = .repeatOff
-          case .all:
-            buttonImg = .repeatAll
-          case .single:
-            buttonImg = .repeatOne
-          }
-          let repeatButton = UIBarButtonItem(
-            image: buttonImg,
-            style: .plain,
-            target: rootView?.contextNextQueueSectionHeader,
-            action: #selector(ContextQueueNextSectionHeader.pressedRepeat)
-          )
-          repeatButton.isSelected = player.repeatMode != .off
-          barButtonItems.append(repeatButton)
-        case .podcast:
-          break
-        }
-      }
-    }
-    rootView?.popupItem.trailingBarButtonItems = barButtonItems
-  }
-
-  func refreshCurrentlyPlayingInfo() {
-    switch player.playerMode {
-    case .music:
-      skipBackwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
-      skipBackwardButton.isEnabled = player.isSkipAvailable
-      skipBackwardButton.alpha = !appDelegate.storage.settings
-        .isShowMusicPlayerSkipButtons ? 0.0 : 1.0
-      skipForwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
-      skipForwardButton.isEnabled = player.isSkipAvailable
-      skipForwardButton.alpha = !appDelegate.storage.settings
-        .isShowMusicPlayerSkipButtons ? 0.0 : 1.0
-    case .podcast:
-      skipBackwardButton.isHidden = true
-      skipBackwardButton.isEnabled = true
-      skipForwardButton.isHidden = true
-      skipForwardButton.isEnabled = true
-    }
-  }
-
-  private var remainingTime: Int? {
-    let duration = player.duration
-    if player.currentlyPlaying != nil, duration.isNormal, !duration.isZero {
-      return Int(player.elapsedTime - ceil(player.duration))
-    }
-    return nil
-  }
-
-  private func refreshAudioInfo(currentlyPlaying: AbstractPlayable) {
-    guard let playType = player.playType else {
-      playTypeIcon.image = nil
-      playTypeIcon.isHidden = true
-      audioInfoLabel.isHidden = true
-      return
-    }
-    playTypeIcon.isHidden = false
-    audioInfoLabel.isHidden = false
-    var displayBitrate = ""
-    var formatText = ""
-
-    func getFormat(contentType: String?) -> String {
-      guard let contentType else { return "" }
-      var contentFormatText = ""
-      // Display MIME type: "audio/mp3" -> "MP3"
-      let components = contentType.split(separator: "/")
-      if components.count > 1 {
-        let format = String(components[1]).uppercased()
-        // Format for display
-        switch format {
-        case "MP3", "MPEG":
-          contentFormatText = "MP3"
-        default:
-          if format.contains("LOSSLESS") {
-            contentFormatText = "LOSSLESS"
-          } else if format.hasPrefix("X-"), format.count > "X-".count {
-            contentFormatText = String(format.dropFirst("X-".count))
-          } else {
-            contentFormatText = format
-          }
-        }
-      }
-      return contentFormatText
-    }
-
-    if playType == .cache {
-      playTypeIcon.image = UIImage.cache
-      displayBitrate = "\(currentlyPlaying.bitrate / 1000) kbps"
-      formatText = getFormat(contentType: currentlyPlaying.fileContentType)
-    } else {
-      playTypeIcon.image = UIImage.antenna
-      let streamingBitrate = player.activeStreamingBitrate
-      if let streamingBitrate {
-        if streamingBitrate == .noLimit ||
-          (streamingBitrate.rawValue > (currentlyPlaying.bitrate / 1000)) {
-          displayBitrate = "\(currentlyPlaying.bitrate / 1000) kbps"
-        } else {
-          displayBitrate = "\(streamingBitrate.rawValue) kbps"
-        }
-      } else {
-        displayBitrate = ""
-      }
-
-      let transcodingFormat = player.activeTranscodingFormat
-      if let transcodingFormat {
-        if transcodingFormat == .raw {
-          // it is the format of the streamed file
-          formatText = getFormat(contentType: currentlyPlaying.contentType)
-        } else {
-          formatText = transcodingFormat.shortInfo
-        }
-      } else {
-        formatText = ""
-      }
-    }
-
-    audioInfoLabel.text = "\(formatText) \(displayBitrate)"
-    playTypeIcon.tintColor = .labelColor
-  }
-
-  func refreshTimeInfo() {
-    if let currentlyPlaying = player.currentlyPlaying {
-      let supportTimeInteraction = !currentlyPlaying.isRadio
-      timeSlider.isEnabled = supportTimeInteraction
-      timeSlider.minimumValue = 0.0
-      timeSlider.maximumValue = Float(player.duration)
-      if !timeSlider.isTracking, !timeSlider.isTrackingManually, supportTimeInteraction {
-        let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
-        elapsedTimeLabel.text = elapsedClockTime.asShortString()
-        if let remainingTime = remainingTime {
-          remainingTimeLabel.text = ClockTime(timeInSeconds: remainingTime).asShortString()
-        } else {
-          remainingTimeLabel.text = "--:--"
-        }
-        timeSlider.value = Float(player.elapsedTime)
-      }
-
-      if !supportTimeInteraction {
-        audioInfoLabel.isHidden = true
-        playTypeIcon.isHidden = true
-        liveLabel.isHidden = false
-        timeSlider.setThumbImage(UIImage(), for: .normal)
-        #if !targetEnvironment(macCatalyst)
-          timeSlider.setThumbImage(UIImage(), for: .highlighted)
-        #endif
-        timeSlider.minimumValue = 0.0
-        timeSlider.maximumValue = 1.0
-        timeSlider.value = 0.0
-
-        // make the middle part of the time slider transparent
-        let mask = CAGradientLayer()
-        mask.frame = timeSlider.bounds
-        mask.colors = [
-          UIColor.white.cgColor,
-          UIColor.white.withAlphaComponent(0).cgColor,
-          UIColor.white.withAlphaComponent(0).cgColor,
-          UIColor.white.cgColor,
-        ]
-        mask.startPoint = CGPoint(x: 0.0, y: 0.0)
-        mask.endPoint = CGPoint(x: 1.0, y: 0.0)
-        mask.locations = [
-          0.0, 0.4, 0.6, 1.0,
-        ]
-        timeSlider.layer.mask = mask
-
-        elapsedTimeLabel.text = ""
-        remainingTimeLabel.text = ""
-        rootView?.popupItem.progress = 0.0
-      } else {
-        audioInfoLabel.isHidden = false
-        playTypeIcon.isHidden = false
-        refreshAudioInfo(currentlyPlaying: currentlyPlaying)
-
-        liveLabel.isHidden = true
-        timeSlider.layer.mask = nil
-        timeSlider.setUnicolorThumbImage(
-          thumbSize: CGSize(width: 10.0, height: 10.0),
-          color: .labelColor,
-          roundedCorners: .allCorners,
-          for: UIControl.State.normal
-        )
-        #if !targetEnvironment(macCatalyst)
-          timeSlider.setUnicolorThumbImage(
-            thumbSize: CGSize(width: 30.0, height: 30.0),
-            color: .labelColor,
-            roundedCorners: .allCorners,
-            for: UIControl.State.highlighted
-          )
-        #endif
-        let progress = Float(player.elapsedTime / player.duration)
-        rootView?.popupItem.progress = progress.isNormal ? progress : 0.0
-      }
-    } else {
-      audioInfoLabel.isHidden = true
-      playTypeIcon.isHidden = true
-      liveLabel.isHidden = true
-      timeSlider.layer.mask = nil
-      timeSlider.setUnicolorThumbImage(
-        thumbSize: CGSize(width: 10.0, height: 10.0),
-        color: .labelColor,
-        roundedCorners: .allCorners,
-        for: UIControl.State.normal
-      )
-      #if !targetEnvironment(macCatalyst)
-        timeSlider.setUnicolorThumbImage(
-          thumbSize: CGSize(width: 30.0, height: 30.0),
-          color: .labelColor,
-          roundedCorners: .allCorners,
-          for: UIControl.State.highlighted
-        )
-      #endif
-      elapsedTimeLabel.text = "--:--"
-      remainingTimeLabel.text = "--:--"
-      timeSlider.minimumValue = 0.0
-      timeSlider.maximumValue = 1.0
-      timeSlider.value = 0.0
-      rootView?.popupItem.progress = 0.0
-    }
-  }
-
   func refreshPlayer() {
-    refreshCurrentlyPlayingInfo()
-    refreshPlayButton()
-    refreshPopupBarButtonItmes()
-    refreshTimeInfo()
-    refreshPrevNextButtons()
-    refreshDisplayPlaylistButton()
+    playerHandler?.refreshSkipButtons(
+      skipBackwardButton: skipBackwardButton,
+      skipForwardButton: skipForwardButton
+    )
+    playerHandler?.refreshPlayButton(playButton)
+    playerHandler?.refreshTimeInfo(
+      timeSlider: timeSlider,
+      elapsedTimeLabel: elapsedTimeLabel,
+      remainingTimeLabel: remainingTimeLabel,
+      audioInfoLabel: audioInfoLabel,
+      playTypeIcon: playTypeIcon,
+      liveLabel: liveLabel
+    )
+    playerHandler?.refreshPrevNextButtons(previousButton: previousButton, nextButton: nextButton)
+    playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton)
     refreshPlayerModeChangeButton()
-  }
-
-  func refreshPrevNextButtons() {
-    previousButton.imageView?.contentMode = .scaleAspectFit
-    nextButton.imageView?.contentMode = .scaleAspectFit
-    switch player.playerMode {
-    case .music:
-      previousButton.setImage(UIImage.backwardFill, for: .normal)
-      nextButton.setImage(UIImage.forwardFill, for: .normal)
-    case .podcast:
-      previousButton.setImage(UIImage.goBackward15, for: .normal)
-      nextButton.setImage(UIImage.goForward30, for: .normal)
-    }
   }
 
   func createPlaybackRateMenu() -> UIMenuElement {
@@ -571,7 +250,7 @@ class PlayerControlView: UIView {
     )
   }
 
-  func createPlayerOptionsMenu() -> UIMenu {
+  func createPlayerOptionsMenu() -> [UIMenuElement] {
     var menuActions = [UIMenuElement]()
     if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player
       .userQueueCount > 0 || player.nextQueueCount > 0 {
@@ -687,22 +366,7 @@ class PlayerControlView: UIView {
       rootView.present(detailVC, animated: true)
     })
     menuActions.append(playerInfo)
-    return UIMenu(options: .displayInline, children: menuActions)
-  }
-
-  func refreshPlayerOptions() {
-    optionsButton.showsMenuAsPrimaryAction = true
-    optionsButton.menu = UIMenu.lazyMenu(title: "Player Options") {
-      self.createPlayerOptionsMenu()
-    }
-  }
-
-  func refreshDisplayPlaylistButton() {
-    let isSelected = appDelegate.storage.settings.playerDisplayStyle == .compact
-    var config = UIButton.Configuration.player(isSelected: isSelected)
-    config.image = .playlistDisplayStyle
-    displayPlaylistButton.isSelected = isSelected
-    displayPlaylistButton.configuration = config
+    return menuActions
   }
 
   func refreshPlayerModeChangeButton() {
@@ -733,11 +397,21 @@ extension PlayerControlView: MusicPlayable {
 
   func didStopPlaying() {
     refreshPlayer()
-    refreshCurrentlyPlayingInfo()
+    playerHandler?.refreshSkipButtons(
+      skipBackwardButton: skipBackwardButton,
+      skipForwardButton: skipForwardButton
+    )
   }
 
   func didElapsedTimeChange() {
-    refreshTimeInfo()
+    playerHandler?.refreshTimeInfo(
+      timeSlider: timeSlider,
+      elapsedTimeLabel: elapsedTimeLabel,
+      remainingTimeLabel: remainingTimeLabel,
+      audioInfoLabel: audioInfoLabel,
+      playTypeIcon: playTypeIcon,
+      liveLabel: liveLabel
+    )
   }
 
   func didPlaylistChange() {
@@ -746,13 +420,9 @@ extension PlayerControlView: MusicPlayable {
 
   func didArtworkChange() {}
 
-  func didShuffleChange() {
-    refreshPopupBarButtonItmes()
-  }
+  func didShuffleChange() {}
 
-  func didRepeatChange() {
-    refreshPopupBarButtonItmes()
-  }
+  func didRepeatChange() {}
 
   func didPlaybackRateChange() {}
 }

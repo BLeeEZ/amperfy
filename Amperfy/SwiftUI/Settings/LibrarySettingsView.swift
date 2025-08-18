@@ -164,11 +164,7 @@ struct LibrarySettingsView: View {
           }
         })
 
-        #if targetEnvironment(macCatalyst)
-          let progressTitle = "Background song sync progress"
-        #else
-          let progressTitle = "Progress"
-        #endif
+        let progressTitle = "Progress"
 
         SettingsSection(content: {
           SettingsRow(title: progressTitle) {
@@ -199,45 +195,26 @@ struct LibrarySettingsView: View {
             }
           }
 
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Cache") { SecondaryText("\(cachedSongCount.description) - Songs") }
-            SettingsRow {
-              SecondaryText("\(cachedPodcastEpisodesCount.description) - Podcast Episodes")
-            }
-            SettingsRow { SecondaryText("\(completeCacheSize.description) - Cache Size") }
-            SettingsRow(title: "Cache Size Limit") {
-              MultiPickerView(
-                data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
-                selection: $cacheSelection
-              )
-              .frame(width: 250, height: 25)
-              .alignmentGuide(.top, computeValue: { _ in 0 })
-            }
-            .frame(height: 25)
-            .onChange(of: cacheSelection, changeHandler)
-            .padding(.bottom, 10)
-          #else
-            SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
-            SettingsRow(title: "Cached Podcast Episodes") {
-              SecondaryText(cachedPodcastEpisodesCount.description)
-            }
-            SettingsRow(title: "Complete Cache Size") {
-              SecondaryText(completeCacheSize.description)
-            }
+          SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
+          SettingsRow(title: "Cached Podcast Episodes") {
+            SecondaryText(cachedPodcastEpisodesCount.description)
+          }
+          SettingsRow(title: "Complete Cache Size") {
+            SecondaryText(completeCacheSize.description)
+          }
 
-            NavigationLink {
-              MultiPickerView(
-                data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
-                selection: $cacheSelection
-              )
-              .navigationTitle("Cache Size Limit")
-            } label: {
-              SettingsRow(title: "Cache Size Limit") {
-                SecondaryText(cacheSizeLimit.description)
-              }
+          NavigationLink {
+            MultiPickerView(
+              data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
+              selection: $cacheSelection
+            )
+            .navigationTitle("Cache Size Limit")
+          } label: {
+            SettingsRow(title: "Cache Size Limit") {
+              SecondaryText(cacheSizeLimit.description)
             }
-            .onChange(of: cacheSelection, changeHandler)
-          #endif
+          }
+          .onChange(of: cacheSelection, changeHandler)
 
           SettingsButtonRow(title: "Downloads", label: "Download all songs in library") {
             isShowDownloadSongsAlert = true

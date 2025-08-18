@@ -119,21 +119,12 @@ struct ArtworkSettingsView: View {
           }
         }
         SettingsSection {
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Artwork Download Settings") {
-              ArtworkDownloadSettingsView()
-            }
-            SettingsRow(title: "Artwork Display Settings") {
-              ArtworkDisplaySettings()
-            }
-          #else
-            NavigationLink(destination: ArtworkDownloadSettingsView()) {
-              Text("Artwork Download Settings")
-            }
-            NavigationLink(destination: ArtworkDisplaySettings()) {
-              Text("Artwork Display Settings")
-            }
-          #endif
+          NavigationLink(destination: ArtworkDownloadSettingsView()) {
+            Text("Artwork Download Settings")
+          }
+          NavigationLink(destination: ArtworkDisplaySettings()) {
+            Text("Artwork Display Settings")
+          }
         }
       }
     }

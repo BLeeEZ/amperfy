@@ -198,6 +198,9 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    // ensures that the collection view stops placing items under the sidebar
+    collectionView.contentInsetAdjustmentBehavior = .always
+
     appDelegate.userStatistics.visited(.albums)
 
     common.rootVC = self
@@ -262,6 +265,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
   }

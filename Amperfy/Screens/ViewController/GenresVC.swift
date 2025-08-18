@@ -82,6 +82,11 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     }
   }
 
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
+  }
+
   override func tableView(
     _ tableView: UITableView,
     cellForRowAt indexPath: IndexPath

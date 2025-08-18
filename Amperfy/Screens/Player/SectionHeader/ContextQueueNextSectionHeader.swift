@@ -36,6 +36,7 @@ class ContextQueueNextSectionHeader: UIView {
 
   private var player: PlayerFacade!
   private var rootView: PopupPlayerVC?
+  private var playerHandler: PlayerUIHandler?
 
   @IBOutlet
   weak var queueNameLabel: UILabel!
@@ -52,6 +53,7 @@ class ContextQueueNextSectionHeader: UIView {
     self.layoutMargins = Self.margin
     self.player = appDelegate.player
     player.addNotifier(notifier: self)
+    self.playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
   }
 
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
@@ -63,8 +65,8 @@ class ContextQueueNextSectionHeader: UIView {
   func refresh() {
     contextNameLabel.text = "\(player.contextName)"
     refreshCurrentlyPlayingInfo()
-    refreshRepeatButton()
-    refreshShuffleButton()
+    playerHandler?.refreshRepeatButton(repeatButton: repeatButton)
+    playerHandler?.refreshShuffleButton(shuffleButton: shuffleButton)
   }
 
   func refreshCurrentlyPlayingInfo() {
@@ -78,39 +80,17 @@ class ContextQueueNextSectionHeader: UIView {
     }
   }
 
-  func refreshRepeatButton() {
-    repeatButton.isSelected = player.repeatMode != .off
-    var config = UIButton.Configuration.player(isSelected: repeatButton.isSelected)
-    switch player.repeatMode {
-    case .off:
-      config.image = .repeatOff
-    case .all:
-      config.image = .repeatAll
-    case .single:
-      config.image = .repeatOne
-    }
-    repeatButton.configuration = config
-  }
-
-  func refreshShuffleButton() {
-    shuffleButton.isEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
-    shuffleButton.isSelected = player.isShuffle
-    var config = UIButton.Configuration.player(isSelected: shuffleButton.isSelected)
-    config.image = .shuffle
-    shuffleButton.configuration = config
-  }
-
   @IBAction
   func pressedShuffle(_ sender: Any) {
-    player.toggleShuffle()
-    refreshShuffleButton()
+    playerHandler?.shuffleButtonPushed()
+    playerHandler?.refreshShuffleButton(shuffleButton: shuffleButton)
     rootView?.scrollToCurrentlyPlayingRow()
   }
 
   @IBAction
   func pressedRepeat(_ sender: Any) {
-    player.setRepeatMode(player.repeatMode.nextMode)
-    refreshRepeatButton()
+    playerHandler?.repeatButtonPushed()
+    playerHandler?.refreshRepeatButton(repeatButton: repeatButton)
   }
 }
 
@@ -136,11 +116,11 @@ extension ContextQueueNextSectionHeader: MusicPlayable {
   func didArtworkChange() {}
 
   func didShuffleChange() {
-    refreshShuffleButton()
+    playerHandler?.refreshShuffleButton(shuffleButton: shuffleButton)
   }
 
   func didRepeatChange() {
-    refreshRepeatButton()
+    playerHandler?.refreshRepeatButton(repeatButton: repeatButton)
   }
 
   func didPlaybackRateChange() {}

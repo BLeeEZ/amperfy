@@ -76,7 +76,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    optionsButton = SortBarButton()
+    optionsButton = UIBarButtonItem.createSortBarButton()
 
     appDelegate.userStatistics.visited(.playlistSelector)
     setNavBarTitle(
@@ -158,14 +158,13 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   }
 
   func updateRightBarButtonItems() {
-    closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
+    closeButton = UIBarButtonItem.createCloseBarButton(
+      target: self,
+      selector: #selector(cancelBarButtonPressed)
+    )
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = createSortButtonMenu()
-    #if targetEnvironment(macCatalyst)
-      navigationItem.rightBarButtonItem = optionsButton
-      navigationItem.leftBarButtonItem = closeButton
-    #else
-      navigationItem.rightBarButtonItems = [closeButton, optionsButton]
-    #endif
+    navigationItem.rightBarButtonItems = [closeButton, optionsButton]
   }
 
   @IBAction

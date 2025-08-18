@@ -32,11 +32,6 @@ struct DisplaySettingsView: View {
     settings.themePreference = preference
     appDelegate.setAppTheme(color: preference.asColor)
 
-    #if targetEnvironment(macCatalyst)
-      // the following applies the tint color to already loaded views in all windows (AppKit)
-      AppDelegate.updateAppKitControlColor(preference.asColor)
-    #endif
-
     // the following applies the tint color to already loaded views in all windows (UIKit)
     let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
     let windows = windowScene.flatMap { $0.windows }
@@ -92,26 +87,24 @@ struct DisplaySettingsView: View {
           }
         }
 
-        #if !targetEnvironment(macCatalyst)
-          SettingsSection {
-            SettingsRow(title: "Appearance") {
-              Menu(
-                settings.appearanceMode == .unspecified ? "System" :
-                  (settings.appearanceMode == .light ? "Light" : "Dark")
-              ) {
-                Button("System") {
-                  setAppearanceMode(style: .unspecified)
-                }
-                Button("Light") {
-                  setAppearanceMode(style: .light)
-                }
-                Button("Dark") {
-                  setAppearanceMode(style: .dark)
-                }
+        SettingsSection {
+          SettingsRow(title: "Appearance") {
+            Menu(
+              settings.appearanceMode == .unspecified ? "System" :
+                (settings.appearanceMode == .light ? "Light" : "Dark")
+            ) {
+              Button("System") {
+                setAppearanceMode(style: .unspecified)
+              }
+              Button("Light") {
+                setAppearanceMode(style: .light)
+              }
+              Button("Dark") {
+                setAppearanceMode(style: .dark)
               }
             }
           }
-        #endif
+        }
 
         #if !targetEnvironment(macCatalyst)
           SettingsSection(

@@ -48,11 +48,9 @@ class LibraryVC: KeyCommandCollectionViewController {
   }
 
   public func pushedOn(selectedItem: LibraryNavigatorItem) {
-    guard let splitVC = splitViewController as? SplitVC,
-          splitVC.isCollapsed,
-          let libraryItem = selectedItem.library
+    guard let libraryItem = selectedItem.library
     else { return }
-    splitVC
-      .pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+    AppDelegate.mainWindowHostVC?
+      .pushLibraryCategory(vc: libraryItem.controller(settings: appDelegate.storage.settings))
   }
 }

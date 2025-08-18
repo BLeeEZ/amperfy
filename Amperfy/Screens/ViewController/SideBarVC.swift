@@ -53,6 +53,8 @@ class SideBarVC: KeyCommandCollectionViewController {
       navigationItem: navigationItem,
       collectionView: collectionView
     )
+    // hard top border -> other glass effect is to big and covers top sidebar elements
+    collectionView.topEdgeEffect.style = .hard
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -69,6 +71,12 @@ class SideBarVC: KeyCommandCollectionViewController {
     resignFirstResponder()
   }
 
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    let topInsetCorrection = 55.0 - collectionView.safeAreaInsets.top
+    collectionView.contentInset = .init(top: topInsetCorrection, left: 0, bottom: 0, right: 0)
+  }
+
   public func pushedOn(selectedItem: LibraryNavigatorItem) {
     guard let splitVC = splitViewController as? SplitVC,
           !splitVC.isCollapsed
@@ -79,16 +87,10 @@ class SideBarVC: KeyCommandCollectionViewController {
     }
 
     if let libraryItem = selectedItem.library {
-      splitVC
-        .pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+      AppDelegate.mainWindowHostVC?
+        .pushLibraryCategory(vc: libraryItem.controller(settings: appDelegate.storage.settings))
     } else if let libraryItem = selectedItem.tab {
-      if libraryItem == .settings {
-        let vc = libraryItem.controller
-        vc.view.backgroundColor = .secondarySystemBackground
-        splitVC.pushReplaceNavLibrary(vc: vc)
-      } else {
-        splitVC.pushReplaceNavLibrary(vc: libraryItem.controller)
-      }
+      AppDelegate.mainWindowHostVC?.pushTabCategory(tabCategory: libraryItem)
     }
   }
 }

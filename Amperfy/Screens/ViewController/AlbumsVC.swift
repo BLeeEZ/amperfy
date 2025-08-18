@@ -225,6 +225,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
   }

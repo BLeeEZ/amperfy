@@ -84,6 +84,10 @@ class EntityPreviewActionBuilder {
   }
 
   public func createMenu() -> UIMenu {
+    UIMenu(children: createMenuActions())
+  }
+
+  public func createMenuActions() -> [UIMenuElement] {
     var menuActions = [UIMenuElement]()
 
     configureUI()
@@ -162,18 +166,7 @@ class EntityPreviewActionBuilder {
       menuActions.append(createCopyIdToClipboardAction())
     }
 
-    #if targetEnvironment(macCatalyst)
-      // Flatten menus on macOS to prevent incorrect display
-      menuActions = menuActions.flatMap { element in
-        if let menu = element as? UIMenu, menu.title.isEmpty {
-          return menu.children
-        } else {
-          return [element]
-        }
-      }
-    #endif
-
-    return UIMenu(options: .displayInline, children: menuActions)
+    return menuActions
   }
 
   public func performPreviewTransition() {
@@ -605,6 +598,9 @@ class EntityPreviewActionBuilder {
       popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
     } else if let navController = rootView.navigationController {
       navController.pushViewController(albumDetailVC, animated: true)
+    } else {
+      guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
+      hostingSplitVC.pushNavLibrary(vc: albumDetailVC)
     }
   }
 
@@ -630,6 +626,9 @@ class EntityPreviewActionBuilder {
         popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
       } else if let navController = rootView.navigationController {
         navController.pushViewController(artistDetailVC, animated: true)
+      } else {
+        guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
+        hostingSplitVC.pushNavLibrary(vc: artistDetailVC)
       }
     } else if let podcast = playable?.asPodcastEpisode?.podcast {
       appDelegate.userStatistics.usedAction(.alertGoToPodcast)
@@ -640,6 +639,9 @@ class EntityPreviewActionBuilder {
         popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
       } else if let navController = rootView.navigationController {
         navController.pushViewController(podcastDetailVC, animated: true)
+      } else {
+        guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
+        hostingSplitVC.pushNavLibrary(vc: podcastDetailVC)
       }
     }
   }
@@ -769,11 +771,10 @@ class EntityPreviewActionBuilder {
     } else if let popupPlayer = rootView as? PopupPlayerVC {
       popupPlayer.tableView.reloadData()
     }
-    #if targetEnvironment(macCatalyst)
-      if let queueVC = rootView as? QueueVC {
-        queueVC.tableView?.reloadData()
-      }
-    #endif
+    if let splitVC = rootView as? SplitVC,
+       let queueVC = splitVC.viewController(for: .inspector) as? QueueVC {
+      queueVC.tableView?.reloadData()
+    }
   }
 }
 

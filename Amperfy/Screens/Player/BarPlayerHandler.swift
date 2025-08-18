@@ -29,12 +29,10 @@ import UIKit
 class BarPlayerHandler {
   let player: PlayerFacade
   var isPopupBarDisplayed = false
-  let splitVC: SplitVC
   var activeViewContainer: UIViewController?
 
-  init(player: PlayerFacade, splitVC: SplitVC) {
+  init(player: PlayerFacade) {
     self.player = player
-    self.splitVC = splitVC
     self.player.addNotifier(notifier: self)
   }
 
@@ -79,7 +77,6 @@ class BarPlayerHandler {
           let vc = activeViewContainer
     else { return }
     let popupPlayer = PopupPlayerVC()
-    popupPlayer.hostingSplitVC = splitVC
     isPopupBarDisplayed = true
     vc.presentPopupBar(with: popupPlayer, animated: true, completion: nil)
   }

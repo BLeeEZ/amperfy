@@ -93,14 +93,9 @@ class SyncVC: UIViewController {
     appDelegate.isKeepScreenAlive = false
     appDelegate.eventLogger.supressAlerts = false
 
-    #if targetEnvironment(macCatalyst)
-      AppDelegate.rootViewController()?.dismiss(animated: true) {
-        guard let splitVC = AppDelegate.topViewController() as? SplitVC else { return }
-        splitVC.displayInfoPopups()
-      }
-    #else
-      performSegue(withIdentifier: "toLibrary", sender: self)
-    #endif
+    let newVC = AppDelegate.createMainWindowTopViewController()
+    newVC.modalPresentationStyle = .fullScreen
+    present(newVC, animated: true, completion: nil)
   }
 
   private func updateSyncInfo(infoText: String? = nil, percentParsed: Float = 0.0) {
