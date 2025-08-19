@@ -39,6 +39,7 @@ protocol MainSceneHostingViewController {
   )
 
   func getSafeAreaExtension() -> CGFloat
+  var miniPlayer: MiniPlayerView? { get }
 }
 
 extension MainSceneHostingViewController {
@@ -48,29 +49,20 @@ extension MainSceneHostingViewController {
     completion completionBlock: (() -> ())? = nil
   ) {
     guard let topView = AppDelegate.topViewController(),
-          let popupBarContainerVC = AppDelegate.mainWindowHostVC as? UIViewController
+          let hostVC = AppDelegate.mainWindowHostVC
     else { return }
 
     if let presentedViewController = topView.presentedViewController {
       presentedViewController.dismiss(animated: animated) {
-        togglePopupPlayer()
+        if direction == .open {
+          hostVC.miniPlayer?.openPlayerView(completion: completionBlock)
+        } else {
+          completionBlock?()
+        }
       }
     } else {
-      togglePopupPlayer()
-    }
-
-    func togglePopupPlayer() {
-      if popupBarContainerVC.popupPresentationState == .open,
-         let _ = popupBarContainerVC.popupContent as? PopupPlayerVC,
-         direction != .open {
-        popupBarContainerVC.closePopup(animated: animated) {
-          completionBlock?()
-        }
-      } else if popupBarContainerVC.popupPresentationState == .barPresented,
-                direction != .close {
-        popupBarContainerVC.openPopup(animated: true) {
-          completionBlock?()
-        }
+      if direction == .open || direction == .toggle {
+        hostVC.miniPlayer?.openPlayerView(completion: completionBlock)
       } else {
         completionBlock?()
       }

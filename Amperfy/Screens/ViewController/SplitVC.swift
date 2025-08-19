@@ -30,10 +30,9 @@ class SplitVC: UISplitViewController {
   public static let sidebarWidth: CGFloat = 250
   public static let inspectorWidth: CGFloat = 300
 
-  lazy var barPlayer = BarPlayerHandler(player: appDelegate.player)
   private var welcomePopupPresenter = WelcomePopupPresenter()
 
-  private var miniPlayer: MiniPlayerView?
+  var miniPlayer: MiniPlayerView?
   var miniPlayerLeadingConstraint: NSLayoutConstraint?
   var miniPlayerTrailingConstraint: NSLayoutConstraint?
   var miniPlayerBottomConstraint: NSLayoutConstraint?

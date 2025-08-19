@@ -30,7 +30,7 @@ class TabBarVC: UITabBarController {
   private var settingsTab: UITab?
 
   private var welcomePopupPresenter = WelcomePopupPresenter()
-  private var miniPlayer: MiniPlayerView?
+  var miniPlayer: MiniPlayerView?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -128,6 +128,10 @@ class TabBarVC: UITabBarController {
         self.configureTraitChangesForMiniPlayer()
       }
     )
+    
+    if appDelegate.storage.settings.isOfflineMode {
+      appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
+    }
   }
 
   private func mainContent() -> UIView {
@@ -272,7 +276,6 @@ extension TabBarVC: MainSceneHostingViewController {
           searchTabVC.activateSearchBar()
         }
       }
-      self.configureTraitChangesForMiniPlayer()
     }
   }
 

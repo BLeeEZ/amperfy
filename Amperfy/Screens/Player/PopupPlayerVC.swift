@@ -82,8 +82,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
     backgroundImage.setBackgroundBlur(style: .prominent)
 
-    refreshCurrentlyPlayingPopupItem()
-
     controlPlaceholderHeightConstraint.constant = PlayerControlView
       .frameHeight + safetyMarginOnBottom
     if let createdPlayerControlView = ViewCreator<PlayerControlView>
