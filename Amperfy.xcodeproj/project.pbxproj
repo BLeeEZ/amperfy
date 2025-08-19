@@ -102,8 +102,6 @@
 		507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE542B1E587B002BBB1D /* Alamofire */; };
 		507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE632B1E5A03002BBB1D /* Alamofire */; };
 		507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE692B1E62C9002BBB1D /* ID3TagEditor */; };
-		507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; };
-		507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8C2B1E7192002BBB1D /* LNPopupController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE8F2B1E7262002BBB1D /* CallbackURLKit */; };
 		508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E721C5965B00C4BB32 /* AppDelegate.swift */; };
 		508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E921C5965B00C4BB32 /* LoginVC.swift */; };
@@ -449,7 +447,6 @@
 		50D54B722E30FFDB0078631E /* FFT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D54B632E30F9350078631E /* FFT.swift */; };
 		50D7709F2E4F1D1C0075D3BF /* AmperfyAppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 50D7709E2E4F1D1C0075D3BF /* AmperfyAppIcon.icon */; };
 		50D770A02E4F20000075D3BF /* AmperfyAppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 50D7709E2E4F1D1C0075D3BF /* AmperfyAppIcon.icon */; };
-		50DE29E92B8F347300ABA78E /* BarPlayerHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */; };
 		50DE29EB2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */; };
 		50DE29ED2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29EC2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift */; };
 		50DE29EF2B90642E00ABA78E /* SelectionAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DE29EE2B90642E00ABA78E /* SelectionAccessory.swift */; };
@@ -528,7 +525,6 @@
 			dstSubfolderSpec = 10;
 			files = (
 				50C9D61B284FA847007F18D0 /* AmperfyKit.framework in Embed Frameworks */,
-				507DFE8E2B1E7192002BBB1D /* LNPopupController in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -971,7 +967,6 @@
 		50DB11B0266537C30033BFFA /* SsPingParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPingParserTest.swift; sourceTree = "<group>"; };
 		50DB11B226653A670033BFFA /* genres_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = genres_example_1.xml; sourceTree = "<group>"; };
 		50DB11B626653B3A0033BFFA /* SsGenreParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsGenreParserTest.swift; sourceTree = "<group>"; };
-		50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarPlayerHandler.swift; sourceTree = "<group>"; };
 		50DE29EA2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryNavigatorConfigurator.swift; sourceTree = "<group>"; };
 		50DE29EC2B8FCFC500ABA78E /* LibraryDisplayType+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryDisplayType+Extension.swift"; sourceTree = "<group>"; };
 		50DE29EE2B90642E00ABA78E /* SelectionAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionAccessory.swift; sourceTree = "<group>"; };
@@ -1065,7 +1060,6 @@
 				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
 				5052497D2D10CBED0005EEB0 /* Collections in Frameworks */,
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
-				507DFE8D2B1E7192002BBB1D /* LNPopupController in Frameworks */,
 				507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */,
 				507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */,
 				507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */,
@@ -1247,7 +1241,6 @@
 				501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */,
 				50A30E4E2B73DDC800722894 /* PlayerControlView.xib */,
 				50A30E4D2B73DDC800722894 /* PlayerControlView.swift */,
-				50DE29E82B8F347300ABA78E /* BarPlayerHandler.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -2020,7 +2013,6 @@
 				507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */,
 				507DFE512B1E5848002BBB1D /* ID3TagEditor */,
 				507DFE542B1E587B002BBB1D /* Alamofire */,
-				507DFE8C2B1E7192002BBB1D /* LNPopupController */,
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
 				5052497C2D10CBED0005EEB0 /* Collections */,
 				500E70D12E2FD63900636770 /* DominantColors */,
@@ -2121,7 +2113,6 @@
 			packageReferences = (
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
 				50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */,
-				507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */,
 				507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
 				507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 				507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
@@ -2329,7 +2320,6 @@
 				5047B7082E3CB90C00D5090C /* PlayerUIHandler.swift in Sources */,
 				504B442228D8EBB20033982C /* MailView.swift in Sources */,
 				50C16C2021E7A37000F086F0 /* Segues.swift in Sources */,
-				50DE29E92B8F347300ABA78E /* BarPlayerHandler.swift in Sources */,
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
 				50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */,
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
@@ -3129,14 +3119,6 @@
 				version = 1.1.4;
 			};
 		};
-		507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/LeoNatan/LNPopupController";
-			requirement = {
-				kind = exactVersion;
-				version = 2.19.6;
-			};
-		};
 		507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/cbpowell/MarqueeLabel";
@@ -3248,11 +3230,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */;
 			productName = ID3TagEditor;
-		};
-		507DFE8C2B1E7192002BBB1D /* LNPopupController */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE472B1E577D002BBB1D /* XCRemoteSwiftPackageReference "LNPopupController" */;
-			productName = LNPopupController;
 		};
 		507DFE8F2B1E7262002BBB1D /* CallbackURLKit */ = {
 			isa = XCSwiftPackageProductDependency;

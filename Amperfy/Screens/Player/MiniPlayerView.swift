@@ -662,6 +662,10 @@ class MiniPlayerView: UIView {
 
   @objc
   private func miniPlayerGotTouched(_ recognizer: UITapGestureRecognizer) {
+    openPlayerView()
+  }
+  
+  public func openPlayerView(completion: (() -> Void)? = nil) {
     guard let hostVC = AppDelegate.mainWindowHostVC as? UIViewController else { return }
     let popupPlayer = PopupPlayerVC()
     popupPlayer.modalPresentationStyle = .pageSheet
@@ -670,7 +674,7 @@ class MiniPlayerView: UIView {
       sheet.prefersGrabberVisible = true
       sheet.preferredCornerRadius = 24
     }
-    hostVC.present(popupPlayer, animated: true, completion: nil)
+    hostVC.present(popupPlayer, animated: true, completion: completion)
   }
 
   @objc

@@ -33,7 +33,7 @@ extension PopupPlayerVC {
   }
 
   func refreshCurrentlyPlayingInfoView() {
-    refreshCurrentlyPlayingPopupItem()
+    refreshBackgroundItemArtwork()
     largeCurrentlyPlayingView?.refresh()
     for visibleCell in tableView.visibleCells {
       if let currentlyPlayingCell = visibleCell as? CurrentlyPlayingTableCell {
@@ -44,7 +44,7 @@ extension PopupPlayerVC {
   }
 
   func refreshCurrentlyPlayingArtworks() {
-    refreshBackgroundAndPopupItemArtwork()
+    refreshBackgroundItemArtwork()
     largeCurrentlyPlayingView?.refreshArtwork()
     for visibleCell in tableView.visibleCells {
       if let currentlyPlayingCell = visibleCell as? CurrentlyPlayingTableCell {
@@ -104,23 +104,7 @@ extension PopupPlayerVC {
     button.configuration = config
   }
 
-  func refreshCurrentlyPlayingPopupItem() {
-    refreshBackgroundAndPopupItemArtwork()
-    if let playableInfo = player.currentlyPlaying {
-      popupItem.title = playableInfo.title
-      popupItem.subtitle = playableInfo.creatorName
-    } else {
-      switch player.playerMode {
-      case .music:
-        popupItem.title = "No music playing"
-      case .podcast:
-        popupItem.title = "No podcast playing"
-      }
-      popupItem.subtitle = ""
-    }
-  }
-
-  func refreshBackgroundAndPopupItemArtwork() {
+  func refreshBackgroundItemArtwork() {
     var artwork: UIImage?
     if let playableInfo = player.currentlyPlaying {
       artwork = LibraryEntityImage.getImageToDisplayImmediately(
@@ -144,7 +128,6 @@ extension PopupPlayerVC {
       }
     }
     guard let artwork = artwork else { return }
-    popupItem.image = artwork
     backgroundImage.image = artwork
     artworkGradientColors = (try? artwork.dominantColors(max: 2)) ?? [
       appDelegate.storage.settings.themePreference.asColor,
@@ -176,13 +159,13 @@ extension PopupPlayerVC {
     else { return }
     if curPlayable.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refreshBackgroundAndPopupItemArtwork()
+        refreshBackgroundItemArtwork()
       }
     }
     if let artwork = curPlayable.artwork,
        artwork.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refreshBackgroundAndPopupItemArtwork()
+        refreshBackgroundItemArtwork()
       }
     }
   }
