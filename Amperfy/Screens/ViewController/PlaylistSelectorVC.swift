@@ -368,14 +368,6 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     }
   }
 
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toPlaylistDetail.rawValue {
-      let vc = segue.destination as! PlaylistDetailVC
-      let playlist = sender as? Playlist
-      vc.playlist = playlist
-    }
-  }
-
   override func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(searchText: searchText)

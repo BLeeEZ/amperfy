@@ -37,6 +37,17 @@ enum AppStoryboard: String {
     instance.instantiateViewController(withIdentifier: viewControllerClass.storyboardID) as! T
   }
 
+  // MARK: true Storyboard view controller
+
+  func segueToLogin() -> UIViewController { LoginVC.instantiateFromAppStoryboard() }
+  func segueToSync() -> UIViewController { SyncVC.instantiateFromAppStoryboard() }
+  func segueToUpdate() -> UIViewController { UpdateVC.instantiateFromAppStoryboard() }
+  func segueToLibrarySyncPopup() -> LibrarySyncPopupVC { LibrarySyncPopupVC
+    .instantiateFromAppStoryboard()
+  }
+
+  // MARK: create regualar instances
+
   func createAlbumsVC(
     style: AlbumsDisplayStyle,
     category: DisplayCategoryFilter
@@ -44,14 +55,122 @@ enum AppStoryboard: String {
     -> UIViewController {
     switch style {
     case .table:
-      let vc = AlbumsVC.instantiateFromAppStoryboard()
+      let vc = AlbumsVC()
       vc.displayFilter = category
       return vc
     case .grid:
-      let vc = AlbumsCollectionVC.instantiateFromAppStoryboard()
+      let vc = AlbumsCollectionVC(collectionViewLayout: .verticalLayout)
       vc.displayFilter = category
       return vc
     }
+  }
+
+  func segueToMainWindow() -> UIViewController {
+    #if targetEnvironment(macCatalyst) // ok
+      SplitVC(style: .doubleColumn)
+    #else
+      TabBarVC()
+    #endif
+  }
+
+  func checkForMainWindow(vc: UIViewController) -> MainSceneHostingViewController? {
+    #if targetEnvironment(macCatalyst) // ok
+      return vc as? SplitVC
+    #else
+      return vc as? TabBarVC
+    #endif
+  }
+
+  func segueToPlaylistSelector(itemsToAdd: [Song]) -> UIViewController {
+    let playlistSelectorVC = PlaylistSelectorVC()
+    playlistSelectorVC.itemsToAdd = itemsToAdd
+    return playlistSelectorVC
+  }
+
+  func segueToPlaylistEdit(playlist: Playlist) -> PlaylistEditVC {
+    let playlistEditVC = PlaylistEditVC()
+    playlistEditVC.playlist = playlist
+    return playlistEditVC
+  }
+
+  func segueToSideBar() -> UIViewController {
+    SideBarVC(collectionViewLayout: .verticalLayout)
+  }
+
+  func segueToLibrary() -> UIViewController { LibraryVC(collectionViewLayout: .verticalLayout) }
+  func segueToSearch() -> SearchVC { SearchVC() }
+  func segueToSettings() -> SettingsHostVC { SettingsHostVC(isForOwnWindow: false) }
+  func segueToDownloads() -> UIViewController { DownloadsVC() }
+  func segueToRadios() -> UIViewController { RadiosVC() }
+  func segueToSongs() -> UIViewController { SongsVC() }
+  func segueToFavoriteSongs() -> UIViewController { let songsVC = SongsVC()
+    songsVC.displayFilter = .favorites
+    return songsVC
+  }
+
+  func segueToPodcasts() -> UIViewController { PodcastsVC() }
+  func segueToPlaylists() -> UIViewController { PlaylistsVC() }
+  func segueToArtists() -> UIViewController { ArtistsVC() }
+  func segueToFavoriteArtists() -> UIViewController { let artistsVC = ArtistsVC()
+    artistsVC.displayFilter = .favorites
+    return artistsVC
+  }
+
+  func segueToMusicFolders() -> UIViewController {
+    MusicFoldersVC()
+  }
+
+  func segueToGenres() -> UIViewController {
+    GenresVC()
+  }
+
+  func segueToGenreDetail(genre: Genre) -> UIViewController {
+    let genreDetailVC = GenreDetailVC()
+    genreDetailVC.genre = genre
+    return genreDetailVC
+  }
+
+  func segueToArtistDetail(artist: Artist, albumToScrollTo: Album? = nil) -> UIViewController {
+    let artistDetailVC = ArtistDetailVC()
+    artistDetailVC.artist = artist
+    artistDetailVC.albumToScrollTo = albumToScrollTo
+    return artistDetailVC
+  }
+
+  func segueToAlbumDetail(album: Album, songToScrollTo: Song? = nil) -> UIViewController {
+    let albumDetailVC = AlbumDetailVC()
+    albumDetailVC.album = album
+    albumDetailVC.songToScrollTo = songToScrollTo
+    return albumDetailVC
+  }
+
+  func segueToIndexes(musicFolder: MusicFolder) -> UIViewController {
+    let indexesVC = IndexesVC()
+    indexesVC.musicFolder = musicFolder
+    return indexesVC
+  }
+
+  func segueToDirectories(directory: Directory) -> UIViewController {
+    let directoriesVC = DirectoriesVC()
+    directoriesVC.directory = directory
+    return directoriesVC
+  }
+
+  func segueToPlaylistDetail(playlist: Playlist) -> UIViewController {
+    let playlistDetailVC = PlaylistDetailVC()
+    playlistDetailVC.playlist = playlist
+    return playlistDetailVC
+  }
+
+  func segueToPodcastDetail(
+    podcast: Podcast,
+    episodeToScrollTo: PodcastEpisode? = nil
+  )
+    -> UIViewController {
+    let podcastDetailVC = PodcastDetailVC()
+    podcastDetailVC.podcast = podcast
+    podcastDetailVC.episodeToScrollTo = episodeToScrollTo
+    return podcastDetailVC
   }
 }
 

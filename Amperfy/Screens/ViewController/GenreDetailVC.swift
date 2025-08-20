@@ -364,28 +364,21 @@ class GenreDetailVC: MultiSourceTableViewController {
         row: indexPath.row,
         section: 0
       ))
-      performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        animated: true
+      )
     case LibraryElement.Album.rawValue:
       let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(
         row: indexPath.row,
         section: 0
       ))
-      performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        animated: true
+      )
     case LibraryElement.Song.rawValue: break
     default: break
-    }
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toArtistDetail.rawValue {
-      let vc = segue.destination as! ArtistDetailVC
-      let artist = sender as? Artist
-      vc.artist = artist
-    }
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
     }
   }
 

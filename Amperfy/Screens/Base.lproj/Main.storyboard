@@ -10,58 +10,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Amperfy-->
-        <scene sceneID="mrX-Zz-Ebp">
-            <objects>
-                <collectionViewController id="Hcv-qR-IhX" customClass="SideBarVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="e1Y-U4-xQV">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="ybH-cr-Au5">
-                            <size key="itemSize" width="128" height="128"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                        </collectionViewFlowLayout>
-                        <cells/>
-                        <variation key="userInterfaceIdiom=mac">
-                            <nil key="backgroundColor"/>
-                        </variation>
-                    </collectionView>
-                    <navigationItem key="navigationItem" title="Amperfy" id="Hqn-0C-F2J"/>
-                </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="D8u-ln-OeP" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2122" y="-1331"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="crl-uR-tK4">
-            <objects>
-                <navigationController id="Im4-0j-icf" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="NeG-lD-bG9">
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ygn-Iq-30O" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1194" y="-593"/>
-        </scene>
-        <!--SplitVC-->
-        <scene sceneID="Vro-PU-fi2">
-            <objects>
-                <splitViewController storyboardIdentifier="SplitVC" allowDoubleColumnStyle="YES" primaryBackgroundStyle="sidebar" id="gSJ-HJ-kXz" customClass="SplitVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="QCo-S0-2E8"/>
-                    <connections>
-                        <segue destination="Odu-0e-SfH" kind="relationship" relationship="compactViewController" id="hjS-Sj-wjB"/>
-                        <segue destination="0kE-xi-dh6" kind="relationship" relationship="masterViewController" id="4ai-j3-sse"/>
-                        <segue destination="Im4-0j-icf" kind="relationship" relationship="detailViewController" id="pCI-0c-KDF"/>
-                    </connections>
-                </splitViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ZUG-Sf-L7w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-29" y="-215"/>
-        </scene>
         <!--LoginVC-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -71,13 +19,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Username" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aKf-Oy-Mn4">
-                                <rect key="frame" x="30" y="278" width="86" height="34"/>
+                                <rect key="frame" x="30" y="328" width="86" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="Hkb-KJ-f3A" userLabel="UsernameTextField">
-                                <rect key="frame" x="120" y="278" width="225" height="34"/>
+                                <rect key="frame" x="120" y="328" width="225" height="34"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="tintColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -90,7 +38,7 @@
                                 </connections>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="vfm-n3-YO9" userLabel="PasswordTextField">
-                                <rect key="frame" x="120" y="320" width="225" height="34"/>
+                                <rect key="frame" x="120" y="370" width="225" height="34"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="tintColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -103,25 +51,25 @@
                                 </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Dr-h8-7rI">
-                                <rect key="frame" x="30" y="320" width="86" height="34"/>
+                                <rect key="frame" x="30" y="370" width="86" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="API" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v9a-mi-SHt" userLabel="Api">
-                                <rect key="frame" x="30" y="366.66666666666669" width="86" height="20.666666666666686"/>
+                                <rect key="frame" x="30" y="416.66666666666669" width="86" height="20.666666666666686"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Server URL" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fDZ-Za-sK8">
-                                <rect key="frame" x="30" y="236" width="86" height="34"/>
+                                <rect key="frame" x="30" y="286" width="86" height="34"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Amperfy" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="23L-Mn-QSO">
-                                <rect key="frame" x="87" y="120" width="201" height="60"/>
+                                <rect key="frame" x="87" y="170" width="201" height="60"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="cu0-Db-zjP"/>
                                 </constraints>
@@ -130,7 +78,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="https://localhost/ampache" adjustsFontSizeToFit="NO" minimumFontSize="17" clearButtonMode="always" translatesAutoresizingMaskIntoConstraints="NO" id="cJB-xi-h6o" userLabel="ServerUrlTextField">
-                                <rect key="frame" x="120" y="236" width="225" height="34"/>
+                                <rect key="frame" x="120" y="286" width="225" height="34"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="tintColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -143,7 +91,7 @@
                                 </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" hasAttributedTitle="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7aA-CY-fi1" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                <rect key="frame" x="147.66666666666666" y="436" width="80" height="30"/>
+                                <rect key="frame" x="147.66666666666666" y="486" width="80" height="30"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="fP5-0V-kT7"/>
@@ -164,7 +112,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="TKD-wA-Xnd" userLabel="ApiSelector" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                <rect key="frame" x="30" y="362" width="315" height="30"/>
+                                <rect key="frame" x="30" y="412" width="315" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="Y5U-L5-OQV"/>
                                 </constraints>
@@ -225,312 +173,11 @@
                         <outlet property="passwordTF" destination="vfm-n3-YO9" id="bfH-Hk-RYo"/>
                         <outlet property="serverUrlTF" destination="cJB-xi-h6o" id="vTq-48-JYD"/>
                         <outlet property="usernameTF" destination="Hkb-KJ-f3A" id="TMh-2q-bUV"/>
-                        <segue destination="n1j-bZ-g7e" kind="presentation" identifier="toSync" modalPresentationStyle="fullScreen" id="TBt-Gf-8Wu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1841" y="-215"/>
-        </scene>
-        <!--Playlists-->
-        <scene sceneID="Zt1-92-WKW">
-            <objects>
-                <tableViewController storyboardIdentifier="PlaylistsVC" title="Playlists" id="1iw-qc-oYh" customClass="PlaylistsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="wvP-mD-HIZ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="1iw-qc-oYh" id="40k-Sj-2Ub"/>
-                            <outlet property="delegate" destination="1iw-qc-oYh" id="ck0-80-i5W"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Playlists" id="isC-Xo-Cv0"/>
-                    <connections>
-                        <segue destination="5fS-Oh-qFf" kind="show" identifier="toPlaylistDetail" id="qYo-eV-9nj"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="4IB-MF-QOi" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3918" y="-2043"/>
-        </scene>
-        <!--Playlist Detail-->
-        <scene sceneID="6un-iS-CaJ">
-            <objects>
-                <tableViewController storyboardIdentifier="PlaylistDetailVC" title="Playlist Detail" id="5fS-Oh-qFf" customClass="PlaylistDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="jkA-6m-ese">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <gestureRecognizers/>
-                        <connections>
-                            <outlet property="dataSource" destination="5fS-Oh-qFf" id="QEc-Gi-T7W"/>
-                            <outlet property="delegate" destination="5fS-Oh-qFf" id="wqZ-kx-w1P"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="vEn-VM-8Ti"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="PnY-qN-50e" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4708" y="-2043"/>
-        </scene>
-        <!--Add to Playlist-->
-        <scene sceneID="m1K-tL-2zP">
-            <objects>
-                <tableViewController storyboardIdentifier="PlaylistSelectorVC" title="Add to Playlist" id="4rB-Ko-4wo" customClass="PlaylistSelectorVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="aAk-vJ-f60">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="4rB-Ko-4wo" id="yq6-D0-Ff1"/>
-                            <outlet property="delegate" destination="4rB-Ko-4wo" id="1sW-W6-7Qp"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Add to Playlist" id="Pg3-E2-61S"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="1s6-dv-ao6" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="7236" y="-1629"/>
-        </scene>
-        <!--Artists-->
-        <scene sceneID="Yf4-Mh-ZX3">
-            <objects>
-                <tableViewController storyboardIdentifier="ArtistsVC" title="Artists" id="ZGw-SA-mia" customClass="ArtistsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="lfA-ZU-K5x">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="ZGw-SA-mia" id="C9G-uA-008"/>
-                            <outlet property="delegate" destination="ZGw-SA-mia" id="kXO-Fx-9mT"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Artists" id="r1Y-hi-fd7"/>
-                    <connections>
-                        <segue destination="CbP-zj-PDn" kind="show" identifier="toArtistDetail" id="PtL-O3-n85"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="8U9-U1-Tcd" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3914" y="-1331"/>
-        </scene>
-        <!--Artist detail-->
-        <scene sceneID="t3a-Jy-hNf">
-            <objects>
-                <tableViewController storyboardIdentifier="ArtistDetailVC" title="Artist detail" id="CbP-zj-PDn" customClass="ArtistDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="91F-6S-6y1">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="762"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="CbP-zj-PDn" id="Hoo-E8-DNP"/>
-                            <outlet property="delegate" destination="CbP-zj-PDn" id="LVK-0w-93d"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="auk-l4-lvE"/>
-                    <connections>
-                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="kw4-13-m0t"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="oMv-HQ-UkV" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4706" y="-1331"/>
-        </scene>
-        <!--Albums-->
-        <scene sceneID="lgQ-R5-DqE">
-            <objects>
-                <tableViewController storyboardIdentifier="AlbumsVC" title="Albums" id="w9f-yb-ooi" customClass="AlbumsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="ili-jA-D28">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="w9f-yb-ooi" id="8L8-Dr-F2F"/>
-                            <outlet property="delegate" destination="w9f-yb-ooi" id="7fk-6A-CFI"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Albums" id="tB5-PS-t7P"/>
-                    <connections>
-                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="sdx-Gn-m0J"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="VJz-wm-vV8" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3919" y="-593"/>
-        </scene>
-        <!--Albums CollectionVC-->
-        <scene sceneID="X1q-02-zDp">
-            <objects>
-                <collectionViewController storyboardIdentifier="AlbumsCollectionVC" id="Cqt-KH-xhP" customClass="AlbumsCollectionVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" dataMode="prototypes" id="dvf-Oo-vEP">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="vSL-sV-K9l">
-                            <size key="itemSize" width="128" height="128"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                        </collectionViewFlowLayout>
-                        <cells/>
-                        <connections>
-                            <outlet property="dataSource" destination="Cqt-KH-xhP" id="yNm-xr-KZA"/>
-                            <outlet property="delegate" destination="Cqt-KH-xhP" id="2YS-BZ-7L5"/>
-                        </connections>
-                    </collectionView>
-                    <connections>
-                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="S1i-QU-0tp"/>
-                    </connections>
-                </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="xX8-9V-U15" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4707" y="-593"/>
-        </scene>
-        <!--Album name-->
-        <scene sceneID="SUf-94-XQH">
-            <objects>
-                <tableViewController storyboardIdentifier="AlbumDetailVC" title="Album name" id="CiG-al-lkI" customClass="AlbumDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="oZh-fj-3uQ">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="CiG-al-lkI" id="nfr-Xp-awV"/>
-                            <outlet property="delegate" destination="CiG-al-lkI" id="hr0-ZU-8lQ"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="i4d-Ey-cJ4"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="DkM-7I-Ffg" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="5546" y="-593"/>
-        </scene>
-        <!--Songs-->
-        <scene sceneID="Ex6-Jn-ywD">
-            <objects>
-                <tableViewController storyboardIdentifier="SongsVC" title="Songs" id="PdJ-u4-MrR" customClass="SongsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Kcs-9P-3Bf">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <gestureRecognizers/>
-                        <connections>
-                            <outlet property="dataSource" destination="PdJ-u4-MrR" id="pBf-dJ-KRv"/>
-                            <outlet property="delegate" destination="PdJ-u4-MrR" id="0lp-vk-w8g"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Songs" id="bi8-mc-CgH"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="8cX-Lc-IQ2" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3918" y="154"/>
-        </scene>
-        <!--Search-->
-        <scene sceneID="2oE-zy-AcU">
-            <objects>
-                <navigationController id="Xme-l1-fiY" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Search" image="magnifyingglass" catalog="system" selectedImage="magnifyingglass" id="6F7-ce-EiN"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="q5a-rn-qe1">
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="xQ3-ra-8Di" kind="relationship" relationship="rootViewController" id="LEO-1x-9RO"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="bqZ-Ad-Rdl" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3918" y="1002"/>
-        </scene>
-        <!--Search-->
-        <scene sceneID="zL3-uO-Cp3">
-            <objects>
-                <tableViewController storyboardIdentifier="SearchVC" id="xQ3-ra-8Di" customClass="SearchVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="TW7-aC-UCo">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="xQ3-ra-8Di" id="JQ4-OD-C4l"/>
-                            <outlet property="delegate" destination="xQ3-ra-8Di" id="xfr-xu-Bpv"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Search" leftItemsSupplementBackButton="YES" largeTitleDisplayMode="always" id="EcY-2V-19G"/>
-                    <connections>
-                        <segue destination="CbP-zj-PDn" kind="show" identifier="toArtistDetail" id="tfW-38-Y3k"/>
-                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="axa-3B-EfE"/>
-                        <segue destination="5fS-Oh-qFf" kind="show" identifier="toPlaylistDetail" id="whh-XI-a5P"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="3tw-4G-Oye" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3918" y="1764"/>
-        </scene>
-        <!--Tab BarVC-->
-        <scene sceneID="nnu-C8-zem">
-            <objects>
-                <tabBarController storyboardIdentifier="TabBarVC" id="Odu-0e-SfH" customClass="TabBarVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="yqn-9v-6Hw">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </tabBar>
-                    <connections>
-                        <segue destination="hgg-wk-1fD" kind="relationship" relationship="viewControllers" id="efZ-e2-QYR"/>
-                        <segue destination="Xme-l1-fiY" kind="relationship" relationship="viewControllers" id="lHO-db-1UC"/>
-                        <segue destination="hqa-F9-lNZ" kind="relationship" relationship="viewControllers" id="nvq-VK-YKi"/>
-                    </connections>
-                </tabBarController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="jPK-lo-A9E" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1200" y="155"/>
-        </scene>
-        <!--Library-->
-        <scene sceneID="04c-tK-1Hj">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="hgg-wk-1fD" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Library" image="music.note.house" catalog="system" selectedImage="music.note.house" id="wHf-aA-izU"/>
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="VnR-3z-lih">
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textAttributes key="largeTitleTextAttributes">
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="30"/>
-                        </textAttributes>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="Rsr-FU-pgx" kind="relationship" relationship="rootViewController" id="aCv-Ro-CBS"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ANa-aq-bwU" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2123" y="155"/>
-        </scene>
-        <!--Library-->
-        <scene sceneID="6Ir-Gm-Emb">
-            <objects>
-                <collectionViewController storyboardIdentifier="LibraryVC" id="Rsr-FU-pgx" customClass="LibraryVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="dye-y7-xj0">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Uwm-IA-oOc">
-                            <size key="itemSize" width="128" height="128"/>
-                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                        </collectionViewFlowLayout>
-                        <cells/>
-                        <connections>
-                            <outlet property="dataSource" destination="Rsr-FU-pgx" id="fjD-HA-oHY"/>
-                            <outlet property="delegate" destination="Rsr-FU-pgx" id="fZU-l2-vBe"/>
-                        </connections>
-                    </collectionView>
-                    <navigationItem key="navigationItem" title="Library" largeTitleDisplayMode="always" id="XAe-Yp-u2h"/>
-                </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="VLy-uR-yTs" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2974" y="155"/>
         </scene>
         <!--Library Sync PopupVC-->
         <scene sceneID="eYN-tJ-QKO">
@@ -679,7 +326,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cuw-Xt-sld" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3031.884057971015" y="-1896.4285714285713"/>
+            <point key="canvasLocation" x="-1842" y="-904"/>
         </scene>
         <!--SyncVC-->
         <scene sceneID="2mS-PW-dbY">
@@ -690,7 +337,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Syncing" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8Hu-Ks-SWY">
-                                <rect key="frame" x="157" y="105" width="61" height="21"/>
+                                <rect key="frame" x="157" y="205" width="61" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="uSi-BX-2HO"/>
                                 </constraints>
@@ -699,10 +346,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="npf-bB-pkf">
-                                <rect key="frame" x="25" y="214" width="325" height="4"/>
+                                <rect key="frame" x="25" y="314" width="325" height="4"/>
                             </progressView>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100.0%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KKh-tQ-byV">
-                                <rect key="frame" x="290" y="226" width="60" height="21"/>
+                                <rect key="frame" x="290" y="326" width="60" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="hbQ-OO-Ail"/>
                                 </constraints>
@@ -711,16 +358,16 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qe5-xR-nU8">
-                                <rect key="frame" x="25" y="226" width="29" height="21"/>
+                                <rect key="frame" x="25" y="326" width="29" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="3en-Wv-ZMc">
-                                <rect key="frame" x="330" y="226" width="20" height="20"/>
+                                <rect key="frame" x="330" y="326" width="20" height="20"/>
                             </activityIndicatorView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="stS-Nk-8XD" customClass="BasicButton" customModule="Amperfy" customModuleProvider="target">
-                                <rect key="frame" x="270" y="282" width="80" height="30"/>
+                                <rect key="frame" x="270" y="382" width="80" height="30"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="Iha-4v-U1b"/>
@@ -764,241 +411,11 @@
                         <outlet property="progressInfo" destination="qe5-xR-nU8" id="9mn-5u-yc5"/>
                         <outlet property="progressLabel" destination="KKh-tQ-byV" id="Wib-rh-Gpj"/>
                         <outlet property="skipButton" destination="stS-Nk-8XD" id="Y0I-Yo-dJ3"/>
-                        <segue destination="gSJ-HJ-kXz" kind="presentation" identifier="toLibrary" modalPresentationStyle="fullScreen" id="iFD-hc-3S7"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M3f-FL-42B" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-958" y="-215"/>
-        </scene>
-        <!--Downloads-->
-        <scene sceneID="6gv-xD-OeS">
-            <objects>
-                <tableViewController storyboardIdentifier="DownloadsVC" title="Downloads" id="0yB-ih-px5" userLabel="Downloads" customClass="DownloadsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="55" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="BWe-SW-JDn">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <gestureRecognizers/>
-                        <connections>
-                            <outlet property="dataSource" destination="0yB-ih-px5" id="UIM-kn-gSt"/>
-                            <outlet property="delegate" destination="0yB-ih-px5" id="Th4-qL-CJ1"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Downloads" id="hg7-nw-O6v"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="UUy-Fi-V0W" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2974" y="-593"/>
-        </scene>
-        <!--Hosting Controller-->
-        <scene sceneID="RDX-hx-hJ1">
-            <objects>
-                <hostingController id="Wdk-bS-aW2" sceneMemberID="viewController"/>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="vPy-c7-xns" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1197" y="1735"/>
-        </scene>
-        <!--Settings-->
-        <scene sceneID="JOx-4q-Kjd">
-            <objects>
-                <viewController storyboardIdentifier="SettingsHostVC" id="hqa-F9-lNZ" customClass="SettingsHostVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="hwu-20-I2H">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bcG-FU-Xh9">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                                <connections>
-                                    <segue destination="Wdk-bS-aW2" kind="embed" destinationCreationSelector="segueToSwiftUI:" id="rgx-91-t0t"/>
-                                </connections>
-                            </containerView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="i9f-wO-MGH"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstItem="bcG-FU-Xh9" firstAttribute="leading" secondItem="hwu-20-I2H" secondAttribute="leading" id="Feh-dt-yoo"/>
-                            <constraint firstAttribute="bottom" secondItem="bcG-FU-Xh9" secondAttribute="bottom" id="I7Z-vX-NPk"/>
-                            <constraint firstAttribute="trailing" secondItem="bcG-FU-Xh9" secondAttribute="trailing" id="gwe-Pw-LmG"/>
-                            <constraint firstItem="bcG-FU-Xh9" firstAttribute="top" secondItem="hwu-20-I2H" secondAttribute="top" id="hpc-ft-5Pw"/>
-                        </constraints>
-                    </view>
-                    <tabBarItem key="tabBarItem" title="Settings" image="gear" catalog="system" selectedImage="gear" id="mhi-Cu-jvN"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="3VL-ED-PZd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1199" y="1002"/>
-        </scene>
-        <!--Genres-->
-        <scene sceneID="Fhr-H0-ODs">
-            <objects>
-                <tableViewController storyboardIdentifier="GenresVC" title="Genres" id="aeq-6R-iJo" userLabel="Genres" customClass="GenresVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="f5t-tw-JHM">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="aeq-6R-iJo" id="N8m-gB-907"/>
-                            <outlet property="delegate" destination="aeq-6R-iJo" id="lHQ-lB-9IY"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Genres" id="QuU-c2-iBn"/>
-                    <connections>
-                        <segue destination="noZ-Ok-RcV" kind="show" identifier="toGenreDetail" id="gUH-lh-jqe"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Mcu-qH-iI4" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3919" y="-2759"/>
-        </scene>
-        <!--Genre detail-->
-        <scene sceneID="6j6-t5-Nu9">
-            <objects>
-                <tableViewController storyboardIdentifier="GenreDetailVC" title="Artist detail" id="noZ-Ok-RcV" userLabel="Genre detail" customClass="GenreDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="znq-mO-hXT">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="762"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="noZ-Ok-RcV" id="0AE-h7-e5m"/>
-                            <outlet property="delegate" destination="noZ-Ok-RcV" id="k26-kg-NsH"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="oXg-qq-3Fh"/>
-                    <connections>
-                        <segue destination="CbP-zj-PDn" kind="show" identifier="toArtistDetail" id="JPy-r0-4uB"/>
-                        <segue destination="CiG-al-lkI" kind="show" identifier="toAlbumDetail" id="qeK-6j-t1f"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ygN-Uz-8ds" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4707" y="-2760"/>
-        </scene>
-        <!--MusicFolders-->
-        <scene sceneID="Nu1-Pv-7Tn">
-            <objects>
-                <tableViewController storyboardIdentifier="MusicFoldersVC" title="MusicFolders" id="abK-SC-K8I" customClass="MusicFoldersVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="wfa-EF-89p">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="abK-SC-K8I" id="Azc-HI-q4M"/>
-                            <outlet property="delegate" destination="abK-SC-K8I" id="GW2-IT-FJg"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Directories" id="A7d-XO-g1o"/>
-                    <connections>
-                        <segue destination="3rD-M7-zZU" kind="show" identifier="toDirectories" id="HRD-UY-JYR"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="R4P-LD-An9" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3917" y="-3457"/>
-        </scene>
-        <!--Indexes-->
-        <scene sceneID="wPw-bg-Wav">
-            <objects>
-                <tableViewController title="Indexes" id="3rD-M7-zZU" customClass="IndexesVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="HeN-MG-BHK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="762"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="3rD-M7-zZU" id="Llw-MC-3HW"/>
-                            <outlet property="delegate" destination="3rD-M7-zZU" id="AVT-0x-B5M"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="SxZ-sE-KZU"/>
-                    <connections>
-                        <segue destination="GWk-0G-KgA" kind="show" identifier="toDirectories" id="Kcj-EG-M7l"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="4MO-47-dsh" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4706" y="-3457"/>
-        </scene>
-        <!--Directories-->
-        <scene sceneID="S96-fV-us6">
-            <objects>
-                <tableViewController storyboardIdentifier="DirectoriesVC" title="Directories" id="GWk-0G-KgA" customClass="DirectoriesVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="RUT-m8-Qq3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="752"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="GWk-0G-KgA" id="ZFV-XP-P6M"/>
-                            <outlet property="delegate" destination="GWk-0G-KgA" id="6ai-4u-qeN"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="gPs-tn-79W"/>
-                    <connections>
-                        <outlet property="view" destination="RUT-m8-Qq3" id="U4D-MI-pme"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="crg-bg-zfE" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="5545" y="-3457"/>
-        </scene>
-        <!--Podcasts-->
-        <scene sceneID="KeG-0i-7dF">
-            <objects>
-                <tableViewController storyboardIdentifier="PodcastsVC" title="Podcasts" id="cJ5-gG-DGL" customClass="PodcastsVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="4lq-IF-nZ5">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="cJ5-gG-DGL" id="1X5-A0-kV6"/>
-                            <outlet property="delegate" destination="cJ5-gG-DGL" id="bO5-kY-vrL"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Podcasts" id="wQx-tb-pKB"/>
-                    <connections>
-                        <segue destination="Bk4-m4-eoF" kind="show" identifier="toPodcastDetail" id="6wn-49-BiQ"/>
-                    </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="9rl-ng-7ml" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3916" y="-4156"/>
-        </scene>
-        <!--Podcast DetailVC-->
-        <scene sceneID="HRZ-fW-Nwj">
-            <objects>
-                <tableViewController storyboardIdentifier="PodcastDetailVC" id="Bk4-m4-eoF" customClass="PodcastDetailVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="PWZ-ta-hZB">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="Bk4-m4-eoF" id="blK-ds-ZAB"/>
-                            <outlet property="delegate" destination="Bk4-m4-eoF" id="cN7-78-Tpl"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="eIT-eD-hUu"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="7Oj-YV-6cf" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4706" y="-4156"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="wYa-w2-eIy">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="0kE-xi-dh6" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="j6n-0F-S2J">
-                        <rect key="frame" x="0.0" y="50" width="375" height="106"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" systemColor="secondarySystemBackgroundColor"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="Hcv-qR-IhX" kind="relationship" relationship="rootViewController" id="wHC-2c-8Jg"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="gVg-z5-aHh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1192.753623188406" y="-1331.25"/>
         </scene>
         <!--UpdateVC-->
         <scene sceneID="kZi-gb-Ied">
@@ -1009,7 +426,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Updating" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jrv-NL-BF0">
-                                <rect key="frame" x="152.66666666666666" y="155" width="70" height="21"/>
+                                <rect key="frame" x="152.66666666666666" y="205" width="70" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="j91-Tv-cP7"/>
                                 </constraints>
@@ -1018,10 +435,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Iq-Ky-1CL">
-                                <rect key="frame" x="25" y="264" width="325" height="4"/>
+                                <rect key="frame" x="25" y="314" width="325" height="4"/>
                             </progressView>
                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100.0%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CPF-gs-YSl">
-                                <rect key="frame" x="290" y="276" width="60" height="21"/>
+                                <rect key="frame" x="290" y="326" width="60" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="PR0-jM-5uS"/>
                                 </constraints>
@@ -1030,13 +447,13 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Info" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SfK-rI-5Rb">
-                                <rect key="frame" x="25" y="276" width="29" height="21"/>
+                                <rect key="frame" x="25" y="326" width="29" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="CnR-bF-BSK">
-                                <rect key="frame" x="330" y="276" width="20" height="20"/>
+                                <rect key="frame" x="330" y="326" width="20" height="20"/>
                             </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="nnI-kd-OaY"/>
@@ -1061,53 +478,21 @@
                         <outlet property="progressBar" destination="3Iq-Ky-1CL" id="W2l-96-FSi"/>
                         <outlet property="progressInfo" destination="SfK-rI-5Rb" id="wDT-oP-TFc"/>
                         <outlet property="progressLabel" destination="CPF-gs-YSl" id="XeY-0n-87Q"/>
-                        <segue destination="gSJ-HJ-kXz" kind="presentation" identifier="toLibrary" modalPresentationStyle="fullScreen" id="rbW-cq-AGx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5UM-fe-Qqf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-959" y="-903"/>
         </scene>
-        <!--Edit Playlist-->
-        <scene sceneID="Xd1-RN-KRY">
-            <objects>
-                <tableViewController storyboardIdentifier="PlaylistEditVC" title="Edit Playlist" id="BdK-66-Any" customClass="PlaylistEditVC" customModule="Amperfy" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="y8Q-Ot-b43">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <connections>
-                            <outlet property="dataSource" destination="BdK-66-Any" id="tTi-mc-IPn"/>
-                            <outlet property="delegate" destination="BdK-66-Any" id="Akx-9i-6xO"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Edit Playlist" id="AWi-ps-2NG"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="PCw-f5-zd8" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="7236" y="-2429"/>
-        </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="kw4-13-m0t"/>
-        <segue reference="PtL-O3-n85"/>
-        <segue reference="whh-XI-a5P"/>
-        <segue reference="iFD-hc-3S7"/>
-    </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.trianglehead.2.clockwise.rotate.90" catalog="system" width="128" height="117"/>
         <image name="arrowtriangle.down.fill" catalog="system" width="128" height="120"/>
-        <image name="gear" catalog="system" width="128" height="122"/>
-        <image name="magnifyingglass" catalog="system" width="128" height="117"/>
-        <image name="music.note.house" catalog="system" width="128" height="104"/>
         <namedColor name="PopupRootOverlayColor">
             <color red="0.36000001430511475" green="0.36000001430511475" blue="0.36000001430511475" alpha="0.80299997329711914" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="secondarySystemBackgroundColor">
-            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

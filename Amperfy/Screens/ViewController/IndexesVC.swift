@@ -71,15 +71,10 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
-    performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: directory)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toDirectories.rawValue {
-      let vc = segue.destination as! DirectoriesVC
-      let directory = sender as! Directory
-      vc.directory = directory
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToDirectories(directory: directory),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {

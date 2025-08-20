@@ -263,15 +263,10 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let artist = artistAt(indexPath: indexPath) else { return }
-    performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toArtistDetail.rawValue {
-      let vc = segue.destination as! ArtistDetailVC
-      let artist = sender as? Artist
-      vc.artist = artist
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToArtistDetail(artist: artist),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {

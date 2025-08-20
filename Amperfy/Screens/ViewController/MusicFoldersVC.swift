@@ -69,15 +69,10 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
-    performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: musicFolder)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toDirectories.rawValue {
-      let vc = segue.destination as! IndexesVC
-      let musicFolder = sender as? MusicFolder
-      vc.musicFolder = musicFolder
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToIndexes(musicFolder: musicFolder),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {

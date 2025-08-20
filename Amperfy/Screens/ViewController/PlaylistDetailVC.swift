@@ -237,8 +237,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
   @objc
   private func openEditView(sender: UIBarButtonItem) {
-    let playlistDetailVC = PlaylistEditVC.instantiateFromAppStoryboard()
-    playlistDetailVC.playlist = playlist
+    let playlistDetailVC = AppStoryboard.Main.segueToPlaylistEdit(playlist: playlist)
     let playlistDetailNav = UINavigationController(rootViewController: playlistDetailVC)
     playlistDetailVC.onDoneCB = {
       self.detailOperationsView?.refresh()

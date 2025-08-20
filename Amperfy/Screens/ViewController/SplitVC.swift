@@ -40,7 +40,10 @@ class SplitVC: UISplitViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    setViewController(embeddInNavigation(vc: AppStoryboard.Main.segueToSideBar()), for: .primary)
     setViewController(defaultSecondaryVC, for: .secondary)
+    primaryEdge = .leading
+    primaryBackgroundStyle = .sidebar
 
     if appDelegate.storage.settings.isOfflineMode {
       appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
@@ -165,7 +168,7 @@ extension SplitVC: MainSceneHostingViewController {
 
   func displaySearch() {
     visualizePopupPlayer(direction: .close, animated: true) {
-      let searchVC = SearchVC.instantiateFromAppStoryboard()
+      let searchVC = AppStoryboard.Main.segueToSearch()
       self.setViewController(self.embeddInNavigation(vc: searchVC), for: .secondary)
       Task {
         try await Task.sleep(nanoseconds: 500_000_000)

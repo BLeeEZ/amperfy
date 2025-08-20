@@ -220,15 +220,10 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let playlist = playlistAt(indexPath: indexPath) else { return }
-    performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toPlaylistDetail.rawValue {
-      let vc = segue.destination as! PlaylistDetailVC
-      let playlist = sender as? Playlist
-      vc.playlist = playlist
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+      animated: true
+    )
   }
 
   private func createSortButtonMenu() -> UIMenu {

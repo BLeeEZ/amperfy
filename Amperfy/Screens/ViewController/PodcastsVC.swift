@@ -186,17 +186,12 @@ class PodcastsVC: MultiSourceTableViewController {
     switch showType {
     case .podcasts:
       let podcast = podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
-      performSegue(withIdentifier: Segues.toPodcastDetail.rawValue, sender: podcast)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
+        animated: true
+      )
     case .episodesSortedByReleaseDate:
       break
-    }
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toPodcastDetail.rawValue {
-      let vc = segue.destination as! PodcastDetailVC
-      let podcast = sender as? Podcast
-      vc.podcast = podcast
     }
   }
 

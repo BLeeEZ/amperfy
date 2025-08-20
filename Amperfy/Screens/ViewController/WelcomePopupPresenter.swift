@@ -32,7 +32,7 @@ class WelcomePopupPresenter: NSObject {
   }
 
   private func displaySyncInfo() {
-    let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+    let popupVC = AppStoryboard.Main.segueToLibrarySyncPopup()
     popupVC.setContent(
       topic: "Synchronization",
       detailMessage: "Your music collection is constantly updating. Already synced library items are offline available. If library items (artists/albums/songs) are not shown in your collection please use the various search functionalities to synchronize with the server.",
@@ -51,7 +51,7 @@ class WelcomePopupPresenter: NSObject {
       let hasAuthorizationNotBeenAskedYet = await self.appDelegate.localNotificationManager
         .hasAuthorizationNotBeenAskedYet()
       guard hasAuthorizationNotBeenAskedYet else { return }
-      let popupVC = LibrarySyncPopupVC.instantiateFromAppStoryboard()
+      let popupVC = AppStoryboard.Main.segueToLibrarySyncPopup()
       popupVC.setContent(
         topic: "Notifications",
         detailMessage: "Amperfy can inform you about the latest podcast episodes. If you want to, please authorize Amperfy to send you notifications.",

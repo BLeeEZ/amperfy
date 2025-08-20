@@ -244,17 +244,14 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
   func displayArtistDetail() {
     if let song = player.currentlyPlaying?.asSong, let artist = song.artist {
-      let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-      artistDetailVC.artist = artist
+      let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(artist: artist)
       closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
     }
   }
 
   func displayAlbumDetail() {
     if let song = player.currentlyPlaying?.asSong, let album = song.album {
-      let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
-      albumDetailVC.album = album
-      albumDetailVC.songToScrollTo = song
+      let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(album: album, songToScrollTo: song)
       closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
     }
   }
@@ -262,9 +259,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   func displayPodcastDetail() {
     if let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode,
        let podcast = podcastEpisode.podcast {
-      let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-      podcastDetailVC.podcast = podcast
-      podcastDetailVC.episodeToScrollTo = podcastEpisode
+      let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(
+        podcast: podcast,
+        episodeToScrollTo: podcastEpisode
+      )
       closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
     }
   }
