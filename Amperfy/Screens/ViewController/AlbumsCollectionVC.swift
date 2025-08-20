@@ -299,7 +299,10 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     guard let albumsDataSource = albumsDataSource,
           let album = albumsDataSource.getAlbum(at: indexPath)
     else { return }
-    performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToAlbumDetail(album: album),
+      animated: true
+    )
   }
 
   override func collectionView(
@@ -308,14 +311,6 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     forItemAt indexPath: IndexPath
   ) {
     common.listViewWillDisplayCell(at: indexPath, searchBarText: searchController.searchBar.text)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
-    }
   }
 
   override func indexTitles(for collectionView: UICollectionView) -> [String]? {

@@ -664,8 +664,8 @@ class MiniPlayerView: UIView {
   private func miniPlayerGotTouched(_ recognizer: UITapGestureRecognizer) {
     openPlayerView()
   }
-  
-  public func openPlayerView(completion: (() -> Void)? = nil) {
+
+  public func openPlayerView(completion: (() -> ())? = nil) {
     guard let hostVC = AppDelegate.mainWindowHostVC as? UIViewController else { return }
     let popupPlayer = PopupPlayerVC()
     popupPlayer.modalPresentationStyle = .pageSheet

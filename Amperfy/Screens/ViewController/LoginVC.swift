@@ -99,7 +99,9 @@ class LoginVC: UIViewController {
         credentials.backendApi = authenticatedApiType
         self.appDelegate.storage.loginCredentials = credentials
         self.appDelegate.backendApi.provideCredentials(credentials: credentials)
-        self.performSegue(withIdentifier: "toSync", sender: self)
+
+        guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
+        mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToSync())
       } catch {
         if error is AuthenticationError {
           self.showErrorMsg(message: error.localizedDescription)

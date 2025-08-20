@@ -61,24 +61,11 @@ extension AppDelegate {
     return base
   }
 
-  static func createMainWindowTopViewController() -> UIViewController {
-    #if targetEnvironment(macCatalyst) // ok
-      SplitVC.instantiateFromAppStoryboard()
-    #else
-      TabBarVC()
-    #endif
-  }
-
   static var mainWindowHostVC: MainSceneHostingViewController? {
     guard let topView = Self.topViewController(),
           (UIApplication.shared.delegate as! AppDelegate).storage.isLibrarySynced
     else { return nil }
-
-    #if targetEnvironment(macCatalyst) // ok
-      return topView as? SplitVC
-    #else
-      return topView as? TabBarVC
-    #endif
+    return AppStoryboard.Main.checkForMainWindow(vc: topView)
   }
 }
 

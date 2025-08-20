@@ -93,9 +93,8 @@ class SyncVC: UIViewController {
     appDelegate.isKeepScreenAlive = false
     appDelegate.eventLogger.supressAlerts = false
 
-    let newVC = AppDelegate.createMainWindowTopViewController()
-    newVC.modalPresentationStyle = .fullScreen
-    present(newVC, animated: true, completion: nil)
+    guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
+    mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow())
   }
 
   private func updateSyncInfo(infoText: String? = nil, percentParsed: Float = 0.0) {

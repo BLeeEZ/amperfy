@@ -84,8 +84,8 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
   @MainActor
   var controller: UIViewController {
     switch self {
-    case .search: return SearchVC.instantiateFromAppStoryboard()
-    case .settings: return SettingsHostVC.instantiateFromAppStoryboard()
+    case .search: return AppStoryboard.Main.segueToSearch()
+    case .settings: return AppStoryboard.Main.segueToSettings()
     }
   }
 }
@@ -157,6 +157,7 @@ class LibraryNavigatorConfigurator: NSObject {
       title: $0.displayName,
       library: $0
     ) }
+    self.collectionView.allowsSelectionDuringEditing = true
     self.collectionView.delegate = self
     self.collectionView.collectionViewLayout = createLayout() // 1 Configure the layout
     configureDataSource() // 2 configure the data Source

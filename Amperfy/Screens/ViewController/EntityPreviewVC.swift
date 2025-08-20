@@ -177,41 +177,35 @@ class EntityPreviewActionBuilder {
         showArtist()
       }
     } else if let album = entityContainer as? Album {
-      let detailVC = AlbumDetailVC.instantiateFromAppStoryboard()
-      detailVC.album = album
-      if let navController = rootView.navigationController {
-        navController.pushViewController(detailVC, animated: true)
-      }
+      rootView.navigationController?.pushViewController(
+        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        animated: true
+      )
     } else if let artist = entityContainer as? Artist {
-      let detailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-      detailVC.artist = artist
-      if let navController = rootView.navigationController {
-        navController.pushViewController(detailVC, animated: true)
-      }
+      rootView.navigationController?.pushViewController(
+        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        animated: true
+      )
     } else if let genre = entityContainer as? Genre {
-      let detailVC = GenreDetailVC.instantiateFromAppStoryboard()
-      detailVC.genre = genre
-      if let navController = rootView.navigationController {
-        navController.pushViewController(detailVC, animated: true)
-      }
+      rootView.navigationController?.pushViewController(
+        AppStoryboard.Main.segueToGenreDetail(genre: genre),
+        animated: true
+      )
     } else if let playlist = entityContainer as? Playlist {
-      let detailVC = PlaylistDetailVC.instantiateFromAppStoryboard()
-      detailVC.playlist = playlist
-      if let navController = rootView.navigationController {
-        navController.pushViewController(detailVC, animated: true)
-      }
+      rootView.navigationController?.pushViewController(
+        AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+        animated: true
+      )
     } else if let podcast = entityContainer as? Podcast {
-      let detailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-      detailVC.podcast = podcast
-      if let navController = rootView.navigationController {
-        navController.pushViewController(detailVC, animated: true)
-      }
+      rootView.navigationController?.pushViewController(
+        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
+        animated: true
+      )
     } else if let directory = entityContainer as? Directory {
-      let detailVC = DirectoriesVC.instantiateFromAppStoryboard()
-      detailVC.directory = directory
-      if let navController = rootView.navigationController {
-        navController.pushViewController(detailVC, animated: true)
-      }
+      rootView.navigationController?.pushViewController(
+        AppStoryboard.Main.segueToDirectories(directory: directory),
+        animated: true
+      )
     }
   }
 
@@ -573,8 +567,8 @@ class EntityPreviewActionBuilder {
   private func createAddToPlaylistAction() -> UIAction {
     UIAction(title: "Add to Playlist", image: .playlistPlus) { action in
       guard !self.entityPlayables.isEmpty else { return }
-      let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-      selectPlaylistVC.itemsToAdd = self.entityPlayables.filterSongs()
+      let selectPlaylistVC = AppStoryboard.Main
+        .segueToPlaylistSelector(itemsToAdd: self.entityPlayables.filterSongs())
       let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
       self.rootView.present(selectPlaylistNav, animated: true)
     }
@@ -591,9 +585,10 @@ class EntityPreviewActionBuilder {
     let album = playable?.asSong?.album
     guard let album = album else { return }
     appDelegate.userStatistics.usedAction(.alertGoToAlbum)
-    let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
-    albumDetailVC.album = album
-    albumDetailVC.songToScrollTo = playable?.asSong
+    let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(
+      album: album,
+      songToScrollTo: playable?.asSong
+    )
     if let popupPlayer = rootView as? PopupPlayerVC {
       popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
     } else if let navController = rootView.navigationController {
@@ -619,9 +614,10 @@ class EntityPreviewActionBuilder {
     let album = entityContainer as? Album
     if let artist = playable?.asSong?.artist ?? album?.artist {
       appDelegate.userStatistics.usedAction(.alertGoToArtist)
-      let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-      artistDetailVC.artist = artist
-      artistDetailVC.albumToScrollTo = album
+      let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(
+        artist: artist,
+        albumToScrollTo: album
+      )
       if let popupPlayer = rootView as? PopupPlayerVC {
         popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
       } else if let navController = rootView.navigationController {
@@ -632,9 +628,10 @@ class EntityPreviewActionBuilder {
       }
     } else if let podcast = playable?.asPodcastEpisode?.podcast {
       appDelegate.userStatistics.usedAction(.alertGoToPodcast)
-      let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-      podcastDetailVC.podcast = podcast
-      podcastDetailVC.episodeToScrollTo = playable?.asPodcastEpisode
+      let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(
+        podcast: podcast,
+        episodeToScrollTo: playable?.asPodcastEpisode
+      )
       if let popupPlayer = rootView as? PopupPlayerVC {
         popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
       } else if let navController = rootView.navigationController {

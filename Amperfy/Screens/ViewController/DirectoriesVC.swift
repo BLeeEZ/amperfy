@@ -294,9 +294,10 @@ class DirectoriesVC: MultiSourceTableViewController {
       row: indexPath.row,
       section: 0
     ))
-    let directoriesVC = DirectoriesVC.instantiateFromAppStoryboard()
-    directoriesVC.directory = selectedDirectory
-    navController.pushViewController(directoriesVC, animated: true)
+    navController.pushViewController(
+      AppStoryboard.Main.segueToDirectories(directory: selectedDirectory),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {

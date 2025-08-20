@@ -320,17 +320,12 @@ class ArtistDetailVC: MultiSourceTableViewController {
         row: indexPath.row,
         section: 0
       ))
-      performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        animated: true
+      )
     case LibraryElement.Song.rawValue: break
     default: break
-    }
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
     }
   }
 

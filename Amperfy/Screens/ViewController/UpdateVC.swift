@@ -65,9 +65,8 @@ class UpdateVC: UIViewController {
       self.appDelegate.eventLogger.supressAlerts = false
       self.appDelegate.startManagerForNormalOperation()
 
-      let newVC = AppDelegate.createMainWindowTopViewController()
-      newVC.modalPresentationStyle = .fullScreen
-      present(newVC, animated: true, completion: nil)
+      guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
+      mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow())
     }
   }
 

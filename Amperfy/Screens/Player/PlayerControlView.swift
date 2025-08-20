@@ -329,14 +329,14 @@ class PlayerControlView: UIView {
           title: "Add Context Queue to Playlist",
           image: .playlistPlus,
           handler: { _ in
-            let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
             var itemsToAdd = self.player.getAllPrevQueueItems().filterSongs()
             if let currentlyPlaying = self.player.currentlyPlaying,
                let currentSong = currentlyPlaying.asSong {
               itemsToAdd.append(currentSong)
             }
             itemsToAdd.append(contentsOf: self.player.getAllNextQueueItems().filterSongs())
-            selectPlaylistVC.itemsToAdd = itemsToAdd
+            let selectPlaylistVC = AppStoryboard.Main
+              .segueToPlaylistSelector(itemsToAdd: itemsToAdd)
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             self.rootView?.present(selectPlaylistNav, animated: true, completion: nil)
           }

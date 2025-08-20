@@ -26,6 +26,11 @@ import UIKit
 class KeyCommandCollectionViewController: UICollectionViewController {
   lazy var collectionViewKeyCommandsController =
     CollectionViewKeyCommandsController(collectionView: collectionView)
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    setNavBarTitle(title: sceneTitle ?? "")
+  }
 }
 
 // MARK: - CollectionViewKeyCommandsController

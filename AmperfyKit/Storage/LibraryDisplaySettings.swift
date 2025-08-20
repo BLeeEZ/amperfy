@@ -115,39 +115,6 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
       return UIImage.radio
     }
   }
-
-  public var segueName: String {
-    switch self {
-    case .artists:
-      return "toArtists"
-    case .albums:
-      return "toAlbums"
-    case .songs:
-      return "toSongs"
-    case .genres:
-      return "toGenres"
-    case .directories:
-      return "toDirectories"
-    case .playlists:
-      return "toPlaylists"
-    case .podcasts:
-      return "toPodcasts"
-    case .downloads:
-      return "toDownloads"
-    case .favoriteSongs:
-      return "toSongs"
-    case .favoriteAlbums:
-      return "toAlbums"
-    case .favoriteArtists:
-      return "toArtists"
-    case .newestAlbums:
-      return "toAlbums"
-    case .recentAlbums:
-      return "toAlbums"
-    case .radios:
-      return "toRadios"
-    }
-  }
 }
 
 // MARK: - LibraryDisplaySettings

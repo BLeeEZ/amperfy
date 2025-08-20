@@ -145,9 +145,10 @@ extension AppDelegate {
     let playable = player.currentlyPlaying
     guard let album = playable?.asSong?.album else { return }
     appDelegate.userStatistics.usedAction(.alertGoToAlbum)
-    let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
-    albumDetailVC.album = album
-    albumDetailVC.songToScrollTo = playable?.asSong
+    let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(
+      album: album,
+      songToScrollTo: playable?.asSong
+    )
     displayInLibraryTab(vc: albumDetailVC)
   }
 

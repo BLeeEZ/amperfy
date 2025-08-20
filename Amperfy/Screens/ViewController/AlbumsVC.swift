@@ -123,6 +123,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   }
 
   private var common = AlbumsCommonVCInteractions()
+  private var detailHeader: LibraryElementDetailTableHeaderView?
 
   public var displayFilter: DisplayCategoryFilter {
     set { common.displayFilter = newValue }
@@ -186,7 +187,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     tableView.rowHeight = GenericTableCell.rowHeight
     tableView.estimatedRowHeight = GenericTableCell.rowHeight
 
-    _ = LibraryElementDetailTableHeaderView.createTableHeader(
+    detailHeader = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,
       configuration: common.createPlayShuffleInfoConfig()
     )
@@ -226,6 +227,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
+    detailHeader?.refresh()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
   }
@@ -267,19 +269,15 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath)
     else { return }
-    performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToAlbumDetail(album: album),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
     common.updateSearchResults(for: self.searchController)
     tableView.reloadData()
+    detailHeader?.refresh()
   }
 }

@@ -37,14 +37,26 @@ class SettingsHostVC: UIViewController {
 
   init(isForOwnWindow: Bool) {
     super.init(nibName: nil, bundle: nil)
-    self.isForOwnWindow = true
 
-    let hostingVC = UIHostingController(
-      rootView: AnyView(
+    self.isForOwnWindow = isForOwnWindow
+
+    var settingsRootView: AnyView? = nil
+    if isForOwnWindow {
+      settingsRootView = AnyView(
         SettingsTabView()
           .environmentObject(settings)
           .environment(\.managedObjectContext, appDelegate.storage.main.context)
       )
+    } else {
+      settingsRootView = AnyView(
+        SettingsView()
+          .environmentObject(settings)
+          .environment(\.managedObjectContext, appDelegate.storage.main.context)
+      )
+    }
+
+    let hostingVC = UIHostingController(
+      rootView: settingsRootView
     )
     view.backgroundColor = .clear
     hostingVC.view.frame = view.bounds

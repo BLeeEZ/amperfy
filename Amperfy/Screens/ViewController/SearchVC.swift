@@ -427,39 +427,30 @@ class SearchVC: BasicTableViewController {
     case .Playlist:
       let playlist = playlists[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: playlist)
-      performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+        animated: true
+      )
     case .Artist:
       let artist = artists[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: artist)
-      performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        animated: true
+      )
     case .Album:
       let album = albums[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: album)
-      performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        animated: true
+      )
     case .Song:
       let song = songs[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: song)
     case .none: break
     }
     appDelegate.storage.main.library.saveContext()
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    switch segue.identifier {
-    case Segues.toPlaylistDetail.rawValue:
-      let vc = segue.destination as! PlaylistDetailVC
-      let playlist = sender as? Playlist
-      vc.playlist = playlist
-    case Segues.toArtistDetail.rawValue:
-      let vc = segue.destination as! ArtistDetailVC
-      let artist = sender as? Artist
-      vc.artist = artist
-    case Segues.toAlbumDetail.rawValue:
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
-    default: break
-    }
   }
 
   struct SearchResultObjectContainer: Sendable {

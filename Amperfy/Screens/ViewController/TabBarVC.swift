@@ -72,14 +72,14 @@ class TabBarVC: UITabBarController {
       identifier: "Tabs.Library",
       children: libraryTabs
     ) { tab in
-      LibraryVC.instantiateFromAppStoryboard()
+      AppStoryboard.Main.segueToLibrary()
     }
     libraryGroup!.managingNavigationController = UINavigationController()
     libraryGroup!.allowsReordering = true
     fixTabs.append(libraryGroup!)
 
     searchTab = UISearchTab { _ in
-      UINavigationController(rootViewController: SearchVC.instantiateFromAppStoryboard())
+      UINavigationController(rootViewController: TabNavigatorItem.search.controller)
     }
     searchTab!.automaticallyActivatesSearch = true
     fixTabs.append(searchTab!)
@@ -128,7 +128,7 @@ class TabBarVC: UITabBarController {
         self.configureTraitChangesForMiniPlayer()
       }
     )
-    
+
     if appDelegate.storage.settings.isOfflineMode {
       appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
     }

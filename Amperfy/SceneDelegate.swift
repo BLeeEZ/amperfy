@@ -115,19 +115,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
     #endif
     if AmperKit.shared.storage.loginCredentials == nil {
-      initialViewController = LoginVC.instantiateFromAppStoryboard()
+      initialViewController = AppStoryboard.Main.segueToLogin()
     } else if !AmperKit.shared.storage.isLibrarySynced {
-      initialViewController = SyncVC.instantiateFromAppStoryboard()
+      initialViewController = AppStoryboard.Main.segueToSync()
     } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
-      initialViewController = UpdateVC.instantiateFromAppStoryboard()
+      initialViewController = AppStoryboard.Main.segueToUpdate()
     } else {
-      initialViewController = AppDelegate.createMainWindowTopViewController()
+      initialViewController = AppStoryboard.Main.segueToMainWindow()
     }
+    replaceMainRootViewController(vc: initialViewController!)
 
-    window?.rootViewController = initialViewController
     window?.makeKeyAndVisible()
 
     appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.appearanceMode)
+  }
+
+  func replaceMainRootViewController(vc: UIViewController) {
+    window?.rootViewController = vc
   }
 
   /** Called when the user activates your application by selecting a shortcut on the Home Screen,

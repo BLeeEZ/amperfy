@@ -101,15 +101,10 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-    performSegue(withIdentifier: Segues.toGenreDetail.rawValue, sender: genre)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toGenreDetail.rawValue {
-      let vc = segue.destination as! GenreDetailVC
-      let genre = sender as? Genre
-      vc.genre = genre
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToGenreDetail(genre: genre),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {

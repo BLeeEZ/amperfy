@@ -26,57 +26,42 @@ extension LibraryDisplayType {
   public func controller(settings: PersistentStorage.Settings) -> UIViewController {
     switch self {
     case .artists:
-      return ArtistsVC.instantiateFromAppStoryboard()
+      return AppStoryboard.Main.segueToArtists()
     case .albums:
-      let vc = AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .all)
-      return vc
+      return AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .all)
     case .songs:
-      let vc = SongsVC.instantiateFromAppStoryboard()
-      return vc
+      return AppStoryboard.Main.segueToSongs()
     case .genres:
-      let vc = GenresVC.instantiateFromAppStoryboard()
-      return vc
+      return AppStoryboard.Main.segueToGenres()
     case .directories:
-      let vc = MusicFoldersVC.instantiateFromAppStoryboard()
-      return vc
+      return AppStoryboard.Main.segueToMusicFolders()
     case .playlists:
-      let vc = PlaylistsVC.instantiateFromAppStoryboard()
-      return vc
+      return AppStoryboard.Main.segueToPlaylists()
     case .podcasts:
-      let vc = PodcastsVC.instantiateFromAppStoryboard()
-      return vc
+      return AppStoryboard.Main.segueToPodcasts()
     case .downloads:
-      let vc = DownloadsVC.instantiateFromAppStoryboard()
-      return vc
+      return AppStoryboard.Main.segueToDownloads()
     case .favoriteSongs:
-      let vc = SongsVC.instantiateFromAppStoryboard()
-      vc.displayFilter = .favorites
-      return vc
+      return AppStoryboard.Main.segueToFavoriteSongs()
     case .favoriteAlbums:
-      let vc = AppStoryboard.Main.createAlbumsVC(
+      return AppStoryboard.Main.createAlbumsVC(
         style: settings.albumsStyleSetting,
         category: .favorites
       )
-      return vc
     case .favoriteArtists:
-      let vc = ArtistsVC.instantiateFromAppStoryboard()
-      vc.displayFilter = .favorites
-      return vc
+      return AppStoryboard.Main.segueToFavoriteArtists()
     case .newestAlbums:
-      let vc = AppStoryboard.Main.createAlbumsVC(
+      return AppStoryboard.Main.createAlbumsVC(
         style: settings.albumsStyleSetting,
         category: .newest
       )
-      return vc
     case .recentAlbums:
-      let vc = AppStoryboard.Main.createAlbumsVC(
+      return AppStoryboard.Main.createAlbumsVC(
         style: settings.albumsStyleSetting,
         category: .recent
       )
-      return vc
     case .radios:
-      let vc = RadiosVC()
-      return vc
+      return AppStoryboard.Main.segueToRadios()
     }
   }
 }

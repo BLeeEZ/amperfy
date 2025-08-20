@@ -67,8 +67,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
       case .podcastEpisode:
         let episode = storage.main.library.getPodcastEpisode(id: id)
         if let podcast = episode?.podcast {
-          let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-          podcastDetailVC.podcast = podcast
+          let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(podcast: podcast)
           displayInLibraryTab(vc: podcastDetailVC)
         }
       }

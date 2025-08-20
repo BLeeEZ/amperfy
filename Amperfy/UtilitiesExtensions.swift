@@ -394,6 +394,14 @@ extension UIImage {
   }
 }
 
+extension UICollectionViewLayout {
+  static var verticalLayout: UICollectionViewFlowLayout {
+    let layout = UICollectionViewFlowLayout()
+    layout.scrollDirection = .vertical
+    return layout
+  }
+}
+
 extension UIDevice.BatteryState {
   public var description: String {
     switch self {

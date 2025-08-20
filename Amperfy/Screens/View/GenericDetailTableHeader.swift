@@ -237,8 +237,9 @@ class GenericDetailTableHeader: UIView {
           let navController = config?.rootView.navigationController
     else { return }
     appDelegate.userStatistics.usedAction(.alertGoToAlbum)
-    let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-    artistDetailVC.artist = artist
-    navController.pushViewController(artistDetailVC, animated: true)
+    navController.pushViewController(
+      AppStoryboard.Main.segueToArtistDetail(artist: artist),
+      animated: true
+    )
   }
 }
