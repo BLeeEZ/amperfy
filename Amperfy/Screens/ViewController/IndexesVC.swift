@@ -29,6 +29,14 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
   var musicFolder: MusicFolder!
   private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.indexes)
@@ -45,6 +53,11 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     tableView.register(nibName: DirectoryTableCell.typeName)
     tableView.rowHeight = DirectoryTableCell.rowHeight
     tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {

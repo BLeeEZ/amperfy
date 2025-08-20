@@ -40,6 +40,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
   private static var maxPlayContextCount = 40
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -60,6 +68,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {
@@ -124,6 +133,18 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     )
     fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
     singleFetchedResultsController = fetchedResultsController
+
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    switch sortType {
+    case .rating:
+      tableView.sectionHeaderHeight = CommonScreenOperations.tableSectionHeightLarge
+      tableView.estimatedSectionHeaderHeight = CommonScreenOperations.tableSectionHeightLarge
+    default:
+      tableView.sectionHeaderHeight = 0.0
+      tableView.estimatedSectionHeaderHeight = 0.0
+    }
+
     tableView.reloadData()
     updateRightBarButtonItems()
     detailHeaderView?.refresh()

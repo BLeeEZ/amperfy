@@ -31,6 +31,14 @@ class DirectoriesVC: MultiSourceTableViewController {
   private var songsFetchedResultsController: DirectorySongsFetchedResultsController!
   private var headerView: LibraryElementDetailTableHeaderView?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.directories)
@@ -55,6 +63,11 @@ class DirectoriesVC: MultiSourceTableViewController {
     setNavBarTitle(title: directory.name)
     tableView.register(nibName: DirectoryTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {

@@ -38,6 +38,14 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
   public var displayFilter: DisplayCategoryFilter = .all
   public var addToPlaylistManager = AddToPlaylistManager()
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -52,6 +60,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     configureSearchController(
       placeholder: "Search in \"\(sceneTitle ?? "Songs")\"",
