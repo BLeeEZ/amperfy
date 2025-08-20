@@ -46,7 +46,7 @@ class SearchDiffableDataSource: BasicUITableViewDiffableDataSource {
     switch SearchSection(rawValue: section) {
     case .History:
       if searchVC.searchHistory.isEmpty {
-        return "No Recent Searches"
+        return ""
       } else {
         return "Recently Searched"
       }
@@ -196,6 +196,7 @@ class SearchVC: BasicTableViewController {
         completionHandler(actionContext)
       }
     }
+    updateContentUnavailable()
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -235,6 +236,7 @@ class SearchVC: BasicTableViewController {
         self.appDelegate.storage.main.library.saveContext()
         self.searchHistory = []
         self.updateDataSource(animated: true)
+        self.updateContentUnavailable()
       }),
     ])
 
@@ -553,6 +555,7 @@ class SearchVC: BasicTableViewController {
           .compactMap { Song(managedObject: $0) }
         self.tableView.separatorStyle = .singleLine
         self.updateDataSource(animated: false)
+        self.updateContentUnavailable()
       } catch {
         // do nothing
       }}
@@ -617,6 +620,7 @@ class SearchVC: BasicTableViewController {
           .compactMap { Song(managedObject: $0) }
         self.tableView.separatorStyle = .singleLine
         self.updateDataSource(animated: false)
+        self.updateContentUnavailable()
       } catch {
         // do nothing
       }}
@@ -629,6 +633,27 @@ class SearchVC: BasicTableViewController {
       songs = []
       tableView.separatorStyle = .singleLine
       updateDataSource(animated: false)
+      updateContentUnavailable()
     }
   }
+
+  func updateContentUnavailable() {
+    if isSearchActive {
+      if artists.isEmpty, albums.isEmpty, playlists.isEmpty, songs.isEmpty {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = nil
+      }
+    } else {
+      contentUnavailableConfiguration = searchHistory.isEmpty ? noSearchHistoryConfig : nil
+    }
+  }
+
+  lazy var noSearchHistoryConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .clock
+    config.text = "No Search History"
+    config.secondaryText = "Your search history will appear here."
+    return config
+  }()
 }
