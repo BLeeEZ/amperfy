@@ -31,6 +31,14 @@ class PodcastsVC: MultiSourceTableViewController {
   private var optionsButton: UIBarButtonItem!
   private var showType: PodcastsShowType = .podcasts
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.podcasts)
@@ -54,6 +62,11 @@ class PodcastsVC: MultiSourceTableViewController {
     setNavBarTitle(title: "Podcasts")
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PodcastEpisodeTableCell.typeName)
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     swipeDisplaySettings.playContextTypeOfElements = .podcast
     containableAtIndexPathCallback = { indexPath in

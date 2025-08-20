@@ -134,6 +134,14 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     diffableDataSource as? AlbumsDiffableDataSource
   }
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       AlbumsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -186,6 +194,11 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeight
     tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     detailHeader = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,

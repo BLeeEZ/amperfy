@@ -46,6 +46,14 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       AlbumDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -84,6 +92,11 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     tableView.rowHeight = PlayableTableCell.rowHeight
     // Catalyst also need an estimate to calculate the correct height before scrolling
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },

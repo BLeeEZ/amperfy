@@ -43,6 +43,14 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
     diffableDataSource as? AlbumsDiffableDataSource
   }
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       AlbumsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -93,6 +101,7 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {

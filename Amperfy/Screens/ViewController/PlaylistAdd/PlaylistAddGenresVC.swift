@@ -31,6 +31,14 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
   private var fetchedResultsController: GenreFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -56,6 +64,7 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {

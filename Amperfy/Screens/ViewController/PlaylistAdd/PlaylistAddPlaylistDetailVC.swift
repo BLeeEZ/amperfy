@@ -33,6 +33,14 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
   private var fetchedResultsController: PlaylistItemsFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       PlaylistDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -75,6 +83,7 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {

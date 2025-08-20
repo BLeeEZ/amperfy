@@ -92,6 +92,14 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   private var optionsButton: UIBarButtonItem!
   var detailOperationsView: GenericDetailTableHeader?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       PlaylistDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -131,6 +139,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     // Use a single button, two buttons don't work on catalyst
     editButton = UIBarButtonItem(

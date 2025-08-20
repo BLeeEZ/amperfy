@@ -55,6 +55,14 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   private var selectBarButton: UIBarButtonItem!
   private var addBarButton: UIBarButtonItem!
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       PlaylistsSelectorDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -90,6 +98,11 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     tableView.register(nibName: PlaylistTableCell.typeName)
     tableView.rowHeight = PlaylistTableCell.rowHeight
     tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     tableView.tableHeaderView = UIView(frame: CGRect(
       x: 0,

@@ -81,6 +81,14 @@ class SearchVC: BasicTableViewController {
   private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   private var isSearchActive = false
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   func createDiffableDataSource() -> SearchDiffableDataSource {
     let source =
       SearchDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -138,8 +146,11 @@ class SearchVC: BasicTableViewController {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.separatorStyle = .none
-    tableView.sectionHeaderTopPadding = 0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     containableAtIndexPathCallback = { indexPath in
       switch SearchSection(rawValue: indexPath.section) {

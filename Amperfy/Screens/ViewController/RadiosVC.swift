@@ -31,6 +31,14 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   private var fetchedResultsController: RadiosFetchedResultsController!
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -54,6 +62,11 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleConfig = PlayShuffleInfoConfiguration(
       infoCB: {
@@ -139,22 +152,6 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     let radio = fetchedResultsController.getWrappedEntity(at: indexPath)
     cell.display(playable: radio, playContextCb: convertCellViewToPlayContext, rootView: self)
     return cell
-  }
-
-  override func tableView(
-    _ tableView: UITableView,
-    heightForHeaderInSection section: Int
-  )
-    -> CGFloat {
-    0.0
-  }
-
-  override func tableView(
-    _ tableView: UITableView,
-    titleForHeaderInSection section: Int
-  )
-    -> String? {
-    nil
   }
 
   func convertIndexPathToPlayContext(radioIndexPath: IndexPath) -> PlayContext? {

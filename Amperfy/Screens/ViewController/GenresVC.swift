@@ -26,6 +26,14 @@ import UIKit
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override var sceneTitle: String? { "Genres" }
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   private var fetchedResultsController: GenreFetchedResultsController!
 
   override func viewDidLoad() {
@@ -52,6 +60,11 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
     tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),
