@@ -141,6 +141,7 @@ class SearchVC: BasicTableViewController {
 
     searchHistory = appDelegate.storage.main.library.getSearchHistory()
     updateDataSource(animated: false)
+    navigationController?.navigationItem.searchBarPlacementAllowsExternalIntegration = true
 
     tableView.register(nibName: PlaylistTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
@@ -202,7 +203,7 @@ class SearchVC: BasicTableViewController {
     extendSafeAreaToAccountForMiniPlayer()
     appDelegate.userStatistics.visited(.search)
     configureSearchController(
-      placeholder: "Playlists, Songs and more",
+      placeholder: "Search in \"Library\"",
       scopeButtonTitles: ["All", "Cached"],
       showSearchBarAtEnter: true
     )
