@@ -235,6 +235,10 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         completionHandler(SwipeActionContext(containable: album))
       }
     }
+    snapshotDidChange = {
+      self.common.updateContentUnavailable()
+      self.updateHeaderViewVisibility()
+    }
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -243,6 +247,12 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     detailHeader?.refresh()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
+    common.updateContentUnavailable()
+    updateHeaderViewVisibility()
+  }
+
+  func updateHeaderViewVisibility() {
+    detailHeader?.isHidden = common.isContentUnavailable
   }
 
   override func tableView(
@@ -292,5 +302,6 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     common.updateSearchResults(for: self.searchController)
     tableView.reloadData()
     detailHeader?.refresh()
+    updateHeaderViewVisibility()
   }
 }

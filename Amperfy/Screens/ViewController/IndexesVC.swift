@@ -58,11 +58,35 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.backgroundColor = .backgroundColor
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .folder
+    config.text = "No Directories"
+    config.secondaryText = "Your directories will appear here."
+    return config
+  }()
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
+    updateContentUnavailable()
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
@@ -93,5 +117,6 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
   override func updateSearchResults(for searchController: UISearchController) {
     fetchedResultsController.search(searchText: searchController.searchBar.text ?? "")
     tableView.reloadData()
+    updateContentUnavailable()
   }
 }

@@ -172,7 +172,30 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
         completionHandler(SwipeActionContext(containable: playlist))
       }
     }
+    snapshotDidChange = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .playlist
+    config.text = "No Playlists"
+    config.secondaryText = "Your playlists will appear here."
+    return config
+  }()
 
   func change(sortType: PlaylistSortType) {
     self.sortType = sortType
@@ -189,6 +212,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     singleFetchedResultsController?.fetch()
     tableView.reloadData()
     updateRightBarButtonItems()
+    updateContentUnavailable()
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -198,6 +222,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
       isEditing = false
     }
     updateRightBarButtonItems()
+    updateContentUnavailable()
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
@@ -360,5 +385,6 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
       playlistSearchCategory: playlistSearchCategory
     )
     tableView.reloadData()
+    updateContentUnavailable()
   }
 }

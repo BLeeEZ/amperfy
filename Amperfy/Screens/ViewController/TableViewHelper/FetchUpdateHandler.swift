@@ -19,12 +19,15 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import CoreData
 import UIKit
 
 @MainActor
 class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate {
   private let tableView: UITableView
+
+  public var changesDidEnd: VoidFunctionCallback?
 
   public init(tableView: UITableView) {
     self.tableView = tableView
@@ -43,6 +46,7 @@ class FetchUpdatePerObjectHandler: NSObject, NSFetchedResultsControllerDelegate 
   ) {
     MainActor.assumeIsolated {
       tableView.endUpdates()
+      changesDidEnd?()
     }
   }
 

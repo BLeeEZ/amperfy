@@ -213,6 +213,8 @@ public class BasicFetchedResultsController<ResultType>: NSObject
     get { fetchResultsController.delegate }
   }
 
+  public var isSearchActive = false
+
   public init(
     coreDataCompanion: CoreDataCompanion,
     fetchRequest: NSFetchRequest<ResultType>,
@@ -231,6 +233,7 @@ public class BasicFetchedResultsController<ResultType>: NSObject
   }
 
   public func search(predicate: NSPredicate?) {
+    isSearchActive = true
     fetchResultsController.fetchRequest.predicate = predicate
     fetchResultsController.fetch()
   }
@@ -244,6 +247,7 @@ public class BasicFetchedResultsController<ResultType>: NSObject
   }
 
   public func showAllResults() {
+    isSearchActive = false
     fetchResultsController.fetchRequest.predicate = defaultPredicate
     fetch()
   }
@@ -474,7 +478,7 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
   }
 
   private var isSearchActiveInternal = false
-  public var isSearchActive: Bool {
+  override public var isSearchActive: Bool {
     set {
       isSearchActiveInternal = newValue
       updateFetchResultsControllerDelegate()
