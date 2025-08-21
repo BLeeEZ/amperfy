@@ -93,11 +93,35 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         completionHandler(SwipeActionContext(containable: genre))
       }
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .genre
+    config.text = "No Genres"
+    config.secondaryText = "Your genres will appear here."
+    return config
+  }()
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
+    updateContentUnavailable()
   }
 
   override func tableView(
@@ -127,6 +151,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
       onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
     )
     tableView.reloadData()
+    updateContentUnavailable()
   }
 
   @objc

@@ -261,6 +261,9 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
       guard let album = self.albumsDataSource?.getAlbum(at: indexPath) else { return nil }
       return PlayContext(containable: album)
     }
+    snapshotDidChange = {
+      self.common.updateContentUnavailable()
+    }
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -268,6 +271,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     extendSafeAreaToAccountForMiniPlayer()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
+    common.updateContentUnavailable()
   }
 
   func createCell(

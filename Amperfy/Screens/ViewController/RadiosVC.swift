@@ -97,8 +97,33 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       let playContext = self.convertIndexPathToPlayContext(radioIndexPath: indexPath)
       completionHandler(SwipeActionContext(containable: radio, playContext: playContext))
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
     setNavBarTitle(title: sceneTitle ?? "")
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+      detailHeaderView?.isHidden = true
+    } else {
+      contentUnavailableConfiguration = nil
+      detailHeaderView?.isHidden = false
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .radio
+    config.text = "No Radios"
+    config.secondaryText = "Your radios will appear here."
+    return config
+  }()
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
@@ -176,6 +201,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     }
     tableView.reloadData()
     detailHeaderView?.refresh()
+    updateContentUnavailable()
   }
 
   @objc

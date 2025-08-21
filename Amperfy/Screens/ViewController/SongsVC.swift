@@ -100,7 +100,32 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
       completionHandler(SwipeActionContext(containable: song, playContext: playContext))
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+      detailHeaderView?.isHidden = true
+    } else {
+      contentUnavailableConfiguration = nil
+      detailHeaderView?.isHidden = false
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .musicalNotes
+    config.text = "No Songs"
+    config.secondaryText = "Your songs will appear here."
+    return config
+  }()
 
   func applyFilter() {
     switch displayFilter {
@@ -293,6 +318,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     }
     tableView.reloadData()
     detailHeaderView?.refresh()
+    updateContentUnavailable()
   }
 
   private func saveSortPreference(preference: SongElementSortType) {

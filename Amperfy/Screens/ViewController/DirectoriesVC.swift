@@ -158,7 +158,33 @@ class DirectoriesVC: MultiSourceTableViewController {
         completionHandler(nil)
       }
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if subdirectoriesFetchedResultsController.fetchedObjects?.count ?? 0 == 0,
+       songsFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if subdirectoriesFetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+      headerView?.isHidden = true
+    } else {
+      contentUnavailableConfiguration = nil
+      headerView?.isHidden = false
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .folder
+    config.text = "No Directories or Songs"
+    config.secondaryText = "Your directories and songs will appear here."
+    return config
+  }()
 
   func refreshHeaderView() {
     headerView?.refresh()
@@ -174,6 +200,7 @@ class DirectoriesVC: MultiSourceTableViewController {
     extendSafeAreaToAccountForMiniPlayer()
     subdirectoriesFetchedResultsController?.delegate = self
     songsFetchedResultsController?.delegate = self
+    updateContentUnavailable()
 
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in
@@ -327,6 +354,7 @@ class DirectoriesVC: MultiSourceTableViewController {
     }
     tableView.reloadData()
     headerView?.refresh()
+    updateContentUnavailable()
   }
 
   override func controller(

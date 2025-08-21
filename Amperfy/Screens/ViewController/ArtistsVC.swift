@@ -145,7 +145,30 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         completionHandler(SwipeActionContext(containable: artist))
       }
     }
+    snapshotDidChange = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .artist
+    config.text = "No " + filterTitle
+    config.secondaryText = "Your " + filterTitle.lowercased() + " will appear here."
+    return config
+  }()
 
   func applyFilter() {
     switch displayFilter {
@@ -191,6 +214,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     extendSafeAreaToAccountForMiniPlayer()
     updateRightBarButtonItems()
     updateFromRemote()
+    updateContentUnavailable()
   }
 
   func updateRightBarButtonItems() {
@@ -297,6 +321,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
       }}
     }
+    updateContentUnavailable()
   }
 
   private func createSortButtonMenu() -> UIMenu {

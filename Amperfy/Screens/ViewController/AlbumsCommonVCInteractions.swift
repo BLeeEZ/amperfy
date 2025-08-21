@@ -120,6 +120,30 @@ class AlbumsCommonVCInteractions {
     self.isSetNavbarButton = isSetNavbarButton
   }
 
+  public var isContentUnavailable: Bool {
+    fetchedResultsController.fetchedObjects?.count ?? 0 == 0
+  }
+
+  func updateContentUnavailable() {
+    if isContentUnavailable {
+      if fetchedResultsController.isSearchActive {
+        rootVC?.contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        rootVC?.contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      rootVC?.contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .album
+    config.text = "No " + filterTitle
+    config.secondaryText = "Your " + filterTitle.lowercased() + " will appear here."
+    return config
+  }()
+
   func applyFilter() {
     switch displayFilter {
     case .all:
@@ -162,6 +186,7 @@ class AlbumsCommonVCInteractions {
     updateFetchDataSourceCB?()
     fetchedResultsController.fetch()
     updateRightBarButtonItems()
+    updateContentUnavailable()
   }
 
   func listViewWillDisplayCell(at indexPath: IndexPath, searchBarText: String?) {
@@ -499,6 +524,7 @@ class AlbumsCommonVCInteractions {
       onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
       displayFilter: displayFilter
     )
+    updateContentUnavailable()
   }
 
   func createPlayShuffleInfoConfig() -> PlayShuffleInfoConfiguration {
