@@ -328,7 +328,7 @@ class LibraryNavigatorConfigurator: NSObject {
         #endif
         var content = cell.defaultContentConfiguration()
         content.text = tabItem.title
-        content.image = tabItem.icon
+        content.image = tabItem.icon.withRenderingMode(.alwaysOriginal)
         cell.contentConfiguration = content
       }
       cell.indentationLevel = 0
@@ -371,11 +371,11 @@ class LibraryNavigatorConfigurator: NSObject {
   ) {
     contentView.text = libraryItem.displayName
     contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
-    var imageSize = CGSize(width: 35.0, height: 25.0)
-    if !libraryItem.image.isSymbolImage {
+    if libraryItem == .podcasts {
       // special case for podcast icon
-      imageSize = CGSize(width: imageSize.width, height: imageSize.height - 2)
+      contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
     }
+    let imageSize = CGSize(width: 35.0, height: 25.0)
     contentView.imageProperties.maximumSize = imageSize
     contentView.imageProperties.reservedLayoutSize = imageSize
   }
