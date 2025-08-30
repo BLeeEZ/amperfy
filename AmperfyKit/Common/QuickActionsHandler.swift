@@ -92,11 +92,12 @@ public class QuickActionsHandler {
       ))
     }
     if let currentPodcastItem = player.currentPodcastItem {
+      let isPlaying = player.isPlaying && player.playerMode == .podcast
       quickActions.append(UIApplicationShortcutItem(
         type: QuickActionType.playPodcastAction.rawValue,
-        localizedTitle: "Play Podcast",
+        localizedTitle: isPlaying ? "Pause Podcast" : "Play Podcast",
         localizedSubtitle: "\(currentPodcastItem.subtitle ?? "Unknown Podcast") - \(currentPodcastItem.title)",
-        icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
+        icon: UIApplicationShortcutIcon(systemImageName: isPlaying ? "pause.circle" : "play.circle"),
         userInfo: nil
       ))
     }
@@ -138,7 +139,11 @@ public class QuickActionsHandler {
         if player.playerMode != .podcast {
           player.setPlayerMode(.podcast)
         }
-        player.play()
+        if player.isPlaying && player.playerMode == .podcast {
+          player.pause()
+        } else {
+          player.play()
+        }
       case .offlineModeAction:
         storage.settings.isOfflineMode = true
       case .onlineModeAction:
