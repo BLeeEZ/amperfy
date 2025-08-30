@@ -82,11 +82,12 @@ public class QuickActionsHandler {
     ))
 
     if let currentMusicItem = player.currentMusicItem {
+      let isPlaying = player.isPlaying && player.playerMode == .music
       quickActions.append(UIApplicationShortcutItem(
         type: QuickActionType.playMusicAction.rawValue,
-        localizedTitle: "Play Song",
+        localizedTitle: isPlaying ? "Pause Song" : "Play Song",
         localizedSubtitle: "\(currentMusicItem.subtitle ?? "Unknown Artist") - \(currentMusicItem.title)",
-        icon: UIApplicationShortcutIcon(systemImageName: "play.circle"),
+        icon: UIApplicationShortcutIcon(systemImageName: isPlaying ? "pause.circle" : "play.circle"),
         userInfo: nil
       ))
     }
@@ -128,7 +129,11 @@ public class QuickActionsHandler {
         if player.playerMode != .music {
           player.setPlayerMode(.music)
         }
-        player.play()
+        if player.isPlaying && player.playerMode == .music {
+          player.pause()
+        } else {
+          player.play()
+        }
       case .playPodcastAction:
         if player.playerMode != .podcast {
           player.setPlayerMode(.podcast)
@@ -152,8 +157,12 @@ extension QuickActionsHandler: MusicPlayable {
     configureQuickActions()
   }
 
-  public func didPause() {}
-  public func didStopPlaying() {}
+  public func didPause() {
+    configureQuickActions()
+  }
+  public func didStopPlaying() {
+    configureQuickActions()
+  }
   public func didElapsedTimeChange() {}
   public func didPlaylistChange() {}
   public func didArtworkChange() {}
