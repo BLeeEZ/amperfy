@@ -22,9 +22,7 @@
 import Foundation
 import SwiftUI
 
-struct SettingsList<Content: View>: View, BehavioralStylable {
-  @State
-  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
+struct SettingsList<Content: View>: View {
   let content: () -> Content
 
   init(@ViewBuilder content: @escaping () -> Content) {
@@ -32,17 +30,9 @@ struct SettingsList<Content: View>: View, BehavioralStylable {
   }
 
   var body: some View {
-    if behavioralStyle == .mac, #available(iOS 16, *) {
-      List {
-        self.content()
-      }
-      .background(Color.clear)
-      .scrollContentBackground(.hidden)
-    } else {
-      List {
-        content()
-      }
-      .background(Color.clear)
+    List {
+      content()
     }
+    .background(Color.clear)
   }
 }

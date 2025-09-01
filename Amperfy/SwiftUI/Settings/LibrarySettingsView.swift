@@ -174,12 +174,11 @@ struct LibrarySettingsView: View {
 
         SettingsSection(content: {
           SettingsCheckBoxRow(
-            title: "Auto Cache",
-            label: "Newest Songs",
+            title: "Newest Songs",
             isOn: $settings.isAutoCacheLatestSongs
           )
           SettingsCheckBoxRow(
-            label: "Newest Podcast Episodes",
+            title: "Newest Podcast Episodes",
             isOn: $settings.isAutoCacheLatestPodcastEpisodes
           )
         }, header: "Auto Cache")
@@ -203,18 +202,28 @@ struct LibrarySettingsView: View {
             SecondaryText(completeCacheSize.description)
           }
 
-          NavigationLink {
+          #if targetEnvironment(macCatalyst) // ok
+            // We can not present the picker in wheel style on macOS. It is not supported.
+            // Instead, we use a menu style picker without a navigation link.
             MultiPickerView(
               data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
               selection: $cacheSelection
             )
-            .navigationTitle("Cache Size Limit")
-          } label: {
-            SettingsRow(title: "Cache Size Limit") {
-              SecondaryText(cacheSizeLimit.description)
+            .onChange(of: cacheSelection, changeHandler)
+          #else
+            NavigationLink {
+              MultiPickerView(
+                data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
+                selection: $cacheSelection
+              )
+              .navigationTitle("Cache Size Limit")
+            } label: {
+              SettingsRow(title: "Cache Size Limit") {
+                SecondaryText(cacheSizeLimit.description)
+              }
             }
-          }
-          .onChange(of: cacheSelection, changeHandler)
+            .onChange(of: cacheSelection, changeHandler)
+          #endif
 
           SettingsButtonRow(title: "Downloads", label: "Download all songs in library") {
             isShowDownloadSongsAlert = true

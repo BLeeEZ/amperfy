@@ -61,7 +61,7 @@ struct PlayerSettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              label: "Enable ReplayGain",
+              title: "Enable ReplayGain",
               isOn: Binding(
                 get: { settings.isReplayGainEnabled },
                 set: { isEnabled in
@@ -76,7 +76,7 @@ struct PlayerSettingsView: View {
         // General Settings
         SettingsSection {
           SettingsCheckBoxRow(
-            label: "Auto cache played Songs",
+            title: "Auto cache played Songs",
             isOn: $settings.isPlayerAutoCachePlayedItems
           )
         }
@@ -84,7 +84,7 @@ struct PlayerSettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              label: "Scrobble streamed Songs",
+              title: "Scrobble streamed Songs",
               isOn: $settings.isScrobbleStreamedItems
             )
           },
@@ -92,7 +92,7 @@ struct PlayerSettingsView: View {
         )
 
         SettingsSection(content: {
-          SettingsCheckBoxRow(label: "Manual Playback", isOn: $settings.isPlaybackStartOnlyOnPlay)
+          SettingsCheckBoxRow(title: "Manual Playback", isOn: $settings.isPlaybackStartOnlyOnPlay)
         }, footer: "Enable to start playback only when the Play button is pressed.")
 
         // Streaming Bitrate Settings

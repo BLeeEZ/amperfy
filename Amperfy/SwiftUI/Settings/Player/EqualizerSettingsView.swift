@@ -53,7 +53,7 @@ struct EqualizerSettingsView: View {
       SettingsList {
         SettingsSection(content: {
           SettingsCheckBoxRow(
-            label: "Enable Equalizer",
+            title: "Enable Equalizer",
             isOn: Binding(
               get: { settings.isEqualizerEnabled },
               set: { isEnabled in

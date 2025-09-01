@@ -125,7 +125,7 @@ struct SwipeSettingsView: View {
           }
         }
       }.environment(\.editMode, .constant(.active))
-        .listStyle(GroupedListStyle())
+        .listStyle(.insetGrouped)
         .sheet(isPresented: $isShowingAddView) {
           AddSwipeActionView(
             isVisible: $isShowingAddView,
