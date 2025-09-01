@@ -53,12 +53,14 @@ extension AppDelegate {
         UIMenu(options: .displayInline, children: [
           UIAction(
             title: "Open Player Window",
+            image: UIImage(systemName: "macwindow"),
             attributes: isMainOrMiniPlayerPlayerOpen ? .disabled : []
           ) { _ in
             self.openMainWindow()
           },
           UIKeyCommand(
             title: "Close Player Window",
+            image: UIImage(systemName: "xmark"),
             action: #selector(closePlayerWindow),
             input: "W",
             modifierFlags: .command,
@@ -66,7 +68,10 @@ extension AppDelegate {
           ),
         ]),
         UIMenu(options: .displayInline, children: [
-          UIAction(title: "Switch Library/Mini Player") { _ in
+          UIAction(
+            title: "Switch Library/Mini Player",
+            image: UIImage(systemName: "play.rectangle.on.rectangle")
+          ) { _ in
             if self.isShowingMiniPlayer {
               self.closeMiniPlayer()
               // mini player close will automatically (in scene disconnect) open Main again
@@ -82,6 +87,7 @@ extension AppDelegate {
       let openSettingsMenu = UIMenu(options: .displayInline, children: [
         UIKeyCommand(
           title: "Settings…",
+          image: UIImage(systemName: "gear"),
           action: #selector(showSettings),
           input: ",",
           modifierFlags: .command
@@ -173,11 +179,13 @@ extension AppDelegate {
     let section1 = [
       UIKeyCommand(
         title: isPlaying ? (player.isStopInsteadOfPause ? "Stop Radio" : "Pause") : "Play",
+        image: isPlaying ? (player.isStopInsteadOfPause ? .stop : .pause) : .play,
         action: isPlaying ? #selector(keyCommandPause) : #selector(keyCommandPlay),
         input: " "
       ),
       UIKeyCommand(
         title: (isPlaying && player.isStopInsteadOfPause) ? "Stop Player" : "Stop",
+        image: .stop,
         action: #selector(keyCommandStop),
         input: ".",
         modifierFlags: .command,
@@ -185,6 +193,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Next Track",
+        image: .forwardMenu,
         action: #selector(keyCommandNext),
         input: UIKeyCommand.inputRightArrow,
         modifierFlags: .command,
@@ -192,6 +201,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Previous Track",
+        image: .backwardMenu,
         action: #selector(keyCommandPrevious),
         input: UIKeyCommand.inputLeftArrow,
         modifierFlags: .command,
@@ -199,6 +209,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Skip Forward: " + Int(player.skipForwardInterval).description + " sec.",
+        image: .skipForwardMenu,
         action: #selector(keyCommandSkipForward),
         input: UIKeyCommand.inputRightArrow,
         modifierFlags: [.shift, .command],
@@ -206,6 +217,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Skip Backward: " + Int(player.skipBackwardInterval).description + " sec.",
+        image: .skipBackwardMenu,
         action: #selector(keyCommandSkipBackward),
         input: UIKeyCommand.inputLeftArrow,
         modifierFlags: [.shift, .command],
@@ -213,6 +225,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Go to Current Song",
+        image: .currentSongMenu,
         action: #selector(keyCommandGoToCurrent),
         input: "L",
         modifierFlags: [.command],
@@ -221,30 +234,38 @@ extension AppDelegate {
     ]
 
     var section2 = [
-      UIMenu(title: "Playback Rate", children: PlaybackRate.allCases.map { rate in
-        UIAction(
-          title: rate.description,
-          state: rate == self.player.playbackRate ? .on : .off
-        ) { _ in
-          self.player.setPlaybackRate(rate)
+      UIMenu(
+        title: "Playback Rate",
+        image: .playbackRateMenu,
+        children: PlaybackRate.allCases.map { rate in
+          UIAction(
+            title: rate.description,
+            state: rate == self.player.playbackRate ? .on : .off
+          ) { _ in
+            self.player.setPlaybackRate(rate)
+          }
         }
-      }),
+      ),
     ]
 
     if appDelegate.player.playerMode == .music {
-      let repeatMenu = UIMenu(title: "Repeat", children: RepeatMode.allCases.map { mode in
-        UIAction(
-          title: mode.description,
-          state: mode == self.player.repeatMode ? .on : .off
-        ) { _ in
-          self.player.setRepeatMode(mode)
+      let repeatMenu = UIMenu(
+        title: "Repeat",
+        image: .repeatMenu,
+        children: RepeatMode.allCases.map { mode in
+          UIAction(
+            title: mode.description,
+            state: mode == self.player.repeatMode ? .on : .off
+          ) { _ in
+            self.player.setRepeatMode(mode)
+          }
         }
-      })
+      )
       section2.insert(repeatMenu, at: 0)
     }
     if appDelegate.player.playerMode == .music,
        appDelegate.storage.settings.isPlayerShuffleButtonEnabled {
-      let shuffleMenu = UIMenu(title: "Shuffle", children: [
+      let shuffleMenu = UIMenu(title: "Shuffle", image: .shuffleMenu, children: [
         UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in
           self?.keyCommandShuffleOn()
         },
@@ -262,7 +283,7 @@ extension AppDelegate {
     ]
 
     let section4 = [
-      UIAction(title: "Switch Music/Podcast mode") { _ in
+      UIAction(title: "Switch Music/Podcast mode", image: .podcast) { _ in
         self.player.setPlayerMode(self.player.playerMode.nextMode)
       },
     ]
@@ -335,6 +356,7 @@ extension AppDelegate {
       return UIMenu(
         title: "Sleep Timer",
         subtitle: "Pause at: \(timer.fireDate.asShortHrMinString)",
+        image: .sleep,
         children: [deactivate]
       )
     } else if player.isShouldPauseAfterFinishedPlaying {
@@ -387,6 +409,7 @@ extension AppDelegate {
       })
       return UIMenu(
         title: "Sleep Timer",
+        image: .sleep,
         children: [
           endOfTrack,
           sleep5,

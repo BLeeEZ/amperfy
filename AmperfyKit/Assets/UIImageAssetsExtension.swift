@@ -195,6 +195,18 @@ extension UIImage {
   public static let volumeMin = UIImage.create(systemName: "speaker.fill")
   public static let volumeMax = UIImage.create(systemName: "speaker.wave.3.fill")
 
+  public static let stopMenu = UIImage.create(systemName: "stop")
+  public static let playMenu = UIImage.create(systemName: "play")
+  public static let pauseMenu = UIImage.create(systemName: "pause")
+  public static let forwardMenu = UIImage.create(systemName: "forward.end")
+  public static let backwardMenu = UIImage.create(systemName: "backward.end")
+  public static let skipForwardMenu = UIImage.create(systemName: "forward")
+  public static let skipBackwardMenu = UIImage.create(systemName: "backward")
+  public static let currentSongMenu = UIImage.create(systemName: "music.note")
+  public static let repeatMenu = UIImage.create(systemName: "repeat")
+  public static let shuffleMenu = UIImage.create(systemName: "shuffle")
+  public static let playbackRateMenu = UIImage.create(systemName: "hare")
+
   public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
   public static let listBullet = UIImage.create(systemName: "list.bullet")
 
