@@ -22,8 +22,6 @@
 import Foundation
 import SwiftUI
 
-// MacOS ignores sections. That is, content in a Section is directly added to the list.
-// The footer is displayed on mouse hover. Headers are ignored.
 struct SettingsSection<Content: View>: View {
   let footer: String?
   let header: String?

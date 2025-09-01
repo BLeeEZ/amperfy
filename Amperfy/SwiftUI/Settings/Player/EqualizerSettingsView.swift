@@ -115,7 +115,7 @@ struct EqualizerSettingsView: View {
               gradientColors: [Color(settings.themePreference.asColor), .clear]
             )
 
-            SettingsButtonRow(label: "Save") {
+            SettingsButtonRow(title: "Save") {
               guard var eqSettingToEdit else { return }
               var curEqSetting = settings.equalizerSettings
               guard let index = curEqSetting.firstIndex(of: eqSettingToEdit) else { return }
@@ -130,7 +130,7 @@ struct EqualizerSettingsView: View {
                 settings.activeEqualizerSetting = eqSettingToEdit
               }
             }
-            SettingsButtonRow(label: "Delete", actionType: .destructive) {
+            SettingsButtonRow(title: "Delete", actionType: .destructive) {
               isShowDeleteAlert = true
             }.alert(isPresented: $isShowDeleteAlert) {
               Alert(

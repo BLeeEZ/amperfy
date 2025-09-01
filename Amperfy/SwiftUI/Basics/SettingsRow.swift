@@ -70,7 +70,6 @@ struct SettingsRow<Content: View>: View {
 
 // MARK: - SettingsCheckBoxRow
 
-// Title is ignored on iOS.
 struct SettingsCheckBoxRow: View {
   let title: String
   let isOn: Binding<Bool>
@@ -107,21 +106,18 @@ struct SettingsButtonRow: View {
     }
   }
 
-  let title: String?
-  let label: String
+  let title: String
   let actionType: ActionType
   let action: () -> ()
   let splitPercentage: CGFloat
 
   init(
-    title: String? = nil,
-    label: String,
+    title: String,
     actionType: ActionType = .normal,
     splitPercentage: CGFloat = 0.4,
     action: @escaping () -> ()
   ) {
     self.title = title
-    self.label = label
     self.actionType = actionType
     self.action = action
     self.splitPercentage = splitPercentage
@@ -129,39 +125,7 @@ struct SettingsButtonRow: View {
 
   var body: some View {
     Button(action: action) {
-      Text(label)
+      Text(title)
     }.foregroundColor(actionType.foregroundColor)
-  }
-}
-
-// MARK: - ListToolbar
-
-struct ListToolbar<Buttons: View>: ViewModifier {
-  let buttons: () -> Buttons
-
-  init(@ViewBuilder _ buttons: @escaping () -> Buttons) {
-    self.buttons = buttons
-  }
-
-  func body(content: Content) -> some View {
-    VStack(spacing: 0) {
-      content
-      HStack(spacing: 10) {
-        Spacer().frame(width: 0.0)
-        buttons()
-        Spacer()
-      }
-      .frame(height: 30)
-      .background(Color.systemBackground)
-      .border(Color.separator, width: 1.0)
-      .padding(.top, -1)
-    }
-    .listRowSeparator(.hidden)
-  }
-}
-
-extension View {
-  func listToolbar<Buttons: View>(@ViewBuilder with buttons: @escaping () -> Buttons) -> some View {
-    modifier(ListToolbar(buttons))
   }
 }

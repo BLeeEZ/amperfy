@@ -81,10 +81,10 @@ struct ServerSettingsView: View {
         }
 
         SettingsSection {
-          SettingsButtonRow(title: "Account", label: "Update Password") {
+          SettingsButtonRow(title: "Update Password") {
             withPopupAnimation { isPwUpdateDialogVisible = true }
           }
-          SettingsButtonRow(label: "Logout", actionType: .destructive) {
+          SettingsButtonRow(title: "Logout", actionType: .destructive) {
             isShowLogoutAlert = true
           }
           .alert(isPresented: $isShowLogoutAlert) {

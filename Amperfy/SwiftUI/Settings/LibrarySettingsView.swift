@@ -225,7 +225,7 @@ struct LibrarySettingsView: View {
             .onChange(of: cacheSelection, changeHandler)
           #endif
 
-          SettingsButtonRow(title: "Downloads", label: "Download all songs in library") {
+          SettingsButtonRow(title: "Download all songs in library") {
             isShowDownloadSongsAlert = true
           }
           .alert(isPresented: $isShowDownloadSongsAlert) {
@@ -244,7 +244,7 @@ struct LibrarySettingsView: View {
           }
 
           SettingsButtonRow(
-            label: "Delete downloaded Songs and Podcast Episodes",
+            title: "Delete downloaded Songs and Podcast Episodes",
             actionType: .destructive
           ) {
             isShowDeleteCacheAlert = true
@@ -265,7 +265,7 @@ struct LibrarySettingsView: View {
         }, header: "Cache")
 
         SettingsSection {
-          SettingsButtonRow(title: "Sync", label: "Resync Library") {
+          SettingsButtonRow(title: "Resync Library") {
             isShowResyncLibraryAlert = true
           }.alert(isPresented: $isShowResyncLibraryAlert) {
             Alert(

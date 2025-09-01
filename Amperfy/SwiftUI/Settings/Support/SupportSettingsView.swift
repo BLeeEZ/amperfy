@@ -38,8 +38,7 @@ struct SupportSettingsView: View {
       SettingsList {
         SettingsSection {
           SettingsButtonRow(
-            title: "Contact",
-            label: "Report an issue on GitHub",
+            title: "Report an issue on GitHub",
             splitPercentage: splitPercentage
           ) {
             if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
@@ -47,7 +46,7 @@ struct SupportSettingsView: View {
             }
           }
           SettingsButtonRow(
-            label: "Send issue or feedback to developer",
+            title: "Send issue or feedback to developer",
             splitPercentage: splitPercentage
           ) {
             if MFMailComposeViewController.canSendMail() {
