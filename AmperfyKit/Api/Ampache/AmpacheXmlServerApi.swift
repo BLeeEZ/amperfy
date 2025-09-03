@@ -97,6 +97,8 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let authHandshake = Atomic<AuthentificationHandshake?>(wrappedValue: nil)
   private let settings: PersistentStorage.Settings
+  private let notificationHandler: EventNotificationHandler
+  private let networkMonitor: NetworkMonitor
 
   public func requestServerPodcastSupport() async throws -> Bool {
     let _ = try await reauthenticate()
@@ -115,10 +117,21 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
+      self.notificationHandler = EventNotificationHandler()
+      self.networkMonitor = NetworkMonitor(notificationHandler: self.notificationHandler)
   }
 
   var isStreamingTranscodingActive: Bool {
-    settings.streamingFormatPreference != .raw
+      if self.networkMonitor.isCellular{
+          if settings.streamingMaxBitrateCellularPreference == .noLimit {
+              return false
+          }
+      } else {
+          if settings.streamingMaxBitrateWifiPreference == .noLimit {
+              return false
+          }
+      }
+      return true
   }
 
   var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
@@ -797,10 +810,13 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     urlComp.addQueryItem(name: "type", value: isSong ? "song" : "podcast_episode")
     urlComp.addQueryItem(name: "id", value: id)
     switch settings.streamingFormatPreference {
-    case .mp3:
-      urlComp.addQueryItem(name: "format", value: "mp3")
-    case .raw:
-      urlComp.addQueryItem(name: "format", value: "raw")
+    case .appConfig:
+        switch maxBitrate{
+            case .noLimit:
+                urlComp.addQueryItem(name: "format", value: "raw")
+            default:
+                urlComp.addQueryItem(name: "format", value: "mp3")
+        }
     case .serverConfig:
       break // do nothing
     }

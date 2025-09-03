@@ -106,7 +106,7 @@ struct PlayerSettingsView: View {
               }
             }
           }
-        }, footer: "Set the maximum streaming bitrate for WiFi")
+        }, footer: "Transcode to MP3 and set the maximum streaming bitrate for WiFi")
 
         SettingsSection(content: {
           SettingsRow(title: "Cellular Streaming Bitrate Limit") {
@@ -118,12 +118,12 @@ struct PlayerSettingsView: View {
               }
             }
           }
-        }, footer: "Set the maximum streaming bitrate for Cellular")
+        }, footer: "Transcode to MP3 and set the maximum streaming bitrate for Cellular")
 
         // Streaming Format Settings
         SettingsSection(
           content: {
-            SettingsRow(title: "Streaming Format (Transcoding)") {
+            SettingsRow(title: "Streaming Codec") {
               Menu(settings.streamingFormatPreference.description) {
                 ForEach(StreamingFormatPreference.allCases, id: \.self) { format in
                   Button(format.description) {
@@ -133,7 +133,7 @@ struct PlayerSettingsView: View {
               }
             }
           },
-          footer: "Select a transcoding format for streaming. Transcoding is recommended for better compatibility."
+          footer: "Select whether to use the server dictated codec or allow the app to choose based on the set bitrate."
         )
 
         // Cache Format Settings

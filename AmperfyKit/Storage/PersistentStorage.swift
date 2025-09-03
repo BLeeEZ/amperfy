@@ -106,7 +106,7 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable {
   public var description: String {
     switch self {
     case .noLimit:
-      return "No Limit (default)"
+      return "No Transcode/Limit (default)"
     default:
       return "\(rawValue) kbps"
     }
@@ -120,29 +120,15 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable {
 // MARK: - StreamingFormatPreference
 
 public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
-  case mp3 = 0
-  case raw = 1
-  case serverConfig = 2 // omit the format to let the server decide which codec should be used
+  case appConfig = 0
+  case serverConfig = 1 // omit the format to let the server decide which codec should be used
 
-  public static let defaultValue: StreamingFormatPreference = .mp3
-
-  public var shortInfo: String {
-    switch self {
-    case .mp3:
-      return "MP3"
-    case .raw:
-      return "RAW"
-    case .serverConfig:
-      return ""
-    }
-  }
+  public static let defaultValue: StreamingFormatPreference = .appConfig
 
   public var description: String {
     switch self {
-    case .mp3:
-      return "mp3 (default)"
-    case .raw:
-      return "Raw/Original"
+    case .appConfig:
+      return "App chooses Codec"
     case .serverConfig:
       return "Server chooses Codec"
     }
