@@ -117,21 +117,21 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
-      self.notificationHandler = EventNotificationHandler()
-      self.networkMonitor = NetworkMonitor(notificationHandler: self.notificationHandler)
+    self.notificationHandler = EventNotificationHandler()
+    self.networkMonitor = NetworkMonitor(notificationHandler: notificationHandler)
   }
 
   var isStreamingTranscodingActive: Bool {
-      if self.networkMonitor.isCellular{
-          if settings.streamingMaxBitrateCellularPreference == .noLimit {
-              return false
-          }
-      } else {
-          if settings.streamingMaxBitrateWifiPreference == .noLimit {
-              return false
-          }
+    if networkMonitor.isCellular {
+      if settings.streamingMaxBitrateCellularPreference == .noLimit {
+        return false
       }
-      return true
+    } else {
+      if settings.streamingMaxBitrateWifiPreference == .noLimit {
+        return false
+      }
+    }
+    return true
   }
 
   var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
@@ -811,12 +811,12 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     urlComp.addQueryItem(name: "id", value: id)
     switch settings.streamingFormatPreference {
     case .appConfig:
-        switch maxBitrate{
-            case .noLimit:
-                urlComp.addQueryItem(name: "format", value: "raw")
-            default:
-                urlComp.addQueryItem(name: "format", value: "mp3")
-        }
+      switch maxBitrate {
+      case .noLimit:
+        urlComp.addQueryItem(name: "format", value: "raw")
+      default:
+        urlComp.addQueryItem(name: "format", value: "mp3")
+      }
     case .serverConfig:
       break // do nothing
     }

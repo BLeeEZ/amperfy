@@ -114,8 +114,8 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let openSubsonicExtensionsSupport =
     Atomic<OpenSubsonicExtensionsSupport?>(wrappedValue: nil)
-    private let notificationHandler: EventNotificationHandler
-    private let networkMonitor: NetworkMonitor
+  private let notificationHandler: EventNotificationHandler
+  private let networkMonitor: NetworkMonitor
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
@@ -125,8 +125,8 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
-      self.notificationHandler = EventNotificationHandler()
-      self.networkMonitor = NetworkMonitor(notificationHandler: self.notificationHandler)
+    self.notificationHandler = EventNotificationHandler()
+    self.networkMonitor = NetworkMonitor(notificationHandler: notificationHandler)
   }
 
   func setAuthType(newAuthType: SubsonicApiAuthType) {
@@ -139,16 +139,16 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   }
 
   var isStreamingTranscodingActive: Bool {
-      if self.networkMonitor.isCellular{
-          if settings.streamingMaxBitrateCellularPreference == .noLimit {
-              return false
-          }
-      } else {
-          if settings.streamingMaxBitrateWifiPreference == .noLimit {
-              return false
-          }
+    if networkMonitor.isCellular {
+      if settings.streamingMaxBitrateCellularPreference == .noLimit {
+        return false
       }
-      return true
+    } else {
+      if settings.streamingMaxBitrateWifiPreference == .noLimit {
+        return false
+      }
+    }
+    return true
   }
 
   var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
@@ -365,12 +365,12 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     var urlComp = try createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
     switch settings.streamingFormatPreference {
     case .appConfig:
-        switch maxBitrate{
-            case .noLimit:
-                urlComp.addQueryItem(name: "format", value: "raw")
-            default:
-                urlComp.addQueryItem(name: "format", value: "mp3")
-        }
+      switch maxBitrate {
+      case .noLimit:
+        urlComp.addQueryItem(name: "format", value: "raw")
+      default:
+        urlComp.addQueryItem(name: "format", value: "mp3")
+      }
     case .serverConfig:
       break // do nothing
     }
