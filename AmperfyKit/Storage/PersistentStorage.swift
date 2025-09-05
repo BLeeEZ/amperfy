@@ -558,20 +558,6 @@ public class PersistentStorage {
       ) }
     }
 
-//    public var streamingFormatPreference: StreamingFormatPreference {
-//      get {
-//        let streamingFormatPreferenceRaw = UserDefaults.standard
-//          .object(forKey: UserDefaultsKey.StreamingFormatPreference.rawValue) as? Int ??
-//          StreamingFormatPreference.defaultValue.rawValue
-//        return StreamingFormatPreference(rawValue: streamingFormatPreferenceRaw) ??
-//          StreamingFormatPreference.defaultValue
-//      }
-//      set { UserDefaults.standard.set(
-//        newValue.rawValue,
-//        forKey: UserDefaultsKey.StreamingFormatPreference.rawValue
-//      ) }
-//    }
-
     public var streamingFormatPreferenceWifi: StreamingFormatPreference {
       get {
         let streamingFormatPreferenceRaw = UserDefaults.standard
