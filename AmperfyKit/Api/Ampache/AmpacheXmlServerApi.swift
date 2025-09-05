@@ -121,20 +121,34 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     self.networkMonitor = NetworkMonitor(notificationHandler: notificationHandler)
   }
 
-  var isStreamingTranscodingActive: Bool {
+  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
+    -> StreamingFormatPreference {
     if networkMonitor.isCellular {
-      if settings.streamingMaxBitrateCellularPreference == .noLimit {
+      return settings.streamingFormatPreferenceCell
+    }
+    return settings.streamingFormatPreferenceWifi
+  }
+
+  public func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
+    if networkMonitor.isCellular {
+      if settings.streamingFormatPreferenceCell == .raw {
         return false
       }
     } else {
-      if settings.streamingMaxBitrateWifiPreference == .noLimit {
+      if settings.streamingFormatPreferenceWifi == .raw {
         return false
       }
     }
     return true
   }
 
-  var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
+  var streamingTranscodingFormatWifi: StreamingFormatPreference {
+    settings.streamingFormatPreferenceWifi
+  }
+
+  var streamingTranscodingFormatCell: StreamingFormatPreference {
+    settings.streamingFormatPreferenceCell
+  }
 
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
@@ -800,7 +814,8 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   public func generateUrlForStreamingPlayable(
     isSong: Bool,
     id: String,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
     let auth = try await reauthenticate()
@@ -809,14 +824,12 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     urlComp.addQueryItem(name: "action", value: "stream")
     urlComp.addQueryItem(name: "type", value: isSong ? "song" : "podcast_episode")
     urlComp.addQueryItem(name: "id", value: id)
-    switch settings.streamingFormatPreference {
-    case .appConfig:
-      switch maxBitrate {
-      case .noLimit:
-        urlComp.addQueryItem(name: "format", value: "raw")
-      default:
-        urlComp.addQueryItem(name: "format", value: "mp3")
-      }
+
+    switch formatPreference {
+    case .mp3:
+      urlComp.addQueryItem(name: "format", value: "mp3")
+    case .raw:
+      urlComp.addQueryItem(name: "format", value: "raw")
     case .serverConfig:
       break // do nothing
     }

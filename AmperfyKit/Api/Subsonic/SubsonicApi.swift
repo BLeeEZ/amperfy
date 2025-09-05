@@ -62,12 +62,13 @@ extension SubsonicApi: BackendApi {
     subsonicServerApi.serverApiVersion.wrappedValue?.description ?? "-"
   }
 
-  public var isStreamingTranscodingActive: Bool {
-    subsonicServerApi.isStreamingTranscodingActive
+  public func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
+    subsonicServerApi.isStreamingTranscodingActive(networkMonitor: networkMonitor)
   }
 
-  public var streamingTranscodingFormat: StreamingFormatPreference {
-    subsonicServerApi.streamingTranscodingFormat
+  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
+    -> StreamingFormatPreference {
+    subsonicServerApi.streamingTranscodingFormat(networkMonitor: networkMonitor)
   }
 
   func provideCredentials(credentials: LoginCredentials) {
@@ -86,13 +87,15 @@ extension SubsonicApi: BackendApi {
 
   func generateUrl(
     forStreamingPlayable playableInfo: AbstractPlayableInfo,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
     let apiId = playableInfo.streamId ?? playableInfo.id
     return try await subsonicServerApi.generateUrl(
       forStreamingPlayableId: apiId,
-      maxBitrate: maxBitrate
+      maxBitrate: maxBitrate,
+      formatPreference: formatPreference
     )
   }
 
