@@ -124,8 +124,6 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
-//    self.notificationHandler = EventNotificationHandler()
-//    self.networkMonitor = NetworkMonitor(notificationHandler: notificationHandler)
   }
 
   func setAuthType(newAuthType: SubsonicApiAuthType) {
@@ -137,7 +135,6 @@ final class SubsonicServerApi: URLCleanser, Sendable {
       .defaultClientApiVersionWithToken
   }
 
-//
   func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
     if networkMonitor.isCellular {
       if settings.streamingFormatPreferenceCell == .raw {
