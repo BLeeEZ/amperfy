@@ -114,7 +114,8 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let openSubsonicExtensionsSupport =
     Atomic<OpenSubsonicExtensionsSupport?>(wrappedValue: nil)
-
+//  private let notificationHandler: EventNotificationHandler
+//  private let networkMonitor: NetworkMonitor
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
@@ -123,6 +124,8 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
+//    self.notificationHandler = EventNotificationHandler()
+//    self.networkMonitor = NetworkMonitor(notificationHandler: notificationHandler)
   }
 
   func setAuthType(newAuthType: SubsonicApiAuthType) {
@@ -134,11 +137,27 @@ final class SubsonicServerApi: URLCleanser, Sendable {
       .defaultClientApiVersionWithToken
   }
 
-  var isStreamingTranscodingActive: Bool {
-    settings.streamingFormatPreference != .raw
+//
+  func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
+    if networkMonitor.isCellular {
+      if settings.streamingFormatPreferenceCell == .raw {
+        return false
+      }
+    } else {
+      if settings.streamingFormatPreferenceWifi == .raw {
+        return false
+      }
+    }
+    return true
   }
 
-  var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
+  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
+    -> StreamingFormatPreference {
+    if networkMonitor.isCellular {
+      return settings.streamingFormatPreferenceCell
+    }
+    return settings.streamingFormatPreferenceWifi
+  }
 
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
@@ -345,12 +364,14 @@ final class SubsonicServerApi: URLCleanser, Sendable {
 
   public func generateUrl(
     forStreamingPlayableId apiId: String,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
     let version = try await determineApiVersionToUse()
     var urlComp = try createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
-    switch settings.streamingFormatPreference {
+
+    switch formatPreference {
     case .mp3:
       urlComp.addQueryItem(name: "format", value: "mp3")
     case .raw:

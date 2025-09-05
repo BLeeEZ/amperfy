@@ -424,7 +424,8 @@ class BackendAudioPlayer: NSObject {
       perloadedStreamingBitrate = nil
       activeTranscodingFormat = nil
       preloadTranscodingFormat = nil
-      guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
+      guard playable.isPlayableOniOS || backendApi
+        .isStreamingTranscodingActive(networkMonitor: networkMonitor) else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
           playableDisplayTitle: playable.displayString
@@ -531,7 +532,8 @@ class BackendAudioPlayer: NSObject {
     queueType: BackendAudioQueueType = .play
   ) async throws {
     let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
-
+    let streamingTranscodingFormat = backendApi
+      .streamingTranscodingFormat(networkMonitor: networkMonitor)
     @MainActor
     func provideUrl() async throws -> URL {
       if let radio = playable.asRadio {
@@ -548,16 +550,17 @@ class BackendAudioPlayer: NSObject {
           perloadedPlayType = nil
           activeStreamingBitrate = streamingMaxBitrate
           perloadedStreamingBitrate = nil
-          activeTranscodingFormat = backendApi.streamingTranscodingFormat
+          activeTranscodingFormat = streamingTranscodingFormat
           preloadTranscodingFormat = nil
         } else {
           perloadedPlayType = .stream
           perloadedStreamingBitrate = streamingMaxBitrate
-          preloadTranscodingFormat = backendApi.streamingTranscodingFormat
+          preloadTranscodingFormat = streamingTranscodingFormat
         }
         return try await backendApi.generateUrl(
           forStreamingPlayable: playable.info,
-          maxBitrate: streamingMaxBitrate
+          maxBitrate: streamingMaxBitrate,
+          formatPreference: streamingTranscodingFormat
         )
       }
     }
