@@ -412,14 +412,13 @@ class PlayerControlView: UIView {
         displayBitrate = ""
       }
 
-      let serverCodec = player.activeTranscodingFormat
-      if serverCodec == .appConfig {
-        let bitRate = player.activeStreamingBitrate
-        if bitRate == .noLimit {
+      let transcodingFormat = player.activeTranscodingFormat
+      if let transcodingFormat {
+        if transcodingFormat == .raw {
           // it is the format of the streamed file
           formatText = getFormat(contentType: currentlyPlaying.contentType)
         } else {
-          formatText = "MP3"
+          formatText = transcodingFormat.shortInfo
         }
       } else {
         formatText = ""
