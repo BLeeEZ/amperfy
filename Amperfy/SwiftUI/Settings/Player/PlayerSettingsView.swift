@@ -127,7 +127,7 @@ struct PlayerSettingsView: View {
               }
             }
           },
-          footer: "Set the maximum streaming bitrate for WiFi. If the original files are lossess and transcoding was not enabled, this setting has no effect."
+          footer: "Set the maximum streaming bitrate for Cellular. If the original files are lossess and transcoding was not enabled, this setting has no effect."
         )
 
         SettingsSection(
