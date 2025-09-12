@@ -47,6 +47,10 @@ extension MarqueeLabel {
   }
 }
 
+extension UIColor {
+  static let hardLabelColor = UIColor(named: "hardLabelColor")
+}
+
 extension Color {
   static let error = Color.red
   static let success = Color.green

@@ -39,7 +39,7 @@ enum AppStoryboard: String {
 
   // MARK: true Storyboard view controller
 
-  func segueToLogin() -> UIViewController { LoginVC.instantiateFromAppStoryboard() }
+  func segueToLogin() -> UIViewController { LoginVC() }
   func segueToSync() -> UIViewController { SyncVC.instantiateFromAppStoryboard() }
   func segueToUpdate() -> UIViewController { UpdateVC.instantiateFromAppStoryboard() }
   func segueToLibrarySyncPopup() -> LibrarySyncPopupVC { LibrarySyncPopupVC

@@ -109,6 +109,8 @@ extension UIImage {
   }
 
   public static let appIcon = UIImage.create("Icon-1024")
+  public static let appIconTemplate = UIImage.create("Icon-monocolor")
+    .withRenderingMode(.alwaysTemplate)
 
   public static let xmark = UIImage.create(systemName: "xmark")
   public static let unSelected = UIImage.create(systemName: "circle")
@@ -136,6 +138,10 @@ extension UIImage {
   public static let playlistPlus = UIImage.create(systemName: "text.badge.plus")
   public static let squareArrow = UIImage.create(systemName: "arrow.forward.square")
   public static let grid = UIImage.create(systemName: "square.grid.2x2")
+  public static let serverUrl = UIImage.create(systemName: "globe")
+  public static let password = UIImage.create(systemName: "key.fill")
+  public static let user = UIImage.create(systemName: "person.fill")
+  public static let login = UIImage.create(systemName: "arrow.right.to.line")
 
   public static let ellipsis = UIImage.create(systemName: "ellipsis")
   public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease")
