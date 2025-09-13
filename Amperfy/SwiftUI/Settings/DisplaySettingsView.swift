@@ -109,7 +109,7 @@ struct DisplaySettingsView: View {
         #if !targetEnvironment(macCatalyst)
           SettingsSection(
             content: {
-              SettingsCheckBoxRow(label: "Haptic Feedback", isOn: $settings.isHapticsEnabled)
+              SettingsCheckBoxRow(title: "Haptic Feedback", isOn: $settings.isHapticsEnabled)
             },
             footer:
             "Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback."

@@ -205,6 +205,15 @@ extension PlayerFacade {
       return skipForwardPodcastInterval
     }
   }
+  
+  public var skipForwardIcon: UIImage {
+    switch playerMode {
+    case .music:
+      return .skipForward10
+    case .podcast:
+      return .skipForward30
+    }
+  }
 
   public var skipBackwardInterval: Double {
     switch playerMode {
@@ -212,6 +221,15 @@ extension PlayerFacade {
       return skipBackwardMusicInterval
     case .podcast:
       return skipBackwardPodcastInterval
+    }
+  }
+  
+  public var skipBackwardIcon: UIImage {
+    switch playerMode {
+    case .music:
+      return .skipBackward10
+    case .podcast:
+      return .skipBackward15
     }
   }
 

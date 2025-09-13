@@ -206,7 +206,7 @@ struct LibrarySettingsView: View {
             // We can not present the picker in wheel style on macOS. It is not supported.
             // Instead, we use a menu style picker without a navigation link.
             MultiPickerView(
-              data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
+              data: [("Cache Size Limit", byteValues), ("", [" MB", " GB"])],
               selection: $cacheSelection
             )
             .onChange(of: cacheSelection, changeHandler)

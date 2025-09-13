@@ -209,7 +209,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Skip Forward: " + Int(player.skipForwardInterval).description + " sec.",
-        image: .skipForwardMenu,
+        image: player.skipForwardIcon,
         action: #selector(keyCommandSkipForward),
         input: UIKeyCommand.inputRightArrow,
         modifierFlags: [.shift, .command],
@@ -217,7 +217,7 @@ extension AppDelegate {
       ),
       UIKeyCommand(
         title: "Skip Backward: " + Int(player.skipBackwardInterval).description + " sec.",
-        image: .skipBackwardMenu,
+        image: player.skipBackwardIcon,
         action: #selector(keyCommandSkipBackward),
         input: UIKeyCommand.inputLeftArrow,
         modifierFlags: [.shift, .command],
@@ -283,7 +283,7 @@ extension AppDelegate {
     ]
 
     let section4 = [
-      UIAction(title: "Switch Music/Podcast mode", image: .podcast) { _ in
+      UIAction(title: "Switch Music/Podcast mode", image: self.player.playerMode == .music ? .musicalNotes : .podcast) { _ in
         self.player.setPlayerMode(self.player.playerMode.nextMode)
       },
     ]
