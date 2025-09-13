@@ -109,7 +109,7 @@ struct DisplaySettingsView: View {
         #if !targetEnvironment(macCatalyst)
           SettingsSection(
             content: {
-              SettingsCheckBoxRow(label: "Haptic Feedback", isOn: $settings.isHapticsEnabled)
+              SettingsCheckBoxRow(title: "Haptic Feedback", isOn: $settings.isHapticsEnabled)
             },
             footer:
             "Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback."
@@ -119,8 +119,7 @@ struct DisplaySettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              title: "Music Player",
-              label: "Music Player Skip Buttons",
+              title: "Music Player Skip Buttons",
               isOn: $settings.isShowMusicPlayerSkipButtons
             )
           },
@@ -131,7 +130,7 @@ struct DisplaySettingsView: View {
         if appDelegate.backendApi.selectedApi != .ampache {
           SettingsSection(
             content: {
-              SettingsCheckBoxRow(label: "Music Player Lyrics Button", isOn: Binding<Bool>(
+              SettingsCheckBoxRow(title: "Music Player Lyrics Button", isOn: Binding<Bool>(
                 get: { !settings.isAlwaysHidePlayerLyricsButton },
                 set: { _ in tooglePlayerLyricsButtonPreference() }
               ))
@@ -143,7 +142,7 @@ struct DisplaySettingsView: View {
           SettingsSection(
             content: {
               SettingsCheckBoxRow(
-                label: "Lyrics Smooth Scrolling",
+                title: "Lyrics Smooth Scrolling",
                 isOn: $settings.isLyricsSmoothScrolling
               )
             },
@@ -155,8 +154,7 @@ struct DisplaySettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              title: "Information",
-              label: "Detailed Information",
+              title: "Detailed Information",
               isOn: $settings.isShowDetailedInfo
             )
           },
@@ -166,7 +164,7 @@ struct DisplaySettingsView: View {
 
         SettingsSection(
           content: {
-            SettingsCheckBoxRow(label: "Song Duration", isOn: $settings.isShowSongDuration)
+            SettingsCheckBoxRow(title: "Song Duration", isOn: $settings.isShowSongDuration)
           },
           footer:
           "Display song duration in table rows."
@@ -174,7 +172,7 @@ struct DisplaySettingsView: View {
 
         SettingsSection(
           content: {
-            SettingsCheckBoxRow(label: "Album Duration", isOn: $settings.isShowAlbumDuration)
+            SettingsCheckBoxRow(title: "Album Duration", isOn: $settings.isShowAlbumDuration)
           },
           footer:
           "Display album duration in table rows."
@@ -182,7 +180,7 @@ struct DisplaySettingsView: View {
 
         SettingsSection(
           content: {
-            SettingsCheckBoxRow(label: "Artist Duration", isOn: $settings.isShowArtistDuration)
+            SettingsCheckBoxRow(title: "Artist Duration", isOn: $settings.isShowArtistDuration)
           },
           footer:
           "Display artist duration in table rows."
@@ -191,8 +189,7 @@ struct DisplaySettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              title: "Shuffle",
-              label: "Disable Player Shuffle Button",
+              title: "Disable Player Shuffle Button",
               isOn: Binding<Bool>(
                 get: { !settings.isPlayerShuffleButtonEnabled },
                 set: {

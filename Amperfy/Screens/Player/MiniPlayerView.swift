@@ -38,9 +38,53 @@ class MiniPlayerView: UIView {
     var airplayVolume: MPVolumeView?
   #endif
 
+  fileprivate lazy var artworkOverlay: UIView = {
+    let view = UIView()
+    view.backgroundColor = .black.withAlphaComponent(0.4)
+    view.isHidden = true
+
+    let imageView = UIImageView()
+    imageView.translatesAutoresizingMaskIntoConstraints = false
+    imageView.contentMode = .scaleAspectFit
+    imageView.tintColor = .white
+    imageView.image = .miniPlayer.withRenderingMode(.alwaysTemplate)
+
+    view.addSubview(imageView)
+    NSLayoutConstraint.activate([
+      imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+      imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+      imageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+      imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8),
+    ])
+
+    return view
+  }()
+
   fileprivate lazy var artworkImage: LibraryEntityImage = {
     let imageView = LibraryEntityImage(frame: .zero)
     imageView.backgroundColor = .clear
+    #if targetEnvironment(macCatalyst) // ok
+      artworkOverlay.translatesAutoresizingMaskIntoConstraints = false
+      imageView.addSubview(artworkOverlay)
+      NSLayoutConstraint.activate([
+        artworkOverlay.centerXAnchor.constraint(equalTo: imageView.centerXAnchor),
+        artworkOverlay.centerYAnchor.constraint(equalTo: imageView.centerYAnchor),
+        artworkOverlay.widthAnchor.constraint(equalTo: imageView.widthAnchor),
+        artworkOverlay.heightAnchor.constraint(equalTo: imageView.heightAnchor),
+      ])
+
+      imageView.isUserInteractionEnabled = true
+      let miniPlayerHoverGesture = UIHoverGestureRecognizer(
+        target: self,
+        action: #selector(artworkHovered(_:))
+      )
+      let miniPlayerTapGesture = UITapGestureRecognizer(
+        target: self,
+        action: #selector(artworkClicked(_:))
+      )
+      imageView.addGestureRecognizer(miniPlayerTapGesture)
+      imageView.addGestureRecognizer(miniPlayerHoverGesture)
+    #endif
     return imageView
   }()
 
@@ -69,6 +113,29 @@ class MiniPlayerView: UIView {
     slider.preferredBehavioralStyle = .pad
     return slider
   }()
+
+  @objc
+  func artworkHovered(_ sender: UIHoverGestureRecognizer) {
+    switch sender.state {
+    case .began:
+      artworkOverlay.isHidden = false
+    case .cancelled, .ended, .failed:
+      artworkOverlay.isHidden = true
+    default:
+      break
+    }
+  }
+
+  @objc
+  func artworkClicked(_ sender: UITapGestureRecognizer) {
+    switch sender.state {
+    case .ended:
+      appDelegate.closeMainWindow()
+      appDelegate.showMiniPlayer()
+    default:
+      break
+    }
+  }
 
   @objc
   func timeSliderChanged(_ slider: UISlider) {

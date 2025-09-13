@@ -79,7 +79,7 @@ struct ArtworkSettingsView: View {
           SettingsRow(title: "Cached Artworks") {
             SecondaryText(cachedArtworksCountText)
           }
-          SettingsButtonRow(label: "Download all artworks in library") {
+          SettingsButtonRow(title: "Download all artworks in library") {
             isShowDownloadArtworksAlert = true
           }
           .alert(isPresented: $isShowDownloadArtworksAlert) {
@@ -96,7 +96,7 @@ struct ArtworkSettingsView: View {
               secondaryButton: .cancel()
             )
           }
-          SettingsButtonRow(label: "Delete all downloaded artworks", actionType: .destructive) {
+          SettingsButtonRow(title: "Delete all downloaded artworks", actionType: .destructive) {
             isShowDeleteArtworksAlert = true
           }
           .alert(isPresented: $isShowDeleteArtworksAlert) {

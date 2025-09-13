@@ -162,7 +162,9 @@ extension UIImage {
   public static let sleepFill = UIImage.create(systemName: "moon.zzz.fill")
   public static let cache = download
   public static let antenna = UIImage.create(systemName: "antenna.radiowaves.left.and.right")
+  public static let skipForward10 = UIImage.create(systemName: "goforward.10")
   public static let skipForward30 = UIImage.create(systemName: "goforward.30")
+  public static let skipBackward10 = UIImage.create(systemName: "gobackward.10")
   public static let skipBackward15 = UIImage.create(systemName: "gobackward.15")
   public static let repeatAll = UIImage.create(systemName: "repeat")
   public static let repeatOne = UIImage.create(systemName: "repeat.1")
@@ -194,6 +196,18 @@ extension UIImage {
   public static let audioVisualizer = UIImage.create(systemName: "circle.dashed")
   public static let volumeMin = UIImage.create(systemName: "speaker.fill")
   public static let volumeMax = UIImage.create(systemName: "speaker.wave.3.fill")
+
+  public static let stopMenu = UIImage.create(systemName: "stop")
+  public static let playMenu = UIImage.create(systemName: "play")
+  public static let pauseMenu = UIImage.create(systemName: "pause")
+  public static let forwardMenu = UIImage.create(systemName: "forward")
+  public static let backwardMenu = UIImage.create(systemName: "backward")
+  public static let skipForwardMenu = UIImage.create(systemName: "goforward")
+  public static let skipBackwardMenu = UIImage.create(systemName: "gobackward")
+  public static let currentSongMenu = UIImage.create(systemName: "music.note")
+  public static let repeatMenu = UIImage.create(systemName: "repeat")
+  public static let shuffleMenu = UIImage.create(systemName: "shuffle")
+  public static let playbackRateMenu = UIImage.create(systemName: "hare")
 
   public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
   public static let listBullet = UIImage.create(systemName: "list.bullet")
