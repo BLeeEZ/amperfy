@@ -340,19 +340,6 @@ extension BackendProxy: BackendApi {
 
   public var serverApiVersion: String { activeApi.serverApiVersion }
 
-  public func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
-    activeApi.isStreamingTranscodingActive(networkMonitor: networkMonitor)
-  }
-
-//  public var streamingTranscodingFormat: StreamingFormatPreference {
-//    activeApi.streamingTranscodingFormat
-//  }
-
-  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
-    -> StreamingFormatPreference {
-    activeApi.streamingTranscodingFormat(networkMonitor: networkMonitor)
-  }
-
   public func provideCredentials(credentials: LoginCredentials) {
     activeApi.provideCredentials(credentials: credentials)
   }

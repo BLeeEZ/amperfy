@@ -43,9 +43,9 @@ final class Settings: ObservableObject {
   var streamingMaxBitrateCellularPreference: StreamingMaxBitratePreference =
     .defaultValue
   @Published
-  var streamingFormatPreferenceCell: StreamingFormatPreference = .defaultValue
+  var streamingFormatCellularPreference: StreamingFormatPreference = .defaultValue
   @Published
-  var streamingFormatPreferenceWifi: StreamingFormatPreference = .defaultValue
+  var streamingFormatWifiPreference: StreamingFormatPreference = .defaultValue
   @Published
   var cacheTranscodingFormatPreference: CacheTranscodingFormatPreference = .defaultValue
   @Published

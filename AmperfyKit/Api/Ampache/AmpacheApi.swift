@@ -45,15 +45,6 @@ final class AmpacheApi: BackendApi {
 
   public var serverApiVersion: String { ampacheXmlServerApi.serverApiVersion.wrappedValue ?? "-" }
 
-  public func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
-    ampacheXmlServerApi.isStreamingTranscodingActive(networkMonitor: networkMonitor)
-  }
-
-  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
-    -> StreamingFormatPreference {
-    ampacheXmlServerApi.streamingTranscodingFormat(networkMonitor: networkMonitor)
-  }
-
   func provideCredentials(credentials: LoginCredentials) {
     ampacheXmlServerApi.provideCredentials(credentials: credentials)
   }

@@ -62,15 +62,6 @@ extension SubsonicApi: BackendApi {
     subsonicServerApi.serverApiVersion.wrappedValue?.description ?? "-"
   }
 
-  public func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
-    subsonicServerApi.isStreamingTranscodingActive(networkMonitor: networkMonitor)
-  }
-
-  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
-    -> StreamingFormatPreference {
-    subsonicServerApi.streamingTranscodingFormat(networkMonitor: networkMonitor)
-  }
-
   func provideCredentials(credentials: LoginCredentials) {
     subsonicServerApi.provideCredentials(credentials: credentials)
   }

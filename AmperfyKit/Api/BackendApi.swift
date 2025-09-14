@@ -258,8 +258,6 @@ public struct TranscodingInfo {
 public protocol BackendApi: URLCleanser, Sendable {
   var clientApiVersion: String { get }
   var serverApiVersion: String { get }
-  func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool
-  func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade) -> StreamingFormatPreference
   func provideCredentials(credentials: LoginCredentials)
   func isAuthenticationValid(credentials: LoginCredentials) async throws
   func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws -> URL

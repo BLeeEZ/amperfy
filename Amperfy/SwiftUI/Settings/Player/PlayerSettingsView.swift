@@ -47,11 +47,21 @@ struct PlayerSettingsView: View {
   }
 
   private func updateFormatCell(_ format: StreamingFormatPreference) {
-    settings.streamingFormatPreferenceCell = format
+    settings.streamingFormatCellularPreference = format
+
+    appDelegate.player.setStreamingTranscodings(to: StreamingTranscodings(
+      wifi: settings.streamingFormatWifiPreference,
+      cellular: settings.streamingFormatCellularPreference
+    ))
   }
 
   private func updateFormatWifi(_ format: StreamingFormatPreference) {
-    settings.streamingFormatPreferenceWifi = format
+    settings.streamingFormatWifiPreference = format
+
+    appDelegate.player.setStreamingTranscodings(to: StreamingTranscodings(
+      wifi: settings.streamingFormatWifiPreference,
+      cellular: settings.streamingFormatCellularPreference
+    ))
   }
 
   private func updateCacheFormat(_ format: CacheTranscodingFormatPreference) {
@@ -103,7 +113,7 @@ struct PlayerSettingsView: View {
         SettingsSection(
           content: {
             SettingsRow(title: "Cellular Streaming\nFormat (Transcoding)") {
-              Menu(settings.streamingFormatPreferenceCell.description) {
+              Menu(settings.streamingFormatCellularPreference.description) {
                 ForEach(StreamingFormatPreference.allCases, id: \.self) { format in
                   Button(format.description) {
                     updateFormatCell(format)
@@ -127,13 +137,13 @@ struct PlayerSettingsView: View {
               }
             }
           },
-          footer: "Set the maximum streaming bitrate for Cellular. If the original files are lossess and transcoding was not enabled, this setting has no effect."
+          footer: "Set the maximum streaming bitrate for Cellular."
         )
 
         SettingsSection(
           content: {
             SettingsRow(title: "WiFi Streaming\nFormat (Transcoding)") {
-              Menu(settings.streamingFormatPreferenceWifi.description) {
+              Menu(settings.streamingFormatWifiPreference.description) {
                 ForEach(StreamingFormatPreference.allCases, id: \.self) { format in
                   Button(format.description) {
                     updateFormatWifi(format)
@@ -157,12 +167,12 @@ struct PlayerSettingsView: View {
               }
             }
           },
-          footer: "Set the maximum streaming bitrate for WiFi. If the original files are lossess and transcoding was not enabled, this setting has no effect."
+          footer: "Set the maximum streaming bitrate for WiFi."
         )
 
         // Cache Format Settings
         SettingsSection(content: {
-          SettingsRow(title: "Cache Format (Transcoding)") {
+          SettingsRow(title: "Cache\nFormat (Transcoding)") {
             Menu(settings.cacheTranscodingFormatPreference.description) {
               ForEach(CacheTranscodingFormatPreference.allCases, id: \.self) { format in
                 Button(format.description) {

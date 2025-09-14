@@ -97,8 +97,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let authHandshake = Atomic<AuthentificationHandshake?>(wrappedValue: nil)
   private let settings: PersistentStorage.Settings
-  private let notificationHandler: EventNotificationHandler
-  private let networkMonitor: NetworkMonitor
 
   public func requestServerPodcastSupport() async throws -> Bool {
     let _ = try await reauthenticate()
@@ -117,37 +115,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
     self.settings = settings
-    self.notificationHandler = EventNotificationHandler()
-    self.networkMonitor = NetworkMonitor(notificationHandler: notificationHandler)
-  }
-
-  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
-    -> StreamingFormatPreference {
-    if networkMonitor.isCellular {
-      return settings.streamingFormatPreferenceCell
-    }
-    return settings.streamingFormatPreferenceWifi
-  }
-
-  public func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
-    if networkMonitor.isCellular {
-      if settings.streamingFormatPreferenceCell == .raw {
-        return false
-      }
-    } else {
-      if settings.streamingFormatPreferenceWifi == .raw {
-        return false
-      }
-    }
-    return true
-  }
-
-  var streamingTranscodingFormatWifi: StreamingFormatPreference {
-    settings.streamingFormatPreferenceWifi
-  }
-
-  var streamingTranscodingFormatCell: StreamingFormatPreference {
-    settings.streamingFormatPreferenceCell
   }
 
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {

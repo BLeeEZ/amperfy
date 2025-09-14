@@ -144,6 +144,21 @@ class BackendAudioPlayer: NSObject {
     streamingMaxBitrates = to
   }
 
+  public private(set) var streamingTranscodings = StreamingTranscodings()
+  public func setStreamingTranscodings(to: StreamingTranscodings) {
+    let oldTranscoding = streamingTranscodings.getActive(networkMonitor: networkMonitor)
+    let newTranscoding = to.getActive(networkMonitor: networkMonitor)
+
+    os_log(
+      .default,
+      "Update Streaming Transcoding: %s -> %s (for next stream)",
+      oldTranscoding.description,
+      newTranscoding.description
+    )
+    // Update the stored bitrates
+    streamingTranscodings = to
+  }
+
   var responder: BackendAudioPlayerNotifiable?
   var volume: Float {
     get {
@@ -424,8 +439,8 @@ class BackendAudioPlayer: NSObject {
       perloadedStreamingBitrate = nil
       activeTranscodingFormat = nil
       preloadTranscodingFormat = nil
-      guard playable.isPlayableOniOS || backendApi
-        .isStreamingTranscodingActive(networkMonitor: networkMonitor) else {
+      guard playable.isPlayableOniOS || streamingTranscodings
+        .isTranscodingActive(networkMonitor: networkMonitor) else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
           playableDisplayTitle: playable.displayString
@@ -532,8 +547,7 @@ class BackendAudioPlayer: NSObject {
     queueType: BackendAudioQueueType = .play
   ) async throws {
     let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
-    let streamingTranscodingFormat = backendApi
-      .streamingTranscodingFormat(networkMonitor: networkMonitor)
+    let streamingTranscodingFormat = streamingTranscodings.getActive(networkMonitor: networkMonitor)
     @MainActor
     func provideUrl() async throws -> URL {
       if let radio = playable.asRadio {

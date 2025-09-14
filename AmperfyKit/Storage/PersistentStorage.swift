@@ -422,8 +422,10 @@ public class PersistentStorage {
     case ScreenLockPreventionPreference = "screenLockPreventionPreference"
     case StreamingMaxBitrateWifiPreference = "streamingMaxBitrateWifiPreference"
     case StreamingMaxBitrateCellularPreference = "streamingMaxBitrateCellularPreference"
-    case StreamingFormatPreferenceWifi = "streamingFormatPreferenceWifi"
-    case StreamingFormatPreferenceCell = "streamingFormatPreferenceCell"
+    case StreamingFormatPreference =
+      "streamingFormatPreference" // deprecated: use Wifi and Cellular instead
+    case StreamingFormatWifiPreference = "streamingFormatWifiPreference"
+    case StreamingFormatCellularPreference = "streamingFormatCellularPreference"
     case CacheTranscodingFormatPreference = "cacheTranscodingFormatPreference"
     case CacheLimit = "cacheLimitInBytes" // limit in byte
     case PlayerVolume = "playerVolume"
@@ -572,31 +574,46 @@ public class PersistentStorage {
       ) }
     }
 
-    public var streamingFormatPreferenceWifi: StreamingFormatPreference {
+    /// deprecated: use Wifi and Cellular instead
+    public var streamingFormatPreference: StreamingFormatPreference {
       get {
         let streamingFormatPreferenceRaw = UserDefaults.standard
-          .object(forKey: UserDefaultsKey.StreamingFormatPreferenceWifi.rawValue) as? Int ??
+          .object(forKey: UserDefaultsKey.StreamingFormatPreference.rawValue) as? Int ??
           StreamingFormatPreference.defaultValue.rawValue
         return StreamingFormatPreference(rawValue: streamingFormatPreferenceRaw) ??
           StreamingFormatPreference.defaultValue
       }
       set { UserDefaults.standard.set(
         newValue.rawValue,
-        forKey: UserDefaultsKey.StreamingFormatPreferenceWifi.rawValue
+        forKey: UserDefaultsKey.StreamingFormatPreference.rawValue
       ) }
     }
 
-    public var streamingFormatPreferenceCell: StreamingFormatPreference {
+    public var streamingFormatWifiPreference: StreamingFormatPreference {
       get {
         let streamingFormatPreferenceRaw = UserDefaults.standard
-          .object(forKey: UserDefaultsKey.StreamingFormatPreferenceCell.rawValue) as? Int ??
+          .object(forKey: UserDefaultsKey.StreamingFormatWifiPreference.rawValue) as? Int ??
           StreamingFormatPreference.defaultValue.rawValue
         return StreamingFormatPreference(rawValue: streamingFormatPreferenceRaw) ??
           StreamingFormatPreference.defaultValue
       }
       set { UserDefaults.standard.set(
         newValue.rawValue,
-        forKey: UserDefaultsKey.StreamingFormatPreferenceCell.rawValue
+        forKey: UserDefaultsKey.StreamingFormatWifiPreference.rawValue
+      ) }
+    }
+
+    public var streamingFormatCellularPreference: StreamingFormatPreference {
+      get {
+        let streamingFormatPreferenceRaw = UserDefaults.standard
+          .object(forKey: UserDefaultsKey.StreamingFormatCellularPreference.rawValue) as? Int ??
+          StreamingFormatPreference.defaultValue.rawValue
+        return StreamingFormatPreference(rawValue: streamingFormatPreferenceRaw) ??
+          StreamingFormatPreference.defaultValue
+      }
+      set { UserDefaults.standard.set(
+        newValue.rawValue,
+        forKey: UserDefaultsKey.StreamingFormatCellularPreference.rawValue
       ) }
     }
 

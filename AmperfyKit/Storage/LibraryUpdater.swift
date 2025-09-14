@@ -206,6 +206,19 @@ public class LibraryUpdater {
       updatePlaylistArtworkItems()
       os_log("Perform blocking library update (DONE): Playlist artworkItems", log: log, type: .info)
     }
+    if storage.librarySyncVersion < .v20 {
+      storage
+        .librarySyncVersion =
+        .v20 // if App crashes don't do this step again -> This step is only for convenience
+      os_log(
+        "Perform blocking preference update: Streaming Transcoding Format Wifi/Cellular",
+        log: log,
+        type: .info
+      )
+      storage.settings.streamingFormatWifiPreference = storage.settings.streamingFormatPreference
+      storage.settings.streamingFormatCellularPreference = storage.settings
+        .streamingFormatPreference
+    }
   }
 
   private var isRunning = true

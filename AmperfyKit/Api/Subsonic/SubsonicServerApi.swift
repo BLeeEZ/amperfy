@@ -114,8 +114,6 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let openSubsonicExtensionsSupport =
     Atomic<OpenSubsonicExtensionsSupport?>(wrappedValue: nil)
-//  private let notificationHandler: EventNotificationHandler
-//  private let networkMonitor: NetworkMonitor
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
@@ -133,27 +131,6 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   private var authTypeBasedClientApiVersion: SubsonicVersion {
     authType.wrappedValue == .legacy ? Self.defaultClientApiVersionPreToken : Self
       .defaultClientApiVersionWithToken
-  }
-
-  func isStreamingTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
-    if networkMonitor.isCellular {
-      if settings.streamingFormatPreferenceCell == .raw {
-        return false
-      }
-    } else {
-      if settings.streamingFormatPreferenceWifi == .raw {
-        return false
-      }
-    }
-    return true
-  }
-
-  public func streamingTranscodingFormat(networkMonitor: NetworkMonitorFacade)
-    -> StreamingFormatPreference {
-    if networkMonitor.isCellular {
-      return settings.streamingFormatPreferenceCell
-    }
-    return settings.streamingFormatPreferenceWifi
   }
 
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
