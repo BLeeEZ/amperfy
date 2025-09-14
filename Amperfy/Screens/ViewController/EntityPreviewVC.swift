@@ -530,7 +530,12 @@ class EntityPreviewActionBuilder {
       },
     ]
 
-    return UIMenu(title: "Rating: \(rating)", image: menuIcon, options: .displayAsPalette, children: children)
+    return UIMenu(
+      title: "Rating: \(rating)",
+      image: menuIcon,
+      options: .displayAsPalette,
+      children: children
+    )
   }
 
   private func setRating(rating: Int) {

@@ -283,7 +283,10 @@ extension AppDelegate {
     ]
 
     let section4 = [
-      UIAction(title: "Switch Music/Podcast mode", image: self.player.playerMode == .music ? .musicalNotes : .podcast) { _ in
+      UIAction(
+        title: "Switch Music/Podcast mode",
+        image: player.playerMode == .music ? .musicalNotes : .podcast
+      ) { _ in
         self.player.setPlayerMode(self.player.playerMode.nextMode)
       },
     ]

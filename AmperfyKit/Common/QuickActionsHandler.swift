@@ -87,7 +87,10 @@ public class QuickActionsHandler {
         type: QuickActionType.playMusicAction.rawValue,
         localizedTitle: isPlaying ? "Pause Song" : "Play Song",
         localizedSubtitle: "\(currentMusicItem.subtitle ?? "Unknown Artist") - \(currentMusicItem.title)",
-        icon: UIApplicationShortcutIcon(systemImageName: isPlaying ? "pause.circle" : "play.circle"),
+        icon: UIApplicationShortcutIcon(
+          systemImageName: isPlaying ? "pause.circle" :
+            "play.circle"
+        ),
         userInfo: nil
       ))
     }
@@ -97,7 +100,10 @@ public class QuickActionsHandler {
         type: QuickActionType.playPodcastAction.rawValue,
         localizedTitle: isPlaying ? "Pause Podcast" : "Play Podcast",
         localizedSubtitle: "\(currentPodcastItem.subtitle ?? "Unknown Podcast") - \(currentPodcastItem.title)",
-        icon: UIApplicationShortcutIcon(systemImageName: isPlaying ? "pause.circle" : "play.circle"),
+        icon: UIApplicationShortcutIcon(
+          systemImageName: isPlaying ? "pause.circle" :
+            "play.circle"
+        ),
         userInfo: nil
       ))
     }
@@ -130,7 +136,7 @@ public class QuickActionsHandler {
         if player.playerMode != .music {
           player.setPlayerMode(.music)
         }
-        if player.isPlaying && player.playerMode == .music {
+        if player.isPlaying, player.playerMode == .music {
           player.pause()
         } else {
           player.play()
@@ -139,7 +145,7 @@ public class QuickActionsHandler {
         if player.playerMode != .podcast {
           player.setPlayerMode(.podcast)
         }
-        if player.isPlaying && player.playerMode == .podcast {
+        if player.isPlaying, player.playerMode == .podcast {
           player.pause()
         } else {
           player.play()
@@ -165,9 +171,11 @@ extension QuickActionsHandler: MusicPlayable {
   public func didPause() {
     configureQuickActions()
   }
+
   public func didStopPlaying() {
     configureQuickActions()
   }
+
   public func didElapsedTimeChange() {}
   public func didPlaylistChange() {}
   public func didArtworkChange() {}

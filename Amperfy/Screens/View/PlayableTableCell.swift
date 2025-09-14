@@ -213,6 +213,7 @@ class PlayableTableCell: BasicTableCell {
     #else
       singleTapGestureRecognizer.isEnabled = (displayMode == .normal)
     #endif
+    backgroundColor = .systemBackground
     refresh()
   }
 

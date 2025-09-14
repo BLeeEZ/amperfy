@@ -71,5 +71,6 @@ class GenericTableCell: BasicTableCell {
       infoLabelWidthConstraint.constant = 140
     }
     accessoryType = .disclosureIndicator
+    backgroundColor = .systemBackground
   }
 }

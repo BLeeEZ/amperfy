@@ -246,7 +246,7 @@ extension PlayerFacade {
       return skipForwardPodcastInterval
     }
   }
-  
+
   public var skipForwardIcon: UIImage {
     switch playerMode {
     case .music:
@@ -264,7 +264,7 @@ extension PlayerFacade {
       return skipBackwardPodcastInterval
     }
   }
-  
+
   public var skipBackwardIcon: UIImage {
     switch playerMode {
     case .music:

@@ -174,13 +174,13 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
       guard let playerIndex = PlayerIndex.create(from: indexPath),
             let playable = player.getPlayable(at: playerIndex)
       else { return cell }
-      cell.backgroundColor = UIColor.clear
       cell.display(
         playable: playable,
         playContextCb: { _ in PlayContext() },
         rootView: self,
         playerIndexCb: convertCellViewToPlayerIndex
       )
+      cell.backgroundColor = UIColor.clear
       cell.maskCell(fromTop: 0.0)
       return cell
     case .currentlyPlaying:
@@ -191,8 +191,8 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
           for: tableView,
           at: indexPath
         )
-        cell.backgroundColor = UIColor.clear
         cell.prepare(toWorkOnRootView: self)
+        cell.backgroundColor = UIColor.clear
         currentlyPlayingTableCell = cell
         return cell
       }

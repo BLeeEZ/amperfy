@@ -262,13 +262,13 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
       guard let playerIndex = PlayerIndex.create(from: indexPath),
             let playable = player.getPlayable(at: playerIndex)
       else { return cell }
-      cell.backgroundColor = .clear
       cell.display(
         playable: playable,
         playContextCb: { _ in PlayContext() },
         rootView: self,
         playerIndexCb: convertCellViewToPlayerIndex
       )
+      cell.backgroundColor = .clear
       return cell
     default:
       return UITableViewCell()
