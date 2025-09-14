@@ -148,7 +148,8 @@ public class LibraryEntityImage: RoundedImage {
     }
   }
 
-  nonisolated func loadImageAndCacheIt(
+  @concurrent
+  private func loadImageAndCacheIt(
     imagePath: String
   ) async {
     guard !Task.isCancelled else { return }
