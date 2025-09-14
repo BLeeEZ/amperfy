@@ -86,9 +86,6 @@ struct SwipeSettingsView: View {
               Image.plus
             }
           }
-          #if targetEnvironment(macCatalyst)
-          .padding(.top, 32)
-          #endif
         ) {
           ForEach(leading, id: \.self) { swipe in
             SwipeCellView(swipe: swipe)
@@ -128,30 +125,14 @@ struct SwipeSettingsView: View {
           }
         }
       }.environment(\.editMode, .constant(.active))
-        .listStyle(GroupedListStyle())
-      #if targetEnvironment(macCatalyst)
-        // Set a background color to allow the move gesture to work...
-        // This bug only appears on macOS. If anybody knows a better workaround let me know!
-        .background(Color.white.opacity(0.001))
-        .formSheet(isPresented: $isShowingAddView) {
+        .listStyle(.insetGrouped)
+        .sheet(isPresented: $isShowingAddView) {
           AddSwipeActionView(
             isVisible: $isShowingAddView,
             swipePosition: $addPositionType,
             addCB: add
           )
-          .frame(width: 400, height: 340)
-          .environmentObject(settings)
-          .environment(\.managedObjectContext, appDelegate.storage.main.context)
         }
-      #else
-        .sheet(isPresented: $isShowingAddView) {
-            AddSwipeActionView(
-              isVisible: $isShowingAddView,
-              swipePosition: $addPositionType,
-              addCB: add
-            )
-          }
-      #endif
     }
     .navigationTitle("Swipe")
     .navigationBarTitleDisplayMode(.inline)

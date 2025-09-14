@@ -38,8 +38,7 @@ struct SupportSettingsView: View {
       SettingsList {
         SettingsSection {
           SettingsButtonRow(
-            title: "Contact",
-            label: "Report an issue on GitHub",
+            title: "Report an issue on GitHub",
             splitPercentage: splitPercentage
           ) {
             if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
@@ -47,7 +46,7 @@ struct SupportSettingsView: View {
             }
           }
           SettingsButtonRow(
-            label: "Send issue or feedback to developer",
+            title: "Send issue or feedback to developer",
             splitPercentage: splitPercentage
           ) {
             if MFMailComposeViewController.canSendMail() {
@@ -64,19 +63,9 @@ struct SupportSettingsView: View {
         }
 
         SettingsSection {
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Event Log", splitPercentage: splitPercentage) {
-              EventLogSettingsView()
-                .background(Color.white)
-                .frame(width: 500, height: 200)
-                .padding(.top, 10)
-            }
-            .frame(height: 220)
-          #else
-            NavigationLink(destination: EventLogSettingsView()) {
-              Text("Event Log")
-            }
-          #endif
+          NavigationLink(destination: EventLogSettingsView()) {
+            Text("Event Log")
+          }
         }
       }
       .sheet(isPresented: $isShowingMailView) {
@@ -99,9 +88,6 @@ struct SupportSettingsView: View {
         )
       }
     }
-    #if targetEnvironment(macCatalyst)
-    .navigationViewStyle(.stack)
-    #endif
     .navigationTitle("Support")
     .navigationBarTitleDisplayMode(.inline)
     .onAppear {

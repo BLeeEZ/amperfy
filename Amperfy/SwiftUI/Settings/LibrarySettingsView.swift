@@ -164,11 +164,7 @@ struct LibrarySettingsView: View {
           }
         })
 
-        #if targetEnvironment(macCatalyst)
-          let progressTitle = "Background song sync progress"
-        #else
-          let progressTitle = "Progress"
-        #endif
+        let progressTitle = "Progress"
 
         SettingsSection(content: {
           SettingsRow(title: progressTitle) {
@@ -178,53 +174,43 @@ struct LibrarySettingsView: View {
 
         SettingsSection(content: {
           SettingsCheckBoxRow(
-            title: "Auto Cache",
-            label: "Newest Songs",
+            title: "Newest Songs",
             isOn: $settings.isAutoCacheLatestSongs
           )
           SettingsCheckBoxRow(
-            label: "Newest Podcast Episodes",
+            title: "Newest Podcast Episodes",
             isOn: $settings.isAutoCacheLatestPodcastEpisodes
           )
         }, header: "Auto Cache")
 
         SettingsSection(content: {
-          let changeHandler: ([String]) -> () = { cacheString in
-            if cacheString[1] == "" {
+          let changeHandler: ([String], [String]) -> () = { oldCacheString, newCacheString in
+            if newCacheString[1] == "" {
               settings.cacheSizeLimit = 0
               cacheSelection = ["0", " MB"]
             }
-            if let cacheInByte = (cacheString[0] + cacheString[1]).asByteCount {
+            if let cacheInByte = (newCacheString[0] + newCacheString[1]).asByteCount {
               settings.cacheSizeLimit = cacheInByte
             }
           }
 
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Cache") { SecondaryText("\(cachedSongCount.description) - Songs") }
-            SettingsRow {
-              SecondaryText("\(cachedPodcastEpisodesCount.description) - Podcast Episodes")
-            }
-            SettingsRow { SecondaryText("\(completeCacheSize.description) - Cache Size") }
-            SettingsRow(title: "Cache Size Limit") {
-              MultiPickerView(
-                data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
-                selection: $cacheSelection
-              )
-              .frame(width: 250, height: 25)
-              .alignmentGuide(.top, computeValue: { _ in 0 })
-            }
-            .frame(height: 25)
-            .onChange(of: cacheSelection, perform: changeHandler)
-            .padding(.bottom, 10)
-          #else
-            SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
-            SettingsRow(title: "Cached Podcast Episodes") {
-              SecondaryText(cachedPodcastEpisodesCount.description)
-            }
-            SettingsRow(title: "Complete Cache Size") {
-              SecondaryText(completeCacheSize.description)
-            }
+          SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
+          SettingsRow(title: "Cached Podcast Episodes") {
+            SecondaryText(cachedPodcastEpisodesCount.description)
+          }
+          SettingsRow(title: "Complete Cache Size") {
+            SecondaryText(completeCacheSize.description)
+          }
 
+          #if targetEnvironment(macCatalyst) // ok
+            // We can not present the picker in wheel style on macOS. It is not supported.
+            // Instead, we use a menu style picker without a navigation link.
+            MultiPickerView(
+              data: [("Cache Size Limit", byteValues), ("", [" MB", " GB"])],
+              selection: $cacheSelection
+            )
+            .onChange(of: cacheSelection, changeHandler)
+          #else
             NavigationLink {
               MultiPickerView(
                 data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
@@ -236,10 +222,10 @@ struct LibrarySettingsView: View {
                 SecondaryText(cacheSizeLimit.description)
               }
             }
-            .onChange(of: cacheSelection, perform: changeHandler)
+            .onChange(of: cacheSelection, changeHandler)
           #endif
 
-          SettingsButtonRow(title: "Downloads", label: "Download all songs in library") {
+          SettingsButtonRow(title: "Download all songs in library") {
             isShowDownloadSongsAlert = true
           }
           .alert(isPresented: $isShowDownloadSongsAlert) {
@@ -258,7 +244,7 @@ struct LibrarySettingsView: View {
           }
 
           SettingsButtonRow(
-            label: "Delete downloaded Songs and Podcast Episodes",
+            title: "Delete downloaded Songs and Podcast Episodes",
             actionType: .destructive
           ) {
             isShowDeleteCacheAlert = true
@@ -279,7 +265,7 @@ struct LibrarySettingsView: View {
         }, header: "Cache")
 
         SettingsSection {
-          SettingsButtonRow(title: "Sync", label: "Resync Library") {
+          SettingsButtonRow(title: "Resync Library") {
             isShowResyncLibraryAlert = true
           }.alert(isPresented: $isShowResyncLibraryAlert) {
             Alert(

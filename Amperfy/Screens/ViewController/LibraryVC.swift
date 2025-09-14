@@ -24,6 +24,9 @@ import UIKit
 
 @MainActor
 class LibraryVC: KeyCommandCollectionViewController {
+  override var sceneTitle: String? { "Library"
+  }
+
   private var offsetData = [LibraryNavigatorItem]()
 
   lazy var layoutConfig = {
@@ -41,18 +44,23 @@ class LibraryVC: KeyCommandCollectionViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    navigationController?.navigationBar.prefersLargeTitles = true
     libraryItemConfigurator.viewDidLoad(
       navigationItem: navigationItem,
       collectionView: collectionView
     )
   }
 
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    navigationController?.navigationBar.prefersLargeTitles = true
+  }
+
   public func pushedOn(selectedItem: LibraryNavigatorItem) {
-    guard let splitVC = splitViewController as? SplitVC,
-          splitVC.isCollapsed,
-          let libraryItem = selectedItem.library
+    guard let libraryItem = selectedItem.library
     else { return }
-    splitVC
-      .pushReplaceNavLibrary(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+    navigationController?.navigationBar.prefersLargeTitles = false
+    AppDelegate.mainWindowHostVC?
+      .pushLibraryCategory(vc: libraryItem.controller(settings: appDelegate.storage.settings))
   }
 }

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -16,8 +15,8 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress" customClass="PlaytimeSlider" customModule="Amperfy" customModuleProvider="target">
-                    <rect key="frame" x="14" y="36" width="347" height="31"/>
+                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress">
+                    <rect key="frame" x="16" y="20" width="343" height="30"/>
                     <color key="tintColor" systemColor="labelColor"/>
                     <gestureRecognizers/>
                     <constraints>
@@ -30,7 +29,7 @@
                     </connections>
                 </slider>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0:15" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="okd-ac-nGY" userLabel="Elapsed time">
-                    <rect key="frame" x="16" y="59" width="159" height="20"/>
+                    <rect key="frame" x="16" y="43" width="159" height="20"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="CEf-3e-Vt5"/>
                     </constraints>
@@ -41,7 +40,7 @@
                     </variation>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-5:30" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="t1c-hF-UMw" userLabel="Remaining time">
-                    <rect key="frame" x="200" y="59" width="159" height="20"/>
+                    <rect key="frame" x="200" y="43" width="159" height="20"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="Sij-WA-5X1"/>
                     </constraints>
@@ -52,12 +51,12 @@
                     </variation>
                 </label>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" alignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="SoI-ny-Hw0" userLabel="Control  Stack">
-                    <rect key="frame" x="22.5" y="81" width="330" height="50"/>
+                    <rect key="frame" x="22.5" y="72" width="330" height="50"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleAspectFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="PZj-JS-NGq" userLabel="Skip Backward Button">
                             <rect key="frame" x="0.0" y="6.5" width="66" height="37.5"/>
                             <color key="tintColor" systemColor="labelColor"/>
-                            <state key="normal" image="gobackward.10" catalog="system">
+                            <state key="normal" image="10.arrow.trianglehead.counterclockwise" catalog="system">
                                 <color key="titleColor" systemColor="labelColor"/>
                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
                             </state>
@@ -105,7 +104,7 @@
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="goforward.10" catalog="system" symbolScale="default" variableValue="1"/>
+                                <imageReference key="image" image="10.arrow.trianglehead.clockwise" catalog="system" symbolScale="default" variableValue="1"/>
                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="30"/>
                             </state>
                             <connections>
@@ -120,7 +119,7 @@
                     </constraints>
                 </stackView>
                 <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="xXq-r4-gI6">
-                    <rect key="frame" x="37.5" y="151" width="300" height="28"/>
+                    <rect key="frame" x="37.5" y="142" width="300" height="28"/>
                     <subviews>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="l5j-2I-Ltc" userLabel="Airplay Button">
                             <rect key="frame" x="0.0" y="0.0" width="28" height="28"/>
@@ -132,7 +131,7 @@
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="airplayaudio" catalog="system" symbolScale="medium"/>
+                                <imageReference key="image" image="airplay.audio" catalog="system" symbolScale="medium"/>
                             </state>
                             <connections>
                                 <action selector="airplayButtonPushed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YPY-8P-oS2"/>
@@ -148,7 +147,7 @@
                             <color key="tintColor" systemColor="labelColor"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="rectangle.portrait.inset.filled" catalog="system" symbolScale="medium"/>
+                                <imageReference key="image" image="inset.filled.rectangle.portrait" catalog="system" symbolScale="medium"/>
                             </state>
                             <buttonConfiguration key="configuration" style="gray" cornerStyle="medium" buttonSize="small">
                                 <imageReference key="image" image="list.bullet" catalog="system" symbolScale="small"/>
@@ -193,7 +192,7 @@
                     </constraints>
                 </stackView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LIVE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lCe-bR-yIr" userLabel="Live Label">
-                    <rect key="frame" x="167.5" y="28" width="40" height="20"/>
+                    <rect key="frame" x="167.5" y="26" width="40" height="20"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="0Q8-Lz-6Rd"/>
                         <constraint firstAttribute="width" constant="40" id="rQl-w5-Gbn"/>
@@ -202,7 +201,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MP3 320kbps" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fic-HG-erH" userLabel="AudioInfo Label">
-                    <rect key="frame" x="157" y="49" width="79" height="20"/>
+                    <rect key="frame" x="157" y="47" width="79" height="20"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="C9Q-ZR-zqL"/>
                     </constraints>
@@ -213,7 +212,7 @@
                     </variation>
                 </label>
                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="antenna.radiowaves.left.and.right" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="1aU-Ga-twf">
-                    <rect key="frame" x="136" y="51" width="17" height="15"/>
+                    <rect key="frame" x="136" y="49" width="17" height="15"/>
                     <color key="tintColor" systemColor="labelColor"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="14" id="C5j-az-nQB">
@@ -227,20 +226,20 @@
             <gestureRecognizers/>
             <constraints>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
-                <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="16" id="4ed-LA-PXc"/>
+                <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="4ed-LA-PXc"/>
                 <constraint firstItem="lCe-bR-yIr" firstAttribute="centerX" secondItem="42q-l9-IXM" secondAttribute="centerX" id="5j4-wU-MHY"/>
                 <constraint firstItem="fic-HG-erH" firstAttribute="leading" secondItem="1aU-Ga-twf" secondAttribute="trailing" constant="4" id="6q3-Lu-SIP"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8yb-bt-h2J"/>
                 <constraint firstAttribute="trailingMargin" secondItem="SoI-ny-Hw0" secondAttribute="trailing" priority="999" id="9wH-XK-zJU"/>
-                <constraint firstItem="fic-HG-erH" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" constant="-10" id="GkZ-a9-4Ra"/>
-                <constraint firstItem="lCe-bR-yIr" firstAttribute="centerY" secondItem="42q-l9-IXM" secondAttribute="centerY" constant="-13" id="Psw-On-UDt"/>
+                <constraint firstItem="fic-HG-erH" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" constant="4" id="GkZ-a9-4Ra"/>
+                <constraint firstItem="lCe-bR-yIr" firstAttribute="centerY" secondItem="42q-l9-IXM" secondAttribute="centerY" constant="1" id="Psw-On-UDt"/>
                 <constraint firstAttribute="trailingMargin" secondItem="t1c-hF-UMw" secondAttribute="trailing" id="QUi-S2-Eme"/>
                 <constraint firstItem="fic-HG-erH" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" constant="9" id="j7a-Es-8zC"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="centerY" secondItem="okd-ac-nGY" secondAttribute="centerY" id="lCh-dw-03A"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="msH-gV-d4u"/>
                 <constraint firstItem="xXq-r4-gI6" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="nkB-6e-9fV"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="-7" id="pOd-F6-MOG"/>
-                <constraint firstItem="SoI-ny-Hw0" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="15" id="rmF-Wl-3ol"/>
+                <constraint firstItem="SoI-ny-Hw0" firstAttribute="top" secondItem="42q-l9-IXM" secondAttribute="bottom" constant="22" id="rmF-Wl-3ol"/>
                 <constraint firstItem="t1c-hF-UMw" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" constant="-159" id="sAk-2J-JEK"/>
                 <constraint firstItem="okd-ac-nGY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leadingMargin" id="tbM-wh-ia0"/>
                 <constraint firstAttribute="leadingMargin" secondItem="okd-ac-nGY" secondAttribute="trailing" constant="-159" id="vQu-6h-oG4"/>
@@ -275,17 +274,17 @@
         </swipeGestureRecognizer>
     </objects>
     <resources>
-        <image name="airplayaudio" catalog="system" width="128" height="123"/>
+        <image name="10.arrow.trianglehead.clockwise" catalog="system" width="119" height="128"/>
+        <image name="10.arrow.trianglehead.counterclockwise" catalog="system" width="119" height="128"/>
+        <image name="airplay.audio" catalog="system" width="128" height="123"/>
         <image name="antenna.radiowaves.left.and.right" catalog="system" width="128" height="111"/>
         <image name="backward.fill" catalog="system" width="128" height="76"/>
         <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="forward.fill" catalog="system" width="128" height="76"/>
-        <image name="gobackward.10" catalog="system" width="119" height="128"/>
-        <image name="goforward.10" catalog="system" width="119" height="128"/>
+        <image name="inset.filled.rectangle.portrait" catalog="system" width="115" height="128"/>
         <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="play.fill" catalog="system" width="120" height="128"/>
         <image name="podcast" width="10" height="11"/>
-        <image name="rectangle.portrait.inset.filled" catalog="system" width="115" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

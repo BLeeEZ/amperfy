@@ -50,37 +50,12 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
     window = UIWindow(windowScene: windowScene)
     window?.backgroundColor = .clear
 
-    #if targetEnvironment(macCatalyst)
-      buildMacToolbar()
-
-      AppDelegate.configureUtilityWindow(
-        persistentIdentifier: windowScene.session.persistentIdentifier,
-        properties: ["auxiliary": true]
-      )
-
-      selectTarget(.general)
-    #endif
-
+    window?.rootViewController = SettingsHostVC(isForOwnWindow: true)
+    // This line is important to guarantee that the fullscreen option is not enabled after switching a tab
+    window?.windowScene?.sizeRestrictions?.allowsFullScreen = false
+    window?.windowScene?.title = windowSettingsTitle
     window?.makeKeyAndVisible()
   }
-
-  #if targetEnvironment(macCatalyst)
-    func buildMacToolbar() {
-      guard let windowScene = window?.windowScene else {
-        return
-      }
-
-      windowScene.title = windowSettingsTitle
-
-      if let titleBar = windowScene.titlebar {
-        let toolbar = NSToolbar(identifier: "Settings")
-        toolbar.delegate = self
-        toolbar.selectedItemIdentifier = NavigationTarget.general.toolbarIdentifier
-        titleBar.toolbarStyle = .preference
-        titleBar.toolbar = toolbar
-      }
-    }
-  #endif
 
   /** Called when the user activates your application by selecting a shortcut on the Home Screen,
        and the window scene is already connected.
@@ -189,68 +164,3 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
     )
   }
 }
-
-#if targetEnvironment(macCatalyst)
-  extension SettingsSceneDelegate: NSToolbarDelegate {
-    func toolbarIdentifiers() -> [NSToolbarItem.Identifier] {
-      NavigationTarget.allCases.map {
-        NSToolbarItem.Identifier($0.rawValue)
-      }
-    }
-
-    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-      toolbarIdentifiers()
-    }
-
-    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-      toolbarIdentifiers()
-    }
-
-    func toolbarSelectableItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-      toolbarIdentifiers()
-    }
-
-    func toolbar(
-      _ toolbar: NSToolbar,
-      itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
-      willBeInsertedIntoToolbar flag: Bool
-    )
-      -> NSToolbarItem? {
-      let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-
-      guard let navTarget = NavigationTarget(rawValue: itemIdentifier.rawValue) else {
-        return item
-      }
-
-      item.target = self
-      item.isBordered = false
-      item.image = navTarget.icon
-      item.label = navTarget.displayName
-      item.action = #selector(selectTab(_:))
-
-      return item
-    }
-
-    @objc
-    func selectTab(_ item: NSToolbarItem) {
-      guard let navigationTarget = NavigationTarget(rawValue: item.itemIdentifier.rawValue)
-      else { return }
-      selectTarget(navigationTarget)
-    }
-
-    func selectTarget(_ navigationTarget: NavigationTarget) {
-      let hostingController = SettingsHostVC(target: navigationTarget)
-      window?.rootViewController = hostingController
-
-      // Change the window size for the selected tab
-      let fixedSize = navigationTarget.fittingWindowSize
-
-      // This line is important to guarantee that the fullscreen option is not enabled after switching a tab
-      if #available(macCatalyst 16.0, *) {
-        self.window?.windowScene?.sizeRestrictions?.allowsFullScreen = false
-      }
-      window?.windowScene?.sizeRestrictions?.minimumSize = fixedSize
-      window?.windowScene?.sizeRestrictions?.maximumSize = fixedSize
-    }
-  }
-#endif

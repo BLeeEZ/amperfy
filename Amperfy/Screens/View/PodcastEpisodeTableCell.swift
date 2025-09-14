@@ -59,11 +59,11 @@ class PodcastEpisodeTableCell: BasicTableCell {
     self.episode = episode
     self.rootView = rootView
     optionsButton.showsMenuAsPrimaryAction = true
-    optionsButton.menu = EntityPreviewActionBuilder(
+    optionsButton.menu = UIMenu.lazyMenu { EntityPreviewActionBuilder(
       container: episode,
       on: rootView,
       playContextCb: { () in PlayContext(containable: episode) }
-    ).createMenu()
+    ).createMenuActions() }
     refresh()
   }
 

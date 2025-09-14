@@ -36,6 +36,9 @@ class BasicCollectionViewController: UICollectionViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     collectionView.keyboardDismissMode = .onDrag
+
+    guard let sceneTitle else { return }
+    setNavBarTitle(title: sceneTitle)
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -61,12 +64,7 @@ class BasicCollectionViewController: UICollectionViewController {
 
     navigationItem.searchController = searchController
     navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-
-    #if targetEnvironment(macCatalyst)
-      if #available(iOS 16.0, *) {
-        navigationItem.preferredSearchBarPlacement = .inline
-      }
-    #endif
+    navigationItem.preferredSearchBarPlacement = .integrated
 
     searchController.delegate = self
     searchController.obscuresBackgroundDuringPresentation = false

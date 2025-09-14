@@ -224,9 +224,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
 
     #if targetEnvironment(macCatalyst)
-      if #available(iOS 16.0, *) {
-        navigationItem.preferredSearchBarPlacement = .inline
-      }
+      navigationItem.preferredSearchBarPlacement = .integrated
     #endif
 
     searchController.delegate = self
@@ -365,8 +363,8 @@ class BasicTableViewController: KeyCommandTableViewController {
           }))
           self.present(alert, animated: true, completion: nil)
         case .addToPlaylist:
-          let selectPlaylistVC = PlaylistSelectorVC.instantiateFromAppStoryboard()
-          selectPlaylistVC.itemsToAdd = actionContext.playables.filterSongs()
+          let selectPlaylistVC = AppStoryboard.Main
+            .segueToPlaylistSelector(itemsToAdd: actionContext.playables.filterSongs())
           let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
           self.present(selectPlaylistNav, animated: true)
         case .play:

@@ -92,6 +92,14 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   private var optionsButton: UIBarButtonItem!
   var detailOperationsView: GenericDetailTableHeader?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       PlaylistDetailDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -131,6 +139,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     // Use a single button, two buttons don't work on catalyst
     editButton = UIBarButtonItem(
@@ -139,10 +152,9 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       target: self,
       action: #selector(openEditView)
     )
-    optionsButton = OptionsBarButton()
-
-    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
-      EntityPreviewActionBuilder(container: self.playlist, on: self).createMenu()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.playlist, on: self).createMenuActions()
     }
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
@@ -185,16 +197,11 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         playContext: playContext
       ))
     }
-
-    #if targetEnvironment(macCatalyst)
-      if #available(iOS 16.0, *) {
-        navigationItem.preferredSearchBarPlacement = .inline
-      }
-    #endif
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     if appDelegate.storage.settings.isOfflineMode {
       tableView.isEditing = false
     }
@@ -225,13 +232,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       }
     }
 
-    #if targetEnvironment(macCatalyst)
-      navigationItem.leftItemsSupplementBackButton = true
-      navigationItem.rightBarButtonItem = optionsButton
-      navigationItem.leftBarButtonItem = edititingBarButton
-    #else
-      navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap { $0 }
-    #endif
+    navigationItem.rightBarButtonItems = [optionsButton, edititingBarButton].compactMap { $0 }
   }
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
@@ -249,8 +250,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
   @objc
   private func openEditView(sender: UIBarButtonItem) {
-    let playlistDetailVC = PlaylistEditVC.instantiateFromAppStoryboard()
-    playlistDetailVC.playlist = playlist
+    let playlistDetailVC = AppStoryboard.Main.segueToPlaylistEdit(playlist: playlist)
     let playlistDetailNav = UINavigationController(rootViewController: playlistDetailVC)
     playlistDetailVC.onDoneCB = {
       self.detailOperationsView?.refresh()

@@ -26,6 +26,14 @@ import UIKit
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override var sceneTitle: String? { "Genres" }
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   private var fetchedResultsController: GenreFetchedResultsController!
 
   override func viewDidLoad() {
@@ -52,6 +60,11 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
     tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),
@@ -80,6 +93,35 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         completionHandler(SwipeActionContext(containable: genre))
       }
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
+  }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .genre
+    config.text = "No Genres"
+    config.secondaryText = "Your genres will appear here."
+    return config
+  }()
+
+  override func viewIsAppearing(_ animated: Bool) {
+    super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
+    updateContentUnavailable()
   }
 
   override func tableView(
@@ -96,15 +138,10 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-    performSegue(withIdentifier: Segues.toGenreDetail.rawValue, sender: genre)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toGenreDetail.rawValue {
-      let vc = segue.destination as! GenreDetailVC
-      let genre = sender as? Genre
-      vc.genre = genre
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToGenreDetail(genre: genre),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
@@ -114,6 +151,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
       onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
     )
     tableView.reloadData()
+    updateContentUnavailable()
   }
 
   @objc

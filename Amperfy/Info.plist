@@ -75,10 +75,6 @@
 		<string>PlayRandomSongsIntent</string>
 		<string>SearchAndPlayIntent</string>
 	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Font Awesome 5 Free-Solid-900.otf</string>
-	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

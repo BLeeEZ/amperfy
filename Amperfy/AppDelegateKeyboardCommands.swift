@@ -189,12 +189,12 @@ extension KeyCommandTableViewController {
   @objc
   func goBackKeyTapped() {
     // if the navigation stack is empty and iPad -> go to sidebar
-    if let splitVC = splitViewController,
-       let navVC = navigationController {
-      if !splitVC.isCollapsed {
-        if navVC.viewControllers.count == 1 {
-          splitVC.show(.primary)
-          splitVC.viewController(for: .primary)?.becomeFirstResponder()
+    if let splitViewController,
+       let navigationController {
+      if !splitViewController.isCollapsed {
+        if navigationController.viewControllers.count == 1 {
+          splitViewController.show(.primary)
+          splitViewController.viewController(for: .primary)?.becomeFirstResponder()
         }
       }
     }
@@ -279,12 +279,12 @@ extension KeyCommandCollectionViewController {
   func selectKeyTapped() {
     collectionViewKeyCommandsController.interactWithFocus()
 
-    if let splitVC = splitViewController,
-       !splitVC.isCollapsed {
-      if splitVC.displayMode == .oneOverSecondary {
-        splitVC.hide(.primary)
+    if let splitViewController,
+       !splitViewController.isCollapsed {
+      if splitViewController.displayMode == .oneOverSecondary {
+        splitViewController.hide(.primary)
       }
-      splitVC.viewController(for: .secondary)?.becomeFirstResponder()
+      splitViewController.viewController(for: .secondary)?.becomeFirstResponder()
     }
   }
 

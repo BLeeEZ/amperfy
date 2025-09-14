@@ -123,6 +123,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   }
 
   private var common = AlbumsCommonVCInteractions()
+  private var detailHeader: LibraryElementDetailTableHeaderView?
 
   public var displayFilter: DisplayCategoryFilter {
     set { common.displayFilter = newValue }
@@ -131,6 +132,14 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
   private var albumsDataSource: AlbumsDiffableDataSource? {
     diffableDataSource as? AlbumsDiffableDataSource
+  }
+
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -185,8 +194,13 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeight
     tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
-    _ = LibraryElementDetailTableHeaderView.createTableHeader(
+    detailHeader = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,
       configuration: common.createPlayShuffleInfoConfig()
     )
@@ -221,12 +235,24 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         completionHandler(SwipeActionContext(containable: album))
       }
     }
+    snapshotDidChange = {
+      self.common.updateContentUnavailable()
+      self.updateHeaderViewVisibility()
+    }
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
+    detailHeader?.refresh()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
+    common.updateContentUnavailable()
+    updateHeaderViewVisibility()
+  }
+
+  func updateHeaderViewVisibility() {
+    detailHeader?.isHidden = common.isContentUnavailable
   }
 
   override func tableView(
@@ -266,19 +292,16 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath)
     else { return }
-    performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToAlbumDetail(album: album),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
     common.updateSearchResults(for: self.searchController)
     tableView.reloadData()
+    detailHeader?.refresh()
+    updateHeaderViewVisibility()
   }
 }

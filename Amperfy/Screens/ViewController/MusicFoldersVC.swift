@@ -28,6 +28,14 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
 
   private var fetchedResultsController: MusicFolderFetchedResultsController!
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.musicFolders)
@@ -43,10 +51,40 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     tableView.register(nibName: DirectoryTableCell.typeName)
     tableView.rowHeight = DirectoryTableCell.rowHeight
     tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .folder
+    config.text = "No Directories"
+    config.secondaryText = "Your directories will appear here."
+    return config
+  }()
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
+    updateContentUnavailable()
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncMusicFolders()
@@ -68,20 +106,16 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
-    performSegue(withIdentifier: Segues.toDirectories.rawValue, sender: musicFolder)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toDirectories.rawValue {
-      let vc = segue.destination as! IndexesVC
-      let musicFolder = sender as? MusicFolder
-      vc.musicFolder = musicFolder
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToIndexes(musicFolder: musicFolder),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(searchText: searchText)
     tableView.reloadData()
+    updateContentUnavailable()
   }
 }

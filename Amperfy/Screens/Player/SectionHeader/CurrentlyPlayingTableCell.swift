@@ -51,7 +51,7 @@ class CurrentlyPlayingTableCell: BasicTableCell {
   }
 
   func refresh() {
-    rootView?.refreshCurrentlyPlayingInfo(
+    rootView?.playerHandler?.refreshCurrentlyPlayingInfo(
       artworkImage: artworkImage,
       titleLabel: titleLabel,
       artistLabel: artistLabel
@@ -61,7 +61,7 @@ class CurrentlyPlayingTableCell: BasicTableCell {
   }
 
   func refreshArtwork() {
-    rootView?.refreshArtwork(artworkImage: artworkImage)
+    rootView?.playerHandler?.refreshArtwork(artworkImage: artworkImage)
   }
 
   @IBAction

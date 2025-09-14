@@ -24,7 +24,7 @@ import SwiftUI
 
 // MARK: - SettingsRow
 
-struct SettingsRow<Content: View>: View, BehavioralStylable {
+struct SettingsRow<Content: View>: View {
   enum Orientation {
     case vertical
     case horizontal
@@ -34,8 +34,6 @@ struct SettingsRow<Content: View>: View, BehavioralStylable {
   let detail: () -> Content
   let orientation: Orientation
   let splitPercentage: CGFloat
-  @State
-  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
 
   init(
     title: String? = nil,
@@ -50,49 +48,21 @@ struct SettingsRow<Content: View>: View, BehavioralStylable {
   }
 
   var body: some View {
-    if behavioralStyle == .mac {
-      // we only support a horizontal style on macOS
-      let lhsSplit = splitPercentage
-      let rhsSplit = (1.0 - lhsSplit)
-      GeometryReader { metrics in
-        HStack(alignment: .center) {
-          HStack(spacing: 0) {
-            Spacer()
-            if let title {
-              Text("\(title):")
-            }
-          }
-          .frame(width: metrics.size.width * lhsSplit)
-          HStack(spacing: 0) {
-            detail()
-              .frame(maxWidth: metrics.size.width * rhsSplit)
-              .alignmentGuide(.leading, computeValue: { _ in 0 })
-              .fixedSize()
-              .lineLimit(1)
-            Spacer()
-          }
-          .frame(width: metrics.size.width * rhsSplit)
+    if orientation == .horizontal {
+      HStack {
+        if let title {
+          Text(title)
         }
+        Spacer()
+        detail()
       }
-      .listRowBackground(Color.clear)
-      .listRowSeparator(.hidden)
     } else {
-      if orientation == .horizontal {
-        HStack {
-          if let title {
-            Text(title)
-          }
-          Spacer()
-          detail()
+      VStack(alignment: .leading) {
+        if let title {
+          Text(title)
+            .padding([.bottom], 2)
         }
-      } else {
-        VStack(alignment: .leading) {
-          if let title {
-            Text(title)
-              .padding([.bottom], 2)
-          }
-          detail()
-        }
+        detail()
       }
     }
   }
@@ -100,40 +70,28 @@ struct SettingsRow<Content: View>: View, BehavioralStylable {
 
 // MARK: - SettingsCheckBoxRow
 
-// Title is ignored on iOS.
-struct SettingsCheckBoxRow: View, BehavioralStylable {
-  let title: String?
-  let label: String
+struct SettingsCheckBoxRow: View {
+  let title: String
   let isOn: Binding<Bool>
   let splitPercentage: CGFloat
-  @State
-  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
 
-  init(title: String? = nil, label: String, splitPercentage: CGFloat = 0.4, isOn: Binding<Bool>) {
+  init(title: String, splitPercentage: CGFloat = 0.4, isOn: Binding<Bool>) {
     self.title = title
-    self.label = label
     self.isOn = isOn
     self.splitPercentage = splitPercentage
   }
 
   var body: some View {
-    if behavioralStyle == .mac {
-      SettingsRow(title: title, splitPercentage: splitPercentage) {
-        Toggle(isOn: isOn) {}
-        Text(label)
-          .padding(.leading, 5)
-      }.preferredBehavioralStyle(preferredBehavioralStyle)
-    } else {
-      SettingsRow(title: label, splitPercentage: splitPercentage) {
-        Toggle(isOn: isOn) {}
-      }.preferredBehavioralStyle(preferredBehavioralStyle)
+    SettingsRow(title: title, splitPercentage: splitPercentage) {
+      Toggle(isOn: isOn) {}
+        .toggleStyle(.switch)
     }
   }
 }
 
 // MARK: - SettingsButtonRow
 
-struct SettingsButtonRow: View, BehavioralStylable {
+struct SettingsButtonRow: View {
   enum ActionType {
     case normal
     case destructive
@@ -148,74 +106,26 @@ struct SettingsButtonRow: View, BehavioralStylable {
     }
   }
 
-  let title: String?
-  let label: String
+  let title: String
   let actionType: ActionType
   let action: () -> ()
   let splitPercentage: CGFloat
-  @State
-  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
 
   init(
-    title: String? = nil,
-    label: String,
+    title: String,
     actionType: ActionType = .normal,
     splitPercentage: CGFloat = 0.4,
     action: @escaping () -> ()
   ) {
     self.title = title
-    self.label = label
     self.actionType = actionType
     self.action = action
     self.splitPercentage = splitPercentage
   }
 
   var body: some View {
-    if behavioralStyle == .mac {
-      SettingsRow(title: title, splitPercentage: splitPercentage) {
-        Button(action: action) {
-          Text(label)
-        }
-      }
-      .preferredBehavioralStyle(preferredBehavioralStyle)
-      .foregroundColor(actionType.foregroundColor)
-      .buttonStyle(.bordered)
-    } else {
-      Button(action: action) {
-        Text(label)
-      }.foregroundColor(actionType.foregroundColor)
-    }
-  }
-}
-
-// MARK: - ListToolbar
-
-struct ListToolbar<Buttons: View>: ViewModifier {
-  let buttons: () -> Buttons
-
-  init(@ViewBuilder _ buttons: @escaping () -> Buttons) {
-    self.buttons = buttons
-  }
-
-  func body(content: Content) -> some View {
-    VStack(spacing: 0) {
-      content
-      HStack(spacing: 10) {
-        Spacer().frame(width: 0.0)
-        buttons()
-        Spacer()
-      }
-      .frame(height: 30)
-      .background(Color.systemBackground)
-      .border(Color.separator, width: 1.0)
-      .padding(.top, -1)
-    }
-    .listRowSeparator(.hidden)
-  }
-}
-
-extension View {
-  func listToolbar<Buttons: View>(@ViewBuilder with buttons: @escaping () -> Buttons) -> some View {
-    modifier(ListToolbar(buttons))
+    Button(action: action) {
+      Text(title)
+    }.foregroundColor(actionType.foregroundColor)
   }
 }

@@ -44,20 +44,22 @@ class CommonCollectionSectionHeader: UICollectionReusableView {
         height: LibraryElementDetailTableHeaderView.frameHeight
       ))
     detailHeader?.prepare(configuration: configuration)
-    detailHeader?.traitCollectionDidChange(nil)
+    detailHeader?.refresh()
     if let detailHeader = detailHeader {
       addSubview(detailHeader)
     }
-  }
-
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    detailHeader?.traitCollectionDidChange(previousTraitCollection)
   }
 
   override func prepareForReuse() {
     detailHeader?.removeFromSuperview()
     detailHeader?.isHidden = true
     detailHeader = nil
+
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.detailHeader?.refresh()
+      }
+    )
   }
 }

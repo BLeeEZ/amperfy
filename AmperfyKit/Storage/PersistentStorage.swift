@@ -308,6 +308,25 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
       return .systemPink
     }
   }
+
+  public var contrastColor: UIColor {
+    switch self {
+    case .blue:
+      return .white
+    case .green:
+      return .white
+    case .red:
+      return .white
+    case .yellow:
+      return .black
+    case .orange:
+      return .white
+    case .purple:
+      return .white
+    case .pink:
+      return .white
+    }
+  }
 }
 
 // MARK: - CacheTranscodingFormatPreference

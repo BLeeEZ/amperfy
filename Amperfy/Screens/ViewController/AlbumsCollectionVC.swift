@@ -198,6 +198,9 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    // ensures that the collection view stops placing items under the sidebar
+    collectionView.contentInsetAdjustmentBehavior = .always
+
     appDelegate.userStatistics.visited(.albums)
 
     common.rootVC = self
@@ -258,12 +261,17 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
       guard let album = self.albumsDataSource?.getAlbum(at: indexPath) else { return nil }
       return PlayContext(containable: album)
     }
+    snapshotDidChange = {
+      self.common.updateContentUnavailable()
+    }
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
+    common.updateContentUnavailable()
   }
 
   func createCell(
@@ -295,7 +303,10 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     guard let albumsDataSource = albumsDataSource,
           let album = albumsDataSource.getAlbum(at: indexPath)
     else { return }
-    performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToAlbumDetail(album: album),
+      animated: true
+    )
   }
 
   override func collectionView(
@@ -304,14 +315,6 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     forItemAt indexPath: IndexPath
   ) {
     common.listViewWillDisplayCell(at: indexPath, searchBarText: searchController.searchBar.text)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
-    }
   }
 
   override func indexTitles(for collectionView: UICollectionView) -> [String]? {
@@ -338,6 +341,9 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 // MARK: UICollectionViewDelegateFlowLayout
 
 extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
+  static let minimumLineSpacing: CGFloat = 16
+  static let minimumInteritemSpacing: CGFloat = 16
+
   func collectionView(
     _ collectionView: UICollectionView,
     layout collectionViewLayout: UICollectionViewLayout,
@@ -349,15 +355,16 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
       layout: collectionViewLayout,
       insetForSectionAt: indexPath.section
     )
-    let spaceBetweenCells = self.collectionView(
-      collectionView,
-      layout: collectionViewLayout,
-      minimumInteritemSpacingForSectionAt: indexPath.section
-    )
-    let availableWidth = collectionView.bounds.size.width - inset.left - inset.right
-    let count = CGFloat(appDelegate.storage.settings.albumsGridSizeSetting)
-    let artworkWidth = (availableWidth - (spaceBetweenCells * (count - 1))) / count
-    return CGSize(width: artworkWidth, height: artworkWidth + 45)
+
+    let marginsAndInsets = inset.left + inset.right + collectionView.safeAreaInsets
+      .left + collectionView.safeAreaInsets.right + Self
+      .minimumInteritemSpacing * CGFloat(appDelegate.storage.settings.albumsGridSizeSetting - 1)
+    let itemWidth =
+      (
+        (collectionView.bounds.size.width - marginsAndInsets) /
+          CGFloat(appDelegate.storage.settings.albumsGridSizeSetting)
+      ).rounded(.down)
+    return CGSize(width: itemWidth, height: itemWidth + 45)
   }
 
   func collectionView(
@@ -366,11 +373,7 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
     minimumLineSpacingForSectionAt section: Int
   )
     -> CGFloat {
-    if self.collectionView.traitCollection.userInterfaceIdiom == .phone {
-      return 16.0
-    } else {
-      return 16.0
-    }
+    Self.minimumLineSpacing
   }
 
   func collectionView(
@@ -379,11 +382,7 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
     minimumInteritemSpacingForSectionAt section: Int
   )
     -> CGFloat {
-    if self.collectionView.traitCollection.userInterfaceIdiom == .phone {
-      return 16.0
-    } else {
-      return 16.0
-    }
+    Self.minimumInteritemSpacing
   }
 
   func collectionView(

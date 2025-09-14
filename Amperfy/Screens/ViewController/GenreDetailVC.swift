@@ -33,12 +33,20 @@ class GenreDetailVC: MultiSourceTableViewController {
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
     appDelegate.userStatistics.visited(.genreDetail)
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     artistsFetchedResultsController = GenreArtistsFetchedResultsController(
       for: genre,
@@ -61,6 +69,11 @@ class GenreDetailVC: MultiSourceTableViewController {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     configureSearchController(
       placeholder: "Artists, Albums and Songs",
@@ -89,13 +102,14 @@ class GenreDetailVC: MultiSourceTableViewController {
     detailOperationsView = GenericDetailTableHeader
       .createTableHeader(configuration: detailHeaderConfig)
 
-    optionsButton.menu = UIMenu.lazyMenu(deferredMenuMightBeBroken: true) {
-      EntityPreviewActionBuilder(container: self.genre, on: self).createMenu()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
+    optionsButton.menu = UIMenu.lazyMenu {
+      EntityPreviewActionBuilder(container: self.genre, on: self).createMenuActions()
     }
     navigationItem.rightBarButtonItem = optionsButton
 
     containableAtIndexPathCallback = { indexPath in
-      switch indexPath.section + 1 {
+      switch indexPath.section + 0 {
       case LibraryElement.Artist.rawValue:
         return self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(
           row: indexPath.row,
@@ -116,7 +130,7 @@ class GenreDetailVC: MultiSourceTableViewController {
       }
     }
     playContextAtIndexPathCallback = { indexPath in
-      switch indexPath.section + 1 {
+      switch indexPath.section + 0 {
       case LibraryElement.Artist.rawValue:
         let entity = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(
           row: indexPath.row,
@@ -140,7 +154,7 @@ class GenreDetailVC: MultiSourceTableViewController {
       }
     }
     swipeCallback = { indexPath, completionHandler in
-      switch indexPath.section + 1 {
+      switch indexPath.section + 0 {
       case LibraryElement.Artist.rawValue:
         let artist = self.artistsFetchedResultsController.getWrappedEntity(at: IndexPath(
           row: indexPath.row,
@@ -188,6 +202,7 @@ class GenreDetailVC: MultiSourceTableViewController {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     artistsFetchedResultsController?.delegate = self
     albumsFetchedResultsController?.delegate = self
     songsFetchedResultsController?.delegate = self
@@ -224,7 +239,7 @@ class GenreDetailVC: MultiSourceTableViewController {
 
   func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
     guard let indexPath = tableView.indexPath(for: cell),
-          indexPath.section + 1 == LibraryElement.Song.rawValue
+          indexPath.section + 0 == LibraryElement.Song.rawValue
     else { return nil }
     return convertIndexPathToPlayContext(songIndexPath: IndexPath(row: indexPath.row, section: 0))
   }
@@ -232,7 +247,8 @@ class GenreDetailVC: MultiSourceTableViewController {
   // MARK: - Table view data source
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    3
+    // 3 section + 1 top section. The top section is needed due to display bugs
+    4
   }
 
   override func tableView(
@@ -240,7 +256,7 @@ class GenreDetailVC: MultiSourceTableViewController {
     titleForHeaderInSection section: Int
   )
     -> String? {
-    switch section + 1 {
+    switch section + 0 {
     case LibraryElement.Artist.rawValue:
       return "Artists"
     case LibraryElement.Album.rawValue:
@@ -253,7 +269,7 @@ class GenreDetailVC: MultiSourceTableViewController {
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    switch section + 1 {
+    switch section + 0 {
     case LibraryElement.Artist.rawValue:
       return artistsFetchedResultsController.sections?[0].numberOfObjects ?? 0
     case LibraryElement.Album.rawValue:
@@ -270,7 +286,7 @@ class GenreDetailVC: MultiSourceTableViewController {
     cellForRowAt indexPath: IndexPath
   )
     -> UITableViewCell {
-    switch indexPath.section + 1 {
+    switch indexPath.section + 0 {
     case LibraryElement.Artist.rawValue:
       let cell: GenericTableCell = dequeueCell(for: tableView, at: indexPath)
       let artist = artistsFetchedResultsController.getWrappedEntity(at: IndexPath(
@@ -305,7 +321,7 @@ class GenreDetailVC: MultiSourceTableViewController {
     heightForHeaderInSection section: Int
   )
     -> CGFloat {
-    switch section + 1 {
+    switch section + 0 {
     case LibraryElement.Artist.rawValue:
       return artistsFetchedResultsController.sections?[0]
         .numberOfObjects ?? 0 > 0 ? CommonScreenOperations.tableSectionHeightLarge : 0
@@ -325,7 +341,7 @@ class GenreDetailVC: MultiSourceTableViewController {
     heightForRowAt indexPath: IndexPath
   )
     -> CGFloat {
-    switch indexPath.section + 1 {
+    switch indexPath.section + 0 {
     case LibraryElement.Artist.rawValue:
       return GenericTableCell.rowHeight
     case LibraryElement.Album.rawValue:
@@ -342,7 +358,7 @@ class GenreDetailVC: MultiSourceTableViewController {
     estimatedHeightForRowAt indexPath: IndexPath
   )
     -> CGFloat {
-    switch indexPath.section + 1 {
+    switch indexPath.section + 0 {
     case LibraryElement.Artist.rawValue:
       return GenericTableCell.rowHeight
     case LibraryElement.Album.rawValue:
@@ -355,34 +371,27 @@ class GenreDetailVC: MultiSourceTableViewController {
   }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    switch indexPath.section + 1 {
+    switch indexPath.section + 0 {
     case LibraryElement.Artist.rawValue:
       let artist = artistsFetchedResultsController.getWrappedEntity(at: IndexPath(
         row: indexPath.row,
         section: 0
       ))
-      performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        animated: true
+      )
     case LibraryElement.Album.rawValue:
       let album = albumsFetchedResultsController.getWrappedEntity(at: IndexPath(
         row: indexPath.row,
         section: 0
       ))
-      performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        animated: true
+      )
     case LibraryElement.Song.rawValue: break
     default: break
-    }
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toArtistDetail.rawValue {
-      let vc = segue.destination as! ArtistDetailVC
-      let artist = sender as? Artist
-      vc.artist = artist
-    }
-    if segue.identifier == Segues.toAlbumDetail.rawValue {
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
     }
   }
 
@@ -414,11 +423,11 @@ class GenreDetailVC: MultiSourceTableViewController {
     var section = 0
     switch controller {
     case artistsFetchedResultsController.fetchResultsController:
-      section = LibraryElement.Artist.rawValue - 1
+      section = LibraryElement.Artist.rawValue - 0
     case albumsFetchedResultsController.fetchResultsController:
-      section = LibraryElement.Album.rawValue - 1
+      section = LibraryElement.Album.rawValue - 0
     case songsFetchedResultsController.fetchResultsController:
-      section = LibraryElement.Song.rawValue - 1
+      section = LibraryElement.Song.rawValue - 0
     default:
       return
     }

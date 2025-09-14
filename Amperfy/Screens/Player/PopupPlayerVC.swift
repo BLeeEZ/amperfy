@@ -51,9 +51,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   )
 
   var player: PlayerFacade!
+  var playerHandler: PlayerUIHandler?
   var controlView: PlayerControlView?
   var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
-  var hostingSplitVC: SplitVC?
 
   var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
   var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -78,10 +78,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
     player = appDelegate.player
     player.addNotifier(notifier: self)
+    playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
 
     backgroundImage.setBackgroundBlur(style: .prominent)
-
-    refreshCurrentlyPlayingPopupItem()
 
     controlPlaceholderHeightConstraint.constant = PlayerControlView
       .frameHeight + safetyMarginOnBottom
@@ -155,6 +154,13 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       name: .downloadFinishedSuccess,
       object: appDelegate.playableDownloadManager
     )
+
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.refresh()
+      }
+    )
   }
 
   override func viewDidLayoutSubviews() {
@@ -197,18 +203,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }}
   }
 
-  #if targetEnvironment(macCatalyst)
-    // Fix the mini player on macOS
-    override var traitCollection: UITraitCollection {
-      let compactHorizontalCollection = UITraitCollection(horizontalSizeClass: .compact)
-      let compactVerticalCollection = UITraitCollection(verticalSizeClass: .compact)
-      let newCollection = UITraitCollection(traitsFrom: [
-        super.traitCollection, compactHorizontalCollection, compactVerticalCollection,
-      ])
-      return newCollection
-    }
-  #endif
-
   func reloadData() {
     tableView.reloadData()
     scrollToCurrentlyPlayingRow()
@@ -250,17 +244,14 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
   func displayArtistDetail() {
     if let song = player.currentlyPlaying?.asSong, let artist = song.artist {
-      let artistDetailVC = ArtistDetailVC.instantiateFromAppStoryboard()
-      artistDetailVC.artist = artist
+      let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(artist: artist)
       closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
     }
   }
 
   func displayAlbumDetail() {
     if let song = player.currentlyPlaying?.asSong, let album = song.album {
-      let albumDetailVC = AlbumDetailVC.instantiateFromAppStoryboard()
-      albumDetailVC.album = album
-      albumDetailVC.songToScrollTo = song
+      let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(album: album, songToScrollTo: song)
       closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
     }
   }
@@ -268,22 +259,23 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   func displayPodcastDetail() {
     if let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode,
        let podcast = podcastEpisode.podcast {
-      let podcastDetailVC = PodcastDetailVC.instantiateFromAppStoryboard()
-      podcastDetailVC.podcast = podcast
-      podcastDetailVC.episodeToScrollTo = podcastEpisode
+      let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(
+        podcast: podcast,
+        episodeToScrollTo: podcastEpisode
+      )
       closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
     }
   }
 
   func closePopupPlayer() {
-    guard let hostingSplitVC = hostingSplitVC else { return }
+    guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true)
   }
 
   func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
-    guard let hostingSplitVC = hostingSplitVC else { return }
+    guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true, completion: { () in
-      hostingSplitVC.push(vc: vc)
+      hostingSplitVC.pushNavLibrary(vc: vc)
     })
   }
 

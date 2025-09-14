@@ -46,7 +46,7 @@ class SearchDiffableDataSource: BasicUITableViewDiffableDataSource {
     switch SearchSection(rawValue: section) {
     case .History:
       if searchVC.searchHistory.isEmpty {
-        return "No Recent Searches"
+        return ""
       } else {
         return "Recently Searched"
       }
@@ -78,8 +78,16 @@ class SearchVC: BasicTableViewController {
   fileprivate var playlists: [Playlist] = []
   fileprivate var songs: [Song] = []
 
-  private var optionsButton: UIBarButtonItem = OptionsBarButton()
+  private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   private var isSearchActive = false
+
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
 
   func createDiffableDataSource() -> SearchDiffableDataSource {
     let source =
@@ -133,13 +141,17 @@ class SearchVC: BasicTableViewController {
 
     searchHistory = appDelegate.storage.main.library.getSearchHistory()
     updateDataSource(animated: false)
+    navigationController?.navigationItem.searchBarPlacementAllowsExternalIntegration = true
 
     tableView.register(nibName: PlaylistTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.separatorStyle = .none
-    tableView.sectionHeaderTopPadding = 0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     containableAtIndexPathCallback = { indexPath in
       switch SearchSection(rawValue: indexPath.section) {
@@ -184,17 +196,15 @@ class SearchVC: BasicTableViewController {
         completionHandler(actionContext)
       }
     }
+    updateContentUnavailable()
   }
 
   override func viewIsAppearing(_ animated: Bool) {
-    #if targetEnvironment(macCatalyst)
-      // Request a search update (in case we navigated back to the search)
-      NotificationCenter.default.post(name: .RequestSearchUpdate, object: view.window)
-    #endif
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     appDelegate.userStatistics.visited(.search)
     configureSearchController(
-      placeholder: "Playlists, Songs and more",
+      placeholder: "Search in \"Library\"",
       scopeButtonTitles: ["All", "Cached"],
       showSearchBarAtEnter: true
     )
@@ -219,54 +229,19 @@ class SearchVC: BasicTableViewController {
     )
 
     // Install the options button
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: [
       UIAction(title: "Clear Search History", image: .clear, handler: { _ in
         self.appDelegate.storage.main.library.deleteSearchHistory()
         self.appDelegate.storage.main.library.saveContext()
         self.searchHistory = []
         self.updateDataSource(animated: true)
+        self.updateContentUnavailable()
       }),
     ])
 
-    #if targetEnvironment(macCatalyst)
-      let scopeButtonSegmentedControl = UISegmentedControl(
-        items:
-        (scopeButtonTitles ?? [])?.enumerated().map { i, title in
-          UIAction(title: title, handler: { [weak self] action in
-            self?.searchController.searchBar.selectedScopeButtonIndex = i
-          })
-        }
-      )
-      scopeButtonSegmentedControl.selectedSegmentIndex = searchController.searchBar
-        .selectedScopeButtonIndex
-
-      // Remove the search bar from the navigationbar on macOS
-      navigationItem.searchController = nil
-      navigationItem.rightBarButtonItems = [
-        optionsButton,
-        UIBarButtonItem(customView: scopeButtonSegmentedControl),
-      ]
-
-      // Listen for search changes from the sidebar
-      NotificationCenter.default.addObserver(
-        self,
-        selector: #selector(handleSearchUpdate(notification:)),
-        name: .SearchChanged,
-        object: nil
-      )
-    #else
-      navigationItem.rightBarButtonItem = optionsButton
-    #endif
+    navigationItem.rightBarButtonItem = optionsButton
   }
-
-  #if targetEnvironment(macCatalyst)
-    @objc
-    func handleSearchUpdate(notification: Notification) {
-      // only update the search in this tab
-      guard notification.object as? UIWindow == view.window else { return }
-      searchController.searchBar.text = notification.userInfo?["searchText"] as? String
-    }
-  #endif
 
   func determSwipeActionContext(
     at indexPath: IndexPath,
@@ -466,39 +441,30 @@ class SearchVC: BasicTableViewController {
     case .Playlist:
       let playlist = playlists[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: playlist)
-      performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+        animated: true
+      )
     case .Artist:
       let artist = artists[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: artist)
-      performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        animated: true
+      )
     case .Album:
       let album = albums[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: album)
-      performSegue(withIdentifier: Segues.toAlbumDetail.rawValue, sender: album)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        animated: true
+      )
     case .Song:
       let song = songs[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: song)
     case .none: break
     }
     appDelegate.storage.main.library.saveContext()
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    switch segue.identifier {
-    case Segues.toPlaylistDetail.rawValue:
-      let vc = segue.destination as! PlaylistDetailVC
-      let playlist = sender as? Playlist
-      vc.playlist = playlist
-    case Segues.toArtistDetail.rawValue:
-      let vc = segue.destination as! ArtistDetailVC
-      let artist = sender as? Artist
-      vc.artist = artist
-    case Segues.toAlbumDetail.rawValue:
-      let vc = segue.destination as! AlbumDetailVC
-      let album = sender as? Album
-      vc.album = album
-    default: break
-    }
   }
 
   struct SearchResultObjectContainer: Sendable {
@@ -589,6 +555,7 @@ class SearchVC: BasicTableViewController {
           .compactMap { Song(managedObject: $0) }
         self.tableView.separatorStyle = .singleLine
         self.updateDataSource(animated: false)
+        self.updateContentUnavailable()
       } catch {
         // do nothing
       }}
@@ -653,6 +620,7 @@ class SearchVC: BasicTableViewController {
           .compactMap { Song(managedObject: $0) }
         self.tableView.separatorStyle = .singleLine
         self.updateDataSource(animated: false)
+        self.updateContentUnavailable()
       } catch {
         // do nothing
       }}
@@ -665,6 +633,27 @@ class SearchVC: BasicTableViewController {
       songs = []
       tableView.separatorStyle = .singleLine
       updateDataSource(animated: false)
+      updateContentUnavailable()
     }
   }
+
+  func updateContentUnavailable() {
+    if isSearchActive {
+      if artists.isEmpty, albums.isEmpty, playlists.isEmpty, songs.isEmpty {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = nil
+      }
+    } else {
+      contentUnavailableConfiguration = searchHistory.isEmpty ? noSearchHistoryConfig : nil
+    }
+  }
+
+  lazy var noSearchHistoryConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .clock
+    config.text = "No Search History"
+    config.secondaryText = "Your search history will appear here."
+    return config
+  }()
 }

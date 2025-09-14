@@ -90,9 +90,11 @@ extension CarPlaySceneDelegate {
 
   func displayNowPlaying(completion: @escaping (() -> ())) {
     configureNowPlayingTemplate()
-    interfaceController?.popToRootTemplate(animated: false) { _, _ in
-      self.interfaceController?
-        .pushTemplate(CPNowPlayingTemplate.shared, animated: true) { _, _ in completion() }
+    Task { @MainActor in
+      guard let _ = try? await interfaceController?.popToRootTemplate(animated: false)
+      else { return }
+      let _ = try? await self.interfaceController?
+        .pushTemplate(CPNowPlayingTemplate.shared, animated: true)
     }
   }
 }
@@ -177,7 +179,8 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
     listItem.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       appDelegate.player.play(playerIndex: playerIndex)
-      interfaceController?.popTemplate(animated: true) { _, _ in
+      Task { @MainActor in
+        guard let _ = try? await interfaceController?.popTemplate(animated: true) else { return }
         completion()
       }
     }

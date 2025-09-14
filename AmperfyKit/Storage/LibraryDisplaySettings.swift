@@ -44,6 +44,12 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
   case recentAlbums = 13
   case radios = 14
 
+  public static func createByDisplayName(name: String) -> LibraryDisplayType? {
+    .allCases.first {
+      $0.displayName == name
+    }
+  }
+
   public var displayName: String {
     switch self {
     case .artists:
@@ -107,39 +113,6 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
       return UIImage.albumRecent
     case .radios:
       return UIImage.radio
-    }
-  }
-
-  public var segueName: String {
-    switch self {
-    case .artists:
-      return "toArtists"
-    case .albums:
-      return "toAlbums"
-    case .songs:
-      return "toSongs"
-    case .genres:
-      return "toGenres"
-    case .directories:
-      return "toDirectories"
-    case .playlists:
-      return "toPlaylists"
-    case .podcasts:
-      return "toPodcasts"
-    case .downloads:
-      return "toDownloads"
-    case .favoriteSongs:
-      return "toSongs"
-    case .favoriteAlbums:
-      return "toAlbums"
-    case .favoriteArtists:
-      return "toArtists"
-    case .newestAlbums:
-      return "toAlbums"
-    case .recentAlbums:
-      return "toAlbums"
-    case .radios:
-      return "toRadios"
     }
   }
 }

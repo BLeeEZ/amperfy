@@ -84,99 +84,11 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
   @MainActor
   var controller: UIViewController {
     switch self {
-    case .search: return SearchVC.instantiateFromAppStoryboard()
-    case .settings: return SettingsHostVC.instantiateFromAppStoryboard()
+    case .search: return AppStoryboard.Main.segueToSearch()
+    case .settings: return AppStoryboard.Main.segueToSettings()
     }
   }
 }
-
-#if targetEnvironment(macCatalyst)
-  class SearchNavigationItemContentView: UISearchBar, UIContentView, UISearchBarDelegate {
-    private var currentConfiguration: SearchNavigationItemConfiguration
-    var configuration: UIContentConfiguration {
-      get { currentConfiguration }
-      set {
-        guard let config = newValue as? SearchNavigationItemConfiguration else { return }
-        apply(config)
-      }
-    }
-
-    init(configuration: SearchNavigationItemConfiguration) {
-      self.currentConfiguration = configuration
-      super.init(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
-
-      // We add the scope buttons, but never show them to the user. The user uses the navigatonbar items instead.
-      self.showsScopeBar = false
-      self.scopeButtonTitles = ["All", "Cached"]
-      self.searchBarStyle = .minimal
-      self.placeholder = "Search"
-      self.delegate = self
-
-      apply(configuration)
-
-      NotificationCenter.default.addObserver(
-        self,
-        selector: #selector(handleSearchRequest(notification:)),
-        name: .RequestSearchUpdate,
-        object: nil
-      )
-    }
-
-    @objc
-    func handleSearchRequest(notification: Notification) {
-      guard let window = notification.object as? UIWindow, window == self.window else { return }
-      let userInfo = ["searchText": text ?? ""]
-      NotificationCenter.default.post(name: .SearchChanged, object: window, userInfo: userInfo)
-    }
-
-    required init(coder: NSCoder) {
-      fatalError("init(coder:) has not been implemented")
-    }
-
-    private func apply(_ config: SearchNavigationItemConfiguration) {
-      guard config != currentConfiguration else { return }
-
-      currentConfiguration = config
-      isUserInteractionEnabled = config.selected
-
-      Task { @MainActor in
-        try await Task.sleep(nanoseconds: 100_000_000)
-        if config.selected {
-          self.becomeFirstResponder()
-        } else {
-          self.resignFirstResponder()
-        }
-      }
-    }
-
-    // MARK: - Delegate
-
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-      // Inform all SearchVC about the new search string
-      guard let sender = window else { return }
-      NotificationCenter.default.post(
-        name: .SearchChanged,
-        object: sender,
-        userInfo: ["searchText": searchText]
-      )
-    }
-  }
-
-  struct SearchNavigationItemConfiguration: UIContentConfiguration, Hashable {
-    var selected: Bool = false
-
-    func updated(for state: any UIConfigurationState) -> SearchNavigationItemConfiguration {
-      let cellState = state as? UICellConfigurationState
-      var newState = self
-      newState.selected = cellState?.isSelected ?? false
-      return newState
-    }
-
-    func makeContentView() -> UIView & UIContentView {
-      SearchNavigationItemContentView(configuration: self)
-    }
-  }
-#endif
 
 typealias SideBarDiffableDataSource = UICollectionViewDiffableDataSource<Int, LibraryNavigatorItem>
 
@@ -212,20 +124,31 @@ class LibraryNavigatorConfigurator: NSObject {
     self.librarySettings = librarySettings
     self.layoutConfig = layoutConfig
     self.pressedOnLibraryItemCB = pressedOnLibraryItemCB
+    super.init()
+
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleLibraryItemsChanged(notification:)),
+      name: .LibraryItemsChanged,
+      object: nil
+    )
+  }
+
+  @objc
+  func handleLibraryItemsChanged(notification: Notification) {
+    refresh(librarySettings: appDelegate.storage.settings.libraryDisplaySettings)
   }
 
   @MainActor
   func viewDidLoad(navigationItem: UINavigationItem, collectionView: UICollectionView) {
     self.collectionView = collectionView
-    #if !targetEnvironment(macCatalyst)
-      editButton = UIBarButtonItem(
-        title: "Edit",
-        style: .plain,
-        target: self,
-        action: #selector(editingPressed)
-      )
-      navigationItem.rightBarButtonItems = [editButton]
-    #endif
+    editButton = UIBarButtonItem(
+      title: "Edit",
+      style: .plain,
+      target: self,
+      action: #selector(editingPressed)
+    )
+    navigationItem.rightBarButtonItems = [editButton]
     libraryInUse = librarySettings.inUse.map { LibraryNavigatorItem(
       title: $0.displayName,
       library: $0
@@ -234,6 +157,7 @@ class LibraryNavigatorConfigurator: NSObject {
       title: $0.displayName,
       library: $0
     ) }
+    self.collectionView.allowsSelectionDuringEditing = true
     self.collectionView.delegate = self
     self.collectionView.collectionViewLayout = createLayout() // 1 Configure the layout
     configureDataSource() // 2 configure the data Source
@@ -241,7 +165,7 @@ class LibraryNavigatorConfigurator: NSObject {
   }
 
   func viewIsAppearing(navigationItem: UINavigationItem, collectionView: UICollectionView) {
-    #if targetEnvironment(macCatalyst)
+    #if targetEnvironment(macCatalyst) // ok
       if self.collectionView.indexPathsForSelectedItems?.first == nil {
         self.collectionView.selectItem(at: .zero, animated: false, scrollPosition: .top)
       }
@@ -251,13 +175,11 @@ class LibraryNavigatorConfigurator: NSObject {
   @MainActor @objc
   private func editingPressed() {
     let isInEditMode = !collectionView.isEditing
-    #if !targetEnvironment(macCatalyst)
-      editButton.title = isInEditMode ? "Done" : "Edit"
-      editButton.style = isInEditMode ? .done : .plain
-    #endif
+    editButton.title = isInEditMode ? "Done" : "Edit"
+    editButton.style = isInEditMode ? .prominent : .plain
 
     if isInEditMode {
-      #if targetEnvironment(macCatalyst)
+      #if targetEnvironment(macCatalyst) // ok
         let selectedIndexPath = collectionView.indexPathsForSelectedItems?.first ?? .zero
         preEditItem = dataSource.itemIdentifier(for: selectedIndexPath)
       #endif
@@ -301,11 +223,48 @@ class LibraryNavigatorConfigurator: NSObject {
       dataSource.apply(snapshot, to: 0, animatingDifferences: true)
 
       // Restore selection after editing endet on macOS
-      #if targetEnvironment(macCatalyst)
+      #if targetEnvironment(macCatalyst) // ok
         let indexPath = preEditItem != nil ? dataSource.indexPath(for: preEditItem!) : .zero
         collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
       #endif
+
+      NotificationCenter.default.post(name: .LibraryItemsChanged, object: nil, userInfo: nil)
     }
+  }
+
+  func refresh(librarySettings: LibraryDisplaySettings) {
+    #if targetEnvironment(macCatalyst) // ok
+      let selectedIndexPath = collectionView.indexPathsForSelectedItems?.first ?? .zero
+      preEditItem = dataSource.itemIdentifier(for: selectedIndexPath)
+    #endif
+
+    var snapshot = dataSource.snapshot(for: 0)
+    snapshot.deleteAll()
+
+    libraryInUse = librarySettings.inUse.map { LibraryNavigatorItem(
+      title: $0.displayName,
+      library: $0,
+      isSelected: true
+    ) }
+    #if targetEnvironment(macCatalyst) // ok
+      // update the preEditItem based on title
+      preEditItem = libraryInUse.first(where: { $0.title == preEditItem?.title })
+    #endif
+    libraryNotUsed = librarySettings.notUsed.map { LibraryNavigatorItem(
+      title: $0.displayName,
+      library: $0
+    ) }
+
+    snapshot.append(offsetData)
+    snapshot.append(libraryInUse)
+    dataSource.apply(snapshot, to: 0, animatingDifferences: true)
+
+    // Restore selection after refresh endet on macOS
+    #if targetEnvironment(macCatalyst) // ok
+      if let preEditItem, let indexPath = dataSource.indexPath(for: preEditItem) {
+        collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
+      }
+    #endif
   }
 
   private func createLayout() -> UICollectionViewLayout {
@@ -342,29 +301,13 @@ class LibraryNavigatorConfigurator: NSObject {
         var content = cell.defaultContentConfiguration()
         content.text = item.title
         content.textProperties.font = .preferredFont(forTextStyle: .headline)
-
-        #if targetEnvironment(macCatalyst)
-          content.textProperties.color = .secondaryLabel
-          // show edit on the right-hand side of the header
-          cell.accessories = [
-            .customView(configuration: .createEdit(
-              target: self,
-              action: #selector(self.editingPressed)
-            )),
-            .customView(configuration: .createDone(
-              target: self,
-              action: #selector(self.editingPressed)
-            )),
-          ]
-        #else
-          cell.accessories = []
-        #endif
+        cell.accessories = []
         cell.contentConfiguration = content
       } else if let libraryItem = item.library {
         var content = cell.defaultContentConfiguration()
         Self.configureForLibrary(contentView: &content, libraryItem: libraryItem)
 
-        #if targetEnvironment(macCatalyst)
+        #if targetEnvironment(macCatalyst) // ok
           cell.accessories = []
         #else
           cell.accessories = [.disclosureIndicator(displayed: .whenNotEditing)]
@@ -378,25 +321,15 @@ class LibraryNavigatorConfigurator: NSObject {
         }
         cell.contentConfiguration = content
       } else if let tabItem = item.tab {
-        #if targetEnvironment(macCatalyst)
+        #if targetEnvironment(macCatalyst) // ok
           cell.accessories = []
-          if tabItem == .search {
-            let content = SearchNavigationItemConfiguration()
-            cell.contentConfiguration = content
-            cell.backgroundConfiguration = UIBackgroundConfiguration.clear()
-          } else {
-            var content = cell.defaultContentConfiguration()
-            content.text = tabItem.title
-            content.image = tabItem.icon
-            cell.contentConfiguration = content
-          }
         #else
           cell.accessories = [.disclosureIndicator()]
-          var content = cell.defaultContentConfiguration()
-          content.text = tabItem.title
-          content.image = tabItem.icon
-          cell.contentConfiguration = content
         #endif
+        var content = cell.defaultContentConfiguration()
+        content.text = tabItem.title
+        content.image = tabItem.icon.withRenderingMode(.alwaysOriginal)
+        cell.contentConfiguration = content
       }
       cell.indentationLevel = 0
     }
@@ -429,11 +362,6 @@ class LibraryNavigatorConfigurator: NSObject {
       let isEdit = self?.collectionView.isEditing ?? false
       return item.isSelected && isEdit && (item.tab == nil)
     }
-
-    // Somehow, this fixes a crash when trying to reorder the sidebar in catalyst. Leave it in.
-    #if targetEnvironment(macCatalyst)
-      dataSource.reorderingHandlers.didReorder = { _ in }
-    #endif
   }
 
   @MainActor
@@ -443,11 +371,11 @@ class LibraryNavigatorConfigurator: NSObject {
   ) {
     contentView.text = libraryItem.displayName
     contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
-    var imageSize = CGSize(width: 35.0, height: 25.0)
-    if !libraryItem.image.isSymbolImage {
+    if libraryItem == .podcasts {
       // special case for podcast icon
-      imageSize = CGSize(width: imageSize.width, height: imageSize.height - 2)
+      contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
     }
+    let imageSize = CGSize(width: 35.0, height: 25.0)
     contentView.imageProperties.maximumSize = imageSize
     contentView.imageProperties.reservedLayoutSize = imageSize
   }
@@ -482,13 +410,6 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
     if collectionView.isEditing {
       return indexPath.row >= offsetData.count
     } else if let item = dataSource.itemIdentifier(for: indexPath) {
-      #if targetEnvironment(macCatalyst)
-        // Do not allow reselecting an already selected cell
-        guard let alreadySelected = collectionView.indexPathsForSelectedItems?.contains(indexPath),
-              !alreadySelected else {
-          return false
-        }
-      #endif
       return item.isInteractable
     } else {
       return false
@@ -564,22 +485,14 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
       item.isSelected.toggle()
       snapshot.reconfigureItems([item])
       dataSource.apply(snapshot, animatingDifferences: false)
-
       return
     }
     // Retrieve the item identifier using index path.
     // The item identifier we get will be the selected data item
 
     guard let selectedItem = dataSource.itemIdentifier(for: indexPath) else {
-      #if !targetEnvironment(macCatalyst)
-        collectionView.deselectItem(at: indexPath, animated: true)
-      #endif
       return
     }
-
-    #if !targetEnvironment(macCatalyst)
-      collectionView.deselectItem(at: indexPath, animated: false)
-    #endif
 
     pressedOnLibraryItemCB(selectedItem)
   }

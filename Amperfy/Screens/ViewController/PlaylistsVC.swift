@@ -82,6 +82,14 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   private var optionsButton: UIBarButtonItem!
   private var sortType: PlaylistSortType = .name
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       PlaylistsDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -108,7 +116,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.playlists)
 
-    optionsButton = SortBarButton()
+    optionsButton = UIBarButtonItem.createSortBarButton()
 
     change(sortType: appDelegate.storage.settings.playlistsSortSetting)
 
@@ -127,6 +135,11 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     tableView.register(nibName: PlaylistTableCell.typeName)
     tableView.rowHeight = PlaylistTableCell.rowHeight
     tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     #if !targetEnvironment(macCatalyst)
       refreshControl = UIRefreshControl()
@@ -159,7 +172,30 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
         completionHandler(SwipeActionContext(containable: playlist))
       }
     }
+    snapshotDidChange = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .playlist
+    config.text = "No Playlists"
+    config.secondaryText = "Your playlists will appear here."
+    return config
+  }()
 
   func change(sortType: PlaylistSortType) {
     self.sortType = sortType
@@ -176,14 +212,17 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     singleFetchedResultsController?.fetch()
     tableView.reloadData()
     updateRightBarButtonItems()
+    updateContentUnavailable()
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     if appDelegate.storage.settings.isOfflineMode {
       isEditing = false
     }
     updateRightBarButtonItems()
+    updateContentUnavailable()
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
@@ -196,21 +235,14 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     var actions = [UIMenu]()
     actions.append(createSortButtonMenu())
     actions.append(createOptionsButtonMenu())
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: actions)
-    #if targetEnvironment(macCatalyst)
-      navigationItem.leftItemsSupplementBackButton = true
-      navigationItem.rightBarButtonItem = optionsButton
-      if appDelegate.storage.settings.isOnlineMode {
-        navigationItem.leftBarButtonItem = editButtonItem
-      }
-    #else
-      var barButtons = [UIBarButtonItem]()
-      barButtons.append(optionsButton)
-      if appDelegate.storage.settings.isOnlineMode {
-        barButtons.append(editButtonItem)
-      }
-      navigationItem.rightBarButtonItems = barButtons
-    #endif
+    var barButtons = [UIBarButtonItem]()
+    barButtons.append(optionsButton)
+    if appDelegate.storage.settings.isOnlineMode {
+      barButtons.append(editButtonItem)
+    }
+    navigationItem.rightBarButtonItems = barButtons
   }
 
   func createCell(
@@ -226,15 +258,10 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let playlist = playlistAt(indexPath: indexPath) else { return }
-    performSegue(withIdentifier: Segues.toPlaylistDetail.rawValue, sender: playlist)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toPlaylistDetail.rawValue {
-      let vc = segue.destination as! PlaylistDetailVC
-      let playlist = sender as? Playlist
-      vc.playlist = playlist
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+      animated: true
+    )
   }
 
   private func createSortButtonMenu() -> UIMenu {
@@ -358,5 +385,6 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
       playlistSearchCategory: playlistSearchCategory
     )
     tableView.reloadData()
+    updateContentUnavailable()
   }
 }

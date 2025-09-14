@@ -55,6 +55,14 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   private var selectBarButton: UIBarButtonItem!
   private var addBarButton: UIBarButtonItem!
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       PlaylistsSelectorDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -76,7 +84,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    optionsButton = SortBarButton()
+    optionsButton = UIBarButtonItem.createSortBarButton()
 
     appDelegate.userStatistics.visited(.playlistSelector)
     setNavBarTitle(
@@ -90,6 +98,11 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     tableView.register(nibName: PlaylistTableCell.typeName)
     tableView.rowHeight = PlaylistTableCell.rowHeight
     tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     tableView.tableHeaderView = UIView(frame: CGRect(
       x: 0,
@@ -158,14 +171,13 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   }
 
   func updateRightBarButtonItems() {
-    closeButton = CloseBarButton(target: self, selector: #selector(cancelBarButtonPressed))
+    closeButton = UIBarButtonItem.createCloseBarButton(
+      target: self,
+      selector: #selector(cancelBarButtonPressed)
+    )
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = createSortButtonMenu()
-    #if targetEnvironment(macCatalyst)
-      navigationItem.rightBarButtonItem = optionsButton
-      navigationItem.leftBarButtonItem = closeButton
-    #else
-      navigationItem.rightBarButtonItems = [closeButton, optionsButton]
-    #endif
+    navigationItem.rightBarButtonItems = [closeButton, optionsButton]
   }
 
   @IBAction
@@ -366,14 +378,6 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
       } else {
         handleSuccessfullSelection(playables: itemsToAdd)
       }
-    }
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toPlaylistDetail.rawValue {
-      let vc = segue.destination as! PlaylistDetailVC
-      let playlist = sender as? Playlist
-      vc.playlist = playlist
     }
   }
 

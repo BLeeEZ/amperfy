@@ -65,11 +65,8 @@ class UpdateVC: UIViewController {
       self.appDelegate.eventLogger.supressAlerts = false
       self.appDelegate.startManagerForNormalOperation()
 
-      #if targetEnvironment(macCatalyst)
-        AppDelegate.rootViewController()?.dismiss(animated: true)
-      #else
-        self.performSegue(withIdentifier: "toLibrary", sender: self)
-      #endif
+      guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
+      mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow())
     }
   }
 

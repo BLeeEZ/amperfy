@@ -23,10 +23,57 @@ import AmperfyKit
 import OSLog
 import UIKit
 
+// MARK: - MainSceneHostingViewController
+
+@MainActor
+protocol MainSceneHostingViewController {
+  func pushNavLibrary(vc: UIViewController)
+  func pushLibraryCategory(vc: UIViewController)
+  func pushTabCategory(tabCategory: TabNavigatorItem)
+  func displaySearch()
+
+  func visualizePopupPlayer(
+    direction: PopupPlayerDirection,
+    animated: Bool,
+    completion completionBlock: (() -> ())?
+  )
+
+  func getSafeAreaExtension() -> CGFloat
+  var miniPlayer: MiniPlayerView? { get }
+}
+
+extension MainSceneHostingViewController {
+  func visualizePopupPlayer(
+    direction: PopupPlayerDirection,
+    animated: Bool,
+    completion completionBlock: (() -> ())? = nil
+  ) {
+    guard let topView = AppDelegate.topViewController(),
+          let hostVC = AppDelegate.mainWindowHostVC
+    else { return }
+
+    if let presentedViewController = topView.presentedViewController {
+      presentedViewController.dismiss(animated: animated) {
+        if direction == .open {
+          hostVC.miniPlayer?.openPlayerView(completion: completionBlock)
+        } else {
+          completionBlock?()
+        }
+      }
+    } else {
+      if direction == .open || direction == .toggle {
+        hostVC.miniPlayer?.openPlayerView(completion: completionBlock)
+      } else {
+        completionBlock?()
+      }
+    }
+  }
+}
+
+// MARK: - SceneDelegate
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-  #if true // default to true: set to false to adjust Main window to App Connect compatible screen size for screenshots
-    static let mainWindowSize = CGSizeMake(SplitVC.sidebarWidth + 810, 580)
-  #else
+  #if false // set to true to adjust Main window to App Connect compatible screen size for screenshots
     static let mainWindowSize = CGSizeMake(1168, 688) // 2560 x 1600
   #endif
 
@@ -64,55 +111,27 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.window = window
     var initialViewController: UIViewController?
 
-    #if targetEnvironment(macCatalyst)
-
+    #if false
       windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
-
-      // Restore window size between restarts
-      AppDelegate.configureUtilityWindow(
-        persistentIdentifier: windowScene.session.persistentIdentifier,
-        properties: ["autosaveName": "mainWindow"]
-      )
-
-      let splitVC = SplitVC.instantiateFromAppStoryboard()
-
-      if AmperKit.shared.storage.loginCredentials == nil {
-        initialViewController = LoginVC.instantiateFromAppStoryboard()
-      } else if !AmperKit.shared.storage.isLibrarySynced {
-        initialViewController = SyncVC.instantiateFromAppStoryboard()
-      } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
-        initialViewController = UpdateVC.instantiateFromAppStoryboard()
-      }
-
-      if let titlebar = windowScene.titlebar {
-        titlebar.toolbarStyle = .unified
-        titlebar.titleVisibility = .hidden
-        titlebar.separatorStyle = .automatic
-        titlebar.toolbar = nil
-      }
-
-      window?.rootViewController = splitVC
-      window?.makeKeyAndVisible()
-
-      if let initialViewController {
-        splitVC.present(initialViewController, animated: true)
-      }
-    #else
-      if AmperKit.shared.storage.loginCredentials == nil {
-        initialViewController = LoginVC.instantiateFromAppStoryboard()
-      } else if !AmperKit.shared.storage.isLibrarySynced {
-        initialViewController = SyncVC.instantiateFromAppStoryboard()
-      } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
-        initialViewController = UpdateVC.instantiateFromAppStoryboard()
-      } else {
-        initialViewController = SplitVC.instantiateFromAppStoryboard()
-      }
-
-      window?.rootViewController = initialViewController
-      window?.makeKeyAndVisible()
     #endif
+    if AmperKit.shared.storage.loginCredentials == nil {
+      initialViewController = AppStoryboard.Main.segueToLogin()
+    } else if !AmperKit.shared.storage.isLibrarySynced {
+      initialViewController = AppStoryboard.Main.segueToSync()
+    } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
+      initialViewController = AppStoryboard.Main.segueToUpdate()
+    } else {
+      initialViewController = AppStoryboard.Main.segueToMainWindow()
+    }
+    replaceMainRootViewController(vc: initialViewController!)
+
+    window?.makeKeyAndVisible()
 
     appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.appearanceMode)
+  }
+
+  func replaceMainRootViewController(vc: UIViewController) {
+    window?.rootViewController = vc
   }
 
   /** Called when the user activates your application by selecting a shortcut on the Home Screen,
@@ -135,9 +154,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Release any resources associated with this scene that can be re-created the next time the scene connects.
     // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
     os_log("sceneDidDisconnect", log: self.log, type: .info)
-    #if targetEnvironment(macCatalyst)
-      appDelegate.rebuildMainMenu()
-    #endif
+    appDelegate.rebuildMainMenu()
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {
@@ -145,9 +162,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     os_log("sceneDidBecomeActive", log: self.log, type: .info)
     appDelegate.quickActionsManager.handleSavedShortCutItemIfSaved()
-    #if targetEnvironment(macCatalyst)
-      appDelegate.rebuildMainMenu()
-    #endif
+    appDelegate.rebuildMainMenu()
   }
 
   func sceneWillResignActive(_ scene: UIScene) {
@@ -155,10 +170,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // This may occur due to temporary interruptions (ex. an incoming phone call).
     os_log("sceneWillResignActive", log: self.log, type: .info)
     appDelegate.quickActionsManager.configureQuickActions()
-    #if targetEnvironment(macCatalyst)
-      // Save the size of the window
-      AppDelegate.saveWindowFrame(scene.session.persistentIdentifier, autosaveName: "mainWindow")
-    #endif
   }
 
   func sceneWillEnterForeground(_ scene: UIScene) {

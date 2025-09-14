@@ -31,6 +31,14 @@ class DirectoriesVC: MultiSourceTableViewController {
   private var songsFetchedResultsController: DirectorySongsFetchedResultsController!
   private var headerView: LibraryElementDetailTableHeaderView?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.directories)
@@ -55,9 +63,16 @@ class DirectoriesVC: MultiSourceTableViewController {
     setNavBarTitle(title: directory.name)
     tableView.register(nibName: DirectoryTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
-      infoCB: { "\(self.directory.songCount) Song\(self.directory.songCount == 1 ? "" : "s")" },
+      infoCB: {
+        "\(self.songsFetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.songsFetchedResultsController.fetchedObjects?.count) == 1 ? "" : "s")"
+      },
       playContextCb: { () in PlayContext(
         containable: self.directory,
         playables: self.songsFetchedResultsController
@@ -143,7 +158,33 @@ class DirectoriesVC: MultiSourceTableViewController {
         completionHandler(nil)
       }
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if subdirectoriesFetchedResultsController.fetchedObjects?.count ?? 0 == 0,
+       songsFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if subdirectoriesFetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+      headerView?.isHidden = true
+    } else {
+      contentUnavailableConfiguration = nil
+      headerView?.isHidden = false
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .folder
+    config.text = "No Directories or Songs"
+    config.secondaryText = "Your directories and songs will appear here."
+    return config
+  }()
 
   func refreshHeaderView() {
     headerView?.refresh()
@@ -156,8 +197,10 @@ class DirectoriesVC: MultiSourceTableViewController {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     subdirectoriesFetchedResultsController?.delegate = self
     songsFetchedResultsController?.delegate = self
+    updateContentUnavailable()
 
     guard appDelegate.storage.settings.isOnlineMode else { return }
     Task { @MainActor in
@@ -291,9 +334,10 @@ class DirectoriesVC: MultiSourceTableViewController {
       row: indexPath.row,
       section: 0
     ))
-    let directoriesVC = DirectoriesVC.instantiateFromAppStoryboard()
-    directoriesVC.directory = selectedDirectory
-    navController.pushViewController(directoriesVC, animated: true)
+    navController.pushViewController(
+      AppStoryboard.Main.segueToDirectories(directory: selectedDirectory),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
@@ -309,6 +353,8 @@ class DirectoriesVC: MultiSourceTableViewController {
       songsFetchedResultsController.showAllResults()
     }
     tableView.reloadData()
+    headerView?.refresh()
+    updateContentUnavailable()
   }
 
   override func controller(

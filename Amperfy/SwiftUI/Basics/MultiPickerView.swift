@@ -44,8 +44,8 @@ struct MultiPickerView: View {
           }
           // Hack to get the picker to reload its data. Otherwise the picker is not updated with .menu style.
           .id(data[column].1.firstIndex(where: { entry in selection[column] == entry }))
-          #if targetEnvironment(macCatalyst)
-            .pickerStyle(.menu)
+          #if targetEnvironment(macCatalyst) // ok
+            .pickerStyle(.menu) // wheel style crashes mac
           #else
             .pickerStyle(.wheel)
           #endif

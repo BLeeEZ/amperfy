@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -28,10 +27,10 @@
                     <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lyG-pB-bha" userLabel="Large Player Placeholder">
-                    <rect key="frame" x="20" y="68" width="374" height="594"/>
+                    <rect key="frame" x="20" y="116" width="374" height="512"/>
                 </view>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" contentViewInsetsToSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6gH-MH-Q1w">
-                    <rect key="frame" x="20" y="68" width="374" height="594"/>
+                    <rect key="frame" x="20" y="116" width="374" height="512"/>
                     <color key="sectionIndexBackgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="3lu-QN-yBq"/>
@@ -39,13 +38,13 @@
                     </connections>
                 </tableView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="B0Y-BS-JDd" userLabel="Control Placeholder">
-                    <rect key="frame" x="20" y="662" width="374" height="200"/>
+                    <rect key="frame" x="20" y="628" width="374" height="200"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="200" id="4Md-WZ-qJc"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GMI-oz-xsz" userLabel="Close Button Placeholder">
-                    <rect key="frame" x="369" y="38" width="25" height="25"/>
+                    <rect key="frame" x="369" y="86" width="25" height="25"/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="GMI-oz-xsz" secondAttribute="height" multiplier="1:1" id="OZG-UR-e2E"/>
                         <constraint firstAttribute="width" constant="25" id="seA-YL-Ib6"/>
@@ -54,7 +53,7 @@
             </subviews>
             <viewLayoutGuide key="safeArea" id="1MA-6G-aB5"/>
             <constraints>
-                <constraint firstItem="lyG-pB-bha" firstAttribute="top" secondItem="9Ao-u1-xa1" secondAttribute="topMargin" constant="20" id="18e-Ia-XA9"/>
+                <constraint firstItem="lyG-pB-bha" firstAttribute="top" secondItem="1MA-6G-aB5" secondAttribute="top" constant="20" id="18e-Ia-XA9"/>
                 <constraint firstItem="B0Y-BS-JDd" firstAttribute="top" secondItem="6gH-MH-Q1w" secondAttribute="bottom" id="31P-Um-22E"/>
                 <constraint firstAttribute="bottom" secondItem="uc4-Rw-bKA" secondAttribute="bottom" id="BR3-r1-kqM"/>
                 <constraint firstAttribute="rightMargin" secondItem="lyG-pB-bha" secondAttribute="right" id="Bv5-GQ-NSk"/>

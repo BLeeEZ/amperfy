@@ -109,6 +109,8 @@ extension UIImage {
   }
 
   public static let appIcon = UIImage.create("Icon-1024")
+  public static let appIconTemplate = UIImage.create("Icon-monocolor")
+    .withRenderingMode(.alwaysTemplate)
 
   public static let xmark = UIImage.create(systemName: "xmark")
   public static let unSelected = UIImage.create(systemName: "circle")
@@ -136,6 +138,10 @@ extension UIImage {
   public static let playlistPlus = UIImage.create(systemName: "text.badge.plus")
   public static let squareArrow = UIImage.create(systemName: "arrow.forward.square")
   public static let grid = UIImage.create(systemName: "square.grid.2x2")
+  public static let serverUrl = UIImage.create(systemName: "globe")
+  public static let password = UIImage.create(systemName: "key.fill")
+  public static let user = UIImage.create(systemName: "person.fill")
+  public static let login = UIImage.create(systemName: "arrow.right.to.line")
 
   public static let ellipsis = UIImage.create(systemName: "ellipsis")
   public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease")
@@ -147,6 +153,7 @@ extension UIImage {
   public static let folder = UIImage.create(systemName: "folder.fill")
   public static let radio = UIImage.create(systemName: "dot.radiowaves.left.and.right")
   public static let playlist = UIImage.create(systemName: "music.note.list")
+  public static let lyrics = UIImage.create(systemName: "quote.bubble")
   public static let musicLibrary = UIImage.create(systemName: "music.note.house")
   public static let musicalNotes = UIImage.create(systemName: "music.note")
   public static let download = UIImage.create(systemName: "arrow.down.circle")
@@ -161,7 +168,9 @@ extension UIImage {
   public static let sleepFill = UIImage.create(systemName: "moon.zzz.fill")
   public static let cache = download
   public static let antenna = UIImage.create(systemName: "antenna.radiowaves.left.and.right")
+  public static let skipForward10 = UIImage.create(systemName: "goforward.10")
   public static let skipForward30 = UIImage.create(systemName: "goforward.30")
+  public static let skipBackward10 = UIImage.create(systemName: "gobackward.10")
   public static let skipBackward15 = UIImage.create(systemName: "gobackward.15")
   public static let repeatAll = UIImage.create(systemName: "repeat")
   public static let repeatOne = UIImage.create(systemName: "repeat.1")
@@ -194,6 +203,18 @@ extension UIImage {
   public static let volumeMin = UIImage.create(systemName: "speaker.fill")
   public static let volumeMax = UIImage.create(systemName: "speaker.wave.3.fill")
 
+  public static let stopMenu = UIImage.create(systemName: "stop")
+  public static let playMenu = UIImage.create(systemName: "play")
+  public static let pauseMenu = UIImage.create(systemName: "pause")
+  public static let forwardMenu = UIImage.create(systemName: "forward")
+  public static let backwardMenu = UIImage.create(systemName: "backward")
+  public static let skipForwardMenu = UIImage.create(systemName: "goforward")
+  public static let skipBackwardMenu = UIImage.create(systemName: "gobackward")
+  public static let currentSongMenu = UIImage.create(systemName: "music.note")
+  public static let repeatMenu = UIImage.create(systemName: "repeat")
+  public static let shuffleMenu = UIImage.create(systemName: "shuffle")
+  public static let playbackRateMenu = UIImage.create(systemName: "hare")
+
   public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
   public static let listBullet = UIImage.create(systemName: "list.bullet")
 
@@ -216,8 +237,6 @@ extension UIImage {
       .create("context_queue_insert") // SF-Symbols 5 Regular: custom.text.line.first.and.arrowtriangle.forward
     public static let contextQueueAppend = UIImage
       .create("context_queue_append") // SF-Symbols 5 Regular: custom.text.line.last.and.arrowtriangle.forward
-    public static let lyrics = UIImage
-      .create(systemName: "book.pages") // SF-Symbols 5 Regular: book.pages (available in system catalog with iOS 17.0 and upwards)
   #endif
   public static let podcastEpisode: UIImage = podcast
   public static let podcastQueueInsert = contextQueueInsert
@@ -512,7 +531,7 @@ extension UIImage {
     let textFont = UIFont(name: "Helvetica Bold", size: fontSize)!
 
     let image = createEmptyImage(with: CGSize(width: 100.0, height: 100.0)) ?? UIImage()
-    let scale = UIScreen.main.scale
+    let scale = UITraitCollection.current.displayScale
     UIGraphicsBeginImageContextWithOptions(image.size, false, scale)
 
     let paragraphStyle = NSMutableParagraphStyle()

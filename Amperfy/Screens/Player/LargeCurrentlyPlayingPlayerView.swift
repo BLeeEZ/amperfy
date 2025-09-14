@@ -321,7 +321,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   }
 
   func refresh() {
-    rootView?.refreshCurrentlyPlayingInfo(
+    rootView?.playerHandler?.refreshCurrentlyPlayingInfo(
       artworkImage: artworkImage,
       titleLabel: titleLabel,
       artistLabel: artistLabel,
@@ -335,7 +335,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   }
 
   func refreshArtwork() {
-    rootView?.refreshArtwork(artworkImage: artworkImage)
+    rootView?.playerHandler?.refreshArtwork(artworkImage: artworkImage)
   }
 
   @IBAction

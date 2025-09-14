@@ -50,11 +50,7 @@ class LibraryElementDetailTableHeaderView: UIView {
   @IBOutlet
   weak var infoLabel: UILabel!
 
-  #if targetEnvironment(macCatalyst)
-    static let frameHeight: CGFloat = 26.0 + margin.top + margin.bottom
-  #else
-    static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
-  #endif
+  static let frameHeight: CGFloat = 40.0 + margin.top + margin.bottom
   static let margin = UIView.defaultMarginMiddleElement
 
   private var config: PlayShuffleInfoConfiguration?
@@ -66,6 +62,13 @@ class LibraryElementDetailTableHeaderView: UIView {
       left: UIView.defaultMarginX,
       bottom: 0.0,
       right: UIView.defaultMarginX
+    )
+
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.refresh()
+      }
     )
   }
 
@@ -90,11 +93,6 @@ class LibraryElementDetailTableHeaderView: UIView {
     genericDetailTableHeaderView.prepare(configuration: configuration)
     rootView.tableView.tableHeaderView?.addSubview(genericDetailTableHeaderView)
     return genericDetailTableHeaderView
-  }
-
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    refresh()
   }
 
   func refresh() {
@@ -165,6 +163,12 @@ class LibraryElementDetailTableHeaderView: UIView {
     playShuffledButton.layer.cornerRadius = 10.0
     playShuffledButton.isHidden = configuration.isShuffleHidden
     activate()
+    registerForTraitChanges(
+      [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.refresh()
+      }
+    )
   }
 
   func activate() {

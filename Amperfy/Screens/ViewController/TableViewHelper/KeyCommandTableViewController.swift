@@ -25,6 +25,11 @@ import UIKit
 
 class KeyCommandTableViewController: UITableViewController {
   lazy var tableViewKeyCommandsController = TableViewKeyCommandsController(tableView: tableView)
+
+  override func viewDidLoad() {
+    guard let sceneTitle else { return }
+    setNavBarTitle(title: sceneTitle)
+  }
 }
 
 // MARK: - TableViewKeyCommandsController

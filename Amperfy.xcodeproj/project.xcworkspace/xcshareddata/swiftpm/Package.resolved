@@ -1,5 +1,5 @@
 {
-  "originHash" : "b1488953e726e522ccc5a3356c0f34537a492d8accfef7d3ea98da56b38403fd",
+  "originHash" : "ac6ab85b6a6be2ef2c424e2944cbc50df7140064e09e3672210f40bb9b724156",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -53,15 +53,6 @@
       "state" : {
         "revision" : "e610cdf4eddec1e76a9c7ae5db37738c7f73150b",
         "version" : "2.0.3"
-      }
-    },
-    {
-      "identity" : "lnpopupcontroller",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/LeoNatan/LNPopupController",
-      "state" : {
-        "revision" : "fae7c61f1b654c20defd5883d3112c7778120ea0",
-        "version" : "2.19.6"
       }
     },
     {

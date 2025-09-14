@@ -57,7 +57,7 @@ struct AddSwipeActionView: View {
             }
         }
       }
-      #if targetEnvironment(macCatalyst)
+      #if targetEnvironment(macCatalyst) // ok
       .listStyle(.plain)
       #else
       .listStyle(.grouped)
@@ -69,7 +69,7 @@ struct AddSwipeActionView: View {
       }
       .padding()
     }
-    #if targetEnvironment(macCatalyst)
+    #if targetEnvironment(macCatalyst) // ok
     .background { Color.clear }
     #endif
     .onAppear {

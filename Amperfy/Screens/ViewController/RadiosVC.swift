@@ -31,6 +31,14 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   private var fetchedResultsController: RadiosFetchedResultsController!
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -54,6 +62,11 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleConfig = PlayShuffleInfoConfiguration(
       infoCB: {
@@ -84,11 +97,37 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       let playContext = self.convertIndexPathToPlayContext(radioIndexPath: indexPath)
       completionHandler(SwipeActionContext(containable: radio, playContext: playContext))
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
     setNavBarTitle(title: sceneTitle ?? "")
   }
 
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+      detailHeaderView?.isHidden = true
+    } else {
+      contentUnavailableConfiguration = nil
+      detailHeaderView?.isHidden = false
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .radio
+    config.text = "No Radios"
+    config.secondaryText = "Your radios will appear here."
+    return config
+  }()
+
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     updateFromRemote()
   }
 
@@ -140,22 +179,6 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     return cell
   }
 
-  override func tableView(
-    _ tableView: UITableView,
-    heightForHeaderInSection section: Int
-  )
-    -> CGFloat {
-    0.0
-  }
-
-  override func tableView(
-    _ tableView: UITableView,
-    titleForHeaderInSection section: Int
-  )
-    -> String? {
-    nil
-  }
-
   func convertIndexPathToPlayContext(radioIndexPath: IndexPath) -> PlayContext? {
     guard let radios = fetchedResultsController.getContextRadios()
     else { return nil }
@@ -177,14 +200,14 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       fetchedResultsController.showAllResults()
     }
     tableView.reloadData()
+    detailHeaderView?.refresh()
+    updateContentUnavailable()
   }
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
     guard appDelegate.storage.settings.isOnlineMode else {
-      #if !targetEnvironment(macCatalyst)
-        self.refreshControl?.endRefreshing()
-      #endif
+      self.refreshControl?.endRefreshing()
       return
     }
     Task { @MainActor in
@@ -195,9 +218,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       }
       self.detailHeaderView?.refresh()
       self.updateSearchResults(for: self.searchController)
-      #if !targetEnvironment(macCatalyst)
-        self.refreshControl?.endRefreshing()
-      #endif
+      self.refreshControl?.endRefreshing()
     }
   }
 }

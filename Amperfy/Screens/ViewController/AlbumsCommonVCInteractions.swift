@@ -105,7 +105,7 @@ class AlbumsCommonVCInteractions {
 
   public var rootVC: UIViewController?
   public var fetchedResultsController: AlbumFetchedResultsController!
-  public var optionsButton: UIBarButtonItem = OptionsBarButton()
+  public var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   public var displayFilter: DisplayCategoryFilter = .all
   public var sortType: AlbumElementSortType = .name
   public var filterTitle = "Albums"
@@ -119,6 +119,30 @@ class AlbumsCommonVCInteractions {
   init(isSetNavbarButton: Bool = true) {
     self.isSetNavbarButton = isSetNavbarButton
   }
+
+  public var isContentUnavailable: Bool {
+    fetchedResultsController.fetchedObjects?.count ?? 0 == 0
+  }
+
+  func updateContentUnavailable() {
+    if isContentUnavailable {
+      if fetchedResultsController.isSearchActive {
+        rootVC?.contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        rootVC?.contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      rootVC?.contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .album
+    config.text = "No " + filterTitle
+    config.secondaryText = "Your " + filterTitle.lowercased() + " will appear here."
+    return config
+  }()
 
   func applyFilter() {
     switch displayFilter {
@@ -162,6 +186,7 @@ class AlbumsCommonVCInteractions {
     updateFetchDataSourceCB?()
     fetchedResultsController.fetch()
     updateRightBarButtonItems()
+    updateContentUnavailable()
   }
 
   func listViewWillDisplayCell(at indexPath: IndexPath, searchBarText: String?) {
@@ -236,6 +261,7 @@ class AlbumsCommonVCInteractions {
     }
 
     if !actions.isEmpty {
+      optionsButton = UIBarButtonItem.createOptionsBarButton()
       optionsButton.menu = UIMenu(children: actions)
       rootVC?.navigationItem.rightBarButtonItems = [optionsButton]
     } else {
@@ -498,6 +524,7 @@ class AlbumsCommonVCInteractions {
       onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
       displayFilter: displayFilter
     )
+    updateContentUnavailable()
   }
 
   func createPlayShuffleInfoConfig() -> PlayShuffleInfoConfiguration {

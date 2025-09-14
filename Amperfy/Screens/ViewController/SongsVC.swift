@@ -32,12 +32,21 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   }
 
   private var fetchedResultsController: SongsFetchedResultsController!
+  private var detailHeaderView: LibraryElementDetailTableHeaderView?
   private var optionsButton: UIBarButtonItem!
   public var displayFilter: DisplayCategoryFilter = .all
   private var sortType: SongElementSortType = .name
   private var filterTitle = "Songs"
 
   private static var maxPlayContextCount = 40
+
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -48,7 +57,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
     appDelegate.userStatistics.visited(.songs)
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     applyFilter()
     configureSearchController(
@@ -59,6 +68,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {
@@ -69,7 +79,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       isInfoAlwaysHidden: false,
       shuffleContextCb: handleHeaderShuffle
     )
-    _ = LibraryElementDetailTableHeaderView.createTableHeader(
+    detailHeaderView = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,
       configuration: playShuffleInfoConfig
     )
@@ -90,7 +100,32 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       let playContext = self.convertIndexPathToPlayContext(songIndexPath: indexPath)
       completionHandler(SwipeActionContext(containable: song, playContext: playContext))
     }
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+      detailHeaderView?.isHidden = true
+    } else {
+      contentUnavailableConfiguration = nil
+      detailHeaderView?.isHidden = false
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .musicalNotes
+    config.text = "No Songs"
+    config.secondaryText = "Your songs will appear here."
+    return config
+  }()
 
   func applyFilter() {
     switch displayFilter {
@@ -123,14 +158,29 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     )
     fetchedResultsController.fetchResultsController.sectionIndexType = sortType.asSectionIndexType
     singleFetchedResultsController = fetchedResultsController
+
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    switch sortType {
+    case .rating:
+      tableView.sectionHeaderHeight = CommonScreenOperations.tableSectionHeightLarge
+      tableView.estimatedSectionHeaderHeight = CommonScreenOperations.tableSectionHeightLarge
+    default:
+      tableView.sectionHeaderHeight = 0.0
+      tableView.estimatedSectionHeaderHeight = 0.0
+    }
+
     tableView.reloadData()
     updateRightBarButtonItems()
+    detailHeaderView?.refresh()
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     updateRightBarButtonItems()
     updateFromRemote()
+    detailHeaderView?.refresh()
   }
 
   func updateRightBarButtonItems() {
@@ -139,6 +189,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     if appDelegate.storage.settings.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: actions)
     navigationItem.rightBarButtonItems = [optionsButton]
   }
@@ -157,6 +208,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
         }
+        self.detailHeaderView?.refresh()
         self.updateSearchResults(for: self.searchController)
       }
     }
@@ -265,6 +317,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       fetchedResultsController.showAllResults()
     }
     tableView.reloadData()
+    detailHeaderView?.refresh()
+    updateContentUnavailable()
   }
 
   private func saveSortPreference(preference: SongElementSortType) {
@@ -436,9 +490,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
     guard appDelegate.storage.settings.isOnlineMode else {
-      #if !targetEnvironment(macCatalyst)
-        self.refreshControl?.endRefreshing()
-      #endif
+      self.refreshControl?.endRefreshing()
       return
     }
     Task { @MainActor in
@@ -452,9 +504,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       } catch {
         self.appDelegate.eventLogger.report(topic: "Songs Newest Elements Sync", error: error)
       }
-      #if !targetEnvironment(macCatalyst)
-        self.refreshControl?.endRefreshing()
-      #endif
+      detailHeaderView?.refresh()
+      self.refreshControl?.endRefreshing()
     }
   }
 }

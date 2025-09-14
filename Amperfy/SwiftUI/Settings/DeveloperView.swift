@@ -54,7 +54,7 @@ struct DeveloperView: View {
     ZStack {
       SettingsList {
         SettingsSection(content: {
-          SettingsButtonRow(title: "Artwork", label: "Generate Default Artworks") {
+          SettingsButtonRow(title: "Generate Default Artworks") {
             generateDefaultArtworks()
           }
         })

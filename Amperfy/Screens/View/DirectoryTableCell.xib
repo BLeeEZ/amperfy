@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,17 +16,17 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="JCR-db-pze" userLabel="Artwork" customClass="LibraryEntityImage" customModule="AmperfyKit">
-                        <rect key="frame" x="16" y="10" width="48" height="48"/>
+                        <rect key="frame" x="32" y="10" width="48" height="48"/>
                         <constraints>
                             <constraint firstAttribute="width" secondItem="JCR-db-pze" secondAttribute="height" multiplier="1:1" id="AFH-YX-4Oq"/>
                             <constraint firstAttribute="width" constant="48" id="Be3-Pb-tdU"/>
                         </constraints>
                     </imageView>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="CTD-zX-CsU" userLabel="Icon">
-                        <rect key="frame" x="20" y="15" width="40" height="37.5"/>
+                        <rect key="frame" x="36" y="15" width="40" height="37.5"/>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Directory" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e" userLabel="Genre Label">
-                        <rect key="frame" x="72" y="23" width="287" height="22"/>
+                        <rect key="frame" x="88" y="23" width="271" height="22"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="22" id="K5Y-Cl-6p5"/>
                         </constraints>
@@ -40,7 +39,7 @@
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="JCR-db-pze" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="8BO-j3-Gi5"/>
+                    <constraint firstItem="JCR-db-pze" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" constant="16" id="8BO-j3-Gi5"/>
                     <constraint firstAttribute="trailingMargin" secondItem="ZWe-re-U6e" secondAttribute="trailing" id="9tO-1D-PDW">
                         <variation key="widthClass=regular" constant="8"/>
                     </constraint>

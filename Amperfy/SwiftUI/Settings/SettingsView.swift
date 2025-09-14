@@ -66,7 +66,7 @@ struct SettingsView: View {
 
         SettingsSection(
           content: {
-            SettingsCheckBoxRow(label: "Offline Mode", isOn: $settings.isOfflineMode)
+            SettingsCheckBoxRow(title: "Offline Mode", isOn: $settings.isOfflineMode)
           },
           footer:
           "Songs, podcasts, and artworks won’t download offline. Searches are limited to the device, and playlists won’t sync with the server."
@@ -91,7 +91,7 @@ struct SettingsView: View {
           }
         }
 
-        #if !targetEnvironment(macCatalyst)
+        #if !targetEnvironment(macCatalyst) // ok
           SettingsSection {
             navigationLink(.displayAndInteraction)
             navigationLink(.server)
@@ -114,10 +114,12 @@ struct SettingsView: View {
         #endif
       }
 
-    #if targetEnvironment(macCatalyst)
+    #if targetEnvironment(macCatalyst) // ok
       ZStack {
         list
       }
+      .navigationTitle("General")
+      .navigationBarTitleDisplayMode(.inline)
     #else
       NavigationView {
         list

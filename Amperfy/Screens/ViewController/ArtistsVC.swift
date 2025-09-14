@@ -60,6 +60,14 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   private var sortType: ArtistElementSortType = .name
   private var filterTitle = "Artists"
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
     let source =
       ArtistDiffableDataSource(tableView: tableView) { tableView, indexPath, objectID -> UITableViewCell? in
@@ -85,7 +93,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.artists)
 
-    optionsButton = OptionsBarButton()
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     applyFilter()
     change(sortType: appDelegate.storage.settings.artistsSortSetting)
@@ -98,6 +106,11 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeight
     tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     #if !targetEnvironment(macCatalyst)
       refreshControl = UIRefreshControl()
@@ -132,7 +145,30 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         completionHandler(SwipeActionContext(containable: artist))
       }
     }
+    snapshotDidChange = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if fetchedResultsController.isSearchActive {
+        contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+      } else {
+        contentUnavailableConfiguration = emptyContentConfig
+      }
+    } else {
+      contentUnavailableConfiguration = nil
+    }
+  }
+
+  lazy var emptyContentConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .artist
+    config.text = "No " + filterTitle
+    config.secondaryText = "Your " + filterTitle.lowercased() + " will appear here."
+    return config
+  }()
 
   func applyFilter() {
     switch displayFilter {
@@ -175,8 +211,10 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     updateRightBarButtonItems()
     updateFromRemote()
+    updateContentUnavailable()
   }
 
   func updateRightBarButtonItems() {
@@ -188,6 +226,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     if appDelegate.storage.settings.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = UIMenu(children: actions)
     navigationItem.rightBarButtonItems = [optionsButton]
   }
@@ -261,15 +300,10 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let artist = artistAt(indexPath: indexPath) else { return }
-    performSegue(withIdentifier: Segues.toArtistDetail.rawValue, sender: artist)
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toArtistDetail.rawValue {
-      let vc = segue.destination as! ArtistDetailVC
-      let artist = sender as? Artist
-      vc.artist = artist
-    }
+    navigationController?.pushViewController(
+      AppStoryboard.Main.segueToArtistDetail(artist: artist),
+      animated: true
+    )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
@@ -287,6 +321,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
       }}
     }
+    updateContentUnavailable()
   }
 
   private func createSortButtonMenu() -> UIMenu {

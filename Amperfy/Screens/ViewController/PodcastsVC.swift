@@ -31,11 +31,19 @@ class PodcastsVC: MultiSourceTableViewController {
   private var optionsButton: UIBarButtonItem!
   private var showType: PodcastsShowType = .podcasts
 
+  init() {
+    super.init(style: .grouped)
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.podcasts)
 
-    optionsButton = SortBarButton()
+    optionsButton = UIBarButtonItem.createSortBarButton()
 
     podcastsFetchedResultsController = PodcastFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main,
@@ -54,6 +62,11 @@ class PodcastsVC: MultiSourceTableViewController {
     setNavBarTitle(title: "Podcasts")
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PodcastEpisodeTableCell.typeName)
+    tableView.sectionHeaderHeight = 0.0
+    tableView.estimatedSectionHeaderHeight = 0.0
+    tableView.sectionFooterHeight = 0.0
+    tableView.estimatedSectionFooterHeight = 0.0
+    tableView.backgroundColor = .backgroundColor
 
     swipeDisplaySettings.playContextTypeOfElements = .podcast
     containableAtIndexPathCallback = { indexPath in
@@ -97,10 +110,56 @@ class PodcastsVC: MultiSourceTableViewController {
     }
 
     showType = appDelegate.storage.settings.podcastsShowSetting
+
+    resultUpdateHandler?.changesDidEnd = {
+      self.updateContentUnavailable()
+    }
   }
+
+  func updateContentUnavailable() {
+    switch showType {
+    case .podcasts:
+      if podcastsFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+        if podcastsFetchedResultsController.isSearchActive {
+          contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+        } else {
+          contentUnavailableConfiguration = emptyPodcastConfig
+        }
+      } else {
+        contentUnavailableConfiguration = nil
+      }
+    case .episodesSortedByReleaseDate:
+      if episodesFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+        if episodesFetchedResultsController.isSearchActive {
+          contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
+        } else {
+          contentUnavailableConfiguration = emptyEpisodeConfig
+        }
+      } else {
+        contentUnavailableConfiguration = nil
+      }
+    }
+  }
+
+  lazy var emptyPodcastConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .podcast
+    config.text = "No Podcasts"
+    config.secondaryText = "Your podcasts will appear here."
+    return config
+  }()
+
+  lazy var emptyEpisodeConfig: UIContentUnavailableConfiguration = {
+    var config = UIContentUnavailableConfiguration.empty()
+    config.image = .podcastEpisode
+    config.text = "No Podcast Episodes"
+    config.secondaryText = "Your podcast episodes will appear here."
+    return config
+  }()
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    extendSafeAreaToAccountForMiniPlayer()
     switch showType {
     case .podcasts:
       podcastsFetchedResultsController?.delegate = self
@@ -110,6 +169,7 @@ class PodcastsVC: MultiSourceTableViewController {
 
     updateRightBarButtonItems()
     syncFromServer()
+    updateContentUnavailable()
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -119,6 +179,7 @@ class PodcastsVC: MultiSourceTableViewController {
   }
 
   func updateRightBarButtonItems() {
+    optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = createSortButtonMenu()
     navigationItem.rightBarButtonItem = optionsButton
   }
@@ -184,17 +245,12 @@ class PodcastsVC: MultiSourceTableViewController {
     switch showType {
     case .podcasts:
       let podcast = podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
-      performSegue(withIdentifier: Segues.toPodcastDetail.rawValue, sender: podcast)
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
+        animated: true
+      )
     case .episodesSortedByReleaseDate:
       break
-    }
-  }
-
-  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    if segue.identifier == Segues.toPodcastDetail.rawValue {
-      let vc = segue.destination as! PodcastDetailVC
-      let podcast = sender as? Podcast
-      vc.podcast = podcast
     }
   }
 
@@ -215,6 +271,7 @@ class PodcastsVC: MultiSourceTableViewController {
       )
       tableView.reloadData()
     }
+    updateContentUnavailable()
   }
 
   override func controller(
@@ -260,6 +317,7 @@ class PodcastsVC: MultiSourceTableViewController {
         self.episodesFetchedResultsController.delegate = nil
         self.updateSearchResults(for: self.searchController)
         self.podcastsFetchedResultsController.delegate = self
+        self.updateContentUnavailable()
       }
     )
     let episodesSortByReleaseDate = UIAction(
@@ -273,6 +331,7 @@ class PodcastsVC: MultiSourceTableViewController {
         self.podcastsFetchedResultsController.delegate = nil
         self.updateSearchResults(for: self.searchController)
         self.episodesFetchedResultsController.delegate = self
+        self.updateContentUnavailable()
       }
     )
     return UIMenu(children: [podcastsSortByName, episodesSortByReleaseDate])

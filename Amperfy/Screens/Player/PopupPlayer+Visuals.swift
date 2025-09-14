@@ -33,7 +33,7 @@ extension PopupPlayerVC {
   }
 
   func refreshCurrentlyPlayingInfoView() {
-    refreshCurrentlyPlayingPopupItem()
+    refreshBackgroundItemArtwork()
     largeCurrentlyPlayingView?.refresh()
     for visibleCell in tableView.visibleCells {
       if let currentlyPlayingCell = visibleCell as? CurrentlyPlayingTableCell {
@@ -44,7 +44,7 @@ extension PopupPlayerVC {
   }
 
   func refreshCurrentlyPlayingArtworks() {
-    refreshBackgroundAndPopupItemArtwork()
+    refreshBackgroundItemArtwork()
     largeCurrentlyPlayingView?.refreshArtwork()
     for visibleCell in tableView.visibleCells {
       if let currentlyPlayingCell = visibleCell as? CurrentlyPlayingTableCell {
@@ -65,7 +65,7 @@ extension PopupPlayerVC {
        let rootView = rootView {
       button.showsMenuAsPrimaryAction = true
       button.menu = UIMenu.lazyMenu {
-        EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenu()
+        EntityPreviewActionBuilder(container: currentlyPlaying, on: rootView).createMenuActions()
       }
       button.isEnabled = true
     } else {
@@ -104,52 +104,7 @@ extension PopupPlayerVC {
     button.configuration = config
   }
 
-  func refreshCurrentlyPlayingPopupItem() {
-    refreshBackgroundAndPopupItemArtwork()
-    if let playableInfo = player.currentlyPlaying {
-      popupItem.title = playableInfo.title
-      popupItem.subtitle = playableInfo.creatorName
-    } else {
-      switch player.playerMode {
-      case .music:
-        popupItem.title = "No music playing"
-      case .podcast:
-        popupItem.title = "No podcast playing"
-      }
-      popupItem.subtitle = ""
-    }
-  }
-
-  func refreshCurrentlyPlayingInfo(
-    artworkImage: LibraryEntityImage,
-    titleLabel: UILabel,
-    artistLabel: UILabel,
-    albumLabel: UILabel? = nil,
-    albumButton: UIButton? = nil,
-    albumContainerView: UIView? = nil
-  ) {
-    refreshArtwork(artworkImage: artworkImage)
-    if let playableInfo = player.currentlyPlaying {
-      titleLabel.text = playableInfo.title
-      albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
-      albumButton?.isEnabled = playableInfo.isSong
-      albumContainerView?.isHidden = !playableInfo.isSong
-      artistLabel.text = playableInfo.creatorName
-    } else {
-      switch player.playerMode {
-      case .music:
-        titleLabel.text = "No music playing"
-      case .podcast:
-        titleLabel.text = "No podcast playing"
-      }
-      albumLabel?.text = ""
-      albumButton?.isEnabled = false
-      albumContainerView?.isHidden = true
-      artistLabel.text = ""
-    }
-  }
-
-  func refreshBackgroundAndPopupItemArtwork() {
+  func refreshBackgroundItemArtwork() {
     var artwork: UIImage?
     if let playableInfo = player.currentlyPlaying {
       artwork = LibraryEntityImage.getImageToDisplayImmediately(
@@ -173,7 +128,6 @@ extension PopupPlayerVC {
       }
     }
     guard let artwork = artwork else { return }
-    popupItem.image = artwork
     backgroundImage.image = artwork
     artworkGradientColors = (try? artwork.dominantColors(max: 2)) ?? [
       appDelegate.storage.settings.themePreference.asColor,
@@ -198,23 +152,6 @@ extension PopupPlayerVC {
     backgroundImage.layer.insertSublayer(gradientLayer, at: 0)
   }
 
-  func refreshArtwork(artworkImage: LibraryEntityImage) {
-    if let playableInfo = player.currentlyPlaying {
-      artworkImage.display(entity: playableInfo)
-    } else {
-      switch player.playerMode {
-      case .music:
-        artworkImage.display(
-          artworkType: .song
-        )
-      case .podcast:
-        artworkImage.display(
-          artworkType: .podcastEpisode
-        )
-      }
-    }
-  }
-
   @objc
   internal func downloadFinishedSuccessful(notification: Notification) {
     guard let downloadNotification = DownloadNotification.fromNotification(notification),
@@ -222,21 +159,15 @@ extension PopupPlayerVC {
     else { return }
     if curPlayable.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refreshBackgroundAndPopupItemArtwork()
+        refreshBackgroundItemArtwork()
       }
     }
     if let artwork = curPlayable.artwork,
        artwork.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refreshBackgroundAndPopupItemArtwork()
+        refreshBackgroundItemArtwork()
       }
     }
-  }
-
-  // handle dark/light mode change
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    refresh()
   }
 
   func adjustLayoutMargins() {

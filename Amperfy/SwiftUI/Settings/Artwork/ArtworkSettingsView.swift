@@ -79,7 +79,7 @@ struct ArtworkSettingsView: View {
           SettingsRow(title: "Cached Artworks") {
             SecondaryText(cachedArtworksCountText)
           }
-          SettingsButtonRow(label: "Download all artworks in library") {
+          SettingsButtonRow(title: "Download all artworks in library") {
             isShowDownloadArtworksAlert = true
           }
           .alert(isPresented: $isShowDownloadArtworksAlert) {
@@ -96,7 +96,7 @@ struct ArtworkSettingsView: View {
               secondaryButton: .cancel()
             )
           }
-          SettingsButtonRow(label: "Delete all downloaded artworks", actionType: .destructive) {
+          SettingsButtonRow(title: "Delete all downloaded artworks", actionType: .destructive) {
             isShowDeleteArtworksAlert = true
           }
           .alert(isPresented: $isShowDeleteArtworksAlert) {
@@ -119,21 +119,12 @@ struct ArtworkSettingsView: View {
           }
         }
         SettingsSection {
-          #if targetEnvironment(macCatalyst)
-            SettingsRow(title: "Artwork Download Settings") {
-              ArtworkDownloadSettingsView()
-            }
-            SettingsRow(title: "Artwork Display Settings") {
-              ArtworkDisplaySettings()
-            }
-          #else
-            NavigationLink(destination: ArtworkDownloadSettingsView()) {
-              Text("Artwork Download Settings")
-            }
-            NavigationLink(destination: ArtworkDisplaySettings()) {
-              Text("Artwork Display Settings")
-            }
-          #endif
+          NavigationLink(destination: ArtworkDownloadSettingsView()) {
+            Text("Artwork Download Settings")
+          }
+          NavigationLink(destination: ArtworkDisplaySettings()) {
+            Text("Artwork Display Settings")
+          }
         }
       }
     }

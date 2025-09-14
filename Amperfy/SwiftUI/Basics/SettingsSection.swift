@@ -22,14 +22,10 @@
 import Foundation
 import SwiftUI
 
-// MacOS ignores sections. That is, content in a Section is directly added to the list.
-// The footer is displayed on mouse hover. Headers are ignored.
-struct SettingsSection<Content: View>: View, BehavioralStylable {
+struct SettingsSection<Content: View>: View {
   let footer: String?
   let header: String?
   let content: () -> Content
-  @State
-  var preferredBehavioralStyle: UIBehavioralStyle = .defaultStyle
 
   init(
     @ViewBuilder content: @escaping () -> Content,
@@ -42,23 +38,14 @@ struct SettingsSection<Content: View>: View, BehavioralStylable {
   }
 
   var body: some View {
-    if behavioralStyle == .mac {
-      if let footer = footer {
-        content()
-          .help(footer)
-      } else {
-        content()
-      }
+    if let footer = footer, let header = header {
+      Section(content: content, header: { Text(header) }, footer: { Text(footer) })
+    } else if let header = header {
+      Section(content: content, header: { Text(header) })
+    } else if let footer = footer {
+      Section(content: content, footer: { Text(footer) })
     } else {
-      if let footer = footer, let header = header {
-        Section(content: content, header: { Text(header) }, footer: { Text(footer) })
-      } else if let header = header {
-        Section(content: content, header: { Text(header) })
-      } else if let footer = footer {
-        Section(content: content, footer: { Text(footer) })
-      } else {
-        Section(content: content)
-      }
+      Section(content: content)
     }
   }
 }

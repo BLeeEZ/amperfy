@@ -92,78 +92,32 @@ struct ServerURLsSettingsView: View {
           deleteURL(url: serverURLs[index])
           serverURLs.remove(atOffsets: indexSet)
         }
-        .onChange(of: selection) { newSelection in
-          #if targetEnvironment(macCatalyst)
-            // Disable selection of the active element
-            if newSelection == activeServerURL {
-              selection = nil
-            }
-          #else
-            // Disable selection of all elements on iOS
-            selection = nil
-          #endif
+        .onChange(of: selection) { oldSelection, newSelection in
+          selection = nil
         }
       }
-      #if targetEnvironment(macCatalyst)
-      .listStyle(.plain)
-      .border(Color.separator, width: 1.0)
-      #endif
     }
-    #if targetEnvironment(macCatalyst)
-    .formSheet(isPresented: $isAddDialogVisible) {
+    .sheet(isPresented: $isAddDialogVisible) {
       AlternativeURLAddDialogView(
         isVisible: $isAddDialogVisible,
         activeServerURL: $activeServerURL,
         serverURLs: $serverURLs
       )
-      .frame(width: 400, height: 260)
-      .environment(\.managedObjectContext, appDelegate.storage.main.context)
     }
-    .background {
-      Color.systemBackground
-    }
-    .listToolbar {
-      Button(action: {
-        withPopupAnimation { isAddDialogVisible = true }
-      }) {
-        Image.plus
+    .navigationTitle("Server URLs")
+    .toolbar {
+      ToolbarItemGroup(placement: .navigationBarTrailing) {
+        EditButton()
+        Button(action: {
+          withPopupAnimation { isAddDialogVisible = true }
+        }) {
+          Image.plus
+        }
       }
-      .buttonStyle(BorderlessButtonStyle())
-      .tint(Color(uiColor: appDelegate.storage.settings.themePreference.asColor))
-      Button(action: {
-        guard let selection = selection,
-              let index = serverURLs.firstIndex(of: selection) else { return }
-        deleteURL(url: selection)
-        serverURLs.remove(at: index)
-      }) {
-        Image.minus
-      }
-      .buttonStyle(BorderlessButtonStyle())
-      .tint(Color(uiColor: appDelegate.storage.settings.themePreference.asColor))
     }
-    #else
-    .sheet(isPresented: $isAddDialogVisible) {
-          AlternativeURLAddDialogView(
-            isVisible: $isAddDialogVisible,
-            activeServerURL: $activeServerURL,
-            serverURLs: $serverURLs
-          )
-        }
-        .navigationTitle("Server URLs")
-        .toolbar {
-          ToolbarItemGroup(placement: .navigationBarTrailing) {
-            EditButton()
-            Button(action: {
-              withPopupAnimation { isAddDialogVisible = true }
-            }) {
-              Image.plus
-            }
-          }
-        }
-    #endif
-        .onAppear {
-          reload()
-        }
+    .onAppear {
+      reload()
+    }
   }
 }
 
