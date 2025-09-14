@@ -214,8 +214,6 @@ final class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
 final class MOCK_BackendApi: BackendApi {
   let clientApiVersion: String = ""
   let serverApiVersion: String = ""
-  let isStreamingTranscodingActive: Bool = true
-  let streamingTranscodingFormat: AmperfyKit.StreamingFormatPreference = .mp3
   func provideCredentials(credentials: LoginCredentials) {}
   func isAuthenticationValid(credentials: LoginCredentials) async throws {
     throw BackendError.notSupported
@@ -230,7 +228,8 @@ final class MOCK_BackendApi: BackendApi {
 
   func generateUrl(
     forStreamingPlayable playableInfo: AbstractPlayableInfo,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL { Helper.testURL }
 

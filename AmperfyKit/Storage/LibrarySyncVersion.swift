@@ -39,6 +39,7 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible, Sendab
   case v18 =
     12 // core date performance improvement: write count valus as attribtes to avoid fetch all releationships (CoreDataMigrationVersion v41)
   case v19 = 13 // Playlist items are as NSOrderedSet
+  case v20 = 14 // Streaming transcoding format preference is split in wifi and celluar
 
   public var description: String {
     switch self {
@@ -56,6 +57,7 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible, Sendab
     case .v17: return "v17"
     case .v18: return "v18"
     case .v19: return "v19"
+    case .v20: return "v20"
     }
   }
 
@@ -63,7 +65,7 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible, Sendab
     self == Self.newestVersion
   }
 
-  public static let newestVersion: LibrarySyncVersion = .v19
+  public static let newestVersion: LibrarySyncVersion = .v20
   public static let defaultValue: LibrarySyncVersion = .v6
 
   public static func < (lhs: LibrarySyncVersion, rhs: LibrarySyncVersion) -> Bool {

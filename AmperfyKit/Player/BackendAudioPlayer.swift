@@ -144,6 +144,20 @@ class BackendAudioPlayer: NSObject {
     streamingMaxBitrates = to
   }
 
+  public private(set) var streamingTranscodings = StreamingTranscodings()
+  public func setStreamingTranscodings(to: StreamingTranscodings) {
+    os_log(
+      .default,
+      "Update Streaming Transcoding: <Wifi: %s, Cellular: %s> -> <Wifi: %s, Cellular: %s> (for next stream)",
+      streamingTranscodings.wifi.description,
+      streamingTranscodings.cellular.description,
+      to.wifi.description,
+      to.cellular.description
+    )
+    // Update the stored bitrates
+    streamingTranscodings = to
+  }
+
   var responder: BackendAudioPlayerNotifiable?
   var volume: Float {
     get {
@@ -424,7 +438,8 @@ class BackendAudioPlayer: NSObject {
       perloadedStreamingBitrate = nil
       activeTranscodingFormat = nil
       preloadTranscodingFormat = nil
-      guard playable.isPlayableOniOS || backendApi.isStreamingTranscodingActive else {
+      guard playable.isPlayableOniOS || streamingTranscodings
+        .isTranscodingActive(networkMonitor: networkMonitor) else {
         reactToIncompatibleContentType(
           contentType: playable.fileContentType ?? "",
           playableDisplayTitle: playable.displayString
@@ -531,7 +546,7 @@ class BackendAudioPlayer: NSObject {
     queueType: BackendAudioQueueType = .play
   ) async throws {
     let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
-
+    let streamingTranscodingFormat = streamingTranscodings.getActive(networkMonitor: networkMonitor)
     @MainActor
     func provideUrl() async throws -> URL {
       if let radio = playable.asRadio {
@@ -548,16 +563,17 @@ class BackendAudioPlayer: NSObject {
           perloadedPlayType = nil
           activeStreamingBitrate = streamingMaxBitrate
           perloadedStreamingBitrate = nil
-          activeTranscodingFormat = backendApi.streamingTranscodingFormat
+          activeTranscodingFormat = streamingTranscodingFormat
           preloadTranscodingFormat = nil
         } else {
           perloadedPlayType = .stream
           perloadedStreamingBitrate = streamingMaxBitrate
-          preloadTranscodingFormat = backendApi.streamingTranscodingFormat
+          preloadTranscodingFormat = streamingTranscodingFormat
         }
         return try await backendApi.generateUrl(
           forStreamingPlayable: playable.info,
-          maxBitrate: streamingMaxBitrate
+          maxBitrate: streamingMaxBitrate,
+          formatPreference: streamingTranscodingFormat
         )
       }
     }

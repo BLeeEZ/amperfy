@@ -46,8 +46,22 @@ struct PlayerSettingsView: View {
     )
   }
 
-  private func updateFormat(_ format: StreamingFormatPreference) {
-    settings.streamingFormatPreference = format
+  private func updateFormatCell(_ format: StreamingFormatPreference) {
+    settings.streamingFormatCellularPreference = format
+
+    appDelegate.player.setStreamingTranscodings(to: StreamingTranscodings(
+      wifi: settings.streamingFormatWifiPreference,
+      cellular: settings.streamingFormatCellularPreference
+    ))
+  }
+
+  private func updateFormatWifi(_ format: StreamingFormatPreference) {
+    settings.streamingFormatWifiPreference = format
+
+    appDelegate.player.setStreamingTranscodings(to: StreamingTranscodings(
+      wifi: settings.streamingFormatWifiPreference,
+      cellular: settings.streamingFormatCellularPreference
+    ))
   }
 
   private func updateCacheFormat(_ format: CacheTranscodingFormatPreference) {
@@ -95,50 +109,70 @@ struct PlayerSettingsView: View {
           SettingsCheckBoxRow(title: "Manual Playback", isOn: $settings.isPlaybackStartOnlyOnPlay)
         }, footer: "Enable to start playback only when the Play button is pressed.")
 
-        // Streaming Bitrate Settings
-        SettingsSection(content: {
-          SettingsRow(title: "WiFi Streaming Bitrate Limit") {
-            Menu(settings.streamingMaxBitrateWifiPreference.description) {
-              ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
-                Button(bitrate.description) {
-                  updateBitrate(wifi: bitrate)
-                }
-              }
-            }
-          }
-        }, footer: "Set the maximum streaming bitrate for WiFi")
-
-        SettingsSection(content: {
-          SettingsRow(title: "Cellular Streaming Bitrate Limit") {
-            Menu(settings.streamingMaxBitrateCellularPreference.description) {
-              ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
-                Button(bitrate.description) {
-                  updateBitrate(cellular: bitrate)
-                }
-              }
-            }
-          }
-        }, footer: "Set the maximum streaming bitrate for Cellular")
-
         // Streaming Format Settings
         SettingsSection(
           content: {
-            SettingsRow(title: "Streaming Format (Transcoding)") {
-              Menu(settings.streamingFormatPreference.description) {
+            SettingsRow(title: "Cellular Streaming\nFormat (Transcoding)") {
+              Menu(settings.streamingFormatCellularPreference.description) {
                 ForEach(StreamingFormatPreference.allCases, id: \.self) { format in
                   Button(format.description) {
-                    updateFormat(format)
+                    updateFormatCell(format)
                   }
                 }
               }
             }
           },
-          footer: "Select a transcoding format for streaming. Transcoding is recommended for better compatibility."
+          footer: "Select a transcoding format for streaming while using Cellular. Transcoding is recommended for better compatibility."
+        )
+
+        SettingsSection(
+          content: {
+            SettingsRow(title: "Cellular Streaming\nBitrate Limit") {
+              Menu(settings.streamingMaxBitrateCellularPreference.description) {
+                ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
+                  Button(bitrate.description) {
+                    updateBitrate(cellular: bitrate)
+                  }
+                }
+              }
+            }
+          },
+          footer: "Set the maximum streaming bitrate for Cellular."
+        )
+
+        SettingsSection(
+          content: {
+            SettingsRow(title: "WiFi Streaming\nFormat (Transcoding)") {
+              Menu(settings.streamingFormatWifiPreference.description) {
+                ForEach(StreamingFormatPreference.allCases, id: \.self) { format in
+                  Button(format.description) {
+                    updateFormatWifi(format)
+                  }
+                }
+              }
+            }
+          },
+          footer: "Select a transcoding format for streaming while on WiFi. Transcoding is recommended for better compatibility."
+        )
+        // Streaming Bitrate Settings
+        SettingsSection(
+          content: {
+            SettingsRow(title: "WiFi Streaming\nBitrate Limit") {
+              Menu(settings.streamingMaxBitrateWifiPreference.description) {
+                ForEach(StreamingMaxBitratePreference.allCases, id: \.self) { bitrate in
+                  Button(bitrate.description) {
+                    updateBitrate(wifi: bitrate)
+                  }
+                }
+              }
+            }
+          },
+          footer: "Set the maximum streaming bitrate for WiFi."
         )
 
         // Cache Format Settings
         SettingsSection(content: {
-          SettingsRow(title: "Cache Format (Transcoding)") {
+          SettingsRow(title: "Cache\nFormat (Transcoding)") {
             Menu(settings.cacheTranscodingFormatPreference.description) {
               ForEach(CacheTranscodingFormatPreference.allCases, id: \.self) { format in
                 Button(format.description) {

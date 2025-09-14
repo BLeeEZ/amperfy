@@ -48,6 +48,45 @@ public struct StreamingMaxBitrates {
   }
 }
 
+// MARK: - StreamingTranscodings
+
+@MainActor
+public struct StreamingTranscodings {
+  public var wifi: StreamingFormatPreference = .serverConfig
+  public var cellular: StreamingFormatPreference = .serverConfig
+
+  public init(wifi: StreamingFormatPreference, cellular: StreamingFormatPreference) {
+    self.wifi = wifi
+    self.cellular = cellular
+  }
+
+  public init() {
+    self.wifi = .serverConfig
+    self.cellular = .serverConfig
+  }
+
+  public func getActive(networkMonitor: NetworkMonitorFacade) -> StreamingFormatPreference {
+    if networkMonitor.isWifiOrEthernet {
+      return wifi
+    } else {
+      return cellular
+    }
+  }
+
+  public func isTranscodingActive(networkMonitor: NetworkMonitorFacade) -> Bool {
+    if networkMonitor.isCellular {
+      if cellular != .raw {
+        return true
+      }
+    } else {
+      if wifi != .raw {
+        return true
+      }
+    }
+    return false
+  }
+}
+
 // MARK: - PlayContext
 
 public struct PlayContext {
@@ -153,6 +192,8 @@ public protocol PlayerFacade {
   func setPlayerMode(_ newValue: PlayerMode)
   var streamingMaxBitrates: StreamingMaxBitrates { get }
   func setStreamingMaxBitrates(to: StreamingMaxBitrates)
+  var streamingTranscodings: StreamingTranscodings { get }
+  func setStreamingTranscodings(to: StreamingTranscodings)
 
   func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
   func seek(toSecond: Double)
@@ -454,6 +495,11 @@ class PlayerFacadeImpl: PlayerFacade {
   var streamingMaxBitrates: StreamingMaxBitrates { backendAudioPlayer.streamingMaxBitrates }
   public func setStreamingMaxBitrates(to: StreamingMaxBitrates) {
     backendAudioPlayer.setStreamingMaxBitrates(to: to)
+  }
+
+  var streamingTranscodings: StreamingTranscodings { backendAudioPlayer.streamingTranscodings }
+  public func setStreamingTranscodings(to: StreamingTranscodings) {
+    backendAudioPlayer.setStreamingTranscodings(to: to)
   }
 
   public func updateEqualizerEnabled(isEnabled: Bool) {

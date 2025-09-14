@@ -117,12 +117,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     self.settings = settings
   }
 
-  var isStreamingTranscodingActive: Bool {
-    settings.streamingFormatPreference != .raw
-  }
-
-  var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
-
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
           let urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false),
@@ -787,7 +781,8 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   public func generateUrlForStreamingPlayable(
     isSong: Bool,
     id: String,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
     let auth = try await reauthenticate()
@@ -796,7 +791,8 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     urlComp.addQueryItem(name: "action", value: "stream")
     urlComp.addQueryItem(name: "type", value: isSong ? "song" : "podcast_episode")
     urlComp.addQueryItem(name: "id", value: id)
-    switch settings.streamingFormatPreference {
+
+    switch formatPreference {
     case .mp3:
       urlComp.addQueryItem(name: "format", value: "mp3")
     case .raw:

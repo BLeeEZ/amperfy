@@ -155,9 +155,16 @@ class SettingsHostVC: UIViewController {
         self.appDelegate.storage.settings.streamingMaxBitrateCellularPreference = newValue
       }))
 
-    settings.streamingFormatPreference = appDelegate.storage.settings.streamingFormatPreference
-    changesAgent.append(settings.$streamingFormatPreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.streamingFormatPreference = newValue
+    settings.streamingFormatCellularPreference = appDelegate.storage.settings
+      .streamingFormatCellularPreference
+    changesAgent.append(settings.$streamingFormatCellularPreference.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.streamingFormatCellularPreference = newValue
+    }))
+
+    settings.streamingFormatWifiPreference = appDelegate.storage.settings
+      .streamingFormatWifiPreference
+    changesAgent.append(settings.$streamingFormatWifiPreference.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.streamingFormatWifiPreference = newValue
     }))
 
     settings.cacheTranscodingFormatPreference = appDelegate.storage.settings

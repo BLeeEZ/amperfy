@@ -340,14 +340,6 @@ extension BackendProxy: BackendApi {
 
   public var serverApiVersion: String { activeApi.serverApiVersion }
 
-  public var isStreamingTranscodingActive: Bool {
-    activeApi.isStreamingTranscodingActive
-  }
-
-  public var streamingTranscodingFormat: StreamingFormatPreference {
-    activeApi.streamingTranscodingFormat
-  }
-
   public func provideCredentials(credentials: LoginCredentials) {
     activeApi.provideCredentials(credentials: credentials)
   }
@@ -363,10 +355,15 @@ extension BackendProxy: BackendApi {
 
   public func generateUrl(
     forStreamingPlayable playableInfo: AbstractPlayableInfo,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
-    try await activeApi.generateUrl(forStreamingPlayable: playableInfo, maxBitrate: maxBitrate)
+    try await activeApi.generateUrl(
+      forStreamingPlayable: playableInfo,
+      maxBitrate: maxBitrate,
+      formatPreference: formatPreference
+    )
   }
 
   public func generateUrl(forArtwork artwork: Artwork) async throws -> URL {

@@ -117,14 +117,16 @@ public class AmperKit {
       cacheProxy: storage.main.library,
       userStatistics: userStatistics
     )
-    networkMonitor.connectionTypeChangedCB = { isWiFiConnected in
-      Task { @MainActor in
-        backendAudioPlayer.setStreamingMaxBitrates(to: StreamingMaxBitrates(
-          wifi: self.storage.settings.streamingMaxBitrateWifiPreference,
-          cellular: self.storage.settings.streamingMaxBitrateCellularPreference
-        ))
-      }
-    }
+
+    backendAudioPlayer.setStreamingMaxBitrates(to: StreamingMaxBitrates(
+      wifi: storage.settings.streamingMaxBitrateWifiPreference,
+      cellular: storage.settings.streamingMaxBitrateCellularPreference
+    ))
+    backendAudioPlayer.setStreamingTranscodings(to: StreamingTranscodings(
+      wifi: storage.settings.streamingFormatWifiPreference,
+      cellular: storage.settings.streamingFormatCellularPreference
+    ))
+
     let playerData = storage.main.library.getPlayerData()
     let queueHandler = PlayQueueHandler(playerData: playerData)
     let curPlayer = AudioPlayer(

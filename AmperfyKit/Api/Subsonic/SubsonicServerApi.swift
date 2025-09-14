@@ -114,7 +114,6 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let openSubsonicExtensionsSupport =
     Atomic<OpenSubsonicExtensionsSupport?>(wrappedValue: nil)
-
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
@@ -133,12 +132,6 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     authType.wrappedValue == .legacy ? Self.defaultClientApiVersionPreToken : Self
       .defaultClientApiVersionWithToken
   }
-
-  var isStreamingTranscodingActive: Bool {
-    settings.streamingFormatPreference != .raw
-  }
-
-  var streamingTranscodingFormat: StreamingFormatPreference { settings.streamingFormatPreference }
 
   static func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? {
     guard let url = URL(string: urlString),
@@ -345,12 +338,14 @@ final class SubsonicServerApi: URLCleanser, Sendable {
 
   public func generateUrl(
     forStreamingPlayableId apiId: String,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
     let version = try await determineApiVersionToUse()
     var urlComp = try createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
-    switch settings.streamingFormatPreference {
+
+    switch formatPreference {
     case .mp3:
       urlComp.addQueryItem(name: "format", value: "mp3")
     case .raw:

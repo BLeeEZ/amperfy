@@ -45,11 +45,6 @@ final class AmpacheApi: BackendApi {
 
   public var serverApiVersion: String { ampacheXmlServerApi.serverApiVersion.wrappedValue ?? "-" }
 
-  public var isStreamingTranscodingActive: Bool { ampacheXmlServerApi.isStreamingTranscodingActive }
-  public var streamingTranscodingFormat: StreamingFormatPreference {
-    ampacheXmlServerApi.streamingTranscodingFormat
-  }
-
   func provideCredentials(credentials: LoginCredentials) {
     ampacheXmlServerApi.provideCredentials(credentials: credentials)
   }
@@ -70,13 +65,15 @@ final class AmpacheApi: BackendApi {
 
   func generateUrl(
     forStreamingPlayable playableInfo: AbstractPlayableInfo,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws
     -> URL {
     try await ampacheXmlServerApi.generateUrlForStreamingPlayable(
       isSong: playableInfo.type == .song,
       id: playableInfo.id,
-      maxBitrate: maxBitrate
+      maxBitrate: maxBitrate,
+      formatPreference: formatPreference
     )
   }
 

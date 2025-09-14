@@ -258,14 +258,13 @@ public struct TranscodingInfo {
 public protocol BackendApi: URLCleanser, Sendable {
   var clientApiVersion: String { get }
   var serverApiVersion: String { get }
-  var isStreamingTranscodingActive: Bool { get }
-  var streamingTranscodingFormat: StreamingFormatPreference { get }
   func provideCredentials(credentials: LoginCredentials)
   func isAuthenticationValid(credentials: LoginCredentials) async throws
   func generateUrl(forDownloadingPlayable playableInfo: AbstractPlayableInfo) async throws -> URL
   func generateUrl(
     forStreamingPlayable playableInfo: AbstractPlayableInfo,
-    maxBitrate: StreamingMaxBitratePreference
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference
   ) async throws -> URL
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
