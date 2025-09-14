@@ -146,14 +146,13 @@ class BackendAudioPlayer: NSObject {
 
   public private(set) var streamingTranscodings = StreamingTranscodings()
   public func setStreamingTranscodings(to: StreamingTranscodings) {
-    let oldTranscoding = streamingTranscodings.getActive(networkMonitor: networkMonitor)
-    let newTranscoding = to.getActive(networkMonitor: networkMonitor)
-
     os_log(
       .default,
-      "Update Streaming Transcoding: %s -> %s (for next stream)",
-      oldTranscoding.description,
-      newTranscoding.description
+      "Update Streaming Transcoding: <Wifi: %s, Cellular: %s> -> <Wifi: %s, Cellular: %s> (for next stream)",
+      streamingTranscodings.wifi.description,
+      streamingTranscodings.cellular.description,
+      to.wifi.description,
+      to.cellular.description
     )
     // Update the stored bitrates
     streamingTranscodings = to
