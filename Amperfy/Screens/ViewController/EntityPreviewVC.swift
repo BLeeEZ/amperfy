@@ -439,7 +439,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func createMusicQueueAction() -> UIMenuElement {
-    UIMenu(title: "Music Queue", children: [
+    UIMenu(title: "Music Queue", image: .listBullet, children: [
       UIAction(title: "Insert Context Queue", image: .contextQueueInsert) { action in
         guard !self.entityPlayables.isEmpty else { return }
         self.appDelegate.player.insertContextQueue(playables: self.entityPlayables)
@@ -460,7 +460,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func createPodcastQueueAction() -> UIMenuElement {
-    UIMenu(options: .displayInline, children: [
+    UIMenu(image: .listBullet, options: .displayInline, children: [
       UIAction(title: "Insert Podcast Queue", image: .podcastQueueInsert) { action in
         guard !self.entityPlayables.isEmpty else { return }
         self.appDelegate.player.insertPodcastQueue(playables: self.entityPlayables)
@@ -494,6 +494,8 @@ class EntityPreviewActionBuilder {
     let rating = libraryEntity
       .rating == 0 ? "Not rated" :
       "\(libraryEntity.rating) Star\(libraryEntity.rating > 1 ? "s" : "")"
+    let menuIcon = libraryEntity
+      .rating == 0 ? UIImage.starEmpty : UIImage.starFill
     let children = [
       UIAction(title: "No Rating", image: .ban) { action in self.setRating(rating: 0) },
       UIAction(
@@ -528,11 +530,7 @@ class EntityPreviewActionBuilder {
       },
     ]
 
-    if #available(iOS 17, *) {
-      return UIMenu(title: "Rating: \(rating)", options: .displayAsPalette, children: children)
-    } else {
-      return UIMenu(title: "Rating: \(rating)", options: .singleSelection, children: children)
-    }
+    return UIMenu(title: "Rating: \(rating)", image: menuIcon, options: .displayAsPalette, children: children)
   }
 
   private func setRating(rating: Int) {
