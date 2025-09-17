@@ -128,8 +128,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     }
     configureSearchController(
       placeholder: "Search in \"Playlists\"",
-      scopeButtonTitles: searchTiles,
-      showSearchBarAtEnter: true
+      scopeButtonTitles: searchTiles
     )
     setNavBarTitle(title: "Playlists")
     tableView.register(nibName: PlaylistTableCell.typeName)

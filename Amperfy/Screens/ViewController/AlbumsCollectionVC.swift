@@ -223,8 +223,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     common.applyFilter()
     configureSearchController(
       placeholder: "Search in \"\(common.filterTitle)\"",
-      scopeButtonTitles: ["All", "Cached"],
-      showSearchBarAtEnter: true
+      scopeButtonTitles: ["All", "Cached"]
     )
     collectionView.register(
       UINib(nibName: CommonCollectionSectionHeader.typeName, bundle: .main),

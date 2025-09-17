@@ -100,8 +100,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     change(filterType: appDelegate.storage.settings.artistsFilterSetting)
     configureSearchController(
       placeholder: "Search in \"\(filterTitle)\"",
-      scopeButtonTitles: ["All", "Cached"],
-      showSearchBarAtEnter: true
+      scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeight

@@ -56,8 +56,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     tableView.reloadData()
 
     configureSearchController(
-      placeholder: "Search in \"\(sceneTitle ?? "")\"",
-      showSearchBarAtEnter: true
+      placeholder: "Search in \"\(sceneTitle ?? "")\""
     )
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight

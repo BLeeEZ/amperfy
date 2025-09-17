@@ -54,8 +54,7 @@ class BasicCollectionViewController: UICollectionViewController {
 
   func configureSearchController(
     placeholder: String?,
-    scopeButtonTitles: [String]? = nil,
-    showSearchBarAtEnter: Bool = false
+    scopeButtonTitles: [String]? = nil
   ) {
     searchController.searchResultsUpdater = self
     searchController.searchBar.autocapitalizationType = .none
@@ -63,8 +62,12 @@ class BasicCollectionViewController: UICollectionViewController {
     searchController.searchBar.placeholder = placeholder
 
     navigationItem.searchController = searchController
-    navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-    navigationItem.preferredSearchBarPlacement = .integrated
+    navigationItem.hidesSearchBarWhenScrolling = true
+    #if targetEnvironment(macCatalyst)
+      navigationItem.preferredSearchBarPlacement = .integrated
+    #else
+      navigationItem.preferredSearchBarPlacement = .automatic
+    #endif
 
     searchController.delegate = self
     searchController.obscuresBackgroundDuringPresentation = false

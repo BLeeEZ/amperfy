@@ -210,8 +210,7 @@ class SearchVC: BasicTableViewController {
     appDelegate.userStatistics.visited(.search)
     configureSearchController(
       placeholder: "Search in \"Library\"",
-      scopeButtonTitles: ["All", "Cached"],
-      showSearchBarAtEnter: true
+      scopeButtonTitles: ["All", "Cached"]
     )
   }
 
@@ -224,13 +223,11 @@ class SearchVC: BasicTableViewController {
 
   override func configureSearchController(
     placeholder: String?,
-    scopeButtonTitles: [String]? = nil,
-    showSearchBarAtEnter: Bool = false
+    scopeButtonTitles: [String]? = nil
   ) {
     super.configureSearchController(
       placeholder: placeholder,
-      scopeButtonTitles: scopeButtonTitles,
-      showSearchBarAtEnter: showSearchBarAtEnter
+      scopeButtonTitles: scopeButtonTitles
     )
 
     // Install the options button

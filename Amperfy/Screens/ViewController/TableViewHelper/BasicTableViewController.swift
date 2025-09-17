@@ -212,8 +212,7 @@ class BasicTableViewController: KeyCommandTableViewController {
 
   func configureSearchController(
     placeholder: String?,
-    scopeButtonTitles: [String]? = nil,
-    showSearchBarAtEnter: Bool = false
+    scopeButtonTitles: [String]? = nil
   ) {
     searchController.searchResultsUpdater = self
     searchController.searchBar.autocapitalizationType = .none
@@ -221,10 +220,11 @@ class BasicTableViewController: KeyCommandTableViewController {
     searchController.searchBar.placeholder = placeholder
 
     navigationItem.searchController = searchController
-    navigationItem.hidesSearchBarWhenScrolling = !showSearchBarAtEnter
-
+    navigationItem.hidesSearchBarWhenScrolling = true
     #if targetEnvironment(macCatalyst)
       navigationItem.preferredSearchBarPlacement = .integrated
+    #else
+      navigationItem.preferredSearchBarPlacement = .automatic
     #endif
 
     searchController.delegate = self

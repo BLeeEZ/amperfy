@@ -108,8 +108,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
     }
     configureSearchController(
       placeholder: "Search in \"Playlists\"",
-      scopeButtonTitles: searchTiles,
-      showSearchBarAtEnter: true
+      scopeButtonTitles: searchTiles
     )
     tableView.register(nibName: PlaylistTableCell.typeName)
     tableView.rowHeight = PlaylistTableCell.rowHeight

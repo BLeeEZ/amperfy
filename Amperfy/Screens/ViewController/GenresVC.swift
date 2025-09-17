@@ -53,8 +53,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
     configureSearchController(
       placeholder: "Search in \"Genres\"",
-      scopeButtonTitles: ["All", "Cached"],
-      showSearchBarAtEnter: true
+      scopeButtonTitles: ["All", "Cached"]
     )
     setNavBarTitle(title: "Genres")
     tableView.register(nibName: GenericTableCell.typeName)
