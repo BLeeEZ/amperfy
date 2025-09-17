@@ -236,7 +236,7 @@ extension AppDelegate {
     var section2 = [
       UIMenu(
         title: "Playback Rate",
-        image: .playbackRateMenu,
+        image: .playbackRate,
         children: PlaybackRate.allCases.map { rate in
           UIAction(
             title: rate.description,

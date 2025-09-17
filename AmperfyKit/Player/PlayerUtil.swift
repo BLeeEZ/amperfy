@@ -173,17 +173,6 @@ public enum PlaybackRate: Int, CaseIterable {
     }
   }
 
-  public var icon: UIImage {
-    switch self {
-    case .dot5: return UIImage.gaugeDown.withRenderingMode(.alwaysTemplate)
-    case .dot75: return UIImage.gaugeDown.withRenderingMode(.alwaysTemplate)
-    case .one: return UIImage.gauge.withRenderingMode(.alwaysTemplate)
-    case .oneDot25: return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
-    case .oneDot5: return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
-    case .oneDot75: return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
-    case .two: return UIImage.gaugeUp.withRenderingMode(.alwaysTemplate)
-    }
-  }
 }
 
 // MARK: - PlayerQueueType

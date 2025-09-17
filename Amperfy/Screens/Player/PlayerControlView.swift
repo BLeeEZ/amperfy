@@ -246,6 +246,7 @@ class PlayerControlView: UIView {
     return UIMenu(
       title: "Playback Rate",
       subtitle: playerPlaybackRate.description,
+      image: .playbackRate,
       children: availablePlaybackRates
     )
   }

@@ -202,6 +202,7 @@ extension UIImage {
   public static let audioVisualizer = UIImage.create(systemName: "circle.dashed")
   public static let volumeMin = UIImage.create(systemName: "speaker.fill")
   public static let volumeMax = UIImage.create(systemName: "speaker.wave.3.fill")
+  public static let playbackRate = UIImage.create(systemName: "gauge.open.with.lines.needle.33percent")
 
   public static let stopMenu = UIImage.create(systemName: "stop")
   public static let playMenu = UIImage.create(systemName: "play")
@@ -213,19 +214,12 @@ extension UIImage {
   public static let currentSongMenu = UIImage.create(systemName: "music.note")
   public static let repeatMenu = UIImage.create(systemName: "repeat")
   public static let shuffleMenu = UIImage.create(systemName: "shuffle")
-  public static let playbackRateMenu = UIImage.create(systemName: "hare")
 
   public static let miniPlayer = UIImage.create(systemName: "play.rectangle.on.rectangle")
   public static let listBullet = UIImage.create(systemName: "list.bullet")
 
   /// Asset symbol generation is enabled by default for both new and old projects but can be disabled by setting the build setting "Generate Asset Symbols" (ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS) to NO.
   #if false
-    public static let gauge = UIImage
-      .create("gauge") // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
-    public static let gaugeDown = UIImage
-      .create("gauge_down") // SF-Symbols 5 Regular:  gauge.open.with.lines.needle.33percent.badge.arrow.down
-    public static let gaugeUp = UIImage
-      .create("gauge_up") // SF-Symbols 5 Regular: gauge.open.with.lines.needle.33percent.badge.arrow.up
     public static let podcast = UIImage.create("podcast").withTintColor(.defaultBlue)
     public static let albumNewest = UIImage.create("album_newest")
     public static let albumRecent = UIImage.create("album_recent")
