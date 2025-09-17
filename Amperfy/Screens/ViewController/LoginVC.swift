@@ -96,6 +96,8 @@ class LoginVC: UIViewController {
     textField.placeholder = "https://localhost/ampache"
     textField.textContentType = .URL
     textField.keyboardType = .URL
+    textField.autocorrectionType = .no
+    textField.autocapitalizationType = .none
     textField.addTarget(
       self,
       action: #selector(Self.serverUrlActionPressed),
@@ -116,6 +118,8 @@ class LoginVC: UIViewController {
     textField.placeholder = "Username"
     textField.textContentType = .username
     textField.keyboardType = .default
+    textField.autocorrectionType = .no
+    textField.autocapitalizationType = .none
     textField.addTarget(
       self,
       action: #selector(Self.usernameActionPressed),
@@ -137,6 +141,8 @@ class LoginVC: UIViewController {
     textField.textContentType = .password
     textField.keyboardType = .default
     textField.isSecureTextEntry = true
+    textField.autocorrectionType = .no
+    textField.autocapitalizationType = .none
     textField.addTarget(
       self,
       action: #selector(Self.passwordActionPressed),
