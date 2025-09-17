@@ -202,7 +202,8 @@ extension UIImage {
   public static let audioVisualizer = UIImage.create(systemName: "circle.dashed")
   public static let volumeMin = UIImage.create(systemName: "speaker.fill")
   public static let volumeMax = UIImage.create(systemName: "speaker.wave.3.fill")
-  public static let playbackRate = UIImage.create(systemName: "gauge.open.with.lines.needle.33percent")
+  public static let playbackRate = UIImage
+    .create(systemName: "gauge.open.with.lines.needle.33percent")
 
   public static let stopMenu = UIImage.create(systemName: "stop")
   public static let playMenu = UIImage.create(systemName: "play")

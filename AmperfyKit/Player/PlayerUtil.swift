@@ -172,7 +172,6 @@ public enum PlaybackRate: Int, CaseIterable {
     case .two: return "2x"
     }
   }
-
 }
 
 // MARK: - PlayerQueueType
