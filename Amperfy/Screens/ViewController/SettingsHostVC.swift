@@ -125,12 +125,6 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.isShowMusicPlayerSkipButtons = newValue
     }))
 
-    settings.isAlwaysHidePlayerLyricsButton = appDelegate.storage.settings
-      .isAlwaysHidePlayerLyricsButton
-    changesAgent.append(settings.$isAlwaysHidePlayerLyricsButton.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isAlwaysHidePlayerLyricsButton = newValue
-    }))
-
     settings.isLyricsSmoothScrolling = appDelegate.storage.settings.isLyricsSmoothScrolling
     changesAgent.append(settings.$isLyricsSmoothScrolling.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.isLyricsSmoothScrolling = newValue

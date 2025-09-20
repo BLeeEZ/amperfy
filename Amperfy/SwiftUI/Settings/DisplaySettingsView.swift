@@ -49,13 +49,6 @@ struct DisplaySettingsView: View {
     appDelegate.setAppAppearanceMode(style: style)
   }
 
-  func tooglePlayerLyricsButtonPreference() {
-    settings.isAlwaysHidePlayerLyricsButton.toggle()
-    if settings.isAlwaysHidePlayerLyricsButton {
-      appDelegate.storage.settings.isPlayerLyricsDisplayed = false
-    }
-  }
-
   var body: some View {
     ZStack {
       SettingsList {
@@ -128,17 +121,6 @@ struct DisplaySettingsView: View {
         )
 
         if appDelegate.backendApi.selectedApi != .ampache {
-          SettingsSection(
-            content: {
-              SettingsCheckBoxRow(title: "Music Player Lyrics Button", isOn: Binding<Bool>(
-                get: { !settings.isAlwaysHidePlayerLyricsButton },
-                set: { _ in tooglePlayerLyricsButtonPreference() }
-              ))
-            },
-            footer:
-            "Display lyrics button in music player."
-          )
-
           SettingsSection(
             content: {
               SettingsCheckBoxRow(

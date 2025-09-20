@@ -472,7 +472,7 @@ public class PersistentStorage {
     case AlbumsGridSizeSetting = "albumsGridSizeSetting"
     case PodcastsShowSetting = "podcastsShowSetting"
     case PlayerDisplayStyle = "playerDisplayStyle"
-    case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed"
+    case IsPlayerLyricsDisplayed = "isPlayerLyricsDisplayed" // not used anymore
     case IsPlayerVisualizerDisplayed = "isPlayerVisualizerDisplayed"
     case IsOfflineMode = "isOfflineMode"
     case IsAutoDownloadLatestSongsActive = "isAutoDownloadLatestSongsActive"
@@ -704,17 +704,6 @@ public class PersistentStorage {
       set { UserDefaults.standard.set(
         newValue,
         forKey: UserDefaultsKey.ShowMusicPlayerSkipButtons.rawValue
-      ) }
-    }
-
-    public var isAlwaysHidePlayerLyricsButton: Bool {
-      get {
-        UserDefaults.standard
-          .object(forKey: UserDefaultsKey.AlwaysHidePlayerLyricsButton.rawValue) as? Bool ?? false
-      }
-      set { UserDefaults.standard.set(
-        newValue,
-        forKey: UserDefaultsKey.AlwaysHidePlayerLyricsButton.rawValue
       ) }
     }
 
