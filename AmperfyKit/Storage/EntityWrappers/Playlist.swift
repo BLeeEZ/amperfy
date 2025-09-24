@@ -453,10 +453,13 @@ public class Playlist: Identifyable {
     shuffeldIndexes = shuffeldIndexes.shuffled()
     assert(shuffeldIndexes.count == managedObject.items.count)
 
-    for i in 0 ..< managedObject.items.count {
-      managedObject.moveInsideItems(fromIndex: shuffeldIndexes[i], to: i)
+    let orgItems = managedObject.items.compactMap { AbstractPlayable(managedObject: $0.playable) }
+    assert(shuffeldIndexes.count == orgItems.count)
+    managedObject.removeAllItems()
+    for i in 0 ..< orgItems.count {
+      createAndAppendPlaylistItem(for: orgItems[shuffeldIndexes[i]])
     }
-    reassignOrder()
+    assert(shuffeldIndexes.count == managedObject.items.count)
     library.saveContext()
   }
 
