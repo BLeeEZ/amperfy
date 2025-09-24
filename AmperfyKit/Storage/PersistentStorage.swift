@@ -305,7 +305,7 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
     case .purple:
       return .systemPurple
     case .pink:
-      return UIColor(_colorLiteralRed: 1.0, green: 111/250, blue: 1.0, alpha: 1.0)
+      return UIColor(_colorLiteralRed: 1.0, green: 111 / 250, blue: 1.0, alpha: 1.0)
     }
   }
 

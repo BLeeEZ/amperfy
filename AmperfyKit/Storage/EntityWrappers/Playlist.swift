@@ -454,7 +454,7 @@ public class Playlist: Identifyable {
     assert(shuffeldIndexes.count == managedObject.items.count)
 
     for i in 0 ..< managedObject.items.count {
-      managedObject.moveInsideItems(fromIndex: i, to: shuffeldIndexes[i])
+      managedObject.moveInsideItems(fromIndex: shuffeldIndexes[i], to: i)
     }
     reassignOrder()
     library.saveContext()

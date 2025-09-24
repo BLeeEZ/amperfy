@@ -333,7 +333,7 @@ class PlayerUIHandler: NSObject {
   }
 
   var isLyricsButtonAllowedToDisplay: Bool {
-      appDelegate.player.playerMode == .music &&
+    appDelegate.player.playerMode == .music &&
       appDelegate.backendApi.selectedApi != .ampache
   }
 
