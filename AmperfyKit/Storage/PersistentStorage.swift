@@ -267,7 +267,6 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
   case yellow = 3
   case orange = 4
   case purple = 5
-  case pink = 6
 
   public static let defaultValue: ThemePreference = .blue
 
@@ -285,8 +284,6 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
       return "Orange"
     case .purple:
       return "Purple"
-    case .pink:
-      return "Pink"
     }
   }
 
@@ -304,8 +301,6 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
       return .systemOrange
     case .purple:
       return .systemPurple
-    case .pink:
-      return UIColor(_colorLiteralRed: 1.0, green: 111 / 250, blue: 1.0, alpha: 1.0)
     }
   }
 
@@ -322,8 +317,6 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
     case .orange:
       return .white
     case .purple:
-      return .white
-    case .pink:
       return .white
     }
   }

@@ -370,27 +370,6 @@ extension UIImage {
       case .radio:
         img = UIImage(imageLiteralResourceName: "PurpleRadio")
       }
-    case .pink:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "PinkSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "PinkAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "PinkGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "PinkArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "PinkPodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "PinkPodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "PinkPlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "PinkFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "PinkRadio")
-      }
     }
 
     return img

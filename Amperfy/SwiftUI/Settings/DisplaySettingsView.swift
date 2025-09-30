@@ -73,9 +73,6 @@ struct DisplaySettingsView: View {
               Button(ThemePreference.purple.description) {
                 setThemePreference(preference: .purple)
               }
-              Button(ThemePreference.pink.description) {
-                setThemePreference(preference: .pink)
-              }
             }
           }
         }
