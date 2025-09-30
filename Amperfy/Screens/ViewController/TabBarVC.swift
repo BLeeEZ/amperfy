@@ -216,7 +216,7 @@ class TabBarVC: UITabBarController {
 
   public func push(vc: UIViewController) {
     guard let libraryGroup else { return }
-    libraryGroup.managingNavigationController?.pushViewController(vc, animated: false)
+    libraryGroup.managingNavigationController?.pushViewController(vc, animated: true)
     selectedTab = libraryGroup
   }
 }
