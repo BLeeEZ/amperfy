@@ -35,21 +35,21 @@ public class MusicFolderMO: NSManagedObject {
   }
 
   fileprivate var hasChangedSongs: Bool {
-    changedValue(forKey: #keyPath(songs)) != nil
+    changedValues().keys.contains(#keyPath(songs))
   }
 
   fileprivate func updateSongCount() {
-    guard Int16(songs?.count ?? 0) != songCount else { return }
-    songCount = Int16(songs?.count ?? 0)
+    guard Int16(clamping: songs?.count ?? 0) != songCount else { return }
+    songCount = Int16(clamping: songs?.count ?? 0)
   }
 
   fileprivate var hasChangedDirectories: Bool {
-    changedValue(forKey: #keyPath(directories)) != nil
+    changedValues().keys.contains(#keyPath(directories))
   }
 
   fileprivate func updateDirectoryCount() {
-    guard Int16(directories?.count ?? 0) != directoryCount else { return }
-    directoryCount = Int16(directories?.count ?? 0)
+    guard Int16(clamping: directories?.count ?? 0) != directoryCount else { return }
+    directoryCount = Int16(clamping: directories?.count ?? 0)
   }
 
   static var idSortedFetchRequest: NSFetchRequest<MusicFolderMO> {

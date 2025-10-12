@@ -37,21 +37,21 @@ public final class DirectoryMO: AbstractLibraryEntityMO {
   }
 
   fileprivate var hasChangedSongs: Bool {
-    changedValue(forKey: #keyPath(songs)) != nil
+    changedValues().keys.contains(#keyPath(songs))
   }
 
   fileprivate func updateSongCount() {
-    guard Int16(songs?.count ?? 0) != songCount else { return }
-    songCount = Int16(songs?.count ?? 0)
+    guard Int16(clamping: songs?.count ?? 0) != songCount else { return }
+    songCount = Int16(clamping: songs?.count ?? 0)
   }
 
   fileprivate var hasChangedSubdirectories: Bool {
-    changedValue(forKey: #keyPath(subdirectories)) != nil
+    changedValues().keys.contains(#keyPath(subdirectories))
   }
 
   fileprivate func updateSubdirectoryCount() {
-    guard Int16(subdirectories?.count ?? 0) != subdirectoryCount else { return }
-    subdirectoryCount = Int16(subdirectories?.count ?? 0)
+    guard Int16(clamping: subdirectories?.count ?? 0) != subdirectoryCount else { return }
+    subdirectoryCount = Int16(clamping: subdirectories?.count ?? 0)
   }
 
   static var alphabeticSortedFetchRequest: NSFetchRequest<DirectoryMO> {

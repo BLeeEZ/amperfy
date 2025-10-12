@@ -606,13 +606,3 @@ extension UIDevice {
     return Int64(capacity)
   }
 }
-
-extension NSManagedObject {
-  public func changedValue(forKey: String) -> Any? {
-    changedValues()[forKey]
-  }
-
-  public func committedValue(forKey: String) -> Any? {
-    committedValues(forKeys: nil)[forKey]
-  }
-}

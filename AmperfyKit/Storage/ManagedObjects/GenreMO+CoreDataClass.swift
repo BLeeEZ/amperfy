@@ -40,30 +40,30 @@ public final class GenreMO: AbstractLibraryEntityMO {
   }
 
   fileprivate var hasChangedSongs: Bool {
-    changedValue(forKey: #keyPath(songs)) != nil
+    changedValues().keys.contains(#keyPath(songs))
   }
 
   fileprivate func updateSongCount() {
-    guard Int16(songs?.count ?? 0) != songCount else { return }
-    songCount = Int16(songs?.count ?? 0)
+    guard Int16(clamping: songs?.count ?? 0) != songCount else { return }
+    songCount = Int16(clamping: songs?.count ?? 0)
   }
 
   fileprivate var hasChangedAlbums: Bool {
-    changedValue(forKey: #keyPath(albums)) != nil
+    changedValues().keys.contains(#keyPath(albums))
   }
 
   fileprivate func updateAlbumCount() {
-    guard Int16(albums?.count ?? 0) != albumCount else { return }
-    albumCount = Int16(albums?.count ?? 0)
+    guard Int16(clamping: albums?.count ?? 0) != albumCount else { return }
+    albumCount = Int16(clamping: albums?.count ?? 0)
   }
 
   fileprivate var hasChangedArtists: Bool {
-    changedValue(forKey: #keyPath(artists)) != nil
+    changedValues().keys.contains(#keyPath(artists))
   }
 
   fileprivate func updateArtistCount() {
-    guard Int16(artists?.count ?? 0) != artistCount else { return }
-    artistCount = Int16(artists?.count ?? 0)
+    guard Int16(clamping: artists?.count ?? 0) != artistCount else { return }
+    artistCount = Int16(clamping: artists?.count ?? 0)
   }
 }
 

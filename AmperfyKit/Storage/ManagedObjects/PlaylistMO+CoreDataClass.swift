@@ -34,12 +34,12 @@ public final class PlaylistMO: NSManagedObject {
   }
 
   fileprivate var hasChangedSongs: Bool {
-    changedValue(forKey: #keyPath(items)) != nil
+    changedValues().keys.contains(#keyPath(items))
   }
 
   fileprivate func updateSongCount() {
-    guard Int16(items.count) != songCount else { return }
-    songCount = Int16(items.count)
+    guard Int16(clamping: items.count) != songCount else { return }
+    songCount = Int16(clamping: items.count)
   }
 
   public func removeAllItems() {

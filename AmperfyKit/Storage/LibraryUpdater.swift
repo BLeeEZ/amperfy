@@ -452,8 +452,8 @@ public class LibraryUpdater {
       notifier.startOperation(name: "Music Folder Update", totalCount: musicFolders.count)
       for musicFolder in musicFolders {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
-        musicFolder.managedObject.songCount = Int16(musicFolder.songs.count)
-        musicFolder.managedObject.directoryCount = Int16(musicFolder.directories.count)
+        musicFolder.managedObject.songCount = Int16(clamping: musicFolder.songs.count)
+        musicFolder.managedObject.directoryCount = Int16(clamping: musicFolder.directories.count)
         notifier.tickOperation()
       }
     }
@@ -463,8 +463,8 @@ public class LibraryUpdater {
       notifier.startOperation(name: "Directory Update", totalCount: directories.count)
       for directory in directories {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
-        directory.managedObject.songCount = Int16(directory.songs.count)
-        directory.managedObject.subdirectoryCount = Int16(directory.subdirectories.count)
+        directory.managedObject.songCount = Int16(clamping: directory.songs.count)
+        directory.managedObject.subdirectoryCount = Int16(clamping: directory.subdirectories.count)
         notifier.tickOperation()
       }
     }
@@ -474,9 +474,9 @@ public class LibraryUpdater {
       notifier.startOperation(name: "Genre Update", totalCount: genres.count)
       for genre in genres {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
-        genre.managedObject.songCount = Int16(genre.songs.count)
-        genre.managedObject.albumCount = Int16(genre.albums.count)
-        genre.managedObject.artistCount = Int16(genre.artists.count)
+        genre.managedObject.songCount = Int16(clamping: genre.songs.count)
+        genre.managedObject.albumCount = Int16(clamping: genre.albums.count)
+        genre.managedObject.artistCount = Int16(clamping: genre.artists.count)
         notifier.tickOperation()
       }
     }
@@ -487,8 +487,8 @@ public class LibraryUpdater {
       for artist in artists {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
         artist.managedObject.remoteAlbumCount = artist.managedObject.albumCount
-        artist.managedObject.albumCount = Int16(artist.albums.count)
-        artist.managedObject.songCount = Int16(artist.songs.count)
+        artist.managedObject.albumCount = Int16(clamping: artist.albums.count)
+        artist.managedObject.songCount = Int16(clamping: artist.songs.count)
         notifier.tickOperation()
       }
     }
@@ -499,7 +499,7 @@ public class LibraryUpdater {
       for album in albums {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
         album.managedObject.remoteSongCount = album.managedObject.songCount
-        album.managedObject.songCount = Int16(album.songs.count)
+        album.managedObject.songCount = Int16(clamping: album.songs.count)
         notifier.tickOperation()
       }
     }
@@ -509,7 +509,7 @@ public class LibraryUpdater {
       notifier.startOperation(name: "Podcast Update", totalCount: podcasts.count)
       for podcast in podcasts {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
-        podcast.managedObject.episodeCount = Int16(podcast.episodes.count)
+        podcast.managedObject.episodeCount = Int16(clamping: podcast.episodes.count)
         notifier.tickOperation()
       }
     }

@@ -34,12 +34,12 @@ public final class AlbumMO: AbstractLibraryEntityMO {
   }
 
   fileprivate var hasChangedSongs: Bool {
-    changedValue(forKey: #keyPath(songs)) != nil
+    changedValues().keys.contains(#keyPath(songs))
   }
 
   fileprivate func updateSongCount() {
-    guard Int16(songs?.count ?? 0) != songCount else { return }
-    songCount = Int16(songs?.count ?? 0)
+    guard Int16(clamping: songs?.count ?? 0) != songCount else { return }
+    songCount = Int16(clamping: songs?.count ?? 0)
   }
 
   static func getFetchPredicateForAlbumsWhoseSongsHave(artist: Artist) -> NSPredicate {

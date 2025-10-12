@@ -34,12 +34,12 @@ public final class PodcastMO: AbstractLibraryEntityMO {
   }
 
   fileprivate var hasChangedEpisodes: Bool {
-    changedValue(forKey: #keyPath(episodes)) != nil
+    changedValues().keys.contains(#keyPath(episodes))
   }
 
   fileprivate func updateEpisodeCount() {
-    guard Int16(episodes?.count ?? 0) != episodeCount else { return }
-    episodeCount = Int16(episodes?.count ?? 0)
+    guard Int16(clamping: episodes?.count ?? 0) != episodeCount else { return }
+    episodeCount = Int16(clamping: episodes?.count ?? 0)
   }
 }
 
