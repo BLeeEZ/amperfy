@@ -452,7 +452,7 @@ class PlayerUIHandler: NSObject {
     }
     playTypeIcon.isHidden = false
     audioInfoLabel.isHidden = false
-    var displayBitrate = ""
+    var displayBitrateInKbps = 0
     var formatText = ""
 
     func getFormat(contentType: String?) -> String {
@@ -481,7 +481,7 @@ class PlayerUIHandler: NSObject {
 
     if playType == .cache {
       playTypeIcon.image = UIImage.cache
-      displayBitrate = "\(currentlyPlaying.bitrate / 1000) kbps"
+      displayBitrateInKbps = currentlyPlaying.bitrate / 1000
       formatText = getFormat(contentType: currentlyPlaying.fileContentType)
     } else {
       playTypeIcon.image = UIImage.antenna
@@ -489,12 +489,12 @@ class PlayerUIHandler: NSObject {
       if let streamingBitrate {
         if streamingBitrate == .noLimit ||
           (streamingBitrate.rawValue > (currentlyPlaying.bitrate / 1000)) {
-          displayBitrate = "\(currentlyPlaying.bitrate / 1000) kbps"
+          displayBitrateInKbps = currentlyPlaying.bitrate / 1000
         } else {
-          displayBitrate = "\(streamingBitrate.rawValue) kbps"
+          displayBitrateInKbps = streamingBitrate.rawValue
         }
       } else {
-        displayBitrate = ""
+        displayBitrateInKbps = 0
       }
 
       let transcodingFormat = player.activeTranscodingFormat
@@ -510,7 +510,9 @@ class PlayerUIHandler: NSObject {
       }
     }
 
-    audioInfoLabel.text = "\(formatText) \(displayBitrate)"
+    audioInfoLabel
+      .text = (displayBitrateInKbps > 0) ? "\(formatText) \(displayBitrateInKbps) kbps" :
+      "\(formatText)"
     playTypeIcon.tintColor = .labelColor
   }
 }
