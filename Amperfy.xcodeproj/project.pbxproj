@@ -143,6 +143,7 @@
 		50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79BF2C206EF10085CBB3 /* LyricTableCell.swift */; };
 		50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */; };
 		50AFA14E2632E95900F198DD /* GenericDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */; };
+		50B166AA2ED071EC00F7A1D6 /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 50B166A92ED071EC00F7A1D6 /* AudioStreaming */; };
 		50BA92F821CC318D00E5901D /* PlayableTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92F721CC318D00E5901D /* PlayableTableCell.swift */; };
 		50BA92FA21CC37F800E5901D /* SongsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92F921CC37F800E5901D /* SongsVC.swift */; };
 		50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92FF21CFDEBD00E5901D /* LibraryVC.swift */; };
@@ -463,7 +464,6 @@
 		50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */; };
 		50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB628D2163F00BDF882 /* SettingsView.swift */; };
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
-		50ED03092E26B36E0092E6DC /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 50ED03082E26B36E0092E6DC /* AudioStreaming */; };
 		50ED03132E278C6B0092E6DC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50ED030C2E2788200092E6DC /* CoreAudio.framework */; };
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 		50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */ = {isa = PBXBuildFile; productRef = 50F40A3A2C9088B30097FE63 /* IfritStatic */; };
@@ -1067,10 +1067,10 @@
 			files = (
 				507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */,
 				50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */,
+				50B166AA2ED071EC00F7A1D6 /* AudioStreaming in Frameworks */,
 				50ED03132E278C6B0092E6DC /* CoreAudio.framework in Frameworks */,
 				5052497B2D10CBC70005EEB0 /* Collections in Frameworks */,
 				50CF3CEF28A4F83100263F7C /* CryptoKit.framework in Frameworks */,
-				50ED03092E26B36E0092E6DC /* AudioStreaming in Frameworks */,
 				507DFE6A2B1E62C9002BBB1D /* ID3TagEditor in Frameworks */,
 				50BE5DA7285714A200156FC6 /* CallbackURLKit in Frameworks */,
 			);
@@ -2032,7 +2032,7 @@
 				507DFE692B1E62C9002BBB1D /* ID3TagEditor */,
 				50F40A3A2C9088B30097FE63 /* IfritStatic */,
 				5052497A2D10CBC70005EEB0 /* Collections */,
-				50ED03082E26B36E0092E6DC /* AudioStreaming */,
+				50B166A92ED071EC00F7A1D6 /* AudioStreaming */,
 			);
 			productName = AmpertyKit;
 			productReference = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */;
@@ -2110,8 +2110,8 @@
 				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
 				505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */,
-				50ED03072E26B36E0092E6DC /* XCRemoteSwiftPackageReference "AudioStreaming" */,
 				500E70D02E2FD63900636770 /* XCRemoteSwiftPackageReference "DominantColors" */,
+				50B166A82ED071A100F7A1D6 /* XCRemoteSwiftPackageReference "AudioStreaming" */,
 			);
 			productRefGroup = 508385E521C5965B00C4BB32 /* Products */;
 			projectDirPath = "";
@@ -3147,20 +3147,20 @@
 				version = 1.5.4;
 			};
 		};
+		50B166A82ED071A100F7A1D6 /* XCRemoteSwiftPackageReference "AudioStreaming" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/dimitris-c/AudioStreaming/";
+			requirement = {
+				kind = exactVersion;
+				version = 1.4.0;
+			};
+		};
 		50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/phimage/CallbackURLKit";
 			requirement = {
 				kind = exactVersion;
 				version = 3.0.0;
-			};
-		};
-		50ED03072E26B36E0092E6DC /* XCRemoteSwiftPackageReference "AudioStreaming" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/BLeeEZ/AudioStreaming";
-			requirement = {
-				branch = main;
-				kind = branch;
 			};
 		};
 		50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */ = {
@@ -3229,15 +3229,15 @@
 			package = 509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */;
 			productName = VYPlayIndicator;
 		};
+		50B166A92ED071EC00F7A1D6 /* AudioStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50B166A82ED071A100F7A1D6 /* XCRemoteSwiftPackageReference "AudioStreaming" */;
+			productName = AudioStreaming;
+		};
 		50BE5DA6285714A200156FC6 /* CallbackURLKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */;
 			productName = CallbackURLKit;
-		};
-		50ED03082E26B36E0092E6DC /* AudioStreaming */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 50ED03072E26B36E0092E6DC /* XCRemoteSwiftPackageReference "AudioStreaming" */;
-			productName = AudioStreaming;
 		};
 		50F40A3A2C9088B30097FE63 /* IfritStatic */ = {
 			isa = XCSwiftPackageProductDependency;

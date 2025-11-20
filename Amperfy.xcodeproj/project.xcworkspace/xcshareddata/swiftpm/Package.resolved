@@ -1,5 +1,5 @@
 {
-  "originHash" : "ac6ab85b6a6be2ef2c424e2944cbc50df7140064e09e3672210f40bb9b724156",
+  "originHash" : "1693d60e9c7794881d2ebb100ed07184229ec508bf762beec8bf2dfac70ad0ac",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -13,10 +13,10 @@
     {
       "identity" : "audiostreaming",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/BLeeEZ/AudioStreaming",
+      "location" : "https://github.com/dimitris-c/AudioStreaming",
       "state" : {
-        "branch" : "main",
-        "revision" : "fe6321dfc12c1cc83a05f818bd3e4b55d4781162"
+        "revision" : "45178a9afc416d942b89f018ffedc642133a3c1c",
+        "version" : "1.4.0"
       }
     },
     {
@@ -74,6 +74,15 @@
       }
     },
     {
+      "identity" : "ogg-binary-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sbooth/ogg-binary-xcframework",
+      "state" : {
+        "revision" : "c0e822e18738ad913864e98d9614927ac1e9337c",
+        "version" : "0.1.2"
+      }
+    },
+    {
       "identity" : "snapkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SnapKit/SnapKit",
@@ -89,6 +98,15 @@
       "state" : {
         "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
         "version" : "1.1.4"
+      }
+    },
+    {
+      "identity" : "vorbis-binary-xcframework",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sbooth/vorbis-binary-xcframework",
+      "state" : {
+        "revision" : "842020eabcebe410e698c68545d6597b2d232e51",
+        "version" : "0.1.2"
       }
     },
     {
