@@ -81,6 +81,7 @@
 		505CA2142B88ED6100AA81CD /* SingleSnapshotFetchedResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA2132B88ED6100AA81CD /* SingleSnapshotFetchedResultsTableViewController.swift */; };
 		5064F3982B96FBAE00DE61C1 /* NotificationDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5064F3972B96FBAE00DE61C1 /* NotificationDetailVC.swift */; };
 		5064F3992B96FBD600DE61C1 /* NotificationDetailVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5064F3962B96FBAE00DE61C1 /* NotificationDetailVC.xib */; };
+		50699C822ED859B20039BECD /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 50699C812ED859B20039BECD /* AudioStreaming */; };
 		507148AD2B767FE200557904 /* ContextQueuePrevSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */; };
 		507148AE2B76800A00557904 /* ContextQueuePrevSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */; };
 		50722747286794FC00910574 /* AppDelegateKeyboardCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* AppDelegateKeyboardCommands.swift */; };
@@ -1049,6 +1050,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50699C822ED859B20039BECD /* AudioStreaming in Frameworks */,
 				500E70D22E2FD63900636770 /* DominantColors in Frameworks */,
 				507DFE902B1E7262002BBB1D /* CallbackURLKit in Frameworks */,
 				507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */,
@@ -2007,6 +2009,7 @@
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
 				5052497C2D10CBED0005EEB0 /* Collections */,
 				500E70D12E2FD63900636770 /* DominantColors */,
+				50699C812ED859B20039BECD /* AudioStreaming */,
 			);
 			productName = Amperfy;
 			productReference = 508385E421C5965B00C4BB32 /* Amperfy.app */;
@@ -3188,6 +3191,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
+		};
+		50699C812ED859B20039BECD /* AudioStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50B166A82ED071A100F7A1D6 /* XCRemoteSwiftPackageReference "AudioStreaming" */;
+			productName = AudioStreaming;
 		};
 		507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */ = {
 			isa = XCSwiftPackageProductDependency;
