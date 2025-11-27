@@ -691,11 +691,11 @@ class MiniPlayerView: UIView {
       artworkImage.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
 
       titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-      titleLabel.bottomAnchor.constraint(equalTo: subtitleLabel.topAnchor),
+      titleLabel.bottomAnchor.constraint(equalTo: playButton.centerYAnchor),
       titleLabel.leadingAnchor.constraint(equalTo: artworkImage.trailingAnchor, constant: 8),
       titleLabel.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -8),
 
-      subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 0),
+      subtitleLabel.topAnchor.constraint(equalTo: playButton.centerYAnchor, constant: 0),
       subtitleLabel.bottomAnchor.constraint(equalTo: timeSlider.topAnchor, constant: -8),
       subtitleLabel.leadingAnchor.constraint(equalTo: artworkImage.trailingAnchor, constant: 8),
       subtitleLabel.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -8),
@@ -717,10 +717,10 @@ class MiniPlayerView: UIView {
 
   public func refreshForTraitChange(horizontalSizeClass: UIUserInterfaceSizeClass) {
     if horizontalSizeClass == .regular {
-      titleLabel.font = .systemFont(ofSize: 16.0)
+      titleLabel.font = .systemFont(ofSize: 8.0)
       subtitleLabel.font = .systemFont(ofSize: 15.0)
     } else {
-      titleLabel.font = .systemFont(ofSize: 13.0)
+      titleLabel.font = .systemFont(ofSize: 11.0)
       subtitleLabel.font = .systemFont(ofSize: 13.0)
     }
   }
