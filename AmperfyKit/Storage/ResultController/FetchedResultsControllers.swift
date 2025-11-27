@@ -230,12 +230,14 @@ public class PodcastFetchedResultsController: CachedFetchedResultsController<Pod
 public class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedResultsController<
   PodcastEpisodeMO
 > {
-  public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
+  public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool,
+              fetchLimit: Int? = nil) {
     let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
     fetchRequest.predicate = coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes()
     fetchRequest.relationshipKeyPathsForPrefetching = PodcastEpisodeMO
       .relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
+    fetchRequest.fetchLimit = fetchLimit ?? 0
     super.init(
       coreDataCompanion: coreDataCompanion,
       fetchRequest: fetchRequest,

@@ -64,10 +64,12 @@ final class LibraryNavigatorItem: Hashable, Sendable {
 
 enum TabNavigatorItem: Int, Hashable, CaseIterable {
   case search
+  case home
   case settings
 
   var title: String {
     switch self {
+    case .home: return "Home"
     case .search: return "Search"
     case .settings: return "Settings"
     }
@@ -76,6 +78,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
   @MainActor
   var icon: UIImage {
     switch self {
+    case .home: return .home
     case .search: return .search
     case .settings: return .settings
     }
@@ -84,6 +87,7 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
   @MainActor
   var controller: UIViewController {
     switch self {
+    case .home: return AppStoryboard.Main.segueToHome()
     case .search: return AppStoryboard.Main.segueToSearch()
     case .settings: return AppStoryboard.Main.segueToSettings()
     }
@@ -167,7 +171,8 @@ class LibraryNavigatorConfigurator: NSObject {
   func viewIsAppearing(navigationItem: UINavigationItem, collectionView: UICollectionView) {
     #if targetEnvironment(macCatalyst) // ok
       if self.collectionView.indexPathsForSelectedItems?.first == nil {
-        self.collectionView.selectItem(at: .zero, animated: false, scrollPosition: .top)
+        // select Home
+        self.collectionView.selectItem(at: IndexPath(row: TabNavigatorItem.home.rawValue, section: 0), animated: false, scrollPosition: .top)
       }
     #endif
   }
@@ -328,7 +333,7 @@ class LibraryNavigatorConfigurator: NSObject {
         #endif
         var content = cell.defaultContentConfiguration()
         content.text = tabItem.title
-        content.image = tabItem.icon.withRenderingMode(.alwaysOriginal)
+        content.image = tabItem.icon.withRenderingMode(.alwaysTemplate)
         cell.contentConfiguration = content
       }
       cell.indentationLevel = 0

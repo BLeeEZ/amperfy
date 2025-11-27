@@ -97,6 +97,7 @@ enum AppStoryboard: String {
     SideBarVC(collectionViewLayout: .verticalLayout)
   }
 
+  func segueToHome() -> HomeVC { HomeVC() }
   func segueToLibrary() -> UIViewController { LibraryVC(collectionViewLayout: .verticalLayout) }
   func segueToSearch() -> SearchVC { SearchVC() }
   func segueToSettings() -> SettingsHostVC { SettingsHostVC(isForOwnWindow: false) }

@@ -474,6 +474,7 @@ public class PersistentStorage {
     case IsPlaybackStartOnlyOnPlay = "isPlaybackStartOnlyOnPlay"
     case LibrarySyncVersion = "librarySyncVersion"
     case IsHapticsEnabled = "isHapticsEnabled"
+    case HomeSections = "homeSections"
 
     case LibrarySyncInfoReadByUser = "librarySyncInfoReadByUser"
     case ThemePreference = "themePreference"
@@ -1090,6 +1091,22 @@ public class PersistentStorage {
       }
       set {
         UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsReplayGainEnabled.rawValue)
+      }
+    }
+    
+    // ordered visible Home Sections
+    public var homeSections: [HomeSection] {
+      get {
+        if let data = UserDefaults.standard.data(forKey: UserDefaultsKey.HomeSections.rawValue),
+           let prefs = try? JSONDecoder().decode([HomeSection].self, from: data) {
+          return prefs
+        }
+        return HomeSection.defaultValue
+      }
+      set {
+        if let data = try? JSONEncoder().encode(newValue) {
+          UserDefaults.standard.set(data, forKey: UserDefaultsKey.HomeSections.rawValue)
+        }
       }
     }
   }

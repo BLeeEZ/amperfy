@@ -28,6 +28,7 @@ class TabBarVC: UITabBarController {
   private var libraryGroup: UITabGroup?
   private var searchTab: UISearchTab?
   private var settingsTab: UITab?
+  private var homeTab: UITab?
 
   private var welcomePopupPresenter = WelcomePopupPresenter()
   var miniPlayer: MiniPlayerView?
@@ -36,6 +37,21 @@ class TabBarVC: UITabBarController {
     super.viewDidLoad()
     var fixTabs = [UITab]()
 
+    searchTab = UISearchTab { _ in
+      UINavigationController(rootViewController: TabNavigatorItem.search.controller)
+    }
+    searchTab!.automaticallyActivatesSearch = true
+    fixTabs.append(searchTab!)
+
+    homeTab = UITab(
+      title: TabNavigatorItem.home.title,
+      image: TabNavigatorItem.home.icon,
+      identifier: "Tabs.\(TabNavigatorItem.home.title)"
+    ) { _ in
+      UINavigationController(rootViewController: TabNavigatorItem.home.controller)
+    }
+    fixTabs.append(homeTab!)
+    
     var libraryTabs = [UITab]()
     let libraryTabsShown = appDelegate.storage.settings.libraryDisplaySettings.inUse
       .compactMap { item in
@@ -77,13 +93,7 @@ class TabBarVC: UITabBarController {
     libraryGroup!.managingNavigationController = UINavigationController()
     libraryGroup!.allowsReordering = true
     fixTabs.append(libraryGroup!)
-
-    searchTab = UISearchTab { _ in
-      UINavigationController(rootViewController: TabNavigatorItem.search.controller)
-    }
-    searchTab!.automaticallyActivatesSearch = true
-    fixTabs.append(searchTab!)
-
+    
     settingsTab = UITab(
       title: TabNavigatorItem.settings.title,
       image: TabNavigatorItem.settings.icon,
@@ -192,6 +202,7 @@ class TabBarVC: UITabBarController {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     refresh()
+    selectedTab = homeTab
     welcomePopupPresenter.displayInfoPopupsIfNeeded()
   }
 
@@ -244,18 +255,18 @@ extension TabBarVC: UITabBarControllerDelegate {
 extension TabBarVC: MainSceneHostingViewController {
   public func pushNavLibrary(vc: UIViewController) {
     push(vc: vc)
-    configureTraitChangesForMiniPlayer()
   }
 
   public func pushLibraryCategory(vc: UIViewController) {
     guard let libraryGroup else { return }
     libraryGroup.managingNavigationController?.popToRootViewController(animated: false)
     push(vc: vc)
-    configureTraitChangesForMiniPlayer()
   }
 
   func pushTabCategory(tabCategory: TabNavigatorItem) {
     switch tabCategory {
+    case .home:
+      selectedTab = homeTab
     case .search:
       selectedTab = searchTab
     case .settings:

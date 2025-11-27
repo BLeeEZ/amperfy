@@ -145,6 +145,7 @@
 		50AFA1492632E83100F198DD /* GenericDetailTableHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */; };
 		50AFA14E2632E95900F198DD /* GenericDetailTableHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */; };
 		50B166AA2ED071EC00F7A1D6 /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 50B166A92ED071EC00F7A1D6 /* AudioStreaming */; };
+		50B166AC2ED4E68400F7A1D6 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B166AB2ED4E68400F7A1D6 /* HomeVC.swift */; };
 		50BA92F821CC318D00E5901D /* PlayableTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92F721CC318D00E5901D /* PlayableTableCell.swift */; };
 		50BA92FA21CC37F800E5901D /* SongsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92F921CC37F800E5901D /* SongsVC.swift */; };
 		50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92FF21CFDEBD00E5901D /* LibraryVC.swift */; };
@@ -462,6 +463,8 @@
 		50E1D3982B8A82BB0001A572 /* KeyCommandTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1D3972B8A82BA0001A572 /* KeyCommandTableViewController.swift */; };
 		50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1D3992B8BEA540001A572 /* SplitVC.swift */; };
 		50E1D39C2B8BED4C0001A572 /* SideBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E1D39B2B8BED4C0001A572 /* SideBarVC.swift */; };
+		50E59A4B2ED747F000F2B65C /* HomeEditorVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E59A4A2ED747F000F2B65C /* HomeEditorVC.swift */; };
+		50E59A4D2ED7541900F2B65C /* HomeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E59A4C2ED7541900F2B65C /* HomeSection.swift */; };
 		50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */; };
 		50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB628D2163F00BDF882 /* SettingsView.swift */; };
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
@@ -843,6 +846,7 @@
 		50AFA1472632E83100F198DD /* GenericDetailTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDetailTableHeader.swift; sourceTree = "<group>"; };
 		50AFA1482632E83100F198DD /* GenericDetailTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GenericDetailTableHeader.xib; sourceTree = "<group>"; };
 		50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageAssetsExtension.swift; sourceTree = "<group>"; };
+		50B166AB2ED4E68400F7A1D6 /* HomeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		50B7989B23B6C77700551E62 /* Amperfy v4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v4.xcdatamodel"; sourceTree = "<group>"; };
 		50B798A023B6CA5400551E62 /* Song.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Song.swift; sourceTree = "<group>"; };
 		50B798A223B6CCE800551E62 /* AbstractLibraryEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbstractLibraryEntity.swift; sourceTree = "<group>"; };
@@ -988,6 +992,8 @@
 		50E1D3972B8A82BA0001A572 /* KeyCommandTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyCommandTableViewController.swift; sourceTree = "<group>"; };
 		50E1D3992B8BEA540001A572 /* SplitVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitVC.swift; sourceTree = "<group>"; };
 		50E1D39B2B8BED4C0001A572 /* SideBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBarVC.swift; sourceTree = "<group>"; };
+		50E59A4A2ED747F000F2B65C /* HomeEditorVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeEditorVC.swift; sourceTree = "<group>"; };
+		50E59A4C2ED7541900F2B65C /* HomeSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeSection.swift; sourceTree = "<group>"; };
 		50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryDisplaySettings.swift; sourceTree = "<group>"; };
 		50E77DB628D2163F00BDF882 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostVC.swift; sourceTree = "<group>"; };
@@ -1591,6 +1597,7 @@
 				50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */,
 				50253F78284614A100BCCFB2 /* DuplicateEntitiesResolver.swift */,
 				50C9D6EA284FAD51007F18D0 /* PodcastsShowType.swift */,
+				50E59A4C2ED7541900F2B65C /* HomeSection.swift */,
 				50C9D6EC284FADB8007F18D0 /* PlayerDisplayStyleType.swift */,
 				5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */,
 			);
@@ -1690,6 +1697,8 @@
 				50E1D3992B8BEA540001A572 /* SplitVC.swift */,
 				508FDE4F21F64ED6005A0724 /* TabBarVC.swift */,
 				50BA92FF21CFDEBD00E5901D /* LibraryVC.swift */,
+				50B166AB2ED4E68400F7A1D6 /* HomeVC.swift */,
+				50E59A4A2ED747F000F2B65C /* HomeEditorVC.swift */,
 				50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */,
 				50E1D39B2B8BED4C0001A572 /* SideBarVC.swift */,
 				632F51232C83A7970032860D /* QueueVC.swift */,
@@ -2245,6 +2254,7 @@
 				631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */,
 				507361E02632BA3B005F151D /* GenresVC.swift in Sources */,
 				50C1715A2D107E7600C0C53A /* PlaylistAddDirectoriesVC.swift in Sources */,
+				50E59A4B2ED747F000F2B65C /* HomeEditorVC.swift in Sources */,
 				501A7D4D26820B080055A51B /* PodcastsVC.swift in Sources */,
 				5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */,
 				50791E7F28D363F0006CE6E5 /* InfoBannerView.swift in Sources */,
@@ -2376,6 +2386,7 @@
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
 				50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */,
 				505CA2082B88E8F400AA81CD /* BasicTableViewController.swift in Sources */,
+				50B166AC2ED4E68400F7A1D6 /* HomeVC.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50C171502D10718C00C0C53A /* PlaylistAddGenreDetailVC.swift in Sources */,
 				50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */,
@@ -2423,6 +2434,7 @@
 				50C9D68A284FAA6C007F18D0 /* EmbeddedArtworkMO+CoreDataProperties.swift in Sources */,
 				50C9D66D284FAA4D007F18D0 /* FetchedResultsControllers.swift in Sources */,
 				50C9D6C3284FAACE007F18D0 /* DownloadProtocols.swift in Sources */,
+				50E59A4D2ED7541900F2B65C /* HomeSection.swift in Sources */,
 				50C9D647284FAA02007F18D0 /* SsMusicFolderParserDelegate.swift in Sources */,
 				50C9D656284FAA02007F18D0 /* SsDirectoryParserDelegate.swift in Sources */,
 				50C9D650284FAA02007F18D0 /* SsPlaylistSongsParserDelegate.swift in Sources */,

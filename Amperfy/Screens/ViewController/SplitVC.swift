@@ -141,7 +141,7 @@ class SplitVC: UISplitViewController {
   }
 
   var defaultSecondaryVC: UINavigationController {
-    embeddInNavigation(vc: TabNavigatorItem.search.controller)
+    embeddInNavigation(vc: TabNavigatorItem.home.controller)
   }
 
   public func push(vc: UIViewController) {

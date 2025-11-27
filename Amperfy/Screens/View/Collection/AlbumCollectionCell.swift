@@ -37,6 +37,22 @@ class AlbumCollectionCell: BasicCollectionCell {
   private var container: PlayableContainable?
   private var rootView: UICollectionViewController?
   private var rootFlowLayout: UICollectionViewDelegateFlowLayout?
+  private var itemWidth: CGFloat?
+
+  func display(
+    container: PlayableContainable,
+    rootView: UICollectionViewController,
+    itemWidth: CGFloat,
+    initialIndexPath: IndexPath
+  ) {
+    self.itemWidth = itemWidth
+    rootFlowLayout = nil
+    apply(
+      container: container,
+      rootView: rootView,
+      initialIndexPath: initialIndexPath
+    )
+  }
 
   func display(
     container: PlayableContainable,
@@ -44,9 +60,22 @@ class AlbumCollectionCell: BasicCollectionCell {
     rootFlowLayout: UICollectionViewDelegateFlowLayout,
     initialIndexPath: IndexPath
   ) {
+    self.rootFlowLayout = rootFlowLayout
+    itemWidth = nil
+    apply(
+      container: container,
+      rootView: rootView,
+      initialIndexPath: initialIndexPath
+    )
+  }
+
+  private func apply(
+    container: PlayableContainable,
+    rootView: UICollectionViewController,
+    initialIndexPath: IndexPath
+  ) {
     self.container = container
     self.rootView = rootView
-    self.rootFlowLayout = rootFlowLayout
     titleLabel.text = container.name
     subtitleLabel.text = container.subtitle
     entityImage.display(
@@ -66,8 +95,8 @@ class AlbumCollectionCell: BasicCollectionCell {
   }
 
   func updateArtworkImageConstraint(indexPath: IndexPath) {
-    if let rootView = rootView,
-       let rootFlowLayout = rootFlowLayout,
+    guard let rootView else { return }
+    if let rootFlowLayout = rootFlowLayout,
        let itemSize = rootFlowLayout.collectionView?(
          rootView.collectionView,
          layout: rootView.collectionView.collectionViewLayout,
@@ -75,6 +104,8 @@ class AlbumCollectionCell: BasicCollectionCell {
        ) {
       let newImageWidth = min(itemSize.width, itemSize.height)
       artworkImageWidthConstraint.constant = newImageWidth
+    } else if let itemWidth {
+      artworkImageWidthConstraint.constant = itemWidth
     }
   }
 }
