@@ -58,7 +58,10 @@ final class HomeVC: UICollectionViewController {
   private var radiosFetchedController: RadiosFetchedResultsController?
 
   private var orderedVisibleSections: [HomeSection]!
-
+  
+  private var userButton: UIButton?
+  private var userBarButtonItem: UIBarButtonItem?
+  
   // MARK: - Init
 
   init() {
@@ -79,6 +82,9 @@ final class HomeVC: UICollectionViewController {
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
+    
+    setupUserNavButton()
+
     navigationController?.navigationBar.prefersLargeTitles = true
     navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSectionsTapped))
     configureCollectionView()
@@ -93,6 +99,27 @@ final class HomeVC: UICollectionViewController {
       object: nil
     )
   }
+
+  private func setupUserNavButton() {
+    let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(pointSize: 24, weight: .regular))
+
+      let button = UIButton(type: .system)
+      button.setImage(image, for: .normal)
+      button.tintColor = .label
+      button.layer.cornerRadius = 20
+      button.clipsToBounds = true
+#if targetEnvironment(macCatalyst)
+      button.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+#else
+    button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+    #endif
+    button.menu = createUserButtonMenu()
+    button.showsMenuAsPrimaryAction = true
+    userButton = button
+
+    userBarButtonItem = UIBarButtonItem(customView: button)
+      navigationItem.leftBarButtonItem = userBarButtonItem!
+  }
   
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
@@ -103,6 +130,39 @@ final class HomeVC: UICollectionViewController {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
     updateFromRemote()
+  }
+
+  private func createUserButtonMenu() -> UIMenu {
+    let userInfo = UIAction(
+      title: appDelegate.storage.loginCredentials?.username ?? "Unknown",
+      subtitle: appDelegate.storage.loginCredentials?.displayServerUrl ?? "",
+      image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(pointSize: 30, weight: .regular)),
+      attributes: [UIMenuElement.Attributes.disabled],
+      state: .on,
+      handler: { _ in }
+    )
+    let openSettings = UIAction(
+      title: "Settings",
+      image: .settings,
+      handler: { _ in
+#if targetEnvironment(macCatalyst)
+        self.appDelegate.showSettings(sender: "")
+#else
+        let nav = AppStoryboard.Main.segueToSettings()
+        nav.modalPresentationStyle = .formSheet
+        self.present(nav, animated: true)
+        #endif
+      }
+    )
+    
+    let settingsMenu = UIMenu(options: [.displayInline], children: [openSettings])
+
+    return UIMenu(
+      title: "",
+      image: nil,
+      options: [.displayInline],
+      children: [userInfo, settingsMenu]
+    )
   }
 
   // MARK: - Layout

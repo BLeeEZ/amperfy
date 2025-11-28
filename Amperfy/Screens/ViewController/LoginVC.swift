@@ -114,7 +114,7 @@ class LoginVC: UIViewController {
 
   fileprivate lazy var usernameTF: UITextField = {
     let textField = UITextField()
-    textField.configuteForLogin(image: .user)
+    textField.configuteForLogin(image: .userPerson)
     textField.placeholder = "Username"
     textField.textContentType = .username
     textField.keyboardType = .default

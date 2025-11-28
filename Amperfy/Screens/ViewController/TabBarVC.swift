@@ -27,7 +27,6 @@ import UIKit
 class TabBarVC: UITabBarController {
   private var libraryGroup: UITabGroup?
   private var searchTab: UISearchTab?
-  private var settingsTab: UITab?
   private var homeTab: UITab?
 
   private var welcomePopupPresenter = WelcomePopupPresenter()
@@ -94,15 +93,6 @@ class TabBarVC: UITabBarController {
     libraryGroup!.allowsReordering = true
     fixTabs.append(libraryGroup!)
     
-    settingsTab = UITab(
-      title: TabNavigatorItem.settings.title,
-      image: TabNavigatorItem.settings.icon,
-      identifier: "Tabs.\(TabNavigatorItem.settings.title)"
-    ) { _ in
-      UINavigationController(rootViewController: TabNavigatorItem.settings.controller)
-    }
-    fixTabs.append(settingsTab!)
-
     delegate = self
     tabs = fixTabs
 
@@ -269,8 +259,6 @@ extension TabBarVC: MainSceneHostingViewController {
       selectedTab = homeTab
     case .search:
       selectedTab = searchTab
-    case .settings:
-      selectedTab = settingsTab
     }
     configureTraitChangesForMiniPlayer()
   }

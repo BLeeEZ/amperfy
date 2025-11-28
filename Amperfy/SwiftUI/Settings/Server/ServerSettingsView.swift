@@ -48,7 +48,7 @@ struct ServerSettingsView: View {
       SettingsList {
         SettingsSection {
           SettingsRow(title: "URL", orientation: .vertical, splitPercentage: splitPercentage) {
-            SecondaryText(appDelegate.storage.loginCredentials?.serverUrl ?? "")
+            SecondaryText(appDelegate.storage.loginCredentials?.displayServerUrl ?? "")
           }
           SettingsRow(title: "Username", orientation: .vertical, splitPercentage: splitPercentage) {
             SecondaryText(appDelegate.storage.loginCredentials?.username ?? "")

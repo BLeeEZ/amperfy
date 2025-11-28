@@ -140,7 +140,10 @@ extension UIImage {
   public static let grid = UIImage.create(systemName: "square.grid.2x2")
   public static let serverUrl = UIImage.create(systemName: "globe")
   public static let password = UIImage.create(systemName: "key.fill")
-  public static let user = UIImage.create(systemName: "person.fill")
+  public static let userPerson = UIImage.create(systemName: "person.fill")
+  public static func userCircle(withConfiguration: UIImage.SymbolConfiguration? = nil) -> UIImage {
+    UIImage(systemName: "person.circle.fill", withConfiguration: withConfiguration) ?? UIImage()
+  }
   public static let login = UIImage.create(systemName: "arrow.right.to.line")
 
   public static let ellipsis = UIImage.create(systemName: "ellipsis")

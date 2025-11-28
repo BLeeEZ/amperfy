@@ -35,6 +35,17 @@ public struct LoginCredentials: Sendable {
     self.passwordHash = ""
     self.backendApi = .notDetected
   }
+  
+  public var displayServerUrl: String {
+    guard let url = URL(string: serverUrl),
+          let host = url.host else {
+      return ""
+    }
+    if let port = url.port {
+      return "\(host):\(port)"
+    }
+    return host
+  }
 
   public init(serverUrl: String, username: String, password: String) {
     self.serverUrl = serverUrl
@@ -54,3 +65,4 @@ public struct LoginCredentials: Sendable {
     passwordHash = StringHasher.sha256(dataString: newPassword)
   }
 }
+

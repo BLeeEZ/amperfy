@@ -65,13 +65,11 @@ final class LibraryNavigatorItem: Hashable, Sendable {
 enum TabNavigatorItem: Int, Hashable, CaseIterable {
   case search
   case home
-  case settings
 
   var title: String {
     switch self {
     case .home: return "Home"
     case .search: return "Search"
-    case .settings: return "Settings"
     }
   }
 
@@ -80,7 +78,6 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
     switch self {
     case .home: return .home
     case .search: return .search
-    case .settings: return .settings
     }
   }
 
@@ -89,7 +86,6 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
     switch self {
     case .home: return AppStoryboard.Main.segueToHome()
     case .search: return AppStoryboard.Main.segueToSearch()
-    case .settings: return AppStoryboard.Main.segueToSettings()
     }
   }
 }

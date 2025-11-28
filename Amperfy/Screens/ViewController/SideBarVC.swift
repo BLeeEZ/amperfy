@@ -24,20 +24,11 @@ import UIKit
 
 class SideBarVC: KeyCommandCollectionViewController {
   private var offsetData: [LibraryNavigatorItem] = {
-    #if targetEnvironment(macCatalyst)
       return [
         LibraryNavigatorItem(title: "Search", tab: .search),
         LibraryNavigatorItem(title: "Home", tab: .home),
         LibraryNavigatorItem(title: "Library", isInteractable: false),
       ]
-    #else
-      return [
-        LibraryNavigatorItem(title: "Search", tab: .search),
-        LibraryNavigatorItem(title: "Home", tab: .home),
-        LibraryNavigatorItem(title: "Settings", tab: .settings),
-        LibraryNavigatorItem(title: "Library", isInteractable: false),
-      ]
-    #endif
   }()
 
   lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)

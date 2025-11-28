@@ -123,8 +123,8 @@ struct SettingsView: View {
     #else
       NavigationView {
         list
+          .navigationTitle("Settings")
       }
-      .navigationTitle("Settings")
       .navigationViewStyle(.stack)
     #endif
   }
