@@ -22,6 +22,7 @@
 import Foundation
 
 public enum HomeSection: Int, Sendable, CaseIterable, Encodable, Decodable {
+  // add new section always at the end to keep the Int consitent
   case lastTimePlayedPlaylists
   case recentAlbums
   case latestAlbums
@@ -29,6 +30,9 @@ public enum HomeSection: Int, Sendable, CaseIterable, Encodable, Decodable {
   case latestPodcastEpisodes
   case podcasts
   case radios
+  case randomArtists
+  case randomGenres
+  case randomSongs
 
   static let defaultValue: [HomeSection] = [
     .randomAlbums,
@@ -39,13 +43,16 @@ public enum HomeSection: Int, Sendable, CaseIterable, Encodable, Decodable {
 
   public var title: String {
     switch self {
-    case .recentAlbums: return "Recent Albums"
+    case .recentAlbums: return "Recently played Albums"
     case .latestAlbums: return "Latest Albums"
     case .randomAlbums: return "Random Albums"
-    case .lastTimePlayedPlaylists: return "Last time played Playlists"
+    case .lastTimePlayedPlaylists: return "Recently played Playlists"
     case .latestPodcastEpisodes: return "Latest Podcast Episodes"
     case .podcasts: return "Podcasts"
     case .radios: return "Radios"
+    case .randomArtists: return "Random Artists"
+    case .randomGenres: return "Random Genres"
+    case .randomSongs: return "Random Songs"
     }
   }
 }

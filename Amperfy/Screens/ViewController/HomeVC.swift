@@ -110,11 +110,13 @@ final class HomeVC: UICollectionViewController {
     let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(
       pointSize: 24,
       weight: .regular
-    ))
+    )).withTintColor(
+      appDelegate.storage.settings.themePreference.asColor,
+      renderingMode: .alwaysTemplate
+    )
 
     let button = UIButton(type: .system)
     button.setImage(image, for: .normal)
-    button.tintColor = .label
     button.layer.cornerRadius = 20
     button.clipsToBounds = true
     #if targetEnvironment(macCatalyst)
@@ -276,6 +278,15 @@ final class HomeVC: UICollectionViewController {
       if section == .randomAlbums {
         header.showsRefreshButton = true
         header.setRefreshHandler { [weak self] in self?.refreshRandomAlbumsSection() }
+      } else if section == .randomArtists {
+        header.showsRefreshButton = true
+        header.setRefreshHandler { [weak self] in self?.refreshRandomArtistsSection() }
+      } else if section == .randomGenres {
+        header.showsRefreshButton = true
+        header.setRefreshHandler { [weak self] in self?.refreshRandomGenresSection() }
+      } else if section == .randomSongs {
+        header.showsRefreshButton = true
+        header.setRefreshHandler { [weak self] in self?.refreshRandomSongsSection() }
       } else {
         header.showsRefreshButton = false
         header.setRefreshHandler(nil)
@@ -334,6 +345,9 @@ final class HomeVC: UICollectionViewController {
     updateAlbumsLatest()
 
     updateRandomAlbums(isOfflineMode: isOfflineMode)
+    updateRandomArtists(isOfflineMode: isOfflineMode)
+    updateRandomGenres()
+    updateRandomSongs(isOfflineMode: isOfflineMode)
 
     playlistsLastTimePlayedFetchController = PlaylistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main,
@@ -446,6 +460,21 @@ final class HomeVC: UICollectionViewController {
     updateRandomAlbums(isOfflineMode: isOfflineMode)
   }
 
+  @objc
+  func refreshRandomArtistsSection() {
+    updateRandomArtists(isOfflineMode: isOfflineMode)
+  }
+
+  @objc
+  func refreshRandomGenresSection() {
+    updateRandomGenres()
+  }
+
+  @objc
+  func refreshRandomSongsSection() {
+    updateRandomSongs(isOfflineMode: isOfflineMode)
+  }
+
   // MARK: - Selection Handling
 
   override func collectionView(
@@ -461,16 +490,20 @@ final class HomeVC: UICollectionViewController {
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
-    }
-    if let playlist = playableContainer as? Playlist {
+    } else if let artist = playableContainer as? Artist {
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        animated: true
+      )
+      navigationController?.navigationBar.prefersLargeTitles = false
+    } else if let playlist = playableContainer as? Playlist {
       navigationController?.pushViewController(
         AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
-    }
-    if let podcastEpisode = playableContainer as? PodcastEpisode,
-       let podcast = podcastEpisode.podcast {
+    } else if let podcastEpisode = playableContainer as? PodcastEpisode,
+              let podcast = podcastEpisode.podcast {
       navigationController?.pushViewController(
         AppStoryboard.Main.segueToPodcastDetail(
           podcast: podcast,
@@ -479,17 +512,21 @@ final class HomeVC: UICollectionViewController {
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
-    }
-    if let podcast = playableContainer as? Podcast {
+    } else if let podcast = playableContainer as? Podcast {
       navigationController?.pushViewController(
         AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
-    }
-    if let _ = playableContainer as? Radio {
+    } else if let _ = playableContainer as? Radio {
       navigationController?.pushViewController(
         AppStoryboard.Main.segueToRadios(),
+        animated: true
+      )
+      navigationController?.navigationBar.prefersLargeTitles = false
+    } else if let genre = playableContainer as? Genre {
+      navigationController?.pushViewController(
+        AppStoryboard.Main.segueToGenreDetail(genre: genre),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
@@ -523,6 +560,44 @@ final class HomeVC: UICollectionViewController {
         onlyCached: isOfflineMode
       )
       data[.randomAlbums] = randomAlbums.compactMap {
+        Item(playableContainable: $0)
+      }
+      applySnapshot(animated: true)
+    }
+  }
+
+  func updateRandomArtists(isOfflineMode: Bool) {
+    Task { @MainActor in
+      let randomArtists = appDelegate.storage.main.library.getRandomArtists(
+        count: Self.sectionMaxItemCount,
+        onlyCached: isOfflineMode
+      )
+      data[.randomArtists] = randomArtists.compactMap {
+        Item(playableContainable: $0)
+      }
+      applySnapshot(animated: true)
+    }
+  }
+
+  func updateRandomGenres() {
+    Task { @MainActor in
+      let randomGenres = appDelegate.storage.main.library.getRandomGenres(
+        count: Self.sectionMaxItemCount
+      )
+      data[.randomGenres] = randomGenres.compactMap {
+        Item(playableContainable: $0)
+      }
+      applySnapshot(animated: true)
+    }
+  }
+
+  func updateRandomSongs(isOfflineMode: Bool) {
+    Task { @MainActor in
+      let randomSongs = appDelegate.storage.main.library.getRandomSongs(
+        count: Self.sectionMaxItemCount,
+        onlyCached: isOfflineMode
+      )
+      data[.randomSongs] = randomSongs.compactMap {
         Item(playableContainable: $0)
       }
       applySnapshot(animated: true)
@@ -661,7 +736,7 @@ final class SectionHeaderView: UICollectionReusableView {
     btn.translatesAutoresizingMaskIntoConstraints = false
     btn.setImage(UIImage.refresh, for: .normal)
     btn.isHidden = true
-    btn.accessibilityLabel = "Refresh Random Albums"
+    btn.accessibilityLabel = "Refresh Randoms"
     return btn
   }()
 
