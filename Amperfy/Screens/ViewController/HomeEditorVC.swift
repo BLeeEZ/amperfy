@@ -25,9 +25,9 @@ import UIKit
 final class HomeEditorVC: UITableViewController {
   private var sections: [HomeSection]
   private var visibility: [HomeSection: Bool]
-  private let onDone: ([HomeSection]) -> Void
+  private let onDone: ([HomeSection]) -> ()
 
-  init(current: [HomeSection], onDone: @escaping ([HomeSection]) -> Void) {
+  init(current: [HomeSection], onDone: @escaping ([HomeSection]) -> ()) {
     self.sections = current
     self.onDone = onDone
     var vis: [HomeSection: Bool] = [:]
@@ -50,7 +50,8 @@ final class HomeEditorVC: UITableViewController {
     isEditing = true
   }
 
-  @objc private func doneTapped() {
+  @objc
+  private func doneTapped() {
     // Persist order of only visible sections
     let newOrder = sections.filter { visibility[$0] == true }
     onDone(newOrder)
@@ -61,8 +62,12 @@ final class HomeEditorVC: UITableViewController {
 
   override func numberOfSections(in tableView: UITableView) -> Int { 2 }
 
-  override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    return section == 0 ? "Visible" : "Hidden"
+  override func tableView(
+    _ tableView: UITableView,
+    titleForHeaderInSection section: Int
+  )
+    -> String? {
+    section == 0 ? "Visible" : "Hidden"
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -81,7 +86,11 @@ final class HomeEditorVC: UITableViewController {
     }
   }
 
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+  override func tableView(
+    _ tableView: UITableView,
+    cellForRowAt indexPath: IndexPath
+  )
+    -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
     let s = sectionFor(indexPath: indexPath)
     cell.textLabel?.text = s.title
@@ -90,13 +99,17 @@ final class HomeEditorVC: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-    return true
+    true
   }
 
-  override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+  override func tableView(
+    _ tableView: UITableView,
+    moveRowAt sourceIndexPath: IndexPath,
+    to destinationIndexPath: IndexPath
+  ) {
     var visible = sections.filter { visibility[$0] == true }
-    var hidden = HomeSection.allCases.filter{ visibility[$0] != true }
-    
+    var hidden = HomeSection.allCases.filter { visibility[$0] != true }
+
     // same as select
     if sourceIndexPath.section != destinationIndexPath.section {
       if destinationIndexPath.section == 0 {
@@ -104,13 +117,14 @@ final class HomeEditorVC: UITableViewController {
         visibility[hidden[sourceIndexPath.row]] = true
         let moved = hidden.remove(at: sourceIndexPath.row)
         visible.insert(moved, at: destinationIndexPath.row)
-      } else  {
+      } else {
         // hide
         visibility[visible[sourceIndexPath.row]] = false
         let moved = visible.remove(at: sourceIndexPath.row)
         hidden.insert(moved, at: destinationIndexPath.row)
       }
-    } else if sourceIndexPath.section == destinationIndexPath.section, sourceIndexPath.section == 1 {
+    } else if sourceIndexPath.section == destinationIndexPath.section,
+              sourceIndexPath.section == 1 {
       // Reorder within hidden
       let moved = hidden.remove(at: sourceIndexPath.row)
       hidden.insert(moved, at: destinationIndexPath.row)
@@ -123,11 +137,19 @@ final class HomeEditorVC: UITableViewController {
     sections = visible + hidden
   }
 
-  override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-    return .none
+  override func tableView(
+    _ tableView: UITableView,
+    editingStyleForRowAt indexPath: IndexPath
+  )
+    -> UITableViewCell.EditingStyle {
+    .none
   }
 
-  override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool { false }
+  override func tableView(
+    _ tableView: UITableView,
+    shouldIndentWhileEditingRowAt indexPath: IndexPath
+  )
+    -> Bool { false }
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
@@ -141,10 +163,10 @@ final class HomeEditorVC: UITableViewController {
       tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
     })
   }
-  
+
   func updateSections() {
     let visible = sections.filter { visibility[$0] == true }
-    let hidden = HomeSection.allCases.filter{ visibility[$0] != true }
+    let hidden = HomeSection.allCases.filter { visibility[$0] != true }
     sections = visible + hidden
   }
 }

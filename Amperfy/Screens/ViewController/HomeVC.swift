@@ -28,6 +28,7 @@ import UIKit
 
 final class HomeVC: UICollectionViewController {
   // MARK: - Types
+
   struct Item: Hashable, @unchecked Sendable {
     let id = UUID()
     var playableContainable: PlayableContainable
@@ -58,10 +59,10 @@ final class HomeVC: UICollectionViewController {
   private var radiosFetchedController: RadiosFetchedResultsController?
 
   private var orderedVisibleSections: [HomeSection]!
-  
+
   private var userButton: UIButton?
   private var userBarButtonItem: UIBarButtonItem?
-  
+
   // MARK: - Init
 
   init() {
@@ -82,16 +83,21 @@ final class HomeVC: UICollectionViewController {
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
-    
+
     setupUserNavButton()
 
     navigationController?.navigationBar.prefersLargeTitles = true
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editSectionsTapped))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      title: "Edit",
+      style: .plain,
+      target: self,
+      action: #selector(editSectionsTapped)
+    )
     configureCollectionView()
     configureDataSource()
     createFetchController()
     applySnapshot(animated: false)
-    
+
     appDelegate.notificationHandler.register(
       self,
       selector: #selector(refreshOfflineMode),
@@ -101,26 +107,29 @@ final class HomeVC: UICollectionViewController {
   }
 
   private func setupUserNavButton() {
-    let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(pointSize: 24, weight: .regular))
+    let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(
+      pointSize: 24,
+      weight: .regular
+    ))
 
-      let button = UIButton(type: .system)
-      button.setImage(image, for: .normal)
-      button.tintColor = .label
-      button.layer.cornerRadius = 20
-      button.clipsToBounds = true
-#if targetEnvironment(macCatalyst)
+    let button = UIButton(type: .system)
+    button.setImage(image, for: .normal)
+    button.tintColor = .label
+    button.layer.cornerRadius = 20
+    button.clipsToBounds = true
+    #if targetEnvironment(macCatalyst)
       button.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-#else
-    button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+    #else
+      button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
     #endif
     button.menu = createUserButtonMenu()
     button.showsMenuAsPrimaryAction = true
     userButton = button
 
     userBarButtonItem = UIBarButtonItem(customView: button)
-      navigationItem.leftBarButtonItem = userBarButtonItem!
+    navigationItem.leftBarButtonItem = userBarButtonItem!
   }
-  
+
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navigationController?.navigationBar.prefersLargeTitles = true
@@ -136,7 +145,10 @@ final class HomeVC: UICollectionViewController {
     let userInfo = UIAction(
       title: appDelegate.storage.loginCredentials?.username ?? "Unknown",
       subtitle: appDelegate.storage.loginCredentials?.displayServerUrl ?? "",
-      image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(pointSize: 30, weight: .regular)),
+      image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
+        pointSize: 30,
+        weight: .regular
+      )),
       attributes: [UIMenuElement.Attributes.disabled],
       state: .on,
       handler: { _ in }
@@ -145,16 +157,16 @@ final class HomeVC: UICollectionViewController {
       title: "Settings",
       image: .settings,
       handler: { _ in
-#if targetEnvironment(macCatalyst)
-        self.appDelegate.showSettings(sender: "")
-#else
-        let nav = AppStoryboard.Main.segueToSettings()
-        nav.modalPresentationStyle = .formSheet
-        self.present(nav, animated: true)
+        #if targetEnvironment(macCatalyst)
+          self.appDelegate.showSettings(sender: "")
+        #else
+          let nav = AppStoryboard.Main.segueToSettings()
+          nav.modalPresentationStyle = .formSheet
+          self.present(nav, animated: true)
         #endif
       }
     )
-    
+
     let settingsMenu = UIMenu(options: [.displayInline], children: [openSettings])
 
     return UIMenu(
@@ -281,15 +293,15 @@ final class HomeVC: UICollectionViewController {
     }
     dataSource.apply(snapshot, animatingDifferences: animated)
   }
-  
+
   var isOfflineMode: Bool {
     appDelegate.storage.settings.isOfflineMode
   }
-  
+
   @objc
   private func refreshOfflineMode() {
     os_log("HomeVC: OfflineModeChanged", log: self.log, type: .info)
-    createFetchController() 
+    createFetchController()
   }
 
   func createFetchController() {
@@ -335,7 +347,7 @@ final class HomeVC: UICollectionViewController {
       playlistSearchCategory: isOfflineMode ? .cached : .all
     )
     updatePlaylistsLastTimePlayed()
-    
+
     podcastEpisodesFetchedController = PodcastEpisodesReleaseDateFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main,
       isGroupedInAlphabeticSections: false,
@@ -344,7 +356,7 @@ final class HomeVC: UICollectionViewController {
     podcastEpisodesFetchedController?.delegate = self
     podcastEpisodesFetchedController?.search(searchText: "", onlyCachedSongs: isOfflineMode)
     updatePodcastEpisodesLatest()
-    
+
     podcastsFetchedController = PodcastFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main,
       isGroupedInAlphabeticSections: false
@@ -352,7 +364,7 @@ final class HomeVC: UICollectionViewController {
     podcastsFetchedController?.delegate = self
     podcastsFetchedController?.search(searchText: "", onlyCached: isOfflineMode)
     updatePodcasts()
-    
+
     radiosFetchedController = RadiosFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main,
       isGroupedInAlphabeticSections: true
@@ -411,7 +423,8 @@ final class HomeVC: UICollectionViewController {
     }
   }
 
-  @objc private func editSectionsTapped() {
+  @objc
+  private func editSectionsTapped() {
     presentSectionEditor()
   }
 
@@ -421,14 +434,15 @@ final class HomeVC: UICollectionViewController {
       guard let self else { return }
       orderedVisibleSections = newOrder
       appDelegate.storage.settings.homeSections = newOrder
-      self.applySnapshot(animated: true)
+      applySnapshot(animated: true)
     }
     let nav = UINavigationController(rootViewController: editor)
     nav.modalPresentationStyle = .formSheet
     present(nav, animated: true)
   }
-  
-  @objc func refreshRandomAlbumsSection() {
+
+  @objc
+  func refreshRandomAlbumsSection() {
     updateRandomAlbums(isOfflineMode: isOfflineMode)
   }
 
@@ -455,9 +469,13 @@ final class HomeVC: UICollectionViewController {
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     }
-    if let podcastEpisode = playableContainer as? PodcastEpisode, let podcast = podcastEpisode.podcast {
+    if let podcastEpisode = playableContainer as? PodcastEpisode,
+       let podcast = podcastEpisode.podcast {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast, episodeToScrollTo: podcastEpisode),
+        AppStoryboard.Main.segueToPodcastDetail(
+          podcast: podcast,
+          episodeToScrollTo: podcastEpisode
+        ),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
@@ -497,7 +515,7 @@ final class HomeVC: UICollectionViewController {
       applySnapshot(animated: true)
     }
   }
-  
+
   func updateRandomAlbums(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
@@ -523,9 +541,10 @@ final class HomeVC: UICollectionViewController {
       applySnapshot(animated: true)
     }
   }
-  
+
   func updatePodcastEpisodesLatest() {
-    if let podcastEpisodes = podcastEpisodesFetchedController?.fetchedObjects as? [PodcastEpisodeMO] {
+    if let podcastEpisodes = podcastEpisodesFetchedController?
+      .fetchedObjects as? [PodcastEpisodeMO] {
       data[.latestPodcastEpisodes] = podcastEpisodes.prefix(Self.sectionMaxItemCount)
         .compactMap { PodcastEpisode(managedObject: $0) }.compactMap {
           Item(playableContainable: $0)
@@ -533,7 +552,7 @@ final class HomeVC: UICollectionViewController {
       applySnapshot(animated: true)
     }
   }
-  
+
   func updatePodcasts() {
     if let podcasts = podcastsFetchedController?.fetchedObjects as? [PodcastMO] {
       data[.podcasts] = podcasts.prefix(Self.sectionMaxItemCount)
@@ -543,7 +562,7 @@ final class HomeVC: UICollectionViewController {
       applySnapshot(animated: true)
     }
   }
-  
+
   func updateRadios() {
     if let radios = radiosFetchedController?.fetchedObjects as? [RadioMO] {
       data[.radios] = radios.prefix(Self.sectionMaxItemCount)
@@ -636,7 +655,7 @@ extension HomeVC: @preconcurrency NSFetchedResultsControllerDelegate {
 
 final class SectionHeaderView: UICollectionReusableView {
   static let reuseID = "SectionHeaderView"
-  
+
   private let refreshButton: UIButton = {
     let btn = UIButton(type: .system)
     btn.translatesAutoresizingMaskIntoConstraints = false
@@ -653,13 +672,13 @@ final class SectionHeaderView: UICollectionReusableView {
     lbl.textColor = .label
     return lbl
   }()
-  
+
   var showsRefreshButton: Bool {
     get { !refreshButton.isHidden }
     set { refreshButton.isHidden = !newValue }
   }
-  
-  func setRefreshHandler(_ handler: (() -> Void)?) {
+
+  func setRefreshHandler(_ handler: (() -> ())?) {
     refreshButton.removeTarget(nil, action: nil, for: .allEvents)
     guard let handler else { return }
     refreshButton.addAction(UIAction { _ in handler() }, for: .touchUpInside)
@@ -675,7 +694,10 @@ final class SectionHeaderView: UICollectionReusableView {
     addSubview(refreshButton)
     NSLayoutConstraint.activate([
       titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-      titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: refreshButton.leadingAnchor, constant: -8),
+      titleLabel.trailingAnchor.constraint(
+        lessThanOrEqualTo: refreshButton.leadingAnchor,
+        constant: -8
+      ),
       titleLabel.topAnchor.constraint(equalTo: topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
       refreshButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
@@ -689,7 +711,10 @@ final class SectionHeaderView: UICollectionReusableView {
     addSubview(refreshButton)
     NSLayoutConstraint.activate([
       titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-      titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: refreshButton.leadingAnchor, constant: -8),
+      titleLabel.trailingAnchor.constraint(
+        lessThanOrEqualTo: refreshButton.leadingAnchor,
+        constant: -8
+      ),
       titleLabel.topAnchor.constraint(equalTo: topAnchor),
       titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
       refreshButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),

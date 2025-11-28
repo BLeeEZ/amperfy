@@ -35,7 +35,7 @@ public struct LoginCredentials: Sendable {
     self.passwordHash = ""
     self.backendApi = .notDetected
   }
-  
+
   public var displayServerUrl: String {
     guard let url = URL(string: serverUrl),
           let host = url.host else {
@@ -65,4 +65,3 @@ public struct LoginCredentials: Sendable {
     passwordHash = StringHasher.sha256(dataString: newPassword)
   }
 }
-

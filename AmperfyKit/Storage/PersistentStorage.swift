@@ -1093,7 +1093,7 @@ public class PersistentStorage {
         UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.IsReplayGainEnabled.rawValue)
       }
     }
-    
+
     // ordered visible Home Sections
     public var homeSections: [HomeSection] {
       get {

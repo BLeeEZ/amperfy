@@ -168,7 +168,11 @@ class LibraryNavigatorConfigurator: NSObject {
     #if targetEnvironment(macCatalyst) // ok
       if self.collectionView.indexPathsForSelectedItems?.first == nil {
         // select Home
-        self.collectionView.selectItem(at: IndexPath(row: TabNavigatorItem.home.rawValue, section: 0), animated: false, scrollPosition: .top)
+        self.collectionView.selectItem(
+          at: IndexPath(row: TabNavigatorItem.home.rawValue, section: 0),
+          animated: false,
+          scrollPosition: .top
+        )
       }
     #endif
   }

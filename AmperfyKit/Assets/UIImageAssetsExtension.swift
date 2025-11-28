@@ -144,6 +144,7 @@ extension UIImage {
   public static func userCircle(withConfiguration: UIImage.SymbolConfiguration? = nil) -> UIImage {
     UIImage(systemName: "person.circle.fill", withConfiguration: withConfiguration) ?? UIImage()
   }
+
   public static let login = UIImage.create(systemName: "arrow.right.to.line")
 
   public static let ellipsis = UIImage.create(systemName: "ellipsis")

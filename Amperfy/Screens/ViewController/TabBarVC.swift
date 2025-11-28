@@ -50,7 +50,7 @@ class TabBarVC: UITabBarController {
       UINavigationController(rootViewController: TabNavigatorItem.home.controller)
     }
     fixTabs.append(homeTab!)
-    
+
     var libraryTabs = [UITab]()
     let libraryTabsShown = appDelegate.storage.settings.libraryDisplaySettings.inUse
       .compactMap { item in
@@ -92,7 +92,7 @@ class TabBarVC: UITabBarController {
     libraryGroup!.managingNavigationController = UINavigationController()
     libraryGroup!.allowsReordering = true
     fixTabs.append(libraryGroup!)
-    
+
     delegate = self
     tabs = fixTabs
 

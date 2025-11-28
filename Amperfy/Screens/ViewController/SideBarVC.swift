@@ -24,11 +24,11 @@ import UIKit
 
 class SideBarVC: KeyCommandCollectionViewController {
   private var offsetData: [LibraryNavigatorItem] = {
-      return [
-        LibraryNavigatorItem(title: "Search", tab: .search),
-        LibraryNavigatorItem(title: "Home", tab: .home),
-        LibraryNavigatorItem(title: "Library", isInteractable: false),
-      ]
+    [
+      LibraryNavigatorItem(title: "Search", tab: .search),
+      LibraryNavigatorItem(title: "Home", tab: .home),
+      LibraryNavigatorItem(title: "Library", isInteractable: false),
+    ]
   }()
 
   lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
