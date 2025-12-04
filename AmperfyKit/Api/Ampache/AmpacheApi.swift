@@ -86,9 +86,9 @@ final class AmpacheApi: BackendApi {
   }
 
   @MainActor
-  func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+  func createLibrarySyncer(account: Account, storage: PersistentStorage) -> LibrarySyncer {
     AmpacheLibrarySyncer(
-      ampacheXmlServerApi: ampacheXmlServerApi,
+      ampacheXmlServerApi: ampacheXmlServerApi, account: account,
       networkMonitor: networkMonitor,
       performanceMonitor: performanceMonitor,
       storage: storage,

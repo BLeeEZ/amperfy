@@ -37,6 +37,8 @@ class PlaylistItemTest: XCTestCase {
   func testCreation() {
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     let item = library.createPlaylistItem(playable: song1)
+    XCTAssertEqual(item.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(item.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(item.order, 0)
 
     XCTAssertEqual(item.playable.id, song1.id)
@@ -53,6 +55,14 @@ class PlaylistItemTest: XCTestCase {
     XCTAssertEqual(playlistFetched.items[itemOrder].playable.id, song1.id)
     XCTAssertEqual(playlistFetched.items[itemOrder].playlist.id, playlistFetched.id)
     XCTAssertEqual(playlistFetched.items[itemOrder].order, itemOrder)
+    XCTAssertEqual(
+      playlistFetched.items[itemOrder].account?.serverHash,
+      TestAccountInfo.test1ServerHash
+    )
+    XCTAssertEqual(
+      playlistFetched.items[itemOrder].account?.userHash,
+      TestAccountInfo.test1UserHash
+    )
   }
 
   func testOrphanDetectionDeletedPlaylist() {

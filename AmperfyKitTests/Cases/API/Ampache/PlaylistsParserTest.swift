@@ -30,7 +30,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
 
   override func createParserDelegate() {
     parserDelegate = PlaylistParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), account: account,
       library: library,
       parseNotifier: nil
     )
@@ -38,7 +38,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
 
   func testLibraryContainsBeforeMorePlaylistsThenAfter() {
     for i in 10 ... 20 {
-      let playlist = library.createPlaylist()
+      let playlist = library.createPlaylist(account: account)
       playlist.id = i.description
       playlist.name = i.description
     }
@@ -50,6 +50,8 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     XCTAssertEqual(playlists.count, 4)
 
     var playlist = playlists[0]
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.id, "smart_21")
     XCTAssertEqual(playlist.name, "admin - 02/23/2021 14:36:44")
     XCTAssertEqual(playlist.songCount, 5000)
@@ -59,6 +61,8 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     XCTAssertEqual(playlist.remoteDuration, 0)
 
     playlist = playlists[1]
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.id, "smart_14")
     XCTAssertEqual(playlist.name, "Album 1*")
     XCTAssertEqual(playlist.songCount, 2)
@@ -68,6 +72,8 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     XCTAssertEqual(playlist.remoteDuration, 0)
 
     playlist = playlists[2]
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.id, "3")
     XCTAssertEqual(playlist.name, "random - admin - private")
     XCTAssertEqual(playlist.songCount, 43)
@@ -77,6 +83,8 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     XCTAssertEqual(playlist.remoteDuration, 0)
 
     playlist = playlists[3]
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.id, "2")
     XCTAssertEqual(playlist.name, "random - admin - public")
     XCTAssertEqual(playlist.songCount, 43)

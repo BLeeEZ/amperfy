@@ -30,14 +30,14 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
 
   override func createParserDelegate() {
     ssParserDelegate = SsPlaylistParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(),
+      performanceMonitor: MOCK_PerformanceMonitor(), account: account,
       library: library
     )
   }
 
   func testLibraryContainsBeforeMorePlaylistsThenAfter() {
     for i in 20 ... 30 {
-      let playlist = library.createPlaylist()
+      let playlist = library.createPlaylist(account: account)
       playlist.id = i.description
       playlist.name = i.description
     }
@@ -49,6 +49,8 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
     XCTAssertEqual(playlists.count, 2)
 
     var playlist = playlists[1]
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.id, "15")
     XCTAssertEqual(playlist.name, "Some random songs")
     XCTAssertEqual(playlist.songCount, 6)
@@ -58,6 +60,8 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
     XCTAssertFalse(playlist.isCached)
 
     playlist = playlists[0]
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.id, "16")
     XCTAssertEqual(playlist.name, "More random songs")
     XCTAssertEqual(playlist.songCount, 5)

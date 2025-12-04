@@ -57,6 +57,7 @@ enum CoreDataMigrationVersion: String, CaseIterable {
   case v45 = "Amperfy v45" // Download: id has default value "Empty String"
   case v46 = "Amperfy v46" // Add addedDate for songs
   case v47 = "Amperfy v47" // Add replay gain and peak for songs
+  case v48 = "Amperfy v48" // Account support: add account (url + user)
 
   // MARK: - Current
 
@@ -165,6 +166,8 @@ enum CoreDataMigrationVersion: String, CaseIterable {
     case .v46:
       return .v47
     case .v47:
+      return .v48
+    case .v48:
       return nil
     }
   }

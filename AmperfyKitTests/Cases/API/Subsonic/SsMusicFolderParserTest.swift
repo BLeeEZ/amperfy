@@ -31,7 +31,7 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsMusicFolderParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library
     )
   }
@@ -43,12 +43,18 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
     XCTAssertEqual(library.musicFolderCount, 3)
 
     let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })
+    XCTAssertEqual(musicFolders[0].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(musicFolders[0].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(musicFolders[0].id, "1")
     XCTAssertEqual(musicFolders[0].name, "Music")
     XCTAssertFalse(musicFolders[0].isCached)
+    XCTAssertEqual(musicFolders[1].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(musicFolders[1].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(musicFolders[1].id, "2")
     XCTAssertEqual(musicFolders[1].name, "Movies")
     XCTAssertFalse(musicFolders[1].isCached)
+    XCTAssertEqual(musicFolders[2].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(musicFolders[2].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(musicFolders[2].id, "3")
     XCTAssertEqual(musicFolders[2].name, "Incoming")
     XCTAssertFalse(musicFolders[2].isCached)

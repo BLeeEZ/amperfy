@@ -31,7 +31,7 @@ class RadiosExampleParserTest: AbstractAmpacheTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = RadioParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library
     )
   }
@@ -45,6 +45,8 @@ class RadiosExampleParserTest: AbstractAmpacheTest {
     XCTAssertEqual(radios.count, 3)
 
     var radio = radios[0]
+    XCTAssertEqual(radio.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(radio.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(radio.id, "1")
     XCTAssertEqual(radio.title, "HBR1.com - Dream Factory")
     XCTAssertEqual(radio.rating, 0)
@@ -63,6 +65,8 @@ class RadiosExampleParserTest: AbstractAmpacheTest {
     XCTAssertNil(radio.artwork)
 
     radio = radios[1]
+    XCTAssertEqual(radio.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(radio.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(radio.id, "2")
     XCTAssertEqual(radio.title, "HBR1.com - I.D.M. Tranceponder")
     XCTAssertEqual(radio.rating, 0)
@@ -81,6 +85,8 @@ class RadiosExampleParserTest: AbstractAmpacheTest {
     XCTAssertNil(radio.artwork)
 
     radio = radios[2]
+    XCTAssertEqual(radio.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(radio.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(radio.id, "3")
     XCTAssertEqual(radio.title, "4ZZZ Community Radio")
     XCTAssertEqual(radio.rating, 0)

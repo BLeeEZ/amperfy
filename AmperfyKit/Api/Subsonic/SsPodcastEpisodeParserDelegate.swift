@@ -33,10 +33,16 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
     performanceMonitor: ThreadPerformanceMonitor,
     podcast: Podcast?,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.podcast = podcast
-    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      account: account,
+      library: library
+    )
   }
 
   override func parser(
@@ -54,7 +60,7 @@ class SsPodcastEpisodeParserDelegate: SsPlayableParserDelegate {
       if let prefetchedEpisode = prefetch.prefetchedPodcastEpisodeDict[episodeId] {
         episodeBuffer = prefetchedEpisode
       } else {
-        episodeBuffer = library.createPodcastEpisode()
+        episodeBuffer = library.createPodcastEpisode(account: account)
         prefetch.prefetchedPodcastEpisodeDict[episodeId] = episodeBuffer
         episodeBuffer?.id = episodeId
       }

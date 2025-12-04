@@ -28,14 +28,14 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "directory_example_2")
-    directory = library.createDirectory()
+    directory = library.createDirectory(account: account)
   }
 
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsDirectoryParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      directory: directory, prefetch: prefetch,
+      directory: directory, prefetch: prefetch, account: account,
       library: library
     )
   }
@@ -77,14 +77,22 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(songs.count, 2)
 
     var song = songs[0]
+    XCTAssertEqual(song.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.id, "111")
     XCTAssertEqual(song.title, "Dancing Queen")
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.id, "5432")
     XCTAssertEqual(song.artist?.name, "ABBA")
+    XCTAssertEqual(song.album?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.album?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.album?.id, "11053")
     XCTAssertEqual(song.album?.name, "Arrival")
     XCTAssertNil(song.disk)
     XCTAssertEqual(song.track, 7)
+    XCTAssertEqual(song.genre?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.genre?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.genre?.id, "")
     XCTAssertEqual(song.genre?.name, "Pop")
     XCTAssertEqual(song.duration, 146)
@@ -93,16 +101,24 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 8421341)
+    XCTAssertEqual(song.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "24")
 
     song = songs[1]
+    XCTAssertEqual(song.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.id, "112")
     XCTAssertEqual(song.title, "Money, Money, Money")
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.name, "ABBA")
     XCTAssertNil(song.album)
     XCTAssertNil(song.disk)
     XCTAssertEqual(song.track, 7)
+    XCTAssertEqual(song.genre?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.genre?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.genre?.id, "")
     XCTAssertEqual(song.genre?.name, "Pop")
     XCTAssertEqual(song.duration, 208)
@@ -111,6 +127,8 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/flac")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 4910028)
+    XCTAssertEqual(song.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "25")
 

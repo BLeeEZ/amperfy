@@ -31,13 +31,14 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
   override init(
     performanceMonitor: ThreadPerformanceMonitor,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage,
     parseNotifier: ParsedObjectNotifiable? = nil
   ) {
     self.parsedPodcasts = Set<Podcast>()
     super.init(
       performanceMonitor: performanceMonitor, prefetch: prefetch,
-      library: library,
+      account: account, library: library,
       parseNotifier: parseNotifier
     )
   }
@@ -65,7 +66,7 @@ class SsPodcastParserDelegate: SsXmlLibWithArtworkParser {
       if let prefetchedPodcast = prefetch.prefetchedPodcastDict[podcastId] {
         podcastBuffer = prefetchedPodcast
       } else {
-        podcastBuffer = library.createPodcast()
+        podcastBuffer = library.createPodcast(account: account)
         prefetch.prefetchedPodcastDict[podcastId] = podcastBuffer
         podcastBuffer?.id = podcastId
       }

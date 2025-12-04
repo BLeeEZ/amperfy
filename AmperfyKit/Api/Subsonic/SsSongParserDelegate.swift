@@ -51,7 +51,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         guessedAlbum = prefetchedSong.album
         guessedGenre = prefetchedSong.genre
       } else {
-        songBuffer = library.createSong()
+        songBuffer = library.createSong(account: account)
         prefetch.prefetchedSongDict[songId] = songBuffer
         songBuffer?.id = songId
         guessedArtist = nil
@@ -68,7 +68,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
           songBuffer?.artist = prefetchedArtist
           songBuffer?.artist?.remoteStatus = .available
         } else if let artistName = attributeDict["artist"] {
-          let artist = library.createArtist()
+          let artist = library.createArtist(account: account)
           prefetch.prefetchedArtistDict[artistId] = artist
           artist.id = artistId
           artist.name = artistName
@@ -87,7 +87,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         } else if let prefetchedArtist = prefetch.prefetchedLocalArtistDict[artistName] {
           songBuffer.artist = prefetchedArtist
         } else {
-          let artist = library.createArtist()
+          let artist = library.createArtist(account: account)
           prefetch.prefetchedLocalArtistDict[artistName] = artist
           artist.name = artistName
           songBuffer.artist = artist
@@ -103,7 +103,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
           songBuffer?.album = prefetchedAlbum
           songBuffer?.album?.remoteStatus = .available
         } else if let albumName = attributeDict["album"] {
-          let album = library.createAlbum()
+          let album = library.createAlbum(account: account)
           prefetch.prefetchedAlbumDict[albumId] = album
           album.id = albumId
           album.name = albumName
@@ -124,7 +124,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         } else if let prefetchedGenre = prefetch.prefetchedGenreDict[genreName] {
           songBuffer?.genre = prefetchedGenre
         } else {
-          let genre = library.createGenre()
+          let genre = library.createGenre(account: account)
           prefetch.prefetchedGenreDict[genreName] = genre
           genre.name = genreName
           os_log("Genre <%s> has been created", log: log, type: .error, genreName)

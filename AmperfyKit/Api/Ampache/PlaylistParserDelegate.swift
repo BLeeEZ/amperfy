@@ -30,14 +30,17 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
   private var playlistsDict: [String: Playlist]
   private let allOldPlaylists: Set<Playlist>
   private var parsedPlaylists: Set<Playlist>
+  private var account: Account
   private var library: LibraryStorage
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
+    account: Account,
     library: LibraryStorage,
     parseNotifier: ParsedObjectNotifiable?,
     playlistToValidate: Playlist? = nil
   ) {
+    self.account = account
     self.library = library
     self.playlist = playlistToValidate
     self.playlistToValidate = playlistToValidate
@@ -87,7 +90,7 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
         if let fetchedPlaylist = playlistsDict[playlistId] {
           playlist = fetchedPlaylist
         } else {
-          playlist = library.createPlaylist()
+          playlist = library.createPlaylist(account: account)
           playlist?.id = playlistId
           playlistsDict[playlistId] = playlist
         }

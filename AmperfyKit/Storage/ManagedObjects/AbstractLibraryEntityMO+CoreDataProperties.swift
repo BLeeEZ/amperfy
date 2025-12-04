@@ -31,6 +31,8 @@ extension AbstractLibraryEntityMO {
   @NSManaged
   public var id: String
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var alphabeticSectionInitial: String
   @NSManaged
   public var isFavorite: Bool

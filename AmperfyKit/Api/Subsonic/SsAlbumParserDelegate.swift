@@ -53,7 +53,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         guessedArtist = prefetchedAlbum.artist
         guessedGenre = prefetchedAlbum.genre
       } else {
-        albumBuffer = library.createAlbum()
+        albumBuffer = library.createAlbum(account: account)
         prefetch.prefetchedAlbumDict[albumId] = albumBuffer
         albumBuffer?.id = albumId
         guessedArtist = nil
@@ -86,7 +86,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         } else if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
           albumBuffer?.artist = prefetchedArtist
         } else if let artistName = attributeDict["artist"] {
-          let artist = library.createArtist()
+          let artist = library.createArtist(account: account)
           prefetch.prefetchedArtistDict[artistId] = artist
           artist.id = artistId
           artist.name = artistName
@@ -107,7 +107,7 @@ class SsAlbumParserDelegate: SsXmlLibWithArtworkParser {
         } else if let prefetchedGenre = prefetch.prefetchedGenreDict[genreName] {
           albumBuffer?.genre = prefetchedGenre
         } else {
-          let genre = library.createGenre()
+          let genre = library.createGenre(account: account)
           prefetch.prefetchedGenreDict[genreName] = genre
           genre.name = genreName
           os_log("Genre <%s> has been created", log: log, type: .error, genreName)

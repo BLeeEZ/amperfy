@@ -374,8 +374,8 @@ extension BackendProxy: BackendApi {
     activeApi.checkForErrorResponse(response: response)
   }
 
-  public func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
-    activeApi.createLibrarySyncer(storage: storage)
+  public func createLibrarySyncer(account: Account, storage: PersistentStorage) -> LibrarySyncer {
+    activeApi.createLibrarySyncer(account: account, storage: storage)
   }
 
   public func getActiveArtworkDownloadDelegate() -> DownloadManagerDelegate {

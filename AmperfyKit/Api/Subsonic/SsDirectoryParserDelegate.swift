@@ -35,26 +35,38 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
     performanceMonitor: ThreadPerformanceMonitor,
     directory: Directory,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.directory = directory
     self.musicFolder = nil
     self.directoriesBeforeFetch = Set(directory.subdirectories)
     self.songsBeforeFetch = Set(directory.songs)
-    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      account: account,
+      library: library
+    )
   }
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     musicFolder: MusicFolder,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.directory = nil
     self.musicFolder = musicFolder
     self.directoriesBeforeFetch = Set(musicFolder.directories)
     self.songsBeforeFetch = Set(musicFolder.songs)
-    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      account: account,
+      library: library
+    )
   }
 
   override func parser(
@@ -79,7 +91,7 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
           if let prefetchedDirectory = prefetch.prefetchedDirectoryDict[id] {
             parsedDirectory = prefetchedDirectory
           } else {
-            parsedDirectory = library.createDirectory()
+            parsedDirectory = library.createDirectory(account: account)
             prefetch.prefetchedDirectoryDict[id] = parsedDirectory
             parsedDirectory.id = id
             parsedDirectory.name = title
@@ -111,7 +123,7 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
         if let prefetchedDirectory = prefetch.prefetchedDirectoryDict[id] {
           parsedDirectory = prefetchedDirectory
         } else {
-          parsedDirectory = library.createDirectory()
+          parsedDirectory = library.createDirectory(account: account)
           prefetch.prefetchedDirectoryDict[id] = parsedDirectory
           parsedDirectory.id = id
           parsedDirectory.name = name

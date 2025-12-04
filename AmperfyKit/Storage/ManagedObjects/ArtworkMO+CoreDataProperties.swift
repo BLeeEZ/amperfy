@@ -31,6 +31,8 @@ extension ArtworkMO {
   @NSManaged
   public var id: String
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var imageData: Data? /// deprecated! use relFilePath instead
   @NSManaged
   public var relFilePath: String?

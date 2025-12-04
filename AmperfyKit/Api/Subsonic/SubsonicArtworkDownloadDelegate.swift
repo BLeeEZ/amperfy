@@ -109,7 +109,8 @@ final class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
   }
 
   func handleCustomImage(fileURL: URL, artworkRemoteInfo: ArtworkRemoteInfo) -> URL? {
-    guard let relFilePath = fileManager.createRelPath(for: artworkRemoteInfo),
+    guard let account = subsonicServerApi.account,
+          let relFilePath = fileManager.createRelPath(for: artworkRemoteInfo, account: account),
           let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
     else { return nil }
     do {

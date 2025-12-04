@@ -33,12 +33,13 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
     performanceMonitor: ThreadPerformanceMonitor,
     podcast: Podcast,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.podcast = podcast
     super.init(
       performanceMonitor: performanceMonitor,
-      prefetch: prefetch,
+      prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
@@ -68,7 +69,7 @@ class PodcastEpisodeParserDelegate: PlayableParserDelegate {
       if let prefetchedEpisode = prefetch.prefetchedPodcastEpisodeDict[episodeId] {
         episodeBuffer = prefetchedEpisode
       } else {
-        episodeBuffer = library.createPodcastEpisode()
+        episodeBuffer = library.createPodcastEpisode(account: account)
         episodeBuffer?.id = episodeId
         prefetch.prefetchedPodcastEpisodeDict[episodeId] = episodeBuffer
       }

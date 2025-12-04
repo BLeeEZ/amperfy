@@ -26,6 +26,7 @@ import XCTest
 class PlaylistTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var testPlaylist: Playlist!
   var defaultPlaylist: Playlist!
   var playlistThreeCached: Playlist!
@@ -34,6 +35,7 @@ class PlaylistTest: XCTestCase {
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
+    account = library.getAccount(info: TestAccountInfo.create1())
     guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
     else { XCTFail(); return }
     defaultPlaylist = playlist
@@ -43,7 +45,7 @@ class PlaylistTest: XCTestCase {
     guard let playlistZeroCached = library.getPlaylist(id: cdHelper.seeder.playlists[2].id)
     else { XCTFail(); return }
     playlistNoCached = playlistZeroCached
-    testPlaylist = library.createPlaylist()
+    testPlaylist = library.createPlaylist(account: account)
     resetTestPlaylist()
   }
 
@@ -70,7 +72,9 @@ class PlaylistTest: XCTestCase {
   }
 
   func testCreation() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(playlist.items.count, 0)
     XCTAssertEqual(playlist.id, "")
     XCTAssertEqual(playlist.lastPlayableIndex, 0)
@@ -86,18 +90,24 @@ class PlaylistTest: XCTestCase {
   }
 
   func testFetch() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
+    XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(playlist.account?.userHash, TestAccountInfo.test1UserHash)
     let id = "12345"
     let name = "Test 234"
+    let testAccount = library.getAccount(info: TestAccountInfo.create2())
+    playlist.account = testAccount
     playlist.name = name
     playlist.id = id
     guard let playlistFetched = library.getPlaylist(id: id) else { XCTFail(); return }
     XCTAssertEqual(playlistFetched.name, name)
     XCTAssertEqual(playlistFetched.id, id)
+    XCTAssertEqual(playlistFetched.account?.serverHash, TestAccountInfo.test2ServerHash)
+    XCTAssertEqual(playlistFetched.account?.userHash, TestAccountInfo.test2UserHash)
   }
 
   func testSongAppend() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     XCTAssertEqual(playlist.items.count, 0)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     playlist.append(playable: song1)
@@ -111,6 +121,8 @@ class PlaylistTest: XCTestCase {
 
     for (index, entry) in playlist.items.enumerated() {
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
@@ -137,7 +149,7 @@ class PlaylistTest: XCTestCase {
   }
 
   func testSongInsert() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
@@ -156,11 +168,13 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
   func testSongInsert1() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
@@ -178,11 +192,13 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
   func testSongInsertCustomIndex() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
@@ -199,11 +215,13 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
   func testSongInsertCustomIndex2() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
@@ -220,11 +238,13 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
   func testSongInsertCustomIndex3() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     playlist.insert(playables: [song1], index: 0)
@@ -235,11 +255,13 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
   func testSongInsertCustomIndex4() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
@@ -255,11 +277,13 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
   func testSongInsertEmpty() {
-    let playlist = library.createPlaylist()
+    let playlist = library.createPlaylist(account: account)
     guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
     guard let song2 = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
     guard let song3 = library.getSong(id: cdHelper.seeder.songs[2].id) else { XCTFail(); return }
@@ -276,6 +300,8 @@ class PlaylistTest: XCTestCase {
         XCTAssert(playlist.items[index - 1].order < entry.order)
       }
       XCTAssertEqual(entry.playable.id, cdHelper.seeder.songs[index].id)
+      XCTAssertEqual(entry.account?.serverHash, TestAccountInfo.test1ServerHash)
+      XCTAssertEqual(entry.account?.userHash, TestAccountInfo.test1UserHash)
     }
   }
 
@@ -287,6 +313,8 @@ class PlaylistTest: XCTestCase {
     XCTAssertEqual(defaultPlaylist.playables[0].id, cdHelper.seeder.songs[0].id)
     XCTAssertEqual(defaultPlaylist.items[0].playable.id, cdHelper.seeder.songs[0].id)
     XCTAssertEqual(defaultPlaylist.items[0].order, Int(PlaylistItemMO.orderDistance) * 1)
+    XCTAssertEqual(defaultPlaylist.items[0].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(defaultPlaylist.items[0].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(defaultPlaylist.playables[1].id, cdHelper.seeder.songs[1].id)
     XCTAssertEqual(defaultPlaylist.items[1].playable.id, cdHelper.seeder.songs[1].id)
     XCTAssertEqual(defaultPlaylist.items[1].order, Int(PlaylistItemMO.orderDistance) * 2)
@@ -299,6 +327,8 @@ class PlaylistTest: XCTestCase {
     XCTAssertEqual(defaultPlaylist.playables[4].id, cdHelper.seeder.songs[3].id)
     XCTAssertEqual(defaultPlaylist.items[4].playable.id, cdHelper.seeder.songs[3].id)
     XCTAssertEqual(defaultPlaylist.items[4].order, Int(PlaylistItemMO.orderDistance) * 5)
+    XCTAssertEqual(defaultPlaylist.items[4].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(defaultPlaylist.items[4].account?.userHash, TestAccountInfo.test1UserHash)
   }
 
   func testReorderLastToFirst() {

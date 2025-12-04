@@ -1,9 +1,9 @@
 //
-//  SearchHistoryItemMO+CoreDataProperties.swift
+//  AccountMO+CoreDataClass.swift
 //  AmperfyKit
 //
-//  Created by Maximilian Bauer on 21.02.24.
-//  Copyright (c) 2024 Maximilian Bauer. All rights reserved.
+//  Created by Maximilian Bauer on 28.11.25.
+//  Copyright (c) 2025 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,21 +19,12 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import CoreData
-import Foundation
+public import Foundation
+public import CoreData
 
-extension SearchHistoryItemMO {
-  @nonobjc
-  public class func fetchRequest() -> NSFetchRequest<SearchHistoryItemMO> {
-    NSFetchRequest<SearchHistoryItemMO>(entityName: "SearchHistoryItem")
-  }
+public typealias AccountMOCoreDataClassSet = NSSet
 
-  @NSManaged
-  public var account: AccountMO?
-  @NSManaged
-  public var date: Date?
-  @NSManaged
-  public var searchedLibraryEntity: AbstractLibraryEntityMO?
-  @NSManaged
-  public var searchedPlaylist: PlaylistMO?
-}
+// MARK: - AccountMO
+
+@objc(AccountMO)
+public class AccountMO: NSManagedObject {}

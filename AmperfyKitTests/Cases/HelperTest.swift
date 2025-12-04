@@ -35,9 +35,19 @@ class HelperTest: XCTestCase {
   override func tearDown() {}
 
   func testSeeder() {
+    XCTAssertEqual(library.getAllAccounts().count, cdHelper.seeder.accounts.count)
     XCTAssertEqual(library.getArtists().count, cdHelper.seeder.artists.count)
     XCTAssertEqual(library.getAlbums().count, cdHelper.seeder.albums.count)
     XCTAssertEqual(library.getSongs().count, cdHelper.seeder.songs.count)
     XCTAssertEqual(library.getPlaylists().count, cdHelper.seeder.playlists.count)
+    let account = library.getAccount(info: TestAccountInfo.create1())
+    XCTAssertEqual(account.managedObject.playlists?.count, cdHelper.seeder.playlists.count)
+    let playlistItemCount = cdHelper.seeder.playlists.reduce(0) { $0 + $1.songIds.count }
+    XCTAssertEqual(account.managedObject.playlistItems?.count, playlistItemCount)
+    XCTAssertEqual(
+      account.managedObject.entities?.count,
+      cdHelper.seeder.artists.count + cdHelper.seeder.albums.count + cdHelper.seeder.songs
+        .count + cdHelper.seeder.radios.count
+    )
   }
 }

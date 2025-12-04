@@ -31,7 +31,7 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsRadioParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
@@ -46,6 +46,8 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
     XCTAssertEqual(radios.count, 2)
 
     var radio = radios[0]
+    XCTAssertEqual(radio.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(radio.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(radio.id, "0")
     XCTAssertEqual(radio.title, "NRK P1")
     XCTAssertEqual(radio.rating, 0)
@@ -64,6 +66,8 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
     XCTAssertNil(radio.artwork)
 
     radio = radios[1]
+    XCTAssertEqual(radio.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(radio.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(radio.id, "1")
     XCTAssertEqual(radio.title, "NRK P2")
     XCTAssertEqual(radio.rating, 0)

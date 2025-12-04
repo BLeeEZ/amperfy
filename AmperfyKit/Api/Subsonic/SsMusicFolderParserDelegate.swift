@@ -30,6 +30,7 @@ class SsMusicFolderParserDelegate: SsXmlLibParser {
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.musicFoldersBeforeFetch = Set(library.getMusicFolders())
@@ -37,7 +38,12 @@ class SsMusicFolderParserDelegate: SsXmlLibParser {
     for mf in musicFoldersBeforeFetch {
       musicFoldersDict[mf.id] = mf
     }
-    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      account: account,
+      library: library
+    )
   }
 
   override func parser(
@@ -60,7 +66,7 @@ class SsMusicFolderParserDelegate: SsXmlLibParser {
       if let musicFolder = musicFoldersDict[id] {
         musicFoldersParsed.insert(musicFolder)
       } else {
-        let musicFolder = library.createMusicFolder()
+        let musicFolder = library.createMusicFolder(account: account)
         musicFolder.id = id
         musicFolder.name = name
         musicFoldersDict[id] = musicFolder

@@ -34,6 +34,7 @@ public class ScrobbleSyncer {
   private let musicPlayer: AudioPlayer
   private let backendAudioPlayer: BackendAudioPlayer
   private let networkMonitor: NetworkMonitorFacade
+  private let account: Account
   private let storage: PersistentStorage
   private let librarySyncer: LibrarySyncer
   private let eventLogger: EventLogger
@@ -53,6 +54,7 @@ public class ScrobbleSyncer {
     musicPlayer: AudioPlayer,
     backendAudioPlayer: BackendAudioPlayer,
     networkMonitor: NetworkMonitorFacade,
+    account: Account,
     storage: PersistentStorage,
     librarySyncer: LibrarySyncer,
     eventLogger: EventLogger
@@ -60,6 +62,7 @@ public class ScrobbleSyncer {
     self.musicPlayer = musicPlayer
     self.backendAudioPlayer = backendAudioPlayer
     self.networkMonitor = networkMonitor
+    self.account = account
     self.storage = storage
     self.librarySyncer = librarySyncer
     self.eventLogger = eventLogger
@@ -170,7 +173,7 @@ public class ScrobbleSyncer {
     if !isUploaded {
       os_log("Scrobble cache: %s", log: self.log, type: .info, playedSong.displayString)
     }
-    let scrobbleEntry = storage.main.library.createScrobbleEntry()
+    let scrobbleEntry = storage.main.library.createScrobbleEntry(account: account)
     scrobbleEntry.date = Date()
     scrobbleEntry.playable = playedSong
     scrobbleEntry.isUploaded = isUploaded

@@ -29,9 +29,11 @@ class SsPlaylistParserDelegate: SsXmlParser {
   private let allOldPlaylists: Set<Playlist>
   private var playlistsDict: [String: Playlist]
   private var parsedPlaylists: Set<Playlist>
+  private let account: Account
   private let library: LibraryStorage
 
-  init(performanceMonitor: ThreadPerformanceMonitor, library: LibraryStorage) {
+  init(performanceMonitor: ThreadPerformanceMonitor, account: Account, library: LibraryStorage) {
+    self.account = account
     self.library = library
     self.allOldPlaylists = Set(library.getPlaylists())
     self.playlistsDict = [String: Playlist]()
@@ -69,7 +71,7 @@ class SsPlaylistParserDelegate: SsXmlParser {
         if let fetchedPlaylist = playlistsDict[playlistId] {
           playlist = fetchedPlaylist
         } else {
-          playlist = library.createPlaylist()
+          playlist = library.createPlaylist(account: account)
           playlist?.id = playlistId
           playlistsDict[playlistId] = playlist!
         }

@@ -62,6 +62,11 @@ class SyncVC: UIViewController {
       self.appDelegate.storage.main.library.cleanStorage()
       self.appDelegate.reinit()
 
+      guard let credentials = self.appDelegate.storage.loginCredentials
+      else { return }
+      let _ = self.appDelegate.storage.main.library
+        .getAccount(info: Account.createInfo(credentials: credentials))
+
       do {
         try await self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
         self.appDelegate.storage.initialSyncCompletionStatus = .completed

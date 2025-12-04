@@ -24,19 +24,24 @@ import CoreData
 import Foundation
 
 class CoreDataSeeder {
+  let accounts = [
+    (serverHash: TestAccountInfo.test1ServerHash, userHash: TestAccountInfo.test1UserHash),
+    (serverHash: TestAccountInfo.test2ServerHash, userHash: TestAccountInfo.test2UserHash),
+  ]
   let artists = [
-    (id: "4", name: "My Dream"),
-    (id: "RopLcTz92", name: "She or He"),
-    (id: "93", name: "Bang!"),
+    (accountIndex: 0, id: "4", name: "My Dream"),
+    (accountIndex: 0, id: "RopLcTz92", name: "She or He"),
+    (accountIndex: 0, id: "93", name: "Bang!"),
   ]
   let albums = [
-    (id: "12", artistId: "4", name: "High Voltage", year: 2018),
-    (id: "34", artistId: "RopLcTz92", name: "Du Hast", year: 1987),
-    (id: "59", artistId: "93", name: "Dreams", year: 2002),
-    (id: "6BTR0", artistId: "93", name: "Let it go", year: 2007),
+    (accountIndex: 0, id: "12", artistId: "4", name: "High Voltage", year: 2018),
+    (accountIndex: 0, id: "34", artistId: "RopLcTz92", name: "Du Hast", year: 1987),
+    (accountIndex: 0, id: "59", artistId: "93", name: "Dreams", year: 2002),
+    (accountIndex: 0, id: "6BTR0", artistId: "93", name: "Let it go", year: 2007),
   ]
   let songs = [
     (
+      accountIndex: 0,
       id: "3",
       artistId: "4",
       albumId: "12",
@@ -46,6 +51,7 @@ class CoreDataSeeder {
       url: "www.blub.de/ahhh"
     ),
     (
+      accountIndex: 0,
       id: "5",
       artistId: "4",
       albumId: "12",
@@ -55,6 +61,7 @@ class CoreDataSeeder {
       url: "www.blub.de/ahhh2"
     ),
     (
+      accountIndex: 0,
       id: "10T",
       artistId: "4",
       albumId: "12",
@@ -64,6 +71,7 @@ class CoreDataSeeder {
       url: "www.blub.de/dd"
     ),
     (
+      accountIndex: 0,
       id: "19",
       artistId: "RopLcTz92",
       albumId: "34",
@@ -73,6 +81,7 @@ class CoreDataSeeder {
       url: "www.blub.de/dddtd"
     ),
     (
+      accountIndex: 0,
       id: "36",
       artistId: "RopLcTz92",
       albumId: "34",
@@ -82,6 +91,7 @@ class CoreDataSeeder {
       url: "www.blub.de/dddtdiuz"
     ),
     (
+      accountIndex: 0,
       id: "38",
       artistId: "93",
       albumId: "59",
@@ -91,6 +101,7 @@ class CoreDataSeeder {
       url: "www.blub.de/dddtd23iuz"
     ),
     (
+      accountIndex: 0,
       id: "41",
       artistId: "93",
       albumId: "59",
@@ -100,6 +111,7 @@ class CoreDataSeeder {
       url: "www.blub.de/dddtd233iuz"
     ),
     (
+      accountIndex: 0,
       id: "54",
       artistId: "93",
       albumId: "6BTR0",
@@ -109,6 +121,7 @@ class CoreDataSeeder {
       url: "www.blub.de/ddf"
     ),
     (
+      accountIndex: 0,
       id: "55",
       artistId: "93",
       albumId: "6BTR0",
@@ -118,6 +131,7 @@ class CoreDataSeeder {
       url: "www.blub.de/654"
     ),
     (
+      accountIndex: 0,
       id: "56",
       artistId: "93",
       albumId: "6BTR0",
@@ -127,6 +141,7 @@ class CoreDataSeeder {
       url: "www.blub.de/trd"
     ),
     (
+      accountIndex: 0,
       id: "57",
       artistId: "93",
       albumId: "6BTR0",
@@ -136,6 +151,7 @@ class CoreDataSeeder {
       url: "www.blub.de/jhrf"
     ),
     (
+      accountIndex: 0,
       id: "59",
       artistId: "asd",
       albumId: "6BTR0",
@@ -145,6 +161,7 @@ class CoreDataSeeder {
       url: "www.blub.de/jads324hrf"
     ),
     (
+      accountIndex: 0,
       id: "99",
       artistId: "asd",
       albumId: "6BTR0",
@@ -154,6 +171,7 @@ class CoreDataSeeder {
       url: "www.blub.de/jds32s4hrf"
     ),
     (
+      accountIndex: 0,
       id: "5a9",
       artistId: "asd",
       albumId: "6BTR0",
@@ -163,6 +181,7 @@ class CoreDataSeeder {
       url: "www.blub.de/sjds324hrf"
     ),
     (
+      accountIndex: 0,
       id: "59e",
       artistId: "asd",
       albumId: "6BTR0",
@@ -172,6 +191,7 @@ class CoreDataSeeder {
       url: "www.blub.de/gjds324hrf"
     ),
     (
+      accountIndex: 0,
       id: "5e9lll",
       artistId: "asd",
       albumId: "6BTR0",
@@ -182,20 +202,34 @@ class CoreDataSeeder {
     ),
   ]
   let playlists = [
-    (id: "3", name: "With One Cached", songIds: ["3", "5", "10T", "36", "19"]),
+    (accountIndex: 0, id: "3", name: "With One Cached", songIds: ["3", "5", "10T", "36", "19"]),
     (
+      accountIndex: 0,
       id: "9",
       name: "With Three Cached",
       songIds: ["3", "5", "10T", "36", "19", "10T", "38", "5", "41"]
     ),
-    (id: "dRsa11", name: "No Cached", songIds: ["3", "10T", "19"]),
-    (id: "d23884", name: "All Cached", songIds: ["99", "5a9", "59e", "5e9lll"]),
+    (accountIndex: 0, id: "dRsa11", name: "No Cached", songIds: ["3", "10T", "19"]),
+    (accountIndex: 0, id: "d23884", name: "All Cached", songIds: ["99", "5a9", "59e", "5e9lll"]),
   ]
   let radios = [
-    (id: "12", title: "GoGo Radio", url: "www.blub.de/aaa", siteUrl: "www.blub.de/ddf"),
-    (id: "36", title: "Wau", url: "www.blub.de/fjjuf", siteUrl: "www.blub.de/23452"),
-    (id: "dRsa11", title: "Invalid Url", url: "", siteUrl: "www.blub.de/daeeaa"),
     (
+      accountIndex: 0,
+      id: "12",
+      title: "GoGo Radio",
+      url: "www.blub.de/aaa",
+      siteUrl: "www.blub.de/ddf"
+    ),
+    (
+      accountIndex: 0,
+      id: "36",
+      title: "Wau",
+      url: "www.blub.de/fjjuf",
+      siteUrl: "www.blub.de/23452"
+    ),
+    (accountIndex: 0, id: "dRsa11", title: "Invalid Url", url: "", siteUrl: "www.blub.de/daeeaa"),
+    (
+      accountIndex: 0,
       id: "dFrDF",
       title: "Radio Channel 2",
       url: "www.blub.de/ffhnnnza",
@@ -206,14 +240,18 @@ class CoreDataSeeder {
   func seed(context: NSManagedObjectContext) {
     let library = LibraryStorage(context: context)
 
+    let accs = accounts.compactMap {
+      library.createAccount(info: AccountInfo(serverHash: $0.serverHash, userHash: $0.userHash))
+    }
+
     for artistSeed in artists {
-      let artist = library.createArtist()
+      let artist = library.createArtist(account: accs[artistSeed.accountIndex])
       artist.id = artistSeed.id
       artist.name = artistSeed.name
     }
 
     for albumSeed in albums {
-      let album = library.createAlbum()
+      let album = library.createAlbum(account: accs[albumSeed.accountIndex])
       album.id = albumSeed.id
       album.name = albumSeed.name
       album.year = albumSeed.year
@@ -229,7 +267,7 @@ class CoreDataSeeder {
     )
 
     for songSeed in songs {
-      let song = library.createSong()
+      let song = library.createSong(account: accs[songSeed.accountIndex])
       song.id = songSeed.id
       song.title = songSeed.title
       song.track = songSeed.track
@@ -244,7 +282,7 @@ class CoreDataSeeder {
     }
 
     for playlistSeed in playlists {
-      let playlist = library.createPlaylist()
+      let playlist = library.createPlaylist(account: accs[playlistSeed.accountIndex])
       playlist.id = playlistSeed.id
       playlist.name = playlistSeed.name
       for songId in playlistSeed.songIds {
@@ -259,7 +297,7 @@ class CoreDataSeeder {
     }
 
     for radioSeed in radios {
-      let radio = library.createRadio()
+      let radio = library.createRadio(account: accs[radioSeed.accountIndex])
       radio.id = radioSeed.id
       radio.title = radioSeed.title
       radio.url = radioSeed.url

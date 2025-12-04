@@ -28,7 +28,7 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "podcast_example_1")
-    testPodcast = library.createPodcast()
+    testPodcast = library.createPodcast(account: account)
     testPodcast?.id = "1"
   }
 
@@ -36,7 +36,7 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsPodcastEpisodeParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      podcast: testPodcast!, prefetch: prefetch,
+      podcast: testPodcast!, prefetch: prefetch, account: account,
       library: library
     )
   }
@@ -78,6 +78,8 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
 
     // episodes are sorted by publish date
     var episode = podcast.episodes[1]
+    XCTAssertEqual(episode.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.id, "34")
     XCTAssertEqual(episode.title, "Scorpions have re-evolved < eyes")
     XCTAssertEqual(
@@ -87,6 +89,8 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1296744403) // "2011-02-03T14:46:43"
     XCTAssertEqual(episode.streamId, "523")
     XCTAssertEqual(episode.podcastStatus, .completed)
+    XCTAssertEqual(episode.podcast?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.podcast?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.podcast, podcast)
     XCTAssertNil(episode.disk)
     XCTAssertEqual(episode.track, 0)
@@ -96,10 +100,14 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     XCTAssertEqual(episode.contentType, "audio/mpeg")
     XCTAssertNil(episode.url)
     XCTAssertEqual(episode.size, 78421341)
+    XCTAssertEqual(episode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.artwork?.type, "")
     XCTAssertEqual(episode.artwork?.id, "24")
 
     episode = podcast.episodes[0]
+    XCTAssertEqual(episode.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.id, "35")
     XCTAssertEqual(episode.title, "Scar tissue and snake venom treatment")
     XCTAssertEqual(
@@ -109,6 +117,8 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     XCTAssertEqual(episode.publishDate.timeIntervalSince1970, 1315068472) // "2011-09-03T16:47:52"
     XCTAssertEqual(episode.streamId, "524")
     XCTAssertEqual(episode.podcastStatus, .completed)
+    XCTAssertEqual(episode.podcast?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.podcast?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.podcast, podcast)
     XCTAssertNil(episode.disk)
     XCTAssertEqual(episode.track, 0)
@@ -118,6 +128,8 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     XCTAssertEqual(episode.contentType, "audio/mpeg")
     XCTAssertNil(episode.url)
     XCTAssertEqual(episode.size, 45624671)
+    XCTAssertEqual(episode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.artwork?.type, "")
     XCTAssertEqual(episode.artwork?.id, "27")
 

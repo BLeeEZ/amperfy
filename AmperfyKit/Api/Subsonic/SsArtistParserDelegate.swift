@@ -48,7 +48,7 @@ class SsArtistParserDelegate: SsXmlLibWithArtworkParser {
       if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
         artistBuffer = prefetchedArtist
       } else {
-        artistBuffer = library.createArtist()
+        artistBuffer = library.createArtist(account: account)
         prefetch.prefetchedArtistDict[artistId] = artistBuffer
         artistBuffer?.id = artistId
       }

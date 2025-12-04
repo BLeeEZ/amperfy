@@ -74,7 +74,8 @@ final class EmbeddedArtworkExtractor: Sendable {
     playable: AbstractPlayable,
     embeddedImage: UIImage
   ) {
-    let embeddedArtwork = library.createEmbeddedArtwork()
+    guard let account = playable.account else { return }
+    let embeddedArtwork = library.createEmbeddedArtwork(account: account)
     embeddedArtwork.owner = playable
 
     guard let relFilePath = fileManager.createRelPath(for: embeddedArtwork),

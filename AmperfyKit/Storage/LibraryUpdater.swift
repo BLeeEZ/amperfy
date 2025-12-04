@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 import os.log
 
@@ -40,7 +41,11 @@ public class UpdateHelper {
       if let imageData = asyncCompanion.library
         .getArtworkData(forArtworkRemoteInfo: artworkRemoteInfo),
         let artwork = asyncCompanion.library.getArtwork(remoteInfo: artworkRemoteInfo),
-        let relFilePath = CacheFileManager.shared.createRelPath(for: artworkRemoteInfo),
+        let account = artwork.account,
+        let relFilePath = CacheFileManager.shared.createRelPath(
+          for: artworkRemoteInfo,
+          account: account.info
+        ),
         let absFilePath = CacheFileManager.shared
         .getAbsoluteAmperfyPath(relFilePath: relFilePath) {
         do {
@@ -289,6 +294,22 @@ public class LibraryUpdater {
         type: .info
       )
     }
+    if storage.librarySyncVersion < .v21 {
+      storage
+        .librarySyncVersion =
+        .v21 // if App crashes don't do this step again -> This step is only for convenience
+      os_log(
+        "Perform blocking library update (START): Account support",
+        log: self.log,
+        type: .info
+      )
+      try await applyAccountSupport(notifier: notifier)
+      os_log(
+        "Perform blocking library update (DONE): Account support",
+        log: self.log,
+        type: .info
+      )
+    }
   }
 
   @MainActor
@@ -513,5 +534,268 @@ public class LibraryUpdater {
         notifier.tickOperation()
       }
     }
+  }
+
+  @MainActor
+  func applyAccountSupport(notifier: LibraryUpdaterCallbacks) async throws {
+    os_log("Create account (url + user) entry in CoreData", log: log, type: .info)
+    guard let credentials = storage.loginCredentials else { return }
+    var accountObjectIdTemp: NSManagedObjectID!
+    let accountInfo = Account.createInfo(credentials: credentials)
+    storage.main.perform { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(info: accountInfo)
+      accountObjectIdTemp = account.managedObject.objectID
+    }
+    let accountObjectId: NSManagedObjectID = accountObjectIdTemp
+
+    os_log(
+      "Create new account/user directory and move all files/dirs inside the account dir",
+      log: log,
+      type: .info
+    )
+    try? fileManager.move(
+      from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "artworks")!),
+      to: fileManager.getOrCreateAbsoluteArtworksDirectory(for: accountInfo)
+    )
+    try? fileManager.move(
+      from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "embedded-artworks")!),
+      to: fileManager.getOrCreateAbsoluteEmbeddedArtworksDirectory(for: accountInfo)
+    )
+    try? fileManager.move(
+      from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "episodes")!),
+      to: fileManager.getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo)
+    )
+    try? fileManager.move(
+      from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "lyrics")!),
+      to: fileManager.getOrCreateAbsoluteLyricsDirectory(for: accountInfo)
+    )
+    try? fileManager.move(
+      from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "songs")!),
+      to: fileManager.getOrCreateAbsoluteSongsDirectory(for: accountInfo)
+    )
+
+    os_log(
+      "Iterate over all library elements with rel file paths and update rel path",
+      log: log,
+      type: .info
+    )
+    /*
+     - artworks
+       - album
+       - artist
+       - podcast
+     - embedded-artworks
+       - episodes
+       - songs
+     - episodes
+     - lyrics
+       - songs
+     - songs
+     */
+    let newServerRelFilePath = fileManager.getRelPath(for: accountInfo)!
+
+    try await storage.async.perform { asyncCompanion in
+      let artworks = asyncCompanion.library.getArtworks()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Artwork Update", totalCount: artworks.count)
+      for artwork in artworks {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        if let relFilePath = artwork.relFilePath {
+          artwork.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
+        }
+        artwork.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let embeddedArtworks = asyncCompanion.library.getEmbeddedArtworks()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworks.count)
+      for artwork in embeddedArtworks {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        if let relFilePath = artwork.relFilePath {
+          artwork.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
+        }
+        artwork.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let episodes = asyncCompanion.library.getPodcastEpisodes()
+      notifier.startOperation(name: "Podcast Episodes Update", totalCount: episodes.count)
+      for episode in episodes {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        if let relFilePath = episode.relFilePath {
+          episode.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
+        }
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let songs = asyncCompanion.library.getSongs()
+      notifier.startOperation(name: "Songs Update", totalCount: songs.count)
+      for song in songs {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        if let relFilePath = song.relFilePath {
+          song.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
+        }
+        if let lyricsRelFilePath = song.lyricsRelFilePath {
+          song.lyricsRelFilePath = newServerRelFilePath
+            .appendingPathComponent(lyricsRelFilePath.path)
+        }
+        notifier.tickOperation()
+      }
+    }
+
+    os_log("Iterate over all library elements to assign account", log: log, type: .info)
+    /*
+     x AbstractLibraryEntity
+     x Artworks -> done in rel path
+     x Downloads
+     x EmbeddedArtworks -> done in rel path
+     x MusicFolders
+     x PlayerData
+     x PlaylistItems
+     x Playlists
+     x ScrobbleEntries
+     x SearchHistories
+     */
+    try await storage.async.perform { asyncCompanion in
+      let entities = asyncCompanion.library.getAbstractLibraryEntities()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "General Update", totalCount: entities.count)
+      for entity in entities {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        entity.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let downloads = asyncCompanion.library.getDownloads()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Download Update", totalCount: downloads.count)
+      for download in downloads {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        download.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let musicFolders = asyncCompanion.library.getMusicFolders()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Music Folders Update", totalCount: musicFolders.count)
+      for musicFolder in musicFolders {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        musicFolder.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let playerDatas = asyncCompanion.library.getAllPlayerData()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Player Update", totalCount: playerDatas.count)
+      for playerData in playerDatas {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        playerData.account = accountAsync.managedObject
+        playerData.contextPlaylist?.account = accountAsync.managedObject
+        playerData.shuffledContextPlaylist?.account = accountAsync.managedObject
+        playerData.userQueuePlaylist?.account = accountAsync.managedObject
+        playerData.podcastPlaylist?.account = accountAsync.managedObject
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let playlists = asyncCompanion.library.getPlaylists()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Playlists Update", totalCount: playlists.count)
+      for playlist in playlists {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        playlist.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let playlistItems = asyncCompanion.library.getPlaylistItems()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Playlist Items Update", totalCount: playlistItems.count)
+      for playlistItem in playlistItems {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        playlistItem.account = accountAsync.managedObject
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let scrobbleEntries = asyncCompanion.library.getScrobbleEntries()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Scrobbles Update", totalCount: scrobbleEntries.count)
+      for scrobbleEntry in scrobbleEntries {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        scrobbleEntry.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let searchHistory = asyncCompanion.library.getAllSearchHistory()
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: accountObjectId) as! AccountMO
+      )
+      notifier.startOperation(name: "Search History Update", totalCount: searchHistory.count)
+      for searchHistoryItem in searchHistory {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        searchHistoryItem.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+
+    /*
+     Elements to adjust for creation
+        x‚ AbstractLibraryEntity
+          x AbstractPlayable
+            x Song
+            x PodcastEpisode
+            x Radio
+          x Album
+          x Artist
+          x Directory
+          x Genre
+          x Podcast
+        x artworks
+        x downloads
+        x embeddedArtworks
+        x musicFolders
+        x player
+        x playlistItems
+        x playlists
+        x scrobbleEntries
+        x searchHistories
+        */
   }
 }

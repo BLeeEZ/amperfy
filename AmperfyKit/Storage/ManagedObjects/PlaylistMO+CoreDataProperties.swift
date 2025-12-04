@@ -29,6 +29,8 @@ extension PlaylistMO {
   }
 
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var alphabeticSectionInitial: String
   @NSManaged
   public var changeDate: Date?

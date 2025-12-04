@@ -35,6 +35,17 @@ public class PlaylistItem: NSObject {
     managedObject.objectID
   }
 
+  public var account: Account? {
+    get {
+      guard let accountMO = managedObject.account else { return nil }
+      return Account(managedObject: accountMO)
+    }
+    set {
+      if managedObject.account != newValue?
+        .managedObject { managedObject.account = newValue?.managedObject }
+    }
+  }
+
   public var order: Int {
     get { Int(managedObject.order) }
     set {

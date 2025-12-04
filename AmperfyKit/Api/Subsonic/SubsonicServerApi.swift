@@ -106,6 +106,10 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   internal let serverApiVersion = Atomic<SubsonicVersion?>(wrappedValue: nil)
   internal let clientApiVersion = Atomic<SubsonicVersion?>(wrappedValue: nil)
   internal let authType = Atomic<SubsonicApiAuthType>(wrappedValue: .autoDetect)
+  internal var account: AccountInfo? {
+    guard let credentials = credentials.wrappedValue else { return nil }
+    return Account.createInfo(credentials: credentials)
+  }
 
   private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
   private let performanceMonitor: ThreadPerformanceMonitor

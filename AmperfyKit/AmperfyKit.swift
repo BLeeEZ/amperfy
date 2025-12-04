@@ -69,8 +69,17 @@ public class AmperKit {
   }
 
   @MainActor
+  public lazy var account: Account = {
+    if let credentials = storage.loginCredentials {
+      return storage.main.library.getAccount(info: Account.createInfo(credentials: credentials))
+    } else {
+      return storage.main.library.getAccount(info: AccountInfo(serverHash: "", userHash: ""))
+    }
+  }()
+
+  @MainActor
   public lazy var librarySyncer: LibrarySyncer = {
-    LibrarySyncerProxy(backendApi: backendApi, storage: storage)
+    LibrarySyncerProxy(backendApi: backendApi, account: account, storage: storage)
   }()
 
   @MainActor
@@ -127,7 +136,7 @@ public class AmperKit {
       cellular: storage.settings.streamingFormatCellularPreference
     ))
 
-    let playerData = storage.main.library.getPlayerData()
+    let playerData = storage.main.library.getPlayerData(account: account)
     let queueHandler = PlayQueueHandler(playerData: playerData)
     let curPlayer = AudioPlayer(
       coreData: playerData,
@@ -156,6 +165,7 @@ public class AmperKit {
       musicPlayer: curPlayer,
       backendAudioPlayer: backendAudioPlayer,
       networkMonitor: networkMonitor,
+      account: account,
       storage: storage,
       librarySyncer: librarySyncer,
       eventLogger: eventLogger
@@ -211,6 +221,7 @@ public class AmperKit {
       return self.playableDownloadDelegate
     }
     let requestManager = DownloadRequestManager(
+      accountObjectId: account.managedObject.objectID,
       storage: storage.async,
       getDownloadDelegateCB: getDownloadDelegateCB
     )
@@ -252,6 +263,7 @@ public class AmperKit {
       return self.backendApi.getActiveArtworkDownloadDelegate()
     }
     let requestManager = DownloadRequestManager(
+      accountObjectId: account.managedObject.objectID,
       storage: storage.async,
       getDownloadDelegateCB: getDownloadDelegateCB
     )
@@ -362,7 +374,7 @@ public class AmperKit {
 
   @MainActor
   public func reinit() {
-    let playerData = storage.main.library.getPlayerData()
+    let playerData = storage.main.library.getPlayerData(account: account)
     let queueHandler = PlayQueueHandler(playerData: playerData)
     player.reinit(playerStatus: playerData, queueHandler: queueHandler)
   }

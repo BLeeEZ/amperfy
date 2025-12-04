@@ -28,6 +28,7 @@ class AbstractSsParserTest: XCTestCase {
   var context: NSManagedObjectContext!
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var xmlData: Data?
   var xmlErrorData: Data!
   var ssIdParserDelegate: SsIDsParserDelegate!
@@ -38,6 +39,8 @@ class AbstractSsParserTest: XCTestCase {
     context = cdHelper.createInMemoryManagedObjectContext()
     cdHelper.clearContext(context: context)
     library = LibraryStorage(context: context)
+    account = library.getAccount(info: TestAccountInfo.create1())
+    _ = library.getAccount(info: TestAccountInfo.create2())
     xmlErrorData = getTestFileData(name: "error_example_1")
     ssIdParserDelegate = SsIDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }

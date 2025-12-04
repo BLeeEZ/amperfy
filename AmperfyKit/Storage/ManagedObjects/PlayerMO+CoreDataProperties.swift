@@ -29,6 +29,8 @@ extension PlayerMO {
   }
 
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var autoCachePlayedItemSetting: Int16
   @NSManaged
   public var musicIndex: Int32

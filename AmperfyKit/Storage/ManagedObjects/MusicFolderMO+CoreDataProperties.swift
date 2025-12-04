@@ -31,6 +31,8 @@ extension MusicFolderMO {
   @NSManaged
   public var id: String
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var name: String
   @NSManaged
   public var directoryCount: Int16

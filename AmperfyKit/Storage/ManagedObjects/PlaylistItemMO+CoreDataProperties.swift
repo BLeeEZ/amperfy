@@ -29,6 +29,8 @@ extension PlaylistItemMO {
   }
 
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var order: Int32
   @NSManaged
   public var playable: AbstractPlayableMO

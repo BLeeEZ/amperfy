@@ -50,7 +50,7 @@ class GenreParserDelegate: AmpacheXmlLibParser {
       if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
         genreBuffer = prefetchedGenre
       } else {
-        genreBuffer = library.createGenre()
+        genreBuffer = library.createGenre(account: account)
         genreBuffer?.id = genreId
         prefetch.prefetchedGenreDict[genreId] = genreBuffer
       }

@@ -97,6 +97,10 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let authHandshake = Atomic<AuthentificationHandshake?>(wrappedValue: nil)
   private let settings: PersistentStorage.Settings
+  public var account: AccountInfo? {
+    guard let credentials = credentials.wrappedValue else { return nil }
+    return Account.createInfo(credentials: credentials)
+  }
 
   public func requestServerPodcastSupport() async throws -> Bool {
     let _ = try await reauthenticate()

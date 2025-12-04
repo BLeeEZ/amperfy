@@ -54,6 +54,17 @@ public class Artwork: NSObject {
     set { if managedObject.id != newValue { managedObject.id = newValue } }
   }
 
+  public var account: Account? {
+    get {
+      guard let accountMO = managedObject.account else { return nil }
+      return Account(managedObject: accountMO)
+    }
+    set {
+      if managedObject.account != newValue?
+        .managedObject { managedObject.account = newValue?.managedObject }
+    }
+  }
+
   public var type: String {
     get { managedObject.type }
     set { if managedObject.type != newValue { managedObject.type = newValue } }

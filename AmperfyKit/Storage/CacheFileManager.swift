@@ -140,6 +140,19 @@ final public class CacheFileManager: Sendable {
     updateCachedDirectorySize(itemUrl: to, isAdded: true)
   }
 
+  public func move(from: URL?, to: URL?) throws {
+    guard let from, let to else { return }
+    if createDirectoryIfNeeded(at: to) {
+      try? markItemAsExcludedFromBackup(at: to)
+    }
+    let items = contentsOfDirectory(url: from)
+    for file in items {
+      let destinationFileURL = to.appendingPathComponent(file.lastPathComponent)
+      try FileManager.default.moveItem(at: file, to: destinationFileURL)
+    }
+    try markItemAsExcludedFromBackup(at: to)
+  }
+
   @discardableResult
   public func createDirectoryIfNeeded(at url: URL) -> Bool {
     guard !FileManager.default.fileExists(atPath: url.path) else { return false }
@@ -201,13 +214,17 @@ final public class CacheFileManager: Sendable {
     }
   }
 
-  private func getOrCreateSubDirectory(subDirectoryName: String) -> URL? {
-    guard let url = amperfyLibraryDirectory?.appendingPathComponent(
-      subDirectoryName,
-      isDirectory: true
-    ) else { return nil }
-    if createDirectoryIfNeeded(at: url) {
-      try? markItemAsExcludedFromBackup(at: url)
+  private func getOrCreateSubDirectory(subDirectoryNames: [String]) -> URL? {
+    var url: URL? = amperfyLibraryDirectory
+    for subDirName in subDirectoryNames {
+      url = url?.appendingPathComponent(
+        subDirName,
+        isDirectory: true
+      )
+      guard let url else { continue }
+      if createDirectoryIfNeeded(at: url) {
+        try? markItemAsExcludedFromBackup(at: url)
+      }
     }
     return url
   }
@@ -244,30 +261,124 @@ final public class CacheFileManager: Sendable {
 
   private static let artworkFileExtension = "png"
   private static let lyricsFileExtension = "xml"
+  private static let accountsDir = URL(string: "accounts")!
   private static let songsDir = URL(string: "songs")!
   private static let episodesDir = URL(string: "episodes")!
   private static let artworksDir = URL(string: "artworks")!
   private static let embeddedArtworksDir = URL(string: "embedded-artworks")!
   private static let lyricsDir = URL(string: "lyrics")!
 
-  public func getOrCreateAbsoluteSongsDirectory() -> URL? {
-    getOrCreateSubDirectory(subDirectoryName: Self.songsDir.path)
+  public func getOrCreateAbsoluteServerDirectory() -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: [Self.accountsDir.path])
   }
 
-  public func getOrCreateAbsolutePodcastEpisodesDirectory() -> URL? {
-    getOrCreateSubDirectory(subDirectoryName: Self.episodesDir.path)
+  public func getOrCreateAbsoluteUserDirectory(server: String) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: [Self.accountsDir.path, server])
   }
 
-  public func getOrCreateAbsoluteArtworksDirectory() -> URL? {
-    getOrCreateSubDirectory(subDirectoryName: Self.artworksDir.path)
+  private func getRelAccountPaths(for account: AccountInfo, dirName: String) -> [String] {
+    [Self.accountsDir.path, account.serverHash, account.userHash, dirName]
   }
 
-  public func getOrCreateAbsoluteEmbeddedArtworksDirectory() -> URL? {
-    getOrCreateSubDirectory(subDirectoryName: Self.embeddedArtworksDir.path)
+  public func getRelPath(for account: AccountInfo) -> URL? {
+    Self.accountsDir.appendingPathComponent(account.serverHash)
+      .appendingPathComponent(account.userHash)
   }
 
-  public func getOrCreateAbsoluteLyricsDirectory() -> URL? {
-    getOrCreateSubDirectory(subDirectoryName: Self.lyricsDir.path)
+  public func getOrCreateAbsoluteSongsDirectory(for account: AccountInfo) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: getRelAccountPaths(
+      for: account,
+      dirName: Self.songsDir.path
+    ))
+  }
+
+  public func getRelSongsDirectory(for account: AccountInfo) -> URL? {
+    getRelPath(for: account)?.appendingPathComponent(Self.songsDir.path)
+  }
+
+  public func getOrCreateAbsolutePodcastEpisodesDirectory(for account: AccountInfo) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: getRelAccountPaths(
+      for: account,
+      dirName: Self.episodesDir.path
+    ))
+  }
+
+  public func getRelPodcastEpisodesDirectory(for account: AccountInfo) -> URL? {
+    getRelPath(for: account)?.appendingPathComponent(Self.episodesDir.path)
+  }
+
+  public func getOrCreateAbsoluteArtworksDirectory(for account: AccountInfo) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: getRelAccountPaths(
+      for: account,
+      dirName: Self.artworksDir.path
+    ))
+  }
+
+  public func getRelArtworkDirectory(for account: AccountInfo) -> URL? {
+    getRelPath(for: account)?.appendingPathComponent(Self.artworksDir.path)
+  }
+
+  public func getOrCreateAbsoluteEmbeddedArtworksDirectory(for account: AccountInfo) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: getRelAccountPaths(
+      for: account,
+      dirName: Self.embeddedArtworksDir.path
+    ))
+  }
+
+  public func getRelEmbeddedArtworkDirectory(for account: AccountInfo) -> URL? {
+    getRelPath(for: account)?.appendingPathComponent(Self.embeddedArtworksDir.path)
+  }
+
+  public func getOrCreateAbsoluteLyricsDirectory(for account: AccountInfo) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: getRelAccountPaths(
+      for: account,
+      dirName: Self.lyricsDir.path
+    ))
+  }
+
+  public func getRelLyricsDirectory(for account: AccountInfo) -> URL? {
+    getRelPath(for: account)?.appendingPathComponent(Self.lyricsDir.path)
+  }
+
+  public func getAccounts() -> [AccountInfo] {
+    var URLs = [URL]()
+    var accountInfo = [AccountInfo]()
+    var serverHashes = [String]()
+    if let accountsDir = getOrCreateAbsoluteServerDirectory() {
+      URLs = contentsOfDirectory(url: accountsDir)
+    }
+    // get all server hashes
+    for url in URLs {
+      let isDirectoryResourceValue: URLResourceValues
+      do {
+        isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+      } catch {
+        continue
+      }
+      guard isDirectoryResourceValue.isDirectory == true else {
+        continue
+      }
+      serverHashes.append(url.lastPathComponent)
+    }
+    for serverHash in serverHashes {
+      if let usersDir = getOrCreateAbsoluteUserDirectory(server: serverHash) {
+        URLs = contentsOfDirectory(url: usersDir)
+      }
+      // get all users hashes for the server hashes
+      for url in URLs {
+        let isDirectoryResourceValue: URLResourceValues
+        do {
+          isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+        } catch {
+          continue
+        }
+        guard isDirectoryResourceValue.isDirectory == true else {
+          continue
+        }
+        accountInfo.append(AccountInfo(serverHash: serverHash, userHash: url.lastPathComponent))
+      }
+    }
+    return accountInfo
   }
 
   public struct PlayableCacheInfo: Sendable {
@@ -278,10 +389,10 @@ final public class CacheFileManager: Sendable {
     let relFilePath: URL?
   }
 
-  public func getCachedSongs() -> [PlayableCacheInfo] {
+  public func getCachedSongs(for account: AccountInfo) -> [PlayableCacheInfo] {
     var URLs = [URL]()
     var cacheInfo = [PlayableCacheInfo]()
-    if let songsDir = getOrCreateAbsoluteSongsDirectory() {
+    if let songsDir = getOrCreateAbsoluteSongsDirectory(for: account) {
       URLs = contentsOfDirectory(url: songsDir)
     }
     for url in URLs {
@@ -309,16 +420,16 @@ final public class CacheFileManager: Sendable {
         id: id,
         fileType: pathExtension,
         mimeType: mimeType,
-        relFilePath: Self.songsDir.appendingPathComponent(fileName)
+        relFilePath: getRelSongsDirectory(for: account)?.appendingPathComponent(fileName)
       ))
     }
     return cacheInfo
   }
 
-  public func getCachedEpisodes() -> [PlayableCacheInfo] {
+  public func getCachedEpisodes(for account: AccountInfo) -> [PlayableCacheInfo] {
     var URLs = [URL]()
     var cacheInfo = [PlayableCacheInfo]()
-    if let episodesDir = getOrCreateAbsolutePodcastEpisodesDirectory() {
+    if let episodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: account) {
       URLs = contentsOfDirectory(url: episodesDir)
     }
     for url in URLs {
@@ -346,7 +457,7 @@ final public class CacheFileManager: Sendable {
         id: id,
         fileType: pathExtension,
         mimeType: mimeType,
-        relFilePath: Self.episodesDir.appendingPathComponent(fileName)
+        relFilePath: getRelPodcastEpisodesDirectory(for: account)?.appendingPathComponent(fileName)
       ))
     }
     return cacheInfo
@@ -359,14 +470,16 @@ final public class CacheFileManager: Sendable {
     let relFilePath: URL?
   }
 
-  public func getCachedEmbeddedArtworks() -> [EmbeddedArtworkCacheInfo] {
+  public func getCachedEmbeddedArtworks(for account: AccountInfo) -> [EmbeddedArtworkCacheInfo] {
     var cacheInfo = [EmbeddedArtworkCacheInfo]()
-    if let embeddedArtworksDir = getOrCreateAbsoluteEmbeddedArtworksDirectory() {
+    if let embeddedArtworksDir = getOrCreateAbsoluteEmbeddedArtworksDirectory(for: account) {
       cacheInfo.append(contentsOf: getCachedEmbeddedArtworks(
+        for: account,
         in: embeddedArtworksDir.appendingPathComponent(Self.songsDir.path),
         isSong: true
       ))
       cacheInfo.append(contentsOf: getCachedEmbeddedArtworks(
+        for: account,
         in: embeddedArtworksDir.appendingPathComponent(Self.episodesDir.path),
         isSong: false
       ))
@@ -374,7 +487,12 @@ final public class CacheFileManager: Sendable {
     return cacheInfo
   }
 
-  private func getCachedEmbeddedArtworks(in dir: URL, isSong: Bool) -> [EmbeddedArtworkCacheInfo] {
+  private func getCachedEmbeddedArtworks(
+    for account: AccountInfo,
+    in dir: URL,
+    isSong: Bool
+  )
+    -> [EmbeddedArtworkCacheInfo] {
     let URLs = contentsOfDirectory(url: dir)
     var cacheInfo = [EmbeddedArtworkCacheInfo]()
     for url in URLs {
@@ -397,9 +515,9 @@ final public class CacheFileManager: Sendable {
         id = (fileName as NSString).deletingPathExtension
       }
       let relFilePath = isSong ?
-        Self.embeddedArtworksDir.appendingPathComponent(Self.songsDir.path)
+        getRelEmbeddedArtworkDirectory(for: account)!.appendingPathComponent(Self.songsDir.path)
         .appendingPathComponent(fileName) :
-        Self.embeddedArtworksDir.appendingPathComponent(Self.episodesDir.path)
+        getRelEmbeddedArtworkDirectory(for: account)!.appendingPathComponent(Self.episodesDir.path)
         .appendingPathComponent(fileName)
       cacheInfo.append(EmbeddedArtworkCacheInfo(
         url: url,
@@ -418,15 +536,20 @@ final public class CacheFileManager: Sendable {
     let relFilePath: URL?
   }
 
-  public func getCachedArtworks() -> [ArtworkCacheInfo] {
+  public func getCachedArtworks(for account: AccountInfo) -> [ArtworkCacheInfo] {
     var cacheInfo = [ArtworkCacheInfo]()
-    if let artworksDir = getOrCreateAbsoluteArtworksDirectory() {
-      cacheInfo.append(contentsOf: getCachedArtworks(in: artworksDir, type: ""))
+    if let artworksDir = getOrCreateAbsoluteArtworksDirectory(for: account) {
+      cacheInfo.append(contentsOf: getCachedArtworks(for: account, in: artworksDir, type: ""))
     }
     return cacheInfo
   }
 
-  private func getCachedArtworks(in dir: URL, type: String) -> [ArtworkCacheInfo] {
+  private func getCachedArtworks(
+    for account: AccountInfo,
+    in dir: URL,
+    type: String
+  )
+    -> [ArtworkCacheInfo] {
     let URLs = contentsOfDirectory(url: dir)
     var cacheInfo = [ArtworkCacheInfo]()
     for url in URLs {
@@ -439,7 +562,7 @@ final public class CacheFileManager: Sendable {
 
       if isDirectoryResourceValue.isDirectory == true {
         let newType = url.lastPathComponent
-        cacheInfo.append(contentsOf: getCachedArtworks(in: url, type: newType))
+        cacheInfo.append(contentsOf: getCachedArtworks(for: account, in: url, type: newType))
       } else {
         let fileName = url.lastPathComponent
         var id = fileName
@@ -448,8 +571,9 @@ final public class CacheFileManager: Sendable {
           id = (fileName as NSString).deletingPathExtension
         }
         let relFilePath = !type.isEmpty ?
-          Self.artworksDir.appendingPathComponent(type).appendingPathComponent(fileName) :
-          Self.artworksDir.appendingPathComponent(fileName)
+          getRelArtworkDirectory(for: account)!.appendingPathComponent(type)
+          .appendingPathComponent(fileName) :
+          getRelArtworkDirectory(for: account)!.appendingPathComponent(fileName)
         cacheInfo.append(ArtworkCacheInfo(url: url, id: id, type: type, relFilePath: relFilePath))
       }
     }
@@ -463,14 +587,16 @@ final public class CacheFileManager: Sendable {
     let relFilePath: URL?
   }
 
-  public func getCachedLyrics() -> [LyricsCacheInfo] {
+  public func getCachedLyrics(for account: AccountInfo) -> [LyricsCacheInfo] {
     var cacheInfo = [LyricsCacheInfo]()
-    if let lyricsDir = getOrCreateAbsoluteLyricsDirectory() {
+    if let lyricsDir = getOrCreateAbsoluteLyricsDirectory(for: account) {
       cacheInfo.append(contentsOf: getCachedLyrics(
+        for: account,
         in: lyricsDir.appendingPathComponent(Self.songsDir.path),
         isSong: true
       ))
       cacheInfo.append(contentsOf: getCachedLyrics(
+        for: account,
         in: lyricsDir.appendingPathComponent(Self.episodesDir.path),
         isSong: false
       ))
@@ -478,7 +604,12 @@ final public class CacheFileManager: Sendable {
     return cacheInfo
   }
 
-  private func getCachedLyrics(in dir: URL, isSong: Bool) -> [LyricsCacheInfo] {
+  private func getCachedLyrics(
+    for account: AccountInfo,
+    in dir: URL,
+    isSong: Bool
+  )
+    -> [LyricsCacheInfo] {
     let URLs = contentsOfDirectory(url: dir)
     var cacheInfo = [LyricsCacheInfo]()
     for url in URLs {
@@ -501,8 +632,9 @@ final public class CacheFileManager: Sendable {
         id = (fileName as NSString).deletingPathExtension
       }
       let relFilePath = isSong ?
-        Self.lyricsDir.appendingPathComponent(Self.songsDir.path).appendingPathComponent(fileName) :
-        Self.lyricsDir.appendingPathComponent(Self.episodesDir.path)
+        getRelLyricsDirectory(for: account)?.appendingPathComponent(Self.songsDir.path)
+        .appendingPathComponent(fileName) :
+        getRelLyricsDirectory(for: account)?.appendingPathComponent(Self.episodesDir.path)
         .appendingPathComponent(fileName)
       cacheInfo.append(LyricsCacheInfo(url: url, id: id, isSong: isSong, relFilePath: relFilePath))
     }
@@ -510,16 +642,26 @@ final public class CacheFileManager: Sendable {
   }
 
   public func createRelPath(forLyricsOf song: Song) -> URL? {
-    guard let ownerRelFilePath = createRelPath(for: song)
+    guard let ownerRelFilePath = createRelPath(for: song),
+          let account = song.account
     else { return nil }
-
-    let lyricsRelFilePath = ownerRelFilePath.deletingPathExtension()
+    var lyricsRelFilePath = ownerRelFilePath.deletingPathExtension()
       .appendingPathExtension(Self.lyricsFileExtension)
-    return Self.lyricsDir.appendingPathComponent(lyricsRelFilePath.path)
+    let components = lyricsRelFilePath.standardized.pathComponents
+
+    guard let directoryCount = getRelPath(for: account.info)?.standardized.pathComponents.count,
+          components.count > directoryCount
+    else { return nil }
+    let trimmed = components.dropFirst(directoryCount)
+    let newPath = NSString.path(withComponents: Array(trimmed))
+    lyricsRelFilePath = URL(fileURLWithPath: newPath, isDirectory: false)
+    
+    return getRelLyricsDirectory(for: account.info)?.appendingPathComponent(lyricsRelFilePath.path)
   }
 
   public func createRelPath(for playable: AbstractPlayable) -> URL? {
-    guard !playable.playableManagedObject.id.isEmpty else { return nil }
+    guard !playable.playableManagedObject.id.isEmpty,
+          let account = playable.account else { return nil }
 
     let fileExtension: String = {
       if let mimeType = playable.contentTypeTranscoded {
@@ -532,34 +674,50 @@ final public class CacheFileManager: Sendable {
     }()
 
     if playable.isSong {
-      return Self.songsDir.appendingPathComponent(playable.playableManagedObject.id)
+      return getRelSongsDirectory(for: account.info)?
+        .appendingPathComponent(playable.playableManagedObject.id)
         .appendingPathExtension(fileExtension)
     } else {
-      return Self.episodesDir.appendingPathComponent(playable.playableManagedObject.id)
+      return getRelPodcastEpisodesDirectory(for: account.info)?
+        .appendingPathComponent(playable.playableManagedObject.id)
         .appendingPathExtension(fileExtension)
     }
   }
 
-  public func createRelPath(for artworkRemoteInfo: ArtworkRemoteInfo) -> URL? {
+  public func createRelPath(
+    for artworkRemoteInfo: ArtworkRemoteInfo,
+    account: AccountInfo
+  )
+    -> URL? {
     guard !artworkRemoteInfo.id.isEmpty else { return nil }
     if !artworkRemoteInfo.type.isEmpty {
-      return Self.artworksDir.appendingPathComponent(artworkRemoteInfo.type)
+      return getRelArtworkDirectory(for: account)?.appendingPathComponent(artworkRemoteInfo.type)
         .appendingPathComponent(artworkRemoteInfo.id)
         .appendingPathExtension(Self.artworkFileExtension)
     } else {
-      return Self.artworksDir.appendingPathComponent(artworkRemoteInfo.id)
+      return getRelArtworkDirectory(for: account)?.appendingPathComponent(artworkRemoteInfo.id)
         .appendingPathExtension(Self.artworkFileExtension)
     }
   }
 
   public func createRelPath(for embeddedArtwork: EmbeddedArtwork) -> URL? {
     guard let owner = embeddedArtwork.owner,
-          let ownerRelFilePath = createRelPath(for: owner)
+          let ownerRelFilePath = createRelPath(for: owner),
+          let account = embeddedArtwork.account
     else { return nil }
-
-    let embeddedArtworkOwnerRelFilePath = ownerRelFilePath.deletingPathExtension()
+    var embeddedArtworkOwnerRelFilePath = ownerRelFilePath.deletingPathExtension()
       .appendingPathExtension(Self.artworkFileExtension)
-    return Self.embeddedArtworksDir.appendingPathComponent(embeddedArtworkOwnerRelFilePath.path)
+    let components = embeddedArtworkOwnerRelFilePath.standardized.pathComponents
+
+    guard let directoryCount = getRelPath(for: account.info)?.standardized.pathComponents.count,
+          components.count > directoryCount
+    else { return nil }
+    let trimmed = components.dropFirst(directoryCount)
+    let newPath = NSString.path(withComponents: Array(trimmed))
+    embeddedArtworkOwnerRelFilePath = URL(fileURLWithPath: newPath, isDirectory: false)
+    
+    return getRelEmbeddedArtworkDirectory(for: account.info)?
+      .appendingPathComponent(embeddedArtworkOwnerRelFilePath.path)
   }
 
   public func getAmperfyPath() -> String? {

@@ -53,7 +53,7 @@ class PodcastParserDelegate: AmpacheXmlLibParser {
       if let prefetchedPodcast = prefetch.prefetchedPodcastDict[podcastId] {
         podcastBuffer = prefetchedPodcast
       } else {
-        podcastBuffer = library.createPodcast()
+        podcastBuffer = library.createPodcast(account: account)
         podcastBuffer?.id = podcastId
         prefetch.prefetchedPodcastDict[podcastId] = podcastBuffer
       }

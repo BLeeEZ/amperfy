@@ -26,20 +26,24 @@ import XCTest
 class PodcastEpisodeTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var testEpisode: PodcastEpisode!
   let testId = "2345"
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
-    testEpisode = library.createPodcastEpisode()
+    account = library.getAccount(info: TestAccountInfo.create1())
+    testEpisode = library.createPodcastEpisode(account: account)
     testEpisode.id = testId
   }
 
   override func tearDown() {}
 
   func testCreation() {
-    let episode = library.createPodcastEpisode()
+    let episode = library.createPodcastEpisode(account: account)
+    XCTAssertEqual(episode.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.id, "")
     XCTAssertNil(episode.artwork)
     XCTAssertEqual(episode.title, "Unknown Title")
@@ -59,7 +63,9 @@ class PodcastEpisodeTest: XCTestCase {
   }
 
   func testPodcast() {
-    let podcast = library.createPodcast()
+    let podcast = library.createPodcast(account: account)
+    XCTAssertEqual(podcast.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(podcast.account?.userHash, TestAccountInfo.test1UserHash)
     podcast.id = "1234"
     testEpisode.podcast = podcast
     XCTAssertEqual(podcast.id, "1234")
@@ -95,7 +101,9 @@ class PodcastEpisodeTest: XCTestCase {
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
-    testEpisode.artwork = library.createArtwork()
+    testEpisode.artwork = library.createArtwork(account: account)
+    XCTAssertEqual(testEpisode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(testEpisode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     testEpisode.artwork?.relFilePath = relFilePath
     testEpisode.artwork?.status = .CustomImage
     XCTAssertNotNil(testEpisode.artwork?.imagePath)
@@ -107,7 +115,9 @@ class PodcastEpisodeTest: XCTestCase {
   }
 
   func testEpisodeDeleteCache() {
-    let podcast = library.createPodcast()
+    let podcast = library.createPodcast(account: account)
+    XCTAssertEqual(podcast.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(podcast.account?.userHash, TestAccountInfo.test1UserHash)
     podcast.id = "1234"
     testEpisode.podcast = podcast
 

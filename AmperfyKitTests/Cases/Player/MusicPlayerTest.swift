@@ -235,7 +235,11 @@ final class MOCK_BackendApi: BackendApi {
 
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL { Helper.testURL }
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { nil }
-  func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer { MOCK_LibrarySyncer() }
+  func createLibrarySyncer(
+    account: AmperfyKit.Account,
+    storage: PersistentStorage
+  )
+    -> LibrarySyncer { MOCK_LibrarySyncer() }
   func createArtworkDownloadDelegate()
     -> DownloadManagerDelegate { MOCK_DownloadManagerDelegate() }
   func extractArtworkInfoFromURL(urlString: String) -> ArtworkRemoteInfo? { nil }
@@ -302,6 +306,7 @@ class MOCK_CoreDataManager: CoreDataManagable {
 class MusicPlayerTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var mockAlertDisplayer: MOCK_AlertDisplayable!
   var mockCoreDataManager: MOCK_CoreDataManager!
   var storage: PersistentStorage!
@@ -327,6 +332,7 @@ class MusicPlayerTest: XCTestCase {
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
+    account = library.getAccount(info: TestAccountInfo.create1())
     songDownloader = MOCK_SongDownloader()
     mockAudioStreamingPlayer = MOCK_AudioStreamingPlayer()
     mockAlertDisplayer = MOCK_AlertDisplayable()
@@ -347,7 +353,7 @@ class MusicPlayerTest: XCTestCase {
       userStatistics: userStatistics
     )
     mockMusicPlayable = MOCK_MusicPlayable()
-    playerData = library.getPlayerData()
+    playerData = library.getPlayerData(account: account)
     testQueueHandler = PlayQueueHandler(playerData: playerData)
     testMusicPlayer = AudioPlayer(
       coreData: playerData,

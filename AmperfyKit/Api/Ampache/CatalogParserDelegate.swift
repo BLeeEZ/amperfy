@@ -32,10 +32,16 @@ class CatalogParserDelegate: AmpacheXmlLibParser {
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.musicFoldersBeforeFetch = Set(library.getMusicFolders())
-    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      account: account,
+      library: library
+    )
   }
 
   override func parser(
@@ -61,7 +67,7 @@ class CatalogParserDelegate: AmpacheXmlLibParser {
       if let prefetchedMusicFolder = prefetch.prefetchedMusicFolderDict[id] {
         musicFolderBuffer = prefetchedMusicFolder
       } else {
-        musicFolderBuffer = library.createMusicFolder()
+        musicFolderBuffer = library.createMusicFolder(account: account)
         musicFolderBuffer?.id = id
         prefetch.prefetchedMusicFolderDict[id] = musicFolderBuffer
       }

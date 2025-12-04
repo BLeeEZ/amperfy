@@ -99,9 +99,9 @@ extension SubsonicApi: BackendApi {
   }
 
   @MainActor
-  func createLibrarySyncer(storage: PersistentStorage) -> LibrarySyncer {
+  func createLibrarySyncer(account: Account, storage: PersistentStorage) -> LibrarySyncer {
     SubsonicLibrarySyncer(
-      subsonicServerApi: subsonicServerApi,
+      subsonicServerApi: subsonicServerApi, account: account,
       networkMonitor: networkMonitor,
       performanceMonitor: performanceMonitor,
       storage: storage,

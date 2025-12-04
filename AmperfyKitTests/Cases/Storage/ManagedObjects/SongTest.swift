@@ -26,20 +26,24 @@ import XCTest
 class SongTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var testSong: Song!
   let testId = "2345"
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
-    testSong = library.createSong()
+    account = library.getAccount(info: TestAccountInfo.create1())
+    testSong = library.createSong(account: account)
     testSong.id = testId
   }
 
   override func tearDown() {}
 
   func testCreation() {
-    let song = library.createSong()
+    let song = library.createSong(account: account)
+    XCTAssertEqual(song.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.id, "")
     XCTAssertNil(song.artwork)
     XCTAssertEqual(song.title, "Unknown Title")
@@ -121,7 +125,9 @@ class SongTest: XCTestCase {
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
-    testSong.artwork = library.createArtwork()
+    testSong.artwork = library.createArtwork(account: account)
+    XCTAssertEqual(testSong.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(testSong.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     testSong.artwork?.relFilePath = relFilePath
     testSong.artwork?.status = .CustomImage
     XCTAssertNotNil(testSong.artwork?.imagePath)
@@ -161,9 +167,13 @@ class SongTest: XCTestCase {
       isDetailFaultResolution: true
     ) else { XCTFail(); return }
     testSong.album = album
-    let directory = library.createDirectory()
+    let directory = library.createDirectory(account: account)
+    XCTAssertEqual(directory.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(directory.account?.userHash, TestAccountInfo.test1UserHash)
     testSong.managedObject.directory = directory.managedObject
-    let musicFolder = library.createMusicFolder()
+    let musicFolder = library.createMusicFolder(account: account)
+    XCTAssertEqual(musicFolder.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(musicFolder.account?.userHash, TestAccountInfo.test1UserHash)
     testSong.managedObject.musicFolder = musicFolder.managedObject
 
     guard let playlist1 = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)

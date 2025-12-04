@@ -40,6 +40,8 @@
 		5021B1282BC723F400893C33 /* FuzzySearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5021B1272BC723F400893C33 /* FuzzySearcher.swift */; };
 		5023D9B02BD9A55E00310144 /* CacheFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9AF2BD9A55E00310144 /* CacheFileManager.swift */; };
 		5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5023D9B12BDAA48200310144 /* UpdateVC.swift */; };
+		502B8A4D2EE0CE40004CA3AD /* AudioStreaming in Frameworks */ = {isa = PBXBuildFile; productRef = 502B8A4C2EE0CE40004CA3AD /* AudioStreaming */; };
+		502B8A532EE0D354004CA3AD /* AccountTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502B8A522EE0D354004CA3AD /* AccountTest.swift */; };
 		502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502B98EC2D03A02D000FE187 /* PlaylistEditVC.swift */; };
 		502E56BC27561AD900638BD2 /* UserQueueSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502E56BB27561AD900638BD2 /* UserQueueSectionHeader.swift */; };
 		502E56BD27561C2700638BD2 /* UserQueueSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */; };
@@ -107,6 +109,9 @@
 		508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E721C5965B00C4BB32 /* AppDelegate.swift */; };
 		508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508385E921C5965B00C4BB32 /* LoginVC.swift */; };
 		508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 508385EB21C5965B00C4BB32 /* Main.storyboard */; };
+		5084F70F2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5084F70D2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift */; };
+		5084F7102ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5084F70E2ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift */; };
+		5084F7122ED9E47100D8D3DA /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5084F7112ED9E47100D8D3DA /* Account.swift */; };
 		508AA57B2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AA57A2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift */; };
 		508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AA57C2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift */; };
 		508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 508385EE21C5965E00C4BB32 /* Assets.xcassets */; };
@@ -641,6 +646,7 @@
 		5029288C2657B78B00DA3A8F /* UserStatisticsMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		5029288D2657B78B00DA3A8F /* UserStatisticsMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserStatisticsMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		5029E0382235A8EC0027F96F /* CommonString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonString.swift; sourceTree = "<group>"; };
+		502B8A522EE0D354004CA3AD /* AccountTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountTest.swift; sourceTree = "<group>"; };
 		502B98EC2D03A02D000FE187 /* PlaylistEditVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistEditVC.swift; sourceTree = "<group>"; };
 		502C0044224C0B1400DA0D1E /* SubsonicArtworkDownloadDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubsonicArtworkDownloadDelegate.swift; sourceTree = "<group>"; };
 		502E56BA27561AD900638BD2 /* UserQueueSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = UserQueueSectionHeader.xib; sourceTree = "<group>"; };
@@ -739,6 +745,10 @@
 		5083861921C827E600C4BB32 /* AuthParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthParserDelegate.swift; sourceTree = "<group>"; };
 		5083861B21C828E200C4BB32 /* AmpacheXmlServerApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheXmlServerApi.swift; sourceTree = "<group>"; };
 		5083862021C97A1C00C4BB32 /* SongParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongParserDelegate.swift; sourceTree = "<group>"; };
+		5084F70C2ED9D87500D8D3DA /* Amperfy v48.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v48.xcdatamodel"; sourceTree = "<group>"; };
+		5084F70D2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountMO+CoreDataClass.swift"; sourceTree = "<group>"; };
+		5084F70E2ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		5084F7112ED9E47100D8D3DA /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		5086F875223852F200546F5A /* SubsonicApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicApi.swift; sourceTree = "<group>"; };
 		5086F87822397B2900546F5A /* StringHasher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringHasher.swift; sourceTree = "<group>"; };
 		5086F87A22397B8400546F5A /* BackendApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendApi.swift; sourceTree = "<group>"; };
@@ -1088,6 +1098,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				502B8A4D2EE0CE40004CA3AD /* AudioStreaming in Frameworks */,
 				50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1131,6 +1142,8 @@
 				50A85EFF268A4B1B00FB3E31 /* Migration */,
 				50A85EF42689EF1D00FB3E31 /* VersionMappings */,
 				500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */,
+				5084F70D2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift */,
+				5084F70E2ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift */,
 				50DEEE14265ED5790073FF20 /* MusicFolderMO+CoreDataClass.swift */,
 				50DEEE15265ED5790073FF20 /* MusicFolderMO+CoreDataProperties.swift */,
 				50DEEE12265ED5790073FF20 /* DirectoryMO+CoreDataClass.swift */,
@@ -1483,6 +1496,7 @@
 		5095F98F23CA94BC008B0805 /* ManagedObjects */ = {
 			isa = PBXGroup;
 			children = (
+				502B8A522EE0D354004CA3AD /* AccountTest.swift */,
 				50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */,
 				50F81E8B23BB666100EAAC3E /* ArtistTest.swift */,
 				50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */,
@@ -1543,6 +1557,7 @@
 		50B798AA23B723CA00551E62 /* EntityWrappers */ = {
 			isa = PBXGroup;
 			children = (
+				5084F7112ED9E47100D8D3DA /* Account.swift */,
 				5077F937221F24C10099CA91 /* Download.swift */,
 				50C16BEF21E0A3B500F086F0 /* PlayerData.swift */,
 				50B798A223B6CCE800551E62 /* AbstractLibraryEntity.swift */,
@@ -2067,6 +2082,7 @@
 			);
 			name = AmperfyKitTests;
 			packageProductDependencies = (
+				502B8A4C2EE0CE40004CA3AD /* AudioStreaming */,
 			);
 			productName = AmpertyKitTests;
 			productReference = 50C9D60E284FA847007F18D0 /* AmperfyKitTests.xctest */;
@@ -2482,6 +2498,7 @@
 				50C9D64C284FAA02007F18D0 /* SubsonicLibrarySyncer.swift in Sources */,
 				50C9D691284FAA6C007F18D0 /* ArtworkMO+CoreDataClass.swift in Sources */,
 				50C9D674284FAA4D007F18D0 /* SwipeActionSettings.swift in Sources */,
+				5084F7122ED9E47100D8D3DA /* Account.swift in Sources */,
 				50C9D6BF284FAACE007F18D0 /* DownloadError.swift in Sources */,
 				50C9D65F284FAA0B007F18D0 /* AmpacheLibrarySyncer.swift in Sources */,
 				50C9D6D4284FAB88007F18D0 /* PlayerDownloadPreparationHandler.swift in Sources */,
@@ -2555,6 +2572,8 @@
 				50C9D698284FAA6C007F18D0 /* DirectoryMO+CoreDataClass.swift in Sources */,
 				50C9D6A2284FAA77007F18D0 /* MappingModelV4toV5.xcmappingmodel in Sources */,
 				50C9D685284FAA6C007F18D0 /* AlbumMO+CoreDataClass.swift in Sources */,
+				5084F70F2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift in Sources */,
+				5084F7102ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift in Sources */,
 				50C9D6DB284FAB88007F18D0 /* AudioSessionHandler.swift in Sources */,
 				50C9D677284FAA4D007F18D0 /* PersistentStorage.swift in Sources */,
 				50C9D6E6284FABCB007F18D0 /* AudioPlayer.swift in Sources */,
@@ -2639,6 +2658,7 @@
 				50BE5D912850F50F00156FC6 /* GenreParserTest.swift in Sources */,
 				50BE5D792850F4FB00156FC6 /* SsDirectoriesExample2ParserTest.swift in Sources */,
 				50BE5D4E2850F4C900156FC6 /* PlayerDataTest.swift in Sources */,
+				502B8A532EE0D354004CA3AD /* AccountTest.swift in Sources */,
 				50C9D616284FA847007F18D0 /* AmpertyKitTests.swift in Sources */,
 				50BE5D4D2850F4C900156FC6 /* ArtworkTest.swift in Sources */,
 				50BE5D932850F51E00156FC6 /* CoreDataSeeder.swift in Sources */,
@@ -3194,6 +3214,11 @@
 			package = 500E70D02E2FD63900636770 /* XCRemoteSwiftPackageReference "DominantColors" */;
 			productName = DominantColors;
 		};
+		502B8A4C2EE0CE40004CA3AD /* AudioStreaming */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 50B166A82ED071A100F7A1D6 /* XCRemoteSwiftPackageReference "AudioStreaming" */;
+			productName = AudioStreaming;
+		};
 		5052497A2D10CBC70005EEB0 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 505249792D10CBC70005EEB0 /* XCRemoteSwiftPackageReference "swift-collections" */;
@@ -3270,6 +3295,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5084F70C2ED9D87500D8D3DA /* Amperfy v48.xcdatamodel */,
 				507C9AD82E29905D001589F8 /* Amperfy v47.xcdatamodel */,
 				64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */,
 				5042B71F2D82FFA50086B9C4 /* Amperfy v45.xcdatamodel */,
@@ -3318,7 +3344,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 507C9AD82E29905D001589F8 /* Amperfy v47.xcdatamodel */;
+			currentVersion = 5084F70C2ED9D87500D8D3DA /* Amperfy v48.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

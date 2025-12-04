@@ -26,12 +26,17 @@ import Foundation
 @MainActor
 class LibrarySyncerProxy {
   let backendApi: BackendApi
+  let account: Account
   let storage: PersistentStorage
 
-  var activeSyncer: LibrarySyncer { backendApi.createLibrarySyncer(storage: storage) }
+  var activeSyncer: LibrarySyncer { backendApi.createLibrarySyncer(
+    account: account,
+    storage: storage
+  ) }
 
-  init(backendApi: BackendApi, storage: PersistentStorage) {
+  init(backendApi: BackendApi, account: Account, storage: PersistentStorage) {
     self.backendApi = backendApi
+    self.account = account
     self.storage = storage
   }
 }

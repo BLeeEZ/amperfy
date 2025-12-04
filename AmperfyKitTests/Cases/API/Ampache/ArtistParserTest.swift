@@ -31,7 +31,7 @@ class ArtistParserTest: AbstractAmpacheTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = ArtistParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
@@ -49,34 +49,48 @@ class ArtistParserTest: AbstractAmpacheTest {
     XCTAssertEqual(library.genreCount, 1)
 
     var artist = artists[0]
+    XCTAssertEqual(artist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.id, "16")
     XCTAssertEqual(artist.name, "CARNÚN")
     XCTAssertEqual(artist.rating, 3)
     XCTAssertEqual(artist.duration, 4282)
     XCTAssertEqual(artist.remoteDuration, 4282)
     XCTAssertEqual(artist.remoteAlbumCount, 1)
+    XCTAssertEqual(artist.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.artwork?.type, "artist")
     XCTAssertEqual(artist.artwork?.id, "16")
 
     artist = artists[1]
+    XCTAssertEqual(artist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.id, "27")
     XCTAssertEqual(artist.name, "Chi.Otic")
     XCTAssertEqual(artist.rating, 0)
     XCTAssertEqual(artist.duration, 433)
     XCTAssertEqual(artist.remoteDuration, 433)
     XCTAssertEqual(artist.remoteAlbumCount, 0)
+    XCTAssertEqual(artist.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.artwork?.type, "artist")
     XCTAssertEqual(artist.artwork?.id, "27")
 
     artist = artists[3]
+    XCTAssertEqual(artist.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.id, "13")
     XCTAssertEqual(artist.name, "IOK-1")
     XCTAssertEqual(artist.rating, 5)
     XCTAssertEqual(artist.duration, 3428)
     XCTAssertEqual(artist.remoteDuration, 3428)
     XCTAssertEqual(artist.remoteAlbumCount, 1)
+    XCTAssertEqual(artist.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.artwork?.type, "artist")
     XCTAssertEqual(artist.artwork?.id, "13")
+    XCTAssertEqual(artist.genre?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artist.genre?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artist.genre?.id, "4")
     XCTAssertEqual(artist.genre?.name, "Dark Ambient")
   }

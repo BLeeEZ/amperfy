@@ -26,6 +26,7 @@ import XCTest
 class PlayQueueHandlerTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var testQueueHandler: PlayQueueHandler!
   var testPlayer: PlayerData!
   var testNormalPlaylist: Playlist!
@@ -35,7 +36,8 @@ class PlayQueueHandlerTest: XCTestCase {
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
-    testPlayer = library.getPlayerData()
+    account = library.getAccount(info: TestAccountInfo.create1())
+    testPlayer = library.getPlayerData(account: account)
     testPlayer.setShuffle(true)
     testShuffledPlaylist = testPlayer.contextQueue
     testPlayer.setShuffle(false)

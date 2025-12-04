@@ -29,6 +29,8 @@ extension ScrobbleEntryMO {
   }
 
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var date: Date?
   @NSManaged
   public var isUploaded: Bool

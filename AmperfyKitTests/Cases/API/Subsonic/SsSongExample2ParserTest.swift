@@ -32,18 +32,18 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsSongParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
   }
 
   func createTestPartner() {
-    let artist = library.createArtist()
+    let artist = library.createArtist(account: account)
     artist.id = "5432"
     artist.name = "AC/DC"
 
-    let album = library.createAlbum()
+    let album = library.createAlbum(account: account)
     album.id = "11053"
     album.name = "High Voltage"
   }
@@ -65,8 +65,12 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(songs.count, 2)
 
     var song = songs[0]
+    XCTAssertEqual(song.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.id, "71463")
     XCTAssertEqual(song.title, "The Jack")
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.id, "5432")
     XCTAssertEqual(song.artist?.name, "AC/DC")
     XCTAssertNil(song.album)
@@ -81,19 +85,27 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 5624132)
+    XCTAssertEqual(song.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     let song1Artwork = song.artwork
 
     song = songs[1]
+    XCTAssertEqual(song.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.id, "71458")
     XCTAssertEqual(song.title, "It's A Long Way To The Top")
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.id, "5432")
     XCTAssertEqual(song.artist?.name, "AC/DC")
     XCTAssertNil(song.album)
     XCTAssertNil(song.disk)
     XCTAssertEqual(song.addedDate, dateFormatter.date(from: "2004-11-27T20:23:32"))
     XCTAssertEqual(song.track, 0)
+    XCTAssertEqual(song.genre?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.genre?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.genre?.id, "")
     XCTAssertEqual(song.genre?.name, "Rock")
     XCTAssertEqual(song.duration, 315)
@@ -103,6 +115,8 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.contentType, "audio/mpeg")
     XCTAssertNil(song.url)
     XCTAssertEqual(song.size, 5037357)
+    XCTAssertEqual(song.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "")
     XCTAssertEqual(song.artwork?.id, "71381")
     XCTAssertEqual(song.artwork, song1Artwork)

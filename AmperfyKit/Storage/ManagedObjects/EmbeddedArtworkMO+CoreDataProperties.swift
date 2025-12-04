@@ -29,6 +29,8 @@ extension EmbeddedArtworkMO {
   }
 
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var imageData: Data? /// deprecated! use relFilePath instead
   @NSManaged
   public var relFilePath: String?

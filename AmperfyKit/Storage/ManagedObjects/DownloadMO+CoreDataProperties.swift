@@ -29,6 +29,8 @@ extension DownloadMO {
   }
 
   @NSManaged
+  public var account: AccountMO?
+  @NSManaged
   public var creationDate: Date?
   @NSManaged
   public var errorDate: Date?

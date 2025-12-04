@@ -36,7 +36,7 @@ class SsGenreParserDelegate: SsXmlLibParser {
       if prefetch.prefetchedGenreDict[genreName] != nil {
         // info already synced -> skip
       } else {
-        let genre = library.createGenre()
+        let genre = library.createGenre(account: account)
         prefetch.prefetchedGenreDict[genreName] = genre
         genre.name = genreName
       }

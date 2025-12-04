@@ -90,15 +90,18 @@ class AmpacheNotifiableXmlParser: AmpacheXmlParser {
 
 class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
   var prefetch: LibraryStorage.PrefetchElementContainer
+  var account: Account
   var library: LibraryStorage
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage,
     parseNotifier: ParsedObjectNotifiable? = nil
   ) {
     self.prefetch = prefetch
+    self.account = account
     self.library = library
     super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
   }
@@ -109,7 +112,7 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
     if let prefetchedArtwork = prefetch.prefetchedArtworkDict[artworkRemoteInfo] {
       return prefetchedArtwork
     } else {
-      let createdArtwork = library.createArtwork()
+      let createdArtwork = library.createArtwork(account: account)
       prefetch.prefetchedArtworkDict[artworkRemoteInfo] = createdArtwork
       createdArtwork.remoteInfo = artworkRemoteInfo
       createdArtwork.status = .NotChecked

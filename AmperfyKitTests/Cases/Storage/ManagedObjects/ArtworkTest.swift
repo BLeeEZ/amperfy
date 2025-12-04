@@ -26,18 +26,22 @@ import XCTest
 class ArtworkTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var testArtwork: Artwork!
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
-    testArtwork = library.createArtwork()
+    account = library.getAccount(info: TestAccountInfo.create1())
+    testArtwork = library.createArtwork(account: account)
   }
 
   override func tearDown() {}
 
   func testCreation() {
-    let artwork = library.createArtwork()
+    let artwork = library.createArtwork(account: account)
+    XCTAssertEqual(artwork.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(artwork.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(artwork.status.rawValue, ImageStatus.IsDefaultImage.rawValue)
     XCTAssertEqual(artwork.id, "")
     XCTAssertEqual(artwork.type, "")

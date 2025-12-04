@@ -33,12 +33,18 @@ class SsPlaylistSongsParserDelegate: SsSongParserDelegate {
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     playlist: Playlist,
+    account: Account,
     library: LibraryStorage,
     prefetch: LibraryStorage.PrefetchElementContainer
   ) {
     self.playlist = playlist
     self.items = playlist.items
-    super.init(performanceMonitor: performanceMonitor, prefetch: prefetch, library: library)
+    super.init(
+      performanceMonitor: performanceMonitor,
+      prefetch: prefetch,
+      account: account,
+      library: library
+    )
   }
 
   override func parser(

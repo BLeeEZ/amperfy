@@ -31,7 +31,7 @@ class SsGenreParserTest: AbstractSsParserTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsGenreParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
@@ -45,17 +45,31 @@ class SsGenreParserTest: AbstractSsParserTest {
 
     guard let genre = library.getGenre(name: "Electronic") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Electronic")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     guard let genre = library.getGenre(name: "Hard Rock") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Hard Rock")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     guard let genre = library.getGenre(name: "R&B") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "R&B")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     guard let genre = library.getGenre(name: "Blues") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Blues")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     guard let genre = library.getGenre(name: "Podcast") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Podcast")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     guard let genre = library.getGenre(name: "Brit Pop") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Brit Pop")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     guard let genre = library.getGenre(name: "Live") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Live")
+    XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
   }
 }

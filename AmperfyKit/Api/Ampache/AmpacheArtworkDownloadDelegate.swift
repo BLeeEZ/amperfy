@@ -140,7 +140,8 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
   }
 
   func handleCustomImage(fileURL: URL, artworkRemoteInfo: ArtworkRemoteInfo) -> URL? {
-    guard let relFilePath = fileManager.createRelPath(for: artworkRemoteInfo),
+    guard let account = ampacheXmlServerApi.account,
+          let relFilePath = fileManager.createRelPath(for: artworkRemoteInfo, account: account),
           let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
     else { return nil }
     do {

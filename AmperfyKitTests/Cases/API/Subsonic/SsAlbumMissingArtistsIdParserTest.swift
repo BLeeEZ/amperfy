@@ -34,14 +34,14 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsSongParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
   }
 
   func createTestAlbum() {
-    let album = library.createAlbum()
+    let album = library.createAlbum(account: account)
     album.id = albumId
     album.name = "FabricLive 25: High Contrast"
   }
@@ -72,6 +72,10 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     XCTAssertEqual(1, song.track)
     XCTAssertEqual("Adam F", song.artist?.name)
     XCTAssertEqual(albumId, song.album?.id)
+    XCTAssertEqual(song.album?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.album?.account?.userHash, TestAccountInfo.test1UserHash)
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     song = songs[1]
     XCTAssertEqual(2, song.track)
     XCTAssertEqual("London Elektricity", song.artist?.name)
@@ -84,6 +88,8 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     song = songs[4]
     XCTAssertEqual(5, song.track)
     XCTAssertEqual("Cyantific & Logistics", song.artist?.name)
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     song = songs[5]
     XCTAssertEqual(6, song.track)
     XCTAssertEqual("Funky Technicians", song.artist?.name)
@@ -97,6 +103,8 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
 
     let localArtist = library.getArtistLocal(name: "Logistics")
     XCTAssertEqual(songs[3].artist, localArtist)
+    XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(2, localArtist?.songs.count)
     // songCount is denormalized -> will be updated at save context
     library.saveContext()

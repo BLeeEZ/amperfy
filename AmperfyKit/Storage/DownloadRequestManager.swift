@@ -35,13 +35,16 @@ typealias GetDownloadManagerDelegateCB = @MainActor () -> DownloadManagerDelegat
 // MARK: - DownloadRequestManager
 
 final class DownloadRequestManager: Sendable {
+  private let accountObjectId: NSManagedObjectID
   private let storage: AsyncCoreDataAccessWrapper
   private let getDownloadDelegateCB: GetDownloadManagerDelegateCB
 
   init(
+    accountObjectId: NSManagedObjectID,
     storage: AsyncCoreDataAccessWrapper,
     getDownloadDelegateCB: @escaping GetDownloadManagerDelegateCB
   ) {
+    self.accountObjectId = accountObjectId
     self.storage = storage
     self.getDownloadDelegateCB = getDownloadDelegateCB
   }
@@ -94,7 +97,8 @@ final class DownloadRequestManager: Sendable {
       return nil
     }
 
-    let newDownload = library.createDownload(id: object.uniqueID)
+    let account = library.getAccount(managedObjectId: accountObjectId)
+    let newDownload = library.createDownload(id: object.uniqueID, account: account)
     newDownload.element = object
     library.saveContext()
     return newDownload

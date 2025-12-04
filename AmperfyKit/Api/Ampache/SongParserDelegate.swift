@@ -63,7 +63,7 @@ class SongParserDelegate: PlayableParserDelegate {
         guessedAlbum = prefetchedSong.album
         guessedGenre = prefetchedSong.genre
       } else {
-        songBuffer = library.createSong()
+        songBuffer = library.createSong(account: account)
         songBuffer?.id = songId
         prefetch.prefetchedSongDict[songId] = songBuffer
         guessedArtist = nil
@@ -113,7 +113,7 @@ class SongParserDelegate: PlayableParserDelegate {
     case "artist":
       if let artistId = artistIdToCreate {
         os_log("Artist <%s> with id %s has been created", log: log, type: .error, buffer, artistId)
-        let artist = library.createArtist()
+        let artist = library.createArtist(account: account)
         prefetch.prefetchedArtistDict[artistId] = artist
         artist.id = artistId
         artist.name = buffer
@@ -123,7 +123,7 @@ class SongParserDelegate: PlayableParserDelegate {
     case "album":
       if let albumId = albumIdToCreate {
         os_log("Album <%s> with id %s has been created", log: log, type: .error, buffer, albumId)
-        let album = library.createAlbum()
+        let album = library.createAlbum(account: account)
         prefetch.prefetchedAlbumDict[albumId] = album
         album.id = albumId
         album.name = buffer
@@ -133,7 +133,7 @@ class SongParserDelegate: PlayableParserDelegate {
     case "genre":
       if let genreId = genreIdToCreate {
         os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
-        let genre = library.createGenre()
+        let genre = library.createGenre(account: account)
         prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer

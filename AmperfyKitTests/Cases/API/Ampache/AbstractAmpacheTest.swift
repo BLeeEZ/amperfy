@@ -22,10 +22,30 @@
 @testable import AmperfyKit
 import XCTest
 
+// MARK: - TestAccountInfo
+
+enum TestAccountInfo {
+  static let test1ServerHash = "111Server"
+  static let test1UserHash = "111User"
+  static let test2ServerHash = "22-S"
+  static let test2UserHash = "22-U"
+
+  static func create1() -> AccountInfo {
+    AccountInfo(serverHash: Self.test1ServerHash, userHash: Self.test1UserHash)
+  }
+
+  static func create2() -> AccountInfo {
+    AccountInfo(serverHash: Self.test2ServerHash, userHash: Self.test2UserHash)
+  }
+}
+
+// MARK: - AbstractAmpacheTest
+
 @MainActor
 class AbstractAmpacheTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var xmlData: Data?
   var xmlErrorData: Data!
   var idParserDelegate: IDsParserDelegate!
@@ -36,6 +56,8 @@ class AbstractAmpacheTest: XCTestCase {
     let context = cdHelper.createInMemoryManagedObjectContext()
     cdHelper.clearContext(context: context)
     library = LibraryStorage(context: context)
+    account = library.getAccount(info: TestAccountInfo.create1())
+    _ = library.getAccount(info: TestAccountInfo.create2())
     xmlErrorData = getTestFileData(name: "error-4700")
     idParserDelegate = IDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }

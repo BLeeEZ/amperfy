@@ -44,7 +44,7 @@ class SsRadioParserDelegate: SsXmlLibParser {
         radioBuffer = prefetchedRadio
         radioBuffer?.remoteStatus = .available
       } else {
-        radioBuffer = library.createRadio()
+        radioBuffer = library.createRadio(account: account)
         prefetch.prefetchedRadioDict[radioId] = radioBuffer
         radioBuffer?.id = radioId
       }

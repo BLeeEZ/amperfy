@@ -53,7 +53,7 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
       if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
         artistBuffer = prefetchedArtist
       } else {
-        artistBuffer = library.createArtist()
+        artistBuffer = library.createArtist(account: account)
         artistBuffer?.id = artistId
       }
     }
@@ -88,7 +88,7 @@ class ArtistParserDelegate: AmpacheXmlLibParser {
     case "genre":
       if let genreId = genreIdToCreate {
         os_log("Genre <%s> with id %s has been created", log: log, type: .error, buffer, genreId)
-        let genre = library.createGenre()
+        let genre = library.createGenre(account: account)
         prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer

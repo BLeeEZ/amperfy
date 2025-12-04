@@ -26,20 +26,24 @@ import XCTest
 class AlbumTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
   var testAlbum: Album!
   let testId = "23489"
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
-    testAlbum = library.createAlbum()
+    account = library.getAccount(info: TestAccountInfo.create1())
+    testAlbum = library.createAlbum(account: account)
     testAlbum.id = testId
   }
 
   override func tearDown() {}
 
   func testCreation() {
-    let album = library.createAlbum()
+    let album = library.createAlbum(account: account)
+    XCTAssertEqual(album.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(album.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(album.id, "")
     XCTAssertEqual(album.identifier, "Unknown Album")
     XCTAssertEqual(album.name, "Unknown Album")
@@ -96,7 +100,7 @@ class AlbumTest: XCTestCase {
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
-    testAlbum.artwork = library.createArtwork()
+    testAlbum.artwork = library.createArtwork(account: account)
     testAlbum.artwork?.relFilePath = relFilePath
     testAlbum.artwork?.status = .CustomImage
     XCTAssertNotNil(testAlbum.artwork?.imagePath)

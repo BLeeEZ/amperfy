@@ -32,6 +32,7 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
     performanceMonitor: ThreadPerformanceMonitor,
     playlist: Playlist,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage
   ) {
     self.playlist = playlist
@@ -39,6 +40,7 @@ class PlaylistSongsParserDelegate: SongParserDelegate {
     super.init(
       performanceMonitor: performanceMonitor,
       prefetch: prefetch,
+      account: account,
       library: library,
       parseNotifier: nil
     )

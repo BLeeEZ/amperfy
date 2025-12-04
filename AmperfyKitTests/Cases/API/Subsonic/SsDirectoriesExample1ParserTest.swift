@@ -28,14 +28,14 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "directory_example_1")
-    directory = library.createDirectory()
+    directory = library.createDirectory(account: account)
   }
 
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsDirectoryParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      directory: directory, prefetch: prefetch,
+      directory: directory, prefetch: prefetch, account: account,
       library: library
     )
   }
@@ -52,13 +52,21 @@ class SsDirectoriesExample1ParserTest: AbstractSsParserTest {
     let directories = directory.subdirectories.sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(directories.count, 2)
 
+    XCTAssertEqual(directories[0].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(directories[0].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(directories[0].id, "11")
     XCTAssertEqual(directories[0].name, "Arrival")
+    XCTAssertEqual(directories[0].artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(directories[0].artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(directories[0].artwork?.type, "")
     XCTAssertEqual(directories[0].artwork?.id, "22")
     XCTAssertFalse(directories[0].isCached)
+    XCTAssertEqual(directories[1].account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(directories[1].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(directories[1].id, "12")
     XCTAssertEqual(directories[1].name, "Super Trouper")
+    XCTAssertEqual(directories[1].artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(directories[1].artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(directories[1].artwork?.type, "")
     XCTAssertEqual(directories[1].artwork?.id, "23")
     XCTAssertFalse(directories[1].isCached)

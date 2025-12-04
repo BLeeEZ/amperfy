@@ -72,6 +72,7 @@ public class LibraryStorage: PlayableFileCachable {
     Download.typeName,
     ScrobbleEntry.typeName,
     SearchHistoryItem.typeName,
+    // Accounts are not going to get deleted
   ]
   private let log = OSLog(subsystem: "Amperfy", category: "LibraryStorage")
   private var context: NSManagedObjectContext
@@ -455,13 +456,70 @@ public class LibraryStorage: PlayableFileCachable {
     return (try? context.count(for: request)) ?? 0
   }
 
-  func createGenre() -> Genre {
+  public func getAllAccounts() -> [Account] {
+    let fetchRequest = AccountMO.fetchRequest()
+    let accountMOs = try? context.fetch(fetchRequest)
+    let accounts = accountMOs?.compactMap {
+      Account(managedObject: $0)
+    }
+    return accounts ?? [Account]()
+  }
+
+  public func createAccount(info: AccountInfo) -> Account {
+    let account = Account(managedObject: AccountMO(context: context))
+    account.assignInfo(info: info)
+    return account
+  }
+
+  public func getAccount(managedObjectId: NSManagedObjectID) -> Account {
+    Account(
+      managedObject: context
+        .object(with: managedObjectId) as! AccountMO
+    )
+  }
+
+  public func getAccount(info: AccountInfo) -> Account {
+    let fetchRequest = AccountMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == %@", #keyPath(AccountMO.serverHash), info.serverHash),
+      NSPredicate(format: "%K == %@", #keyPath(AccountMO.userHash), info.userHash),
+    ])
+    fetchRequest.fetchLimit = 1
+    if let accounts = try? context.fetch(fetchRequest),
+       let accountMO = accounts.lazy.first {
+      return Account(managedObject: accountMO)
+    } else {
+      // search for an "empty" Account
+      let fetchRequestForEmptyAccount = AccountMO.fetchRequest()
+      fetchRequestForEmptyAccount.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        NSPredicate(format: "%K == %@", #keyPath(AccountMO.serverHash), ""),
+        NSPredicate(format: "%K == %@", #keyPath(AccountMO.userHash), ""),
+      ])
+      fetchRequestForEmptyAccount.fetchLimit = 1
+      if let accounts = try? context.fetch(fetchRequestForEmptyAccount),
+         let accountMO = accounts.lazy.first {
+        let account = Account(managedObject: accountMO)
+        account.assignInfo(info: info)
+        saveContext()
+        return account
+      } else {
+        // create an "empty" Account
+        let account = createAccount(info: info)
+        saveContext()
+        return account
+      }
+    }
+  }
+
+  func createGenre(account: Account) -> Genre {
     let genreMO = GenreMO(context: context)
+    genreMO.account = account.managedObject
     return Genre(managedObject: genreMO)
   }
 
-  func createArtist() -> Artist {
+  func createArtist(account: Account) -> Artist {
     let artistMO = ArtistMO(context: context)
+    artistMO.account = account.managedObject
     return Artist(managedObject: artistMO)
   }
 
@@ -469,8 +527,9 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(artist.managedObject)
   }
 
-  func createAlbum() -> Album {
+  func createAlbum(account: Account) -> Album {
     let albumMO = AlbumMO(context: context)
+    albumMO.account = account.managedObject
     return Album(managedObject: albumMO)
   }
 
@@ -478,8 +537,9 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(album.managedObject)
   }
 
-  func createPodcast() -> Podcast {
+  func createPodcast(account: Account) -> Podcast {
     let podcastMO = PodcastMO(context: context)
+    podcastMO.account = account.managedObject
     return Podcast(managedObject: podcastMO)
   }
 
@@ -487,23 +547,27 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(podcast.managedObject)
   }
 
-  func createPodcastEpisode() -> PodcastEpisode {
+  func createPodcastEpisode(account: Account) -> PodcastEpisode {
     let podcastEpisodeMO = PodcastEpisodeMO(context: context)
+    podcastEpisodeMO.account = account.managedObject
     return PodcastEpisode(managedObject: podcastEpisodeMO)
   }
 
-  func createSong() -> Song {
+  func createSong(account: Account) -> Song {
     let songMO = SongMO(context: context)
+    songMO.account = account.managedObject
     return Song(managedObject: songMO)
   }
 
-  func createRadio() -> Radio {
+  func createRadio(account: Account) -> Radio {
     let radioMO = RadioMO(context: context)
+    radioMO.account = account.managedObject
     return Radio(managedObject: radioMO)
   }
 
-  func createScrobbleEntry() -> ScrobbleEntry {
+  func createScrobbleEntry(account: Account) -> ScrobbleEntry {
     let scrobbleEntryMO = ScrobbleEntryMO(context: context)
+    scrobbleEntryMO.account = account.managedObject
     return ScrobbleEntry(managedObject: scrobbleEntryMO)
   }
 
@@ -515,17 +579,20 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(scrobbleEntry.managedObject)
   }
 
-  func createMusicFolder() -> MusicFolder {
+  func createMusicFolder(account: Account) -> MusicFolder {
     let musicFolderMO = MusicFolderMO(context: context)
-    return MusicFolder(managedObject: musicFolderMO)
+    let musicFolder = MusicFolder(managedObject: musicFolderMO)
+    musicFolder.account = account
+    return musicFolder
   }
 
   func deleteMusicFolder(musicFolder: MusicFolder) {
     context.delete(musicFolder.managedObject)
   }
 
-  func createDirectory() -> Directory {
+  func createDirectory(account: Account) -> Directory {
     let directoryMO = DirectoryMO(context: context)
+    directoryMO.account = account.managedObject
     return Directory(managedObject: directoryMO)
   }
 
@@ -620,8 +687,10 @@ public class LibraryStorage: PlayableFileCachable {
     }
   }
 
-  func createEmbeddedArtwork() -> EmbeddedArtwork {
-    EmbeddedArtwork(managedObject: EmbeddedArtworkMO(context: context))
+  func createEmbeddedArtwork(account: Account) -> EmbeddedArtwork {
+    let artwork = EmbeddedArtwork(managedObject: EmbeddedArtworkMO(context: context))
+    artwork.account = account
+    return artwork
   }
 
   func deleteEmbeddedArtworks() {
@@ -632,16 +701,20 @@ public class LibraryStorage: PlayableFileCachable {
     }
   }
 
-  func createArtwork() -> Artwork {
-    Artwork(managedObject: ArtworkMO(context: context))
+  func createArtwork(account: Account) -> Artwork {
+    let artwork = Artwork(managedObject: ArtworkMO(context: context))
+    artwork.account = account
+    return artwork
   }
 
   func deleteArtwork(artwork: Artwork) {
     context.delete(artwork.managedObject)
   }
 
-  public func createPlaylist() -> Playlist {
-    Playlist(library: self, managedObject: PlaylistMO(context: context))
+  public func createPlaylist(account: Account) -> Playlist {
+    let playlist = Playlist(library: self, managedObject: PlaylistMO(context: context))
+    playlist.account = account
+    return playlist
   }
 
   public func deletePlaylist(_ playlist: Playlist) {
@@ -652,6 +725,7 @@ public class LibraryStorage: PlayableFileCachable {
   func createPlaylistItem(playable: AbstractPlayable) -> PlaylistItem {
     let itemMO = PlaylistItemMO(context: context)
     itemMO.playable = playable.playableManagedObject
+    itemMO.account = playable.account?.managedObject
     return PlaylistItem(library: self, managedObject: itemMO)
   }
 
@@ -663,10 +737,20 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(item)
   }
 
-  func createDownload(id: String) -> Download {
+  func createDownload(id: String, account: Account) -> Download {
     let download = Download(managedObject: DownloadMO(context: context))
     download.id = id
+    download.account = account
     return download
+  }
+
+  func getDownloads() -> [Download] {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+    let downloadsMO = try? context.fetch(fetchRequest)
+    let downloads = downloadsMO?.compactMap {
+      Download(managedObject: $0)
+    }
+    return downloads ?? [Download]()
   }
 
   func getDownload(id: String) -> Download? {
@@ -728,6 +812,7 @@ public class LibraryStorage: PlayableFileCachable {
   public func createOrUpdateSearchHistory(container: PlayableContainable) -> SearchHistoryItem {
     let fetchRequest: NSFetchRequest<SearchHistoryItemMO> = SearchHistoryItemMO.fetchRequest()
     var predicate: NSPredicate?
+    var account: Account?
 
     if let song = container as? Song {
       predicate = NSPredicate(
@@ -735,36 +820,42 @@ public class LibraryStorage: PlayableFileCachable {
         #keyPath(SearchHistoryItemMO.searchedLibraryEntity),
         song.managedObject
       )
+      account = song.account
     } else if let episode = container as? PodcastEpisode {
       predicate = NSPredicate(
         format: "%K == %@",
         #keyPath(SearchHistoryItemMO.searchedLibraryEntity),
         episode.managedObject
       )
+      account = episode.account
     } else if let album = container as? Album {
       predicate = NSPredicate(
         format: "%K == %@",
         #keyPath(SearchHistoryItemMO.searchedLibraryEntity),
         album.managedObject
       )
+      account = album.account
     } else if let artist = container as? Artist {
       predicate = NSPredicate(
         format: "%K == %@",
         #keyPath(SearchHistoryItemMO.searchedLibraryEntity),
         artist.managedObject
       )
+      account = artist.account
     } else if let podcast = container as? Podcast {
       predicate = NSPredicate(
         format: "%K == %@",
         #keyPath(SearchHistoryItemMO.searchedLibraryEntity),
         podcast.managedObject
       )
+      account = podcast.account
     } else if let playlist = container as? Playlist {
       predicate = NSPredicate(
         format: "%K == %@",
         #keyPath(SearchHistoryItemMO.searchedPlaylist),
         playlist.managedObject
       )
+      account = playlist.account
     }
 
     fetchRequest.predicate = predicate
@@ -781,12 +872,17 @@ public class LibraryStorage: PlayableFileCachable {
       let item = SearchHistoryItem(managedObject: itemMO)
       item.date = Date()
       item.searchedPlayableContainable = container
+      item.account = account
       return item
     }
   }
 
   public func deleteSearchHistory() {
     clearStorage(ofType: SearchHistoryItem.typeName)
+  }
+
+  func getFetchPredicate(forAccount account: Account) -> NSPredicate {
+    NSPredicate(format: "account == %@", account.managedObject.objectID)
   }
 
   func getFetchPredicate(forGenre genre: Genre) -> NSPredicate {
@@ -1196,6 +1292,13 @@ public class LibraryStorage: PlayableFileCachable {
     return podcastEpisodes ?? [PodcastEpisode]()
   }
 
+  public func getAbstractLibraryEntities() -> [AbstractLibraryEntity] {
+    let fetchRequest = AbstractLibraryEntityMO.fetchRequest()
+    let foundEntities = try? context.fetch(fetchRequest)
+    let entities = foundEntities?.compactMap { AbstractLibraryEntity(managedObject: $0) }
+    return entities ?? [AbstractLibraryEntity]()
+  }
+
   public func getSongs() -> [Song] {
     let fetchRequest = SongMO.identifierSortedFetchRequest
     let foundSongs = try? context.fetch(fetchRequest)
@@ -1209,6 +1312,13 @@ public class LibraryStorage: PlayableFileCachable {
     let foundRadios = try? context.fetch(fetchRequest)
     let radios = foundRadios?.compactMap { Radio(managedObject: $0) }
     return radios ?? [Radio]()
+  }
+
+  public func getAllSearchHistory() -> [SearchHistoryItem] {
+    let fetchRequest = SearchHistoryItemMO.fetchRequest()
+    let foundHistory = try? context.fetch(fetchRequest)
+    let history = foundHistory?.compactMap { SearchHistoryItem(managedObject: $0) }
+    return history ?? [SearchHistoryItem]()
   }
 
   public func getSearchHistory() -> [SearchHistoryItem] {
@@ -1442,6 +1552,12 @@ public class LibraryStorage: PlayableFileCachable {
     return songs ?? [Song]()
   }
 
+  public func getScrobbleEntries() -> [ScrobbleEntry] {
+    let fetchRequest = ScrobbleEntryMO.fetchRequest()
+    let entries = try? context.fetch(fetchRequest)
+    return entries?.compactMap { ScrobbleEntry(managedObject: $0) } ?? [ScrobbleEntry]()
+  }
+
   public func getFirstUploadableScrobbleEntry() -> ScrobbleEntry? {
     let fetchRequest = ScrobbleEntryMO.fetchRequest()
     fetchRequest.sortDescriptors = [
@@ -1475,6 +1591,12 @@ public class LibraryStorage: PlayableFileCachable {
     return playlists ?? [Playlist]()
   }
 
+  public func getPlaylistItems() -> [PlaylistItemMO] {
+    let fetchRequest = PlaylistItemMO.fetchRequest()
+    let foundPlaylistItems = try? context.fetch(fetchRequest)
+    return foundPlaylistItems ?? [PlaylistItemMO]()
+  }
+
   public func getPlaylistItems(playlist: Playlist) -> [PlaylistItemMO] {
     let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
     fetchRequest.predicate = getFetchPredicate(forPlaylist: playlist)
@@ -1497,7 +1619,13 @@ public class LibraryStorage: PlayableFileCachable {
     return entries ?? [LogEntry]()
   }
 
-  func getPlayerData() -> PlayerData {
+  func getAllPlayerData() -> [PlayerMO] {
+    let fetchRequest = PlayerMO.fetchRequest()
+    let fetchResults = try? context.fetch(fetchRequest)
+    return fetchResults ?? [PlayerMO]()
+  }
+
+  func getPlayerData(account: Account) -> PlayerData {
     let fetchRequest = PlayerMO.fetchRequest()
     fetchRequest.relationshipKeyPathsForPrefetching = PlayerMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
@@ -1509,31 +1637,42 @@ public class LibraryStorage: PlayableFileCachable {
         playerMO = fetchResults[0]
       } else if fetchResults.isEmpty {
         playerMO = PlayerMO(context: context)
+        playerMO.account = account.managedObject
         saveContext()
       } else {
-        clearStorage(ofType: PlayerData.entityName)
-        playerMO = PlayerMO(context: context)
-        saveContext()
+        if let accountPlayerData = fetchResults
+          .first(where: { $0.account == account.managedObject }) {
+          playerMO = accountPlayerData
+        } else {
+          playerMO = PlayerMO(context: context)
+          playerMO.account = account.managedObject
+          saveContext()
+        }
       }
     } else {
       playerMO = PlayerMO(context: context)
+      playerMO.account = account.managedObject
       saveContext()
     }
 
     if playerMO.userQueuePlaylist == nil {
       playerMO.userQueuePlaylist = PlaylistMO(context: context)
+      playerMO.userQueuePlaylist?.account = account.managedObject
       saveContext()
     }
     if playerMO.contextPlaylist == nil {
       playerMO.contextPlaylist = PlaylistMO(context: context)
+      playerMO.contextPlaylist?.account = account.managedObject
       saveContext()
     }
     if playerMO.shuffledContextPlaylist == nil {
       playerMO.shuffledContextPlaylist = PlaylistMO(context: context)
+      playerMO.shuffledContextPlaylist?.account = account.managedObject
       saveContext()
     }
     if playerMO.podcastPlaylist == nil {
       playerMO.podcastPlaylist = PlaylistMO(context: context)
+      playerMO.podcastPlaylist?.account = account.managedObject
       saveContext()
     }
 
@@ -2301,6 +2440,13 @@ public class LibraryStorage: PlayableFileCachable {
       data = embeddedArtworks?.lazy.compactMap { $0.imageData }.first
     }
     return data
+  }
+
+  public func getEmbeddedArtworks() -> [EmbeddedArtwork] {
+    let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
+    let embeddedArtworks = try? context.fetch(fetchRequest)
+    return embeddedArtworks?
+      .compactMap { EmbeddedArtwork(managedObject: $0) } ?? [EmbeddedArtwork]()
   }
 
   public func getEmbeddedArtwork(forOwner playable: AbstractPlayable) -> EmbeddedArtwork? {

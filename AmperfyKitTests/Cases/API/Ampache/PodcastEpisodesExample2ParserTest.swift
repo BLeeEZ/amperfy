@@ -28,14 +28,14 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
     xmlData = getTestFileData(name: "podcast_episodes_example_2")
-    testPodcast = library.createPodcast()
+    testPodcast = library.createPodcast(account: account)
   }
 
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = PodcastEpisodeParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
-      podcast: testPodcast!, prefetch: prefetch,
+      podcast: testPodcast!, prefetch: prefetch, account: account,
       library: library
     )
   }
@@ -75,6 +75,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     XCTAssertEqual(podcast.episodes.count, 4)
 
     var episode = podcast.episodes[0]
+    XCTAssertEqual(episode.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.id, "44")
     XCTAssertEqual(
       episode.title,
@@ -91,6 +93,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     ) // "2021-11-29T22:07:56+00:00"
     XCTAssertNil(episode.streamId)
     XCTAssertEqual(episode.podcastStatus, .completed)
+    XCTAssertEqual(episode.podcast?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.podcast?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.podcast, podcast)
     XCTAssertNil(episode.disk)
     XCTAssertEqual(episode.track, 0)
@@ -103,6 +107,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
       "https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=podcast_episode&oid=44&uid=4&format=raw&player=api&name=60-Second%20Science%20-%20COVID-%20Quickly-%20Episode%203-%20Vaccine%20Inequality-plus%20Your%20Body%20the%20Variant%20Fighter.mp3"
     )
     XCTAssertEqual(episode.size, 5460000)
+    XCTAssertEqual(episode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.artwork?.type, "podcast")
     XCTAssertEqual(episode.artwork?.id, "1")
 
@@ -120,6 +126,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     ) // "2021-11-15T22:07:00+00:00"
     XCTAssertNil(episode.streamId)
     XCTAssertEqual(episode.podcastStatus, .downloading)
+    XCTAssertEqual(episode.podcast?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.podcast?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.podcast, podcast)
     XCTAssertNil(episode.disk)
     XCTAssertEqual(episode.track, 0)
@@ -132,6 +140,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
       "https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=podcast_episode&oid=46&uid=4&format=raw&player=api&name=60-Second%20Science%20-%20Smartphones%20Can%20Hear%20the%20Shape%20of%20Your%20Door%20Keys."
     )
     XCTAssertEqual(episode.size, 0)
+    XCTAssertEqual(episode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.artwork?.type, "podcast")
     XCTAssertEqual(episode.artwork?.id, "1")
 
@@ -152,6 +162,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
     ) // "2021-11-08T22:19:37+00:00"
     XCTAssertNil(episode.streamId)
     XCTAssertEqual(episode.podcastStatus, .downloading)
+    XCTAssertEqual(episode.podcast?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.podcast?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.podcast, podcast)
     XCTAssertNil(episode.disk)
     XCTAssertEqual(episode.track, 0)
@@ -164,6 +176,8 @@ class PodcastEpisodesExample2ParserTest: AbstractAmpacheTest {
       "https://music.com.au/play/index.php?ssid=cfj3f237d563f479f5223k23189dbb34&type=podcast_episode&oid=47&uid=4&format=raw&player=api&name=60-Second%20Science%20-%20Chimpanzees%20Show%20Altruism%20while%20Gathering%20around%20the%20Juice%20Fountain."
     )
     XCTAssertEqual(episode.size, 0)
+    XCTAssertEqual(episode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(episode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(episode.artwork?.type, "podcast")
     XCTAssertEqual(episode.artwork?.id, "1")
 

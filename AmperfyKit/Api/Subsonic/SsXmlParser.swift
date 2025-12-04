@@ -64,15 +64,18 @@ class SsNotifiableXmlParser: SsXmlParser {
 
 class SsXmlLibParser: SsNotifiableXmlParser {
   var prefetch: LibraryStorage.PrefetchElementContainer
+  var account: Account
   var library: LibraryStorage
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     prefetch: LibraryStorage.PrefetchElementContainer,
+    account: Account,
     library: LibraryStorage,
     parseNotifier: ParsedObjectNotifiable? = nil
   ) {
     self.prefetch = prefetch
+    self.account = account
     self.library = library
     super.init(performanceMonitor: performanceMonitor, parseNotifier: parseNotifier)
   }
@@ -86,7 +89,7 @@ class SsXmlLibWithArtworkParser: SsXmlLibParser {
     if let prefetchedArtwork = prefetch.prefetchedArtworkDict[remoteInfo] {
       return prefetchedArtwork
     } else {
-      let createdArtwork = library.createArtwork()
+      let createdArtwork = library.createArtwork(account: account)
       prefetch.prefetchedArtworkDict[remoteInfo] = createdArtwork
       createdArtwork.remoteInfo = remoteInfo
       createdArtwork.status = .NotChecked

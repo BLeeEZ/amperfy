@@ -31,7 +31,7 @@ class SsPodcastParserTest: AbstractSsParserTest {
   override func createParserDelegate() {
     let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
     ssParserDelegate = SsPodcastParserDelegate(
-      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch,
+      performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
       parseNotifier: nil
     )
@@ -53,23 +53,31 @@ class SsPodcastParserTest: AbstractSsParserTest {
     XCTAssertEqual(podcasts.count, 2)
 
     var podcast = podcasts[0]
+    XCTAssertEqual(podcast.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(podcast.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(podcast.id, "1")
     XCTAssertEqual(podcast.title, "Dr Karl and the < Naked Scientist")
     XCTAssertEqual(
       podcast.depiction,
       "Dr Chris Smith aka The < Naked Scientist with the latest news from the world of science and Dr Karl answers listeners' science questions."
     )
+    XCTAssertEqual(podcast.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(podcast.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(podcast.artwork?.type, "")
     XCTAssertEqual(podcast.artwork?.id, "pod-1")
     XCTAssertFalse(podcast.isCached)
 
     podcast = podcasts[1]
+    XCTAssertEqual(podcast.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(podcast.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(podcast.id, "2")
     XCTAssertEqual(podcast.title, "NRK P1 - Herreavdelingen")
     XCTAssertEqual(
       podcast.depiction,
       "Et program der herrene Yan Friis og Finn Bjelke møtes og musikk nytes."
     )
+    XCTAssertEqual(podcast.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(podcast.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(podcast.artwork?.type, "")
     XCTAssertEqual(podcast.artwork?.id, "pod-2")
     XCTAssertFalse(podcast.isCached)

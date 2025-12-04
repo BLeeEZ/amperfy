@@ -63,6 +63,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AmperKit.shared.log
   }()
 
+  public lazy var account = {
+    AmperKit.shared.account
+  }()
+
   public lazy var storage = {
     AmperKit.shared.storage
   }()

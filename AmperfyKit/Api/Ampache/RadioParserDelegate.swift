@@ -53,7 +53,7 @@ class RadioParserDelegate: AmpacheXmlLibParser {
         radioBuffer = prefetchedRadio
         radioBuffer?.remoteStatus = .available
       } else {
-        radioBuffer = library.createRadio()
+        radioBuffer = library.createRadio(account: account)
         radioBuffer?.id = radioId
         prefetch.prefetchedRadioDict[radioId] = radioBuffer
       }
