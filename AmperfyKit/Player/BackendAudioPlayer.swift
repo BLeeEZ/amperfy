@@ -105,6 +105,7 @@ class BackendAudioPlayer: NSObject {
   private var volumePlayer: Float = 1.0
 
   private var player: AudioStreamingPlayer?
+  private var basicAVPlayer: AVPlayer?
   private var equalizer: AVAudioUnitEQ?
   private var replayGainNode: AVAudioMixerNode?
   public private(set) var audioAnalyzer: AudioAnalyzer
@@ -438,6 +439,7 @@ class BackendAudioPlayer: NSObject {
       perloadedStreamingBitrate = nil
       activeTranscodingFormat = nil
       preloadTranscodingFormat = nil
+      basicAVPlayer = nil
       guard playable.isPlayableOniOS || streamingTranscodings
         .isTranscodingActive(networkMonitor: networkMonitor) else {
         reactToIncompatibleContentType(
@@ -452,6 +454,16 @@ class BackendAudioPlayer: NSObject {
               URL(string: urlString) != nil
         else {
           reactToInvalidRadioUrl(playableDisplayTitle: playable.displayString)
+          return
+        }
+        // Basic AVFoundation radio playback quick and easy
+        if urlString.contains(".m3u8"),
+           let radioUrl = URL(string: urlString) {
+          stop()
+          basicAVPlayer = AVPlayer(url: radioUrl)
+          basicAVPlayer?.play()
+
+          isPlaying = true
           return
         }
       }
@@ -515,6 +527,8 @@ class BackendAudioPlayer: NSObject {
     seekTimeWhenStarted = nil
     isPlaying = false
     playType = nil
+    basicAVPlayer?.pause()
+    basicAVPlayer = nil
 
     stopTimers()
     audioAnalyzer.stop()
