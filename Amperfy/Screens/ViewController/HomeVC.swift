@@ -316,123 +316,171 @@ final class HomeVC: UICollectionViewController {
   }
 
   func createFetchController() {
-    albumsRecentFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
-      sortType: .recent,
-      isGroupedInAlphabeticSections: false,
-      fetchLimit: Self.sectionMaxItemCount
-    )
-    albumsRecentFetchController?.delegate = self
-    albumsRecentFetchController?.search(
-      searchText: "",
-      onlyCached: isOfflineMode,
-      displayFilter: .recent
-    )
-    updateAlbumsRecent()
+    if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
+      albumsRecentFetchController = AlbumFetchedResultsController(
+        coreDataCompanion: appDelegate.storage.main,
+        sortType: .recent,
+        isGroupedInAlphabeticSections: false,
+        fetchLimit: Self.sectionMaxItemCount
+      )
+      albumsRecentFetchController?.delegate = self
+      albumsRecentFetchController?.search(
+        searchText: "",
+        onlyCached: isOfflineMode,
+        displayFilter: .recent
+      )
+      updateAlbumsRecent()
+    } else {
+      albumsRecentFetchController?.delegate = nil
+      albumsRecentFetchController = nil
+    }
 
-    albumsLatestFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
-      sortType: .recent,
-      isGroupedInAlphabeticSections: false,
-      fetchLimit: Self.sectionMaxItemCount
-    )
-    albumsLatestFetchController?.delegate = self
-    albumsLatestFetchController?.search(
-      searchText: "",
-      onlyCached: isOfflineMode,
-      displayFilter: .newest
-    )
-    updateAlbumsLatest()
+    if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
+      albumsLatestFetchController = AlbumFetchedResultsController(
+        coreDataCompanion: appDelegate.storage.main,
+        sortType: .recent,
+        isGroupedInAlphabeticSections: false,
+        fetchLimit: Self.sectionMaxItemCount
+      )
+      albumsLatestFetchController?.delegate = self
+      albumsLatestFetchController?.search(
+        searchText: "",
+        onlyCached: isOfflineMode,
+        displayFilter: .newest
+      )
+      updateAlbumsLatest()
+    } else {
+      albumsLatestFetchController?.delegate = nil
+      albumsLatestFetchController = nil
+    }
 
-    updateRandomAlbums(isOfflineMode: isOfflineMode)
-    updateRandomArtists(isOfflineMode: isOfflineMode)
-    updateRandomGenres()
-    updateRandomSongs(isOfflineMode: isOfflineMode)
+    if orderedVisibleSections.contains(where: { $0 == .randomAlbums }) {
+      updateRandomAlbums(isOfflineMode: isOfflineMode)
+    }
+    if orderedVisibleSections.contains(where: { $0 == .randomArtists }) {
+      updateRandomArtists(isOfflineMode: isOfflineMode)
+    }
+    if orderedVisibleSections.contains(where: { $0 == .randomGenres }) {
+      updateRandomGenres()
+    }
+    if orderedVisibleSections.contains(where: { $0 == .randomSongs }) {
+      updateRandomSongs(isOfflineMode: isOfflineMode)
+    }
 
-    playlistsLastTimePlayedFetchController = PlaylistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
-      sortType: .lastPlayed,
-      isGroupedInAlphabeticSections: false,
-      fetchLimit: Self.sectionMaxItemCount
-    )
-    playlistsLastTimePlayedFetchController?.delegate = self
-    playlistsLastTimePlayedFetchController?.search(
-      searchText: "",
-      playlistSearchCategory: isOfflineMode ? .cached : .all
-    )
-    updatePlaylistsLastTimePlayed()
+    if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
+      playlistsLastTimePlayedFetchController = PlaylistFetchedResultsController(
+        coreDataCompanion: appDelegate.storage.main,
+        sortType: .lastPlayed,
+        isGroupedInAlphabeticSections: false,
+        fetchLimit: Self.sectionMaxItemCount
+      )
+      playlistsLastTimePlayedFetchController?.delegate = self
+      playlistsLastTimePlayedFetchController?.search(
+        searchText: "",
+        playlistSearchCategory: isOfflineMode ? .cached : .all
+      )
+      updatePlaylistsLastTimePlayed()
+    } else {
+      playlistsLastTimePlayedFetchController?.delegate = nil
+      playlistsLastTimePlayedFetchController = nil
+    }
 
-    podcastEpisodesFetchedController = PodcastEpisodesReleaseDateFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
-      isGroupedInAlphabeticSections: false,
-      fetchLimit: Self.sectionMaxItemCount
-    )
-    podcastEpisodesFetchedController?.delegate = self
-    podcastEpisodesFetchedController?.search(searchText: "", onlyCachedSongs: isOfflineMode)
-    updatePodcastEpisodesLatest()
+    if orderedVisibleSections.contains(where: { $0 == .latestPodcastEpisodes }) {
+      podcastEpisodesFetchedController = PodcastEpisodesReleaseDateFetchedResultsController(
+        coreDataCompanion: appDelegate.storage.main,
+        isGroupedInAlphabeticSections: false,
+        fetchLimit: Self.sectionMaxItemCount
+      )
+      podcastEpisodesFetchedController?.delegate = self
+      podcastEpisodesFetchedController?.search(searchText: "", onlyCachedSongs: isOfflineMode)
+      updatePodcastEpisodesLatest()
+    } else {
+      podcastEpisodesFetchedController?.delegate = nil
+      podcastEpisodesFetchedController = nil
+    }
 
-    podcastsFetchedController = PodcastFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
-      isGroupedInAlphabeticSections: false
-    )
-    podcastsFetchedController?.delegate = self
-    podcastsFetchedController?.search(searchText: "", onlyCached: isOfflineMode)
-    updatePodcasts()
+    if orderedVisibleSections.contains(where: { $0 == .podcasts }) {
+      podcastsFetchedController = PodcastFetchedResultsController(
+        coreDataCompanion: appDelegate.storage.main,
+        isGroupedInAlphabeticSections: false
+      )
+      podcastsFetchedController?.delegate = self
+      podcastsFetchedController?.search(searchText: "", onlyCached: isOfflineMode)
+      updatePodcasts()
+    } else {
+      podcastsFetchedController?.delegate = nil
+      podcastsFetchedController = nil
+    }
 
-    radiosFetchedController = RadiosFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
-      isGroupedInAlphabeticSections: true
-    )
-    radiosFetchedController?.delegate = self
-    radiosFetchedController?.fetch()
-    updateRadios()
+    if orderedVisibleSections.contains(where: { $0 == .radios }) {
+      radiosFetchedController = RadiosFetchedResultsController(
+        coreDataCompanion: appDelegate.storage.main,
+        isGroupedInAlphabeticSections: true
+      )
+      radiosFetchedController?.delegate = self
+      radiosFetchedController?.fetch()
+      updateRadios()
+    } else {
+      radiosFetchedController?.delegate = nil
+      radiosFetchedController = nil
+    }
   }
 
   func updateFromRemote() {
     guard appDelegate.storage.settings.isOnlineMode else { return }
-    Task { @MainActor in
-      do {
-        try await AutoDownloadLibrarySyncer(
+    if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
+      Task { @MainActor in
+        do {
+          try await AutoDownloadLibrarySyncer(
+            storage: self.appDelegate.storage,
+            librarySyncer: self.appDelegate.librarySyncer,
+            playableDownloadManager: self.appDelegate.playableDownloadManager
+          )
+          .syncNewestLibraryElements(offset: 0, count: Self.sectionMaxItemCount)
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Newest Albums Sync", error: error)
+        }
+      }
+    }
+    if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
+      Task { @MainActor in
+        do {
+          try await self.appDelegate.librarySyncer.syncRecentAlbums(
+            offset: 0,
+            count: Self.sectionMaxItemCount
+          )
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
+        }
+      }
+    }
+    if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
+      Task { @MainActor in do {
+        try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
+      }}
+    }
+    if orderedVisibleSections.contains(where: { $0 == .latestPodcastEpisodes }) {
+      Task { @MainActor in do {
+        let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate.playableDownloadManager
+          playableDownloadManager: self.appDelegate
+            .playableDownloadManager
         )
-        .syncNewestLibraryElements(offset: 0, count: Self.sectionMaxItemCount)
+        .syncNewestPodcastEpisodes()
       } catch {
-        self.appDelegate.eventLogger.report(topic: "Newest Albums Sync", error: error)
-      }
+        self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
+      }}
     }
-    Task { @MainActor in
-      do {
-        try await self.appDelegate.librarySyncer.syncRecentAlbums(
-          offset: 0,
-          count: Self.sectionMaxItemCount
-        )
-      } catch {
-        self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
-      }
-    }
-    Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
-    } catch {
-      self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
-    }}
-    Task { @MainActor in do {
-      let _ = try await AutoDownloadLibrarySyncer(
-        storage: self.appDelegate.storage,
-        librarySyncer: self.appDelegate.librarySyncer,
-        playableDownloadManager: self.appDelegate
-          .playableDownloadManager
-      )
-      .syncNewestPodcastEpisodes()
-    } catch {
-      self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
-    }}
-    Task { @MainActor in
-      do {
-        try await self.appDelegate.librarySyncer.syncRadios()
-      } catch {
-        self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
+    if orderedVisibleSections.contains(where: { $0 == .radios }) {
+      Task { @MainActor in
+        do {
+          try await self.appDelegate.librarySyncer.syncRadios()
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
+        }
       }
     }
   }
@@ -449,6 +497,9 @@ final class HomeVC: UICollectionViewController {
       orderedVisibleSections = newOrder
       appDelegate.storage.settings.homeSections = newOrder
       applySnapshot(animated: true)
+
+      createFetchController()
+      updateFromRemote()
     }
     let nav = UINavigationController(rootViewController: editor)
     nav.modalPresentationStyle = .formSheet

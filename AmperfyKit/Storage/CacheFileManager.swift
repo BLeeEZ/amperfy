@@ -655,7 +655,7 @@ final public class CacheFileManager: Sendable {
     let trimmed = components.dropFirst(directoryCount)
     let newPath = NSString.path(withComponents: Array(trimmed))
     lyricsRelFilePath = URL(fileURLWithPath: newPath, isDirectory: false)
-    
+
     return getRelLyricsDirectory(for: account.info)?.appendingPathComponent(lyricsRelFilePath.path)
   }
 
@@ -715,7 +715,7 @@ final public class CacheFileManager: Sendable {
     let trimmed = components.dropFirst(directoryCount)
     let newPath = NSString.path(withComponents: Array(trimmed))
     embeddedArtworkOwnerRelFilePath = URL(fileURLWithPath: newPath, isDirectory: false)
-    
+
     return getRelEmbeddedArtworkDirectory(for: account.info)?
       .appendingPathComponent(embeddedArtworkOwnerRelFilePath.path)
   }
