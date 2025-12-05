@@ -33,7 +33,10 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(
+      account: account,
+      prefetchIDs: ssIdParserDelegate.prefetchIDs
+    )
     ssParserDelegate = SsPlaylistSongsParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
       playlist: playlist, account: account,
@@ -117,7 +120,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(playlist.duration, 1391)
     XCTAssertEqual(playlist.remoteDuration, 1391)
 
-    XCTAssertEqual(library.songCount, 6 + createdSongCount)
+    XCTAssertEqual(library.getSongCount(for: account), 6 + createdSongCount)
 
     let dateFormatter = ISO8601DateFormatter()
     dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]

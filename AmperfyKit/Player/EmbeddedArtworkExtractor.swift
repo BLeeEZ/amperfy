@@ -84,7 +84,11 @@ final class EmbeddedArtworkExtractor: Sendable {
     else { return }
 
     do {
-      try fileManager.writeDataExcludedFromBackup(data: pngData, to: absFilePath)
+      try fileManager.writeDataExcludedFromBackup(
+        data: pngData,
+        to: absFilePath,
+        accountInfo: account.info
+      )
       embeddedArtwork.relFilePath = relFilePath
     } catch {
       embeddedArtwork.relFilePath = nil

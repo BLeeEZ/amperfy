@@ -29,7 +29,7 @@ class GenreParserTest: AbstractAmpacheTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(account: account, prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = GenreParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
@@ -42,7 +42,7 @@ class GenreParserTest: AbstractAmpacheTest {
       genreIdCount: 2
     )
 
-    XCTAssertEqual(library.genreCount, 2)
+    XCTAssertEqual(library.getGenreCount(for: account), 2)
 
     guard let genre = library.getGenre(id: "6") else { XCTFail(); return }
     XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)

@@ -106,7 +106,8 @@ class PrefetchIdTester {
       actAlbumFetchCount + actSongFetchCount + actPodcastEpisodeFetchCount + actRadioFetchCount +
       actMusicFolderFetchCount + actDirectoryFetchCount + actPodcastFetchCount
 
-    let prefetch = library.getElements(prefetchIDs: prefetchIDs)
+    let account = library.getAccount(info: TestAccountInfo.create1())
+    let prefetch = library.getElements(account: account, prefetchIDs: prefetchIDs)
     XCTAssertEqual(actArtworkFetchCount, prefetch.prefetchedArtworkDict.count)
     XCTAssertEqual(
       actGenreFetchCount,
@@ -133,21 +134,33 @@ class PrefetchIdTester {
     // summed
     XCTAssertEqual(summedFetchCount, prefetch.counts)
 
-    XCTAssertEqual(artworkLibraryCount ?? actArtworkFetchCount, library.artworkCount)
-    XCTAssertEqual(genreLibraryCount ?? actGenreFetchCount, library.genreCount)
+    XCTAssertEqual(
+      artworkLibraryCount ?? actArtworkFetchCount,
+      library.getArtworkCount(for: account)
+    )
+    XCTAssertEqual(genreLibraryCount ?? actGenreFetchCount, library.getGenreCount(for: account))
     XCTAssertEqual(
       artistLibraryCount ?? (actArtistFetchCount + actLocalArtistFetchCount),
-      library.artistCount
+      library.getArtistCount(for: account)
     )
-    XCTAssertEqual(albumLibraryCount ?? actAlbumFetchCount, library.albumCount)
-    XCTAssertEqual(songLibraryCount ?? actSongFetchCount, library.songCount)
+    XCTAssertEqual(albumLibraryCount ?? actAlbumFetchCount, library.getAlbumCount(for: account))
+    XCTAssertEqual(songLibraryCount ?? actSongFetchCount, library.getSongCount(for: account))
     XCTAssertEqual(
       podcastEpisodeLibraryCount ?? actPodcastEpisodeFetchCount,
-      library.podcastEpisodeCount
+      library.getPodcastEpisodeCount(for: account)
     )
-    XCTAssertEqual(radioLibraryCount ?? actRadioFetchCount, library.radioCount)
-    XCTAssertEqual(musicFolderLibraryCount ?? actMusicFolderFetchCount, library.musicFolderCount)
-    XCTAssertEqual(directoryLibraryCount ?? actDirectoryFetchCount, library.directoryCount)
-    XCTAssertEqual(podcastLibraryCount ?? actPodcastFetchCount, library.podcastCount)
+    XCTAssertEqual(radioLibraryCount ?? actRadioFetchCount, library.getRadioCount(for: account))
+    XCTAssertEqual(
+      musicFolderLibraryCount ?? actMusicFolderFetchCount,
+      library.getMusicFolderCount(for: account)
+    )
+    XCTAssertEqual(
+      directoryLibraryCount ?? actDirectoryFetchCount,
+      library.getDirectoryCount(for: account)
+    )
+    XCTAssertEqual(
+      podcastLibraryCount ?? actPodcastFetchCount,
+      library.getPodcastCount(for: account)
+    )
   }
 }

@@ -263,7 +263,7 @@ class CoreDataSeeder {
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
     try! CacheFileManager.shared.writeDataExcludedFromBackup(
       data: Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!,
-      to: absFilePath
+      to: absFilePath, accountInfo: nil
     )
 
     for songSeed in songs {

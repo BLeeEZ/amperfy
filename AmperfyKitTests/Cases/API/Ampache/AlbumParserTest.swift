@@ -29,7 +29,7 @@ class AlbumParserTest: AbstractAmpacheTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(account: account, prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = AlbumParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
@@ -47,7 +47,7 @@ class AlbumParserTest: AbstractAmpacheTest {
 
     let albums = library.getAlbums().sorted(by: { $0.id < $1.id })
     XCTAssertEqual(albums.count, 3)
-    XCTAssertEqual(library.genreCount, 2)
+    XCTAssertEqual(library.getGenreCount(for: account), 2)
 
     var album = albums[0]
     XCTAssertEqual(album.account?.serverHash, TestAccountInfo.test1ServerHash)

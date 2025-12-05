@@ -74,27 +74,56 @@ struct LibrarySettingsView: View {
 
   private func updateValues() {
     Task { @MainActor in do {
+      let accountObjectId = appDelegate.account.managedObject.objectID
       playlistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.playlistCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getPlaylistCount(for: accountAsync)
       }
       artistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.artistCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getArtistCount(for: accountAsync)
       }
       albumCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.albumCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getAlbumCount(for: accountAsync)
       }
       podcastCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.podcastCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getPodcastCount(for: accountAsync)
       }
       podcastEpisodeCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.podcastEpisodeCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getPodcastEpisodeCount(for: accountAsync)
       }
       songCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.songCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getSongCount(for: accountAsync)
       }
       albumWithSyncedSongsCount = try await appDelegate.storage.async
         .performAndGet { asyncCompanion in
-          asyncCompanion.library.albumWithSyncedSongsCount
+          let accountAsync = Account(
+            managedObject: asyncCompanion.context
+              .object(with: accountObjectId) as! AccountMO
+          )
+          return asyncCompanion.library.getAlbumWithSyncedSongsCount(for: accountAsync)
         }
 
       if albumCount < 1 {
@@ -105,14 +134,26 @@ struct LibrarySettingsView: View {
       }
 
       cachedSongCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        asyncCompanion.library.cachedSongCount
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        return asyncCompanion.library.getCachedSongCount(for: accountAsync)
       }
       cachedPodcastEpisodesCount = try await appDelegate.storage.async
         .performAndGet { asyncCompanion in
-          asyncCompanion.library.cachedPodcastEpisodeCount
+          let accountAsync = Account(
+            managedObject: asyncCompanion.context
+              .object(with: accountObjectId) as! AccountMO
+          )
+          return asyncCompanion.library.getCachedPodcastEpisodeCount(for: accountAsync)
         }
       completeCacheSize = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let playableByteSize = fileManager.playableCacheSize
+        let accountAsync = Account(
+          managedObject: asyncCompanion.context
+            .object(with: accountObjectId) as! AccountMO
+        )
+        let playableByteSize = fileManager.getPlayableCacheSize(for: accountAsync.info)
         return (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0)
           .asByteString
       }
@@ -257,7 +298,7 @@ struct LibrarySettingsView: View {
                 appDelegate.playableDownloadManager.stop()
                 appDelegate.storage.main.library.deletePlayableCachePaths()
                 appDelegate.storage.main.library.saveContext()
-                fileManager.deletePlayableCache()
+                fileManager.deletePlayableCache(accountInfo: appDelegate.account.info)
                 appDelegate.playableDownloadManager.start()
               }, secondaryButton: .cancel()
             )

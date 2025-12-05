@@ -44,13 +44,18 @@ struct ArtworkSettingsView: View {
 
   func updateValues() {
     Task { @MainActor in do {
+      let accountObjectId = appDelegate.account.managedObject.objectID
       (
         artworkCountText,
         artworkNotCheckedCountText,
         cachedArtworksCountText
       ) = try await appDelegate.storage.async
         .performAndGet { asyncCompanion in
-          let artworkCount = asyncCompanion.library.artworkCount
+          let accountAsync = Account(
+            managedObject: asyncCompanion.context
+              .object(with: accountObjectId) as! AccountMO
+          )
+          let artworkCount = asyncCompanion.library.getArtworkCount(for: accountAsync)
           let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
           let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self
             .artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
@@ -111,7 +116,7 @@ struct ArtworkSettingsView: View {
                 appDelegate.artworkDownloadManager.clearFinishedDownloads()
                 appDelegate.storage.main.library.deleteRemoteArtworkCachePaths()
                 appDelegate.storage.main.library.saveContext()
-                fileManager.deleteRemoteArtworkCache()
+                fileManager.deleteRemoteArtworkCache(accountInfo: appDelegate.account.info)
                 appDelegate.artworkDownloadManager.start()
               },
               secondaryButton: .cancel()

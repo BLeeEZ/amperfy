@@ -137,10 +137,15 @@ final class PlayableDownloadDelegate: DownloadManagerDelegate {
       // transcoding info needs to available to generate a correct file extension
       guard let relFilePath = CacheFileManager.shared.createRelPath(for: playableAsync),
             let absFilePath = CacheFileManager.shared
-            .getAbsoluteAmperfyPath(relFilePath: relFilePath)
+            .getAbsoluteAmperfyPath(relFilePath: relFilePath),
+            let accountInfo = playableAsync.account?.info
       else { return }
       do {
-        try CacheFileManager.shared.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
+        try CacheFileManager.shared.moveExcludedFromBackupItem(
+          at: fileURL,
+          to: absFilePath,
+          accountInfo: accountInfo
+        )
         playableAsync.relFilePath = relFilePath
       } catch {
         playableAsync.relFilePath = nil

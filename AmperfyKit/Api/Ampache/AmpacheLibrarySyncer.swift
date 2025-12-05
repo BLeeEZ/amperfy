@@ -62,7 +62,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = GenreParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -98,7 +101,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
               isThrowingErrorsAllowed: false
             )
             let prefetch = asyncCompanion.library
-              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+              .getElements(account: accountAsync, prefetchIDs: idParserDelegate.prefetchIDs)
 
             let parserDelegate = ArtistParserDelegate(
               performanceMonitor: self.performanceMonitor, prefetch: prefetch,
@@ -139,7 +142,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
               isThrowingErrorsAllowed: false
             )
             let prefetch = asyncCompanion.library
-              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+              .getElements(account: accountAsync, prefetchIDs: idParserDelegate.prefetchIDs)
 
             let parserDelegate = AlbumParserDelegate(
               performanceMonitor: self.performanceMonitor, prefetch: prefetch,
@@ -192,7 +195,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = PodcastParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -238,7 +244,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           delegate: idParserDelegate,
           isThrowingErrorsAllowed: false
         )
-        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+        let prefetch = asyncCompanion.library.getElements(
+          account: accountAsync,
+          prefetchIDs: idParserDelegate.prefetchIDs
+        )
 
         let parserDelegate = ArtistParserDelegate(
           performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -292,7 +301,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = AlbumParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -328,7 +340,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = SongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -360,7 +375,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           delegate: idParserDelegate,
           isThrowingErrorsAllowed: false
         )
-        let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+        let prefetch = asyncCompanion.library.getElements(
+          account: accountAsync,
+          prefetchIDs: idParserDelegate.prefetchIDs
+        )
 
         let parserDelegate = AlbumParserDelegate(
           performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -412,7 +430,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = SongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -445,7 +466,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = SongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -479,7 +503,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = PodcastEpisodeParserDelegate(
         performanceMonitor: self.performanceMonitor,
@@ -537,7 +564,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
               isThrowingErrorsAllowed: false
             )
             let prefetch = asyncCompanion.library
-              .getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+              .getElements(account: accountAsync, prefetchIDs: idParserDelegate.prefetchIDs)
 
             let parserDelegate = PodcastEpisodeParserDelegate(
               performanceMonitor: self.performanceMonitor,
@@ -568,7 +595,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = CatalogParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -594,7 +624,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = ArtistParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -613,7 +646,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         "artist-\($0.id)"
       }
       let artistDirectoryIdsSet = Set(artistDirectoryIds)
-      let directoriesForArtists = asyncCompanion.library.getDirectories(ids: artistDirectoryIdsSet)
+      let directoriesForArtists = asyncCompanion.library.getDirectories(
+        account: accountAsync,
+        ids: artistDirectoryIdsSet
+      )
 
       for artist in parserDelegate.artistsParsed {
         let artistDirId = "artist-\(artist.id)"
@@ -718,7 +754,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         "album-\($0.id)"
       }
       let albumDirectoryIdsSet = Set(albumDirectoryIds)
-      let directoriesForAlbums = asyncCompanion.library.getDirectories(ids: albumDirectoryIdsSet)
+      let directoriesForAlbums = asyncCompanion.library.getDirectories(
+        account: accountAsync,
+        ids: albumDirectoryIdsSet
+      )
 
       for album in artistAlbums {
         let albumDirId = "album-\(album.id)"
@@ -758,7 +797,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = AlbumParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -789,7 +831,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = AlbumParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -822,7 +867,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = ArtistParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -849,7 +897,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = AlbumParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -876,7 +927,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = SongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -906,7 +960,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = RadioParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -939,7 +996,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = SongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -1006,7 +1066,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = PlaylistSongsParserDelegate(
         performanceMonitor: self.performanceMonitor,
@@ -1159,7 +1222,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = PodcastParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -1278,7 +1344,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = ArtistParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -1304,7 +1373,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = AlbumParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
@@ -1330,7 +1402,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         delegate: idParserDelegate,
         isThrowingErrorsAllowed: false
       )
-      let prefetch = asyncCompanion.library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
 
       let parserDelegate = SongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,

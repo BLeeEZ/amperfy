@@ -124,7 +124,11 @@ class SongTest: XCTestCase {
     let testData = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .song).pngData()!
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
-    try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+    try! CacheFileManager.shared.writeDataExcludedFromBackup(
+      data: testData,
+      to: absFilePath,
+      accountInfo: account.info
+    )
     testSong.artwork = library.createArtwork(account: account)
     XCTAssertEqual(testSong.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(testSong.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
@@ -136,7 +140,7 @@ class SongTest: XCTestCase {
     guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
     XCTAssertNotNil(songFetched.artwork?.imagePath)
     XCTAssertEqual(songFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
-    try! CacheFileManager.shared.removeItem(at: absFilePath)
+    try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
   }
 
   func testRating() {

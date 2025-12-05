@@ -32,7 +32,10 @@ class SsIndexesParserTest: AbstractSsParserTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(
+      account: account,
+      prefetchIDs: ssIdParserDelegate.prefetchIDs
+    )
     ssParserDelegate = SsDirectoryParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
       musicFolder: musicFolder, prefetch: prefetch, account: account,

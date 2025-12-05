@@ -108,7 +108,11 @@ class ArtistTest: XCTestCase {
     let testData = UIImage.getGeneratedArtwork(theme: .blue, artworkType: .artist).pngData()!
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
-    try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+    try! CacheFileManager.shared.writeDataExcludedFromBackup(
+      data: testData,
+      to: absFilePath,
+      accountInfo: account.info
+    )
     testArtist.artwork = library.createArtwork(account: account)
     testArtist.artwork?.relFilePath = relFilePath
     testArtist.artwork?.status = .CustomImage
@@ -120,6 +124,6 @@ class ArtistTest: XCTestCase {
     guard let artistFetched = library.getArtist(id: testId) else { XCTFail(); return }
     XCTAssertNotNil(artistFetched.artwork?.imagePath)
     XCTAssertEqual(artistFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
-    try! CacheFileManager.shared.removeItem(at: absFilePath)
+    try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
   }
 }

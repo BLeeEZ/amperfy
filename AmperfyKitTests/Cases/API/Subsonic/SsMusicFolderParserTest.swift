@@ -29,7 +29,10 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(
+      account: account,
+      prefetchIDs: ssIdParserDelegate.prefetchIDs
+    )
     ssParserDelegate = SsMusicFolderParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library
@@ -40,7 +43,7 @@ class SsMusicFolderParserTest: AbstractSsParserTest {
     prefetchIdTester.checkPrefetchIdCounts(
       musicFolderCount: 3
     )
-    XCTAssertEqual(library.musicFolderCount, 3)
+    XCTAssertEqual(library.getMusicFolderCount(for: account), 3)
 
     let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(musicFolders[0].account?.serverHash, TestAccountInfo.test1ServerHash)

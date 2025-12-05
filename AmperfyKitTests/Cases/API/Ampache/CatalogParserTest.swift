@@ -29,7 +29,7 @@ class CatalogParserTest: AbstractAmpacheTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(account: account, prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = CatalogParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library
@@ -41,7 +41,7 @@ class CatalogParserTest: AbstractAmpacheTest {
       musicFolderCount: 4
     )
 
-    XCTAssertEqual(library.musicFolderCount, 4)
+    XCTAssertEqual(library.getMusicFolderCount(for: account), 4)
 
     let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(musicFolders[0].account?.serverHash, TestAccountInfo.test1ServerHash)

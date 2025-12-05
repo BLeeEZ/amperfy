@@ -59,8 +59,13 @@ public struct LogData: Encodable {
     serverInfo.apiVersion = amperfyData.backendApi.serverApiVersion
     logData.serverInfo = serverInfo
 
-    logData.libraryInfo = amperfyData.storage.main.library.getInfo()
+    logData.libraryInfo = LibraryInfo()
     logData.libraryInfo?.version = amperfyData.storage.librarySyncVersion.description
+    let accounts = amperfyData.storage.main.library.getAllAccounts()
+    for account in accounts {
+      let accountLibraryInfo = amperfyData.storage.main.library.getInfo(account: account)
+      logData.libraryInfo?.accounts?.append(accountLibraryInfo)
+    }
 
     var playerInfo = PlayerInfo()
     playerInfo.isPlaying = amperfyData.player.isPlaying
@@ -123,6 +128,13 @@ public struct ServerInfo: Encodable {
 // MARK: - LibraryInfo
 
 public struct LibraryInfo: Encodable {
+  public var version: String?
+  public var accounts: [AccountLibraryInfo]?
+}
+
+// MARK: - AccountLibraryInfo
+
+public struct AccountLibraryInfo: Encodable {
   public var genreCount: Int?
   public var artistCount: Int?
   public var albumCount: Int?
@@ -133,9 +145,9 @@ public struct LibraryInfo: Encodable {
   public var directoryCount: Int?
   public var podcastCount: Int?
   public var podcastEpisodeCount: Int?
+  public var radioCount: Int?
   public var artworkCount: Int?
   public var cachedSongSize: String?
-  public var version: String?
 }
 
 // MARK: - PlayerInfo

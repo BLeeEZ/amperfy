@@ -331,7 +331,7 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   func storageExceedsCacheLimit() -> Bool {
     guard settings.cacheLimit != 0 else { return false }
-    return fileManager.playableCacheSize > settings.cacheLimit
+    return fileManager.completePlayableCacheSize > settings.cacheLimit
   }
 
   private func setupDownloadQueue() async {

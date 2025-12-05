@@ -43,7 +43,8 @@ struct DeveloperView: View {
           let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: fileURL)!
           try? CacheFileManager.shared.writeDataExcludedFromBackup(
             data: img.pngData()!,
-            to: absFilePath
+            to: absFilePath,
+            accountInfo: nil
           )
         }
       }

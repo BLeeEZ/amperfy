@@ -100,7 +100,11 @@ class PodcastEpisodeTest: XCTestCase {
       .pngData()!
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
-    try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+    try! CacheFileManager.shared.writeDataExcludedFromBackup(
+      data: testData,
+      to: absFilePath,
+      accountInfo: account.info
+    )
     testEpisode.artwork = library.createArtwork(account: account)
     XCTAssertEqual(testEpisode.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(testEpisode.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
@@ -111,7 +115,7 @@ class PodcastEpisodeTest: XCTestCase {
     library.saveContext()
     guard let episodeFetched = library.getPodcastEpisode(id: testId) else { XCTFail(); return }
     XCTAssertEqual(episodeFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
-    try! CacheFileManager.shared.removeItem(at: absFilePath)
+    try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
   }
 
   func testEpisodeDeleteCache() {

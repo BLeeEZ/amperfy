@@ -84,11 +84,20 @@ final public class CacheFileManager: Sendable {
 
   // Get the URL to the app container's 'Library' directory.
   private let amperfyLibraryDirectory: URL?
-  // Playable directory size
-  nonisolated(unsafe) private var _playableCacheSize: Int64 = 0
-  private let _playableCacheSizeLock = NSLock()
-  nonisolated public var playableCacheSize: Int64 {
-    _playableCacheSizeLock.withLock { _playableCacheSize }
+  // Complete playable directory size
+  nonisolated(unsafe) private var _completePlayableCacheSize: Int64 = 0
+  private let _completePlayableCacheSizeLock = NSLock()
+  nonisolated public var completePlayableCacheSize: Int64 {
+    _completePlayableCacheSizeLock.withLock { _completePlayableCacheSize }
+  }
+
+  // Account playable directory size
+  nonisolated(unsafe) private var _accountPlayableCacheSize = [AccountInfo: Int64]()
+  private let _accountPlayableCacheSizeLock = NSLock()
+  nonisolated public func getPlayableCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    var size = Int64(0)
+    _accountPlayableCacheSizeLock.withLock { size = _accountPlayableCacheSize[accountInfo] ?? 0 }
+    return size
   }
 
   init() {
@@ -107,7 +116,14 @@ final public class CacheFileManager: Sendable {
     } else {
       self.amperfyLibraryDirectory = nil
     }
-    self._playableCacheSize = calculatePlayableCacheSize()
+
+    let accounts = getAccounts()
+    for account in accounts {
+      let accountCache = calculatePlayableCacheSize(for: account)
+      _accountPlayableCacheSize[account] = accountCache
+      _completePlayableCacheSize += accountCache
+    }
+
     checkAmperfyDirectory()
   }
 
@@ -126,18 +142,18 @@ final public class CacheFileManager: Sendable {
     return tmpFileURL
   }
 
-  public func moveExcludedFromBackupItem(at: URL, to: URL) throws {
+  public func moveExcludedFromBackupItem(at: URL, to: URL, accountInfo: AccountInfo) throws {
     let subDir = to.deletingLastPathComponent()
     if createDirectoryIfNeeded(at: subDir) {
       try? markItemAsExcludedFromBackup(at: subDir)
     }
     if FileManager.default.fileExists(atPath: to.path) {
-      try? removeItem(at: to)
+      try? removeItem(at: to, accountInfo: accountInfo)
     }
     try FileManager.default.moveItem(at: at, to: to)
     try markItemAsExcludedFromBackup(at: to)
 
-    updateCachedDirectorySize(itemUrl: to, isAdded: true)
+    updateCachedDirectorySize(itemUrl: to, isAdded: true, accountInfo: accountInfo)
   }
 
   public func move(from: URL?, to: URL?) throws {
@@ -164,21 +180,40 @@ final public class CacheFileManager: Sendable {
     return true
   }
 
-  nonisolated private func resetPlayableCacheSize() {
-    _playableCacheSizeLock.withLock {
-      _playableCacheSize = 0
+  nonisolated private func resetPlayableCacheSize(for accountInfo: AccountInfo) {
+    var newCompleteSize = Int64(0)
+    _accountPlayableCacheSizeLock.withLock {
+      _accountPlayableCacheSize[accountInfo] = 0
+      newCompleteSize = _accountPlayableCacheSize.reduce(0) { $0 + $1.value }
+    }
+    _completePlayableCacheSizeLock.withLock {
+      _completePlayableCacheSize = newCompleteSize
     }
   }
 
-  nonisolated private func playableCacheSize(addItemSize itemSize: Int64) {
-    _playableCacheSizeLock.withLock {
-      _playableCacheSize += itemSize
+  nonisolated private func playableCacheSize(
+    addItemSize itemSize: Int64,
+    to accountInfo: AccountInfo
+  ) {
+    _completePlayableCacheSizeLock.withLock {
+      _completePlayableCacheSize += itemSize
+    }
+    _accountPlayableCacheSizeLock.withLock {
+      _accountPlayableCacheSize[accountInfo] = (_accountPlayableCacheSize[accountInfo] ?? 0) +
+        itemSize
     }
   }
 
-  nonisolated private func playableCacheSize(subtractItemSize itemSize: Int64) {
-    _playableCacheSizeLock.withLock {
-      _playableCacheSize -= itemSize
+  nonisolated private func playableCacheSize(
+    subtractItemSize itemSize: Int64,
+    to accountInfo: AccountInfo
+  ) {
+    _completePlayableCacheSizeLock.withLock {
+      _completePlayableCacheSize -= itemSize
+    }
+    _accountPlayableCacheSizeLock.withLock {
+      _accountPlayableCacheSize[accountInfo] = (_accountPlayableCacheSize[accountInfo] ?? 0) -
+        itemSize
     }
   }
 
@@ -194,23 +229,23 @@ final public class CacheFileManager: Sendable {
     return standardizedFileURL.path.hasPrefix(standardizedDirectoryURL.path)
   }
 
-  public func removeItem(at itemUrl: URL) throws {
-    updateCachedDirectorySize(itemUrl: itemUrl, isAdded: false)
+  public func removeItem(at itemUrl: URL, accountInfo: AccountInfo) throws {
+    updateCachedDirectorySize(itemUrl: itemUrl, isAdded: false, accountInfo: accountInfo)
     try FileManager.default.removeItem(at: itemUrl)
   }
 
-  private func updateCachedDirectorySize(itemUrl: URL, isAdded: Bool) {
-    guard let absSongsDir = getAbsoluteAmperfyPath(relFilePath: Self.songsDir),
-          let absEpisodesDir = getAbsoluteAmperfyPath(relFilePath: Self.episodesDir),
+  private func updateCachedDirectorySize(itemUrl: URL, isAdded: Bool, accountInfo: AccountInfo) {
+    guard let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo),
+          let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo),
           let itemSize = getFileSize(url: itemUrl),
           isFileURLInsideDirectory(fileURL: itemUrl, directoryURL: absSongsDir) ||
           isFileURLInsideDirectory(fileURL: itemUrl, directoryURL: absEpisodesDir)
     else { return }
 
     if isAdded {
-      playableCacheSize(addItemSize: itemSize)
+      playableCacheSize(addItemSize: itemSize, to: accountInfo)
     } else {
-      playableCacheSize(subtractItemSize: itemSize)
+      playableCacheSize(subtractItemSize: itemSize, to: accountInfo)
     }
   }
 
@@ -229,31 +264,31 @@ final public class CacheFileManager: Sendable {
     return url
   }
 
-  public func deletePlayableCache() {
-    if let absSongsDir = getAbsoluteAmperfyPath(relFilePath: Self.songsDir) {
+  public func deletePlayableCache(accountInfo: AccountInfo) {
+    if let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo) {
       try? FileManager.default.removeItem(at: absSongsDir)
     }
-    if let absEpisodesDir = getAbsoluteAmperfyPath(relFilePath: Self.episodesDir) {
+    if let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo) {
       try? FileManager.default.removeItem(at: absEpisodesDir)
     }
-    if let absEmbeddedArtworksDir = getAbsoluteAmperfyPath(relFilePath: Self.embeddedArtworksDir) {
+    if let absEmbeddedArtworksDir = getOrCreateAbsoluteEmbeddedArtworksDirectory(for: accountInfo) {
       try? FileManager.default.removeItem(at: absEmbeddedArtworksDir)
     }
-    resetPlayableCacheSize()
+    resetPlayableCacheSize(for: accountInfo)
   }
 
-  public func deleteRemoteArtworkCache() {
-    if let absArtworksDir = getAbsoluteAmperfyPath(relFilePath: Self.artworksDir) {
+  public func deleteRemoteArtworkCache(accountInfo: AccountInfo) {
+    if let absArtworksDir = getOrCreateAbsoluteArtworksDirectory(for: accountInfo) {
       try? FileManager.default.removeItem(at: absArtworksDir)
     }
   }
 
-  private func calculatePlayableCacheSize() -> Int64 {
+  private func calculatePlayableCacheSize(for accountInfo: AccountInfo) -> Int64 {
     var bytes = Int64(0)
-    if let absSongsDir = getAbsoluteAmperfyPath(relFilePath: Self.songsDir) {
+    if let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo) {
       bytes += directorySize(url: absSongsDir)
     }
-    if let absEpisodesDir = getAbsoluteAmperfyPath(relFilePath: Self.episodesDir) {
+    if let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo) {
       bytes += directorySize(url: absEpisodesDir)
     }
     return bytes
@@ -735,14 +770,17 @@ final public class CacheFileManager: Sendable {
     return FileManager.default.fileExists(atPath: absFilePath.path)
   }
 
-  public func writeDataExcludedFromBackup(data: Data, to: URL) throws {
+  public func writeDataExcludedFromBackup(data: Data, to: URL, accountInfo: AccountInfo?) throws {
     let subDir = to.deletingLastPathComponent()
     if createDirectoryIfNeeded(at: subDir) {
       try? markItemAsExcludedFromBackup(at: subDir)
     }
     try data.write(to: to, options: [.atomic])
     try markItemAsExcludedFromBackup(at: to)
-    updateCachedDirectorySize(itemUrl: to, isAdded: true)
+    // account info is nil when written to Amperfy directory directly
+    if let accountInfo {
+      updateCachedDirectorySize(itemUrl: to, isAdded: true, accountInfo: accountInfo)
+    }
   }
 
   private func markItemAsExcludedFromBackup(at: URL) throws {

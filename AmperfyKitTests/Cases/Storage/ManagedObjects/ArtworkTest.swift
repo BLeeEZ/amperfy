@@ -66,11 +66,15 @@ class ArtworkTest: XCTestCase {
     let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
-    try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+    try! CacheFileManager.shared.writeDataExcludedFromBackup(
+      data: testData,
+      to: absFilePath,
+      accountInfo: account.info
+    )
     testArtwork.relFilePath = relFilePath
     XCTAssertEqual(testArtwork.status, ImageStatus.CustomImage)
     XCTAssertEqual(testArtwork.imagePath, absFilePath.path)
-    try! CacheFileManager.shared.removeItem(at: absFilePath)
+    try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
   }
 
   func testImageWithWrongStatus() {
@@ -78,11 +82,15 @@ class ArtworkTest: XCTestCase {
     let testData = Data(base64Encoded: "Test", options: .ignoreUnknownCharacters)!
     let relFilePath = URL(string: "testArtwork")!
     let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)!
-    try! CacheFileManager.shared.writeDataExcludedFromBackup(data: testData, to: absFilePath)
+    try! CacheFileManager.shared.writeDataExcludedFromBackup(
+      data: testData,
+      to: absFilePath,
+      accountInfo: account.info
+    )
     testArtwork.relFilePath = relFilePath
     XCTAssertEqual(testArtwork.status, ImageStatus.NotChecked)
     XCTAssertNil(testArtwork.imagePath)
-    try! CacheFileManager.shared.removeItem(at: absFilePath)
+    try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
   }
 
   func testOwners() {

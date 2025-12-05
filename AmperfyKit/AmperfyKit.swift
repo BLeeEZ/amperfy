@@ -84,7 +84,7 @@ public class AmperKit {
 
   @MainActor
   public lazy var duplicateEntitiesResolver = {
-    DuplicateEntitiesResolver(storage: storage)
+    DuplicateEntitiesResolver(account: account, storage: storage)
   }()
 
   @MainActor

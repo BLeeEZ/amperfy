@@ -33,7 +33,10 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(
+      account: account,
+      prefetchIDs: ssIdParserDelegate.prefetchIDs
+    )
     ssParserDelegate = SsPodcastEpisodeParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(),
       podcast: testPodcast!, prefetch: prefetch, account: account,

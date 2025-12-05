@@ -29,7 +29,10 @@ class SsGenreParserTest: AbstractSsParserTest {
   }
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: ssIdParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(
+      account: account,
+      prefetchIDs: ssIdParserDelegate.prefetchIDs
+    )
     ssParserDelegate = SsGenreParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(), prefetch: prefetch, account: account,
       library: library,
@@ -41,7 +44,7 @@ class SsGenreParserTest: AbstractSsParserTest {
     prefetchIdTester.checkPrefetchIdCounts(
       genreNameCount: 7
     )
-    XCTAssertEqual(library.genreCount, 7)
+    XCTAssertEqual(library.getGenreCount(for: account), 7)
 
     guard let genre = library.getGenre(name: "Electronic") else { XCTFail(); return }
     XCTAssertEqual(genre.name, "Electronic")

@@ -27,7 +27,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
   var createdSongCount = 0
 
   override func createParserDelegate() {
-    let prefetch = library.getElements(prefetchIDs: idParserDelegate.prefetchIDs)
+    let prefetch = library.getElements(account: account, prefetchIDs: idParserDelegate.prefetchIDs)
     parserDelegate = PlaylistSongsParserDelegate(
       performanceMonitor: MOCK_PerformanceMonitor(), playlist: playlist, prefetch: prefetch,
       account: account,
@@ -135,7 +135,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
       songCount: 4,
       songLibraryCount: 4 + createdSongCount
     )
-    XCTAssertEqual(library.songCount, 4 + createdSongCount)
+    XCTAssertEqual(library.getSongCount(for: account), 4 + createdSongCount)
 
     XCTAssertEqual(playlist.playables.count, 4)
     XCTAssertEqual(playlist.duration, 1442)

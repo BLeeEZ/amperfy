@@ -145,7 +145,7 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
           let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
     else { return nil }
     do {
-      try fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath)
+      try fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath, accountInfo: account)
       return relFilePath
     } catch {
       return nil
