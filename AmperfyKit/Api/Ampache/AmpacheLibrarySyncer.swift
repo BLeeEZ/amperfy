@@ -855,11 +855,8 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let artistsResponse = try await ampacheXmlServerApi.requestFavoriteArtists()
     try await storage.async.perform { asyncCompanion in
       os_log("Sync favorite artists", log: self.log, type: .info)
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
-      let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists())
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists(for: accountAsync))
 
       let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(

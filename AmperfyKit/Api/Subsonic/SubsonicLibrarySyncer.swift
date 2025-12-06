@@ -85,10 +85,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
     let artistsResponse = try await subsonicServerApi.requestArtists()
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: artistsResponse,
@@ -114,7 +111,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var pollCountArtist = 0
     storage.main.perform { companion in
-      let artists = companion.library.getArtists().filter { !$0.id.isEmpty }
+      let accountAsync = companion.library.getAccount(managedObjectId: self.accountObjectId)
+      let artists = companion.library.getArtists(for: accountAsync).filter { !$0.id.isEmpty }
       let albumCount = artists.reduce(0) { $0 + $1.remoteAlbumCount }
       pollCountArtist = max(
         1,
@@ -163,8 +161,9 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
 
     try await storage.async.perform { asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       // Delete duplicated artists due to concurrence
-      let allArtists = asyncCompanion.library.getArtists()
+      let allArtists = asyncCompanion.library.getArtists(for: accountAsync)
       var uniqueArtists: [String: Artist] = [:]
       for artist in allArtists {
         if uniqueArtists[artist.id] != nil {
@@ -710,11 +709,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestFavoriteElements()
     try await storage.async.perform { asyncCompanion in
       os_log("Sync favorite artists", log: self.log, type: .info)
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
-      let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists())
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      let oldFavoriteArtists = Set(asyncCompanion.library.getFavoriteArtists(for: accountAsync))
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,

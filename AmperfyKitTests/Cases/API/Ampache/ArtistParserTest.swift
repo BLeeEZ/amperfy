@@ -44,7 +44,7 @@ class ArtistParserTest: AbstractAmpacheTest {
       artistCount: 4
     )
 
-    let artists = library.getArtists()
+    let artists = library.getArtists(for: account)
     XCTAssertEqual(artists.count, 4)
     XCTAssertEqual(library.getGenreCount(for: account), 1)
 

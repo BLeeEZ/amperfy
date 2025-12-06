@@ -407,11 +407,13 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         var artists = [Artist]()
         switch self.displayFilter {
         case .all:
-          artists = self.appDelegate.storage.main.library.getArtists()
+          artists = self.appDelegate.storage.main.library.getArtists(for: self.appDelegate.account)
         case .albumArtists:
-          artists = self.appDelegate.storage.main.library.getAlbumArtists()
+          artists = self.appDelegate.storage.main.library
+            .getAlbumArtists(for: self.appDelegate.account)
         case .favorites:
-          artists = self.appDelegate.storage.main.library.getFavoriteArtists()
+          artists = self.appDelegate.storage.main.library
+            .getFavoriteArtists(for: self.appDelegate.account)
         }
         let artistSongs = Array(artists.compactMap { $0.playables }.joined())
         if artistSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {

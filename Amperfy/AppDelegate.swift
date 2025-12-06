@@ -125,6 +125,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       librarySyncer: librarySyncer,
       playableDownloadManager: playableDownloadManager,
       library: storage.main.library,
+      account: account,
       player: player, networkMonitor: networkMonitor,
       eventLogger: eventLogger
     )

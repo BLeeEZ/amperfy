@@ -46,7 +46,7 @@ class SsArtistParserTest: AbstractSsParserTest {
       artistCount: 6
     )
 
-    let artists = library.getArtists().sorted(by: { Int($0.id)! < Int($1.id)! })
+    let artists = library.getArtists(for: account).sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(artists.count, 6)
 
     var artist = artists[0]

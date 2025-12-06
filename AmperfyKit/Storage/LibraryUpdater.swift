@@ -200,10 +200,10 @@ public class LibraryUpdater {
   @MainActor
   private func updateAlphabeticSectionInitial() {
     os_log("Library update: Genres", log: log, type: .info)
-    let genres = storage.main.library.getGenres()
+    let genres = storage.main.library.getAllGenres()
     genres.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Artists", log: log, type: .info)
-    let artists = storage.main.library.getArtists()
+    let artists = storage.main.library.getAllArtists()
     artists.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Albums", log: log, type: .info)
     let albums = storage.main.library.getAlbums()
@@ -292,7 +292,7 @@ public class LibraryUpdater {
     }
     os_log("Genre Denormalize", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let genres = asyncCompanion.library.getGenres(isFaultsOptimized: true)
+      let genres = asyncCompanion.library.getAllGenres()
       notifier.startOperation(name: "Genre Update", totalCount: genres.count)
       for genre in genres {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -304,7 +304,7 @@ public class LibraryUpdater {
     }
     os_log("Artist Denormalize", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let artists = asyncCompanion.library.getArtists(isFaultsOptimized: true)
+      let artists = asyncCompanion.library.getAllArtists()
       notifier.startOperation(name: "Artist Update", totalCount: artists.count)
       for artist in artists {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)

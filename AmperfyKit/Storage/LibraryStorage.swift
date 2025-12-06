@@ -921,6 +921,8 @@ public class LibraryStorage: PlayableFileCachable {
     clearStorage(ofType: SearchHistoryItem.typeName)
   }
 
+  // MARK: FetchPredicates
+
   func getFetchPredicate(forAccount account: Account) -> NSPredicate {
     NSPredicate(format: "account == %@", account.managedObject.objectID)
   }
@@ -1129,8 +1131,23 @@ public class LibraryStorage: PlayableFileCachable {
     }
   }
 
-  public func getGenres(isFaultsOptimized: Bool = false) -> [Genre] {
+  // MARK: Genres
+
+  public func getAllGenres() -> [Genre] {
+    getGenres(account: nil, isFaultsOptimized: true)
+  }
+
+  public func getGenres(for account: Account) -> [Genre] {
+    getGenres(account: account, isFaultsOptimized: false)
+  }
+
+  private func getGenres(account: Account?, isFaultsOptimized: Bool) -> [Genre] {
     let fetchRequest = GenreMO.identifierSortedFetchRequest
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
     if isFaultsOptimized {
       fetchRequest.relationshipKeyPathsForPrefetching = GenreMO.relationshipKeyPathsForPrefetching
       fetchRequest.returnsObjectsAsFaults = false
@@ -1140,19 +1157,34 @@ public class LibraryStorage: PlayableFileCachable {
     return genres ?? [Genre]()
   }
 
-  public func getRandomGenres(count: Int) -> [Genre] {
+  public func getRandomGenres(for account: Account, count: Int) -> [Genre] {
     let fetchRequest = GenreMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
       AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
     ])
-
     let foundGenres = try? context.fetch(fetchRequest)
     let genres = foundGenres?[randomPick: count].compactMap { Genre(managedObject: $0) }
     return genres ?? [Genre]()
   }
 
-  public func getArtists(isFaultsOptimized: Bool = false) -> [Artist] {
+  // MARK: Artists
+
+  public func getAllArtists() -> [Artist] {
+    getArtists(account: nil, isFaultsOptimized: true)
+  }
+
+  public func getArtists(for account: Account) -> [Artist] {
+    getArtists(account: account, isFaultsOptimized: false)
+  }
+
+  private func getArtists(account: Account?, isFaultsOptimized: Bool) -> [Artist] {
     let fetchRequest = ArtistMO.identifierSortedFetchRequest
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
     if isFaultsOptimized {
       fetchRequest.relationshipKeyPathsForPrefetching = ArtistMO.relationshipKeyPathsForPrefetching
       fetchRequest.returnsObjectsAsFaults = false
@@ -1162,27 +1194,31 @@ public class LibraryStorage: PlayableFileCachable {
     return artists ?? [Artist]()
   }
 
-  public func getRandomArtists(count: Int, onlyCached: Bool) -> [Artist] {
+  public func getRandomArtists(for account: Account, count: Int, onlyCached: Bool) -> [Artist] {
     let fetchRequest = ArtistMO.identifierSortedFetchRequest
     if onlyCached {
-      fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
         getFetchPredicate(onlyCachedArtists: true),
       ])
     } else {
-      fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-        AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-        getFetchPredicate(onlyCachedArtists: true),
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+        NSCompoundPredicate(orPredicateWithSubpredicates: [
+          AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+          getFetchPredicate(onlyCachedArtists: true),
+        ]),
       ])
     }
-
     let foundArtists = try? context.fetch(fetchRequest)
     let artists = foundArtists?[randomPick: count].compactMap { Artist(managedObject: $0) }
     return artists ?? [Artist]()
   }
 
-  public func getFavoriteArtists() -> [Artist] {
+  public func getFavoriteArtists(for account: Account) -> [Artist] {
     let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.identifierSortedFetchRequest
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
       NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite)),
     ])
     let foundArtists = try? context.fetch(fetchRequest)
@@ -1190,9 +1226,10 @@ public class LibraryStorage: PlayableFileCachable {
     return artists ?? [Artist]()
   }
 
-  public func getAlbumArtists() -> [Artist] {
+  public func getAlbumArtists(for account: Account) -> [Artist] {
     let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.identifierSortedFetchRequest
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
       getFetchPredicate(artistsDisplayFilter: .albumArtists),
     ])
     let foundArtists = try? context.fetch(fetchRequest)

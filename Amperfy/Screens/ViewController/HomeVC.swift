@@ -620,6 +620,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomArtists(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomArtists = appDelegate.storage.main.library.getRandomArtists(
+        for: self.appDelegate.account,
         count: Self.sectionMaxItemCount,
         onlyCached: isOfflineMode
       )
@@ -633,6 +634,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomGenres() {
     Task { @MainActor in
       let randomGenres = appDelegate.storage.main.library.getRandomGenres(
+        for: appDelegate.account,
         count: Self.sectionMaxItemCount
       )
       data[.randomGenres] = randomGenres.compactMap {

@@ -99,6 +99,7 @@ public class IntentManager {
   private let librarySyncer: LibrarySyncer
   private let playableDownloadManager: DownloadManageable
   private let library: LibraryStorage
+  private let account: Account
   private let player: PlayerFacade
   private let networkMonitor: NetworkMonitorFacade
   private let eventLogger: EventLogger
@@ -109,6 +110,7 @@ public class IntentManager {
     librarySyncer: LibrarySyncer,
     playableDownloadManager: DownloadManageable,
     library: LibraryStorage,
+    account: Account,
     player: PlayerFacade,
     networkMonitor: NetworkMonitorFacade,
     eventLogger: EventLogger
@@ -117,6 +119,7 @@ public class IntentManager {
     self.librarySyncer = librarySyncer
     self.playableDownloadManager = playableDownloadManager
     self.library = library
+    self.account = account
     self.player = player
     self.networkMonitor = networkMonitor
     self.eventLogger = eventLogger
@@ -220,7 +223,8 @@ public class IntentManager {
       }
       let playableContainer = self.getPlayableContainer(
         searchTerm: searchTerm,
-        searchCategory: searchCategory
+        searchCategory: searchCategory,
+        account: self.account
       )
       Task { @MainActor in
         let playSuccess = await self.play(
@@ -811,7 +815,8 @@ public class IntentManager {
         )
         if let playableContainer = getPlayableContainer(
           searchTerm: mediaName,
-          searchCategory: playableContainerType
+          searchCategory: playableContainerType,
+          account: account
         ) {
           result = AmperfyMediaIntentItemResult(
             playableContainer: playableContainer,
@@ -836,7 +841,8 @@ public class IntentManager {
           os_log("Search explicitly in genre: <%s>", log: self.log, type: .info, genre)
           if let playableContainer = getPlayableContainer(
             searchTerm: genre,
-            searchCategory: .genre
+            searchCategory: .genre,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -880,7 +886,8 @@ public class IntentManager {
           os_log("Search implicitly in playlists: <%s>", log: self.log, type: .info, mediaName)
           if let playableContainer = getPlayableContainer(
             searchTerm: mediaName,
-            searchCategory: .playlist
+            searchCategory: .playlist,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -897,7 +904,8 @@ public class IntentManager {
           os_log("Search implicitly in artists: <%s>", log: self.log, type: .info, mediaName)
           if let playableContainer = getPlayableContainer(
             searchTerm: mediaName,
-            searchCategory: .artist
+            searchCategory: .artist,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -914,7 +922,8 @@ public class IntentManager {
           os_log("Search implicitly in podcasts: <%s>", log: self.log, type: .info, mediaName)
           if let playableContainer = getPlayableContainer(
             searchTerm: mediaName,
-            searchCategory: .podcast
+            searchCategory: .podcast,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -931,7 +940,8 @@ public class IntentManager {
           os_log("Search implicitly in albums: <%s>", log: self.log, type: .info, mediaName)
           if let playableContainer = getPlayableContainer(
             searchTerm: mediaName,
-            searchCategory: .album
+            searchCategory: .album,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -948,7 +958,8 @@ public class IntentManager {
           os_log("Search implicitly in songs: <%s>", log: self.log, type: .info, mediaName)
           if let playableContainer = getPlayableContainer(
             searchTerm: mediaName,
-            searchCategory: .song
+            searchCategory: .song,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -971,7 +982,8 @@ public class IntentManager {
           )
           if let playableContainer = getPlayableContainer(
             searchTerm: mediaName,
-            searchCategory: .podcastEpisode
+            searchCategory: .podcastEpisode,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -997,7 +1009,8 @@ public class IntentManager {
           os_log("Search implicitly in genre: <%s>", log: self.log, type: .info, genre)
           if let playableContainer = getPlayableContainer(
             searchTerm: genre,
-            searchCategory: .genre
+            searchCategory: .genre,
+            account: account
           ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
@@ -1070,7 +1083,8 @@ public class IntentManager {
 
       let playableContainer = getPlayableContainer(
         searchTerm: searchTerm,
-        searchCategory: searchCategory
+        searchCategory: searchCategory,
+        account: account
       )
       return await play(
         container: playableContainer,
@@ -1117,7 +1131,8 @@ public class IntentManager {
 
   private func getPlayableContainer(
     searchTerm: String,
-    searchCategory: PlayableContainerType
+    searchCategory: PlayableContainerType,
+    account: Account
   )
     -> PlayableContainable? {
     var playableContainer: PlayableContainable?
@@ -1129,8 +1144,11 @@ public class IntentManager {
       playableContainer = FuzzySearcher.findBestMatch(in: library.getSongs(), search: searchTerm)
         .first
     case .artist:
-      playableContainer = FuzzySearcher.findBestMatch(in: library.getArtists(), search: searchTerm)
-        .first
+      playableContainer = FuzzySearcher.findBestMatch(
+        in: library.getArtists(for: account),
+        search: searchTerm
+      )
+      .first
     case .podcastEpisode:
       playableContainer = FuzzySearcher.findBestMatch(
         in: library.getPodcastEpisodes(),
@@ -1143,8 +1161,11 @@ public class IntentManager {
       playableContainer = FuzzySearcher.findBestMatch(in: library.getAlbums(), search: searchTerm)
         .first
     case .genre:
-      playableContainer = FuzzySearcher.findBestMatch(in: library.getGenres(), search: searchTerm)
-        .first
+      playableContainer = FuzzySearcher.findBestMatch(
+        in: library.getGenres(for: account),
+        search: searchTerm
+      )
+      .first
     case .podcast:
       playableContainer = FuzzySearcher.findBestMatch(in: library.getPodcasts(), search: searchTerm)
         .first
