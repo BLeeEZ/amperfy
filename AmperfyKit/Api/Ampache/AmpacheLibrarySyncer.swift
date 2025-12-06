@@ -913,7 +913,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await storage.async.perform { asyncCompanion in
       os_log("Sync favorite songs", log: self.log, type: .info)
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
+      let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs(for: accountAsync))
 
       let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
@@ -943,7 +943,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await ampacheXmlServerApi.requestRadios()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      let oldRadios = Set(asyncCompanion.library.getRadios())
+      let oldRadios = Set(asyncCompanion.library.getRadios(for: accountAsync))
 
       let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(

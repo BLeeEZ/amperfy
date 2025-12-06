@@ -466,11 +466,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         var songs = [Song]()
         switch self.displayFilter {
         case .all:
-          songs = self.appDelegate.storage.main.library.getSongs()
+          songs = self.appDelegate.storage.main.library.getSongs(for: self.appDelegate.account)
         case .newest, .recent:
           break
         case .favorites:
-          songs = self.appDelegate.storage.main.library.getFavoriteSongs()
+          songs = self.appDelegate.storage.main.library
+            .getFavoriteSongs(for: self.appDelegate.account)
         }
         if songs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
           let alert = UIAlertController(

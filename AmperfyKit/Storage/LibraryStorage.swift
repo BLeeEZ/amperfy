@@ -702,12 +702,12 @@ public class LibraryStorage: PlayableFileCachable {
     }
   }
 
-  public func deletePlayableCachePaths(account: Account) {
-    let songs = getCachedSongs(account: account)
+  public func deletePlayableCachePaths(for account: Account) {
+    let songs = getCachedSongs(for: account)
     songs.forEach {
       deleteCacheFinalStep(playable: $0)
     }
-    let episodes = getCachedPodcastEpisodes(account: account)
+    let episodes = getCachedPodcastEpisodes(for: account)
     episodes.forEach {
       deleteCacheFinalStep(playable: $0)
     }
@@ -1131,6 +1131,15 @@ public class LibraryStorage: PlayableFileCachable {
     }
   }
 
+  // MARK: AbstractLibraryEntity
+
+  public func getAllAbstractLibraryEntities() -> [AbstractLibraryEntity] {
+    let fetchRequest = AbstractLibraryEntityMO.fetchRequest()
+    let foundEntities = try? context.fetch(fetchRequest)
+    let entities = foundEntities?.compactMap { AbstractLibraryEntity(managedObject: $0) }
+    return entities ?? [AbstractLibraryEntity]()
+  }
+
   // MARK: Genres
 
   public func getAllGenres() -> [Genre] {
@@ -1391,14 +1400,29 @@ public class LibraryStorage: PlayableFileCachable {
     return podcasts ?? [Podcast]()
   }
 
-  public func getPodcastEpisodes() -> [PodcastEpisode] {
+  // MARK: PodcastEpisodes
+
+  public func getAllPodcastEpisodes() -> [PodcastEpisode] {
+    getPodcastEpisodes(account: nil)
+  }
+
+  public func getPodcastEpisodes(for account: Account) -> [PodcastEpisode] {
+    getPodcastEpisodes(account: account)
+  }
+
+  private func getPodcastEpisodes(account: Account?) -> [PodcastEpisode] {
     let fetchRequest = PodcastEpisodeMO.identifierSortedFetchRequest
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
     let foundPodcastEpisodes = try? context.fetch(fetchRequest)
     let podcastEpisodes = foundPodcastEpisodes?.compactMap { PodcastEpisode(managedObject: $0) }
     return podcastEpisodes ?? [PodcastEpisode]()
   }
 
-  public func getCachedPodcastEpisodes(account: Account) -> [PodcastEpisode] {
+  public func getCachedPodcastEpisodes(for account: Account) -> [PodcastEpisode] {
     let fetchRequest = PodcastEpisodeMO.identifierSortedFetchRequest
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
       getFetchPredicate(forAccount: account),
@@ -1409,32 +1433,85 @@ public class LibraryStorage: PlayableFileCachable {
     return podcastEpisodes ?? [PodcastEpisode]()
   }
 
-  /// depricated: file data is now in file manager
-  public func getCachedPodcastEpisodesThatHaveFileDataInCoreData() -> [PodcastEpisode] {
-    let fetchRequest = PodcastEpisodeMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSPredicate(format: "%K != nil", #keyPath(PodcastEpisodeMO.file))
-    let foundPodcastEpisodes = try? context.fetch(fetchRequest)
-    let podcastEpisodes = foundPodcastEpisodes?.compactMap { PodcastEpisode(managedObject: $0) }
-    return podcastEpisodes ?? [PodcastEpisode]()
+  // MARK: Songs
+
+  public func getAllSongs() -> [Song] {
+    getSongs(account: nil)
   }
 
-  public func getAbstractLibraryEntities() -> [AbstractLibraryEntity] {
-    let fetchRequest = AbstractLibraryEntityMO.fetchRequest()
-    let foundEntities = try? context.fetch(fetchRequest)
-    let entities = foundEntities?.compactMap { AbstractLibraryEntity(managedObject: $0) }
-    return entities ?? [AbstractLibraryEntity]()
+  public func getSongs(for account: Account) -> [Song] {
+    getSongs(account: account)
   }
 
-  public func getSongs() -> [Song] {
+  private func getSongs(account: Account?) -> [Song] {
     let fetchRequest = SongMO.identifierSortedFetchRequest
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
     return songs ?? [Song]()
   }
 
-  public func getRadios() -> [Radio] {
+  public func getCachedSongs(for account: Account) -> [Song] {
+    let fetchRequest = SongMO.identifierSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      getFetchPredicate(onlyCachedSongs: true),
+    ])
+    let foundSongs = try? context.fetch(fetchRequest)
+    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
+    return songs ?? [Song]()
+  }
+
+  public func getRandomSongs(for account: Account, count: Int = 100, onlyCached: Bool) -> [Song] {
+    let fetchRequest = SongMO.identifierSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      getFetchPredicate(onlyCachedSongs: onlyCached),
+    ])
+    let foundSongs = try? context.fetch(fetchRequest)
+    let songs = foundSongs?[randomPick: count].compactMap { Song(managedObject: $0) }
+    return songs ?? [Song]()
+  }
+
+  public func getFavoriteSongs(for account: Account) -> [Song] {
+    let fetchRequest = SongMO.identifierSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite)),
+    ])
+    let foundSongs = try? context.fetch(fetchRequest)
+    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
+    return songs ?? [Song]()
+  }
+
+  public func getSongsForCompleteLibraryDownload(for account: Account) -> [Song] {
+    let fetchRequest = SongMO.identifierSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      NSPredicate(format: "%K == nil", #keyPath(SongMO.relFilePath)),
+      NSPredicate(format: "%K == nil", #keyPath(SongMO.download)),
+    ])
+    let foundSongs = try? context.fetch(fetchRequest)
+    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
+    return songs ?? [Song]()
+  }
+
+  // MARK: Radios
+
+  public func getRadios(for account: Account) -> [Radio] {
     let fetchRequest = RadioMO.identifierSortedFetchRequest
-    fetchRequest.predicate = RadioMO.excludeServerDeleteRadiosFetchPredicate
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      RadioMO.excludeServerDeleteRadiosFetchPredicate,
+    ])
     let foundRadios = try? context.fetch(fetchRequest)
     let radios = foundRadios?.compactMap { Radio(managedObject: $0) }
     return radios ?? [Radio]()
@@ -1611,61 +1688,6 @@ public class LibraryStorage: PlayableFileCachable {
         getFetchPredicate(onlyCachedSongs: onlyCached),
       ]),
     ])
-    let foundSongs = try? context.fetch(fetchRequest)
-    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
-    return songs ?? [Song]()
-  }
-
-  public func getRandomSongs(count: Int = 100, onlyCached: Bool) -> [Song] {
-    let fetchRequest = SongMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-      getFetchPredicate(onlyCachedSongs: onlyCached),
-    ])
-    let foundSongs = try? context.fetch(fetchRequest)
-    let songs = foundSongs?[randomPick: count].compactMap { Song(managedObject: $0) }
-    return songs ?? [Song]()
-  }
-
-  public func getSongsForCompleteLibraryDownload() -> [Song] {
-    let fetchRequest = SongMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-      NSPredicate(format: "%K == nil", #keyPath(SongMO.relFilePath)),
-      NSPredicate(format: "%K == nil", #keyPath(SongMO.download)),
-    ])
-    let foundSongs = try? context.fetch(fetchRequest)
-    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
-    return songs ?? [Song]()
-  }
-
-  public func getFavoriteSongs() -> [Song] {
-    let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-      NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite)),
-    ])
-    let foundSongs = try? context.fetch(fetchRequest)
-    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
-    return songs ?? [Song]()
-  }
-
-  public func getCachedSongs(account: Account) -> [Song] {
-    let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-      getFetchPredicate(onlyCachedSongs: true),
-    ])
-    let foundSongs = try? context.fetch(fetchRequest)
-    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
-    return songs ?? [Song]()
-  }
-
-  /// depricated: file data is now in file manager
-  public func getCachedSongsThatHaveFileDataInCoreData() -> [Song] {
-    let fetchRequest: NSFetchRequest<SongMO> = SongMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSPredicate(format: "%K != nil", #keyPath(SongMO.file))
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
     return songs ?? [Song]()

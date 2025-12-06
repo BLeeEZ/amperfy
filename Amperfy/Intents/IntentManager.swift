@@ -371,8 +371,11 @@ public class IntentManager {
         isOnlyUseCached = onlyCachedRaw == 1
       }
 
-      let songs = self.library.getSongs()
-        .filterCached(dependigOn: isOnlyUseCached)[randomPick: self.player.maxSongsToAddOnce]
+      let songs = self.library.getRandomSongs(
+        for: self.account,
+        count: self.player.maxSongsToAddOnce,
+        onlyCached: isOnlyUseCached
+      )
       let playerContext = PlayContext(name: "Random Songs", playables: songs)
       self.player.play(context: playerContext)
       success(nil)
@@ -777,7 +780,10 @@ public class IntentManager {
         mediaSearch.mediaType == .station ||
         mediaSearch.mediaType == .algorithmicRadioStation {
         os_log("Play Music", log: self.log, type: .info)
-        let playableElements = library.getRandomSongs(onlyCached: storage.settings.isOfflineMode)
+        let playableElements = library.getRandomSongs(
+          for: account,
+          onlyCached: storage.settings.isOfflineMode
+        )
         result = AmperfyMediaIntentItemResult(
           playableElements: playableElements,
           item: INMediaItem(
@@ -1119,8 +1125,11 @@ public class IntentManager {
       )
     } else if let playRandomSongsIntent = userActivity.playRandomSongsIntent {
       let cacheOnly = playRandomSongsIntent.filterOption == .cache
-      let songs = library.getSongs()
-        .filterCached(dependigOn: cacheOnly)[randomPick: player.maxSongsToAddOnce]
+      let songs = library.getRandomSongs(
+        for: account,
+        count: player.maxSongsToAddOnce,
+        onlyCached: cacheOnly
+      )
       let playerContext = PlayContext(name: "Random Songs", playables: songs)
       return play(context: playerContext, shuffleOption: true, repeatOption: .off)
 
@@ -1141,8 +1150,11 @@ public class IntentManager {
     case .unknown:
       fallthrough
     case .song:
-      playableContainer = FuzzySearcher.findBestMatch(in: library.getSongs(), search: searchTerm)
-        .first
+      playableContainer = FuzzySearcher.findBestMatch(
+        in: library.getSongs(for: account),
+        search: searchTerm
+      )
+      .first
     case .artist:
       playableContainer = FuzzySearcher.findBestMatch(
         in: library.getArtists(for: account),
@@ -1151,7 +1163,7 @@ public class IntentManager {
       .first
     case .podcastEpisode:
       playableContainer = FuzzySearcher.findBestMatch(
-        in: library.getPodcastEpisodes(),
+        in: library.getPodcastEpisodes(for: account),
         search: searchTerm
       ).first
     case .playlist:
@@ -1180,7 +1192,10 @@ public class IntentManager {
   }
 
   private func getSong(songName: String, artistName: String) -> PlayableContainable? {
-    let foundPlayables = FuzzySearcher.findBestMatch(in: library.getSongs(), search: songName)
+    let foundPlayables = FuzzySearcher.findBestMatch(
+      in: library.getSongs(for: account),
+      search: songName
+    )
     let foundSongs = foundPlayables.compactMap { $0 as? Song }
     let artists = foundSongs.compactMap { $0.artist }
     let matchingArtistsRaw = FuzzySearcher.findBestMatch(in: artists, search: artistName)

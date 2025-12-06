@@ -209,13 +209,13 @@ public class LibraryUpdater {
     let albums = storage.main.library.getAllAlbums()
     albums.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Songs", log: log, type: .info)
-    let songs = storage.main.library.getSongs()
+    let songs = storage.main.library.getAllSongs()
     songs.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Podcasts", log: log, type: .info)
     let podcasts = storage.main.library.getAllPodcasts()
     podcasts.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: PodcastEpisodes", log: log, type: .info)
-    let podcastEpisodes = storage.main.library.getPodcastEpisodes()
+    let podcastEpisodes = storage.main.library.getAllPodcastEpisodes()
     podcastEpisodes.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Directories", log: log, type: .info)
     let directories = storage.main.library.getDirectories()
@@ -428,7 +428,7 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let episodes = asyncCompanion.library.getPodcastEpisodes()
+      let episodes = asyncCompanion.library.getAllPodcastEpisodes()
       notifier.startOperation(name: "Podcast Episodes Update", totalCount: episodes.count)
       for episode in episodes {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -439,7 +439,7 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let songs = asyncCompanion.library.getSongs()
+      let songs = asyncCompanion.library.getAllSongs()
       notifier.startOperation(name: "Songs Update", totalCount: songs.count)
       for song in songs {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -468,7 +468,7 @@ public class LibraryUpdater {
      x SearchHistories
      */
     try await storage.async.perform { asyncCompanion in
-      let entities = asyncCompanion.library.getAbstractLibraryEntities()
+      let entities = asyncCompanion.library.getAllAbstractLibraryEntities()
       let accountAsync = Account(
         managedObject: asyncCompanion.context
           .object(with: accountObjectId) as! AccountMO

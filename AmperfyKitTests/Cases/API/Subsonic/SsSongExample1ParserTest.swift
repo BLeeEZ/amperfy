@@ -50,7 +50,7 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
       artworkFetchCount: 1 // the album cover itself is not created and all songs have the same cover
     )
 
-    let songs = library.getSongs().sorted(by: { $0.id < $1.id })
+    let songs = library.getSongs(for: account).sorted(by: { $0.id < $1.id })
     XCTAssertEqual(songs.count, 8)
 
     let dateFormatter = ISO8601DateFormatter()

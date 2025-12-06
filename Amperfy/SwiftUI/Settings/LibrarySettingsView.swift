@@ -273,11 +273,11 @@ struct LibrarySettingsView: View {
             Alert(
               title: Text("Download all songs in library"),
               message: Text(
-                "This action will add all uncached songs in \"Library -> Songs\" to the download queue. High network traffic can be generated and device storage capacity will be taken. Continue?"
+                "This will add all uncached songs in your library to the download queue. This may use a lot of data and storage. Continue?"
               ),
               primaryButton: .default(Text("OK")) {
                 let allSongsToDownload = appDelegate.storage.main.library
-                  .getSongsForCompleteLibraryDownload()
+                  .getSongsForCompleteLibraryDownload(for: appDelegate.account)
                 appDelegate.playableDownloadManager.download(objects: allSongsToDownload)
               },
               secondaryButton: .cancel()
@@ -299,7 +299,7 @@ struct LibrarySettingsView: View {
                 appDelegate.player.stop()
                 appDelegate.playableDownloadManager.stop()
                 appDelegate.storage.main.library
-                  .deletePlayableCachePaths(account: appDelegate.account)
+                  .deletePlayableCachePaths(for: appDelegate.account)
                 appDelegate.storage.main.library.saveContext()
                 fileManager.deletePlayableCache(accountInfo: appDelegate.account.info)
                 appDelegate.playableDownloadManager.start()

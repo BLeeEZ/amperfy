@@ -740,7 +740,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       notFavoriteAlbumsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
 
       os_log("Sync favorite songs", log: self.log, type: .info)
-      let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs())
+      let oldFavoriteSongs = Set(asyncCompanion.library.getFavoriteSongs(for: accountAsync))
       let parserDelegateSong = SsSongParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
         library: asyncCompanion.library
@@ -757,7 +757,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestRadios()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      let oldRadios = Set(asyncCompanion.library.getRadios())
+      let oldRadios = Set(asyncCompanion.library.getRadios(for: accountAsync))
 
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(

@@ -64,7 +64,7 @@ class SsSongExample2ParserTest: AbstractSsParserTest {
     let dateFormatter = ISO8601DateFormatter()
     dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
 
-    let songs = library.getSongs().sorted(by: { $0.id > $1.id })
+    let songs = library.getSongs(for: account).sorted(by: { $0.id > $1.id })
     XCTAssertEqual(songs.count, 2)
 
     var song = songs[0]

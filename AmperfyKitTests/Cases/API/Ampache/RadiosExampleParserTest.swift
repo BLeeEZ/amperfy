@@ -41,7 +41,7 @@ class RadiosExampleParserTest: AbstractAmpacheTest {
       radioCount: 3
     )
 
-    let radios = library.getRadios().sorted(by: { $0.id < $1.id })
+    let radios = library.getRadios(for: account).sorted(by: { $0.id < $1.id })
     XCTAssertEqual(radios.count, 3)
 
     var radio = radios[0]

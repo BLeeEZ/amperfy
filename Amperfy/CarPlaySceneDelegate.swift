@@ -447,7 +447,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     item.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       let songs = appDelegate.storage.main.library
-        .getRandomSongs(onlyCached: onlyCached || isOfflineMode)
+        .getRandomSongs(for: appDelegate.account, onlyCached: onlyCached || isOfflineMode)
       let playContext = PlayContext(
         name: "Random\(onlyCached ? " Cached" : "") Songs",
         playables: songs

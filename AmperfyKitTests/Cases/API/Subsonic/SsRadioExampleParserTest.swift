@@ -45,7 +45,7 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
       radioCount: 2
     )
 
-    let radios = library.getRadios().sorted(by: { $0.id < $1.id })
+    let radios = library.getRadios(for: account).sorted(by: { $0.id < $1.id })
     XCTAssertEqual(radios.count, 2)
 
     var radio = radios[0]

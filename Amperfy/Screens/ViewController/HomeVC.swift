@@ -650,6 +650,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomSongs(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomSongs = appDelegate.storage.main.library.getRandomSongs(
+        for: appDelegate.account,
         count: Self.sectionMaxItemCount,
         onlyCached: isOfflineMode
       )

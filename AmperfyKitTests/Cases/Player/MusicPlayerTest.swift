@@ -1433,7 +1433,7 @@ class MusicPlayerTest: XCTestCase {
   }
 
   func testPlayPreviousOrReplay_Radio_Previous() {
-    let radios = library.getRadios()
+    let radios = library.getRadios(for: account)
     XCTAssertEqual(radios.count, 4)
     testPlayer.play(context: PlayContext(name: "Radios", playables: radios))
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
@@ -1446,7 +1446,7 @@ class MusicPlayerTest: XCTestCase {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "DidStartPlaying")
     mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
 
-    let radios = library.getRadios()
+    let radios = library.getRadios(for: account)
     XCTAssertEqual(radios.count, 4)
     testPlayer.play(context: PlayContext(name: "Radios", playables: radios))
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
@@ -1461,7 +1461,7 @@ class MusicPlayerTest: XCTestCase {
   }
 
   func testRadioInvalidUrl() {
-    let radios = library.getRadios()
+    let radios = library.getRadios(for: account)
 
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "Normal Play")
     mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 1

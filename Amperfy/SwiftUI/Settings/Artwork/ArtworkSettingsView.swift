@@ -109,7 +109,7 @@ struct ArtworkSettingsView: View {
             Alert(
               title: Text("Delete all downloaded artworks"),
               message: Text(
-                "This action will delete this account´s downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
+                "This action will delete downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
               ),
               primaryButton: .destructive(Text("Delete")) {
                 appDelegate.artworkDownloadManager.stop()
