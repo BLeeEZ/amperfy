@@ -285,18 +285,21 @@ struct LibrarySettingsView: View {
           }
 
           SettingsButtonRow(
-            title: "Delete downloaded Songs and Podcast Episodes",
+            title: "Delete downloaded songs and podcast episodes",
             actionType: .destructive
           ) {
             isShowDeleteCacheAlert = true
           }.alert(isPresented: $isShowDeleteCacheAlert) {
             Alert(
               title: Text("Delete Cache"),
-              message: Text("Are you sure to delete all downloaded Songs and Podcast Episodes?"),
+              message: Text(
+                "Are you sure you want to delete this account’s downloaded songs and podcast episodes?"
+              ),
               primaryButton: .destructive(Text("Delete")) {
                 appDelegate.player.stop()
                 appDelegate.playableDownloadManager.stop()
-                appDelegate.storage.main.library.deletePlayableCachePaths()
+                appDelegate.storage.main.library
+                  .deletePlayableCachePaths(account: appDelegate.account)
                 appDelegate.storage.main.library.saveContext()
                 fileManager.deletePlayableCache(accountInfo: appDelegate.account.info)
                 appDelegate.playableDownloadManager.start()

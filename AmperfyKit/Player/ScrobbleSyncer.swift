@@ -69,7 +69,7 @@ public class ScrobbleSyncer {
   }
 
   public func start() {
-    guard storage.main.library.uploadableScrobbleEntryCount > 0 else { return }
+    guard storage.main.library.getUploadableScrobbleEntryCount(for: account) > 0 else { return }
     isRunning = true
     if !isActive {
       isActive = true

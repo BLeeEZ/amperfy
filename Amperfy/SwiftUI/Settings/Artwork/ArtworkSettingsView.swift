@@ -56,10 +56,11 @@ struct ArtworkSettingsView: View {
               .object(with: accountObjectId) as! AccountMO
           )
           let artworkCount = asyncCompanion.library.getArtworkCount(for: accountAsync)
-          let artworkNotCheckedCount = asyncCompanion.library.artworkNotCheckedCount
+          let artworkNotCheckedCount = asyncCompanion.library
+            .getArtworkNotCheckedCount(for: accountAsync)
           let artworkNotCheckedDisplayCount = artworkNotCheckedCount > Self
             .artworkNotCheckedThreshold ? artworkNotCheckedCount : 0
-          let cachedArtworkCount = asyncCompanion.library.cachedArtworkCount
+          let cachedArtworkCount = asyncCompanion.library.getCachedArtworkCount(for: accountAsync)
           return (
             String(artworkCount),
             String(artworkNotCheckedDisplayCount),
@@ -108,13 +109,14 @@ struct ArtworkSettingsView: View {
             Alert(
               title: Text("Delete all downloaded artworks"),
               message: Text(
-                "This action will delete all downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
+                "This action will delete this account´s downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
               ),
               primaryButton: .destructive(Text("Delete")) {
                 appDelegate.artworkDownloadManager.stop()
                 appDelegate.artworkDownloadManager.cancelDownloads()
                 appDelegate.artworkDownloadManager.clearFinishedDownloads()
-                appDelegate.storage.main.library.deleteRemoteArtworkCachePaths()
+                appDelegate.storage.main.library
+                  .deleteRemoteArtworkCachePaths(account: appDelegate.account)
                 appDelegate.storage.main.library.saveContext()
                 fileManager.deleteRemoteArtworkCache(accountInfo: appDelegate.account.info)
                 appDelegate.artworkDownloadManager.start()

@@ -88,7 +88,8 @@ final class DownloadRequestManager: Sendable {
   }
 
   nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) -> Download? {
-    if let existingDownload = library.getDownload(id: object.uniqueID) {
+    let account = library.getAccount(managedObjectId: accountObjectId)
+    if let existingDownload = library.getDownload(account: account, id: object.uniqueID) {
       if existingDownload.errorDate != nil {
         existingDownload.reset()
         library.saveContext()
@@ -97,8 +98,7 @@ final class DownloadRequestManager: Sendable {
       return nil
     }
 
-    let account = library.getAccount(managedObjectId: accountObjectId)
-    let newDownload = library.createDownload(id: object.uniqueID, account: account)
+    let newDownload = library.createDownload(account: account, id: object.uniqueID)
     newDownload.element = object
     library.saveContext()
     return newDownload
@@ -106,8 +106,12 @@ final class DownloadRequestManager: Sendable {
 
   func removeFinishedDownload(for uniqueID: String) async {
     try? await storage.perform { asyncCompanion in
-      guard let existingDownload = asyncCompanion.library.getDownload(id: uniqueID),
-            existingDownload.finishDate != nil
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      guard let existingDownload = asyncCompanion.library.getDownload(
+        account: account,
+        id: uniqueID
+      ),
+        existingDownload.finishDate != nil
       else { return }
       asyncCompanion.library.deleteDownload(existingDownload)
       asyncCompanion.saveContext()
@@ -116,9 +120,13 @@ final class DownloadRequestManager: Sendable {
 
   func removeFinishedDownload(for uniqueIDs: [String]) async {
     try? await storage.perform { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       for uniqueID in uniqueIDs {
-        guard let existingDownload = asyncCompanion.library.getDownload(id: uniqueID),
-              existingDownload.finishDate != nil
+        guard let existingDownload = asyncCompanion.library.getDownload(
+          account: account,
+          id: uniqueID
+        ),
+          existingDownload.finishDate != nil
         else { continue }
         asyncCompanion.library.deleteDownload(existingDownload)
       }

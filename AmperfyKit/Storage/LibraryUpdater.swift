@@ -481,7 +481,7 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let downloads = asyncCompanion.library.getDownloads()
+      let downloads = asyncCompanion.library.getAllDownloads()
       let accountAsync = Account(
         managedObject: asyncCompanion.context
           .object(with: accountObjectId) as! AccountMO
