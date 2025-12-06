@@ -45,7 +45,7 @@ class AlbumParserTest: AbstractAmpacheTest {
       albumCount: 3
     )
 
-    let albums = library.getAlbums().sorted(by: { $0.id < $1.id })
+    let albums = library.getAlbums(for: account).sorted(by: { $0.id < $1.id })
     XCTAssertEqual(albums.count, 3)
     XCTAssertEqual(library.getGenreCount(for: account), 2)
 

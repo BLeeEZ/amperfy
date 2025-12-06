@@ -334,6 +334,7 @@ public class AmperKit {
   public lazy var backgroundLibrarySyncer = {
     let autoSyncer = AutoDownloadLibrarySyncer(
       storage: self.storage,
+      account: self.account,
       librarySyncer: self.librarySyncer,
       playableDownloadManager: self.playableDownloadManager
     )
@@ -366,6 +367,7 @@ public class AmperKit {
   public lazy var backgroundFetchTriggeredSyncer = {
     BackgroundFetchTriggeredSyncer(
       storage: storage,
+      account: account,
       librarySyncer: librarySyncer,
       notificationManager: localNotificationManager,
       playableDownloadManager: playableDownloadManager

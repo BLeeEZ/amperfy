@@ -182,7 +182,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
       }
       // Delete duplicated albums due to concurrence
-      let albums = asyncCompanion.library.getAlbums()
+      let albums = asyncCompanion.library.getAlbums(for: accountAsync)
       var uniqueAlbums: [String: Album] = [:]
       for album in albums {
         if uniqueAlbums[album.id] != nil {
@@ -610,10 +610,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await syncDownPodcastsWithoutEpisodes()
     let response = try await subsonicServerApi.requestNewestPodcasts()
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -641,10 +638,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await subsonicServerApi.requestNewestAlbums(offset: offset, count: count)
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -661,7 +655,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
-      let oldNewestAlbums = asyncCompanion.library.getNewestAlbums(offset: offset, count: count)
+      let oldNewestAlbums = asyncCompanion.library.getNewestAlbums(
+        for: accountAsync,
+        offset: offset,
+        count: count
+      )
       oldNewestAlbums.forEach { $0.markAsNotNewAnymore() }
       parserDelegate.parsedAlbums.enumerated().forEach { index, album in
         album.updateIsNewestInfo(index: index + 1 + offset)
@@ -675,10 +673,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await subsonicServerApi.requestRecentAlbums(offset: offset, count: count)
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -695,7 +690,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
-      let oldRecentAlbums = asyncCompanion.library.getRecentAlbums(offset: offset, count: count)
+      let oldRecentAlbums = asyncCompanion.library.getRecentAlbums(
+        for: accountAsync,
+        offset: offset,
+        count: count
+      )
       oldRecentAlbums.forEach { $0.markAsNotRecentAnymore() }
       parserDelegate.parsedAlbums.enumerated().forEach { index, album in
         album.updateIsRecentInfo(index: index + 1 + offset)
@@ -731,7 +730,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       notFavoriteArtistsAnymore.forEach { $0.isFavorite = false; $0.starredDate = nil }
 
       os_log("Sync favorite albums", log: self.log, type: .info)
-      let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums())
+      let oldFavoriteAlbums = Set(asyncCompanion.library.getFavoriteAlbums(for: accountAsync))
       let parserDelegateAlbum = SsAlbumParserDelegate(
         performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
         library: asyncCompanion.library
@@ -757,10 +756,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await subsonicServerApi.requestRadios()
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let oldRadios = Set(asyncCompanion.library.getRadios())
 
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -793,10 +789,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await subsonicServerApi.requestMusicFolders()
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -822,10 +815,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestIndexes(musicFolderId: musicFolder.id)
     let musicFolderObjectId = musicFolder.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let musicFolderAsync = MusicFolder(
         managedObject: asyncCompanion.context
           .object(with: musicFolderObjectId) as! MusicFolderMO
@@ -857,10 +847,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestMusicDirectory(id: directory.id)
     let directoryObjectId = directory.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let directoryAsync = Directory(
         managedObject: asyncCompanion.context
           .object(with: directoryObjectId) as! DirectoryMO
@@ -892,10 +879,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestRandomSongs(count: count)
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -932,10 +916,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     let response = try await subsonicServerApi.requestPlaylists()
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let parserDelegate = SsPlaylistParserDelegate(
         performanceMonitor: self.performanceMonitor, account: accountAsync,
         library: asyncCompanion.library
@@ -953,10 +934,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Playlist \"%s\": Parse songs start", log: self.log, type: .info, playlist.name)
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let playlistAsync = Playlist(
         library: asyncCompanion.library,
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO
@@ -1078,10 +1056,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     let response = try await subsonicServerApi.requestPodcasts()
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
 
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -1213,10 +1188,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchArtists(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -1242,10 +1214,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchAlbums(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -1271,10 +1240,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchSongs(searchText: searchText)
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
         response: response,
@@ -1317,10 +1283,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestPlaylistCreate(name: playlist.name)
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let playlistAsync = Playlist(
         library: asyncCompanion.library,
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO

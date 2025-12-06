@@ -476,6 +476,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     item.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
+        for: appDelegate.account,
         count: 5,
         onlyCached: onlyCached || isOfflineMode
       )

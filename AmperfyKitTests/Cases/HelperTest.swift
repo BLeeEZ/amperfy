@@ -37,7 +37,7 @@ class HelperTest: XCTestCase {
   func testSeeder() {
     XCTAssertEqual(library.getAllAccounts().count, cdHelper.seeder.accounts.count)
     XCTAssertEqual(library.getAllArtists().count, cdHelper.seeder.artists.count)
-    XCTAssertEqual(library.getAlbums().count, cdHelper.seeder.albums.count)
+    XCTAssertEqual(library.getAllAlbums().count, cdHelper.seeder.albums.count)
     XCTAssertEqual(library.getSongs().count, cdHelper.seeder.songs.count)
     XCTAssertEqual(library.getPlaylists().count, cdHelper.seeder.playlists.count)
     let account = library.getAccount(info: TestAccountInfo.create1())

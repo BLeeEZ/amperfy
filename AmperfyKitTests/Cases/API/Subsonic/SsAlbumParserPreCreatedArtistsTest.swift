@@ -48,7 +48,7 @@ class SsAlbumParserPreCreatedArtistsTest: AbstractSsParserTest {
       artworkFetchCount: 15 // the artist artwork is not created
     )
 
-    let albums = library.getAlbums().sorted(by: { Int($0.id)! < Int($1.id)! })
+    let albums = library.getAlbums(for: account).sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(albums.count, 15)
 
     var album = albums[1]

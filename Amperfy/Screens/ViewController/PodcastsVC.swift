@@ -193,6 +193,7 @@ class PodcastsVC: MultiSourceTableViewController {
       Task { @MainActor in do {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
+          account: self.appDelegate.account,
           librarySyncer: self.appDelegate.librarySyncer,
           playableDownloadManager: self.appDelegate
             .playableDownloadManager

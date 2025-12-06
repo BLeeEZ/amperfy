@@ -214,6 +214,7 @@ class AlbumsCommonVCInteractions {
         do {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
+            account: appDelegate.account,
             librarySyncer: self.appDelegate.librarySyncer,
             playableDownloadManager: self.appDelegate.playableDownloadManager
           )
@@ -446,13 +447,16 @@ class AlbumsCommonVCInteractions {
         var albums = [Album]()
         switch self.displayFilter {
         case .all:
-          albums = self.appDelegate.storage.main.library.getAlbums()
+          albums = self.appDelegate.storage.main.library.getAlbums(for: self.appDelegate.account)
         case .newest:
-          albums = self.appDelegate.storage.main.library.getNewestAlbums()
+          albums = self.appDelegate.storage.main.library
+            .getNewestAlbums(for: self.appDelegate.account)
         case .recent:
-          albums = self.appDelegate.storage.main.library.getRecentAlbums()
+          albums = self.appDelegate.storage.main.library
+            .getRecentAlbums(for: self.appDelegate.account)
         case .favorites:
-          albums = self.appDelegate.storage.main.library.getFavoriteAlbums()
+          albums = self.appDelegate.storage.main.library
+            .getFavoriteAlbums(for: self.appDelegate.account)
         }
         let albumSongs = Array(albums.compactMap { $0.playables }.joined())
         if albumSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
@@ -556,6 +560,7 @@ class AlbumsCommonVCInteractions {
         } else {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
+            account: appDelegate.account,
             librarySyncer: self.appDelegate.librarySyncer,
             playableDownloadManager: self.appDelegate.playableDownloadManager
           )

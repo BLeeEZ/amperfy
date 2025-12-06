@@ -25,6 +25,7 @@ import UIKit
 
 public class BackgroundFetchTriggeredSyncer {
   private let storage: PersistentStorage
+  private let account: Account
   private let librarySyncer: LibrarySyncer
   private let notificationManager: LocalNotificationManager
   private let playableDownloadManager: DownloadManageable
@@ -32,11 +33,13 @@ public class BackgroundFetchTriggeredSyncer {
 
   init(
     storage: PersistentStorage,
+    account: Account,
     librarySyncer: LibrarySyncer,
     notificationManager: LocalNotificationManager,
     playableDownloadManager: DownloadManageable
   ) {
     self.storage = storage
+    self.account = account
     self.librarySyncer = librarySyncer
     self.notificationManager = notificationManager
     self.playableDownloadManager = playableDownloadManager
@@ -47,6 +50,7 @@ public class BackgroundFetchTriggeredSyncer {
     os_log("Perform podcast episode sync", log: self.log, type: .info)
     let autoDlLibSyncer = AutoDownloadLibrarySyncer(
       storage: storage,
+      account: account,
       librarySyncer: librarySyncer,
       playableDownloadManager: playableDownloadManager
     )

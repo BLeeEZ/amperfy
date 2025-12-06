@@ -27,15 +27,18 @@ import OSLog
 public class AutoDownloadLibrarySyncer {
   private let log = OSLog(subsystem: "Amperfy", category: "AutoDownloadLibrarySyncer")
   private let storage: PersistentStorage
+  private let account: Account
   private let librarySyncer: LibrarySyncer
   private let playableDownloadManager: DownloadManageable
 
   public init(
     storage: PersistentStorage,
+    account: Account,
     librarySyncer: LibrarySyncer,
     playableDownloadManager: DownloadManageable
   ) {
     self.storage = storage
+    self.account = account
     self.librarySyncer = librarySyncer
     self.playableDownloadManager = playableDownloadManager
   }
@@ -45,12 +48,20 @@ public class AutoDownloadLibrarySyncer {
     offset: Int = 0,
     count: Int = AmperKit.newestElementsFetchCount
   ) async throws {
-    let oldNewestAlbums = Set(storage.main.library.getNewestAlbums(offset: 0, count: count))
+    let oldNewestAlbums = Set(storage.main.library.getNewestAlbums(
+      for: account,
+      offset: 0,
+      count: count
+    ))
     var newNewestAlbums = Set<Album>()
     var fetchNeededNewestAlbums = Set<Album>()
 
     try await librarySyncer.syncNewestAlbums(offset: offset, count: count)
-    let updatedNewestAlbums = Set(storage.main.library.getNewestAlbums(offset: 0, count: count))
+    let updatedNewestAlbums = Set(storage.main.library.getNewestAlbums(
+      for: account,
+      offset: 0,
+      count: count
+    ))
     newNewestAlbums = updatedNewestAlbums.subtracting(oldNewestAlbums)
     if offset == 0 {
       if newNewestAlbums.isEmpty {

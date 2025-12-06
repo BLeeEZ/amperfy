@@ -1237,8 +1237,23 @@ public class LibraryStorage: PlayableFileCachable {
     return artists ?? [Artist]()
   }
 
-  public func getAlbums(isFaultsOptimized: Bool = false) -> [Album] {
+  // MARK: Albums
+
+  public func getAllAlbums() -> [Album] {
+    getAlbums(account: nil, isFaultsOptimized: true)
+  }
+
+  public func getAlbums(for account: Account) -> [Album] {
+    getAlbums(account: account, isFaultsOptimized: false)
+  }
+
+  public func getAlbums(account: Account?, isFaultsOptimized: Bool) -> [Album] {
     let fetchRequest = AlbumMO.identifierSortedFetchRequest
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
     if isFaultsOptimized {
       fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
       fetchRequest.returnsObjectsAsFaults = false
@@ -1248,9 +1263,12 @@ public class LibraryStorage: PlayableFileCachable {
     return albums ?? [Album]()
   }
 
-  public func getNewestAlbums(offset: Int = 0, count: Int = 50) -> [Album] {
+  public func getNewestAlbums(for account: Account, offset: Int = 0, count: Int = 50) -> [Album] {
     let fetchRequest = AlbumMO.newestSortedFetchRequest
-    fetchRequest.predicate = getFetchPredicate(albumsDisplayFilter: .newest)
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      getFetchPredicate(albumsDisplayFilter: .newest),
+    ])
     fetchRequest.fetchOffset = offset
     fetchRequest.fetchLimit = count
     let foundAlbums = try? context.fetch(fetchRequest)
@@ -1258,11 +1276,46 @@ public class LibraryStorage: PlayableFileCachable {
     return albums ?? [Album]()
   }
 
-  public func getRecentAlbums(offset: Int = 0, count: Int = 50) -> [Album] {
+  public func getRecentAlbums(for account: Account, offset: Int = 0, count: Int = 50) -> [Album] {
     let fetchRequest = AlbumMO.recentSortedFetchRequest
-    fetchRequest.predicate = getFetchPredicate(albumsDisplayFilter: .recent)
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      getFetchPredicate(albumsDisplayFilter: .recent),
+    ])
     fetchRequest.fetchOffset = offset
     fetchRequest.fetchLimit = count
+    let foundAlbums = try? context.fetch(fetchRequest)
+    let albums = foundAlbums?.compactMap { Album(managedObject: $0) }
+    return albums ?? [Album]()
+  }
+
+  public func getRandomAlbums(for account: Account, count: Int, onlyCached: Bool) -> [Album] {
+    let fetchRequest = AlbumMO.identifierSortedFetchRequest
+    if onlyCached {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+        getFetchPredicate(onlyCachedAlbums: true),
+      ])
+    } else {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+        NSCompoundPredicate(orPredicateWithSubpredicates: [
+          AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+          getFetchPredicate(onlyCachedAlbums: true),
+        ]),
+      ])
+    }
+    let foundAlbums = try? context.fetch(fetchRequest)
+    let albums = foundAlbums?[randomPick: count].compactMap { Album(managedObject: $0) }
+    return albums ?? [Album]()
+  }
+
+  public func getFavoriteAlbums(for account: Account,) -> [Album] {
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.identifierSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite)),
+    ])
     let foundAlbums = try? context.fetch(fetchRequest)
     let albums = foundAlbums?.compactMap { Album(managedObject: $0) }
     return albums ?? [Album]()
@@ -1286,33 +1339,7 @@ public class LibraryStorage: PlayableFileCachable {
     return albums ?? [Album]()
   }
 
-  public func getRandomAlbums(count: Int, onlyCached: Bool) -> [Album] {
-    let fetchRequest = AlbumMO.identifierSortedFetchRequest
-    if onlyCached {
-      fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-        getFetchPredicate(onlyCachedAlbums: true),
-      ])
-    } else {
-      fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-        AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-        getFetchPredicate(onlyCachedAlbums: true),
-      ])
-    }
-
-    let foundAlbums = try? context.fetch(fetchRequest)
-    let albums = foundAlbums?[randomPick: count].compactMap { Album(managedObject: $0) }
-    return albums ?? [Album]()
-  }
-
-  public func getFavoriteAlbums() -> [Album] {
-    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite)),
-    ])
-    let foundAlbums = try? context.fetch(fetchRequest)
-    let albums = foundAlbums?.compactMap { Album(managedObject: $0) }
-    return albums ?? [Album]()
-  }
+  // MARK: Podcasts
 
   public func getPodcasts(isFaultsOptimized: Bool = false) -> [Podcast] {
     let fetchRequest = PodcastMO.identifierSortedFetchRequest

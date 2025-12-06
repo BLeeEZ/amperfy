@@ -206,7 +206,7 @@ public class LibraryUpdater {
     let artists = storage.main.library.getAllArtists()
     artists.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Albums", log: log, type: .info)
-    let albums = storage.main.library.getAlbums()
+    let albums = storage.main.library.getAllAlbums()
     albums.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Songs", log: log, type: .info)
     let songs = storage.main.library.getSongs()
@@ -316,7 +316,7 @@ public class LibraryUpdater {
     }
     os_log("Album Denormalize", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let albums = asyncCompanion.library.getAlbums(isFaultsOptimized: true)
+      let albums = asyncCompanion.library.getAllAlbums()
       notifier.startOperation(name: "Album Update", totalCount: albums.count)
       for album in albums {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)

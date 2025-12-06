@@ -433,6 +433,7 @@ final class HomeVC: UICollectionViewController {
         do {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
+            account: self.appDelegate.account,
             librarySyncer: self.appDelegate.librarySyncer,
             playableDownloadManager: self.appDelegate.playableDownloadManager
           )
@@ -465,6 +466,7 @@ final class HomeVC: UICollectionViewController {
       Task { @MainActor in do {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
+          account: self.appDelegate.account,
           librarySyncer: self.appDelegate.librarySyncer,
           playableDownloadManager: self.appDelegate
             .playableDownloadManager
@@ -607,6 +609,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomAlbums(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
+        for: self.appDelegate.account,
         count: Self.sectionMaxItemCount,
         onlyCached: isOfflineMode
       )

@@ -446,6 +446,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
       do {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
+          account: appDelegate.account,
           librarySyncer: self.appDelegate.librarySyncer,
           playableDownloadManager: self.appDelegate.playableDownloadManager
         )
