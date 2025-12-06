@@ -52,7 +52,7 @@ class SsPodcastParserTest: AbstractSsParserTest {
       podcastFetchCount: 2 // one podcast has an error
     )
 
-    let podcasts = library.getPodcasts().sorted(by: { Int($0.id)! < Int($1.id)! })
+    let podcasts = library.getPodcasts(for: account).sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(podcasts.count, 2)
 
     var podcast = podcasts[0]

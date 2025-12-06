@@ -1057,7 +1057,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await subsonicServerApi.requestPodcasts()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
+      let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts(for: accountAsync))
 
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(

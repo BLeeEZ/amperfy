@@ -45,7 +45,7 @@ class PodcastsParserTest: AbstractAmpacheTest {
       podcastCount: 3
     )
 
-    let podcasts = library.getPodcasts()
+    let podcasts = library.getPodcasts(for: account)
     XCTAssertEqual(podcasts.count, 3)
 
     var podcast = podcasts[0]

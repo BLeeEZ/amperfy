@@ -792,7 +792,7 @@ public class IntentManager {
         mediaSearch.mediaType == .podcastStation ||
         mediaSearch.mediaType == .podcastPlaylist {
         os_log("Play Podcasts", log: self.log, type: .info)
-        let playableElements = library.getNewestPodcastEpisode(count: 1)
+        let playableElements = library.getNewestPodcastEpisode(for: account, count: 1)
         if !playableElements.isEmpty {
           result = AmperfyMediaIntentItemResult(
             playableElements: playableElements,
@@ -1170,8 +1170,11 @@ public class IntentManager {
       )
       .first
     case .podcast:
-      playableContainer = FuzzySearcher.findBestMatch(in: library.getPodcasts(), search: searchTerm)
-        .first
+      playableContainer = FuzzySearcher.findBestMatch(
+        in: library.getPodcasts(for: account),
+        search: searchTerm
+      )
+      .first
     }
     return playableContainer
   }

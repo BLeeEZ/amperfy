@@ -212,7 +212,7 @@ public class LibraryUpdater {
     let songs = storage.main.library.getSongs()
     songs.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Podcasts", log: log, type: .info)
-    let podcasts = storage.main.library.getPodcasts()
+    let podcasts = storage.main.library.getAllPodcasts()
     podcasts.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: PodcastEpisodes", log: log, type: .info)
     let podcastEpisodes = storage.main.library.getPodcastEpisodes()
@@ -327,7 +327,7 @@ public class LibraryUpdater {
     }
     os_log("Podcast Denormalize", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let podcasts = asyncCompanion.library.getPodcasts(isFaultsOptimized: true)
+      let podcasts = asyncCompanion.library.getAllPodcasts()
       notifier.startOperation(name: "Podcast Update", totalCount: podcasts.count)
       for podcast in podcasts {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)

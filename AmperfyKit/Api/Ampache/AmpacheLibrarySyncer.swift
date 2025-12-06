@@ -538,7 +538,8 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSupported else { return }
     try await syncDownPodcastsWithoutEpisodes()
 
-    let podcasts = storage.main.library.getPodcasts().filter { $0.remoteStatus == .available }
+    let podcasts = storage.main.library.getPodcasts(for: account)
+      .filter { $0.remoteStatus == .available }
     try await withThrowingTaskGroup(of: Void.self) { taskGroup in
       podcasts.forEach { podcast in
         let podcastObjectId = podcast.managedObject.objectID
@@ -1186,7 +1187,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let response = try await ampacheXmlServerApi.requestPodcasts()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts())
+      let oldPodcasts = Set(asyncCompanion.library.getRemoteAvailablePodcasts(for: accountAsync))
 
       let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(

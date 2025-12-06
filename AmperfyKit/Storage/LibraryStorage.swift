@@ -1247,7 +1247,7 @@ public class LibraryStorage: PlayableFileCachable {
     getAlbums(account: account, isFaultsOptimized: false)
   }
 
-  public func getAlbums(account: Account?, isFaultsOptimized: Bool) -> [Album] {
+  private func getAlbums(account: Account?, isFaultsOptimized: Bool) -> [Album] {
     let fetchRequest = AlbumMO.identifierSortedFetchRequest
     if let account {
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -1341,8 +1341,21 @@ public class LibraryStorage: PlayableFileCachable {
 
   // MARK: Podcasts
 
-  public func getPodcasts(isFaultsOptimized: Bool = false) -> [Podcast] {
+  public func getAllPodcasts() -> [Podcast] {
+    getPodcasts(account: nil, isFaultsOptimized: true)
+  }
+
+  public func getPodcasts(for account: Account) -> [Podcast] {
+    getPodcasts(account: account, isFaultsOptimized: false)
+  }
+
+  private func getPodcasts(account: Account?, isFaultsOptimized: Bool) -> [Podcast] {
     let fetchRequest = PodcastMO.identifierSortedFetchRequest
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
     if isFaultsOptimized {
       fetchRequest.relationshipKeyPathsForPrefetching = PodcastMO.relationshipKeyPathsForPrefetching
       fetchRequest.returnsObjectsAsFaults = false
@@ -1352,20 +1365,26 @@ public class LibraryStorage: PlayableFileCachable {
     return podcasts ?? [Podcast]()
   }
 
-  public func getNewestPodcastEpisode(count: Int) -> [PodcastEpisode] {
+  public func getNewestPodcastEpisode(for account: Account, count: Int) -> [PodcastEpisode] {
     let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
-    fetchRequest.predicate = getFetchPredicateForUserAvailableEpisodes()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      getFetchPredicateForUserAvailableEpisodes(),
+    ])
     fetchRequest.fetchLimit = count
     let foundPodcastEpisodes = try? context.fetch(fetchRequest)
     let podcastEpisodes = foundPodcastEpisodes?.compactMap { PodcastEpisode(managedObject: $0) }
     return podcastEpisodes ?? [PodcastEpisode]()
   }
 
-  public func getRemoteAvailablePodcasts() -> [Podcast] {
+  public func getRemoteAvailablePodcasts(for account: Account) -> [Podcast] {
     let fetchRequest = PodcastMO.identifierSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-      AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-      getFetchPredicate(onlyCachedPodcasts: true),
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+        getFetchPredicate(onlyCachedPodcasts: true),
+      ]),
     ])
     let foundPodcasts = try? context.fetch(fetchRequest)
     let podcasts = foundPodcasts?.compactMap { Podcast(managedObject: $0) }
