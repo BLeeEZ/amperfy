@@ -46,7 +46,7 @@ class PlaylistsParserTest: AbstractAmpacheTest {
   }
 
   override func checkCorrectParsing() {
-    let playlists = library.getPlaylists()
+    let playlists = library.getPlaylists(for: account)
     XCTAssertEqual(playlists.count, 4)
 
     var playlist = playlists[0]

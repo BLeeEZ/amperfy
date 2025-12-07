@@ -1168,7 +1168,7 @@ public class IntentManager {
       ).first
     case .playlist:
       playableContainer = FuzzySearcher
-        .findBestMatch(in: library.getPlaylists(), search: searchTerm).first
+        .findBestMatch(in: library.getPlaylists(for: account), search: searchTerm).first
     case .album:
       playableContainer = FuzzySearcher.findBestMatch(
         in: library.getAlbums(for: account),

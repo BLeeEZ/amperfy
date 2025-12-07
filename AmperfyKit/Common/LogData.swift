@@ -90,7 +90,7 @@ public struct LogData: Encodable {
     logData.userStatistics = allUserStatistics.compactMap { $0.createLogInfo() }
 
     var eventInfo = EventInfo()
-    let eventLogs = amperfyData.storage.main.library.getLogEntries()
+    let eventLogs = amperfyData.storage.main.library.getAllLogEntries()
     eventInfo.totalEventCount = eventLogs.count
     eventInfo.events = Array(eventLogs.prefix(Self.latestEventsCount))
     eventInfo.attachedEventCount = eventInfo.events?.count ?? 0

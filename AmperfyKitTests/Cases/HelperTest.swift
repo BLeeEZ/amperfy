@@ -39,7 +39,7 @@ class HelperTest: XCTestCase {
     XCTAssertEqual(library.getAllArtists().count, cdHelper.seeder.artists.count)
     XCTAssertEqual(library.getAllAlbums().count, cdHelper.seeder.albums.count)
     XCTAssertEqual(library.getAllSongs().count, cdHelper.seeder.songs.count)
-    XCTAssertEqual(library.getPlaylists().count, cdHelper.seeder.playlists.count)
+    XCTAssertEqual(library.getAllPlaylists().count, cdHelper.seeder.playlists.count)
     let account = library.getAccount(info: TestAccountInfo.create1())
     XCTAssertEqual(account.managedObject.playlists?.count, cdHelper.seeder.playlists.count)
     let playlistItemCount = cdHelper.seeder.playlists.reduce(0) { $0 + $1.songIds.count }

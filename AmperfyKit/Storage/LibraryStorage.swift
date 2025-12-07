@@ -1516,9 +1516,9 @@ public class LibraryStorage: PlayableFileCachable {
     let radios = foundRadios?.compactMap { Radio(managedObject: $0) }
     return radios ?? [Radio]()
   }
-  
+
   // MARK: SearchHistory
-  
+
   public func getAllSearchHistory() -> [SearchHistoryItem] {
     let fetchRequest = SearchHistoryItemMO.fetchRequest()
     let foundHistory = try? context.fetch(fetchRequest)
@@ -1535,6 +1535,212 @@ public class LibraryStorage: PlayableFileCachable {
     let foundHistory = try? context.fetch(fetchRequest)
     let history = foundHistory?.compactMap { SearchHistoryItem(managedObject: $0) }
     return history ?? [SearchHistoryItem]()
+  }
+
+  // MARK: ScrobbleEntries
+
+  public func getAllScrobbleEntries() -> [ScrobbleEntry] {
+    getScrobbleEntries(account: nil)
+  }
+
+  public func getScrobbleEntries(for account: Account) -> [ScrobbleEntry] {
+    getScrobbleEntries(account: account)
+  }
+
+  private func getScrobbleEntries(account: Account?) -> [ScrobbleEntry] {
+    let fetchRequest = ScrobbleEntryMO.fetchRequest()
+    if let account {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        getFetchPredicate(forAccount: account),
+      ])
+    }
+    let entries = try? context.fetch(fetchRequest)
+    return entries?.compactMap { ScrobbleEntry(managedObject: $0) } ?? [ScrobbleEntry]()
+  }
+
+  public func getFirstUploadableScrobbleEntry(for account: Account) -> ScrobbleEntry? {
+    let fetchRequest = ScrobbleEntryMO.fetchRequest()
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(ScrobbleEntryMO.date), ascending: true), // oldest first
+    ]
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(
+        format: "%K == FALSE",
+        #keyPath(ScrobbleEntryMO.isUploaded)
+      ),
+    ])
+    fetchRequest.fetchLimit = 1
+    let entries = try? context.fetch(fetchRequest)
+    return entries?.lazy.compactMap { ScrobbleEntry(managedObject: $0) }.first
+  }
+
+  // MARK: Playlists
+
+  public func getAllPlaylists(
+    isFaultsOptimized: Bool = false
+  )
+    -> [Playlist] {
+    getPlaylists(
+      account: nil,
+      isFaultsOptimized: true,
+      areSystemPlaylistsIncluded: true
+    )
+  }
+
+  public func getPlaylists(
+    for account: Account,
+    areSystemPlaylistsIncluded: Bool = false
+  )
+    -> [Playlist] {
+    getPlaylists(
+      account: account,
+      isFaultsOptimized: false,
+      areSystemPlaylistsIncluded: areSystemPlaylistsIncluded
+    )
+  }
+
+  private func getPlaylists(
+    account: Account?,
+    isFaultsOptimized: Bool = false,
+    areSystemPlaylistsIncluded: Bool = false
+  )
+    -> [Playlist] {
+    let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+    var predicates = [NSPredicate]()
+    if let account {
+      predicates.append(getFetchPredicate(forAccount: account))
+    }
+    if !areSystemPlaylistsIncluded {
+      predicates.append(PlaylistMO.excludeSystemPlaylistsFetchPredicate)
+    }
+    if !predicates.isEmpty {
+      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+    }
+    if isFaultsOptimized {
+      fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO
+        .relationshipKeyPathsForPrefetching
+      fetchRequest.returnsObjectsAsFaults = false
+    }
+    let foundPlaylists = try? context.fetch(fetchRequest)
+    let playlists = foundPlaylists?.compactMap { Playlist(library: self, managedObject: $0) }
+    return playlists ?? [Playlist]()
+  }
+
+  public func getAllPlaylistItems() -> [PlaylistItemMO] {
+    let fetchRequest = PlaylistItemMO.fetchRequest()
+    let foundPlaylistItems = try? context.fetch(fetchRequest)
+    return foundPlaylistItems ?? [PlaylistItemMO]()
+  }
+
+  public func getPlaylistItems(playlist: Playlist) -> [PlaylistItemMO] {
+    let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
+    fetchRequest.predicate = getFetchPredicate(forPlaylist: playlist)
+    let foundPlaylistItems = try? context.fetch(fetchRequest)
+    return foundPlaylistItems ?? [PlaylistItemMO]()
+  }
+
+  public func getAllPlaylistItemOrphans() -> [PlaylistItem] {
+    let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
+    fetchRequest.predicate = getFetchPredicateForOrphanedPlaylistItems()
+    let foundPlaylistItems = try? context.fetch(fetchRequest)
+    let items = foundPlaylistItems?.compactMap { PlaylistItem(library: self, managedObject: $0) }
+    return items ?? [PlaylistItem]()
+  }
+
+  // MARK: LogEntries
+
+  public func getAllLogEntries() -> [LogEntry] {
+    let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.creationDateSortedFetchRequest
+    let foundEntries = try? context.fetch(fetchRequest)
+    let entries = foundEntries?.compactMap { LogEntry(managedObject: $0) }
+    return entries ?? [LogEntry]()
+  }
+
+  // MARK: PlayerData
+
+  func getAllPlayerData() -> [PlayerMO] {
+    let fetchRequest = PlayerMO.fetchRequest()
+    let fetchResults = try? context.fetch(fetchRequest)
+    return fetchResults ?? [PlayerMO]()
+  }
+
+  func getPlayerData(account: Account) -> PlayerData {
+    let fetchRequest = PlayerMO.fetchRequest()
+    fetchRequest.relationshipKeyPathsForPrefetching = PlayerMO.relationshipKeyPathsForPrefetching
+    fetchRequest.returnsObjectsAsFaults = false
+    var playerData: PlayerData
+    var playerMO: PlayerMO
+
+    if let fetchResults: [PlayerMO] = try? context.fetch(fetchRequest) {
+      if fetchResults.count == 1 {
+        playerMO = fetchResults[0]
+      } else if fetchResults.isEmpty {
+        playerMO = PlayerMO(context: context)
+        playerMO.account = account.managedObject
+        saveContext()
+      } else {
+        if let accountPlayerData = fetchResults
+          .first(where: { $0.account == account.managedObject }) {
+          playerMO = accountPlayerData
+        } else {
+          playerMO = PlayerMO(context: context)
+          playerMO.account = account.managedObject
+          saveContext()
+        }
+      }
+    } else {
+      playerMO = PlayerMO(context: context)
+      playerMO.account = account.managedObject
+      saveContext()
+    }
+
+    if playerMO.userQueuePlaylist == nil {
+      playerMO.userQueuePlaylist = PlaylistMO(context: context)
+      playerMO.userQueuePlaylist?.account = account.managedObject
+      saveContext()
+    }
+    if playerMO.contextPlaylist == nil {
+      playerMO.contextPlaylist = PlaylistMO(context: context)
+      playerMO.contextPlaylist?.account = account.managedObject
+      saveContext()
+    }
+    if playerMO.shuffledContextPlaylist == nil {
+      playerMO.shuffledContextPlaylist = PlaylistMO(context: context)
+      playerMO.shuffledContextPlaylist?.account = account.managedObject
+      saveContext()
+    }
+    if playerMO.podcastPlaylist == nil {
+      playerMO.podcastPlaylist = PlaylistMO(context: context)
+      playerMO.podcastPlaylist?.account = account.managedObject
+      saveContext()
+    }
+
+    let userQueuePlaylist = Playlist(library: self, managedObject: playerMO.userQueuePlaylist!)
+    let contextPlaylist = Playlist(library: self, managedObject: playerMO.contextPlaylist!)
+    let shuffledContextPlaylist = Playlist(
+      library: self,
+      managedObject: playerMO.shuffledContextPlaylist!
+    )
+    let podcastPlaylist = Playlist(library: self, managedObject: playerMO.podcastPlaylist!)
+
+    if shuffledContextPlaylist.managedObject.items.count != contextPlaylist.managedObject.items
+      .count {
+      shuffledContextPlaylist.removeAllItems()
+      shuffledContextPlaylist.append(playables: contextPlaylist.playables)
+      shuffledContextPlaylist.shuffle()
+    }
+
+    playerData = PlayerData(
+      library: self,
+      managedObject: playerMO,
+      userQueue: userQueuePlaylist,
+      contextQueue: contextPlaylist,
+      shuffledContextQueue: shuffledContextPlaylist,
+      podcastQueue: podcastPlaylist
+    )
+
+    return playerData
   }
 
   public func getSearchArtistsPredicate(
@@ -1698,156 +1904,9 @@ public class LibraryStorage: PlayableFileCachable {
     return songs ?? [Song]()
   }
 
-  public func getScrobbleEntries() -> [ScrobbleEntry] {
-    let fetchRequest = ScrobbleEntryMO.fetchRequest()
-    let entries = try? context.fetch(fetchRequest)
-    return entries?.compactMap { ScrobbleEntry(managedObject: $0) } ?? [ScrobbleEntry]()
-  }
+  /*
 
-  public func getFirstUploadableScrobbleEntry() -> ScrobbleEntry? {
-    let fetchRequest = ScrobbleEntryMO.fetchRequest()
-    fetchRequest.sortDescriptors = [
-      NSSortDescriptor(key: #keyPath(ScrobbleEntryMO.date), ascending: true), // oldest first
-    ]
-    fetchRequest.predicate = NSPredicate(
-      format: "%K == FALSE",
-      #keyPath(ScrobbleEntryMO.isUploaded)
-    )
-    fetchRequest.fetchLimit = 1
-    let entries = try? context.fetch(fetchRequest)
-    return entries?.lazy.compactMap { ScrobbleEntry(managedObject: $0) }.first
-  }
-
-  public func getPlaylists(
-    isFaultsOptimized: Bool = false,
-    areSystemPlaylistsIncluded: Bool = false
-  )
-    -> [Playlist] {
-    let fetchRequest = PlaylistMO.identifierSortedFetchRequest
-    if !areSystemPlaylistsIncluded {
-      fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
-    }
-    if isFaultsOptimized {
-      fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO
-        .relationshipKeyPathsForPrefetching
-      fetchRequest.returnsObjectsAsFaults = false
-    }
-    let foundPlaylists = try? context.fetch(fetchRequest)
-    let playlists = foundPlaylists?.compactMap { Playlist(library: self, managedObject: $0) }
-    return playlists ?? [Playlist]()
-  }
-
-  public func getPlaylistItems() -> [PlaylistItemMO] {
-    let fetchRequest = PlaylistItemMO.fetchRequest()
-    let foundPlaylistItems = try? context.fetch(fetchRequest)
-    return foundPlaylistItems ?? [PlaylistItemMO]()
-  }
-
-  public func getPlaylistItems(playlist: Playlist) -> [PlaylistItemMO] {
-    let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
-    fetchRequest.predicate = getFetchPredicate(forPlaylist: playlist)
-    let foundPlaylistItems = try? context.fetch(fetchRequest)
-    return foundPlaylistItems ?? [PlaylistItemMO]()
-  }
-
-  public func getPlaylistItemOrphans() -> [PlaylistItem] {
-    let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
-    fetchRequest.predicate = getFetchPredicateForOrphanedPlaylistItems()
-    let foundPlaylistItems = try? context.fetch(fetchRequest)
-    let items = foundPlaylistItems?.compactMap { PlaylistItem(library: self, managedObject: $0) }
-    return items ?? [PlaylistItem]()
-  }
-
-  public func getLogEntries() -> [LogEntry] {
-    let fetchRequest: NSFetchRequest<LogEntryMO> = LogEntryMO.creationDateSortedFetchRequest
-    let foundEntries = try? context.fetch(fetchRequest)
-    let entries = foundEntries?.compactMap { LogEntry(managedObject: $0) }
-    return entries ?? [LogEntry]()
-  }
-
-  func getAllPlayerData() -> [PlayerMO] {
-    let fetchRequest = PlayerMO.fetchRequest()
-    let fetchResults = try? context.fetch(fetchRequest)
-    return fetchResults ?? [PlayerMO]()
-  }
-
-  func getPlayerData(account: Account) -> PlayerData {
-    let fetchRequest = PlayerMO.fetchRequest()
-    fetchRequest.relationshipKeyPathsForPrefetching = PlayerMO.relationshipKeyPathsForPrefetching
-    fetchRequest.returnsObjectsAsFaults = false
-    var playerData: PlayerData
-    var playerMO: PlayerMO
-
-    if let fetchResults: [PlayerMO] = try? context.fetch(fetchRequest) {
-      if fetchResults.count == 1 {
-        playerMO = fetchResults[0]
-      } else if fetchResults.isEmpty {
-        playerMO = PlayerMO(context: context)
-        playerMO.account = account.managedObject
-        saveContext()
-      } else {
-        if let accountPlayerData = fetchResults
-          .first(where: { $0.account == account.managedObject }) {
-          playerMO = accountPlayerData
-        } else {
-          playerMO = PlayerMO(context: context)
-          playerMO.account = account.managedObject
-          saveContext()
-        }
-      }
-    } else {
-      playerMO = PlayerMO(context: context)
-      playerMO.account = account.managedObject
-      saveContext()
-    }
-
-    if playerMO.userQueuePlaylist == nil {
-      playerMO.userQueuePlaylist = PlaylistMO(context: context)
-      playerMO.userQueuePlaylist?.account = account.managedObject
-      saveContext()
-    }
-    if playerMO.contextPlaylist == nil {
-      playerMO.contextPlaylist = PlaylistMO(context: context)
-      playerMO.contextPlaylist?.account = account.managedObject
-      saveContext()
-    }
-    if playerMO.shuffledContextPlaylist == nil {
-      playerMO.shuffledContextPlaylist = PlaylistMO(context: context)
-      playerMO.shuffledContextPlaylist?.account = account.managedObject
-      saveContext()
-    }
-    if playerMO.podcastPlaylist == nil {
-      playerMO.podcastPlaylist = PlaylistMO(context: context)
-      playerMO.podcastPlaylist?.account = account.managedObject
-      saveContext()
-    }
-
-    let userQueuePlaylist = Playlist(library: self, managedObject: playerMO.userQueuePlaylist!)
-    let contextPlaylist = Playlist(library: self, managedObject: playerMO.contextPlaylist!)
-    let shuffledContextPlaylist = Playlist(
-      library: self,
-      managedObject: playerMO.shuffledContextPlaylist!
-    )
-    let podcastPlaylist = Playlist(library: self, managedObject: playerMO.podcastPlaylist!)
-
-    if shuffledContextPlaylist.managedObject.items.count != contextPlaylist.managedObject.items
-      .count {
-      shuffledContextPlaylist.removeAllItems()
-      shuffledContextPlaylist.append(playables: contextPlaylist.playables)
-      shuffledContextPlaylist.shuffle()
-    }
-
-    playerData = PlayerData(
-      library: self,
-      managedObject: playerMO,
-      userQueue: userQueuePlaylist,
-      contextQueue: contextPlaylist,
-      shuffledContextQueue: shuffledContextPlaylist,
-      podcastQueue: podcastPlaylist
-    )
-
-    return playerData
-  }
+   */
 
   public func getGenre(id: String) -> Genre? {
     let fetchRequest: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()

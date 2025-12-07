@@ -70,11 +70,11 @@ class PlaylistItemTest: XCTestCase {
     else { XCTFail(); return }
     let playlistItemCount = playlist.songCount
     XCTAssertGreaterThan(playlistItemCount, 0)
-    var orphans = library.getPlaylistItemOrphans()
+    var orphans = library.getAllPlaylistItemOrphans()
     XCTAssertEqual(orphans.count, 0)
 
     playlist.managedObject.managedObjectContext?.delete(playlist.managedObject)
-    orphans = library.getPlaylistItemOrphans()
+    orphans = library.getAllPlaylistItemOrphans()
     // Delete Rule should delete the orphans
     XCTAssertEqual(orphans.count, 0)
   }
@@ -84,11 +84,11 @@ class PlaylistItemTest: XCTestCase {
     else { XCTFail(); return }
     let playlistItemCount = playlist.songCount
     XCTAssertGreaterThan(playlistItemCount, 0)
-    var orphans = library.getPlaylistItemOrphans()
+    var orphans = library.getAllPlaylistItemOrphans()
     XCTAssertEqual(orphans.count, 0)
 
     playlist.managedObject.managedObjectContext?.delete(playlist.playables[0].playableManagedObject)
-    orphans = library.getPlaylistItemOrphans()
+    orphans = library.getAllPlaylistItemOrphans()
     // Delete Rule should delete the orphans
     XCTAssertEqual(orphans.count, 0)
   }

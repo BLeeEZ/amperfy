@@ -35,7 +35,7 @@ class SsPlaylistParserDelegate: SsXmlParser {
   init(performanceMonitor: ThreadPerformanceMonitor, account: Account, library: LibraryStorage) {
     self.account = account
     self.library = library
-    self.allOldPlaylists = Set(library.getPlaylists())
+    self.allOldPlaylists = Set(library.getPlaylists(for: account))
     self.playlistsDict = [String: Playlist]()
     for pl in allOldPlaylists {
       playlistsDict[pl.id] = pl

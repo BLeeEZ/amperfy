@@ -221,14 +221,14 @@ public class LibraryUpdater {
     let directories = storage.main.library.getDirectories()
     directories.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Playlists", log: log, type: .info)
-    let playlists = storage.main.library.getPlaylists()
+    let playlists = storage.main.library.getAllPlaylists()
     playlists.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     storage.main.saveContext()
   }
 
   @MainActor
   private func updatePlaylistArtworkItems() {
-    let playlists = storage.main.library.getPlaylists()
+    let playlists = storage.main.library.getAllPlaylists()
     playlists.forEach {
       $0.updateArtworkItems()
     }
@@ -239,17 +239,14 @@ public class LibraryUpdater {
   private func sortPlaylistItems(notifier: LibraryUpdaterCallbacks) async throws {
     os_log("Playlist items delete orphans", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let orphanPlaylistItems = asyncCompanion.library.getPlaylistItemOrphans()
+      let orphanPlaylistItems = asyncCompanion.library.getAllPlaylistItemOrphans()
       for orphanPlaylistItem in orphanPlaylistItems {
         asyncCompanion.library.deletePlaylistItem(item: orphanPlaylistItem)
       }
     }
     os_log("Playlist items sort", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let playlists = asyncCompanion.library.getPlaylists(
-        isFaultsOptimized: true,
-        areSystemPlaylistsIncluded: true
-      )
+      let playlists = asyncCompanion.library.getAllPlaylists()
       notifier.startOperation(name: "Playlist Update", totalCount: playlists.count)
       for playlist in playlists {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -397,10 +394,7 @@ public class LibraryUpdater {
 
     try await storage.async.perform { asyncCompanion in
       let artworks = asyncCompanion.library.getArtworks()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Artwork Update", totalCount: artworks.count)
       for artwork in artworks {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -413,10 +407,7 @@ public class LibraryUpdater {
     }
     try await storage.async.perform { asyncCompanion in
       let embeddedArtworks = asyncCompanion.library.getEmbeddedArtworks()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworks.count)
       for artwork in embeddedArtworks {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -469,10 +460,7 @@ public class LibraryUpdater {
      */
     try await storage.async.perform { asyncCompanion in
       let entities = asyncCompanion.library.getAllAbstractLibraryEntities()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "General Update", totalCount: entities.count)
       for entity in entities {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -482,10 +470,7 @@ public class LibraryUpdater {
     }
     try await storage.async.perform { asyncCompanion in
       let downloads = asyncCompanion.library.getAllDownloads()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Download Update", totalCount: downloads.count)
       for download in downloads {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -495,10 +480,7 @@ public class LibraryUpdater {
     }
     try await storage.async.perform { asyncCompanion in
       let musicFolders = asyncCompanion.library.getMusicFolders()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Music Folders Update", totalCount: musicFolders.count)
       for musicFolder in musicFolders {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -508,10 +490,7 @@ public class LibraryUpdater {
     }
     try await storage.async.perform { asyncCompanion in
       let playerDatas = asyncCompanion.library.getAllPlayerData()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Player Update", totalCount: playerDatas.count)
       for playerData in playerDatas {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -524,11 +503,8 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let playlists = asyncCompanion.library.getPlaylists()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let playlists = asyncCompanion.library.getAllPlaylists(isFaultsOptimized: false)
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Playlists Update", totalCount: playlists.count)
       for playlist in playlists {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -537,11 +513,8 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let playlistItems = asyncCompanion.library.getPlaylistItems()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let playlistItems = asyncCompanion.library.getAllPlaylistItems()
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Playlist Items Update", totalCount: playlistItems.count)
       for playlistItem in playlistItems {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -550,11 +523,8 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let scrobbleEntries = asyncCompanion.library.getScrobbleEntries()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let scrobbleEntries = asyncCompanion.library.getAllScrobbleEntries()
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Scrobbles Update", totalCount: scrobbleEntries.count)
       for scrobbleEntry in scrobbleEntries {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -564,10 +534,7 @@ public class LibraryUpdater {
     }
     try await storage.async.perform { asyncCompanion in
       let searchHistory = asyncCompanion.library.getAllSearchHistory()
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Search History Update", totalCount: searchHistory.count)
       for searchHistoryItem in searchHistory {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)

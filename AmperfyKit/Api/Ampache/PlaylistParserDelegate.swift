@@ -44,7 +44,7 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
     self.library = library
     self.playlist = playlistToValidate
     self.playlistToValidate = playlistToValidate
-    self.allOldPlaylists = Set(library.getPlaylists())
+    self.allOldPlaylists = Set(library.getPlaylists(for: account))
     self.playlistsDict = [String: Playlist]()
     for pl in allOldPlaylists {
       playlistsDict[pl.id] = pl

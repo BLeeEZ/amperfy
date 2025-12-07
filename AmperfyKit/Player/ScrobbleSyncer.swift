@@ -35,6 +35,7 @@ public class ScrobbleSyncer {
   private let backendAudioPlayer: BackendAudioPlayer
   private let networkMonitor: NetworkMonitorFacade
   private let account: Account
+  private let accountObjectId: NSManagedObjectID
   private let storage: PersistentStorage
   private let librarySyncer: LibrarySyncer
   private let eventLogger: EventLogger
@@ -63,6 +64,7 @@ public class ScrobbleSyncer {
     self.backendAudioPlayer = backendAudioPlayer
     self.networkMonitor = networkMonitor
     self.account = account
+    self.accountObjectId = account.managedObject.objectID
     self.storage = storage
     self.librarySyncer = librarySyncer
     self.eventLogger = eventLogger
@@ -157,7 +159,9 @@ public class ScrobbleSyncer {
   private func getNextScrobbleEntry() async throws -> ScrobbleEntry? {
     let scobbleObjectId: NSManagedObjectID? = try? await storage.async
       .performAndGet { asyncCompanion in
-        guard let scobbleEntry = asyncCompanion.library.getFirstUploadableScrobbleEntry() else {
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+        guard let scobbleEntry = asyncCompanion.library
+          .getFirstUploadableScrobbleEntry(for: accountAsync) else {
           return nil
         }
         return scobbleEntry.managedObject.objectID

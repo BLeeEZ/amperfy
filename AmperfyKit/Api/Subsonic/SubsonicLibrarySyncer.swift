@@ -1318,11 +1318,12 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await syncDownPlaylistsWithoutSongs()
     let playlistObjectId = playlist.managedObject.objectID
     try await storage.async.perform { asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let playlistAsync = Playlist(
         library: asyncCompanion.library,
         managedObject: asyncCompanion.context.object(with: playlistObjectId) as! PlaylistMO
       )
-      let playlists = asyncCompanion.library.getPlaylists()
+      let playlists = asyncCompanion.library.getPlaylists(for: accountAsync)
       let nameMatchingPlaylists = playlists.filter { filterPlaylist in
         filterPlaylist.name == playlistAsync.name && filterPlaylist.id != ""
       }
