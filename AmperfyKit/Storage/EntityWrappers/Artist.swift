@@ -138,9 +138,10 @@ extension Artist: PlayableContainable {
     }
 
     if details.artistFilterSetting == .albumArtists,
-       let managedObjectContext = managedObject.managedObjectContext {
+       let managedObjectContext = managedObject.managedObjectContext, let account {
       let library = LibraryStorage(context: managedObjectContext)
-      let relatedSongsCount = library.getSongs(whichContainsSongsWithArtist: self).count
+      let relatedSongsCount = library.getSongs(for: account, whichContainsSongsWithArtist: self)
+        .count
       if relatedSongsCount == 1 {
         infoContent.append("1 Song")
       } else if relatedSongsCount > 1 {

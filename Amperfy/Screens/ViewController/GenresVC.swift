@@ -46,7 +46,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     appDelegate.userStatistics.visited(.genres)
 
     fetchedResultsController = GenreFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: true
     )
     singleFetchedResultsController = fetchedResultsController

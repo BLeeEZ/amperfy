@@ -41,7 +41,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     appDelegate.userStatistics.visited(.musicFolders)
 
     fetchedResultsController = MusicFolderFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: false
     )
     singleFetchedResultsController = fetchedResultsController

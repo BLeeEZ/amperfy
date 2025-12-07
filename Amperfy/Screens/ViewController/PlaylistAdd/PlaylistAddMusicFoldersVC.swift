@@ -47,7 +47,7 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
     navigationItem.rightBarButtonItems = [doneButton]
 
     fetchedResultsController = MusicFolderFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: false
     )
     singleFetchedResultsController = fetchedResultsController

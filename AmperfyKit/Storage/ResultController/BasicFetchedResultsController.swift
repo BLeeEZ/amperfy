@@ -463,6 +463,7 @@ extension BasicFetchedResultsController where ResultType == DownloadMO {
 
 public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType>
   where ResultType: NSFetchRequestResult {
+  let account: Account
   var keepAllResultsUpdated = true
   private let allFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
   private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
@@ -489,9 +490,11 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
   public init(
     coreDataCompanion: CoreDataCompanion,
     fetchRequest: NSFetchRequest<ResultType>,
+    account: Account,
     sectionIndexType: SectionIndexType = .defaultValue,
     isGroupedInAlphabeticSections: Bool
   ) {
+    self.account = account
     self.sectionIndexType = sectionIndexType
     let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest
       .sortDescriptors![0].key : nil
@@ -499,7 +502,7 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
       fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>,
       coreDataCompanion: coreDataCompanion,
       sectionNameKeyPath: sectionNameKeyPath,
-      cacheName: Self.typeName
+      cacheName: "\(Self.typeName)-\(account.serverHash)-\(account.userHash)"
     )
     allFetchResulsController.sectionIndexType = sectionIndexType
     self.searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(

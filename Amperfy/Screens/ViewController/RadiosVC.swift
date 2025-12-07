@@ -49,7 +49,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     appDelegate.userStatistics.visited(.radios)
 
     fetchedResultsController = RadiosFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: true
     )
     singleFetchedResultsController = fetchedResultsController

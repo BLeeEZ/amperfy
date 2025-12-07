@@ -193,17 +193,24 @@ public class SearchHistoryFetchedResultsController: BasicFetchedResultsControlle
 // MARK: - PodcastFetchedResultsController
 
 public class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
-  public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
+  public init(
+    coreDataCompanion: CoreDataCompanion,
+    account: Account,
+    isGroupedInAlphabeticSections: Bool
+  ) {
     let fetchRequest = PodcastMO.alphabeticSortedFetchRequest
-    fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-      AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-      coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+        coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
+      ]),
     ])
     fetchRequest.relationshipKeyPathsForPrefetching = PodcastMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
   }
@@ -211,6 +218,7 @@ public class PodcastFetchedResultsController: CachedFetchedResultsController<Pod
   public func search(searchText: String, onlyCached: Bool) {
     if !searchText.isEmpty || onlyCached {
       let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        coreDataCompanion.library.getFetchPredicate(forAccount: account),
         NSCompoundPredicate(orPredicateWithSubpredicates: [
           AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
           coreDataCompanion.library.getFetchPredicate(onlyCachedPodcasts: true),
@@ -305,13 +313,20 @@ public class PodcastEpisodesFetchedResultsController: BasicFetchedResultsControl
 // MARK: - GenreFetchedResultsController
 
 public class GenreFetchedResultsController: CachedFetchedResultsController<GenreMO> {
-  public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
+  public init(
+    coreDataCompanion: CoreDataCompanion,
+    account: Account,
+    isGroupedInAlphabeticSections: Bool
+  ) {
     let fetchRequest = GenreMO.alphabeticSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = GenreMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
   }
@@ -319,6 +334,7 @@ public class GenreFetchedResultsController: CachedFetchedResultsController<Genre
   public func search(searchText: String, onlyCached: Bool) {
     if !searchText.isEmpty || onlyCached {
       let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        coreDataCompanion.library.getFetchPredicate(forAccount: account),
         GenreMO.getIdentifierBasedSearchPredicate(searchText: searchText),
         NSCompoundPredicate(orPredicateWithSubpredicates: [
           coreDataCompanion.library.getFetchPredicate(onlyCachedGenreArtists: onlyCached),
@@ -472,6 +488,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
 
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     sortType: ArtistElementSortType,
     isGroupedInAlphabeticSections: Bool,
     fetchLimit: Int? = nil
@@ -490,15 +507,19 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
       fetchRequest = ArtistMO.durationSortedFetchRequest
     }
     fetchRequest.fetchLimit = fetchLimit ?? 0
-    fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-      AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-      coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true),
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+        coreDataCompanion.library.getFetchPredicate(onlyCachedArtists: true),
+      ]),
     ])
     fetchRequest.relationshipKeyPathsForPrefetching = ArtistMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
       fetchRequest: fetchRequest,
+      account: account,
       sectionIndexType: sortType.asSectionIndexType,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
@@ -507,6 +528,7 @@ public class ArtistFetchedResultsController: CachedFetchedResultsController<Arti
   public func search(searchText: String, onlyCached: Bool, displayFilter: ArtistCategoryFilter) {
     if !searchText.isEmpty || onlyCached || displayFilter != .all {
       let predicate = coreDataCompanion.library.getSearchArtistsPredicate(
+        for: account,
         searchText: searchText,
         onlyCached: onlyCached,
         displayFilter: displayFilter
@@ -654,6 +676,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
 
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     sortType: AlbumElementSortType,
     isGroupedInAlphabeticSections: Bool,
     fetchLimit: Int? = nil
@@ -677,15 +700,18 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
       fetchRequest = AlbumMO.yearSortedFetchRequest
     }
     fetchRequest.fetchLimit = fetchLimit ?? 0
-    fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-      AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
-      coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true),
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        AbstractLibraryEntityMO.excludeRemoteDeleteFetchPredicate,
+        coreDataCompanion.library.getFetchPredicate(onlyCachedAlbums: true),
+      ]),
     ])
     fetchRequest.relationshipKeyPathsForPrefetching = AlbumMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       sectionIndexType: sortType.asSectionIndexType,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
@@ -694,6 +720,7 @@ public class AlbumFetchedResultsController: CachedFetchedResultsController<Album
   public func search(searchText: String, onlyCached: Bool, displayFilter: DisplayCategoryFilter) {
     if !searchText.isEmpty || onlyCached || displayFilter != .all {
       let predicate = coreDataCompanion.library.getSearchAlbumsPredicate(
+        for: account,
         searchText: searchText,
         onlyCached: onlyCached,
         displayFilter: displayFilter
@@ -712,6 +739,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
 
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     sortType: SongElementSortType,
     isGroupedInAlphabeticSections: Bool,
     fetchLimit: Int? = nil
@@ -731,12 +759,15 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
       fetchRequest = SongMO.starredDateSortedFetchRequest
     }
     fetchRequest.fetchLimit = fetchLimit ?? 0
-    fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       sectionIndexType: sortType.asSectionIndexType,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
@@ -752,6 +783,7 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
   ) {
     if !searchText.isEmpty || onlyCachedSongs || displayFilter != .all {
       let predicate = coreDataCompanion.library.getSearchSongsPredicate(
+        for: account,
         searchText: searchText,
         onlyCached: onlyCachedSongs,
         displayFilter: displayFilter
@@ -768,17 +800,21 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
 public class RadiosFetchedResultsController: CachedFetchedResultsController<RadioMO> {
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     isGroupedInAlphabeticSections: Bool,
     fetchLimit: Int? = nil
   ) {
     let fetchRequest = RadioMO.alphabeticSortedFetchRequest
     fetchRequest.fetchLimit = fetchLimit ?? 0
-    fetchRequest.predicate = RadioMO.excludeServerDeleteRadiosFetchPredicate
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      RadioMO.excludeServerDeleteRadiosFetchPredicate,
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = RadioMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       sectionIndexType: .alphabet,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
@@ -786,7 +822,10 @@ public class RadiosFetchedResultsController: CachedFetchedResultsController<Radi
 
   public func search(searchText: String) {
     if !searchText.isEmpty {
-      let predicate = coreDataCompanion.library.getSearchRadiosPredicate(searchText: searchText)
+      let predicate = coreDataCompanion.library.getSearchRadiosPredicate(
+        for: account,
+        searchText: searchText
+      )
       search(predicate: predicate)
     } else {
       showAllResults()
@@ -874,13 +913,16 @@ public class PlaylistItemsFetchedResultsController: BasicFetchedResultsControlle
 
 public class PlaylistFetchedResultsController: BasicFetchedResultsController<PlaylistMO> {
   public private(set) var sortType: PlaylistSortType
+  private let account: Account
 
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     sortType: PlaylistSortType,
     isGroupedInAlphabeticSections: Bool,
     fetchLimit: Int? = nil
   ) {
+    self.account = account
     self.sortType = sortType
     var fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
     switch sortType {
@@ -894,7 +936,10 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
       fetchRequest = PlaylistMO.durationFetchRequest
     }
     fetchRequest.fetchLimit = fetchLimit ?? 0
-    fetchRequest.predicate = PlaylistMO.excludeSystemPlaylistsFetchPredicate
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      PlaylistMO.excludeSystemPlaylistsFetchPredicate,
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
@@ -907,6 +952,7 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
   public func search(searchText: String, playlistSearchCategory: PlaylistSearchCategory) {
     if !searchText.isEmpty || playlistSearchCategory != .defaultValue {
       let predicate = coreDataCompanion.library.getSearchPlaylistsPredicate(
+        for: account,
         searchText: searchText,
         playlistSearchCategory: playlistSearchCategory
       )
@@ -924,6 +970,7 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
 
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     sortType: PlaylistSortType,
     isGroupedInAlphabeticSections: Bool
   ) {
@@ -940,6 +987,7 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
       fetchRequest = PlaylistMO.durationFetchRequest
     }
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
       PlaylistMO.excludeSystemPlaylistsFetchPredicate,
       coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: .userOnly),
     ])
@@ -947,7 +995,7 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
   }
@@ -955,6 +1003,7 @@ public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsContr
   public func search(searchText: String) {
     if !searchText.isEmpty {
       let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        coreDataCompanion.library.getFetchPredicate(forAccount: account),
         PlaylistMO.excludeSystemPlaylistsFetchPredicate,
         PlaylistMO.getIdentifierBasedSearchPredicate(searchText: searchText),
         coreDataCompanion.library.getFetchPredicate(forPlaylistSearchCategory: .userOnly),
@@ -982,21 +1031,32 @@ public class ErrorLogFetchedResultsController: BasicFetchedResultsController<Log
 // MARK: - MusicFolderFetchedResultsController
 
 public class MusicFolderFetchedResultsController: CachedFetchedResultsController<MusicFolderMO> {
-  public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
+  public init(
+    coreDataCompanion: CoreDataCompanion,
+    account: Account,
+    isGroupedInAlphabeticSections: Bool
+  ) {
     let fetchRequest = MusicFolderMO.idSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = MusicFolderMO
       .relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(
       coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
+      fetchRequest: fetchRequest, account: account,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
   }
 
   public func search(searchText: String) {
     if !searchText.isEmpty {
-      search(predicate: MusicFolderMO.getSearchPredicate(searchText: searchText))
+      let searchPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        coreDataCompanion.library.getFetchPredicate(forAccount: account),
+        MusicFolderMO.getSearchPredicate(searchText: searchText),
+      ])
+      search(predicate: searchPredicate)
     } else {
       showAllResults()
     }

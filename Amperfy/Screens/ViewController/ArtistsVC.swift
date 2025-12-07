@@ -187,7 +187,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = ArtistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       sortType: sortType,
       isGroupedInAlphabeticSections: true
     )

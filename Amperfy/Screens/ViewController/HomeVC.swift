@@ -318,7 +318,7 @@ final class HomeVC: UICollectionViewController {
   func createFetchController() {
     if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
       albumsRecentFetchController = AlbumFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main,
+        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
         sortType: .recent,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
@@ -337,7 +337,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
       albumsLatestFetchController = AlbumFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main,
+        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
         sortType: .recent,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
@@ -369,7 +369,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
       playlistsLastTimePlayedFetchController = PlaylistFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main,
+        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
         sortType: .lastPlayed,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
@@ -401,7 +401,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .podcasts }) {
       podcastsFetchedController = PodcastFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main,
+        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
         isGroupedInAlphabeticSections: false
       )
       podcastsFetchedController?.delegate = self
@@ -414,7 +414,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .radios }) {
       radiosFetchedController = RadiosFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main,
+        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
         isGroupedInAlphabeticSections: true
       )
       radiosFetchedController?.delegate = self

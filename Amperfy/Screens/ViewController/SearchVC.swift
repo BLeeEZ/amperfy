@@ -80,6 +80,7 @@ class SearchVC: BasicTableViewController {
 
   private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   private var isSearchActive = false
+  private var accountObjectId: NSManagedObjectID?
 
   init() {
     super.init(style: .grouped)
@@ -139,6 +140,7 @@ class SearchVC: BasicTableViewController {
     /// Assign the data source to your collection view.
     tableView.dataSource = diffableDataSource
 
+    accountObjectId = appDelegate.account.managedObject.objectID
     searchHistory = appDelegate.storage.main.library.getSearchHistory(for: appDelegate.account)
     updateDataSource(animated: false)
     navigationController?.navigationItem.searchBarPlacementAllowsExternalIntegration = true
@@ -477,7 +479,7 @@ class SearchVC: BasicTableViewController {
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
-    guard let searchText = searchController.searchBar.text else { return }
+    guard let searchText = searchController.searchBar.text, let accountObjectId else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
         try await self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
@@ -499,21 +501,26 @@ class SearchVC: BasicTableViewController {
 
       Task { @MainActor in do {
         let searchResult = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+          let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
           let artists = asyncCompanion.library.searchArtists(
+            for: accountAsync,
             searchText: searchText,
             onlyCached: false,
             displayFilter: .all
           )
           let albums = asyncCompanion.library.searchAlbums(
+            for: accountAsync,
             searchText: searchText,
             onlyCached: false,
             displayFilter: .all
           )
           let playlists = asyncCompanion.library.searchPlaylists(
+            for: accountAsync,
             searchText: searchText,
             playlistSearchCategory: .all
           )
           let songs = asyncCompanion.library.searchSongs(
+            for: accountAsync,
             searchText: searchText,
             onlyCached: false,
             displayFilter: .all
@@ -564,21 +571,26 @@ class SearchVC: BasicTableViewController {
     } else if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 1 {
       Task { @MainActor in do {
         let searchResult = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+          let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
           let artists = asyncCompanion.library.searchArtists(
+            for: accountAsync,
             searchText: searchText,
             onlyCached: true,
             displayFilter: .all
           )
           let albums = asyncCompanion.library.searchAlbums(
+            for: accountAsync,
             searchText: searchText,
             onlyCached: true,
             displayFilter: .all
           )
           let playlists = asyncCompanion.library.searchPlaylists(
+            for: accountAsync,
             searchText: searchText,
             playlistSearchCategory: .cached
           )
           let songs = asyncCompanion.library.searchSongs(
+            for: accountAsync,
             searchText: searchText,
             onlyCached: true,
             displayFilter: .all

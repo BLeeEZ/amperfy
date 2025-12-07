@@ -46,7 +46,7 @@ class PodcastsVC: MultiSourceTableViewController {
     optionsButton = UIBarButtonItem.createSortBarButton()
 
     podcastsFetchedResultsController = PodcastFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: false
     )
     episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(

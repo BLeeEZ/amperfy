@@ -201,7 +201,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     appDelegate.storage.settings.playlistsSortSetting = sortType
     singleFetchedResultsController?.clearResults()
     fetchedResultsController = PlaylistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       sortType: sortType,
       isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none
     )

@@ -178,7 +178,7 @@ class AlbumsCommonVCInteractions {
     }
 
     fetchedResultsController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       sortType: sortType,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )

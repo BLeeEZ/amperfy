@@ -46,7 +46,7 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
     navigationItem.rightBarButtonItems = [doneButton]
 
     fetchedResultsController = GenreFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: true
     )
     singleFetchedResultsController = fetchedResultsController
