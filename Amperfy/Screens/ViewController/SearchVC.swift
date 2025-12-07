@@ -139,7 +139,7 @@ class SearchVC: BasicTableViewController {
     /// Assign the data source to your collection view.
     tableView.dataSource = diffableDataSource
 
-    searchHistory = appDelegate.storage.main.library.getSearchHistory()
+    searchHistory = appDelegate.storage.main.library.getSearchHistory(for: appDelegate.account)
     updateDataSource(animated: false)
     navigationController?.navigationItem.searchBarPlacementAllowsExternalIntegration = true
 
@@ -628,7 +628,7 @@ class SearchVC: BasicTableViewController {
       }}
     } else {
       isSearchActive = false
-      searchHistory = appDelegate.storage.main.library.getSearchHistory()
+      searchHistory = appDelegate.storage.main.library.getSearchHistory(for: appDelegate.account)
       artists = []
       albums = []
       playlists = []

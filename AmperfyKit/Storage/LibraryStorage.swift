@@ -1516,7 +1516,9 @@ public class LibraryStorage: PlayableFileCachable {
     let radios = foundRadios?.compactMap { Radio(managedObject: $0) }
     return radios ?? [Radio]()
   }
-
+  
+  // MARK: SearchHistory
+  
   public func getAllSearchHistory() -> [SearchHistoryItem] {
     let fetchRequest = SearchHistoryItemMO.fetchRequest()
     let foundHistory = try? context.fetch(fetchRequest)
@@ -1524,9 +1526,12 @@ public class LibraryStorage: PlayableFileCachable {
     return history ?? [SearchHistoryItem]()
   }
 
-  public func getSearchHistory() -> [SearchHistoryItem] {
+  public func getSearchHistory(for account: Account) -> [SearchHistoryItem] {
     let fetchRequest = SearchHistoryItemMO.searchDateFetchRequest
-    fetchRequest.predicate = SearchHistoryItemMO.excludeEmptyItemsFetchPredicate
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SearchHistoryItemMO.excludeEmptyItemsFetchPredicate,
+    ])
     let foundHistory = try? context.fetch(fetchRequest)
     let history = foundHistory?.compactMap { SearchHistoryItem(managedObject: $0) }
     return history ?? [SearchHistoryItem]()
