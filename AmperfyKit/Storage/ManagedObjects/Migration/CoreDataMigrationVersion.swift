@@ -58,6 +58,8 @@ enum CoreDataMigrationVersion: String, CaseIterable {
   case v46 = "Amperfy v46" // Add addedDate for songs
   case v47 = "Amperfy v47" // Add replay gain and peak for songs
   case v48 = "Amperfy v48" // Account support: add account (url + user)
+  case v49 =
+    "Amperfy v49" // Remove PlayableFile and Artwork data (they were already deprecated); Account: add apiType
 
   // MARK: - Current
 
@@ -168,6 +170,8 @@ enum CoreDataMigrationVersion: String, CaseIterable {
     case .v47:
       return .v48
     case .v48:
+      return .v49
+    case .v49:
       return nil
     }
   }

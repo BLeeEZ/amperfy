@@ -27,15 +27,25 @@ import XCTest
 enum TestAccountInfo {
   static let test1ServerHash = "111Server"
   static let test1UserHash = "111User"
+  static let test1ApiType = BackenApiType.ampache
   static let test2ServerHash = "22-S"
   static let test2UserHash = "22-U"
+  static let test2ApiType = BackenApiType.subsonic
 
   static func create1() -> AccountInfo {
-    AccountInfo(serverHash: Self.test1ServerHash, userHash: Self.test1UserHash)
+    AccountInfo(
+      serverHash: Self.test1ServerHash,
+      userHash: Self.test1UserHash,
+      apiType: Self.test1ApiType
+    )
   }
 
   static func create2() -> AccountInfo {
-    AccountInfo(serverHash: Self.test2ServerHash, userHash: Self.test2UserHash)
+    AccountInfo(
+      serverHash: Self.test2ServerHash,
+      userHash: Self.test2UserHash,
+      apiType: Self.test2ApiType
+    )
   }
 }
 

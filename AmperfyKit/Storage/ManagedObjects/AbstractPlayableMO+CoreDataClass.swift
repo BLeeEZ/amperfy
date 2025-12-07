@@ -44,10 +44,5 @@ public class AbstractPlayableMO: AbstractLibraryEntityMO {
       targetPlayable.embeddedArtwork = embeddedArtwork
       embeddedArtwork = nil
     }
-
-    if targetPlayable.file == nil {
-      targetPlayable.file = file
-      file = nil
-    }
   }
 }

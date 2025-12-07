@@ -25,8 +25,16 @@ import Foundation
 
 class CoreDataSeeder {
   let accounts = [
-    (serverHash: TestAccountInfo.test1ServerHash, userHash: TestAccountInfo.test1UserHash),
-    (serverHash: TestAccountInfo.test2ServerHash, userHash: TestAccountInfo.test2UserHash),
+    (
+      serverHash: TestAccountInfo.test1ServerHash,
+      userHash: TestAccountInfo.test1UserHash,
+      apiType: BackenApiType.ampache.rawValue
+    ),
+    (
+      serverHash: TestAccountInfo.test2ServerHash,
+      userHash: TestAccountInfo.test2UserHash,
+      apiType: BackenApiType.subsonic.rawValue
+    ),
   ]
   let artists = [
     (accountIndex: 0, id: "4", name: "My Dream"),
@@ -241,7 +249,11 @@ class CoreDataSeeder {
     let library = LibraryStorage(context: context)
 
     let accs = accounts.compactMap {
-      library.createAccount(info: AccountInfo(serverHash: $0.serverHash, userHash: $0.userHash))
+      library.createAccount(info: AccountInfo(
+        serverHash: $0.serverHash,
+        userHash: $0.userHash,
+        apiType: BackenApiType(rawValue: $0.apiType)!
+      ))
     }
 
     for artistSeed in artists {

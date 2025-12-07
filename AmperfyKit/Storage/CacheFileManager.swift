@@ -410,7 +410,11 @@ final public class CacheFileManager: Sendable {
         guard isDirectoryResourceValue.isDirectory == true else {
           continue
         }
-        accountInfo.append(AccountInfo(serverHash: serverHash, userHash: url.lastPathComponent))
+        accountInfo.append(AccountInfo(
+          serverHash: serverHash,
+          userHash: url.lastPathComponent,
+          apiType: .notDetected
+        ))
       }
     }
     return accountInfo

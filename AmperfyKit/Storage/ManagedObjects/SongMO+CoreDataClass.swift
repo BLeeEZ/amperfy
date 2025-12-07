@@ -45,7 +45,7 @@ extension SongMO: CoreDataIdentifyable {
           RemoteStatus.available.rawValue
         ),
       ]),
-      NSPredicate(format: "%K != nil", #keyPath(SongMO.file)),
+      NSPredicate(format: "%K != nil", #keyPath(SongMO.relFilePath)),
     ])
   }
 

@@ -33,6 +33,8 @@ extension AccountMO {
   @NSManaged
   public var id: String?
   @NSManaged
+  public var apiType: Int16
+  @NSManaged
   public var serverHash: String?
   @NSManaged
   public var serverUrl: String?

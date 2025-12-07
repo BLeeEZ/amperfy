@@ -57,7 +57,6 @@ public class LibraryStorage: PlayableFileCachable {
     Artist.typeName,
     Album.typeName,
     Song.typeName,
-    PlayableFile.typeName,
     Artwork.typeName,
     EmbeddedArtwork.typeName,
     Playlist.typeName,

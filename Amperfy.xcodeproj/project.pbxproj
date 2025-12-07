@@ -342,8 +342,6 @@
 		50C9D691284FAA6C007F18D0 /* ArtworkMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81ED823BF6B1E00EAAC3E /* ArtworkMO+CoreDataClass.swift */; };
 		50C9D692284FAA6C007F18D0 /* DownloadMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FE808C26A55CEA00CB434D /* DownloadMO+CoreDataClass.swift */; };
 		50C9D693284FAA6C007F18D0 /* DirectoryMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE13265ED5790073FF20 /* DirectoryMO+CoreDataProperties.swift */; };
-		50C9D694284FAA6C007F18D0 /* PlayableFileMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81ECF23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataProperties.swift */; };
-		50C9D695284FAA6C007F18D0 /* PlayableFileMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81ECE23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataClass.swift */; };
 		50C9D696284FAA6C007F18D0 /* DownloadMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50FE808D26A55CEA00CB434D /* DownloadMO+CoreDataProperties.swift */; };
 		50C9D697284FAA6C007F18D0 /* PlaylistMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81ECB23BF6B1D00EAAC3E /* PlaylistMO+CoreDataProperties.swift */; };
 		50C9D698284FAA6C007F18D0 /* DirectoryMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEE12265ED5790073FF20 /* DirectoryMO+CoreDataClass.swift */; };
@@ -374,7 +372,6 @@
 		50C9D6B2284FAA87007F18D0 /* ScrobbleEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50947E0227DA011F00C368D7 /* ScrobbleEntry.swift */; };
 		50C9D6B3284FAA87007F18D0 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50CDF20B264BC72800F83EF6 /* LogEntry.swift */; };
 		50C9D6B4284FAA87007F18D0 /* AbstractPlayable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A85EEA2689C0A500FB3E31 /* AbstractPlayable.swift */; };
-		50C9D6B5284FAA87007F18D0 /* PlayableFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9323BE1AFD00EAAC3E /* PlayableFile.swift */; };
 		50C9D6B6284FAA87007F18D0 /* PodcastEpisode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D482681C1700055A51B /* PodcastEpisode.swift */; };
 		50C9D6B7284FAA87007F18D0 /* UserStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288A26579DA900DA3A8F /* UserStatistics.swift */; };
 		50C9D6B8284FAA87007F18D0 /* AbstractLibraryEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B798A223B6CCE800551E62 /* AbstractLibraryEntity.swift */; };
@@ -710,6 +707,7 @@
 		506890E528CF3696009722B0 /* Amperfy v27.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v27.xcdatamodel"; sourceTree = "<group>"; };
 		5068D37F26A85C2D0006710D /* DownloadError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadError.swift; sourceTree = "<group>"; };
 		506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v2.xcdatamodel"; sourceTree = "<group>"; };
+		506C314D2EE6D2100011A2C3 /* Amperfy v49.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v49.xcdatamodel"; sourceTree = "<group>"; };
 		5070ED2C2D46979A00EB2972 /* Amperfy v42.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v42.xcdatamodel"; sourceTree = "<group>"; };
 		507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ContextQueuePrevSectionHeader.xib; sourceTree = "<group>"; };
 		507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextQueuePrevSectionHeader.swift; sourceTree = "<group>"; };
@@ -1022,15 +1020,12 @@
 		50F81E8D23BC6FEA00EAAC3E /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
 		50F81E8F23BCDE1600EAAC3E /* ArtworkTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkTest.swift; sourceTree = "<group>"; };
 		50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDataTest.swift; sourceTree = "<group>"; };
-		50F81E9323BE1AFD00EAAC3E /* PlayableFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableFile.swift; sourceTree = "<group>"; };
 		50F81EC823BF6B1D00EAAC3E /* ArtistMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArtistMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F81EC923BF6B1D00EAAC3E /* ArtistMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ArtistMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50F81ECA23BF6B1D00EAAC3E /* PlaylistMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F81ECB23BF6B1D00EAAC3E /* PlaylistMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlaylistMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50F81ECC23BF6B1D00EAAC3E /* AbstractLibraryEntityMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractLibraryEntityMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F81ECD23BF6B1D00EAAC3E /* AbstractLibraryEntityMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractLibraryEntityMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		50F81ECE23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayableFileMO+CoreDataClass.swift"; sourceTree = "<group>"; };
-		50F81ECF23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayableFileMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50F81ED223BF6B1D00EAAC3E /* PlayerMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerMO+CoreDataClass.swift"; sourceTree = "<group>"; };
 		50F81ED323BF6B1D00EAAC3E /* PlayerMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50F81ED423BF6B1D00EAAC3E /* AlbumMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AlbumMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1158,8 +1153,6 @@
 				50F81ECD23BF6B1D00EAAC3E /* AbstractLibraryEntityMO+CoreDataProperties.swift */,
 				5046DAF12689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift */,
 				5046DAF22689B97600B3C37E /* AbstractPlayableMO+CoreDataProperties.swift */,
-				50F81ECE23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataClass.swift */,
-				50F81ECF23BF6B1D00EAAC3E /* PlayableFileMO+CoreDataProperties.swift */,
 				50814C9F27D9FF660072738F /* ScrobbleEntryMO+CoreDataClass.swift */,
 				50814CA027D9FF660072738F /* ScrobbleEntryMO+CoreDataProperties.swift */,
 				505CA1F72B87387600AA81CD /* SearchHistoryItemMO+CoreDataClass.swift */,
@@ -1571,7 +1564,6 @@
 				50F81E8D23BC6FEA00EAAC3E /* Artwork.swift */,
 				50C16BF721E10E7500F086F0 /* Playlist.swift */,
 				50B798A823B6E5FF00551E62 /* PlaylistItem.swift */,
-				50F81E9323BE1AFD00EAAC3E /* PlayableFile.swift */,
 				50947E0227DA011F00C368D7 /* ScrobbleEntry.swift */,
 				505CA1FD2B8739AE00AA81CD /* SearchHistoryItem.swift */,
 				505905BB261D980C007C34CB /* PlayableContainable.swift */,
@@ -2482,7 +2474,6 @@
 				50C9D670284FAA4D007F18D0 /* LibraryStorage.swift in Sources */,
 				50C9D672284FAA4D007F18D0 /* BasicFetchedResultsController.swift in Sources */,
 				50C9D682284FAA6C007F18D0 /* PodcastEpisodeMO+CoreDataProperties.swift in Sources */,
-				50C9D694284FAA6C007F18D0 /* PlayableFileMO+CoreDataProperties.swift in Sources */,
 				50C9D6F028506EBC007F18D0 /* AmperfyKit.swift in Sources */,
 				50C9D665284FAA0B007F18D0 /* PodcastEpisodeParserDelegate.swift in Sources */,
 				50C9D699284FAA6C007F18D0 /* PlayerMO+CoreDataProperties.swift in Sources */,
@@ -2555,7 +2546,6 @@
 				50AD70DB2D5FBB0100E369BF /* AsyncOperation.swift in Sources */,
 				50C9D6C0284FAACE007F18D0 /* DownloadManagerSessionExtension.swift in Sources */,
 				50C9D6C4284FAB0C007F18D0 /* LocalNotificationManager.swift in Sources */,
-				50C9D6B5284FAA87007F18D0 /* PlayableFile.swift in Sources */,
 				50C9D654284FAA02007F18D0 /* SsPlayableParserDelegate.swift in Sources */,
 				50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */,
 				50C9D64D284FAA02007F18D0 /* SubsonicArtworkDownloadDelegate.swift in Sources */,
@@ -2577,7 +2567,6 @@
 				50C9D6DB284FAB88007F18D0 /* AudioSessionHandler.swift in Sources */,
 				50C9D677284FAA4D007F18D0 /* PersistentStorage.swift in Sources */,
 				50C9D6E6284FABCB007F18D0 /* AudioPlayer.swift in Sources */,
-				50C9D695284FAA6C007F18D0 /* PlayableFileMO+CoreDataClass.swift in Sources */,
 				50C9D659284FAA0B007F18D0 /* SongParserDelegate.swift in Sources */,
 				50C9D688284FAA6C007F18D0 /* SongMO+CoreDataClass.swift in Sources */,
 				50CEC6472D1F405500D0E696 /* RadioParserDelegate.swift in Sources */,
@@ -3295,6 +3284,7 @@
 		500BB49521CAAA2700D367CF /* Amperfy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				506C314D2EE6D2100011A2C3 /* Amperfy v49.xcdatamodel */,
 				5084F70C2ED9D87500D8D3DA /* Amperfy v48.xcdatamodel */,
 				507C9AD82E29905D001589F8 /* Amperfy v47.xcdatamodel */,
 				64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */,
@@ -3344,7 +3334,7 @@
 				506B3A3823B4539D00E31F21 /* Amperfy v2.xcdatamodel */,
 				500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */,
 			);
-			currentVersion = 5084F70C2ED9D87500D8D3DA /* Amperfy v48.xcdatamodel */;
+			currentVersion = 506C314D2EE6D2100011A2C3 /* Amperfy v49.xcdatamodel */;
 			path = Amperfy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

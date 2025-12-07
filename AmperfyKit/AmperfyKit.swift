@@ -73,7 +73,11 @@ public class AmperKit {
     if let credentials = storage.loginCredentials {
       return storage.main.library.getAccount(info: Account.createInfo(credentials: credentials))
     } else {
-      return storage.main.library.getAccount(info: AccountInfo(serverHash: "", userHash: ""))
+      return storage.main.library.getAccount(info: AccountInfo(
+        serverHash: "",
+        userHash: "",
+        apiType: .notDetected
+      ))
     }
   }()
 

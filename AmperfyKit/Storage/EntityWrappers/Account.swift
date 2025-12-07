@@ -28,6 +28,7 @@ import Foundation
 public struct AccountInfo: Sendable, Hashable {
   let serverHash: String
   let userHash: String
+  let apiType: BackenApiType
 }
 
 // MARK: - Account
@@ -40,21 +41,26 @@ public class Account: NSObject {
     super.init()
   }
 
-  func assignAccount(serverUrl: String, userName: String) {
+  func assignAccount(serverUrl: String, userName: String, apiType: BackenApiType) {
     managedObject.serverUrl = serverUrl
     managedObject.userName = userName
 
-    let info = Self.createInfo(serverUrl: serverUrl, userName: userName)
-    managedObject.serverHash = info.serverHash
-    managedObject.userHash = info.userHash
+    let info = Self.createInfo(serverUrl: serverUrl, userName: userName, apiType: apiType)
+    assignInfo(info: info)
   }
 
   func assignInfo(info: AccountInfo) {
     managedObject.serverHash = info.serverHash
     managedObject.userHash = info.userHash
+    managedObject.apiType = Int16(clamping: info.apiType.rawValue)
   }
 
-  public static func createInfo(serverUrl: String, userName: String) -> AccountInfo {
+  public static func createInfo(
+    serverUrl: String,
+    userName: String,
+    apiType: BackenApiType
+  )
+    -> AccountInfo {
     // Convert String → Data → SHA256 digest
     let serverHashData = SHA256.hash(data: serverUrl.data(using: .utf8)!)
     // Take the first 16 bytes (128 bits) for a shorter name, convert digest to hex string
@@ -63,15 +69,23 @@ public class Account: NSObject {
     let userHashData = SHA256.hash(data: userName.data(using: .utf8)!)
     // Take the first 16 bytes (128 bits) for a shorter name, convert digest to hex string
     let userHash = userHashData.prefix(8).compactMap { String(format: "%02hhx", $0) }.joined()
-    return AccountInfo(serverHash: serverHash, userHash: userHash)
+    return AccountInfo(serverHash: serverHash, userHash: userHash, apiType: apiType)
   }
 
   public static func createInfo(credentials: LoginCredentials) -> AccountInfo {
-    Self.createInfo(serverUrl: credentials.serverUrl, userName: credentials.username)
+    Self.createInfo(
+      serverUrl: credentials.serverUrl,
+      userName: credentials.username,
+      apiType: credentials.backendApi
+    )
   }
 
   public var id: String {
     managedObject.id ?? ""
+  }
+
+  public var apiType: BackenApiType {
+    BackenApiType(rawValue: Int(managedObject.apiType)) ?? .notDetected
   }
 
   public var serverHash: String {
@@ -91,6 +105,6 @@ public class Account: NSObject {
   }
 
   public var info: AccountInfo {
-    AccountInfo(serverHash: serverHash, userHash: userHash)
+    AccountInfo(serverHash: serverHash, userHash: userHash, apiType: apiType)
   }
 }

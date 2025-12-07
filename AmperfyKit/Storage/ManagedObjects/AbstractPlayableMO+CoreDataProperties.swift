@@ -68,9 +68,6 @@ extension AbstractPlayableMO {
   public var download: DownloadMO?
   @NSManaged
   public var embeddedArtwork: EmbeddedArtworkMO?
-  /// deprecated! use relFilePath instead
-  @NSManaged
-  public var file: PlayableFileMO?
   @NSManaged
   public var playlistItems: [PlaylistItemMO]
   @NSManaged
