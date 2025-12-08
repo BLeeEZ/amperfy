@@ -142,17 +142,11 @@ struct LibrarySettingsView: View {
       }
       cachedPodcastEpisodesCount = try await appDelegate.storage.async
         .performAndGet { asyncCompanion in
-          let accountAsync = Account(
-            managedObject: asyncCompanion.context
-              .object(with: accountObjectId) as! AccountMO
-          )
+          let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
           return asyncCompanion.library.getCachedPodcastEpisodeCount(for: accountAsync)
         }
       completeCacheSize = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         let playableByteSize = fileManager.getPlayableCacheSize(for: accountAsync.info)
         return (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0)
           .asByteString

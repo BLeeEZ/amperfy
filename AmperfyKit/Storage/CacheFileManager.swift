@@ -117,14 +117,23 @@ final public class CacheFileManager: Sendable {
       self.amperfyLibraryDirectory = nil
     }
 
+    checkAmperfyDirectory()
+    recalculatePlayableCacheSizes()
+  }
+
+  public func recalculatePlayableCacheSizes() {
+    var completeCacheSize = Int64(0)
     let accounts = getAccounts()
     for account in accounts {
       let accountCache = calculatePlayableCacheSize(for: account)
-      _accountPlayableCacheSize[account] = accountCache
-      _completePlayableCacheSize += accountCache
+      _accountPlayableCacheSizeLock.withLock {
+        _accountPlayableCacheSize[account] = accountCache
+      }
+      completeCacheSize += accountCache
     }
-
-    checkAmperfyDirectory()
+    _completePlayableCacheSizeLock.withLock {
+      _completePlayableCacheSize = completeCacheSize
+    }
   }
 
   func checkAmperfyDirectory() {

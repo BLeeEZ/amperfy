@@ -51,6 +51,15 @@ public struct AccountInfo: Sendable, Hashable {
       return nil
     }
   }
+
+  public static func == (lhs: AccountInfo, rhs: AccountInfo) -> Bool {
+    lhs.serverHash == rhs.serverHash && lhs.userHash == rhs.userHash
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(serverHash)
+    hasher.combine(userHash)
+  }
 }
 
 // MARK: - Account

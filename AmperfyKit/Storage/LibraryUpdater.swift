@@ -351,26 +351,45 @@ public class LibraryUpdater {
       log: log,
       type: .info
     )
-    try? fileManager.move(
+    notifier.startOperation(name: "Cache Update", totalCount: 6)
+    @Sendable
+    func moveFilesDetached(cfm: CacheFileManager, from: URL?, to: URL?) async {
+      await Task.detached(priority: .utility) {
+        try? cfm.move(from: from, to: to)
+      }.value
+    }
+    await moveFilesDetached(
+      cfm: fileManager,
       from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "artworks")!),
       to: fileManager.getOrCreateAbsoluteArtworksDirectory(for: accountInfo)
     )
-    try? fileManager.move(
+    notifier.tickOperation()
+    await moveFilesDetached(
+      cfm: fileManager,
       from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "embedded-artworks")!),
       to: fileManager.getOrCreateAbsoluteEmbeddedArtworksDirectory(for: accountInfo)
     )
-    try? fileManager.move(
+    notifier.tickOperation()
+    await moveFilesDetached(
+      cfm: fileManager,
       from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "episodes")!),
       to: fileManager.getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo)
     )
-    try? fileManager.move(
+    notifier.tickOperation()
+    await moveFilesDetached(
+      cfm: fileManager,
       from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "lyrics")!),
       to: fileManager.getOrCreateAbsoluteLyricsDirectory(for: accountInfo)
     )
-    try? fileManager.move(
+    notifier.tickOperation()
+    await moveFilesDetached(
+      cfm: fileManager,
       from: fileManager.getAbsoluteAmperfyPath(relFilePath: URL(string: "songs")!),
       to: fileManager.getOrCreateAbsoluteSongsDirectory(for: accountInfo)
     )
+    notifier.tickOperation()
+    fileManager.recalculatePlayableCacheSizes()
+    notifier.tickOperation()
 
     os_log(
       "Iterate over all library elements with rel file paths and update rel path",
@@ -392,12 +411,19 @@ public class LibraryUpdater {
      */
     let newServerRelFilePath = fileManager.getRelPath(for: accountInfo)!
 
+    @Sendable
+    nonisolated func sleepConditionally(_ index: Int) {
+      if index != 0, index % 100 == 0 {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      }
+    }
+
     try await storage.async.perform { asyncCompanion in
       let artworks = asyncCompanion.library.getAllArtworks()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Artwork Update", totalCount: artworks.count)
-      for artwork in artworks {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, artwork) in artworks.enumerated() {
+        sleepConditionally(index)
         if let relFilePath = artwork.relFilePath {
           artwork.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
         }
@@ -409,8 +435,8 @@ public class LibraryUpdater {
       let embeddedArtworks = asyncCompanion.library.getAllEmbeddedArtworks()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworks.count)
-      for artwork in embeddedArtworks {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, artwork) in embeddedArtworks.enumerated() {
+        sleepConditionally(index)
         if let relFilePath = artwork.relFilePath {
           artwork.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
         }
@@ -421,8 +447,8 @@ public class LibraryUpdater {
     try await storage.async.perform { asyncCompanion in
       let episodes = asyncCompanion.library.getAllPodcastEpisodes()
       notifier.startOperation(name: "Podcast Episodes Update", totalCount: episodes.count)
-      for episode in episodes {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, episode) in episodes.enumerated() {
+        sleepConditionally(index)
         if let relFilePath = episode.relFilePath {
           episode.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
         }
@@ -432,8 +458,8 @@ public class LibraryUpdater {
     try await storage.async.perform { asyncCompanion in
       let songs = asyncCompanion.library.getAllSongs()
       notifier.startOperation(name: "Songs Update", totalCount: songs.count)
-      for song in songs {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, song) in songs.enumerated() {
+        sleepConditionally(index)
         if let relFilePath = song.relFilePath {
           song.relFilePath = newServerRelFilePath.appendingPathComponent(relFilePath.path)
         }
@@ -463,8 +489,8 @@ public class LibraryUpdater {
       let entities = asyncCompanion.library.getAllAbstractLibraryEntities()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "General Update", totalCount: entities.count)
-      for entity in entities {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, entity) in entities.enumerated() {
+        sleepConditionally(index)
         entity.account = accountAsync
         notifier.tickOperation()
       }
@@ -473,8 +499,8 @@ public class LibraryUpdater {
       let downloads = asyncCompanion.library.getAllDownloads()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Download Update", totalCount: downloads.count)
-      for download in downloads {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, download) in downloads.enumerated() {
+        sleepConditionally(index)
         download.account = accountAsync
         notifier.tickOperation()
       }
@@ -483,8 +509,8 @@ public class LibraryUpdater {
       let musicFolders = asyncCompanion.library.getAllMusicFolders()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Music Folders Update", totalCount: musicFolders.count)
-      for musicFolder in musicFolders {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, musicFolder) in musicFolders.enumerated() {
+        sleepConditionally(index)
         musicFolder.account = accountAsync
         notifier.tickOperation()
       }
@@ -493,8 +519,8 @@ public class LibraryUpdater {
       let directories = asyncCompanion.library.getAllDirectories()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Directories Update", totalCount: directories.count)
-      for directory in directories {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, directory) in directories.enumerated() {
+        sleepConditionally(index)
         directory.account = accountAsync
         notifier.tickOperation()
       }
@@ -503,8 +529,8 @@ public class LibraryUpdater {
       let playerDatas = asyncCompanion.library.getAllPlayerData()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Player Update", totalCount: playerDatas.count)
-      for playerData in playerDatas {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, playerData) in playerDatas.enumerated() {
+        sleepConditionally(index)
         playerData.account = accountAsync.managedObject
         playerData.contextPlaylist?.account = accountAsync.managedObject
         playerData.shuffledContextPlaylist?.account = accountAsync.managedObject
@@ -517,8 +543,8 @@ public class LibraryUpdater {
       let playlists = asyncCompanion.library.getAllPlaylists(isFaultsOptimized: false)
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Playlists Update", totalCount: playlists.count)
-      for playlist in playlists {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, playlist) in playlists.enumerated() {
+        sleepConditionally(index)
         playlist.account = accountAsync
         notifier.tickOperation()
       }
@@ -527,8 +553,8 @@ public class LibraryUpdater {
       let playlistItems = asyncCompanion.library.getAllPlaylistItems()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Playlist Items Update", totalCount: playlistItems.count)
-      for playlistItem in playlistItems {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, playlistItem) in playlistItems.enumerated() {
+        sleepConditionally(index)
         playlistItem.account = accountAsync.managedObject
         notifier.tickOperation()
       }
@@ -537,8 +563,8 @@ public class LibraryUpdater {
       let scrobbleEntries = asyncCompanion.library.getAllScrobbleEntries()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Scrobbles Update", totalCount: scrobbleEntries.count)
-      for scrobbleEntry in scrobbleEntries {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, scrobbleEntry) in scrobbleEntries.enumerated() {
+        sleepConditionally(index)
         scrobbleEntry.account = accountAsync
         notifier.tickOperation()
       }
@@ -547,8 +573,8 @@ public class LibraryUpdater {
       let searchHistory = asyncCompanion.library.getAllSearchHistory()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Search History Update", totalCount: searchHistory.count)
-      for searchHistoryItem in searchHistory {
-        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+      for (index, searchHistoryItem) in searchHistory.enumerated() {
+        sleepConditionally(index)
         searchHistoryItem.account = accountAsync
         notifier.tickOperation()
       }
