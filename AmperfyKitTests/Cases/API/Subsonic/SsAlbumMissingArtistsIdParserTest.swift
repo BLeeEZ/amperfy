@@ -60,7 +60,7 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     )
 
     let fetchRequest = SongMO.trackNumberSortedFetchRequest
-    let album = library.getAlbum(id: albumId, isDetailFaultResolution: true)!
+    let album = library.getAlbum(for: account, id: albumId, isDetailFaultResolution: true)!
     fetchRequest.predicate = library.getFetchPredicate(forAlbum: album)
 
     let songsMO = try? context.fetch(fetchRequest)
@@ -104,7 +104,7 @@ class SsAlbumMissingArtistsIdParserTest: AbstractSsParserTest {
     XCTAssertEqual("High Contrast", song.artist?.name)
     XCTAssertEqual(albumId, song.album?.id)
 
-    let localArtist = library.getArtistLocal(name: "Logistics")
+    let localArtist = library.getArtistLocal(for: account, name: "Logistics")
     XCTAssertEqual(songs[3].artist, localArtist)
     XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)

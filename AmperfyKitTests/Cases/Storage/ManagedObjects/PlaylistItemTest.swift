@@ -26,23 +26,26 @@ import XCTest
 class PlaylistItemTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
+  var account: Account!
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
+    account = library.getAccount(info: TestAccountInfo.create1())
   }
 
   override func tearDown() {}
 
   func testCreation() {
-    guard let song1 = library.getSong(id: cdHelper.seeder.songs[0].id) else { XCTFail(); return }
+    guard let song1 = library.getSong(for: account, id: cdHelper.seeder.songs[0].id)
+    else { XCTFail(); return }
     let item = library.createPlaylistItem(playable: song1)
     XCTAssertEqual(item.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(item.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(item.order, 0)
 
     XCTAssertEqual(item.playable.id, song1.id)
-    guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
+    guard let playlist = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[0].id)
     else { XCTFail(); return }
     let itemOrder = playlist.playables.count
     item.playlist = playlist
@@ -50,7 +53,10 @@ class PlaylistItemTest: XCTestCase {
     item.order = itemOrder
     XCTAssertEqual(item.order, itemOrder)
 
-    guard let playlistFetched = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
+    guard let playlistFetched = library.getPlaylist(
+      for: account,
+      id: cdHelper.seeder.playlists[0].id
+    )
     else { XCTFail(); return }
     XCTAssertEqual(playlistFetched.items[itemOrder].playable.id, song1.id)
     XCTAssertEqual(playlistFetched.items[itemOrder].playlist.id, playlistFetched.id)
@@ -66,7 +72,7 @@ class PlaylistItemTest: XCTestCase {
   }
 
   func testOrphanDetectionDeletedPlaylist() {
-    guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
+    guard let playlist = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[0].id)
     else { XCTFail(); return }
     let playlistItemCount = playlist.songCount
     XCTAssertGreaterThan(playlistItemCount, 0)
@@ -80,7 +86,7 @@ class PlaylistItemTest: XCTestCase {
   }
 
   func testOrphanDetectionDeletedSong() {
-    guard let playlist = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
+    guard let playlist = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[0].id)
     else { XCTFail(); return }
     let playlistItemCount = playlist.songCount
     XCTAssertGreaterThan(playlistItemCount, 0)

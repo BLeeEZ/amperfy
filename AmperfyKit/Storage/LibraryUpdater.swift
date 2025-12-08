@@ -218,7 +218,7 @@ public class LibraryUpdater {
     let podcastEpisodes = storage.main.library.getAllPodcastEpisodes()
     podcastEpisodes.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Directories", log: log, type: .info)
-    let directories = storage.main.library.getDirectories()
+    let directories = storage.main.library.getAllDirectories()
     directories.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Playlists", log: log, type: .info)
     let playlists = storage.main.library.getAllPlaylists()
@@ -267,7 +267,7 @@ public class LibraryUpdater {
   private func denormalizeCount(notifier: LibraryUpdaterCallbacks) async throws {
     os_log("Music Folder Denormalize", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let musicFolders = asyncCompanion.library.getMusicFolders(isFaultsOptimized: true)
+      let musicFolders = asyncCompanion.library.getAllMusicFolders(isFaultsOptimized: true)
       notifier.startOperation(name: "Music Folder Update", totalCount: musicFolders.count)
       for musicFolder in musicFolders {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -278,7 +278,7 @@ public class LibraryUpdater {
     }
     os_log("Directory Denormalize", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let directories = asyncCompanion.library.getDirectories(isFaultsOptimized: true)
+      let directories = asyncCompanion.library.getAllDirectories(isFaultsOptimized: true)
       notifier.startOperation(name: "Directory Update", totalCount: directories.count)
       for directory in directories {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -393,7 +393,7 @@ public class LibraryUpdater {
     let newServerRelFilePath = fileManager.getRelPath(for: accountInfo)!
 
     try await storage.async.perform { asyncCompanion in
-      let artworks = asyncCompanion.library.getArtworks()
+      let artworks = asyncCompanion.library.getAllArtworks()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Artwork Update", totalCount: artworks.count)
       for artwork in artworks {
@@ -406,7 +406,7 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let embeddedArtworks = asyncCompanion.library.getEmbeddedArtworks()
+      let embeddedArtworks = asyncCompanion.library.getAllEmbeddedArtworks()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Embedded Artwork Update", totalCount: embeddedArtworks.count)
       for artwork in embeddedArtworks {
@@ -452,6 +452,7 @@ public class LibraryUpdater {
      x Downloads
      x EmbeddedArtworks -> done in rel path
      x MusicFolders
+     x Directories
      x PlayerData
      x PlaylistItems
      x Playlists
@@ -479,12 +480,22 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let musicFolders = asyncCompanion.library.getMusicFolders()
+      let musicFolders = asyncCompanion.library.getAllMusicFolders()
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Music Folders Update", totalCount: musicFolders.count)
       for musicFolder in musicFolders {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
         musicFolder.account = accountAsync
+        notifier.tickOperation()
+      }
+    }
+    try await storage.async.perform { asyncCompanion in
+      let directories = asyncCompanion.library.getAllDirectories()
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
+      notifier.startOperation(name: "Directories Update", totalCount: directories.count)
+      for directory in directories {
+        usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
+        directory.account = accountAsync
         notifier.tickOperation()
       }
     }

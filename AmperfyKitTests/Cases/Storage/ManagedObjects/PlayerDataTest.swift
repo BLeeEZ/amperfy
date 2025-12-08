@@ -49,7 +49,8 @@ class PlayerDataTest: XCTestCase {
 
   func fillPlayerWithSomeSongs() {
     for i in 0 ... fillCount - 1 {
-      guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
+      guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[i].id)
+      else { XCTFail(); return }
       testPlayer.appendActiveQueue(playables: [song])
     }
   }
@@ -61,7 +62,7 @@ class PlayerDataTest: XCTestCase {
   }
 
   func checkPlaylistIndexEqualSeedIndex(playlistIndex: Int, seedIndex: Int) {
-    guard let song = library.getSong(id: cdHelper.seeder.songs[seedIndex].id)
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[seedIndex].id)
     else { XCTFail(); return }
     XCTAssertEqual(testPlayer.activeQueue.playables[playlistIndex].id, song.id)
   }
@@ -89,7 +90,8 @@ class PlayerDataTest: XCTestCase {
     fillPlayerWithSomeSongs()
 
     for i in [3, 2, 4, 1, 0] {
-      guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
+      guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[i].id)
+      else { XCTFail(); return }
       testPlayer.setCurrentIndex(i)
       XCTAssertEqual(testPlayer.currentItem?.id, song.id)
     }
@@ -154,8 +156,10 @@ class PlayerDataTest: XCTestCase {
 
   func testAddToPlaylist() {
     fillPlayerWithSomeSongs()
-    guard let song1 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
-    guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
+    guard let song1 = library.getSong(for: account, id: cdHelper.seeder.songs[6].id)
+    else { XCTFail(); return }
+    guard let song2 = library.getSong(for: account, id: cdHelper.seeder.songs[7].id)
+    else { XCTFail(); return }
     testPlayer.appendActiveQueue(playables: [song1])
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount + 1)
     testPlayer.setShuffle(true)
@@ -176,8 +180,10 @@ class PlayerDataTest: XCTestCase {
     XCTAssertEqual(testPlayer.currentIndex, 0)
     XCTAssertEqual(testPlayer.activeQueue.playables.count, 0)
 
-    guard let song1 = library.getSong(id: cdHelper.seeder.songs[6].id) else { XCTFail(); return }
-    guard let song2 = library.getSong(id: cdHelper.seeder.songs[7].id) else { XCTFail(); return }
+    guard let song1 = library.getSong(for: account, id: cdHelper.seeder.songs[6].id)
+    else { XCTFail(); return }
+    guard let song2 = library.getSong(for: account, id: cdHelper.seeder.songs[7].id)
+    else { XCTFail(); return }
     testPlayer.appendActiveQueue(playables: [song1])
     testPlayer.appendActiveQueue(playables: [song2])
     testPlayer.removeAllItems()

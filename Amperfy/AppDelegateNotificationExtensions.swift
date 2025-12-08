@@ -57,6 +57,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     let userInfo = response.notification.request.content.userInfo
     guard let contentTypeRaw = userInfo[NotificationUserInfo.type] as? String,
           let contentType = NotificationContentType(rawValue: contentTypeRaw),
+          let accountIdent = userInfo[NotificationUserInfo.account] as? String,
+          let accountInfo = AccountInfo.create(basedOnIdent: accountIdent),
           let id = userInfo[NotificationUserInfo.id] as? String else {
       return
     }
@@ -65,7 +67,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
       userStatistics.appStartedViaNotification()
       switch contentType {
       case .podcastEpisode:
-        let episode = storage.main.library.getPodcastEpisode(id: id)
+        let account = storage.main.library.getAccount(info: accountInfo)
+        let episode = storage.main.library.getPodcastEpisode(for: account, id: id)
         if let podcast = episode?.podcast {
           let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(podcast: podcast)
           displayInLibraryTab(vc: podcastDetailVC)

@@ -26,12 +26,15 @@ import UIKit
 
 extension AppDelegate {
   static var window: UIWindow? {
-    // Always get the topmost window that corresponds to the active tab
-    (UIApplication.shared.connectedScenes.first {
-      let isForeground = $0.activationState == .foregroundActive
-      let isMainWindow = ($0.delegate as? SceneDelegate) != nil
-      return isForeground && isMainWindow
-    }?.delegate as? SceneDelegate)?.window
+    let mainSceneDelegates: [SceneDelegate] = UIApplication.shared.connectedScenes
+      // only scenes that are attached
+      .filter { $0.activationState.rawValue >= 0 }
+      // sort order: foregroundActive < foregroundInactive < background
+      // this places the active tab first
+      .sorted { $0.activationState.rawValue < $1.activationState.rawValue }
+      // only "main" scene delegates
+      .compactMap { $0.delegate as? SceneDelegate }
+    return mainSceneDelegates.first?.window
   }
 
   static func rootViewController() -> UIViewController? {

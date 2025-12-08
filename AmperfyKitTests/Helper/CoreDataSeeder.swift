@@ -267,7 +267,7 @@ class CoreDataSeeder {
       album.id = albumSeed.id
       album.name = albumSeed.name
       album.year = albumSeed.year
-      let artist = library.getArtist(id: albumSeed.artistId)
+      let artist = library.getArtist(for: accs[albumSeed.accountIndex], id: albumSeed.artistId)
       album.artist = artist
     }
 
@@ -284,9 +284,13 @@ class CoreDataSeeder {
       song.title = songSeed.title
       song.track = songSeed.track
       song.url = songSeed.url
-      let artist = library.getArtist(id: songSeed.artistId)
+      let artist = library.getArtist(for: accs[songSeed.accountIndex], id: songSeed.artistId)
       song.artist = artist
-      let album = library.getAlbum(id: songSeed.albumId, isDetailFaultResolution: true)
+      let album = library.getAlbum(
+        for: accs[songSeed.accountIndex],
+        id: songSeed.albumId,
+        isDetailFaultResolution: true
+      )
       song.album = album
       if songSeed.isCached {
         song.relFilePath = relFilePath
@@ -298,7 +302,7 @@ class CoreDataSeeder {
       playlist.id = playlistSeed.id
       playlist.name = playlistSeed.name
       for songId in playlistSeed.songIds {
-        if let song = library.getSong(id: songId) {
+        if let song = library.getSong(for: accs[playlistSeed.accountIndex], id: songId) {
           playlist.append(playable: song)
         } else {
           let logMsg = "Song id <" + String(songId) + "> for playlist id <" +

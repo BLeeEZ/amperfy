@@ -123,9 +123,10 @@ extension Artist: PlayableContainable {
   public var subsubtitle: String? { nil }
   public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
-    if let managedObjectContext = managedObject.managedObjectContext {
+    if let managedObjectContext = managedObject.managedObjectContext, let account {
       let library = LibraryStorage(context: managedObjectContext)
-      let relatedAlbumCount = library.getAlbums(whichContainsSongsWithArtist: self).count
+      let relatedAlbumCount = library.getAlbums(for: account, whichContainsSongsWithArtist: self)
+        .count
       if relatedAlbumCount == 1 {
         infoContent.append("1 Album")
       } else if relatedAlbumCount > 1 {

@@ -58,7 +58,7 @@ class SsAlbumMultidiscExample1ParserTest: AbstractSsParserTest {
     )
 
     let fetchRequest = SongMO.trackNumberSortedFetchRequest
-    let album = library.getAlbum(id: albumId, isDetailFaultResolution: true)!
+    let album = library.getAlbum(for: account, id: albumId, isDetailFaultResolution: true)!
     fetchRequest.predicate = library.getFetchPredicate(forAlbum: album)
 
     let songsMO = try? context.fetch(fetchRequest)

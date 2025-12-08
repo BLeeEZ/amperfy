@@ -33,7 +33,7 @@ class SsMusicFolderParserDelegate: SsXmlLibParser {
     account: Account,
     library: LibraryStorage
   ) {
-    self.musicFoldersBeforeFetch = Set(library.getMusicFolders())
+    self.musicFoldersBeforeFetch = Set(library.getMusicFolders(for: account))
     self.musicFoldersDict = [String: MusicFolder]()
     for mf in musicFoldersBeforeFetch {
       musicFoldersDict[mf.id] = mf

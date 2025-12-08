@@ -1216,19 +1216,36 @@ public class IntentManager {
     case .unknown:
       fallthrough
     case .song:
-      playableContainer = library.getSong(id: id)
+      playableContainer = library.getSong(for: account, id: id)
     case .artist:
-      playableContainer = library.getArtist(id: id)
+      switch account.apiType.asServerApiType {
+      case .ampache:
+        playableContainer = library.getArtist(for: account, id: id)
+      case .subsonic:
+        playableContainer = library.getArtist(for: account, id: id)
+        if playableContainer == nil {
+          playableContainer = library.getArtistLocal(for: account, name: id)
+        }
+      case .none:
+        break // do nothing
+      }
     case .podcastEpisode:
-      playableContainer = library.getPodcastEpisode(id: id)
+      playableContainer = library.getPodcastEpisode(for: account, id: id)
     case .playlist:
-      playableContainer = library.getPlaylist(id: id)
+      playableContainer = library.getPlaylist(for: account, id: id)
     case .album:
-      playableContainer = library.getAlbum(id: id, isDetailFaultResolution: false)
+      playableContainer = library.getAlbum(for: account, id: id, isDetailFaultResolution: false)
     case .genre:
-      playableContainer = library.getGenre(id: id)
+      switch account.apiType.asServerApiType {
+      case .ampache:
+        playableContainer = library.getGenre(for: account, id: id)
+      case .subsonic:
+        playableContainer = library.getGenre(for: account, name: id)
+      case .none:
+        break // do nothing
+      }
     case .podcast:
-      playableContainer = library.getPodcast(id: id)
+      playableContainer = library.getPodcast(for: account, id: id)
     }
     return playableContainer
   }

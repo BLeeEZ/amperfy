@@ -64,11 +64,7 @@ class CommonLibrarySyncer {
       let cachedSongs = self.fileManager.getCachedSongs(for: accountInfo)
       let cachedEpisodes = self.fileManager.getCachedEpisodes(for: accountInfo)
 
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
-
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedLyrics
         .count + cachedSongs.count + cachedEpisodes.count
       guard totalCount > 0 else {
@@ -77,10 +73,13 @@ class CommonLibrarySyncer {
       }
       statusNotifyier?.notifySyncStarted(ofType: .cache, totalCount: totalCount)
       for cachedArtwork in cachedArtworks {
-        let artwork = asyncCompanion.library.getArtwork(remoteInfo: ArtworkRemoteInfo(
-          id: cachedArtwork.id,
-          type: cachedArtwork.type
-        )) ?? asyncCompanion.library.createArtwork(account: accountAsync)
+        let artwork = asyncCompanion.library.getArtwork(
+          for: accountAsync,
+          remoteInfo: ArtworkRemoteInfo(
+            id: cachedArtwork.id,
+            type: cachedArtwork.type
+          )
+        ) ?? asyncCompanion.library.createArtwork(account: accountAsync)
         artwork.id = cachedArtwork.id
         artwork.type = cachedArtwork.type
         artwork.relFilePath = cachedArtwork.relFilePath
@@ -104,13 +103,16 @@ class CommonLibrarySyncer {
       // match embedded artworks after songs/episods so that owner are already created
       for cachedEmbeddedArtwork in cachedEmbeddedArtworks {
         if cachedEmbeddedArtwork.isSong,
-           let song = asyncCompanion.library.getSong(id: cachedEmbeddedArtwork.id) {
+           let song = asyncCompanion.library.getSong(
+             for: accountAsync,
+             id: cachedEmbeddedArtwork.id
+           ) {
           let embeddedArtwork = asyncCompanion.library.createEmbeddedArtwork(account: accountAsync)
           embeddedArtwork.relFilePath = cachedEmbeddedArtwork.relFilePath
           embeddedArtwork.owner = song
         } else if !cachedEmbeddedArtwork.isSong,
                   let episode = asyncCompanion.library
-                  .getPodcastEpisode(id: cachedEmbeddedArtwork.id) {
+                  .getPodcastEpisode(for: accountAsync, id: cachedEmbeddedArtwork.id) {
           let embeddedArtwork = asyncCompanion.library.createEmbeddedArtwork(account: accountAsync)
           embeddedArtwork.relFilePath = cachedEmbeddedArtwork.relFilePath
           embeddedArtwork.owner = episode
@@ -120,14 +122,17 @@ class CommonLibrarySyncer {
       // match lyrics after songs/episods so that owner are already created
       for cachedLyric in cachedLyrics {
         if cachedLyric.isSong {
-          var song = asyncCompanion.library.getSong(id: cachedLyric.id)
+          var song = asyncCompanion.library.getSong(for: accountAsync, id: cachedLyric.id)
           if song == nil {
             song = asyncCompanion.library.createSong(account: accountAsync)
             song?.id = cachedLyric.id
           }
           song?.lyricsRelFilePath = cachedLyric.relFilePath
         } else if !cachedLyric.isSong,
-                  let _ = asyncCompanion.library.getPodcastEpisode(id: cachedLyric.id) {
+                  let _ = asyncCompanion.library.getPodcastEpisode(
+                    for: accountAsync,
+                    id: cachedLyric.id
+                  ) {
           // not supported
         }
         statusNotifyier?.notifyParsedObject(ofType: .cache)

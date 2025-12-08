@@ -52,11 +52,11 @@ class ArtworkTest: XCTestCase {
   func testStatus() {
     testArtwork.status = ImageStatus.FetchError
     XCTAssertEqual(testArtwork.status, ImageStatus.FetchError)
-    guard let artist1 = library.getArtist(id: cdHelper.seeder.artists[0].id)
+    guard let artist1 = library.getArtist(for: account, id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
     artist1.managedObject.artwork = testArtwork.managedObject
     library.saveContext()
-    guard let artistFetched = library.getArtist(id: cdHelper.seeder.artists[0].id)
+    guard let artistFetched = library.getArtist(for: account, id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
     XCTAssertEqual(artistFetched.artwork?.status, ImageStatus.FetchError)
   }
@@ -94,9 +94,9 @@ class ArtworkTest: XCTestCase {
   }
 
   func testOwners() {
-    guard let artist1 = library.getArtist(id: cdHelper.seeder.artists[0].id)
+    guard let artist1 = library.getArtist(for: account, id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
-    guard let artist2 = library.getArtist(id: cdHelper.seeder.artists[1].id)
+    guard let artist2 = library.getArtist(for: account, id: cdHelper.seeder.artists[1].id)
     else { XCTFail(); return }
     XCTAssertEqual(testArtwork.owners.count, 0)
     artist1.managedObject.artwork = testArtwork.managedObject

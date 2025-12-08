@@ -44,13 +44,13 @@ class GenreParserTest: AbstractAmpacheTest {
 
     XCTAssertEqual(library.getGenreCount(for: account), 2)
 
-    guard let genre = library.getGenre(id: "6") else { XCTFail(); return }
+    guard let genre = library.getGenre(for: account, id: "6") else { XCTFail(); return }
     XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(genre.id, "6")
     XCTAssertEqual(genre.name, "Dance")
 
-    guard let genre = library.getGenre(id: "4") else { XCTFail(); return }
+    guard let genre = library.getGenre(for: account, id: "4") else { XCTFail(); return }
     XCTAssertEqual(genre.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(genre.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(genre.id, "4")

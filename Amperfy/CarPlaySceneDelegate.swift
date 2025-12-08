@@ -657,6 +657,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       )))
       albumItems.append(createDetailAllSongsTemplate(for: artist, onlyCached: onlyCached))
       let artistAlbums = appDelegate.storage.main.library.getAlbums(
+        for: appDelegate.account,
         whichContainsSongsWithArtist: artist,
         onlyCached: onlyCached || isOfflineMode
       ).prefix(LibraryStorage.carPlayMaxElements)

@@ -63,12 +63,16 @@ class AlbumTest: XCTestCase {
   }
 
   func testArtist() {
-    guard let artist = library.getArtist(id: cdHelper.seeder.artists[0].id)
+    guard let artist = library.getArtist(for: account, id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
     testAlbum.artist = artist
     XCTAssertEqual(testAlbum.artist!.id, artist.id)
     library.saveContext()
-    guard let albumFetched = library.getAlbum(id: testId, isDetailFaultResolution: true)
+    guard let albumFetched = library.getAlbum(
+      for: account,
+      id: testId,
+      isDetailFaultResolution: true
+    )
     else { XCTFail(); return }
     XCTAssertEqual(albumFetched.artist!.id, artist.id)
   }
@@ -79,7 +83,11 @@ class AlbumTest: XCTestCase {
     XCTAssertEqual(testAlbum.name, testTitle)
     XCTAssertEqual(testAlbum.identifier, testTitle)
     library.saveContext()
-    guard let albumFetched = library.getAlbum(id: testId, isDetailFaultResolution: true)
+    guard let albumFetched = library.getAlbum(
+      for: account,
+      id: testId,
+      isDetailFaultResolution: true
+    )
     else { XCTFail(); return }
     XCTAssertEqual(albumFetched.name, testTitle)
     XCTAssertEqual(albumFetched.identifier, testTitle)
@@ -90,7 +98,11 @@ class AlbumTest: XCTestCase {
     testAlbum.year = testYear
     XCTAssertEqual(testAlbum.year, testYear)
     library.saveContext()
-    guard let albumFetched = library.getAlbum(id: testId, isDetailFaultResolution: true)
+    guard let albumFetched = library.getAlbum(
+      for: account,
+      id: testId,
+      isDetailFaultResolution: true
+    )
     else { XCTFail(); return }
     XCTAssertEqual(albumFetched.year, testYear)
   }
@@ -109,7 +121,11 @@ class AlbumTest: XCTestCase {
     testAlbum.artwork?.status = .CustomImage
     XCTAssertNotNil(testAlbum.artwork?.imagePath)
     library.saveContext()
-    guard let albumFetched = library.getAlbum(id: testId, isDetailFaultResolution: true)
+    guard let albumFetched = library.getAlbum(
+      for: account,
+      id: testId,
+      isDetailFaultResolution: true
+    )
     else { XCTFail(); return }
     XCTAssertNotNil(albumFetched.artwork?.imagePath)
     try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
@@ -117,12 +133,14 @@ class AlbumTest: XCTestCase {
 
   func testSongs() {
     guard let album3Items = library.getAlbum(
+      for: account,
       id: cdHelper.seeder.albums[0].id,
       isDetailFaultResolution: true
     ) else { XCTFail(); return }
     XCTAssertEqual(album3Items.songs.count, 3)
     XCTAssertEqual(album3Items.songCount, 3)
     guard let album2Items = library.getAlbum(
+      for: account,
       id: cdHelper.seeder.albums[2].id,
       isDetailFaultResolution: true
     ) else { XCTFail(); return }
@@ -132,11 +150,13 @@ class AlbumTest: XCTestCase {
 
   func testHasCachedSongs() {
     guard let albumNoCached = library.getAlbum(
+      for: account,
       id: cdHelper.seeder.albums[0].id,
       isDetailFaultResolution: true
     ) else { XCTFail(); return }
     XCTAssertFalse(albumNoCached.playables.hasCachedItems)
     guard let albumTwoCached = library.getAlbum(
+      for: account,
       id: cdHelper.seeder.albums[2].id,
       isDetailFaultResolution: true
     ) else { XCTFail(); return }

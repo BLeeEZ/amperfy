@@ -29,6 +29,28 @@ public struct AccountInfo: Sendable, Hashable {
   let serverHash: String
   let userHash: String
   let apiType: BackenApiType
+
+  static let defaultIdent = "0-0"
+  static let defaultAccountInfo = AccountInfo(
+    serverHash: "",
+    userHash: "",
+    apiType: .notDetected
+  )
+
+  public static func create(basedOnIdent ident: String) -> AccountInfo? {
+    let parts = ident.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
+    if parts.count == 2 {
+      let server = String(parts[0])
+      let user = String(parts[1])
+      if server == "0", user == "0" {
+        return Self.defaultAccountInfo
+      } else {
+        return AccountInfo(serverHash: server, userHash: user, apiType: .notDetected)
+      }
+    } else {
+      return nil
+    }
+  }
 }
 
 // MARK: - Account
@@ -82,6 +104,10 @@ public class Account: NSObject {
 
   public var id: String {
     managedObject.id ?? ""
+  }
+
+  public var ident: String {
+    "\(serverHash)-\(userHash)"
   }
 
   public var apiType: BackenApiType {

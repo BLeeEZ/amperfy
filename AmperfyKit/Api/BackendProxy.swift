@@ -22,6 +22,13 @@
 import Foundation
 import os.log
 
+// MARK: - ServerApiType
+
+public enum ServerApiType: Int, Sendable {
+  case ampache = 1
+  case subsonic = 2
+}
+
 // MARK: - BackenApiType
 
 public enum BackenApiType: Int, Sendable {
@@ -45,6 +52,15 @@ public enum BackenApiType: Int, Sendable {
     case .ampache: return "Ampache"
     case .subsonic: return "Subsonic"
     case .subsonic_legacy: return "Subsonic (legacy login)"
+    }
+  }
+
+  public var asServerApiType: ServerApiType? {
+    switch self {
+    case .notDetected: return nil
+    case .ampache: return .ampache
+    case .subsonic: return .subsonic
+    case .subsonic_legacy: return .subsonic
     }
   }
 }

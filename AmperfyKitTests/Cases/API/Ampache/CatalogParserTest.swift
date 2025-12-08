@@ -43,7 +43,8 @@ class CatalogParserTest: AbstractAmpacheTest {
 
     XCTAssertEqual(library.getMusicFolderCount(for: account), 4)
 
-    let musicFolders = library.getMusicFolders().sorted(by: { Int($0.id)! < Int($1.id)! })
+    let musicFolders = library.getMusicFolders(for: account)
+      .sorted(by: { Int($0.id)! < Int($1.id)! })
     XCTAssertEqual(musicFolders[0].account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(musicFolders[0].account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(musicFolders[0].id, "1")

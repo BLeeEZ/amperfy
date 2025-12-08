@@ -35,7 +35,7 @@ class CatalogParserDelegate: AmpacheXmlLibParser {
     account: Account,
     library: LibraryStorage
   ) {
-    self.musicFoldersBeforeFetch = Set(library.getMusicFolders())
+    self.musicFoldersBeforeFetch = Set(library.getMusicFolders(for: account))
     super.init(
       performanceMonitor: performanceMonitor,
       prefetch: prefetch,

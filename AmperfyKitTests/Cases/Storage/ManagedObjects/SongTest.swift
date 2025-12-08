@@ -68,24 +68,25 @@ class SongTest: XCTestCase {
   }
 
   func testArtist() {
-    guard let artist = library.getArtist(id: cdHelper.seeder.artists[0].id)
+    guard let artist = library.getArtist(for: account, id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
     testSong.artist = artist
     XCTAssertEqual(testSong.artist!.id, artist.id)
     library.saveContext()
-    guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertEqual(songFetched.artist!.id, artist.id)
   }
 
   func testAlbum() {
     guard let album = library.getAlbum(
+      for: account,
       id: cdHelper.seeder.albums[0].id,
       isDetailFaultResolution: true
     ) else { XCTFail(); return }
     testSong.album = album
     XCTAssertEqual(testSong.album!.id, album.id)
     library.saveContext()
-    guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertEqual(songFetched.album!.id, album.id)
   }
 
@@ -96,7 +97,7 @@ class SongTest: XCTestCase {
     XCTAssertEqual(testSong.displayString, "Unknown Artist - " + testTitle)
     XCTAssertEqual(testSong.identifier, testTitle)
     library.saveContext()
-    guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertEqual(songFetched.title, testTitle)
     XCTAssertEqual(songFetched.displayString, "Unknown Artist - " + testTitle)
     XCTAssertEqual(songFetched.identifier, testTitle)
@@ -107,7 +108,7 @@ class SongTest: XCTestCase {
     testSong.track = testTrack
     XCTAssertEqual(testSong.track, testTrack)
     library.saveContext()
-    guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertEqual(songFetched.track, testTrack)
   }
 
@@ -116,7 +117,7 @@ class SongTest: XCTestCase {
     testSong.url = testUrl
     XCTAssertEqual(testSong.url, testUrl)
     library.saveContext()
-    guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertEqual(songFetched.url, testUrl)
   }
 
@@ -137,7 +138,7 @@ class SongTest: XCTestCase {
     XCTAssertNotNil(testSong.artwork?.imagePath)
     XCTAssertEqual(testSong.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     library.saveContext()
-    guard let songFetched = library.getSong(id: testId) else { XCTFail(); return }
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertNotNil(songFetched.artwork?.imagePath)
     XCTAssertEqual(songFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
@@ -163,10 +164,11 @@ class SongTest: XCTestCase {
   }
 
   func testSongDeleteCache() {
-    guard let artist = library.getArtist(id: cdHelper.seeder.artists[0].id)
+    guard let artist = library.getArtist(for: account, id: cdHelper.seeder.artists[0].id)
     else { XCTFail(); return }
     testSong.artist = artist
     guard let album = library.getAlbum(
+      for: account,
       id: cdHelper.seeder.albums[0].id,
       isDetailFaultResolution: true
     ) else { XCTFail(); return }
@@ -180,10 +182,10 @@ class SongTest: XCTestCase {
     XCTAssertEqual(musicFolder.account?.userHash, TestAccountInfo.test1UserHash)
     testSong.managedObject.musicFolder = musicFolder.managedObject
 
-    guard let playlist1 = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
+    guard let playlist1 = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[0].id)
     else { XCTFail(); return }
     playlist1.append(playable: testSong)
-    guard let playlist2 = library.getPlaylist(id: cdHelper.seeder.playlists[1].id)
+    guard let playlist2 = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[1].id)
     else { XCTFail(); return }
     playlist2.append(playable: testSong)
 

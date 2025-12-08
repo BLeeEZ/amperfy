@@ -60,7 +60,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func fillPlayerWithSomeSongs() {
     for i in 0 ... fillCount - 1 {
-      guard let song = library.getSong(id: cdHelper.seeder.songs[i].id) else { XCTFail(); return }
+      guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[i].id)
+      else { XCTFail(); return }
       testPlayer.appendContextQueue(playables: [song])
     }
   }
@@ -68,7 +69,7 @@ class PlayQueueHandlerTest: XCTestCase {
   func fillPlayerWithSomeSongsAndWaitingQueue() {
     fillPlayerWithSomeSongs()
     for i in 0 ... 3 {
-      guard let song = library.getSong(id: cdHelper.seeder.songs[fillCount + i].id)
+      guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[fillCount + i].id)
       else { XCTFail(); return }
       testPlayer.appendUserQueue(playables: [song])
     }
@@ -81,7 +82,7 @@ class PlayQueueHandlerTest: XCTestCase {
   }
 
   func checkPlaylistIndexEqualSeedIndex(playlistIndex: Int, seedIndex: Int) {
-    guard let song = library.getSong(id: cdHelper.seeder.songs[seedIndex].id)
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[seedIndex].id)
     else { XCTFail(); return }
     XCTAssertEqual(testPlayer.contextQueue.playables[playlistIndex].id, song.id)
   }
@@ -90,7 +91,7 @@ class PlayQueueHandlerTest: XCTestCase {
     XCTAssertEqual(queue.count, seedIds.count)
     if queue.count == seedIds.count, !queue.isEmpty {
       for i in 0 ... queue.count - 1 {
-        guard let song = library.getSong(id: cdHelper.seeder.songs[seedIds[i]].id)
+        guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[seedIds[i]].id)
         else { XCTFail(); return }
         let queueId = queue[i].id
         let songId = song.id
@@ -101,7 +102,7 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func checkCurrentlyPlaying(idToBe: Int?) {
     if let idToBe = idToBe {
-      guard let song = library.getSong(id: cdHelper.seeder.songs[idToBe].id)
+      guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[idToBe].id)
       else { XCTFail(); return }
       XCTAssertEqual(testQueueHandler.currentlyPlaying?.id, song.id)
     } else {
@@ -238,13 +239,13 @@ class PlayQueueHandlerTest: XCTestCase {
     }
   }
 
-  var song9: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[9].id)! }
-  var songA: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[10].id)! }
-  var songB: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[11].id)! }
-  var songC: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[12].id)! }
-  var songD: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[13].id)! }
-  var songE: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[14].id)! }
-  var songF: AbstractPlayable { library.getSong(id: cdHelper.seeder.songs[15].id)! }
+  var song9: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[9].id)! }
+  var songA: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[10].id)! }
+  var songB: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[11].id)! }
+  var songC: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[12].id)! }
+  var songD: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[13].id)! }
+  var songE: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[14].id)! }
+  var songF: AbstractPlayable { library.getSong(for: account, id: cdHelper.seeder.songs[15].id)! }
 
   func testCreation() {
     XCTAssertEqual(testQueueHandler.prevQueueCount, 0)
@@ -263,7 +264,8 @@ class PlayQueueHandlerTest: XCTestCase {
   }
 
   func testAddToWaitingQueueToEmptyPlayerStartsPlaying() {
-    guard let song = library.getSong(id: cdHelper.seeder.songs[5].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[5].id)
+    else { XCTFail(); return }
     testQueueHandler.insertUserQueue(playables: [song])
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [Int]())
@@ -364,7 +366,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testWaitingQueueInsertFirst_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)
+    else { XCTFail(); return }
     testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -380,7 +383,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testWaitingQueueInsertFirst_noWaitingQueuePlaying2() {
     prepareNoWaitingQueuePlaying()
-    guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)
+    else { XCTFail(); return }
     testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -401,7 +405,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testWaitingQueueInsertFirst_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)
+    else { XCTFail(); return }
     testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])
@@ -417,7 +422,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testWaitingQueueInsertFirst_withWaitingQueuePlaying2() {
     prepareWithWaitingQueuePlaying()
-    guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)
+    else { XCTFail(); return }
     testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     testQueueHandler.removePlayable(at: PlayerIndex(queueType: .user, index: 0))
@@ -437,7 +443,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testWaitingQueueInsertLast_noWaitingQueuePlaying() {
     prepareNoWaitingQueuePlaying()
-    guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)
+    else { XCTFail(); return }
     testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 2)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1])
@@ -453,7 +460,8 @@ class PlayQueueHandlerTest: XCTestCase {
 
   func testWaitingQueueInsertLast_withWaitingQueuePlaying() {
     prepareWithWaitingQueuePlaying()
-    guard let song = library.getSong(id: cdHelper.seeder.songs[1].id) else { XCTFail(); return }
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)
+    else { XCTFail(); return }
     testPlayer.setCurrentIndex(2)
     checkCurrentlyPlaying(idToBe: 5)
     checkQueueItems(queue: testQueueHandler.getAllPrevQueueItems(), seedIds: [0, 1, 2])

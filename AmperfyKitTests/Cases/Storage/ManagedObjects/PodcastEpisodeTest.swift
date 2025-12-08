@@ -71,7 +71,8 @@ class PodcastEpisodeTest: XCTestCase {
     XCTAssertEqual(podcast.id, "1234")
     XCTAssertEqual(testEpisode.podcast!.id, podcast.id)
     library.saveContext()
-    guard let episodeFetched = library.getPodcastEpisode(id: testId) else { XCTFail(); return }
+    guard let episodeFetched = library.getPodcastEpisode(for: account, id: testId)
+    else { XCTFail(); return }
     XCTAssertEqual(episodeFetched.podcast!.id, podcast.id)
   }
 
@@ -81,7 +82,8 @@ class PodcastEpisodeTest: XCTestCase {
     XCTAssertEqual(testEpisode.title, testTitle)
     XCTAssertEqual(testEpisode.displayString, "Unknown Podcast - " + testTitle)
     library.saveContext()
-    guard let episodeFetched = library.getPodcastEpisode(id: testId) else { XCTFail(); return }
+    guard let episodeFetched = library.getPodcastEpisode(for: account, id: testId)
+    else { XCTFail(); return }
     XCTAssertEqual(episodeFetched.title, testTitle)
     XCTAssertEqual(episodeFetched.displayString, "Unknown Podcast - " + testTitle)
   }
@@ -91,7 +93,8 @@ class PodcastEpisodeTest: XCTestCase {
     testEpisode.url = testUrl
     XCTAssertEqual(testEpisode.url, testUrl)
     library.saveContext()
-    guard let episodeFetched = library.getPodcastEpisode(id: testId) else { XCTFail(); return }
+    guard let episodeFetched = library.getPodcastEpisode(for: account, id: testId)
+    else { XCTFail(); return }
     XCTAssertEqual(episodeFetched.url, testUrl)
   }
 
@@ -113,7 +116,8 @@ class PodcastEpisodeTest: XCTestCase {
     XCTAssertNotNil(testEpisode.artwork?.imagePath)
     XCTAssertEqual(testEpisode.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     library.saveContext()
-    guard let episodeFetched = library.getPodcastEpisode(id: testId) else { XCTFail(); return }
+    guard let episodeFetched = library.getPodcastEpisode(for: account, id: testId)
+    else { XCTFail(); return }
     XCTAssertEqual(episodeFetched.imagePath(setting: .serverArtworkOnly), absFilePath.path)
     try! CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
   }
@@ -125,10 +129,10 @@ class PodcastEpisodeTest: XCTestCase {
     podcast.id = "1234"
     testEpisode.podcast = podcast
 
-    guard let playlist1 = library.getPlaylist(id: cdHelper.seeder.playlists[0].id)
+    guard let playlist1 = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[0].id)
     else { XCTFail(); return }
     playlist1.append(playable: testEpisode)
-    guard let playlist2 = library.getPlaylist(id: cdHelper.seeder.playlists[1].id)
+    guard let playlist2 = library.getPlaylist(for: account, id: cdHelper.seeder.playlists[1].id)
     else { XCTFail(); return }
     playlist2.append(playable: testEpisode)
 

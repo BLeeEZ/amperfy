@@ -688,7 +688,11 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   private func sync(directory: Directory, thatIsAlbumId albumId: String) async throws {
-    guard let album = storage.main.library.getAlbum(id: albumId, isDetailFaultResolution: true)
+    guard let album = storage.main.library.getAlbum(
+      for: account,
+      id: albumId,
+      isDetailFaultResolution: true
+    )
     else { return }
     let songsObjectIdsBeforeFetch = Set(directory.songs).compactMap { $0.managedObject.objectID }
     let directoryObjectId = directory.managedObject.objectID
@@ -724,7 +728,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   private func sync(directory: Directory, thatIsArtistId artistId: String) async throws {
-    guard let artist = storage.main.library.getArtist(id: artistId) else { return }
+    guard let artist = storage.main.library.getArtist(for: account, id: artistId) else { return }
     let directoriesObjectIdsBeforeFetch = Set(directory.subdirectories)
       .compactMap { $0.managedObject.objectID }
     let directoryObjectId = directory.managedObject.objectID
@@ -732,10 +736,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     try await sync(artist: artist)
     try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let directoryAsync = Directory(
         managedObject: asyncCompanion.context
           .object(with: directoryObjectId) as! DirectoryMO
@@ -749,7 +750,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       })
 
       var directoriesAfterFetch: Set<Directory> = Set()
-      let artistAlbums = asyncCompanion.library.getAlbums(whichContainsSongsWithArtist: artistAsync)
+      let artistAlbums = asyncCompanion.library.getAlbums(
+        for: accountAsync,
+        whichContainsSongsWithArtist: artistAsync
+      )
 
       let albumDirectoryIds = artistAlbums.compactMap {
         "album-\($0.id)"

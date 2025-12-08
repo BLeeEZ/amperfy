@@ -34,6 +34,7 @@ public enum NotificationContentType: String, Sendable {
 
 public enum NotificationUserInfo {
   public static let type: String = "type"
+  public static let account: String = "account"
   public static let id: String = "id"
 }
 
@@ -86,7 +87,8 @@ public class LocalNotificationManager {
       content.title = podcastEpisode.creatorName
       content.body = podcastEpisode.title
       content.sound = .default
-      let identifier = "podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
+      let identifier =
+        "account-\(podcastEpisode.account?.ident ?? AccountInfo.defaultIdent)podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
       do {
         let fileIdentifier = identifier + ".png"
         let artworkUrl = createLocalUrl(
@@ -109,6 +111,7 @@ public class LocalNotificationManager {
       }
       content.userInfo = [
         NotificationUserInfo.type: NotificationContentType.podcastEpisode.rawValue,
+        NotificationUserInfo.account: podcastEpisode.account?.ident ?? AccountInfo.defaultIdent,
         NotificationUserInfo.id: podcastEpisode.id,
       ]
       let trigger = UNTimeIntervalNotificationTrigger(

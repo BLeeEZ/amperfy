@@ -96,7 +96,7 @@ struct ArtworkSettingsView: View {
               ),
               primaryButton: .default(Text("OK")) {
                 let allArtworksToDownload = appDelegate.storage.main.library
-                  .getArtworksForCompleteLibraryDownload()
+                  .getArtworksForCompleteLibraryDownload(for: appDelegate.account)
                 appDelegate.artworkDownloadManager.download(objects: allArtworksToDownload)
               },
               secondaryButton: .cancel()
