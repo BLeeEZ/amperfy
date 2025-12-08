@@ -174,22 +174,6 @@ public enum AlbumsDisplayStyle: Int, Sendable {
   public static let defaultValue: AlbumsDisplayStyle = .grid
 }
 
-// MARK: - SearchHistoryFetchedResultsController
-
-public class SearchHistoryFetchedResultsController: BasicFetchedResultsController<
-  SearchHistoryItemMO
-> {
-  public init(coreDataCompanion: CoreDataCompanion) {
-    let fetchRequest = SearchHistoryItemMO.searchDateFetchRequest
-    fetchRequest.predicate = SearchHistoryItemMO.excludeEmptyItemsFetchPredicate
-    super.init(
-      coreDataCompanion: coreDataCompanion,
-      fetchRequest: fetchRequest,
-      isGroupedInAlphabeticSections: false
-    )
-  }
-}
-
 // MARK: - PodcastFetchedResultsController
 
 public class PodcastFetchedResultsController: CachedFetchedResultsController<PodcastMO> {
@@ -238,13 +222,20 @@ public class PodcastFetchedResultsController: CachedFetchedResultsController<Pod
 public class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedResultsController<
   PodcastEpisodeMO
 > {
+  let account: Account
+
   public init(
     coreDataCompanion: CoreDataCompanion,
+    account: Account,
     isGroupedInAlphabeticSections: Bool,
     fetchLimit: Int? = nil
   ) {
+    self.account = account
     let fetchRequest = PodcastEpisodeMO.publishedDateSortedFetchRequest
-    fetchRequest.predicate = coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes(),
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = PodcastEpisodeMO
       .relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
@@ -259,6 +250,7 @@ public class PodcastEpisodesReleaseDateFetchedResultsController: BasicFetchedRes
   public func search(searchText: String, onlyCachedSongs: Bool) {
     if !searchText.isEmpty || onlyCachedSongs {
       let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        coreDataCompanion.library.getFetchPredicate(forAccount: account),
         coreDataCompanion.library.getFetchPredicateForUserAvailableEpisodes(),
         PodcastEpisodeMO.getIdentifierBasedSearchPredicate(searchText: searchText),
         coreDataCompanion.library.getFetchPredicate(onlyCachedPodcastEpisodes: onlyCachedSongs),
@@ -1184,9 +1176,19 @@ public class DirectorySongsFetchedResultsController: BasicFetchedResultsControll
 // MARK: - DownloadsFetchedResultsController
 
 public class DownloadsFetchedResultsController: BasicFetchedResultsController<DownloadMO> {
-  public init(coreDataCompanion: CoreDataCompanion, isGroupedInAlphabeticSections: Bool) {
+  let account: Account
+
+  public init(
+    coreDataCompanion: CoreDataCompanion,
+    account: Account,
+    isGroupedInAlphabeticSections: Bool
+  ) {
+    self.account = account
     let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-    fetchRequest.predicate = DownloadMO.onlyPlayablesPredicate
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      DownloadMO.onlyPlayablesPredicate,
+    ])
     fetchRequest.relationshipKeyPathsForPrefetching = DownloadMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
     super.init(

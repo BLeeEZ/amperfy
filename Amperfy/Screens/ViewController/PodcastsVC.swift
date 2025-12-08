@@ -50,7 +50,7 @@ class PodcastsVC: MultiSourceTableViewController {
       isGroupedInAlphabeticSections: false
     )
     episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: false
     )
 

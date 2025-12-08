@@ -387,7 +387,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .latestPodcastEpisodes }) {
       podcastEpisodesFetchedController = PodcastEpisodesReleaseDateFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main,
+        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
       )

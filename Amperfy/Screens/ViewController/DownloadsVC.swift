@@ -44,7 +44,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     downloadManager = appDelegate.playableDownloadManager
 
     fetchedResultsController = DownloadsFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main,
+      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
       isGroupedInAlphabeticSections: false
     )
     singleFetchedResultsController = fetchedResultsController
