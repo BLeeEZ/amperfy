@@ -90,7 +90,7 @@ final class DownloadRequestManager: Sendable {
   nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) -> Download? {
     let account = library.getAccount(managedObjectId: accountObjectId)
     if let existingDownload = library.getDownload(account: account, id: object.uniqueID) {
-      if existingDownload.errorDate != nil {
+      if existingDownload.errorDate != nil || !object.isCached {
         existingDownload.reset()
         library.saveContext()
         return existingDownload
