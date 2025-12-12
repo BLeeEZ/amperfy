@@ -3176,7 +3176,7 @@
 			repositoryURL = "https://github.com/dimitris-c/AudioStreaming/";
 			requirement = {
 				kind = exactVersion;
-				version = 1.4.0;
+				version = 1.4.3;
 			};
 		};
 		50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */ = {
