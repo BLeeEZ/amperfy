@@ -184,7 +184,8 @@ struct PlayerSettingsView: View {
         }, footer: """
         Select a transcoding format for cached songs. Changes will not apply to already downloaded songs; clear cache and redownload if needed.
         \(
-          appDelegate.storage.loginCredentials?.backendApi == .ampache ? "" :
+          appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?.backendApi
+            .asServerApiType == .ampache ? "" :
             """
             For 'raw', Amperfy uses the Subsonic API's 'download' action, which skips transcoding. Other formats use the 'stream' action, which requires proper server configuration for transcoding.
             """

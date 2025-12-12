@@ -109,11 +109,11 @@ public class ScrobbleSyncer {
 
     switch songPosition {
     case .start:
-      if storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
+      if storage.settings.user.isOnlineMode, networkMonitor.isConnectedToNetwork {
         nowPlayingToServerAsync(playedSong: playedSong, songPosition: .start)
       }
     case .end:
-      if storage.settings.isOnlineMode, networkMonitor.isConnectedToNetwork {
+      if storage.settings.user.isOnlineMode, networkMonitor.isConnectedToNetwork {
         nowPlayingToServerAsync(playedSong: playedSong, songPosition: .end) { song, success in
           self.cacheScrobbleRequest(playedSong: song, isUploaded: success)
           guard success else { return }
@@ -129,7 +129,7 @@ public class ScrobbleSyncer {
     Task { @MainActor in
       os_log("start", log: self.log, type: .info)
 
-      while self.isRunning, self.storage.settings.isOnlineMode,
+      while self.isRunning, self.storage.settings.user.isOnlineMode,
             self.networkMonitor.isConnectedToNetwork {
         do {
           let scobbleEntry = try await self.getNextScrobbleEntry()
@@ -221,7 +221,7 @@ public class ScrobbleSyncer {
         let curPlayingClosure = Song(managedObject: curPlayingClosureMO)
         guard curPlayingClosure == self.musicPlayer.currentlyPlaying,
               self.backendAudioPlayer.playType == .cache || self.storage.settings
-              .isScrobbleStreamedItems
+              .accounts.getSetting(self.account.info).read.isScrobbleStreamedItems
         else { return }
         self.songHasBeenListendEnough = true
       }

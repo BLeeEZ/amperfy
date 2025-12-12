@@ -92,7 +92,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
         "Add \(itemsToAdd?.count ?? 0) Songs to Playlist" : "Add to Playlist"
     )
 
-    change(sortType: appDelegate.storage.settings.playlistsSortSetting)
+    change(sortType: appDelegate.storage.settings.user.playlistsSortSetting)
 
     configureSearchController(placeholder: "Search in \"Playlists\"")
     tableView.register(nibName: PlaylistTableCell.typeName)
@@ -162,7 +162,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     updateRightBarButtonItems()
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
     } catch {
@@ -301,7 +301,8 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     if selectMode == .multi {
       let isMarked = (selectedPlaylits[playlist] != nil)
       let img = UIImageView(image: isMarked ? .checkmark : .circle)
-      img.tintColor = isMarked ? appDelegate.storage.settings.themePreference
+      img.tintColor = isMarked ? appDelegate.storage.settings.accounts.activeSettings.read
+        .themePreference
         .asColor : .secondaryLabelColor
       cell.accessoryView = img
     } else {

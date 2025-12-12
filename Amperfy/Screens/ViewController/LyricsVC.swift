@@ -64,7 +64,7 @@ class LyricsVC: UIViewController {
   }
 
   private func fetchSongInfoAndUpdateLyrics() {
-    guard appDelegate.storage.settings.isOnlineMode,
+    guard appDelegate.storage.settings.user.isOnlineMode,
           let song = player.currentlyPlaying?.asSong
     else { return }
 
@@ -79,7 +79,7 @@ class LyricsVC: UIViewController {
   private func showLyrics(structuredLyrics: StructuredLyrics) {
     lyricsView?.display(
       lyrics: structuredLyrics,
-      scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling
+      scrollAnimation: appDelegate.storage.settings.user.isLyricsSmoothScrolling
     )
   }
 

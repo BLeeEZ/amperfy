@@ -40,12 +40,12 @@ public struct DetailInfoType {
   public var isShowArtistDuration: Bool
   public var artistFilterSetting: ArtistCategoryFilter
 
-  public init(type: DetailType, settings: PersistentStorage.Settings) {
+  public init(type: DetailType, settings: AmperfySettings) {
     self.type = type
-    self.isShowDetailedInfo = settings.isShowDetailedInfo
-    self.isShowAlbumDuration = settings.isShowAlbumDuration
-    self.isShowArtistDuration = settings.isShowArtistDuration
-    self.artistFilterSetting = settings.artistsFilterSetting
+    self.isShowDetailedInfo = settings.user.isShowDetailedInfo
+    self.isShowAlbumDuration = settings.user.isShowAlbumDuration
+    self.isShowArtistDuration = settings.user.isShowArtistDuration
+    self.artistFilterSetting = settings.user.artistsFilterSetting
   }
 }
 
@@ -121,7 +121,7 @@ extension PlayableContainable {
     librarySyncer: LibrarySyncer,
     playableDownloadManager: DownloadManageable
   ) async throws {
-    guard storage.settings.isOnlineMode else { return }
+    guard storage.settings.user.isOnlineMode else { return }
     try await fetchFromServer(
       storage: storage,
       librarySyncer: librarySyncer,

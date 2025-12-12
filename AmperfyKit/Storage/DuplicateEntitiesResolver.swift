@@ -51,7 +51,7 @@ public class DuplicateEntitiesResolver {
       os_log("start", log: self.log, type: .info)
 
       // only check for duplicates on Ampache API, Subsonic does not have genre ids
-      if self.isRunning, self.storage.loginCredentials?.backendApi == .ampache {
+      if self.isRunning, account.apiType.asServerApiType == .ampache {
         try? await self.storage.async.perform { asyncCompanion in
           let accountAsync = Account(
             managedObject: asyncCompanion.context
@@ -68,7 +68,7 @@ public class DuplicateEntitiesResolver {
             byName: false
           )
         }
-      } else if self.isRunning, self.storage.loginCredentials?.backendApi != .ampache {
+      } else if self.isRunning, account.apiType.asServerApiType == .subsonic {
         try? await self.storage.async.perform { asyncCompanion in
           let accountAsync = Account(
             managedObject: asyncCompanion.context

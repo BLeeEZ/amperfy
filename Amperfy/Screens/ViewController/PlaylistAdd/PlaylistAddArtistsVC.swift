@@ -74,8 +74,8 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
     doneButton = addToPlaylistManager.createDoneButton()
     navigationItem.rightBarButtonItems = [doneButton]
 
-    change(sortType: appDelegate.storage.settings.artistsSortSetting)
-    change(filterType: appDelegate.storage.settings.artistsFilterSetting)
+    change(sortType: appDelegate.storage.settings.user.artistsSortSetting)
+    change(filterType: appDelegate.storage.settings.user.artistsFilterSetting)
     configureSearchController(
       placeholder: "Search in \"\(sceneTitle ?? "Artists")\"",
       scopeButtonTitles: ["All", "Cached"]
@@ -120,7 +120,7 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
     // favorite views can't change the display filter
     guard displayFilter != .favorites else { return }
     displayFilter = filterType
-    appDelegate.storage.settings.artistsFilterSetting = filterType
+    appDelegate.storage.settings.user.artistsFilterSetting = filterType
     updateSearchResults(for: searchController)
   }
 

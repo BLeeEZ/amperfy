@@ -271,40 +271,40 @@ class PlayerControlView: UIView {
     menuActions.append(createPlaybackRateMenu())
 
     if rootView?.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false {
-      if !appDelegate.storage.settings.isPlayerLyricsDisplayed ||
-        appDelegate.storage.settings.playerDisplayStyle != .large {
+      if !appDelegate.storage.settings.user.isPlayerLyricsDisplayed ||
+        appDelegate.storage.settings.user.playerDisplayStyle != .large {
         let showLyricsAction = UIAction(title: "Show Lyrics", image: .lyrics, handler: { _ in
-          if !self.appDelegate.storage.settings.isPlayerLyricsDisplayed {
-            self.appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
-            self.appDelegate.storage.settings.isPlayerVisualizerDisplayed = false
+          if !self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
+            self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
+            self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
             self.rootView?.largeCurrentlyPlayingView?.display(element: .lyrics)
           }
-          if self.appDelegate.storage.settings.playerDisplayStyle != .large {
+          if self.appDelegate.storage.settings.user.playerDisplayStyle != .large {
             self.displayPlaylistPressed()
           }
         })
         menuActions.append(showLyricsAction)
       } else {
         let hideLyricsAction = UIAction(title: "Hide Lyrics", image: .lyrics, handler: { _ in
-          self.appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
+          self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
           self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
         })
         menuActions.append(hideLyricsAction)
       }
     }
 
-    if !appDelegate.storage.settings.isPlayerVisualizerDisplayed ||
-      appDelegate.storage.settings.playerDisplayStyle != .large {
+    if !appDelegate.storage.settings.user.isPlayerVisualizerDisplayed ||
+      appDelegate.storage.settings.user.playerDisplayStyle != .large {
       let showVisualizerAction = UIAction(
         title: "Show Audio Visualizer",
         image: .audioVisualizer,
         handler: { _ in
-          if !self.appDelegate.storage.settings.isPlayerVisualizerDisplayed {
-            self.appDelegate.storage.settings.isPlayerVisualizerDisplayed = true
-            self.appDelegate.storage.settings.isPlayerLyricsDisplayed = false
+          if !self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed {
+            self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = true
+            self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
             self.rootView?.largeCurrentlyPlayingView?.display(element: .visualizer)
           }
-          if self.appDelegate.storage.settings.playerDisplayStyle != .large {
+          if self.appDelegate.storage.settings.user.playerDisplayStyle != .large {
             self.displayPlaylistPressed()
           }
         }
@@ -315,7 +315,7 @@ class PlayerControlView: UIView {
         title: "Hide Audio Visualizer",
         image: .audioVisualizer,
         handler: { _ in
-          self.appDelegate.storage.settings.isPlayerVisualizerDisplayed = false
+          self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
           self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
         }
       )
@@ -325,7 +325,7 @@ class PlayerControlView: UIView {
     switch player.playerMode {
     case .music:
       if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player.nextQueueCount > 0,
-         appDelegate.storage.settings.isOnlineMode {
+         appDelegate.storage.settings.user.isOnlineMode {
         let addContextToPlaylist = UIAction(
           title: "Add Context Queue to Playlist",
           image: .playlistPlus,
@@ -347,7 +347,7 @@ class PlayerControlView: UIView {
     case .podcast: break
     }
 
-    switch appDelegate.storage.settings.playerDisplayStyle {
+    switch appDelegate.storage.settings.user.playerDisplayStyle {
     case .compact:
       let scrollToCurrentlyPlaying = UIAction(
         title: "Scroll to currently playing",
@@ -371,7 +371,8 @@ class PlayerControlView: UIView {
   }
 
   func refreshPlayerModeChangeButton() {
-    playerModeButton.isHidden = !appDelegate.storage.settings.libraryDisplaySettings
+    playerModeButton.isHidden = !appDelegate.storage.settings.accounts.activeSettings.read
+      .libraryDisplaySettings
       .isVisible(libraryType: .podcasts)
     switch player.playerMode {
     case .music:

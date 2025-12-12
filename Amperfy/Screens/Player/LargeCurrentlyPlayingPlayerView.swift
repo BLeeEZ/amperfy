@@ -249,9 +249,9 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   }
 
   public func getDisplayElementBasedOnConfig() -> LargeDisplayElement {
-    if appDelegate.storage.settings.isPlayerLyricsDisplayed {
+    if appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
       return .lyrics
-    } else if appDelegate.storage.settings.isPlayerVisualizerDisplayed {
+    } else if appDelegate.storage.settings.user.isPlayerVisualizerDisplayed {
       return .visualizer
     } else {
       return .artwork
@@ -293,7 +293,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   public func showVisualizer() {
     visualizerHostingView?.hostingController?.view.isHidden = false
     appDelegate.player.audioAnalyzer
-      .isActive = (appDelegate.storage.settings.playerDisplayStyle == .large)
+      .isActive = (appDelegate.storage.settings.user.playerDisplayStyle == .large)
   }
 
   private func hideLyrics() {
@@ -314,7 +314,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   private func showLyrics(structuredLyrics: StructuredLyrics) {
     lyricsView?.display(
       lyrics: structuredLyrics,
-      scrollAnimation: appDelegate.storage.settings.isLyricsSmoothScrolling
+      scrollAnimation: appDelegate.storage.settings.user.isLyricsSmoothScrolling
     )
     lyricsView?.isHidden = false
   }

@@ -21,7 +21,7 @@
 
 import Foundation
 
-public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible, Sendable {
+public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible, Sendable, Codable {
   case v6 = 0
   case v7 = 1 // Genres added
   case v8 = 2 // Directories added

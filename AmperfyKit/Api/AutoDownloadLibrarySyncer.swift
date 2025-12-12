@@ -82,7 +82,7 @@ public class AutoDownloadLibrarySyncer {
     }
 
     if offset == 0, !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty,
-       storage.settings.isAutoDownloadLatestSongsActive {
+       storage.settings.accounts.getSetting(account.info).read.isAutoDownloadLatestSongsActive {
       var newestSongs = [AbstractPlayable]()
       for album in newNewestAlbums {
         newestSongs.append(contentsOf: album.songs)
@@ -103,7 +103,8 @@ public class AutoDownloadLibrarySyncer {
     let updatedEpisodes = Set(storage.main.library.getNewestPodcastEpisode(for: account, count: 20))
     let newAddedNewestEpisodes = updatedEpisodes.subtracting(oldNewestEpisodes)
     if !oldNewestEpisodes.isEmpty, !newAddedNewestEpisodes.isEmpty,
-       storage.settings.isAutoDownloadLatestPodcastEpisodesActive {
+       storage.settings.accounts.getSetting(account.info).read
+       .isAutoDownloadLatestPodcastEpisodesActive {
       playableDownloadManager.download(objects: Array(newAddedNewestEpisodes))
     }
     if !oldNewestEpisodes.isEmpty {

@@ -126,7 +126,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     super.viewIsAppearing(animated)
 
     if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1,
-       appDelegate.storage.settings.isOfflineMode {
+       appDelegate.storage.settings.user.isOfflineMode {
       searchController.searchBar.selectedScopeButtonIndex = 1
     } else {
       searchController.searchBar.selectedScopeButtonIndex = 0
@@ -154,11 +154,11 @@ class BasicTableViewController: KeyCommandTableViewController {
 
     var createdActionsIndex = 0
     var actions = [UIContextualAction]()
-    for actionType in appDelegate.storage.settings.swipeActionSettings.leading {
+    for actionType in appDelegate.storage.settings.user.swipeActionSettings.leading {
       if !swipeDisplaySettings.isAllowedToDisplay(
         actionType: actionType,
         containable: containable,
-        isOfflineMode: appDelegate.storage.settings.isOfflineMode
+        isOfflineMode: appDelegate.storage.settings.user.isOfflineMode
       ) { continue }
       let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self
         .swipeButtonColors.last!
@@ -190,11 +190,11 @@ class BasicTableViewController: KeyCommandTableViewController {
     else { return UISwipeActionsConfiguration() }
     var createdActionsIndex = 0
     var actions = [UIContextualAction]()
-    for actionType in appDelegate.storage.settings.swipeActionSettings.trailing {
+    for actionType in appDelegate.storage.settings.user.swipeActionSettings.trailing {
       if !swipeDisplaySettings.isAllowedToDisplay(
         actionType: actionType,
         containable: containable,
-        isOfflineMode: appDelegate.storage.settings.isOfflineMode
+        isOfflineMode: appDelegate.storage.settings.user.isOfflineMode
       ) { continue }
       let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self
         .swipeButtonColors.last!
@@ -313,7 +313,8 @@ class BasicTableViewController: KeyCommandTableViewController {
       style: .normal,
       title: actionType.displayName
     ) { action, view, completionHandler in
-      Haptics.success.vibrate(isHapticsEnabled: self.appDelegate.storage.settings.isHapticsEnabled)
+      Haptics.success
+        .vibrate(isHapticsEnabled: self.appDelegate.storage.settings.user.isHapticsEnabled)
       actionCallback(indexPath) { actionContext in
         guard let actionContext = actionContext else { return }
         switch actionType {
@@ -321,25 +322,25 @@ class BasicTableViewController: KeyCommandTableViewController {
           self.appDelegate.player
             .insertUserQueue(
               playables: actionContext.playables
-                .filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
+                .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .appendUserQueue:
           self.appDelegate.player
             .appendUserQueue(
               playables: actionContext.playables
-                .filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
+                .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .insertContextQueue:
           self.appDelegate.player
             .insertContextQueue(
               playables: actionContext.playables
-                .filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
+                .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .appendContextQueue:
           self.appDelegate.player
             .appendContextQueue(
               playables: actionContext.playables
-                .filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
+                .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .download:
           self.appDelegate.playableDownloadManager.download(objects: actionContext.playables)
@@ -379,13 +380,13 @@ class BasicTableViewController: KeyCommandTableViewController {
           self.appDelegate.player
             .insertPodcastQueue(
               playables: actionContext.playables
-                .filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
+                .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .appendPodcastQueue:
           self.appDelegate.player
             .appendPodcastQueue(
               playables: actionContext.playables
-                .filterCached(dependigOn: self.appDelegate.storage.settings.isOfflineMode)
+                .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .favorite:
           Task { @MainActor in

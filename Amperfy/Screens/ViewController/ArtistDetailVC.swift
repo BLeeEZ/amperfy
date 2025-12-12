@@ -55,7 +55,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
     albumsFetchedResultsController.delegate = self
     songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(
       for: artist,
-      displayFilter: appDelegate.storage.settings.artistsFilterSetting,
+      displayFilter: appDelegate.storage.settings.user.artistsFilterSetting,
       coreDataCompanion: appDelegate.storage.main,
       isGroupedInAlphabeticSections: false
     )
@@ -75,7 +75,8 @@ class ArtistDetailVC: MultiSourceTableViewController {
       },
       playContextCb: { () in
         let songs = self.songsFetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
+          []
         let sortedSongs = songs.filterSongs().sortByAlbum()
         return PlayContext(containable: self.artist, playables: sortedSongs)
       },
@@ -210,7 +211,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = songsFetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     else { return nil }
     let selectedSong = songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
     guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

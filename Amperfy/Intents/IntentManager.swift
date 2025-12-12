@@ -589,7 +589,7 @@ public class IntentManager {
         ))
         return
       }
-      self.storage.settings.isOfflineMode = offlineMode == 1
+      self.storage.settings.user.isOfflineMode = offlineMode == 1
       success(nil)
     }
 
@@ -631,7 +631,7 @@ public class IntentManager {
           ))
           return
         }
-        guard self.storage.settings.isOnlineMode else {
+        guard self.storage.settings.user.isOnlineMode else {
           failure(NSError.error(
             code: .missingParameter,
             failureReason: "Rating can only be changed in Online Mode."
@@ -701,7 +701,7 @@ public class IntentManager {
           ))
           return
         }
-        guard self.storage.settings.isOnlineMode else {
+        guard self.storage.settings.user.isOnlineMode else {
           failure(NSError.error(
             code: .missingParameter,
             failureReason: "Favorite can only be changed in Online Mode."
@@ -782,7 +782,7 @@ public class IntentManager {
         os_log("Play Music", log: self.log, type: .info)
         let playableElements = library.getRandomSongs(
           for: account,
-          onlyCached: storage.settings.isOfflineMode
+          onlyCached: storage.settings.user.isOfflineMode
         )
         result = AmperfyMediaIntentItemResult(
           playableElements: playableElements,
@@ -1301,7 +1301,7 @@ public class IntentManager {
     guard let container = container else { return false }
     do {
       if container is Playlist {
-        if storage.settings.isOnlineMode, networkMonitor.isWifiOrEthernet {
+        if storage.settings.user.isOnlineMode, networkMonitor.isWifiOrEthernet {
           os_log(
             "Fetch playlist start: %s",
             log: self.log,

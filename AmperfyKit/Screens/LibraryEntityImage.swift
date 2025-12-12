@@ -120,14 +120,14 @@ public class LibraryEntityImage: RoundedImage {
 
   private var placeholderImage: UIImage {
     UIImage.getGeneratedArtwork(
-      theme: appDelegate.storage.settings.themePreference,
+      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
       artworkType: backupArtworkType ?? .song
     )
   }
 
   private var entityImagePathToDisplay: String? {
     entity?.imagePath(
-      setting: appDelegate.storage.settings.artworkDisplayPreference
+      setting: appDelegate.storage.settings.accounts.activeSettings.read.artworkDisplayPreference
     )
   }
 
@@ -171,7 +171,8 @@ public class LibraryEntityImage: RoundedImage {
        playable.uniqueID == downloadNotification.id {
       Task { @MainActor in
         guard let imagePath = entity.imagePath(
-          setting: appDelegate.storage.settings.artworkDisplayPreference
+          setting: appDelegate.storage.settings.accounts.activeSettings.read
+            .artworkDisplayPreference
         ) else { return }
         await self.loadImageAndCacheIt(
           imagePath: imagePath
@@ -182,7 +183,8 @@ public class LibraryEntityImage: RoundedImage {
        artwork.uniqueID == downloadNotification.id {
       Task { @MainActor in
         guard let imagePath = entity.imagePath(
-          setting: appDelegate.storage.settings.artworkDisplayPreference
+          setting: appDelegate.storage.settings.accounts.activeSettings.read
+            .artworkDisplayPreference
         ) else { return }
         await self.loadImageAndCacheIt(
           imagePath: imagePath

@@ -24,7 +24,7 @@ import UIKit
 
 // MARK: - SwipeActionType
 
-public enum SwipeActionType: Int, CaseIterable {
+public enum SwipeActionType: Int, CaseIterable, Sendable, Codable {
   case insertUserQueue = 0
   case appendUserQueue = 1
   case insertContextQueue = 2
@@ -129,7 +129,7 @@ public enum SwipeActionType: Int, CaseIterable {
 
 // MARK: - SwipeActionSettings
 
-public struct SwipeActionSettings {
+public struct SwipeActionSettings: Sendable, Codable {
   public var combined: [[SwipeActionType]]
 
   public var leading: [SwipeActionType] {
@@ -148,6 +148,36 @@ public struct SwipeActionSettings {
     let notUsedSet = Set(SwipeActionType.allCases).subtracting(Set(leading))
       .subtracting(Set(trailing))
     self.combined = [leading, trailing, Array(notUsedSet)]
+  }
+
+  // Explicit Codable conformance to ensure stable schema
+  private enum CodingKeys: String, CodingKey {
+    case combined
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    // Decode combined as an array of arrays of SwipeActionType
+    let decodedCombined = try container.decode([[SwipeActionType]].self, forKey: .combined)
+    // Ensure we always have exactly three buckets: leading, trailing, notUsed
+    if decodedCombined.count >= 3 {
+      self.combined = decodedCombined
+    } else if decodedCombined.count == 2 {
+      // If older data without notUsed, compute it
+      let leading = decodedCombined[0]
+      let trailing = decodedCombined[1]
+      let notUsedSet = Set(SwipeActionType.allCases).subtracting(Set(leading))
+        .subtracting(Set(trailing))
+      self.combined = [leading, trailing, Array(notUsedSet)]
+    } else {
+      // Fallback to defaults if data is malformed
+      self = SwipeActionSettings.defaultSettings
+    }
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(combined, forKey: .combined)
   }
 
   public static var defaultSettings: SwipeActionSettings {

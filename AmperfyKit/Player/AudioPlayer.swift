@@ -48,7 +48,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   private var playerStatus: PlayerStatusPersistent
   private var queueHandler: PlayQueueHandler
   private let backendAudioPlayer: BackendAudioPlayer
-  private let settings: PersistentStorage.Settings
+  private let settings: AmperfySettings
   private let userStatistics: UserStatistics
   private var notifierList = [MusicPlayable]()
 
@@ -56,7 +56,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     coreData: PlayerStatusPersistent,
     queueHandler: PlayQueueHandler,
     backendAudioPlayer: BackendAudioPlayer,
-    settings: PersistentStorage.Settings,
+    settings: AmperfySettings,
     userStatistics: UserStatistics
   ) {
     self.playerStatus = coreData
@@ -108,7 +108,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     backendAudioPlayer.requestToPlay(
       playable: playable,
       playbackRate: playerStatus.playbackRate,
-      autoStartPlayback: !settings.isPlaybackStartOnlyOnPlay
+      autoStartPlayback: !settings.user.isPlaybackStartOnlyOnPlay
     )
   }
 
@@ -132,7 +132,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
           .nextQueueCount == 0
       ) {
       replayCurrentItem()
-    } else if !settings.isPlaybackStartOnlyOnPlay {
+    } else if !settings.user.isPlaybackStartOnlyOnPlay {
       playNext()
     }
   }

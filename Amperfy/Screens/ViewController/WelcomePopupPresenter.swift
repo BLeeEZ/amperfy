@@ -24,7 +24,7 @@ import Foundation
 @MainActor
 class WelcomePopupPresenter: NSObject {
   func displayInfoPopupsIfNeeded() {
-    if !appDelegate.storage.isLibrarySyncInfoReadByUser {
+    if !appDelegate.storage.settings.app.isLibrarySyncInfoReadByUser {
       displaySyncInfo()
     } else {
       displayNotificationAuthorization()
@@ -39,7 +39,7 @@ class WelcomePopupPresenter: NSObject {
       customIcon: .refresh,
       customAnimation: .rotate,
       onClosePressed: { _ in
-        self.appDelegate.storage.isLibrarySyncInfoReadByUser = true
+        self.appDelegate.storage.settings.app.isLibrarySyncInfoReadByUser = true
         self.displayNotificationAuthorization()
       }
     )

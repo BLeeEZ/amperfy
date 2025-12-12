@@ -30,7 +30,7 @@ public struct LogData: Encodable {
   public var serverInfo: ServerInfo?
   public var playerInfo: PlayerInfo?
   public var libraryInfo: LibraryInfo?
-  public var userSettings: UserSettings?
+  public var userSettings: UserSettingsLog?
   public var userStatistics: [UserStatisticsOverview]?
   public var eventInfo: EventInfo?
 
@@ -60,7 +60,7 @@ public struct LogData: Encodable {
     logData.serverInfo = serverInfo
 
     logData.libraryInfo = LibraryInfo()
-    logData.libraryInfo?.version = amperfyData.storage.librarySyncVersion.description
+    logData.libraryInfo?.version = amperfyData.storage.settings.app.librarySyncVersion.description
     let accounts = amperfyData.storage.main.library.getAllAccounts()
     for account in accounts {
       let accountLibraryInfo = amperfyData.storage.main.library.getInfo(account: account)
@@ -76,14 +76,14 @@ public struct LogData: Encodable {
       .nextQueueCount + 1
     logData.playerInfo = playerInfo
 
-    var userSettings = UserSettings()
+    var userSettings = UserSettingsLog()
     let settings = amperfyData.storage.settings
-    userSettings.swipeLeadingActions = settings.swipeActionSettings.leading
+    userSettings.swipeLeadingActions = settings.user.swipeActionSettings.leading
       .compactMap { $0.displayName }
-    userSettings.swipeTrailingActions = settings.swipeActionSettings.trailing
+    userSettings.swipeTrailingActions = settings.user.swipeActionSettings.trailing
       .compactMap { $0.displayName }
-    userSettings.playerDisplayStyle = settings.playerDisplayStyle.description
-    userSettings.isOfflineMode = settings.isOfflineMode
+    userSettings.playerDisplayStyle = settings.user.playerDisplayStyle.description
+    userSettings.isOfflineMode = settings.user.isOfflineMode
     logData.userSettings = userSettings
 
     let allUserStatistics = amperfyData.storage.main.library.getAllUserStatistics()
@@ -160,9 +160,9 @@ public struct PlayerInfo: Encodable {
   public var playlistItemCount: Int?
 }
 
-// MARK: - UserSettings
+// MARK: - UserSettingsLog
 
-public struct UserSettings: Encodable {
+public struct UserSettingsLog: Encodable {
   public var swipeLeadingActions: [String]?
   public var swipeTrailingActions: [String]?
   public var playerDisplayStyle: String?

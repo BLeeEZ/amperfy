@@ -32,7 +32,8 @@ struct ArtworkDisplaySettings: View {
 
   func updateValues() {
     settingOptions = ArtworkDisplayPreference.allCases
-    activeOption = appDelegate.storage.settings.artworkDisplayPreference
+    activeOption = appDelegate.storage.settings.accounts.activeSettings.read
+      .artworkDisplayPreference
   }
 
   var body: some View {
@@ -41,7 +42,10 @@ struct ArtworkDisplaySettings: View {
         Section {
           ForEach(settingOptions, id: \.self) { option in
             Button(action: {
-              appDelegate.storage.settings.artworkDisplayPreference = option
+              appDelegate.storage.settings.accounts
+                .updateSetting(appDelegate.account.info) { accountSettings in
+                  accountSettings.artworkDisplayPreference = option
+                }
               updateValues()
             }) {
               HStack {

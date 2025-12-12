@@ -69,7 +69,8 @@ class LoginVC: UIViewController {
     let imageView = UIImageView()
     imageView.contentMode = .scaleAspectFit
     imageView.image = .appIconTemplate
-    imageView.tintColor = appDelegate.storage.settings.themePreference.asColor
+    imageView.tintColor = appDelegate.storage.settings.accounts.activeSettings.read.themePreference
+      .asColor
     return imageView
   }()
 
@@ -78,7 +79,8 @@ class LoginVC: UIViewController {
     label.text = "Amperfy"
     label.font = .systemFont(ofSize: 50, weight: .bold)
     label.textColor = .tintColor
-    label.tintColor = appDelegate.storage.settings.themePreference.asColor
+    label.tintColor = appDelegate.storage.settings.accounts.activeSettings.read.themePreference
+      .asColor
     return label
   }()
 
@@ -319,7 +321,8 @@ class LoginVC: UIViewController {
     let container = UIVisualEffectView()
     let glassEffect = UIGlassEffect(style: .regular)
     glassEffect.isInteractive = false
-    glassEffect.tintColor = appDelegate.storage.settings.themePreference.asColor
+    glassEffect.tintColor = appDelegate.storage.settings.accounts.activeSettings.read
+      .themePreference.asColor
       .withAlphaComponent(0.1)
     container.effect = glassEffect
     container.cornerConfiguration = .corners(radius: 20)
@@ -372,7 +375,7 @@ class LoginVC: UIViewController {
         )
         self.appDelegate.backendApi.selectedApi = authenticatedApiType
         credentials.backendApi = authenticatedApiType
-        self.appDelegate.storage.loginCredentials = credentials
+        self.appDelegate.storage.settings.accounts.login(credentials)
         self.appDelegate.backendApi.provideCredentials(credentials: credentials)
 
         guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
@@ -495,7 +498,8 @@ class LoginVC: UIViewController {
   override func viewWillLayoutSubviews() {
     let glassEffect = UIGlassEffect(style: .regular)
     glassEffect.isInteractive = false
-    glassEffect.tintColor = appDelegate.storage.settings.themePreference.asColor
+    glassEffect.tintColor = appDelegate.storage.settings.accounts.activeSettings.read
+      .themePreference.asColor
       .withAlphaComponent(0.1)
     formGlassContainer.effect = glassEffect
 
@@ -512,7 +516,8 @@ class LoginVC: UIViewController {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
-    if let credentials = appDelegate.storage.loginCredentials {
+    if let credentials = appDelegate.storage.settings.accounts.activeSettings.read
+      .loginCredentials {
       serverUrlTF.text = credentials.serverUrl
       usernameTF.text = credentials.username
     }

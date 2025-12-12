@@ -294,9 +294,9 @@ class MiniPlayerView: UIView {
 
   @IBAction
   func lyricsPressed() {
-    appDelegate.storage.settings.isPlayerLyricsDisplayed.toggle()
-    if appDelegate.storage.settings.isPlayerLyricsDisplayed {
-      appDelegate.storage.settings.playerDisplayStyle = .large
+    appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
+    if appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
+      appDelegate.storage.settings.user.playerDisplayStyle = .large
     }
     playerHandler?.refreshDisplayLyrisButton(displayLyricsButton: lyricsButton)
     playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: playlistButton)
@@ -320,9 +320,9 @@ class MiniPlayerView: UIView {
 
   @IBAction
   func playlistPressed() {
-    appDelegate.storage.settings.playerDisplayStyle.switchToNextStyle()
-    if appDelegate.storage.settings.playerDisplayStyle == .compact {
-      appDelegate.storage.settings.isPlayerLyricsDisplayed = false
+    appDelegate.storage.settings.user.playerDisplayStyle.switchToNextStyle()
+    if appDelegate.storage.settings.user.playerDisplayStyle == .compact {
+      appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
     }
     playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: playlistButton)
     playerHandler?.refreshDisplayLyrisButton(displayLyricsButton: lyricsButton)

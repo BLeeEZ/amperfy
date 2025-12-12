@@ -96,8 +96,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     applyFilter()
-    change(sortType: appDelegate.storage.settings.artistsSortSetting)
-    change(filterType: appDelegate.storage.settings.artistsFilterSetting)
+    change(sortType: appDelegate.storage.settings.user.artistsSortSetting)
+    change(filterType: appDelegate.storage.settings.user.artistsFilterSetting)
     configureSearchController(
       placeholder: "Search in \"\(filterTitle)\"",
       scopeButtonTitles: ["All", "Cached"]
@@ -183,7 +183,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   func change(sortType: ArtistElementSortType) {
     self.sortType = sortType
-    appDelegate.storage.settings.artistsSortSetting = sortType
+    appDelegate.storage.settings.user.artistsSortSetting = sortType
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = ArtistFetchedResultsController(
@@ -203,7 +203,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     // favorite views can't change the display filter
     guard displayFilter != .favorites else { return }
     displayFilter = filterType
-    appDelegate.storage.settings.artistsFilterSetting = filterType
+    appDelegate.storage.settings.user.artistsFilterSetting = filterType
     updateSearchResults(for: searchController)
     updateRightBarButtonItems()
   }
@@ -227,7 +227,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     if displayFilter != .favorites {
       actions.append(createFilterButtonMenu())
     }
-    if appDelegate.storage.settings.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
     optionsButton = UIBarButtonItem.createOptionsBarButton()
@@ -236,7 +236,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   }
 
   func updateFromRemote() {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     switch displayFilter {
     case .albumArtists, .all:
       break
@@ -437,7 +437,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode else {
       self.refreshControl?.endRefreshing()
       return
     }

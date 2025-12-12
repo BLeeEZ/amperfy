@@ -24,7 +24,7 @@ import Foundation
 
 // MARK: - ArtistElementSortType
 
-public enum ArtistElementSortType: Int, Sendable {
+public enum ArtistElementSortType: Int, Sendable, Codable {
   case name = 0
   case rating = 1
   case newest = 2
@@ -48,7 +48,7 @@ public enum ArtistElementSortType: Int, Sendable {
 
 // MARK: - AlbumElementSortType
 
-public enum AlbumElementSortType: Int, Sendable {
+public enum AlbumElementSortType: Int, Sendable, Codable {
   case name = 0
   case rating = 1
   case newest = 2
@@ -81,7 +81,7 @@ public enum AlbumElementSortType: Int, Sendable {
 
 // MARK: - PlaylistSortType
 
-public enum PlaylistSortType: Int, Sendable {
+public enum PlaylistSortType: Int, Sendable, Codable {
   case name = 0
   case lastPlayed = 1
   case lastChanged = 2
@@ -105,7 +105,7 @@ public enum PlaylistSortType: Int, Sendable {
 
 // MARK: - SongElementSortType
 
-public enum SongElementSortType: Int, Sendable {
+public enum SongElementSortType: Int, Sendable, Codable {
   case name = 0
   case rating = 1
   case addedDate = 2
@@ -148,7 +148,7 @@ public enum SongElementSortType: Int, Sendable {
 
 // MARK: - DisplayCategoryFilter
 
-public enum DisplayCategoryFilter {
+public enum DisplayCategoryFilter: Codable {
   case all
   case newest
   case recent
@@ -157,7 +157,7 @@ public enum DisplayCategoryFilter {
 
 // MARK: - ArtistCategoryFilter
 
-public enum ArtistCategoryFilter: Int, Sendable {
+public enum ArtistCategoryFilter: Int, Sendable, Codable {
   case all = 0
   case favorites = 1
   case albumArtists = 2
@@ -167,7 +167,7 @@ public enum ArtistCategoryFilter: Int, Sendable {
 
 // MARK: - AlbumsDisplayStyle
 
-public enum AlbumsDisplayStyle: Int, Sendable {
+public enum AlbumsDisplayStyle: Int, Sendable, Codable {
   case table = 0
   case grid = 1
 

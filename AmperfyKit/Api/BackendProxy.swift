@@ -31,7 +31,7 @@ public enum ServerApiType: Int, Sendable {
 
 // MARK: - BackenApiType
 
-public enum BackenApiType: Int, Sendable {
+public enum BackenApiType: Int, Sendable, Codable {
   case notDetected = 0
   case ampache = 1
   case subsonic = 2
@@ -198,7 +198,7 @@ public final class BackendProxy: Sendable {
   private let networkMonitor: NetworkMonitorFacade
   private let performanceMonitor: ThreadPerformanceMonitor
   private let eventLogger: EventLogger
-  private let settings: PersistentStorage.Settings
+  private let settings: AmperfySettings
 
   public var selectedApi: BackenApiType {
     get {
@@ -235,7 +235,7 @@ public final class BackendProxy: Sendable {
     networkMonitor: NetworkMonitorFacade,
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
-    settings: PersistentStorage.Settings
+    settings: AmperfySettings
   ) {
     self.networkMonitor = networkMonitor
     self.performanceMonitor = performanceMonitor
@@ -313,14 +313,14 @@ public final class BackendProxy: Sendable {
 
   @MainActor
   private func checkServerReachablity(credentials: LoginCredentials) async throws {
-    guard let serverUrl = URL(string: credentials.serverUrl) else {
+    guard let activeBackendServerUrl = URL(string: credentials.activeBackendServerUrl) else {
       throw AuthenticationError.invalidUrl
     }
 
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(), Error>) in
       let sessionConfig = URLSessionConfiguration.default
       let session = URLSession(configuration: sessionConfig)
-      let request = URLRequest(url: serverUrl)
+      let request = URLRequest(url: activeBackendServerUrl)
       let task = session.downloadTask(with: request) { tempLocalUrl, response, error in
         if let error = error {
           continuation

@@ -156,7 +156,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func configureBatteryMonitoring() {
     UIDevice.current.isBatteryMonitoringEnabled =
-      (AmperKit.shared.storage.settings.screenLockPreventionPreference == .onlyIfCharging)
+      (AmperKit.shared.storage.settings.user.screenLockPreventionPreference == .onlyIfCharging)
     configureLockScreenPrevention()
     NotificationCenter.default.addObserver(
       self,
@@ -178,7 +178,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       type: .info,
       UIDevice.current.batteryState.description
     )
-    switch AmperKit.shared.storage.settings.screenLockPreventionPreference {
+    switch AmperKit.shared.storage.settings.user.screenLockPreventionPreference {
     case .always:
       isKeepScreenAlive = true
     case .never:
@@ -271,6 +271,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       os_log("application launch", log: self.log, type: .info)
     }
 
+    storage.applyMultiAccountSettingsUpdateIfNeeded()
+
     configureDefaultNavigationBarStyle()
     configureBatteryMonitoring()
     configureBackgroundFetch()
@@ -278,16 +280,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     configureMainMenu()
     initEventLogger()
 
-    guard let credentials = storage.loginCredentials else {
+    guard let credentials = appDelegate.storage.settings.accounts.activeSettings.read
+      .loginCredentials else {
       return true
     }
 
-    setAppTheme(color: storage.settings.themePreference.asColor)
+    setAppTheme(color: storage.settings.accounts.activeSettings.read.themePreference.asColor)
 
     backendApi.selectedApi = credentials.backendApi
     backendApi.provideCredentials(credentials: credentials)
 
-    guard AmperKit.shared.storage.isLibrarySynced else {
+    guard AmperKit.shared.storage.settings.app.isLibrarySynced else {
       return true
     }
 

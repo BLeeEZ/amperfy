@@ -118,13 +118,13 @@ class PlayerUIHandler: NSObject {
   func refreshSkipButtons(skipBackwardButton: UIButton, skipForwardButton: UIButton) {
     switch player.playerMode {
     case .music:
-      skipBackwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
+      skipBackwardButton.isHidden = !appDelegate.storage.settings.user.isShowMusicPlayerSkipButtons
       skipBackwardButton.isEnabled = player.isSkipAvailable
-      skipBackwardButton.alpha = !appDelegate.storage.settings
+      skipBackwardButton.alpha = !appDelegate.storage.settings.user
         .isShowMusicPlayerSkipButtons ? 0.0 : 1.0
-      skipForwardButton.isHidden = !appDelegate.storage.settings.isShowMusicPlayerSkipButtons
+      skipForwardButton.isHidden = !appDelegate.storage.settings.user.isShowMusicPlayerSkipButtons
       skipForwardButton.isEnabled = player.isSkipAvailable
-      skipForwardButton.alpha = !appDelegate.storage.settings
+      skipForwardButton.alpha = !appDelegate.storage.settings.user
         .isShowMusicPlayerSkipButtons ? 0.0 : 1.0
     case .podcast:
       skipBackwardButton.isHidden = true
@@ -212,12 +212,12 @@ class PlayerUIHandler: NSObject {
       config.image = .shuffle
       shuffleButton.configuration = config
     }
-    shuffleButton.isEnabled = appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+    shuffleButton.isEnabled = appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     shuffleButton.isSelected = player.isShuffle
   }
 
   func refreshDisplayPlaylistButton(displayPlaylistButton: UIButton) {
-    let isSelected = appDelegate.storage.settings.playerDisplayStyle == .compact
+    let isSelected = appDelegate.storage.settings.user.playerDisplayStyle == .compact
 
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:
@@ -231,7 +231,7 @@ class PlayerUIHandler: NSObject {
   }
 
   func refreshDisplayLyrisButton(displayLyricsButton: UIButton) {
-    let isSelected = appDelegate.storage.settings.isPlayerLyricsDisplayed
+    let isSelected = appDelegate.storage.settings.user.isPlayerLyricsDisplayed
 
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:

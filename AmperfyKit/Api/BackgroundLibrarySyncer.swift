@@ -45,7 +45,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   private let storage: AsyncCoreDataAccessWrapper
   @MainActor
   private let mainStorage: CoreDataCompanion
-  private let settings: PersistentStorage.Settings
+  private let settings: AmperfySettings
   private let networkMonitor: NetworkMonitorFacade
   private let librarySyncer: LibrarySyncer
   @MainActor
@@ -64,7 +64,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   init(
     storage: AsyncCoreDataAccessWrapper,
     mainStorage: CoreDataCompanion,
-    settings: PersistentStorage.Settings,
+    settings: AmperfySettings,
     networkMonitor: NetworkMonitorFacade,
     librarySyncer: LibrarySyncer,
     playableDownloadManager: DownloadManageable,
@@ -103,7 +103,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     backgroundTask.wrappedValue = Task {
       os_log("start", log: self.log, type: .info)
 
-      if self.isRunning.wrappedValue, self.settings.isOnlineMode,
+      if self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
          self.networkMonitor.isConnectedToNetwork {
         do {
           try await autoDownloadLibrarySyncer
@@ -123,7 +123,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
         for albumToSync in albumsToSync {
           let albumObjectID = albumToSync.managedObject.objectID
           let asyncOperation = BackgroundSyncOperation {
-            guard !Task.isCancelled, self.isRunning.wrappedValue, self.settings.isOnlineMode,
+            guard !Task.isCancelled, self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
                   self.networkMonitor.isConnectedToNetwork else { return }
             let albumMO = self.mainStorage.context.object(with: albumObjectID) as! AlbumMO
             let album = Album(managedObject: albumMO)

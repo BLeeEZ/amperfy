@@ -114,9 +114,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     #if false
       windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
     #endif
-    if AmperKit.shared.storage.loginCredentials == nil {
+    if AmperKit.shared.storage.settings.accounts.activeSettings.read.loginCredentials == nil {
       initialViewController = AppStoryboard.Main.segueToLogin()
-    } else if !AmperKit.shared.storage.isLibrarySynced {
+    } else if !AmperKit.shared.storage.settings.app.isLibrarySynced {
       initialViewController = AppStoryboard.Main.segueToSync()
     } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
       initialViewController = AppStoryboard.Main.segueToUpdate()
@@ -127,7 +127,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     window?.makeKeyAndVisible()
 
-    appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.appearanceMode)
+    appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.user.appearanceMode)
   }
 
   func replaceMainRootViewController(vc: UIViewController) {

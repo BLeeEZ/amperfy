@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import SwiftUI
 
 // MARK: - UpdatePasswordView
@@ -45,8 +46,9 @@ struct UpdatePasswordView: View {
   func updatePassword() {
     resetStatus()
     let newPassword = passwordInput
-    guard var loginCredentials = appDelegate.storage.loginCredentials,
-          !newPassword.isEmpty else {
+    guard var loginCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+      .loginCredentials,
+      !newPassword.isEmpty else {
       errorMsg = "Please provide the new password."
       return
     }
@@ -55,7 +57,10 @@ struct UpdatePasswordView: View {
     Task { @MainActor in
       do {
         try await appDelegate.backendApi.isAuthenticationValid(credentials: loginCredentials)
-        appDelegate.storage.loginCredentials = loginCredentials
+        let accountInfo = Account.createInfo(credentials: loginCredentials)
+        appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+          accountSettings.loginCredentials = loginCredentials
+        }
         appDelegate.backendApi.provideCredentials(credentials: loginCredentials)
         successMsg = "Password updated!"
       } catch {

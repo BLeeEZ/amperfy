@@ -25,7 +25,7 @@ import Foundation
 
 // MARK: - AccountInfo
 
-public struct AccountInfo: Sendable, Hashable {
+public struct AccountInfo: Sendable, Hashable, Codable {
   let serverHash: String
   let userHash: String
   let apiType: BackenApiType
@@ -36,6 +36,18 @@ public struct AccountInfo: Sendable, Hashable {
     userHash: "",
     apiType: .notDetected
   )
+
+  private enum CodingKeys: String, CodingKey {
+    case serverHash
+    case userHash
+    // apiType is intentionally omitted
+  }
+
+  init(serverHash: String, userHash: String, apiType: BackenApiType) {
+    self.serverHash = serverHash
+    self.userHash = userHash
+    self.apiType = apiType
+  }
 
   public static func create(basedOnIdent ident: String) -> AccountInfo? {
     let parts = ident.split(separator: "-", maxSplits: 1, omittingEmptySubsequences: false)
@@ -59,6 +71,22 @@ public struct AccountInfo: Sendable, Hashable {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(serverHash)
     hasher.combine(userHash)
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.serverHash = try container.decode(String.self, forKey: .serverHash)
+    self.userHash = try container.decode(String.self, forKey: .userHash)
+
+    // apiType must be given a default or computed value since it’s not decoded
+    self.apiType = .notDetected
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(serverHash, forKey: .serverHash)
+    try container.encode(userHash, forKey: .userHash)
+    // apiType is intentionally not encoded
   }
 }
 

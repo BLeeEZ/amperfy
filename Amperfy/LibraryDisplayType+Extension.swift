@@ -23,12 +23,15 @@ import AmperfyKit
 import UIKit
 
 extension LibraryDisplayType {
-  public func controller(settings: PersistentStorage.Settings) -> UIViewController {
+  public func controller(settings: AmperfySettings) -> UIViewController {
     switch self {
     case .artists:
       return AppStoryboard.Main.segueToArtists()
     case .albums:
-      return AppStoryboard.Main.createAlbumsVC(style: settings.albumsStyleSetting, category: .all)
+      return AppStoryboard.Main.createAlbumsVC(
+        style: settings.user.albumsStyleSetting,
+        category: .all
+      )
     case .songs:
       return AppStoryboard.Main.segueToSongs()
     case .genres:
@@ -45,19 +48,19 @@ extension LibraryDisplayType {
       return AppStoryboard.Main.segueToFavoriteSongs()
     case .favoriteAlbums:
       return AppStoryboard.Main.createAlbumsVC(
-        style: settings.albumsStyleSetting,
+        style: settings.user.albumsStyleSetting,
         category: .favorites
       )
     case .favoriteArtists:
       return AppStoryboard.Main.segueToFavoriteArtists()
     case .newestAlbums:
       return AppStoryboard.Main.createAlbumsVC(
-        style: settings.albumsStyleSetting,
+        style: settings.user.albumsStyleSetting,
         category: .newest
       )
     case .recentAlbums:
       return AppStoryboard.Main.createAlbumsVC(
-        style: settings.albumsStyleSetting,
+        style: settings.user.albumsStyleSetting,
         category: .recent
       )
     case .radios:

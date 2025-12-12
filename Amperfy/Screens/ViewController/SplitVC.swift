@@ -45,7 +45,7 @@ class SplitVC: UISplitViewController {
     primaryEdge = .leading
     primaryBackgroundStyle = .sidebar
 
-    if appDelegate.storage.settings.isOfflineMode {
+    if appDelegate.storage.settings.user.isOfflineMode {
       appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
     }
 
@@ -108,11 +108,11 @@ class SplitVC: UISplitViewController {
   }
 
   func displayOrHideInspector() {
-    if appDelegate.storage.settings.isPlayerLyricsDisplayed {
+    if appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
       let lyricsVC = LyricsVC()
       setViewController(lyricsVC, for: .inspector)
       show(.inspector)
-    } else if appDelegate.storage.settings.playerDisplayStyle == .compact {
+    } else if appDelegate.storage.settings.user.playerDisplayStyle == .compact {
       let queueVC = QueueVC()
       setViewController(queueVC, for: .inspector)
       show(.inspector)

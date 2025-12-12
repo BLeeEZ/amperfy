@@ -47,7 +47,7 @@ public class LibraryUpdater {
   }
 
   public var isVisualUpadateNeeded: Bool {
-    storage.librarySyncVersion != .newestVersion
+    storage.settings.app.librarySyncVersion != .newestVersion
   }
 
   /// This function will block the execution before the scene handler
@@ -55,7 +55,7 @@ public class LibraryUpdater {
   /// Use UpdateVC for longer operations to display progress to user
   @MainActor
   public func performSmallBlockingLibraryUpdatesIfNeeded() {
-    if storage.librarySyncVersion < .v12 {
+    if storage.settings.app.librarySyncVersion < .v12 {
       os_log(
         "Perform blocking library update (START): alphabeticSectionInitial",
         log: log,
@@ -68,9 +68,9 @@ public class LibraryUpdater {
         type: .info
       )
     }
-    if storage.librarySyncVersion < .v13 {
+    if storage.settings.app.librarySyncVersion < .v13 {
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v13 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking library update (START): AbstractPlayable.duration",
@@ -84,9 +84,9 @@ public class LibraryUpdater {
         type: .info
       )
     }
-    if storage.librarySyncVersion < .v15 {
+    if storage.settings.app.librarySyncVersion < .v15 {
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v15 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking library update (START): Artist,Album,Playlist duration,remoteSongCount",
@@ -100,9 +100,9 @@ public class LibraryUpdater {
         type: .info
       )
     }
-    if storage.librarySyncVersion < .v16 {
+    if storage.settings.app.librarySyncVersion < .v16 {
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v16 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking library update (START): Playlist artworkItems",
@@ -112,17 +112,18 @@ public class LibraryUpdater {
       updatePlaylistArtworkItems()
       os_log("Perform blocking library update (DONE): Playlist artworkItems", log: log, type: .info)
     }
-    if storage.librarySyncVersion < .v20 {
+    if storage.settings.app.librarySyncVersion < .v20 {
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v20 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking preference update: Streaming Transcoding Format Wifi/Cellular",
         log: log,
         type: .info
       )
-      storage.settings.streamingFormatWifiPreference = storage.settings.streamingFormatPreference
-      storage.settings.streamingFormatCellularPreference = storage.settings
+      storage.settings.user.streamingFormatWifiPreference = storage.legacySettings
+        .streamingFormatPreference
+      storage.settings.user.streamingFormatCellularPreference = storage.legacySettings
         .streamingFormatPreference
     }
   }
@@ -139,17 +140,23 @@ public class LibraryUpdater {
     notifier: LibraryUpdaterCallbacks
   ) async throws {
     isRunning = true
-    if storage.librarySyncVersion < .v18 {
+    if storage.settings.app.librarySyncVersion < .v18 {
       // add radios to libraryDisplaySettings to display it for old users
-      var libraryDisplaySettingsInUse = storage.settings.libraryDisplaySettings.inUse
+      var libraryDisplaySettingsInUse = storage.settings.accounts.activeSettings.read
+        .libraryDisplaySettings.inUse
       if !libraryDisplaySettingsInUse.contains(where: { $0 == .radios }) {
         libraryDisplaySettingsInUse.append(.radios)
-        storage.settings
-          .libraryDisplaySettings = LibraryDisplaySettings(inUse: libraryDisplaySettingsInUse)
+
+        if let accountInfo = storage.settings.accounts.active {
+          storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+            accountSettings
+              .libraryDisplaySettings = LibraryDisplaySettings(inUse: libraryDisplaySettingsInUse)
+          }
+        }
       }
 
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v18 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking library update (START): Denormalization Count",
@@ -163,9 +170,9 @@ public class LibraryUpdater {
         type: .info
       )
     }
-    if storage.librarySyncVersion < .v19 {
+    if storage.settings.app.librarySyncVersion < .v19 {
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v19 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking library update (START): Sort playlist items",
@@ -179,9 +186,9 @@ public class LibraryUpdater {
         type: .info
       )
     }
-    if storage.librarySyncVersion < .v21 {
+    if storage.settings.app.librarySyncVersion < .v21 {
       storage
-        .librarySyncVersion =
+        .settings.app.librarySyncVersion =
         .v21 // if App crashes don't do this step again -> This step is only for convenience
       os_log(
         "Perform blocking library update (START): Account support",
@@ -337,7 +344,8 @@ public class LibraryUpdater {
   @MainActor
   func applyAccountSupport(notifier: LibraryUpdaterCallbacks) async throws {
     os_log("Create account (url + user) entry in CoreData", log: log, type: .info)
-    guard let credentials = storage.loginCredentials else { return }
+    guard let credentials = storage.settings.accounts.activeSettings.read.loginCredentials
+    else { return }
     var accountObjectIdTemp: NSManagedObjectID!
     let accountInfo = Account.createInfo(credentials: credentials)
     storage.main.perform { asyncCompanion in

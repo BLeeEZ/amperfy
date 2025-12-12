@@ -95,7 +95,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
   }
 
   func updateFromRemote() {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     switch displayFilter {
     case .all:
       break
@@ -117,15 +117,15 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     switch displayFilter {
     case .all:
       isIndexTitelsHidden = false
-      change(sortType: appDelegate.storage.settings.songsSortSetting)
+      change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .newest, .recent:
       break
     case .favorites:
       isIndexTitelsHidden = false
       if appDelegate.backendApi.selectedApi != .ampache {
-        change(sortType: appDelegate.storage.settings.favoriteSongSortSetting)
+        change(sortType: appDelegate.storage.settings.user.favoriteSongSortSetting)
       } else {
-        change(sortType: appDelegate.storage.settings.songsSortSetting)
+        change(sortType: appDelegate.storage.settings.user.songsSortSetting)
       }
     }
   }

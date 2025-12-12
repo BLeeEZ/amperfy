@@ -186,7 +186,8 @@ class PlayIndicator {
 
     if playable == appDelegate.player.currentlyPlaying {
       let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
-      indicator.color = isDisplayedOnImage ? .white : appDelegate.storage.settings.themePreference
+      indicator.color = isDisplayedOnImage ? .white : appDelegate.storage.settings.accounts
+        .activeSettings.read.themePreference
         .asColor
       if appDelegate.player.isPlaying {
         if indicator.state != .playing {

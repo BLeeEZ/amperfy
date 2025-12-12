@@ -164,9 +164,9 @@ struct LibrarySettingsView: View {
   }
 
   private func resyncLibrary() {
-    appDelegate.storage.settings.isOfflineMode = false
+    appDelegate.storage.settings.user.isOfflineMode = false
     // reset library sync flag -> rest library at new start and continue with sync
-    appDelegate.storage.isLibrarySynced = false
+    appDelegate.storage.settings.app.isLibrarySynced = false
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.restartByUser()
@@ -195,7 +195,10 @@ struct LibrarySettingsView: View {
             SecondaryText(podcastEpisodeCount.description)
           }
           SettingsRow(title: "Initial Sync") {
-            SecondaryText(appDelegate.storage.initialSyncCompletionStatus.description)
+            SecondaryText(
+              appDelegate.storage.settings.accounts.activeSettings.read
+                .initialSyncCompletionStatus.description
+            )
           }
         })
 

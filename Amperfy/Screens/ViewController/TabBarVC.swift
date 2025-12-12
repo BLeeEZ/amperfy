@@ -52,7 +52,8 @@ class TabBarVC: UITabBarController {
     fixTabs.append(homeTab!)
 
     var libraryTabs = [UITab]()
-    let libraryTabsShown = appDelegate.storage.settings.libraryDisplaySettings.inUse
+    let libraryTabsShown = appDelegate.storage.settings.accounts.activeSettings.read
+      .libraryDisplaySettings.inUse
       .compactMap { item in
         let tab = UITab(
           title: item.displayName,
@@ -66,7 +67,8 @@ class TabBarVC: UITabBarController {
       }
     libraryTabs.append(contentsOf: libraryTabsShown)
 
-    let libraryTabsHidden = appDelegate.storage.settings.libraryDisplaySettings.notUsed
+    let libraryTabsHidden = appDelegate.storage.settings.accounts.activeSettings.read
+      .libraryDisplaySettings.notUsed
       .compactMap { item in
         let tab = UITab(
           title: item.displayName,
@@ -129,7 +131,7 @@ class TabBarVC: UITabBarController {
       }
     )
 
-    if appDelegate.storage.settings.isOfflineMode {
+    if appDelegate.storage.settings.user.isOfflineMode {
       appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
     }
   }
@@ -203,7 +205,7 @@ class TabBarVC: UITabBarController {
 
   func refresh() {
     guard let libraryGroup else { return }
-    let config = appDelegate.storage.settings.libraryDisplaySettings
+    let config = appDelegate.storage.settings.accounts.activeSettings.read.libraryDisplaySettings
     libraryGroup.displayOrderIdentifiers = config.inUse.compactMap { "Tabs.\($0.displayName)" }
     for tab in libraryGroup.displayOrder {
       guard let item = LibraryDisplayType.createByDisplayName(name: tab.title) else { continue }
@@ -234,8 +236,10 @@ extension TabBarVC: UITabBarControllerDelegate {
         visibleItems.append(item)
       }
     }
-    appDelegate.storage.settings
-      .libraryDisplaySettings = LibraryDisplaySettings(inUse: visibleItems)
+    appDelegate.storage.settings.accounts
+      .updateSetting(appDelegate.account.info) { accountSettings in
+        accountSettings.libraryDisplaySettings = LibraryDisplaySettings(inUse: visibleItems)
+      }
     NotificationCenter.default.post(name: .LibraryItemsChanged, object: nil, userInfo: nil)
   }
 }

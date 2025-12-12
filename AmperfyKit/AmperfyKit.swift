@@ -60,7 +60,7 @@ public class AmperKit {
     PersistentStorage(coreDataManager: coreDataManager)
   }()
 
-  public var settings: PersistentStorage.Settings {
+  public var settings: AmperfySettings {
     storage.settings
   }
 
@@ -70,7 +70,7 @@ public class AmperKit {
 
   @MainActor
   public lazy var account: Account = {
-    if let credentials = storage.loginCredentials {
+    if let credentials = storage.settings.accounts.activeSettings.read.loginCredentials {
       return storage.main.library.getAccount(info: Account.createInfo(credentials: credentials))
     } else {
       return storage.main.library.getAccount(info: AccountInfo.defaultAccountInfo)
@@ -128,12 +128,12 @@ public class AmperKit {
     )
 
     backendAudioPlayer.setStreamingMaxBitrates(to: StreamingMaxBitrates(
-      wifi: storage.settings.streamingMaxBitrateWifiPreference,
-      cellular: storage.settings.streamingMaxBitrateCellularPreference
+      wifi: storage.settings.user.streamingMaxBitrateWifiPreference,
+      cellular: storage.settings.user.streamingMaxBitrateCellularPreference
     ))
     backendAudioPlayer.setStreamingTranscodings(to: StreamingTranscodings(
-      wifi: storage.settings.streamingFormatWifiPreference,
-      cellular: storage.settings.streamingFormatCellularPreference
+      wifi: storage.settings.user.streamingFormatWifiPreference,
+      cellular: storage.settings.user.streamingFormatCellularPreference
     ))
 
     let playerData = storage.main.library.getPlayerData(account: account)
@@ -149,11 +149,11 @@ public class AmperKit {
     audioSessionHandler.eventLogger = eventLogger
     audioSessionHandler.configureObserverForAudioSessionInterruption()
     backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
-    backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.isEqualizerEnabled)
+    backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.user.isEqualizerEnabled)
     backendAudioPlayer
-      .updateEqualizerSetting(eqSetting: storage.settings.activeEqualizerSetting)
-    backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.isReplayGainEnabled)
-    backendAudioPlayer.volume = storage.settings.playerVolume
+      .updateEqualizerSetting(eqSetting: storage.settings.user.activeEqualizerSetting)
+    backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.user.isReplayGainEnabled)
+    backendAudioPlayer.volume = storage.settings.user.playerVolume
 
     let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(
       playerStatus: playerData,
@@ -181,12 +181,13 @@ public class AmperKit {
       backendAudioPlayer: backendAudioPlayer,
       userStatistics: userStatistics
     )
-    facadeImpl.isOfflineMode = storage.settings.isOfflineMode
+    facadeImpl.isOfflineMode = storage.settings.user.isOfflineMode
 
     let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(
       musicPlayer: curPlayer,
       backendAudioPlayer: backendAudioPlayer,
       nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(),
+      account: account,
       storage: storage, notificationHandler: notificationHandler,
       artworkDownloadManager: artworkDownloadManager,
       playableDownloadManager: playableDownloadManager
@@ -286,7 +287,10 @@ public class AmperKit {
       { (downloadInfos: [DownloadElementInfo]) -> [DownloadElementInfo] in
         let artworkDownloadInfos = downloadInfos.filter { $0.type == .artwork }
 
-        let artworkDownloadSetting = await self.settings.artworkDownloadSetting
+        guard let accountInfo = await self.settings.accounts.active
+        else { return [DownloadElementInfo]() }
+        let artworkDownloadSetting = await self.settings.accounts.getSetting(accountInfo).read
+          .artworkDownloadSetting
         guard artworkDownloadSetting != .never else { return [DownloadElementInfo]() }
         guard artworkDownloadSetting != .updateOncePerSession else { return artworkDownloadInfos }
 

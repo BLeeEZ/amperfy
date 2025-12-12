@@ -273,17 +273,22 @@ class PlayableTableCell: BasicTableCell {
       playable: playable,
       newStyle: isDislayAlbumTrackNumberStyle ? .trackNumber : .artwork
     )
-    entityImage.display(theme: appDelegate.storage.settings.themePreference, container: playable)
+    entityImage.display(
+      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      container: playable
+    )
     configurePlayIndicator(playable: playable)
 
     if displayMode == .selection {
       let img = UIImageView(image: isMarked ? .checkmark : .circle)
-      img.tintColor = isMarked ? appDelegate.storage.settings.themePreference
+      img.tintColor = isMarked ? appDelegate.storage.settings.accounts.activeSettings.read
+        .themePreference
         .asColor : .secondaryLabelColor
       accessoryView = img
     } else if displayMode == .add {
       let img = UIImageView(image: isMarked ? .checkmark : .plusCircle)
-      img.tintColor = appDelegate.storage.settings.themePreference.asColor
+      img.tintColor = appDelegate.storage.settings.accounts.activeSettings.read.themePreference
+        .asColor
       accessoryView = img
     } else if displayMode == .reorder || playerIndexCb != nil {
       let img = UIImageView(image: .bars)
@@ -326,7 +331,7 @@ class PlayableTableCell: BasicTableCell {
 
     let isDurationVisible = !playable.isRadio &&
       (
-        appDelegate.storage.settings
+        appDelegate.storage.settings.user
           .isShowSongDuration || (traitCollection.horizontalSizeClass == .regular)
       )
     let cacheIconWidth = (traitCollection.horizontalSizeClass == .regular) ? 17.0 : 15.0
@@ -405,10 +410,10 @@ class PlayableTableCell: BasicTableCell {
     if let playerIndex = playerIndexCb?(self) {
       appDelegate.player.play(playerIndex: playerIndex)
     } else if let context = playContextCb?(self),
-              playable.isCached || appDelegate.storage.settings.isOnlineMode {
+              playable.isCached || appDelegate.storage.settings.user.isOnlineMode {
       animateActivation()
       hideSearchBarKeyboardInRootView()
-      Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
+      Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.user.isHapticsEnabled)
       appDelegate.player.play(context: context)
     }
   }

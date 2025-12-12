@@ -21,7 +21,7 @@
 
 import Foundation
 
-public enum PlayerDisplayStyle: Int, Sendable {
+public enum PlayerDisplayStyle: Int, Sendable, Codable {
   case compact = 0
   case large = 1
 

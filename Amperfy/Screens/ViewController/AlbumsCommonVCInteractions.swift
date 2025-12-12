@@ -149,7 +149,7 @@ class AlbumsCommonVCInteractions {
     case .all:
       filterTitle = "Albums"
       isIndexTitelsHidden = false
-      change(sortType: appDelegate.storage.settings.albumsSortSetting)
+      change(sortType: appDelegate.storage.settings.user.albumsSortSetting)
     case .newest:
       filterTitle = "Newest Albums"
       isIndexTitelsHidden = true
@@ -161,7 +161,7 @@ class AlbumsCommonVCInteractions {
     case .favorites:
       filterTitle = "Favorite Albums"
       isIndexTitelsHidden = false
-      change(sortType: appDelegate.storage.settings.albumsSortSetting)
+      change(sortType: appDelegate.storage.settings.user.albumsSortSetting)
     }
     rootVC?.setNavBarTitle(title: filterTitle)
   }
@@ -205,7 +205,7 @@ class AlbumsCommonVCInteractions {
   }
 
   func updateFromRemote(offset: Int = 0, count: Int = AmperKit.newestElementsFetchCount) {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     switch displayFilter {
     case .all:
       break
@@ -257,7 +257,7 @@ class AlbumsCommonVCInteractions {
     }
     actions.append(createStyleButtonMenu())
 
-    if appDelegate.storage.settings.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
 
@@ -276,7 +276,7 @@ class AlbumsCommonVCInteractions {
       image: sortType == .name ? .check : nil,
       handler: { _ in
         self.change(sortType: .name)
-        self.appDelegate.storage.settings.albumsSortSetting = .name
+        self.appDelegate.storage.settings.user.albumsSortSetting = .name
         self.updateSearchResultsCB?()
         self.appDelegate.notificationHandler.post(
           name: .fetchControllerSortChanged,
@@ -290,7 +290,7 @@ class AlbumsCommonVCInteractions {
       image: sortType == .rating ? .check : nil,
       handler: { _ in
         self.change(sortType: .rating)
-        self.appDelegate.storage.settings.albumsSortSetting = .rating
+        self.appDelegate.storage.settings.user.albumsSortSetting = .rating
         self.updateSearchResultsCB?()
         self.appDelegate.notificationHandler.post(
           name: .fetchControllerSortChanged,
@@ -304,7 +304,7 @@ class AlbumsCommonVCInteractions {
       image: sortType == .artist ? .check : nil,
       handler: { _ in
         self.change(sortType: .artist)
-        self.appDelegate.storage.settings.albumsSortSetting = .artist
+        self.appDelegate.storage.settings.user.albumsSortSetting = .artist
         self.updateSearchResultsCB?()
         self.appDelegate.notificationHandler.post(
           name: .fetchControllerSortChanged,
@@ -318,7 +318,7 @@ class AlbumsCommonVCInteractions {
       image: sortType == .duration ? .check : nil,
       handler: { _ in
         self.change(sortType: .duration)
-        self.appDelegate.storage.settings.albumsSortSetting = .duration
+        self.appDelegate.storage.settings.user.albumsSortSetting = .duration
         self.updateSearchResultsCB?()
         self.appDelegate.notificationHandler.post(
           name: .fetchControllerSortChanged,
@@ -332,7 +332,7 @@ class AlbumsCommonVCInteractions {
       image: sortType == .year ? .check : nil,
       handler: { _ in
         self.change(sortType: .year)
-        self.appDelegate.storage.settings.albumsSortSetting = .year
+        self.appDelegate.storage.settings.user.albumsSortSetting = .year
         self.updateSearchResultsCB?()
         self.appDelegate.notificationHandler.post(
           name: .fetchControllerSortChanged,
@@ -369,14 +369,14 @@ class AlbumsCommonVCInteractions {
     sliderMenuView.slider.value = min(
       max(
         sliderMenuView.slider.minimumValue,
-        Float(appDelegate.storage.settings.albumsGridSizeSetting)
+        Float(appDelegate.storage.settings.user.albumsGridSizeSetting)
       ),
       sliderMenuView.slider.maximumValue
     )
     sliderMenuView.sliderValueChangedCB = {
       let newIntValue = Int(sliderMenuView.slider.value)
-      if newIntValue != self.appDelegate.storage.settings.albumsGridSizeSetting {
-        self.appDelegate.storage.settings.albumsGridSizeSetting = newIntValue
+      if newIntValue != self.appDelegate.storage.settings.user.albumsGridSizeSetting {
+        self.appDelegate.storage.settings.user.albumsGridSizeSetting = newIntValue
         if let collectionVC = rootVC as? AlbumsCollectionVC {
           collectionVC.collectionView.reloadData()
         }
@@ -397,13 +397,13 @@ class AlbumsCommonVCInteractions {
   private func createStyleButtonMenu() -> UIMenu {
     let tableStyle = UIAction(
       title: "Table",
-      image: appDelegate.storage.settings.albumsStyleSetting == .table ? .check : nil,
+      image: appDelegate.storage.settings.user.albumsStyleSetting == .table ? .check : nil,
       handler: { _ in
-        self.appDelegate.storage.settings.albumsStyleSetting = .table
+        self.appDelegate.storage.settings.user.albumsStyleSetting = .table
         self.rootVC?.navigationController?.replaceCurrentlyActiveVC(
           with: AppStoryboard.Main
             .createAlbumsVC(
-              style: self.appDelegate.storage.settings.albumsStyleSetting,
+              style: self.appDelegate.storage.settings.user.albumsStyleSetting,
               category: self.displayFilter
             ),
           animated: false
@@ -412,13 +412,13 @@ class AlbumsCommonVCInteractions {
     )
     let gridStyle = UIAction(
       title: "Grid",
-      image: appDelegate.storage.settings.albumsStyleSetting == .grid ? .check : nil,
+      image: appDelegate.storage.settings.user.albumsStyleSetting == .grid ? .check : nil,
       handler: { _ in
-        self.appDelegate.storage.settings.albumsStyleSetting = .grid
+        self.appDelegate.storage.settings.user.albumsStyleSetting = .grid
         self.rootVC?.navigationController?.replaceCurrentlyActiveVC(
           with: AppStoryboard.Main
             .createAlbumsVC(
-              style: self.appDelegate.storage.settings.albumsStyleSetting,
+              style: self.appDelegate.storage.settings.user.albumsStyleSetting,
               category: self.displayFilter
             ),
           animated: false
@@ -429,7 +429,7 @@ class AlbumsCommonVCInteractions {
       self.showSliderMenu()
     })
     changeGridSize
-      .attributes = (appDelegate.storage.settings.albumsStyleSetting != .grid) ? .disabled : []
+      .attributes = (appDelegate.storage.settings.user.albumsStyleSetting != .grid) ? .disabled : []
 
     return UIMenu(
       title: "Style",
@@ -546,7 +546,7 @@ class AlbumsCommonVCInteractions {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode else {
       endRefreshCB?()
       return
     }

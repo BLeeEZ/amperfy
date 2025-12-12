@@ -92,7 +92,7 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
       selectButtonSelector: #selector(selectAllButtonPressed)
     )
 
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
       try await album.fetch(
         storage: self.appDelegate.storage,

@@ -131,16 +131,16 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     case .all:
       filterTitle = "Songs"
       isIndexTitelsHidden = false
-      change(sortType: appDelegate.storage.settings.songsSortSetting)
+      change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .newest, .recent:
       break
     case .favorites:
       filterTitle = "Favorite Songs"
       isIndexTitelsHidden = false
       if appDelegate.backendApi.selectedApi != .ampache {
-        change(sortType: appDelegate.storage.settings.favoriteSongSortSetting)
+        change(sortType: appDelegate.storage.settings.user.favoriteSongSortSetting)
       } else {
-        change(sortType: appDelegate.storage.settings.songsSortSetting)
+        change(sortType: appDelegate.storage.settings.user.songsSortSetting)
       }
     }
     setNavBarTitle(title: filterTitle)
@@ -190,7 +190,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   func updateRightBarButtonItems() {
     var actions = [UIMenu]()
     actions.append(createSortButtonMenu())
-    if appDelegate.storage.settings.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
     optionsButton = UIBarButtonItem.createOptionsBarButton()
@@ -199,7 +199,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   }
 
   func updateFromRemote() {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     switch displayFilter {
     case .all:
       break
@@ -327,9 +327,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
   private func saveSortPreference(preference: SongElementSortType) {
     if appDelegate.backendApi.selectedApi != .ampache, displayFilter == .favorites {
-      appDelegate.storage.settings.favoriteSongSortSetting = preference
+      appDelegate.storage.settings.user.favoriteSongSortSetting = preference
     } else {
-      appDelegate.storage.settings.songsSortSetting = preference
+      appDelegate.storage.settings.user.songsSortSetting = preference
     }
   }
 
@@ -494,7 +494,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode else {
       self.refreshControl?.endRefreshing()
       return
     }

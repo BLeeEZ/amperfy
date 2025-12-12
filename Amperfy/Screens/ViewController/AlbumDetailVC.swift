@@ -103,7 +103,8 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
       playContextCb: { () in PlayContext(
         containable: self.album,
         playables: self.fetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
+          []
       ) },
       player: appDelegate.player,
       isInfoAlwaysHidden: true
@@ -169,7 +170,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = fetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     else { return nil }
     let selectedSong = fetchedResultsController.getWrappedEntity(at: songIndexPath)
     guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

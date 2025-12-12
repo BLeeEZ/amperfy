@@ -33,11 +33,13 @@ struct ServerSettingsView: View {
   var isShowLogoutAlert = false
 
   private func logout() {
-    appDelegate.storage.settings.isOfflineMode = false
+    appDelegate.storage.settings.user.isOfflineMode = false
     // reset login credentials -> at new start the login view is presented to auth and resync library
-    appDelegate.storage.loginCredentials = nil
+    if let activeAccountInfo = appDelegate.storage.settings.accounts.active {
+      appDelegate.storage.settings.accounts.logout(activeAccountInfo)
+    }
     // force resync after login
-    appDelegate.storage.isLibrarySynced = false
+    appDelegate.storage.settings.app.isLibrarySynced = false
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.restartByUser()
@@ -48,18 +50,30 @@ struct ServerSettingsView: View {
       SettingsList {
         SettingsSection {
           SettingsRow(title: "URL", orientation: .vertical, splitPercentage: splitPercentage) {
-            SecondaryText(appDelegate.storage.loginCredentials?.displayServerUrl ?? "")
+            SecondaryText(
+              appDelegate.storage.settings.accounts.activeSettings.read
+                .loginCredentials?.displayServerUrl ?? ""
+            )
           }
           SettingsRow(title: "Username", orientation: .vertical, splitPercentage: splitPercentage) {
-            SecondaryText(appDelegate.storage.loginCredentials?.username ?? "")
+            SecondaryText(
+              appDelegate.storage.settings.accounts.activeSettings.read
+                .loginCredentials?.username ?? ""
+            )
           }
         }
 
         SettingsSection {
           SettingsRow(title: "Backend API", splitPercentage: splitPercentage) {
-            Text(appDelegate.storage.loginCredentials?.backendApi.description ?? "")
-              .foregroundColor(.secondary)
-              .help(appDelegate.storage.loginCredentials?.backendApi.description ?? "")
+            Text(
+              appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+                .backendApi.description ?? ""
+            )
+            .foregroundColor(.secondary)
+            .help(
+              appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+                .backendApi.description ?? ""
+            )
           }
 
           SettingsRow(title: "Server API Version", splitPercentage: splitPercentage) {

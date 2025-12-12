@@ -68,7 +68,7 @@ public class QuickActionsHandler {
   public func configureQuickActions() {
     var quickActions = [UIApplicationShortcutItem]()
 
-    guard storage.isLibrarySynced else {
+    guard storage.settings.app.isLibrarySynced else {
       application.shortcutItems = quickActions
       return
     }
@@ -107,7 +107,7 @@ public class QuickActionsHandler {
         userInfo: nil
       ))
     }
-    if storage.settings.isOfflineMode {
+    if storage.settings.user.isOfflineMode {
       quickActions.append(UIApplicationShortcutItem(
         type: QuickActionType.onlineModeAction.rawValue,
         localizedTitle: "Start in Online Mode",
@@ -151,9 +151,9 @@ public class QuickActionsHandler {
           player.play()
         }
       case .offlineModeAction:
-        storage.settings.isOfflineMode = true
+        storage.settings.user.isOfflineMode = true
       case .onlineModeAction:
-        storage.settings.isOfflineMode = false
+        storage.settings.user.isOfflineMode = false
       }
     }
     return true

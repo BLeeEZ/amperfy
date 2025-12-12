@@ -54,6 +54,7 @@
 		504262B22BF5FC3400B5EF38 /* IntentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */; };
 		504262B32BF5FC3800B5EF38 /* AmperfyIntentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BE5D442850EFE100156FC6 /* AmperfyIntentHandler.swift */; };
 		504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A7BB30284F3F6400C02990 /* NSUserActivity+IntentData.swift */; };
+		504415C72EE865D1005E8429 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504415C62EE865D1005E8429 /* Settings.swift */; };
 		504627EA2B73B44C00F481F8 /* PopupPlayerVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */; };
 		5047B7082E3CB90C00D5090C /* PlayerUIHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5047B7072E3CB8D400D5090C /* PlayerUIHandler.swift */; };
 		504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504B441628D6EB370033982C /* ArtworkDisplaySettings.swift */; };
@@ -658,6 +659,7 @@
 		5040B2C5269D947F00911451 /* BackgroundFetchTriggeredSyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundFetchTriggeredSyncer.swift; sourceTree = "<group>"; };
 		504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonLibrarySyncer.swift; sourceTree = "<group>"; };
 		5042B71F2D82FFA50086B9C4 /* Amperfy v45.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v45.xcdatamodel"; sourceTree = "<group>"; };
+		504415C62EE865D1005E8429 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		504627E92B73B44C00F481F8 /* PopupPlayerVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PopupPlayerVC.xib; sourceTree = "<group>"; };
 		5046DAF02689A66E00B3C37E /* Amperfy v11.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v11.xcdatamodel"; sourceTree = "<group>"; };
 		5046DAF12689B97600B3C37E /* AbstractPlayableMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AbstractPlayableMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1595,6 +1597,7 @@
 				5020402E2202271000ED48A3 /* ManagedObjects */,
 				50C16C3321EB454100F086F0 /* LibraryUpdater.swift */,
 				500BB45521CAA73700D367CF /* PersistentStorage.swift */,
+				504415C62EE865D1005E8429 /* Settings.swift */,
 				50BA930521D5715D00E5901D /* LibraryStorage.swift */,
 				50223EF2264543EA007445BC /* LibrarySyncVersion.swift */,
 				50073BDE22301D9A000130D8 /* DownloadRequestManager.swift */,
@@ -2449,6 +2452,7 @@
 				50C9D641284FA9C7007F18D0 /* EventLogger.swift in Sources */,
 				50C9D6B0284FAA87007F18D0 /* Download.swift in Sources */,
 				50C9D6AD284FAA87007F18D0 /* Directory.swift in Sources */,
+				504415C72EE865D1005E8429 /* Settings.swift in Sources */,
 				50C9D69C284FAA6C007F18D0 /* ArtistMO+CoreDataClass.swift in Sources */,
 				50C9D6BE284FAA87007F18D0 /* Song.swift in Sources */,
 				50C9D6C7284FAB0C007F18D0 /* LogData.swift in Sources */,

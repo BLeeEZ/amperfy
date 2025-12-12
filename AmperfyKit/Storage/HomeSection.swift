@@ -21,7 +21,7 @@
 
 import Foundation
 
-public enum HomeSection: Int, Sendable, CaseIterable, Encodable, Decodable {
+public enum HomeSection: Int, Sendable, CaseIterable, Codable {
   // add new section always at the end to keep the Int consitent
   case lastTimePlayedPlaylists
   case recentAlbums

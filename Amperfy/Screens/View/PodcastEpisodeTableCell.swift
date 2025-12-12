@@ -80,7 +80,10 @@ class PodcastEpisodeTableCell: BasicTableCell {
       configurePlayEpisodeButton()
     }
     podcastEpisodeLabel.text = episode.title
-    entityImage.display(theme: appDelegate.storage.settings.themePreference, container: episode)
+    entityImage.display(
+      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      container: episode
+    )
 
     infoLabel.text = "\(episode.publishDate.asShortDayMonthString)"
     descriptionLabel.text = episode.depiction ?? ""
@@ -138,7 +141,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
 
   @IBAction
   func showDescriptionButtonPressed(_ sender: Any) {
-    Haptics.light.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
+    Haptics.light.vibrate(isHapticsEnabled: appDelegate.storage.settings.user.isHapticsEnabled)
     guard let episode = episode, let rootView = rootView else { return }
     let showDescriptionVC = PlainDetailsVC()
     showDescriptionVC.display(podcastEpisode: episode, on: rootView)

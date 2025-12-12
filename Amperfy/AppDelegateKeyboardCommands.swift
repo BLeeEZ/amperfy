@@ -115,7 +115,7 @@ extension AppDelegate {
   @objc
   fileprivate func handleKeyCommand(sender: UIKeyCommand) {
     guard let senderInput = sender.input,
-          storage.isLibrarySynced
+          storage.settings.app.isLibrarySynced
     else { return }
     let cmd = KeyboardCommand(input: senderInput, modifierFlags: sender.modifierFlags)
     guard let cmdEnum = KeyboardCommands.isA(cmd: cmd) else { return }

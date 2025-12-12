@@ -27,9 +27,9 @@ extension PopupPlayerVC {
 
   func switchDisplayStyleOptionPersistent() {
     appDelegate.userStatistics.usedAction(.changePlayerDisplayStyle)
-    var displayStyle = appDelegate.storage.settings.playerDisplayStyle
+    var displayStyle = appDelegate.storage.settings.user.playerDisplayStyle
     displayStyle.switchToNextStyle()
-    appDelegate.storage.settings.playerDisplayStyle = displayStyle
+    appDelegate.storage.settings.user.playerDisplayStyle = displayStyle
     changeDisplayStyleVisually(to: displayStyle, animated: true)
   }
 

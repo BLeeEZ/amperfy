@@ -76,7 +76,8 @@ class DirectoriesVC: MultiSourceTableViewController {
       playContextCb: { () in PlayContext(
         containable: self.directory,
         playables: self.songsFetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
+          []
       ) },
       player: appDelegate.player,
       isInfoAlwaysHidden: false
@@ -207,7 +208,7 @@ class DirectoriesVC: MultiSourceTableViewController {
     songsFetchedResultsController?.delegate = self
     updateContentUnavailable()
 
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in
       do {
         try await self.appDelegate.librarySyncer.sync(directory: directory)
@@ -226,7 +227,7 @@ class DirectoriesVC: MultiSourceTableViewController {
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = songsFetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     else { return nil }
     let selectedSong = songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
     guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

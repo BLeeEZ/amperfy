@@ -94,7 +94,7 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
       selectButtonSelector: #selector(selectAllButtonPressed)
     )
 
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
       try await playlist.fetch(
         storage: self.appDelegate.storage,
@@ -164,7 +164,8 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
-    fetchedResultsController.search(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+    fetchedResultsController
+      .search(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     tableView.reloadData()
   }
 }

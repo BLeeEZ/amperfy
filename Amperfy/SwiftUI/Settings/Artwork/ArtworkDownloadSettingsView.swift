@@ -32,7 +32,7 @@ struct ArtworkDownloadSettingsView: View {
 
   func updateValues() {
     settingOptions = ArtworkDownloadSetting.allCases
-    activeOption = appDelegate.storage.settings.artworkDownloadSetting
+    activeOption = appDelegate.storage.settings.accounts.activeSettings.read.artworkDownloadSetting
   }
 
   var body: some View {
@@ -41,7 +41,10 @@ struct ArtworkDownloadSettingsView: View {
         Section {
           ForEach(settingOptions, id: \.self) { option in
             Button(action: {
-              appDelegate.storage.settings.artworkDownloadSetting = option
+              appDelegate.storage.settings.accounts
+                .updateSetting(appDelegate.account.info) { accountSettings in
+                  accountSettings.artworkDownloadSetting = option
+                }
               updateValues()
             }) {
               HStack {

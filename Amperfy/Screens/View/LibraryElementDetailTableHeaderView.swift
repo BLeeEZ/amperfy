@@ -123,13 +123,13 @@ class LibraryElementDetailTableHeaderView: UIView {
 
   @IBAction
   func playAllButtonPressed(_ sender: Any) {
-    Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
+    Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.user.isHapticsEnabled)
     play(isShuffled: false)
   }
 
   @IBAction
   func addAllShuffledButtonPressed(_ sender: Any) {
-    Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.isHapticsEnabled)
+    Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.user.isHapticsEnabled)
     shuffle()
   }
 
@@ -174,7 +174,7 @@ class LibraryElementDetailTableHeaderView: UIView {
   func activate() {
     playAllButton.isEnabled = true
     playShuffledButton.isEnabled = !(config?.isShuffleOnContextNeccessary ?? true) || appDelegate
-      .storage.settings.isPlayerShuffleButtonEnabled
+      .storage.settings.user.isPlayerShuffleButtonEnabled
   }
 
   func deactivate() {

@@ -264,7 +264,7 @@ extension AppDelegate {
       section2.insert(repeatMenu, at: 0)
     }
     if appDelegate.player.playerMode == .music,
-       appDelegate.storage.settings.isPlayerShuffleButtonEnabled {
+       appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
       let shuffleMenu = UIMenu(title: "Shuffle", image: .shuffleMenu, children: [
         UIAction(title: "On", state: isShuffle ? .on : .off) { [weak self] _ in
           self?.keyCommandShuffleOn()

@@ -44,7 +44,7 @@ class BasicCollectionViewController: UICollectionViewController {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1,
-       appDelegate.storage.settings.isOfflineMode {
+       appDelegate.storage.settings.user.isOfflineMode {
       searchController.searchBar.selectedScopeButtonIndex = 1
     } else {
       searchController.searchBar.selectedScopeButtonIndex = 0

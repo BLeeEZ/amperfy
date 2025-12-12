@@ -39,7 +39,7 @@ class EntityPreviewActionBuilder {
 
   private var entityPlayables: [AbstractPlayable] {
     let playables = entityContainer.playables
-      .filterCached(dependigOn: appDelegate.storage.settings.isOfflineMode)
+      .filterCached(dependigOn: appDelegate.storage.settings.user.isOfflineMode)
     switch entityContainer.playContextType {
     case .music:
       return playables
@@ -60,7 +60,7 @@ class EntityPreviewActionBuilder {
   private var isDownloadPossible: Bool {
     !(
       entityContainer.playables.isCachedCompletely ||
-        appDelegate.storage.settings.isOfflineMode ||
+        appDelegate.storage.settings.user.isOfflineMode ||
         !entityContainer.isDownloadAvailable
     )
   }
@@ -134,11 +134,11 @@ class EntityPreviewActionBuilder {
       menuActions.append(UIMenu(options: .displayInline, children: gotoActions))
     }
     if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isFavoritable,
-       appDelegate.storage.settings.isOnlineMode {
+       appDelegate.storage.settings.user.isOnlineMode {
       ratingFavActions.append(createFavoriteMenu(libraryEntity: libraryEntity))
     }
     if let libraryEntity = entityContainer as? AbstractLibraryEntity, entityContainer.isRateable,
-       appDelegate.storage.settings.isOnlineMode {
+       appDelegate.storage.settings.user.isOnlineMode {
       ratingFavActions.append(createRatingMenu(libraryEntity: libraryEntity))
     }
     if !ratingFavActions.isEmpty {
@@ -162,7 +162,7 @@ class EntityPreviewActionBuilder {
     if !elementHandlingActions.isEmpty {
       menuActions.append(UIMenu(options: .displayInline, children: elementHandlingActions))
     }
-    if appDelegate.storage.settings.isShowDetailedInfo {
+    if appDelegate.storage.settings.user.isShowDetailedInfo {
       menuActions.append(createCopyIdToClipboardAction())
     }
 
@@ -236,23 +236,23 @@ class EntityPreviewActionBuilder {
   private func configureFor(song: Song) {
     isPlay = !(
       (playContextCb == nil) ||
-        (!song.isCached && appDelegate.storage.settings.isOfflineMode)
+        (!song.isCached && appDelegate.storage.settings.user.isOfflineMode)
     )
     isShuffle = !(
       (playContextCb == nil) ||
         playerIndexCb != nil ||
-        (!song.isCached && appDelegate.storage.settings.isOfflineMode)
+        (!song.isCached && appDelegate.storage.settings.user.isOfflineMode)
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isMusicQueue = !(
       (playContextCb == nil) ||
         playerIndexCb != nil ||
-        (!song.isCached && appDelegate.storage.settings.isOfflineMode)
+        (!song.isCached && appDelegate.storage.settings.user.isOfflineMode)
     )
     isPodcastQueue = false
     isShowAlbum = !(rootView is AlbumDetailVC)
     isShowArtist = !(rootView is ArtistDetailVC)
-    isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
+    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
     isGoToSiteUrl = false
     isShowPodcastDetails = false
@@ -262,21 +262,21 @@ class EntityPreviewActionBuilder {
   private func configureFor(podcastEpisode: PodcastEpisode) {
     isPlay = !(
       (playContextCb == nil) ||
-        (!podcastEpisode.isAvailableToUser() && appDelegate.storage.settings.isOnlineMode) ||
-        (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode)
+        (!podcastEpisode.isAvailableToUser() && appDelegate.storage.settings.user.isOnlineMode) ||
+        (!podcastEpisode.isCached && appDelegate.storage.settings.user.isOfflineMode)
     )
     isShuffle = false
     isMusicQueue = false
     isPodcastQueue = !(
       (playContextCb == nil) ||
         (playerIndexCb != nil) ||
-        (!podcastEpisode.isAvailableToUser() && appDelegate.storage.settings.isOnlineMode) ||
-        (!podcastEpisode.isCached && appDelegate.storage.settings.isOfflineMode)
+        (!podcastEpisode.isAvailableToUser() && appDelegate.storage.settings.user.isOnlineMode) ||
+        (!podcastEpisode.isCached && appDelegate.storage.settings.user.isOfflineMode)
     )
     isShowAlbum = false
     isShowArtist = !(rootView is PodcastDetailVC)
     isAddToPlaylist = false
-    isDeleteOnServer = podcastEpisode.podcastStatus != .deleted && appDelegate.storage.settings
+    isDeleteOnServer = podcastEpisode.podcastStatus != .deleted && appDelegate.storage.settings.user
       .isOnlineMode
     isGoToSiteUrl = false
     isShowPodcastDetails = true
@@ -284,12 +284,12 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(radio: Radio) {
-    isPlay = !((playContextCb == nil) || appDelegate.storage.settings.isOfflineMode)
+    isPlay = !((playContextCb == nil) || appDelegate.storage.settings.user.isOfflineMode)
     isShuffle = false
     isMusicQueue = !(
       (playContextCb == nil) ||
         playerIndexCb != nil ||
-        (appDelegate.storage.settings.isOfflineMode)
+        (appDelegate.storage.settings.user.isOfflineMode)
     )
     isPodcastQueue = false
     isAddToPlaylist = false
@@ -300,17 +300,18 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(playlist: Playlist) {
-    isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
+      .hasCachedItems
     isShuffle = (
-      appDelegate.storage.settings.isOnlineMode || entityContainer.playables
+      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
         .hasCachedItems
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isMusicQueue = true
     isPodcastQueue = false
     isShowAlbum = false
     isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
+    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
     isGoToSiteUrl = false
     isShowPodcastDetails = false
@@ -318,17 +319,18 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(genre: Genre) {
-    isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
+      .hasCachedItems
     isShuffle = (
-      appDelegate.storage.settings.isOnlineMode || entityContainer.playables
+      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
         .hasCachedItems
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isMusicQueue = true
     isPodcastQueue = false
     isShowAlbum = false
     isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
+    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
     isGoToSiteUrl = false
     isShowPodcastDetails = false
@@ -337,10 +339,10 @@ class EntityPreviewActionBuilder {
 
   private func configureFor(podcast: Podcast) {
     isPlay = (
-      appDelegate.storage.settings.isOnlineMode || entityContainer.playables
+      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
         .hasCachedItems
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isShuffle = false
     isMusicQueue = false
     isShowAlbum = false
@@ -354,17 +356,18 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(artist: Artist) {
-    isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
+      .hasCachedItems
     isShuffle = (
-      appDelegate.storage.settings.isOnlineMode || entityContainer.playables
+      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
         .hasCachedItems
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isMusicQueue = true
     isPodcastQueue = false
     isShowAlbum = false
     isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
+    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
     isGoToSiteUrl = false
     isShowPodcastDetails = false
@@ -372,17 +375,18 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(album: Album) {
-    isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
+      .hasCachedItems
     isShuffle = (
-      appDelegate.storage.settings.isOnlineMode || entityContainer.playables
+      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
         .hasCachedItems
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isMusicQueue = true
     isPodcastQueue = false
     isShowAlbum = false
     isShowArtist = !(rootView is ArtistDetailVC)
-    isAddToPlaylist = appDelegate.storage.settings.isOnlineMode
+    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
     isGoToSiteUrl = false
     isShowPodcastDetails = false
@@ -390,17 +394,18 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(directory: Directory) {
-    isPlay = appDelegate.storage.settings.isOnlineMode || entityContainer.playables.hasCachedItems
+    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
+      .hasCachedItems
     isShuffle = (
-      appDelegate.storage.settings.isOnlineMode || entityContainer.playables
+      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
         .hasCachedItems
     ) &&
-      appDelegate.storage.settings.isPlayerShuffleButtonEnabled
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     isMusicQueue = true
     isPodcastQueue = false
     isShowAlbum = false
     isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.isOnlineMode && !entityContainer.playables
+    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode && !entityContainer.playables
       .isEmpty
     isDeleteOnServer = false
     isGoToSiteUrl = false
@@ -479,7 +484,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func toggleFavorite() {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in
       do {
         try await entityContainer.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
@@ -539,7 +544,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func setRating(rating: Int) {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     if let song = (entityContainer as? AbstractPlayable)?.asSong {
       song.rating = rating
       appDelegate.storage.main.saveContext()
@@ -852,7 +857,7 @@ class EntityPreviewVC: UIViewController {
   func refresh() {
     guard let entityContainer = entityContainer else { return }
     entityImageView.display(
-      theme: appDelegate.storage.settings.themePreference,
+      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
       container: entityContainer
     )
     titleLabel.text = entityContainer.name

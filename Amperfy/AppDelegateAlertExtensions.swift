@@ -66,7 +66,7 @@ extension AppDelegate {
 
   static var mainWindowHostVC: MainSceneHostingViewController? {
     guard let topView = Self.topViewController(),
-          (UIApplication.shared.delegate as! AppDelegate).storage.isLibrarySynced
+          (UIApplication.shared.delegate as! AppDelegate).storage.settings.app.isLibrarySynced
     else { return nil }
     return AppStoryboard.Main.checkForMainWindow(vc: topView)
   }

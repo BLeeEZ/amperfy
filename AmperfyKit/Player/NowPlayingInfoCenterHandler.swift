@@ -28,6 +28,7 @@ import MediaPlayer
 class NowPlayingInfoCenterHandler {
   private let musicPlayer: AudioPlayer
   private let backendAudioPlayer: BackendAudioPlayer
+  private let account: Account
   private let storage: PersistentStorage
   private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
   private let artworkDownloadManager: DownloadManageable
@@ -36,6 +37,7 @@ class NowPlayingInfoCenterHandler {
     musicPlayer: AudioPlayer,
     backendAudioPlayer: BackendAudioPlayer,
     nowPlayingInfoCenter: MPNowPlayingInfoCenter,
+    account: Account,
     storage: PersistentStorage,
     notificationHandler: EventNotificationHandler,
     artworkDownloadManager: DownloadManageable,
@@ -44,6 +46,7 @@ class NowPlayingInfoCenterHandler {
     self.musicPlayer = musicPlayer
     self.backendAudioPlayer = backendAudioPlayer
     self.nowPlayingInfoCenter = nowPlayingInfoCenter
+    self.account = account
     self.storage = storage
     self.artworkDownloadManager = artworkDownloadManager
 
@@ -68,8 +71,9 @@ class NowPlayingInfoCenterHandler {
 
     let artworkImage = LibraryEntityImage.getImageToDisplayImmediately(
       libraryEntity: playable,
-      themePreference: storage.settings.themePreference,
-      artworkDisplayPreference: storage.settings.artworkDisplayPreference,
+      themePreference: storage.settings.accounts.getSetting(account.info).read.themePreference,
+      artworkDisplayPreference: storage.settings.accounts.getSetting(account.info).read
+        .artworkDisplayPreference,
       useCache: true
     )
     if let artwork = playable.artwork {

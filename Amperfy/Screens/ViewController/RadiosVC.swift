@@ -136,7 +136,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   }
 
   func updateFromRemote() {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in
       do {
         try await self.appDelegate.librarySyncer.syncRadios()
@@ -210,7 +210,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode else {
       self.refreshControl?.endRefreshing()
       return
     }

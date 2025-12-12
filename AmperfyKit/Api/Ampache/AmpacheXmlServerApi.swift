@@ -96,7 +96,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private let eventLogger: EventLogger
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let authHandshake = Atomic<AuthentificationHandshake?>(wrappedValue: nil)
-  private let settings: PersistentStorage.Settings
+  private let settings: AmperfySettings
   public var account: AccountInfo? {
     guard let credentials = credentials.wrappedValue else { return nil }
     return Account.createInfo(credentials: credentials)
@@ -114,7 +114,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
-    settings: PersistentStorage.Settings
+    settings: AmperfySettings
   ) {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
@@ -146,7 +146,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private func createApiUrl(providedCredentials: LoginCredentials? = nil) -> URL? {
     let localCredentials = providedCredentials != nil ? providedCredentials : credentials
       .wrappedValue
-    guard let hostname = localCredentials?.serverUrl else { return nil }
+    guard let hostname = localCredentials?.activeBackendServerUrl else { return nil }
     var apiUrl = URL(string: hostname)
     Self.apiPathComponents.forEach { apiUrl?.appendPathComponent($0) }
     return apiUrl
@@ -283,7 +283,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
 
   public func requestDefaultArtwork() async throws -> APIDataResponse {
     try await request { auth in
-      guard let hostname = self.credentials.wrappedValue?.serverUrl,
+      guard let hostname = self.credentials.wrappedValue?.activeBackendServerUrl,
             var url = URL(string: hostname)
       else { throw BackendError.invalidUrl }
       url.appendPathComponent("image.php")
@@ -773,7 +773,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     urlComp.addQueryItem(name: "action", value: "download")
     urlComp.addQueryItem(name: "type", value: isSong ? "song" : "podcast_episode")
     urlComp.addQueryItem(name: "id", value: id)
-    switch settings.cacheTranscodingFormatPreference {
+    switch settings.user.cacheTranscodingFormatPreference {
     case .mp3:
       urlComp.addQueryItem(name: "format", value: "mp3")
     default:
@@ -817,7 +817,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
 
   public func generateUrlForArtwork(artworkRemoteInfo: ArtworkRemoteInfo) async throws -> URL {
     guard let hostname = credentials
-      .wrappedValue?.serverUrl else { throw BackendError.noCredentials }
+      .wrappedValue?.activeBackendServerUrl else { throw BackendError.noCredentials }
     guard var apiUrl = URL(string: hostname) else { throw BackendError.invalidUrl }
     apiUrl.appendPathComponent("image.php")
 

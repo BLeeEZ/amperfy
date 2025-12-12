@@ -90,7 +90,7 @@ actor DownloadManager: NSObject, DownloadManageable {
   private let getDownloadDelegateCB: GetDownloadManagerDelegateCB
   private let notificationHandler: EventNotificationHandler
   private let eventLogger: EventLogger
-  private let settings: PersistentStorage.Settings
+  private let settings: AmperfySettings
   private let urlCleanser: URLCleanser
 
   private var isRunning = false
@@ -106,7 +106,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     requestManager: DownloadRequestManager,
     getDownloadDelegateCB: @escaping GetDownloadManagerDelegateCB,
     eventLogger: EventLogger,
-    settings: PersistentStorage.Settings,
+    settings: AmperfySettings,
     networkMonitor: NetworkMonitorFacade,
     notificationHandler: EventNotificationHandler,
     urlCleanser: URLCleanser,
@@ -330,8 +330,8 @@ actor DownloadManager: NSObject, DownloadManageable {
   }
 
   func storageExceedsCacheLimit() -> Bool {
-    guard settings.cacheLimit != 0 else { return false }
-    return fileManager.completePlayableCacheSize > settings.cacheLimit
+    guard settings.user.cacheLimit != 0 else { return false }
+    return fileManager.completePlayableCacheSize > settings.user.cacheLimit
   }
 
   private func setupDownloadQueue() async {
@@ -506,7 +506,7 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   private var isAllowedToTriggerDownload: Bool {
     isRunning &&
-      settings.isOnlineMode &&
+      settings.user.isOnlineMode &&
       networkMonitor.isConnectedToNetwork &&
       (!isCacheSizeLimited || !storageExceedsCacheLimit())
   }

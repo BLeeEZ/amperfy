@@ -119,7 +119,7 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
 
 // MARK: - LibraryDisplaySettings
 
-public struct LibraryDisplaySettings {
+public struct LibraryDisplaySettings: Sendable, Codable {
   public var combined: [[LibraryDisplayType]]
 
   public var inUse: [LibraryDisplayType] {
@@ -128,6 +128,35 @@ public struct LibraryDisplaySettings {
 
   public var notUsed: [LibraryDisplayType] {
     combined[1]
+  }
+
+  private enum CodingKeys: String, CodingKey {
+    case combined
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    let encodedCombined = combined.map { $0.map { $0.rawValue } }
+    try container.encode(encodedCombined, forKey: .combined)
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let decodedCombined = try container.decode([[Int]].self, forKey: .combined)
+
+    let mapped: [[LibraryDisplayType]] = decodedCombined.map { group in
+      group.compactMap { LibraryDisplayType(rawValue: $0) }
+    }
+
+    if mapped.count == 2 {
+      self.combined = mapped
+    } else if let first = mapped.first {
+      // If only one group present, treat it as inUse and compute notUsed
+      self = LibraryDisplaySettings(inUse: first)
+    } else {
+      // Fallback to defaults if decoding produced no valid entries
+      self = LibraryDisplaySettings(inUse: [])
+    }
   }
 
   public func isVisible(libraryType: LibraryDisplayType) -> Bool {

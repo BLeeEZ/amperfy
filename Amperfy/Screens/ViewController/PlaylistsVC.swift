@@ -118,7 +118,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
 
     optionsButton = UIBarButtonItem.createSortBarButton()
 
-    change(sortType: appDelegate.storage.settings.playlistsSortSetting)
+    change(sortType: appDelegate.storage.settings.user.playlistsSortSetting)
 
     var searchTiles: [String]? = nil
     if appDelegate.backendApi.selectedApi == .ampache {
@@ -198,7 +198,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
 
   func change(sortType: PlaylistSortType) {
     self.sortType = sortType
-    appDelegate.storage.settings.playlistsSortSetting = sortType
+    appDelegate.storage.settings.user.playlistsSortSetting = sortType
     singleFetchedResultsController?.clearResults()
     fetchedResultsController = PlaylistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
@@ -222,12 +222,12 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
-    if appDelegate.storage.settings.isOfflineMode {
+    if appDelegate.storage.settings.user.isOfflineMode {
       isEditing = false
     }
     updateRightBarButtonItems()
     updateContentUnavailable()
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
     } catch {
@@ -243,7 +243,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     optionsButton.menu = UIMenu(children: actions)
     var barButtons = [UIBarButtonItem]()
     barButtons.append(optionsButton)
-    if appDelegate.storage.settings.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode {
       barButtons.append(editButtonItem)
     }
     navigationItem.rightBarButtonItems = barButtons

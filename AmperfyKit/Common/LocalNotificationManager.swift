@@ -87,6 +87,7 @@ public class LocalNotificationManager {
       content.title = podcastEpisode.creatorName
       content.body = podcastEpisode.title
       content.sound = .default
+      let accountInfo = podcastEpisode.account?.info ?? AccountInfo.defaultAccountInfo
       let identifier =
         "account-\(podcastEpisode.account?.ident ?? AccountInfo.defaultIdent)podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
       do {
@@ -94,8 +95,9 @@ public class LocalNotificationManager {
         let artworkUrl = createLocalUrl(
           forImage: LibraryEntityImage.getImageToDisplayImmediately(
             libraryEntity: podcastEpisode,
-            themePreference: storage.settings.themePreference,
-            artworkDisplayPreference: storage.settings.artworkDisplayPreference,
+            themePreference: storage.settings.accounts.getSetting(accountInfo).read.themePreference,
+            artworkDisplayPreference: storage.settings.accounts.getSetting(accountInfo).read
+              .artworkDisplayPreference,
             useCache: false
           ),
           fileIdentifier: fileIdentifier

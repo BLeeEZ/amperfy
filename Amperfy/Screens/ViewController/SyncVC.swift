@@ -58,18 +58,22 @@ class SyncVC: UIViewController {
       self.appDelegate.backgroundLibrarySyncer.stop()
       self.appDelegate.artworkDownloadManager.stop()
       self.appDelegate.playableDownloadManager.stop()
-      self.appDelegate.storage.isLibrarySynced = false
+      self.appDelegate.storage.settings.app.isLibrarySynced = false
       self.appDelegate.storage.main.library.cleanStorage()
       self.appDelegate.reinit()
 
-      guard let credentials = self.appDelegate.storage.loginCredentials
+      guard let credentials = self.appDelegate.storage.settings.accounts.activeSettings.read
+        .loginCredentials
       else { return }
+      let accountInfo = Account.createInfo(credentials: credentials)
       let _ = self.appDelegate.storage.main.library
-        .getAccount(info: Account.createInfo(credentials: credentials))
+        .getAccount(info: accountInfo)
 
       do {
         try await self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
-        self.appDelegate.storage.initialSyncCompletionStatus = .completed
+        self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+          accountSettings.initialSyncCompletionStatus = .completed
+        }
       } catch {
         guard !self.syncFinished else { return }
         self.appDelegate.eventLogger.report(
@@ -77,7 +81,9 @@ class SyncVC: UIViewController {
           error: error,
           displayPopup: false
         )
-        self.appDelegate.storage.initialSyncCompletionStatus = .aborded
+        self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+          accountSettings.initialSyncCompletionStatus = .aborded
+        }
       }
       self.finishSync()
     }
@@ -92,8 +98,8 @@ class SyncVC: UIViewController {
     activitySpinner.isHidden = true
     progressLabel.isHidden = true
 
-    appDelegate.storage.librarySyncVersion = .newestVersion
-    appDelegate.storage.isLibrarySynced = true
+    appDelegate.storage.settings.app.librarySyncVersion = .newestVersion
+    appDelegate.storage.settings.app.isLibrarySynced = true
     appDelegate.startManagerAfterSync()
     appDelegate.isKeepScreenAlive = false
     appDelegate.eventLogger.supressAlerts = false
@@ -118,7 +124,13 @@ class SyncVC: UIViewController {
       preferredStyle: .alert
     )
     let skip = UIAlertAction(title: "Skip", style: .destructive, handler: { action in
-      self.appDelegate.storage.initialSyncCompletionStatus = .skipped
+      if let credentials = self.appDelegate.storage.settings.accounts.activeSettings.read
+        .loginCredentials {
+        let accountInfo = Account.createInfo(credentials: credentials)
+        self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+          accountSettings.initialSyncCompletionStatus = .skipped
+        }
+      }
       self.finishSync()
     })
     let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)

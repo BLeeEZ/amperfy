@@ -160,7 +160,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode else {
       self.refreshControl?.endRefreshing()
       return
     }

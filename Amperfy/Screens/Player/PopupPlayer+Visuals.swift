@@ -80,8 +80,9 @@ extension PopupPlayerVC {
       if let playableInfo = player.currentlyPlaying,
          playableInfo.isSong {
         config.image = playableInfo.isFavorite ? .heartFill : .heartEmpty
-        config.baseForegroundColor = appDelegate.storage.settings.isOnlineMode ? .redHeart : .label
-        button.isEnabled = appDelegate.storage.settings.isOnlineMode
+        config.baseForegroundColor = appDelegate.storage.settings.user
+          .isOnlineMode ? .redHeart : .label
+        button.isEnabled = appDelegate.storage.settings.user.isOnlineMode
       } else if let playableInfo = player.currentlyPlaying,
                 let radio = playableInfo.asRadio {
         config.image = .followLink
@@ -109,20 +110,21 @@ extension PopupPlayerVC {
     if let playableInfo = player.currentlyPlaying {
       artwork = LibraryEntityImage.getImageToDisplayImmediately(
         libraryEntity: playableInfo,
-        themePreference: appDelegate.storage.settings.themePreference,
-        artworkDisplayPreference: appDelegate.storage.settings.artworkDisplayPreference,
+        themePreference: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+        artworkDisplayPreference: appDelegate.storage.settings.accounts.activeSettings.read
+          .artworkDisplayPreference,
         useCache: true
       )
     } else {
       switch player.playerMode {
       case .music:
         artwork = .getGeneratedArtwork(
-          theme: appDelegate.storage.settings.themePreference,
+          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
           artworkType: .song
         )
       case .podcast:
         artwork = .getGeneratedArtwork(
-          theme: appDelegate.storage.settings.themePreference,
+          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
           artworkType: .podcastEpisode
         )
       }
@@ -130,7 +132,7 @@ extension PopupPlayerVC {
     guard let artwork = artwork else { return }
     backgroundImage.image = artwork
     artworkGradientColors = (try? artwork.dominantColors(max: 2)) ?? [
-      appDelegate.storage.settings.themePreference.asColor,
+      appDelegate.storage.settings.accounts.activeSettings.read.themePreference.asColor,
       UIColor.systemBackground,
     ]
     applyGradientBackground()

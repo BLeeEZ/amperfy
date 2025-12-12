@@ -88,7 +88,8 @@ class GenreDetailVC: MultiSourceTableViewController {
       playContextCb: { () in PlayContext(
         containable: self.genre,
         playables: self.songsFetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
+          []
       ) },
       player: appDelegate.player,
       isInfoAlwaysHidden: true
@@ -235,7 +236,7 @@ class GenreDetailVC: MultiSourceTableViewController {
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = songsFetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     else { return nil }
     let selectedSong = songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
     guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }

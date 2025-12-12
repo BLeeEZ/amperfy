@@ -108,7 +108,7 @@ class PodcastsVC: MultiSourceTableViewController {
       }
     }
 
-    showType = appDelegate.storage.settings.podcastsShowSetting
+    showType = appDelegate.storage.settings.user.podcastsShowSetting
 
     resultUpdateHandler?.changesDidEnd = {
       self.updateContentUnavailable()
@@ -189,7 +189,7 @@ class PodcastsVC: MultiSourceTableViewController {
   }
 
   func syncFromServer() {
-    if appDelegate.storage.settings.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode {
       Task { @MainActor in do {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
@@ -316,7 +316,7 @@ class PodcastsVC: MultiSourceTableViewController {
       image: showType == .podcasts ? .check : nil,
       handler: { _ in
         self.showType = .podcasts
-        self.appDelegate.storage.settings.podcastsShowSetting = .podcasts
+        self.appDelegate.storage.settings.user.podcastsShowSetting = .podcasts
         self.syncFromServer()
         self.updateRightBarButtonItems()
         self.episodesFetchedResultsController.delegate = nil
@@ -330,7 +330,7 @@ class PodcastsVC: MultiSourceTableViewController {
       image: showType == .episodesSortedByReleaseDate ? .check : nil,
       handler: { _ in
         self.showType = .episodesSortedByReleaseDate
-        self.appDelegate.storage.settings.podcastsShowSetting = .episodesSortedByReleaseDate
+        self.appDelegate.storage.settings.user.podcastsShowSetting = .episodesSortedByReleaseDate
         self.syncFromServer()
         self.updateRightBarButtonItems()
         self.podcastsFetchedResultsController.delegate = nil

@@ -28,7 +28,7 @@ extension CarPlaySceneDelegate {
   func createPlaylistFetchController() {
     playlistFetchController = PlaylistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
-      sortType: appDelegate.storage.settings.playlistsSortSetting,
+      sortType: appDelegate.storage.settings.user.playlistsSortSetting,
       isGroupedInAlphabeticSections: false
     )
     playlistFetchController?.delegate = self
@@ -64,7 +64,7 @@ extension CarPlaySceneDelegate {
   func createArtistsFavoritesFetchController() {
     artistsFavoritesFetchController = ArtistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
-      sortType: appDelegate.storage.settings.artistsSortSetting,
+      sortType: appDelegate.storage.settings.user.artistsSortSetting,
       isGroupedInAlphabeticSections: false
     )
     artistsFavoritesFetchController?.delegate = self
@@ -78,7 +78,7 @@ extension CarPlaySceneDelegate {
   func createArtistsFavoritesCachedFetchController() {
     artistsFavoritesCachedFetchController = ArtistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
-      sortType: appDelegate.storage.settings.artistsSortSetting,
+      sortType: appDelegate.storage.settings.user.artistsSortSetting,
       isGroupedInAlphabeticSections: false
     )
     artistsFavoritesCachedFetchController?.delegate = self
@@ -92,7 +92,7 @@ extension CarPlaySceneDelegate {
   func createAlbumsFavoritesFetchController() {
     albumsFavoritesFetchController = AlbumFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
-      sortType: appDelegate.storage.settings.albumsSortSetting,
+      sortType: appDelegate.storage.settings.user.albumsSortSetting,
       isGroupedInAlphabeticSections: false
     )
     albumsFavoritesFetchController?.delegate = self
@@ -106,7 +106,7 @@ extension CarPlaySceneDelegate {
   func createAlbumsFavoritesCachedFetchController() {
     albumsFavoritesCachedFetchController = AlbumFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
-      sortType: appDelegate.storage.settings.albumsSortSetting,
+      sortType: appDelegate.storage.settings.user.albumsSortSetting,
       isGroupedInAlphabeticSections: false
     )
     albumsFavoritesCachedFetchController?.delegate = self
@@ -174,9 +174,9 @@ extension CarPlaySceneDelegate {
   }
 
   func createSongsFavoritesFetchController() {
-    var sortSetting = appDelegate.storage.settings.songsSortSetting
+    var sortSetting = appDelegate.storage.settings.user.songsSortSetting
     if appDelegate.backendApi.selectedApi != .ampache {
-      sortSetting = appDelegate.storage.settings.favoriteSongSortSetting
+      sortSetting = appDelegate.storage.settings.user.favoriteSongSortSetting
     }
     songsFavoritesFetchController = SongsFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
@@ -192,9 +192,9 @@ extension CarPlaySceneDelegate {
   }
 
   func createSongsFavoritesCachedFetchController() {
-    var sortSetting = appDelegate.storage.settings.songsSortSetting
+    var sortSetting = appDelegate.storage.settings.user.songsSortSetting
     if appDelegate.backendApi.selectedApi != .ampache {
-      sortSetting = appDelegate.storage.settings.favoriteSongSortSetting
+      sortSetting = appDelegate.storage.settings.user.favoriteSongSortSetting
     }
     songsFavoritesCachedFetchController = SongsFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,

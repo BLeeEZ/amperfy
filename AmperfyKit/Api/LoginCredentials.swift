@@ -21,12 +21,23 @@
 
 import Foundation
 
-public struct LoginCredentials: Sendable {
+public struct LoginCredentials: Sendable, Codable {
+  private enum CodingKeys: String, CodingKey {
+    case serverUrl
+    case username
+    case password
+    case backendApi
+    case activeBackendServerUrl
+    case alternativeServerURLs
+  }
+
   public var serverUrl: String
   public var username: String
   public var password: String
   public var passwordHash: String
   public var backendApi: BackenApiType
+  public var activeBackendServerUrl: String
+  public var alternativeServerURLs: [String]
 
   public init() {
     self.serverUrl = ""
@@ -34,6 +45,8 @@ public struct LoginCredentials: Sendable {
     self.password = ""
     self.passwordHash = ""
     self.backendApi = .notDetected
+    self.activeBackendServerUrl = ""
+    self.alternativeServerURLs = []
   }
 
   public var displayServerUrl: String {
@@ -47,17 +60,53 @@ public struct LoginCredentials: Sendable {
     return host
   }
 
+  public var availableServerURLs: [String] {
+    var availableURLs = alternativeServerURLs
+    availableURLs.insert(serverUrl, at: 0)
+    return availableURLs
+  }
+
   public init(serverUrl: String, username: String, password: String) {
     self.serverUrl = serverUrl
     self.username = username
     self.password = password
     self.passwordHash = StringHasher.sha256(dataString: password)
     self.backendApi = .notDetected
+    self.activeBackendServerUrl = serverUrl
+    self.alternativeServerURLs = []
   }
 
   public init(serverUrl: String, username: String, password: String, backendApi: BackenApiType) {
     self.init(serverUrl: serverUrl, username: username, password: password)
     self.backendApi = backendApi
+  }
+
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    self.serverUrl = try container.decode(String.self, forKey: .serverUrl)
+    self.username = try container.decode(String.self, forKey: .username)
+    self.password = try container.decode(String.self, forKey: .password)
+    self.backendApi = try container
+      .decodeIfPresent(BackenApiType.self, forKey: .backendApi) ?? .notDetected
+    self.activeBackendServerUrl = try container.decodeIfPresent(
+      String.self,
+      forKey: .activeBackendServerUrl
+    ) ?? serverUrl
+    self.alternativeServerURLs = try container.decodeIfPresent(
+      [String].self,
+      forKey: .alternativeServerURLs
+    ) ?? []
+    self.passwordHash = StringHasher.sha256(dataString: password)
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+    try container.encode(serverUrl, forKey: .serverUrl)
+    try container.encode(username, forKey: .username)
+    try container.encode(password, forKey: .password)
+    try container.encode(backendApi, forKey: .backendApi)
+    try container.encode(activeBackendServerUrl, forKey: .activeBackendServerUrl)
+    try container.encode(alternativeServerURLs, forKey: .alternativeServerURLs)
   }
 
   public mutating func changePasswordAndHash(password newPassword: String) {

@@ -174,7 +174,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     super.viewIsAppearing(animated)
     appDelegate.userStatistics.visited(.popupPlayer)
     becomeFirstResponder()
-    changeDisplayStyleVisually(to: appDelegate.storage.settings.playerDisplayStyle, animated: false)
+    changeDisplayStyleVisually(
+      to: appDelegate.storage.settings.user.playerDisplayStyle,
+      animated: false
+    )
     reloadData()
     scrollToCurrentlyPlayingRow()
     controlView?.refreshView()
@@ -191,7 +194,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   }
 
   func fetchSongInfoAndUpdateViews() {
-    guard appDelegate.storage.settings.isOnlineMode,
+    guard appDelegate.storage.settings.user.isOnlineMode,
           let song = player.currentlyPlaying?.asSong
     else { return }
 

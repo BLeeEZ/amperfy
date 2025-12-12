@@ -30,43 +30,48 @@ struct ServerURLsSettingsView: View {
   @State
   var activeServerURL: String = ""
   @State
+  var accountServerURL: String = ""
+  @State
   var isAddDialogVisible: Bool = false
   @State
   private var selection: String?
 
   func reload() {
-    serverURLs = appDelegate.storage.alternativeServerURLs
-    activeServerURL = appDelegate.storage.loginCredentials?.serverUrl ?? ""
-    serverURLs.append(activeServerURL)
+    serverURLs = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+      .availableServerURLs ?? []
+    activeServerURL = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+      .activeBackendServerUrl ?? ""
+    accountServerURL = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+      .serverUrl ?? ""
   }
 
   func setAsActiveURL(url: String) {
     guard url != activeServerURL else { return }
-    if let altIndex = appDelegate.storage.alternativeServerURLs.firstIndex(of: url),
-       let currentCredentials = appDelegate.storage.loginCredentials {
-      var altURLs = appDelegate.storage.alternativeServerURLs
-      altURLs.remove(at: altIndex)
-      altURLs.append(currentCredentials.serverUrl)
-      appDelegate.storage.alternativeServerURLs = altURLs
-
-      let newCredentials = LoginCredentials(
-        serverUrl: url,
-        username: currentCredentials.username,
-        password: currentCredentials.password,
-        backendApi: currentCredentials.backendApi
-      )
-      appDelegate.storage.loginCredentials = newCredentials
-      appDelegate.backendApi.provideCredentials(credentials: newCredentials)
+    if let currentCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+      .loginCredentials {
+      appDelegate.storage.settings.accounts
+        .updateSetting(Account.createInfo(credentials: currentCredentials)) { accountSettings in
+          accountSettings.loginCredentials?.activeBackendServerUrl = url
+        }
+      if let updatedCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+        .loginCredentials {
+        appDelegate.backendApi.provideCredentials(credentials: updatedCredentials)
+      }
     }
     reload()
   }
 
   func deleteURL(url: String) {
-    guard url != activeServerURL else { return }
-    if let altIndex = appDelegate.storage.alternativeServerURLs.firstIndex(of: url) {
-      var altURLs = appDelegate.storage.alternativeServerURLs
+    guard url != activeServerURL, url != accountServerURL else { return }
+    if let currentCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+      .loginCredentials,
+      let altIndex = currentCredentials.alternativeServerURLs.firstIndex(of: url) {
+      var altURLs = currentCredentials.alternativeServerURLs
       altURLs.remove(at: altIndex)
-      appDelegate.storage.alternativeServerURLs = altURLs
+      appDelegate.storage.settings.accounts
+        .updateSetting(Account.createInfo(credentials: currentCredentials)) { accountSettings in
+          accountSettings.loginCredentials?.alternativeServerURLs = altURLs
+        }
     }
   }
 
@@ -82,7 +87,7 @@ struct ServerURLsSettingsView: View {
             }
           }
           .id(url)
-          .deleteDisabled(url == activeServerURL)
+          .deleteDisabled(url == activeServerURL || url == accountServerURL)
           .onTapGesture {
             setAsActiveURL(url: url)
           }

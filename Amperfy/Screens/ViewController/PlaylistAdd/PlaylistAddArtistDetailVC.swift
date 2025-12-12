@@ -55,7 +55,7 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
     albumsFetchedResultsController.delegate = self
     songsFetchedResultsController = ArtistSongsItemsFetchedResultsController(
       for: artist,
-      displayFilter: appDelegate.storage.settings.artistsFilterSetting,
+      displayFilter: appDelegate.storage.settings.user.artistsFilterSetting,
       coreDataCompanion: appDelegate.storage.main,
       isGroupedInAlphabeticSections: false
     )
@@ -81,7 +81,7 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
       selectButtonSelector: #selector(selectAllButtonPressed)
     )
 
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
       try await artist.fetch(
         storage: self.appDelegate.storage,

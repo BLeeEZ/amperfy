@@ -75,7 +75,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
       playContextCb: { () in
         let context = self.fetchedResultsController
           .getContextPodcastEpisodes(
-            onlyCachedSongs: self.appDelegate.storage.settings
+            onlyCachedSongs: self.appDelegate.storage.settings.user
               .isOfflineMode
           )
         let newestEpisode = context?.first

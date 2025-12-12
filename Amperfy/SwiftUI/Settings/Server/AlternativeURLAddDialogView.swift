@@ -56,18 +56,20 @@ struct AlternativeURLAddDialogView: View {
     resetStatus()
     let newAltUrl = urlInput.trimmingCharacters(in: .whitespacesAndNewlines)
     let password = passwordInput
-    let username = appDelegate.storage.loginCredentials?.username ?? ""
+    let username = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+      .username ?? ""
     guard !newAltUrl.isEmpty,
           !username.isEmpty,
           !password.isEmpty,
-          let activeApi = appDelegate.storage.loginCredentials?.backendApi
+          let activeCred = appDelegate.storage.settings.accounts.activeSettings.read
+          .loginCredentials
     else {
       errorMsg = "Inputs are not valid."
       return
     }
 
     guard !serverURLs.contains(where: { $0 == newAltUrl }) else {
-      errorMsg = "Provided URL is already in alternative URLs list."
+      errorMsg = "Provided URL is already in URLs list."
       return
     }
 
@@ -76,26 +78,21 @@ struct AlternativeURLAddDialogView: View {
       return
     }
 
-    let credentials = LoginCredentials(
-      serverUrl: newAltUrl,
-      username: username,
-      password: password,
-      backendApi: activeApi
-    )
+    var credentialsToCheck = activeCred
+    credentialsToCheck.activeBackendServerUrl = newAltUrl
+    credentialsToCheck.alternativeServerURLs.append(newAltUrl)
 
     isValidating = true
     Task { @MainActor in
       do {
-        try await appDelegate.backendApi.isAuthenticationValid(credentials: credentials)
-        if let activeUrl = appDelegate.storage.loginCredentials?.serverUrl {
-          var currentAltUrls = appDelegate.storage.alternativeServerURLs
-          currentAltUrls.append(activeUrl)
-          appDelegate.storage.alternativeServerURLs = currentAltUrls
-        }
-        appDelegate.storage.loginCredentials = credentials
-        appDelegate.backendApi.provideCredentials(credentials: credentials)
-        activeServerURL = newAltUrl
-        serverURLs.append(newAltUrl)
+        try await appDelegate.backendApi.isAuthenticationValid(credentials: credentialsToCheck)
+        appDelegate.storage.settings.accounts
+          .updateSetting(Account.createInfo(credentials: credentialsToCheck)) { accountSettings in
+            accountSettings.loginCredentials = credentialsToCheck
+          }
+        appDelegate.backendApi.provideCredentials(credentials: credentialsToCheck)
+        activeServerURL = credentialsToCheck.activeBackendServerUrl
+        serverURLs = credentialsToCheck.availableServerURLs
         successMsg = "Alternative URL added."
       } catch {
         errorMsg =
@@ -131,7 +128,8 @@ struct AlternativeURLAddDialogView: View {
                 TextField("https://localhost/ampache", text: $urlInput)
                   .textFieldStyle(.roundedBorder)
                 TextField(
-                  appDelegate.storage.loginCredentials?.username ?? "",
+                  appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+                    .username ?? "",
                   text: $usernameInput
                 )
                 .disabled(true)

@@ -81,11 +81,11 @@ class SettingsHostVC: UIViewController {
       extendSafeAreaToAccountForMiniPlayer()
     }
 
-    settings.isOfflineMode = appDelegate.storage.settings.isOfflineMode
+    settings.isOfflineMode = appDelegate.storage.settings.user.isOfflineMode
     changesAgent.append(settings.$isOfflineMode.sink(receiveValue: { newValue in
-      let hasValueChanged = self.appDelegate.storage.settings.isOfflineMode != newValue
+      let hasValueChanged = self.appDelegate.storage.settings.user.isOfflineMode != newValue
       guard hasValueChanged else { return }
-      self.appDelegate.storage.settings.isOfflineMode = newValue
+      self.appDelegate.storage.settings.user.isOfflineMode = newValue
       self.appDelegate.notificationHandler.post(
         name: .offlineModeChanged,
         object: nil,
@@ -93,89 +93,97 @@ class SettingsHostVC: UIViewController {
       )
     }))
 
-    settings.isShowDetailedInfo = appDelegate.storage.settings.isShowDetailedInfo
+    settings.isShowDetailedInfo = appDelegate.storage.settings.user.isShowDetailedInfo
     changesAgent.append(settings.$isShowDetailedInfo.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isShowDetailedInfo = newValue
+      self.appDelegate.storage.settings.user.isShowDetailedInfo = newValue
     }))
 
-    settings.isShowSongDuration = appDelegate.storage.settings.isShowSongDuration
+    settings.isShowSongDuration = appDelegate.storage.settings.user.isShowSongDuration
     changesAgent.append(settings.$isShowSongDuration.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isShowSongDuration = newValue
+      self.appDelegate.storage.settings.user.isShowSongDuration = newValue
     }))
 
-    settings.isShowAlbumDuration = appDelegate.storage.settings.isShowAlbumDuration
+    settings.isShowAlbumDuration = appDelegate.storage.settings.user.isShowAlbumDuration
     changesAgent.append(settings.$isShowAlbumDuration.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isShowAlbumDuration = newValue
+      self.appDelegate.storage.settings.user.isShowAlbumDuration = newValue
     }))
 
-    settings.isShowArtistDuration = appDelegate.storage.settings.isShowArtistDuration
+    settings.isShowArtistDuration = appDelegate.storage.settings.user.isShowArtistDuration
     changesAgent.append(settings.$isShowArtistDuration.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isShowArtistDuration = newValue
+      self.appDelegate.storage.settings.user.isShowArtistDuration = newValue
     }))
 
-    settings.isPlayerShuffleButtonEnabled = appDelegate.storage.settings
+    settings.isPlayerShuffleButtonEnabled = appDelegate.storage.settings.user
       .isPlayerShuffleButtonEnabled
     changesAgent.append(settings.$isPlayerShuffleButtonEnabled.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isPlayerShuffleButtonEnabled = newValue
+      self.appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled = newValue
     }))
 
-    settings.isShowMusicPlayerSkipButtons = appDelegate.storage.settings
+    settings.isShowMusicPlayerSkipButtons = appDelegate.storage.settings.user
       .isShowMusicPlayerSkipButtons
     changesAgent.append(settings.$isShowMusicPlayerSkipButtons.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isShowMusicPlayerSkipButtons = newValue
+      self.appDelegate.storage.settings.user.isShowMusicPlayerSkipButtons = newValue
     }))
 
-    settings.isLyricsSmoothScrolling = appDelegate.storage.settings.isLyricsSmoothScrolling
+    settings.isLyricsSmoothScrolling = appDelegate.storage.settings.user.isLyricsSmoothScrolling
     changesAgent.append(settings.$isLyricsSmoothScrolling.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isLyricsSmoothScrolling = newValue
+      self.appDelegate.storage.settings.user.isLyricsSmoothScrolling = newValue
     }))
 
-    settings.screenLockPreventionPreference = appDelegate.storage.settings
+    settings.screenLockPreventionPreference = appDelegate.storage.settings.user
       .screenLockPreventionPreference
     changesAgent.append(settings.$screenLockPreventionPreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.screenLockPreventionPreference = newValue
+      self.appDelegate.storage.settings.user.screenLockPreventionPreference = newValue
     }))
 
-    settings.streamingMaxBitrateWifiPreference = appDelegate.storage.settings
+    settings.streamingMaxBitrateWifiPreference = appDelegate.storage.settings.user
       .streamingMaxBitrateWifiPreference
     changesAgent.append(settings.$streamingMaxBitrateWifiPreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.streamingMaxBitrateWifiPreference = newValue
+      self.appDelegate.storage.settings.user.streamingMaxBitrateWifiPreference = newValue
     }))
 
-    settings.streamingMaxBitrateCellularPreference = appDelegate.storage.settings
+    settings.streamingMaxBitrateCellularPreference = appDelegate.storage.settings.user
       .streamingMaxBitrateCellularPreference
     changesAgent
       .append(settings.$streamingMaxBitrateCellularPreference.sink(receiveValue: { newValue in
-        self.appDelegate.storage.settings.streamingMaxBitrateCellularPreference = newValue
+        self.appDelegate.storage.settings.user.streamingMaxBitrateCellularPreference = newValue
       }))
 
-    settings.streamingFormatCellularPreference = appDelegate.storage.settings
+    settings.streamingFormatCellularPreference = appDelegate.storage.settings.user
       .streamingFormatCellularPreference
     changesAgent.append(settings.$streamingFormatCellularPreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.streamingFormatCellularPreference = newValue
+      self.appDelegate.storage.settings.user.streamingFormatCellularPreference = newValue
     }))
 
-    settings.streamingFormatWifiPreference = appDelegate.storage.settings
+    settings.streamingFormatWifiPreference = appDelegate.storage.settings.user
       .streamingFormatWifiPreference
     changesAgent.append(settings.$streamingFormatWifiPreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.streamingFormatWifiPreference = newValue
+      self.appDelegate.storage.settings.user.streamingFormatWifiPreference = newValue
     }))
 
-    settings.cacheTranscodingFormatPreference = appDelegate.storage.settings
+    settings.cacheTranscodingFormatPreference = appDelegate.storage.settings.user
       .cacheTranscodingFormatPreference
     changesAgent.append(settings.$cacheTranscodingFormatPreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.cacheTranscodingFormatPreference = newValue
+      self.appDelegate.storage.settings.user.cacheTranscodingFormatPreference = newValue
     }))
 
-    settings.isAutoCacheLatestSongs = appDelegate.storage.settings.isAutoDownloadLatestSongsActive
+    settings.isAutoCacheLatestSongs = appDelegate.storage.settings.accounts.activeSettings.read
+      .isAutoDownloadLatestSongsActive
     changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isAutoDownloadLatestSongsActive = newValue
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.appDelegate.account.info) { accountSettings in
+          accountSettings.isAutoDownloadLatestSongsActive = newValue
+        }
     }))
 
-    settings.isAutoCacheLatestPodcastEpisodes = appDelegate.storage.settings
+    settings.isAutoCacheLatestPodcastEpisodes = appDelegate.storage.settings.accounts.activeSettings
+      .read
       .isAutoDownloadLatestPodcastEpisodesActive
     changesAgent.append(settings.$isAutoCacheLatestPodcastEpisodes.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isAutoDownloadLatestPodcastEpisodesActive = newValue
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.appDelegate.account.info) { accountSettings in
+          accountSettings.isAutoDownloadLatestPodcastEpisodesActive = newValue
+        }
     }))
 
     settings.isPlayerAutoCachePlayedItems = appDelegate.player.isAutoCachePlayedItems
@@ -183,63 +191,71 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.player.isAutoCachePlayedItems = newValue
     }))
 
-    settings.isScrobbleStreamedItems = appDelegate.storage.settings.isScrobbleStreamedItems
+    settings.isScrobbleStreamedItems = appDelegate.storage.settings.accounts.activeSettings.read
+      .isScrobbleStreamedItems
     changesAgent.append(settings.$isScrobbleStreamedItems.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isScrobbleStreamedItems = newValue
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.appDelegate.account.info) { accountSettings in
+          accountSettings.isScrobbleStreamedItems = newValue
+        }
     }))
 
-    settings.isPlaybackStartOnlyOnPlay = appDelegate.storage.settings.isPlaybackStartOnlyOnPlay
+    settings.isPlaybackStartOnlyOnPlay = appDelegate.storage.settings.user.isPlaybackStartOnlyOnPlay
     changesAgent.append(settings.$isPlaybackStartOnlyOnPlay.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isPlaybackStartOnlyOnPlay = newValue
+      self.appDelegate.storage.settings.user.isPlaybackStartOnlyOnPlay = newValue
     }))
 
-    settings.swipeActionSettings = appDelegate.storage.settings.swipeActionSettings
+    settings.swipeActionSettings = appDelegate.storage.settings.user.swipeActionSettings
 
-    settings.isReplayGainEnabled = appDelegate.storage.settings.isReplayGainEnabled
+    settings.isReplayGainEnabled = appDelegate.storage.settings.user.isReplayGainEnabled
     changesAgent.append(settings.$isReplayGainEnabled.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isReplayGainEnabled = newValue
+      self.appDelegate.storage.settings.user.isReplayGainEnabled = newValue
       self.appDelegate.player.updateReplayGainEnabled(isEnabled: newValue)
     }))
 
-    settings.isEqualizerEnabled = appDelegate.storage.settings.isEqualizerEnabled
+    settings.isEqualizerEnabled = appDelegate.storage.settings.user.isEqualizerEnabled
     changesAgent.append(settings.$isEqualizerEnabled.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isEqualizerEnabled = newValue
+      self.appDelegate.storage.settings.user.isEqualizerEnabled = newValue
       self.appDelegate.player.updateEqualizerEnabled(isEnabled: newValue)
     }))
 
-    settings.activeEqualizerSetting = appDelegate.storage.settings.activeEqualizerSetting
+    settings.activeEqualizerSetting = appDelegate.storage.settings.user.activeEqualizerSetting
     changesAgent.append(settings.$activeEqualizerSetting.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.activeEqualizerSetting = newValue
+      self.appDelegate.storage.settings.user.activeEqualizerSetting = newValue
       self.appDelegate.player.updateEqualizerSetting(eqSetting: newValue)
     }))
 
-    settings.equalizerSettings = appDelegate.storage.settings.equalizerSettings
+    settings.equalizerSettings = appDelegate.storage.settings.user.equalizerSettings
     changesAgent.append(settings.$equalizerSettings.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.equalizerSettings = newValue
+      self.appDelegate.storage.settings.user.equalizerSettings = newValue
     }))
 
     changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.swipeActionSettings = newValue
+      self.appDelegate.storage.settings.user.swipeActionSettings = newValue
     }))
 
-    settings.cacheSizeLimit = appDelegate.storage.settings.cacheLimit
+    settings.cacheSizeLimit = appDelegate.storage.settings.user.cacheLimit
     changesAgent.append(settings.$cacheSizeLimit.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.cacheLimit = newValue
+      self.appDelegate.storage.settings.user.cacheLimit = newValue
     }))
 
-    settings.isHapticsEnabled = appDelegate.storage.settings.isHapticsEnabled
+    settings.isHapticsEnabled = appDelegate.storage.settings.user.isHapticsEnabled
     changesAgent.append(settings.$isHapticsEnabled.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.isHapticsEnabled = newValue
+      self.appDelegate.storage.settings.user.isHapticsEnabled = newValue
     }))
 
-    settings.themePreference = appDelegate.storage.settings.themePreference
+    settings.themePreference = appDelegate.storage.settings.accounts.activeSettings.read
+      .themePreference
     changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.themePreference = newValue
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.appDelegate.account.info) { accountSettings in
+          accountSettings.themePreference = newValue
+        }
     }))
 
-    settings.appearanceMode = appDelegate.storage.settings.appearanceMode
+    settings.appearanceMode = appDelegate.storage.settings.user.appearanceMode
     changesAgent.append(settings.$appearanceMode.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.appearanceMode = newValue
+      self.appDelegate.storage.settings.user.appearanceMode = newValue
       self.appDelegate.setAppAppearanceMode(style: newValue)
     }))
   }

@@ -25,7 +25,7 @@ import UIKit
 
 // MARK: - ArtworkDownloadSetting
 
-public enum ArtworkDownloadSetting: Int, CaseIterable, Sendable {
+public enum ArtworkDownloadSetting: Int, CaseIterable, Sendable, Codable {
   case updateOncePerSession = 0
   case onlyOnce = 1
   case never = 2
@@ -46,7 +46,7 @@ public enum ArtworkDownloadSetting: Int, CaseIterable, Sendable {
 
 // MARK: - ArtworkDisplayPreference
 
-public enum ArtworkDisplayPreference: Int, CaseIterable, Sendable {
+public enum ArtworkDisplayPreference: Int, CaseIterable, Sendable, Codable {
   case id3TagOnly = 0
   case serverArtworkOnly = 1
   case preferServerArtwork = 2
@@ -70,7 +70,7 @@ public enum ArtworkDisplayPreference: Int, CaseIterable, Sendable {
 
 // MARK: - ScreenLockPreventionPreference
 
-public enum ScreenLockPreventionPreference: Int, CaseIterable, Sendable {
+public enum ScreenLockPreventionPreference: Int, CaseIterable, Sendable, Codable {
   case always = 0
   case never = 1
   case onlyIfCharging = 2
@@ -91,7 +91,7 @@ public enum ScreenLockPreventionPreference: Int, CaseIterable, Sendable {
 
 // MARK: - StreamingMaxBitratePreference
 
-public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable {
+public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable, Codable {
   case noLimit = 0
   case limit32 = 32
   case limit64 = 64
@@ -119,7 +119,7 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable {
 
 // MARK: - StreamingFormatPreference
 
-public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
+public enum StreamingFormatPreference: Int, CaseIterable, Sendable, Codable {
   case mp3 = 0
   case raw = 1
   case serverConfig = 2 // omit the format to let the server decide which codec should be used
@@ -151,7 +151,7 @@ public enum StreamingFormatPreference: Int, CaseIterable, Sendable {
 
 // MARK: - EqualizerSetting
 
-public struct EqualizerSetting: Hashable, Sendable, Encodable, Decodable {
+public struct EqualizerSetting: Hashable, Sendable, Codable {
   // Frequencies in Hz
   public static let frequencies: [Float] = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
   public static let defaultGains: [Float] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -206,7 +206,7 @@ public struct EqualizerSetting: Hashable, Sendable, Encodable, Decodable {
 
 // MARK: - EqualizerPreset
 
-public enum EqualizerPreset: Int, CaseIterable, Sendable {
+public enum EqualizerPreset: Int, CaseIterable, Sendable, Codable {
   case off = 0
   case increasedBass = 1
   case reducedBass = 2
@@ -239,7 +239,7 @@ public enum EqualizerPreset: Int, CaseIterable, Sendable {
 
 // MARK: - SyncCompletionStatus
 
-public enum SyncCompletionStatus: Int, CaseIterable, Sendable {
+public enum SyncCompletionStatus: Int, CaseIterable, Sendable, Codable {
   case completed = 0
   case skipped = 1
   case aborded = 2
@@ -260,7 +260,7 @@ public enum SyncCompletionStatus: Int, CaseIterable, Sendable {
 
 // MARK: - ThemePreference
 
-public enum ThemePreference: Int, CaseIterable, Sendable {
+public enum ThemePreference: Int, CaseIterable, Sendable, Codable {
   case blue = 0
   case green = 1
   case red = 2
@@ -324,7 +324,7 @@ public enum ThemePreference: Int, CaseIterable, Sendable {
 
 // MARK: - CacheTranscodingFormatPreference
 
-public enum CacheTranscodingFormatPreference: Int, CaseIterable, Sendable {
+public enum CacheTranscodingFormatPreference: Int, CaseIterable, Sendable, Codable {
   case raw = 0
   case mp3 = 1
   case serverConfig = 2 // omit the format to let the server decide which codec should be used
@@ -340,6 +340,21 @@ public enum CacheTranscodingFormatPreference: Int, CaseIterable, Sendable {
     case .serverConfig:
       return "Server chooses Codec"
     }
+  }
+}
+
+// MARK: - UIUserInterfaceStyle
+
+extension UIUserInterfaceStyle: @retroactive Encodable, @retroactive Decodable {
+  public init(from decoder: Decoder) throws {
+    let container = try decoder.singleValueContainer()
+    let raw = try container.decode(Int.self)
+    self = UIUserInterfaceStyle(rawValue: raw) ?? .unspecified
+  }
+
+  public func encode(to encoder: Encoder) throws {
+    var container = encoder.singleValueContainer()
+    try container.encode(rawValue)
   }
 }
 
@@ -420,7 +435,11 @@ public actor AsyncCoreDataAccessWrapper {
 // MARK: - PersistentStorage
 
 public class PersistentStorage {
-  private enum UserDefaultsKey: String {
+  public enum UserDefaultsKey: String {
+    case SettingsApp = "settings.app"
+    case SettingsUser = "settings.user"
+    case SettingsAccount = "settings.account"
+
     case ServerUrl = "serverUrl"
     case AlternativeServerUrls = "alternativeServerUrls"
     case Username = "username"
@@ -1111,9 +1130,11 @@ public class PersistentStorage {
     }
   }
 
-  public var settings = Settings()
+  public var legacySettings = Settings()
+  public var settings = AmperfySettings()
 
-  public var loginCredentials: LoginCredentials? {
+  // depricated
+  public var depricatedLoginCredentials: LoginCredentials? {
     get {
       if let serverUrl = UserDefaults.standard
         .object(forKey: UserDefaultsKey.ServerUrl.rawValue) as? String,
@@ -1160,7 +1181,8 @@ public class PersistentStorage {
     }
   }
 
-  public var alternativeServerURLs: [String] {
+  // depricated
+  public var depricatedAlternativeServerURLs: [String] {
     get {
       UserDefaults.standard
         .object(forKey: UserDefaultsKey.AlternativeServerUrls.rawValue) as? [String] ?? [String]()
@@ -1170,7 +1192,8 @@ public class PersistentStorage {
     }
   }
 
-  public var isLibrarySyncInfoReadByUser: Bool {
+  // depricated
+  public var depricatedIsLibrarySyncInfoReadByUser: Bool {
     get {
       UserDefaults.standard
         .object(forKey: UserDefaultsKey.LibrarySyncInfoReadByUser.rawValue) as? Bool ?? false
@@ -1181,7 +1204,8 @@ public class PersistentStorage {
     ) }
   }
 
-  public var isLibrarySynced: Bool {
+  // depricated
+  public var depricatedIsLibrarySynced: Bool {
     get {
       UserDefaults.standard
         .object(forKey: UserDefaultsKey.LibraryIsSynced.rawValue) as? Bool ?? false
@@ -1189,7 +1213,8 @@ public class PersistentStorage {
     set { UserDefaults.standard.set(newValue, forKey: UserDefaultsKey.LibraryIsSynced.rawValue) }
   }
 
-  public var initialSyncCompletionStatus: SyncCompletionStatus {
+  // depricated
+  public var depricatedInitialSyncCompletionStatus: SyncCompletionStatus {
     get {
       let initialSyncCompletionStatusRaw = UserDefaults.standard
         .object(forKey: UserDefaultsKey.InitialSyncCompletionStatus.rawValue) as? Int ??
@@ -1203,7 +1228,8 @@ public class PersistentStorage {
     ) }
   }
 
-  public var librarySyncVersion: LibrarySyncVersion {
+  // depricated
+  public var depricatedLibrarySyncVersion: LibrarySyncVersion {
     get {
       if let raw = UserDefaults.standard
         .object(forKey: UserDefaultsKey.LibrarySyncVersion.rawValue) as? Int,
@@ -1218,6 +1244,74 @@ public class PersistentStorage {
         forKey: UserDefaultsKey.LibrarySyncVersion.rawValue
       )
     }
+  }
+
+  @MainActor
+  public func applyMultiAccountSettingsUpdateIfNeeded() {
+    guard let credentials = depricatedLoginCredentials else { return }
+    depricatedLoginCredentials = nil
+
+    let accountInfo = Account.createInfo(credentials: credentials)
+    settings.accounts.login(credentials)
+    settings.accounts.updateSetting(accountInfo) { accountSetting in
+      accountSetting.artworkDisplayPreference = legacySettings.artworkDisplayPreference
+      accountSetting.artworkDownloadSetting = legacySettings.artworkDownloadSetting
+      accountSetting.homeSections = legacySettings.homeSections
+      accountSetting.initialSyncCompletionStatus = depricatedInitialSyncCompletionStatus
+      accountSetting.isAutoDownloadLatestPodcastEpisodesActive = legacySettings
+        .isAutoDownloadLatestPodcastEpisodesActive
+      accountSetting.isAutoDownloadLatestSongsActive = legacySettings
+        .isAutoDownloadLatestSongsActive
+      accountSetting.isScrobbleStreamedItems = legacySettings.isScrobbleStreamedItems
+      accountSetting.libraryDisplaySettings = legacySettings.libraryDisplaySettings
+      accountSetting.loginCredentials = credentials
+      accountSetting.loginCredentials?.alternativeServerURLs = depricatedAlternativeServerURLs
+      accountSetting.themePreference = legacySettings.themePreference
+    }
+
+    settings.app.isLibrarySyncInfoReadByUser = depricatedIsLibrarySyncInfoReadByUser
+    settings.app.isLibrarySynced = depricatedIsLibrarySynced
+    settings.app.librarySyncVersion = depricatedLibrarySyncVersion
+
+    settings.user.streamingMaxBitrateWifiPreference = legacySettings
+      .streamingMaxBitrateWifiPreference
+    settings.user.streamingMaxBitrateCellularPreference = legacySettings
+      .streamingMaxBitrateCellularPreference
+    settings.user.streamingFormatWifiPreference = legacySettings.streamingFormatWifiPreference
+    settings.user.streamingFormatCellularPreference = legacySettings
+      .streamingFormatCellularPreference
+    settings.user.cacheTranscodingFormatPreference = legacySettings.cacheTranscodingFormatPreference
+    settings.user.isShowDetailedInfo = legacySettings.isShowDetailedInfo
+    settings.user.isShowSongDuration = legacySettings.isShowSongDuration
+    settings.user.isShowAlbumDuration = legacySettings.isShowAlbumDuration
+    settings.user.isShowArtistDuration = legacySettings.isShowArtistDuration
+    settings.user.isPlayerShuffleButtonEnabled = legacySettings.isPlayerShuffleButtonEnabled
+    settings.user.isShowMusicPlayerSkipButtons = legacySettings.isShowMusicPlayerSkipButtons
+    settings.user.isLyricsSmoothScrolling = legacySettings.isLyricsSmoothScrolling
+    settings.user.cacheLimit = legacySettings.cacheLimit
+    settings.user.isPlayerLyricsDisplayed = legacySettings.isPlayerLyricsDisplayed
+    settings.user.isPlayerVisualizerDisplayed = legacySettings.isPlayerVisualizerDisplayed
+    settings.user.isOfflineMode = legacySettings.isOfflineMode
+    settings.user.isPlaybackStartOnlyOnPlay = legacySettings.isPlaybackStartOnlyOnPlay
+    settings.user.isHapticsEnabled = legacySettings.isHapticsEnabled
+    settings.user.isEqualizerEnabled = legacySettings.isEqualizerEnabled
+    settings.user.activeEqualizerSetting = legacySettings.activeEqualizerSetting
+    settings.user.equalizerSettings = legacySettings.equalizerSettings
+    settings.user.isReplayGainEnabled = legacySettings.isReplayGainEnabled
+    settings.user.playerVolume = legacySettings.playerVolume
+    settings.user.appearanceMode = legacySettings.appearanceMode
+    settings.user.screenLockPreventionPreference = legacySettings.screenLockPreventionPreference
+    settings.user.playlistsSortSetting = legacySettings.playlistsSortSetting
+    settings.user.artistsSortSetting = legacySettings.artistsSortSetting
+    settings.user.albumsSortSetting = legacySettings.albumsSortSetting
+    settings.user.swipeActionSettings = legacySettings.swipeActionSettings
+    settings.user.songsSortSetting = legacySettings.songsSortSetting
+    settings.user.favoriteSongSortSetting = legacySettings.favoriteSongSortSetting
+    settings.user.artistsFilterSetting = legacySettings.artistsFilterSetting
+    settings.user.albumsStyleSetting = legacySettings.albumsStyleSetting
+    settings.user.podcastsShowSetting = legacySettings.podcastsShowSetting
+    settings.user.playerDisplayStyle = legacySettings.playerDisplayStyle
+    settings.user.albumsGridSizeSetting = legacySettings.albumsGridSizeSetting
   }
 
   @MainActor

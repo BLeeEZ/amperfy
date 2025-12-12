@@ -136,7 +136,7 @@ class GenericDetailTableHeader: UIView {
     guard let config = config else { return }
     let entityContainer = config.entityContainer
     entityImage.display(
-      theme: appDelegate.storage.settings.themePreference,
+      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
       container: entityContainer
     )
     titleLabel.text = entityContainer.name
@@ -221,7 +221,7 @@ class GenericDetailTableHeader: UIView {
           nameText != playlist.name else { return }
     playlist.name = nameText
     titleLabel.text = nameText
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
 
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateName: playlist)

@@ -79,7 +79,7 @@ final class HomeVC: UICollectionViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    orderedVisibleSections = appDelegate.storage.settings.homeSections
+    orderedVisibleSections = appDelegate.storage.settings.accounts.activeSettings.read.homeSections
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
@@ -111,7 +111,7 @@ final class HomeVC: UICollectionViewController {
       pointSize: 24,
       weight: .regular
     )).withTintColor(
-      appDelegate.storage.settings.themePreference.asColor,
+      appDelegate.storage.settings.accounts.activeSettings.read.themePreference.asColor,
       renderingMode: .alwaysTemplate
     )
 
@@ -145,8 +145,10 @@ final class HomeVC: UICollectionViewController {
 
   private func createUserButtonMenu() -> UIMenu {
     let userInfo = UIAction(
-      title: appDelegate.storage.loginCredentials?.username ?? "Unknown",
-      subtitle: appDelegate.storage.loginCredentials?.displayServerUrl ?? "",
+      title: appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+        .username ?? "Unknown",
+      subtitle: appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+        .displayServerUrl ?? "",
       image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
         pointSize: 30,
         weight: .regular
@@ -306,7 +308,7 @@ final class HomeVC: UICollectionViewController {
   }
 
   var isOfflineMode: Bool {
-    appDelegate.storage.settings.isOfflineMode
+    appDelegate.storage.settings.user.isOfflineMode
   }
 
   @objc
@@ -427,7 +429,7 @@ final class HomeVC: UICollectionViewController {
   }
 
   func updateFromRemote() {
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
       Task { @MainActor in
         do {
@@ -497,7 +499,11 @@ final class HomeVC: UICollectionViewController {
     let editor = HomeEditorVC(current: orderedVisibleSections) { [weak self] newOrder in
       guard let self else { return }
       orderedVisibleSections = newOrder
-      appDelegate.storage.settings.homeSections = newOrder
+      if let accountInfo = appDelegate.storage.settings.accounts.active {
+        appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+          accountSettings.homeSections = newOrder
+        }
+      }
       applySnapshot(animated: true)
 
       createFetchController()

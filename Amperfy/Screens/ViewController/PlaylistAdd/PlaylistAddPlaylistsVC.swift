@@ -98,7 +98,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
     doneButton = addToPlaylistManager.createDoneButton()
     navigationItem.rightBarButtonItems = [doneButton]
 
-    change(sortType: appDelegate.storage.settings.playlistsSortSetting)
+    change(sortType: appDelegate.storage.settings.user.playlistsSortSetting)
 
     var searchTiles: [String]? = nil
     if appDelegate.backendApi.selectedApi == .ampache {
@@ -124,7 +124,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
     super.viewIsAppearing(animated)
     updateTitle()
 
-    guard appDelegate.storage.settings.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
       try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
     } catch {
@@ -138,7 +138,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
 
   func change(sortType: PlaylistSortType) {
     self.sortType = sortType
-    appDelegate.storage.settings.playlistsSortSetting = sortType
+    appDelegate.storage.settings.user.playlistsSortSetting = sortType
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = PlaylistFetchedResultsController(

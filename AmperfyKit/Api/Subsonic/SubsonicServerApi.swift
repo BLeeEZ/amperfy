@@ -114,14 +114,14 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   private let log = OSLog(subsystem: "Amperfy", category: "Subsonic")
   private let performanceMonitor: ThreadPerformanceMonitor
   private let eventLogger: EventLogger
-  private let settings: PersistentStorage.Settings
+  private let settings: AmperfySettings
   private let credentials = Atomic<LoginCredentials?>(wrappedValue: nil)
   private let openSubsonicExtensionsSupport =
     Atomic<OpenSubsonicExtensionsSupport?>(wrappedValue: nil)
   init(
     performanceMonitor: ThreadPerformanceMonitor,
     eventLogger: EventLogger,
-    settings: PersistentStorage.Settings
+    settings: AmperfySettings
   ) {
     self.performanceMonitor = performanceMonitor
     self.eventLogger = eventLogger
@@ -198,7 +198,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     -> URLComponents? {
     let localCredentials = providedCredentials != nil ? providedCredentials : credentials
       .wrappedValue
-    guard let hostname = localCredentials?.serverUrl,
+    guard let hostname = localCredentials?.activeBackendServerUrl,
           var apiUrl = URL(string: hostname)
     else { return nil }
 
@@ -318,7 +318,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     let version = try await determineApiVersionToUse()
     // If transcoding is selected for caching the subsonic API method 'stream' must be used
     // For raw format subsonic API method 'download' can be used
-    switch settings.cacheTranscodingFormatPreference {
+    switch settings.user.cacheTranscodingFormatPreference {
     case .mp3:
       var urlComp = try createAuthApiUrlComponent(version: version, forAction: "stream", id: apiId)
       urlComp.addQueryItem(name: "format", value: "mp3")

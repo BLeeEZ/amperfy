@@ -362,11 +362,12 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
 
     let marginsAndInsets = inset.left + inset.right + collectionView.safeAreaInsets
       .left + collectionView.safeAreaInsets.right + Self
-      .minimumInteritemSpacing * CGFloat(appDelegate.storage.settings.albumsGridSizeSetting - 1)
+      .minimumInteritemSpacing *
+      CGFloat(appDelegate.storage.settings.user.albumsGridSizeSetting - 1)
     let itemWidth =
       (
         (collectionView.bounds.size.width - marginsAndInsets) /
-          CGFloat(appDelegate.storage.settings.albumsGridSizeSetting)
+          CGFloat(appDelegate.storage.settings.user.albumsGridSizeSetting)
       ).rounded(.down)
     return CGSize(width: itemWidth, height: itemWidth + 45)
   }

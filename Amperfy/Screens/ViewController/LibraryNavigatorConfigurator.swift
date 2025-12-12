@@ -136,7 +136,10 @@ class LibraryNavigatorConfigurator: NSObject {
 
   @objc
   func handleLibraryItemsChanged(notification: Notification) {
-    refresh(librarySettings: appDelegate.storage.settings.libraryDisplaySettings)
+    refresh(
+      librarySettings: appDelegate.storage.settings.accounts
+        .getSetting(appDelegate.account.info).read.libraryDisplaySettings
+    )
   }
 
   @MainActor
@@ -220,11 +223,14 @@ class LibraryNavigatorConfigurator: NSObject {
       snapshot2.delete(libraryInUse)
       libraryNotUsed = snapshot2.items
       snapshot.delete(libraryNotUsed)
-      appDelegate.storage.settings
-        .libraryDisplaySettings = LibraryDisplaySettings(
-          inUse: libraryInUse
-            .compactMap { $0.library }
-        )
+
+      appDelegate.storage.settings.accounts
+        .updateSetting(appDelegate.account.info) { accountSetting in
+          accountSetting.libraryDisplaySettings = LibraryDisplaySettings(
+            inUse: libraryInUse
+              .compactMap { $0.library }
+          )
+        }
       dataSource.apply(snapshot, to: 0, animatingDifferences: true)
 
       // Restore selection after editing endet on macOS

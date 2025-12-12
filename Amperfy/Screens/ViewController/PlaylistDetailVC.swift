@@ -48,7 +48,7 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     exectueAfterAnimation {
       self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
 
-      guard self.appDelegate.storage.settings.isOnlineMode else { return }
+      guard self.appDelegate.storage.settings.user.isOnlineMode else { return }
       Task { @MainActor in do {
         try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
       } catch {
@@ -66,7 +66,7 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     guard editingStyle == .delete else { return }
     exectueAfterAnimation {
       self.playlist?.remove(at: indexPath.row)
-      guard self.appDelegate.storage.settings.isOnlineMode else { return }
+      guard self.appDelegate.storage.settings.user.isOnlineMode else { return }
       Task { @MainActor in do {
         try await self.appDelegate.librarySyncer.syncUpload(
           playlistToDeleteSong: self.playlist,
@@ -162,7 +162,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       playContextCb: { () in PlayContext(
         containable: self.playlist,
         playables: self.fetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.isOfflineMode) ?? []
+          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
+          []
       ) },
       player: appDelegate.player,
       isInfoAlwaysHidden: true
@@ -207,7 +208,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
-    if appDelegate.storage.settings.isOfflineMode {
+    if appDelegate.storage.settings.user.isOfflineMode {
       tableView.isEditing = false
     }
     refreshBarButtons()
@@ -228,7 +229,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   func refreshBarButtons() {
     var edititingBarButton: UIBarButtonItem? = nil
 
-    if appDelegate.storage.settings.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode {
       edititingBarButton = editButton
       edititingBarButton?.title = "Edit"
       edititingBarButton?.style = .plain
@@ -242,7 +243,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = fetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     else { return nil }
     return PlayContext(containable: playlist, index: songIndexPath.row, playables: songs)
   }
@@ -278,7 +279,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
-    fetchedResultsController.search(onlyCachedSongs: appDelegate.storage.settings.isOfflineMode)
+    fetchedResultsController
+      .search(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
     tableView.reloadData()
   }
 
