@@ -412,7 +412,8 @@ public struct AmperfySettings: Sendable, Codable {
   private var _appSettings: AppSettings = .init()
   public var app: AppSettings {
     get {
-      guard let data = UserDefaults.standard.data(forKey: PersistentStorage.UserDefaultsKey.SettingsApp.rawValue)
+      guard let data = UserDefaults.standard
+        .data(forKey: PersistentStorage.UserDefaultsKey.SettingsApp.rawValue)
       else { return _appSettings }
       do {
         return try Self.decoder.decode(AppSettings.self, from: data)
@@ -424,7 +425,10 @@ public struct AmperfySettings: Sendable, Codable {
       _appSettings = newValue
       do {
         let data = try Self.encoder.encode(_appSettings)
-        UserDefaults.standard.set(data, forKey: PersistentStorage.UserDefaultsKey.SettingsApp.rawValue)
+        UserDefaults.standard.set(
+          data,
+          forKey: PersistentStorage.UserDefaultsKey.SettingsApp.rawValue
+        )
       } catch {}
     }
   }
@@ -432,7 +436,8 @@ public struct AmperfySettings: Sendable, Codable {
   private var _userSettings: UserSettings = .init()
   public var user: UserSettings {
     get {
-      guard let data = UserDefaults.standard.data(forKey: PersistentStorage.UserDefaultsKey.SettingsUser.rawValue)
+      guard let data = UserDefaults.standard
+        .data(forKey: PersistentStorage.UserDefaultsKey.SettingsUser.rawValue)
       else { return _userSettings }
       do {
         return try Self.decoder.decode(UserSettings.self, from: data)
@@ -444,7 +449,10 @@ public struct AmperfySettings: Sendable, Codable {
       _userSettings = newValue
       do {
         let data = try Self.encoder.encode(_userSettings)
-        UserDefaults.standard.set(data, forKey: PersistentStorage.UserDefaultsKey.SettingsUser.rawValue)
+        UserDefaults.standard.set(
+          data,
+          forKey: PersistentStorage.UserDefaultsKey.SettingsUser.rawValue
+        )
       } catch {}
     }
   }
@@ -452,7 +460,8 @@ public struct AmperfySettings: Sendable, Codable {
   private var _accountSettings: AccountSettings = .init()
   public var accounts: AccountSettings {
     get {
-      guard let data = UserDefaults.standard.data(forKey: PersistentStorage.UserDefaultsKey.SettingsAccount.rawValue)
+      guard let data = UserDefaults.standard
+        .data(forKey: PersistentStorage.UserDefaultsKey.SettingsAccount.rawValue)
       else { return _accountSettings }
       do {
         return try Self.decoder.decode(AccountSettings.self, from: data)
@@ -464,7 +473,10 @@ public struct AmperfySettings: Sendable, Codable {
       _accountSettings = newValue
       do {
         let data = try Self.encoder.encode(_accountSettings)
-        UserDefaults.standard.set(data, forKey: PersistentStorage.UserDefaultsKey.SettingsAccount.rawValue)
+        UserDefaults.standard.set(
+          data,
+          forKey: PersistentStorage.UserDefaultsKey.SettingsAccount.rawValue
+        )
       } catch {}
     }
   }

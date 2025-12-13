@@ -256,6 +256,8 @@
 		50C171562D107CA100C0C53A /* PlaylistAddMusicFoldersVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C171552D107CA100C0C53A /* PlaylistAddMusicFoldersVC.swift */; };
 		50C171582D107DC300C0C53A /* PlaylistAddIndexesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C171572D107DC300C0C53A /* PlaylistAddIndexesVC.swift */; };
 		50C1715A2D107E7600C0C53A /* PlaylistAddDirectoriesVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C171592D107E7600C0C53A /* PlaylistAddDirectoriesVC.swift */; };
+		50C3B9AC2EED848B00F5CAB7 /* LegacySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C3B9AB2EED848B00F5CAB7 /* LegacySettings.swift */; };
+		50C3B9AE2EED882D00F5CAB7 /* SettingEnumerations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C3B9AD2EED882D00F5CAB7 /* SettingEnumerations.swift */; };
 		50C9D609284FA847007F18D0 /* AmperfyKit.docc in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D608284FA847007F18D0 /* AmperfyKit.docc */; };
 		50C9D60F284FA847007F18D0 /* AmperfyKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50C9D605284FA847007F18D0 /* AmperfyKit.framework */; };
 		50C9D616284FA847007F18D0 /* AmpertyKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D615284FA847007F18D0 /* AmpertyKitTests.swift */; };
@@ -906,6 +908,8 @@
 		50C171552D107CA100C0C53A /* PlaylistAddMusicFoldersVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistAddMusicFoldersVC.swift; sourceTree = "<group>"; };
 		50C171572D107DC300C0C53A /* PlaylistAddIndexesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistAddIndexesVC.swift; sourceTree = "<group>"; };
 		50C171592D107E7600C0C53A /* PlaylistAddDirectoriesVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistAddDirectoriesVC.swift; sourceTree = "<group>"; };
+		50C3B9AB2EED848B00F5CAB7 /* LegacySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegacySettings.swift; sourceTree = "<group>"; };
+		50C3B9AD2EED882D00F5CAB7 /* SettingEnumerations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingEnumerations.swift; sourceTree = "<group>"; };
 		50C80F2726831DB40022F710 /* SsPodcastEpisodeParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPodcastEpisodeParserDelegate.swift; sourceTree = "<group>"; };
 		50C86CA22B23545400385328 /* Amperfy v29.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v29.xcdatamodel"; sourceTree = "<group>"; };
 		50C9D605284FA847007F18D0 /* AmperfyKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AmperfyKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1598,6 +1602,8 @@
 				50C16C3321EB454100F086F0 /* LibraryUpdater.swift */,
 				500BB45521CAA73700D367CF /* PersistentStorage.swift */,
 				504415C62EE865D1005E8429 /* Settings.swift */,
+				50C3B9AD2EED882D00F5CAB7 /* SettingEnumerations.swift */,
+				50C3B9AB2EED848B00F5CAB7 /* LegacySettings.swift */,
 				50BA930521D5715D00E5901D /* LibraryStorage.swift */,
 				50223EF2264543EA007445BC /* LibrarySyncVersion.swift */,
 				50073BDE22301D9A000130D8 /* DownloadRequestManager.swift */,
@@ -2523,11 +2529,13 @@
 				505CA1FE2B8739AE00AA81CD /* SearchHistoryItem.swift in Sources */,
 				50C9D69B284FAA6C007F18D0 /* PlayerMO+CoreDataClass.swift in Sources */,
 				50C9D69E284FAA6C007F18D0 /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
+				50C3B9AE2EED882D00F5CAB7 /* SettingEnumerations.swift in Sources */,
 				504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */,
 				505CA1FC2B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift in Sources */,
 				50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */,
 				50C9D642284FA9C7007F18D0 /* GenericXmlParser.swift in Sources */,
 				50C9D683284FAA6C007F18D0 /* PlaylistItemMO+CoreDataClass.swift in Sources */,
+				50C3B9AC2EED848B00F5CAB7 /* LegacySettings.swift in Sources */,
 				50C9D664284FAA0B007F18D0 /* CatalogParserDelegate.swift in Sources */,
 				50C9D690284FAA6C007F18D0 /* ArtworkMO+CoreDataProperties.swift in Sources */,
 				50C9D657284FAA02007F18D0 /* SsSongParserDelegate.swift in Sources */,
