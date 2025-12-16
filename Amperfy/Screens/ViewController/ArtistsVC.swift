@@ -135,8 +135,9 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         do {
           try await artist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
@@ -243,7 +244,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
         }
@@ -320,7 +322,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     tableView.reloadData()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .searchArtists(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
       }}
@@ -423,12 +426,14 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.playableDownloadManager.download(objects: artistSongs)
+            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+              .download(objects: artistSongs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.playableDownloadManager.download(objects: artistSongs)
+          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            .download(objects: artistSongs)
         }
       }
     )
@@ -447,8 +452,9 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           account: appDelegate.account,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate.playableDownloadManager
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            .playableDownloadManager
         )
         .syncNewestLibraryElements()
       } catch {

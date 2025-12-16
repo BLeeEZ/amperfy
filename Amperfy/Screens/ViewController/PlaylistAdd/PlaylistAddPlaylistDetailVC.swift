@@ -98,8 +98,9 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
     Task { @MainActor in do {
       try await playlist.fetch(
         storage: self.appDelegate.storage,
-        librarySyncer: self.appDelegate.librarySyncer,
-        playableDownloadManager: self.appDelegate.playableDownloadManager
+        librarySyncer: self.appDelegate.getMeta(appDelegate.account.info).librarySyncer,
+        playableDownloadManager: self.appDelegate.getMeta(appDelegate.account.info)
+          .playableDownloadManager
       )
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)

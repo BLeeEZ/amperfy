@@ -50,7 +50,8 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
 
       guard self.appDelegate.storage.settings.user.isOnlineMode else { return }
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateOrder: self.playlist)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .syncUpload(playlistToUpdateOrder: self.playlist)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
       }}
@@ -68,7 +69,7 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
       self.playlist?.remove(at: indexPath.row)
       guard self.appDelegate.storage.settings.user.isOnlineMode else { return }
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.syncUpload(
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncUpload(
           playlistToDeleteSong: self.playlist,
           index: indexPath.row
         )
@@ -216,8 +217,9 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       do {
         try await playlist.fetch(
           storage: self.appDelegate.storage,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate.playableDownloadManager
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            .playableDownloadManager
         )
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
@@ -288,7 +290,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   func handleRefresh(refreshControl: UIRefreshControl) {
     Task { @MainActor in
       do {
-        try await self.appDelegate.librarySyncer.syncDown(playlist: playlist)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .syncDown(playlist: playlist)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
       }

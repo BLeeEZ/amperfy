@@ -77,8 +77,8 @@ public protocol PlayableContainable {
   var name: String { get }
   var subtitle: String? { get }
   var subsubtitle: String? { get }
-  func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String]
-  func info(for api: BackenApiType, details: DetailInfoType) -> String
+  func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String]
+  func info(for api: ServerApiType?, details: DetailInfoType) -> String
   var playables: [AbstractPlayable] { get }
   var playContextType: PlayerMode { get }
   var isRateable: Bool { get }
@@ -111,7 +111,7 @@ extension PlayableContainable {
     }
   }
 
-  public func info(for api: BackenApiType, details: DetailInfoType) -> String {
+  public func info(for api: ServerApiType?, details: DetailInfoType) -> String {
     infoDetails(for: api, details: details).joined(separator: " \(CommonString.oneMiddleDot) ")
   }
 

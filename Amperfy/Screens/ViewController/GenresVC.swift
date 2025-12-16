@@ -83,8 +83,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         do {
           try await genre.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Genre Sync", error: error)
@@ -169,8 +170,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate.playableDownloadManager
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(appDelegate.account.info)
+            .playableDownloadManager
         )
         .syncNewestLibraryElements()
       } catch {

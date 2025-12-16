@@ -395,6 +395,10 @@ public struct AccountSettings: Sendable, Codable {
     guard let _activeAccount else { return ReadOnlyAccountSetting(read: AccountSetting()) }
     return ReadOnlyAccountSetting(read: _accounts[_activeAccount] ?? AccountSetting())
   }
+
+  public var allAccounts: [AccountInfo] {
+    _accounts.compactMap { $0.key }
+  }
 }
 
 // MARK: - AmperfySettings

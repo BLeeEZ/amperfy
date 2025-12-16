@@ -94,8 +94,9 @@ class PodcastsVC: MultiSourceTableViewController {
           do {
             try await podcast.fetch(
               storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.librarySyncer,
-              playableDownloadManager: self.appDelegate.playableDownloadManager
+              librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+                .playableDownloadManager
             )
           } catch {
             self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
@@ -194,8 +195,8 @@ class PodcastsVC: MultiSourceTableViewController {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
             .playableDownloadManager
         )
         .syncNewestPodcastEpisodes()

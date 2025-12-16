@@ -87,7 +87,7 @@ public class Genre: AbstractLibraryEntity {
 extension Genre: PlayableContainable {
   public var subtitle: String? { nil }
   public var subsubtitle: String? { nil }
-  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if api == .ampache {
       if artistCount == 1 {

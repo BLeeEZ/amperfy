@@ -139,7 +139,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in
       do {
-        try await self.appDelegate.librarySyncer.syncRadios()
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncRadios()
       } catch {
         self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
       }
@@ -216,7 +216,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     }
     Task { @MainActor in
       do {
-        try await self.appDelegate.librarySyncer.syncRadios()
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncRadios()
       } catch {
         self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
       }

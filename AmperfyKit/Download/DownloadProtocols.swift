@@ -36,6 +36,8 @@ public struct DownloadRequest: Hashable, Sendable {
 // MARK: - DownloadManageable
 
 public protocol DownloadManageable {
+  @MainActor
+  var urlSessionIdentifier: String? { get }
   func getBackgroundFetchCompletionHandler() async -> CompleteHandlerBlock?
   func setBackgroundFetchCompletionHandler(_ newValue: CompleteHandlerBlock?)
   @MainActor

@@ -142,18 +142,20 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       contextNextQueueSectionHeader?.prepare(toWorkOnRootView: self)
     }
 
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.artworkDownloadManager
-    )
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.playableDownloadManager
-    )
+    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).artworkDownloadManager
+      )
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).playableDownloadManager
+      )
+    }
 
     registerForTraitChanges(
       [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
@@ -199,7 +201,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     else { return }
 
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.sync(song: song)
+      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer.sync(song: song)
       self.refreshCurrentlyPlayingInfoView()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
@@ -226,7 +228,11 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       if playableInfo.isSong {
         Task { @MainActor in
           do {
-            try await playableInfo.remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+            try await playableInfo
+              .remoteToggleFavorite(
+                syncer: self.appDelegate.getMeta(appDelegate.account.info)
+                  .librarySyncer
+              )
           } catch {
             self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
           }

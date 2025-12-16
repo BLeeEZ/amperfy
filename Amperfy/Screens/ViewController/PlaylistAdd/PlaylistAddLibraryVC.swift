@@ -235,7 +235,7 @@ public class AddToPlaylistManager {
 
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncUpload(
+          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer.syncUpload(
             playlistToAddSongs: playlist,
             songs: songsToAdd
           )

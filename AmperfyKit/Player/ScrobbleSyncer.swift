@@ -83,7 +83,7 @@ public class ScrobbleSyncer {
     isRunning = false
   }
 
-  func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) async {
+  private func scrobble(playedSong: Song, songPosition: NowPlayingSongPosition) async {
     func nowPlayingToServerAsync(
       playedSong: Song,
       songPosition: NowPlayingSongPosition,
@@ -188,7 +188,8 @@ public class ScrobbleSyncer {
     await syncSongStopped(clearCurPlaying: true)
 
     guard let curPlaying = musicPlayer.currentlyPlaying,
-          let curPlayingSong = curPlaying.asSong
+          let curPlayingSong = curPlaying.asSong,
+          curPlayingSong.account == account
     else { return }
 
     songToBeScrobbled = curPlayingSong
@@ -258,7 +259,8 @@ extension ScrobbleSyncer: MusicPlayable {
 
   public func didStartPlaying() {
     guard let curPlaying = musicPlayer.currentlyPlaying,
-          let curPlayingSong = curPlaying.asSong
+          let curPlayingSong = curPlaying.asSong,
+          curPlayingSong.account == account
     else { return }
 
     // Check if it's still the same song after a pause

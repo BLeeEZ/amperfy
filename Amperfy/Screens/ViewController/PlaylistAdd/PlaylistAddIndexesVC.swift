@@ -71,7 +71,8 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
 
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.syncIndexes(musicFolder: musicFolder)
+      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+        .syncIndexes(musicFolder: musicFolder)
     } catch {
       self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)
     }}

@@ -70,7 +70,7 @@ public class Directory: AbstractLibraryEntity {
 extension Directory: PlayableContainable {
   public var subtitle: String? { nil }
   public var subsubtitle: String? { nil }
-  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if subdirectories.count == 1 {
       infoContent.append("1 Subdirectory")

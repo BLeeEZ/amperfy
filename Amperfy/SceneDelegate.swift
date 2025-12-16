@@ -144,6 +144,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     completionHandler: @escaping (Bool) -> ()
   ) {
     os_log("windowScene shortcutItem", log: self.log, type: .info)
+    guard appDelegate.isNormalInteraction else {
+      return completionHandler(false)
+    }
     let handled = appDelegate.quickActionsManager.handleShortCutItem(shortcutItem: shortcutItem)
     completionHandler(handled)
   }
@@ -161,6 +164,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Called when the scene has moved from an inactive state to an active state.
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     os_log("sceneDidBecomeActive", log: self.log, type: .info)
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
     appDelegate.quickActionsManager.handleSavedShortCutItemIfSaved()
     appDelegate.rebuildMainMenu()
   }
@@ -169,6 +175,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Called when the scene will move from an active state to an inactive state.
     // This may occur due to temporary interruptions (ex. an incoming phone call).
     os_log("sceneWillResignActive", log: self.log, type: .info)
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
     appDelegate.quickActionsManager.configureQuickActions()
   }
 
@@ -186,12 +195,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // Save changes in the application's managed object context when the application transitions to the background.
     os_log("sceneDidEnterBackground", log: self.log, type: .info)
-    appDelegate.scheduleAppRefresh()
     AmperKit.shared.threadPerformanceMonitor.isInForeground = false
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
+    appDelegate.scheduleAppRefresh()
   }
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     os_log("openURLContexts", log: self.log, type: .info)
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
     for URLContext in URLContexts {
       _ = appDelegate.intentManager.handleIncoming(url: URLContext.url)
     }
@@ -234,7 +249,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       type: .info,
       userActivity.activityType
     )
-
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
     Task { @MainActor in
       _ = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
     }

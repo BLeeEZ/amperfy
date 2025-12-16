@@ -96,8 +96,8 @@ public struct XCallbackActionDocu: Hashable {
 public class IntentManager {
   public private(set) var documentation: [XCallbackActionDocu]
   private let storage: PersistentStorage
-  private let librarySyncer: LibrarySyncer
-  private let playableDownloadManager: DownloadManageable
+  private let getLibrarySyncerCB: GetLibrarySyncerCallback
+  private let getPlayableDownloadManagerCB: GetPlayableDownloadManagerCallback
   private let library: LibraryStorage
   private let account: Account
   private let player: PlayerFacade
@@ -107,8 +107,8 @@ public class IntentManager {
 
   init(
     storage: PersistentStorage,
-    librarySyncer: LibrarySyncer,
-    playableDownloadManager: DownloadManageable,
+    getLibrarySyncerCB: @escaping GetLibrarySyncerCallback,
+    getPlayableDownloadManagerCB: @escaping GetPlayableDownloadManagerCallback,
     library: LibraryStorage,
     account: Account,
     player: PlayerFacade,
@@ -116,8 +116,8 @@ public class IntentManager {
     eventLogger: EventLogger
   ) {
     self.storage = storage
-    self.librarySyncer = librarySyncer
-    self.playableDownloadManager = playableDownloadManager
+    self.getLibrarySyncerCB = getLibrarySyncerCB
+    self.getPlayableDownloadManagerCB = getPlayableDownloadManagerCB
     self.library = library
     self.account = account
     self.player = player
@@ -654,7 +654,10 @@ public class IntentManager {
         self.storage.main.saveContext()
         Task { @MainActor in
           do {
-            try await self.librarySyncer.setRating(song: song, rating: rating)
+            if let accountInfo = song.account?.info {
+              let librarySyncer = self.getLibrarySyncerCB(accountInfo)
+              try await librarySyncer.setRating(song: song, rating: rating)
+            }
           } catch {
             // ignore error here
           }
@@ -728,7 +731,10 @@ public class IntentManager {
 
         Task { @MainActor in
           do {
-            try await currentlyPlaying.remoteToggleFavorite(syncer: self.librarySyncer)
+            if let accountInfo = currentlyPlaying.account?.info {
+              let librarySyncer = self.getLibrarySyncerCB(accountInfo)
+              try await currentlyPlaying.remoteToggleFavorite(syncer: librarySyncer)
+            }
           } catch {
             // ignore error here
           }
@@ -1300,7 +1306,8 @@ public class IntentManager {
     -> Bool {
     guard let container = container else { return false }
     do {
-      if container is Playlist {
+      if let containerPlaylist = container as? Playlist,
+         let accountInfo = containerPlaylist.account?.info {
         if storage.settings.user.isOnlineMode, networkMonitor.isWifiOrEthernet {
           os_log(
             "Fetch playlist start: %s",
@@ -1308,6 +1315,8 @@ public class IntentManager {
             type: .info,
             container.name
           )
+          let librarySyncer = getLibrarySyncerCB(accountInfo)
+          let playableDownloadManager = getPlayableDownloadManagerCB(accountInfo)
           try await container.fetch(
             storage: storage,
             librarySyncer: librarySyncer,

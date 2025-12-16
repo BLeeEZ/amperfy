@@ -193,7 +193,8 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
     tableView.reloadData()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
+        try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+          .searchArtists(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
       }}

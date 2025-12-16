@@ -86,7 +86,8 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
 
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.sync(directory: directory)
+      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+        .sync(directory: directory)
     } catch {
       self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)
     }}

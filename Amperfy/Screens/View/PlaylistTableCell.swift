@@ -44,7 +44,7 @@ class PlaylistTableCell: BasicTableCell {
       container: playlist
     )
     infoLabel.text = playlist.info(
-      for: appDelegate.backendApi.selectedApi,
+      for: appDelegate.account.apiType.asServerApiType,
       details: DetailInfoType(type: .short, settings: appDelegate.storage.settings)
     )
     infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left

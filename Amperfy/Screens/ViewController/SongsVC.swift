@@ -137,7 +137,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     case .favorites:
       filterTitle = "Favorite Songs"
       isIndexTitelsHidden = false
-      if appDelegate.backendApi.selectedApi != .ampache {
+      if appDelegate.account.apiType.asServerApiType != .ampache {
         change(sortType: appDelegate.storage.settings.user.favoriteSongSortSetting)
       } else {
         change(sortType: appDelegate.storage.settings.user.songsSortSetting)
@@ -208,7 +208,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
         }
@@ -296,7 +297,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     guard let searchText = searchController.searchBar.text else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.searchSongs(searchText: searchText)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .searchSongs(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
       }}
@@ -326,7 +328,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   }
 
   private func saveSortPreference(preference: SongElementSortType) {
-    if appDelegate.backendApi.selectedApi != .ampache, displayFilter == .favorites {
+    if appDelegate.account.apiType.asServerApiType != .ampache, displayFilter == .favorites {
       appDelegate.storage.settings.user.favoriteSongSortSetting = preference
     } else {
       appDelegate.storage.settings.user.songsSortSetting = preference
@@ -434,14 +436,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         )
       }
     )
-    if displayFilter == .favorites, appDelegate.backendApi.selectedApi != .ampache {
+    if displayFilter == .favorites, appDelegate.account.apiType.asServerApiType != .ampache {
       return UIMenu(
         title: "Sort",
         image: .sort,
         options: [],
         children: [sortByName, sortByRating, sortByDuration, sortByStarredDate, sortByAddedDate]
       )
-    } else if appDelegate.backendApi.selectedApi != .ampache {
+    } else if appDelegate.account.apiType.asServerApiType != .ampache {
       return UIMenu(
         title: "Sort",
         image: .sort,
@@ -480,12 +482,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.playableDownloadManager.download(objects: songs)
+            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+              .download(objects: songs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.playableDownloadManager.download(objects: songs)
+          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            .download(objects: songs)
         }
       }
     )
@@ -503,8 +507,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate.playableDownloadManager
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            .playableDownloadManager
         )
         .syncNewestLibraryElements()
       } catch {

@@ -117,7 +117,7 @@ struct DisplaySettingsView: View {
           "Add skip forward and skip backward buttons to the music player, along with the previous/next buttons."
         )
 
-        if appDelegate.backendApi.selectedApi != .ampache {
+        if appDelegate.account.apiType.asServerApiType != .ampache {
           SettingsSection(
             content: {
               SettingsCheckBoxRow(

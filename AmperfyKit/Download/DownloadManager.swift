@@ -99,6 +99,8 @@ actor DownloadManager: NSObject, DownloadManageable {
   private var isFailWithPopupError: Bool = true
   private var preDownloadIsValidCheck: PreDownloadIsValidCB?
   private var isCacheSizeLimited: Bool
+  @MainActor
+  private var _urlSessionIdentifier: String?
 
   init(
     name: String,
@@ -154,9 +156,18 @@ actor DownloadManager: NSObject, DownloadManageable {
     }
   }
 
+  @MainActor
+  public var urlSessionIdentifier: String? {
+    _urlSessionIdentifier
+  }
+
   private func _initialize(urlSession: URLSession, validationCB: PreDownloadIsValidCB?) {
     self.urlSession = urlSession
+    let ident = self.urlSession?.configuration.identifier
     preDownloadIsValidCheck = validationCB
+    Task { @MainActor in
+      _urlSessionIdentifier = ident
+    }
   }
 
   nonisolated func getBackgroundFetchCompletionHandler() async -> CompleteHandlerBlock? {

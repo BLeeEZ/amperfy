@@ -329,6 +329,7 @@ public class LibraryStorage: PlayableFileCachable {
 
   func getInfo(account: Account) -> AccountLibraryInfo {
     var libraryInfo = AccountLibraryInfo()
+    libraryInfo.apiType = account.apiType.description
     libraryInfo.artistCount = getArtistCount(for: account)
     libraryInfo.albumCount = getAlbumCount(for: account)
     libraryInfo.songCount = getSongCount(for: account)

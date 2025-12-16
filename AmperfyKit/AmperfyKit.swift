@@ -48,6 +48,34 @@ public class AmperKit {
     return monitor
   }()
 
+  private var metaManager = [AccountInfo: MetaManager]()
+  public func getMeta(_ accountInfo: AccountInfo) -> MetaManager {
+    if let manager = metaManager[accountInfo] {
+      return manager
+    } else {
+      let account = storage.main.library.getAccount(info: accountInfo)
+      let newManager = MetaManager(
+        storage: storage,
+        account: account,
+        networkMonitor: networkMonitor,
+        performanceMonitor: threadPerformanceMonitor,
+        eventLogger: eventLogger,
+        notificationHandler: notificationHandler,
+        localNotificationManager: localNotificationManager
+      )
+      metaManager[accountInfo] = newManager
+      return newManager
+    }
+  }
+
+  public var allActiveMetas: [AccountInfo: MetaManager] {
+    metaManager
+  }
+
+  public func resetMeta(_ accountInfo: AccountInfo) {
+    metaManager[accountInfo] = nil
+  }
+
   public lazy var threadPerformanceMonitor: ThreadPerformanceMonitor = {
     ThreadPerformanceObserver.shared
   }()
@@ -78,36 +106,14 @@ public class AmperKit {
   }()
 
   @MainActor
-  public lazy var librarySyncer: LibrarySyncer = {
-    LibrarySyncerProxy(backendApi: backendApi, account: account, storage: storage)
-  }()
-
-  @MainActor
-  public lazy var duplicateEntitiesResolver = {
-    DuplicateEntitiesResolver(account: account, storage: storage)
-  }()
-
-  @MainActor
   public lazy var eventLogger = {
     EventLogger(storage: storage)
-  }()
-
-  public lazy var backendApi: BackendProxy = {
-    let api = BackendProxy(
-      networkMonitor: networkMonitor,
-      performanceMonitor: threadPerformanceMonitor,
-      eventLogger: eventLogger,
-      settings: storage.settings
-    )
-    api.initialize()
-    return api
   }()
 
   public lazy var notificationHandler: EventNotificationHandler = {
     EventNotificationHandler()
   }()
 
-  public private(set) var scrobbleSyncer: ScrobbleSyncer?
   @MainActor
   public lazy var player: PlayerFacade = {
     createPlayer()
@@ -120,9 +126,9 @@ public class AmperKit {
       createAudioStreamingPlayerCB: { AudioStreamingPlayer() },
       audioSessionHandler: audioSessionHandler,
       eventLogger: eventLogger,
-      backendApi: backendApi,
+      backendApi: getMeta(account.info).backendApi,
       networkMonitor: networkMonitor,
-      playableDownloader: playableDownloadManager,
+      playableDownloader: getMeta(account.info).playableDownloadManager,
       cacheProxy: storage.main.library,
       userStatistics: userStatistics
     )
@@ -158,45 +164,37 @@ public class AmperKit {
     let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(
       playerStatus: playerData,
       queueHandler: queueHandler,
-      playableDownloadManager: playableDownloadManager
+      playableDownloadManager: getMeta(account.info).playableDownloadManager
     )
     curPlayer.addNotifier(notifier: playerDownloadPreparationHandler)
-    scrobbleSyncer = ScrobbleSyncer(
-      musicPlayer: curPlayer,
-      backendAudioPlayer: backendAudioPlayer,
-      networkMonitor: networkMonitor,
-      account: account,
-      storage: storage,
-      librarySyncer: librarySyncer,
-      eventLogger: eventLogger
+    let scrobbleSyncer = getMeta(account.info).createScrobbleSyncer(
+      audioPlayer: curPlayer,
+      backendAudioPlayer: backendAudioPlayer
     )
-    curPlayer.addNotifier(notifier: scrobbleSyncer!)
+    curPlayer.addNotifier(notifier: scrobbleSyncer)
 
     let facadeImpl = PlayerFacadeImpl(
       playerStatus: playerData,
       queueHandler: queueHandler,
       musicPlayer: curPlayer,
       library: storage.main.library,
-      playableDownloadManager: playableDownloadManager,
+      playableDownloadManager: getMeta(account.info).playableDownloadManager,
       backendAudioPlayer: backendAudioPlayer,
       userStatistics: userStatistics
     )
     facadeImpl.isOfflineMode = storage.settings.user.isOfflineMode
 
-    let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(
-      musicPlayer: curPlayer,
-      backendAudioPlayer: backendAudioPlayer,
-      nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(),
-      account: account,
-      storage: storage, notificationHandler: notificationHandler,
-      artworkDownloadManager: artworkDownloadManager,
-      playableDownloadManager: playableDownloadManager
+    let nowPlayingInfoCenterHandler = getMeta(account.info).createNowPlayingInfoCenterHandler(
+      audioPlayer: curPlayer,
+      backendAudioPlayer: backendAudioPlayer
     )
     curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
     let remoteCommandCenterHandler = RemoteCommandCenterHandler(
       musicPlayer: facadeImpl,
       backendAudioPlayer: backendAudioPlayer,
-      librarySyncer: librarySyncer,
+      getLibrarySyncerCB: { accountInfo in
+        self.getMeta(accountInfo).librarySyncer
+      },
       eventLogger: eventLogger,
       remoteCommandCenter: MPRemoteCommandCenter.shared()
     )
@@ -208,154 +206,9 @@ public class AmperKit {
     return facadeImpl
   }
 
-  private lazy var playableDownloadDelegate: DownloadManagerDelegate = {
-    let artworkExtractor = EmbeddedArtworkExtractor()
-    return PlayableDownloadDelegate(
-      backendApi: backendApi,
-      artworkExtractor: artworkExtractor,
-      networkMonitor: networkMonitor
-    )
-  }()
-
-  public lazy var playableDownloadManager: DownloadManageable = {
-    let getDownloadDelegateCB = { @MainActor in
-      return self.playableDownloadDelegate
-    }
-    let requestManager = DownloadRequestManager(
-      accountObjectId: account.managedObject.objectID,
-      storage: storage.async,
-      getDownloadDelegateCB: getDownloadDelegateCB
-    )
-    let dlManager = DownloadManager(
-      name: "PlayableDownloader",
-      storage: storage.async,
-      requestManager: requestManager,
-      getDownloadDelegateCB: getDownloadDelegateCB,
-      eventLogger: eventLogger,
-      settings: storage.settings,
-      networkMonitor: networkMonitor,
-      notificationHandler: notificationHandler,
-      urlCleanser: backendApi,
-      limitCacheSize: true,
-      isFailWithPopupError: true
-    )
-
-    let configuration = URLSessionConfiguration
-      .background(withIdentifier: "\(Bundle.main.bundleIdentifier!).PlayableDownloader.background")
-    let urlSession = URLSession(
-      configuration: configuration,
-      delegate: dlManager,
-      delegateQueue: nil
-    )
-    dlManager.initialize(
-      urlSession: urlSession,
-      validationCB: nil
-    )
-
-    return dlManager
-  }()
-
-  public lazy var artworkDownloadManager: DownloadManageable = {
-    createArtworkDownloadManager()
-  }()
-
-  private func createArtworkDownloadManager() -> DownloadManageable {
-    let getDownloadDelegateCB = { @MainActor in
-      return self.backendApi.getActiveArtworkDownloadDelegate()
-    }
-    let requestManager = DownloadRequestManager(
-      accountObjectId: account.managedObject.objectID,
-      storage: storage.async,
-      getDownloadDelegateCB: getDownloadDelegateCB
-    )
-    requestManager.clearAllDownloadsAsyncIfAllHaveFinished()
-    let dlManager = DownloadManager(
-      name: "ArtworkDownloader",
-      storage: storage.async,
-      requestManager: requestManager,
-      getDownloadDelegateCB: getDownloadDelegateCB,
-      eventLogger: eventLogger,
-      settings: storage.settings,
-      networkMonitor: networkMonitor,
-      notificationHandler: notificationHandler,
-      urlCleanser: backendApi,
-      limitCacheSize: false,
-      isFailWithPopupError: false
-    )
-
-    let validationCB: PreDownloadIsValidCB =
-      { (downloadInfos: [DownloadElementInfo]) -> [DownloadElementInfo] in
-        let artworkDownloadInfos = downloadInfos.filter { $0.type == .artwork }
-
-        guard let accountInfo = await self.settings.accounts.active
-        else { return [DownloadElementInfo]() }
-        let artworkDownloadSetting = await self.settings.accounts.getSetting(accountInfo).read
-          .artworkDownloadSetting
-        guard artworkDownloadSetting != .never else { return [DownloadElementInfo]() }
-        guard artworkDownloadSetting != .updateOncePerSession else { return artworkDownloadInfos }
-
-        let dlInfos = try? await self.asyncStorage.performAndGet { asyncCompanion in
-          var validDls = [DownloadElementInfo]()
-          for dlInfo in artworkDownloadInfos {
-            guard dlInfo.type == .artwork else { continue }
-            let artwork = Artwork(
-              managedObject: asyncCompanion.context
-                .object(with: dlInfo.objectId) as! ArtworkMO
-            )
-
-            switch artworkDownloadSetting {
-            case .onlyOnce:
-              switch artwork.status {
-              case .FetchError, .NotChecked:
-                validDls.append(dlInfo)
-              case .CustomImage, .IsDefaultImage:
-                continue
-              }
-            case .never, .updateOncePerSession:
-              continue // already handled above
-            }
-          }
-          return validDls
-        }
-        return dlInfos ?? [DownloadElementInfo]()
-      }
-
-    let configuration = URLSessionConfiguration.default
-    let urlSession = URLSession(
-      configuration: configuration,
-      delegate: dlManager,
-      delegateQueue: nil
-    )
-    dlManager.initialize(
-      urlSession: urlSession,
-      validationCB: validationCB
-    )
-
-    return dlManager
-  }
-
-  @MainActor
-  public lazy var backgroundLibrarySyncer = {
-    let autoSyncer = AutoDownloadLibrarySyncer(
-      storage: self.storage,
-      account: self.account,
-      librarySyncer: self.librarySyncer,
-      playableDownloadManager: self.playableDownloadManager
-    )
-    return BackgroundLibrarySyncer(
-      storage: storage.async,
-      mainStorage: storage.main,
-      settings: storage.settings,
-      networkMonitor: networkMonitor,
-      librarySyncer: librarySyncer,
-      playableDownloadManager: playableDownloadManager, autoDownloadLibrarySyncer: autoSyncer,
-      eventLogger: eventLogger
-    )
-  }()
-
   @MainActor
   public lazy var libraryUpdater = {
-    LibraryUpdater(storage: storage, backendApi: backendApi)
+    LibraryUpdater(storage: storage)
   }()
 
   public lazy var userStatistics = {
@@ -365,17 +218,6 @@ public class AmperKit {
   @MainActor
   public lazy var localNotificationManager = {
     LocalNotificationManager(userStatistics: userStatistics, storage: storage)
-  }()
-
-  @MainActor
-  public lazy var backgroundFetchTriggeredSyncer = {
-    BackgroundFetchTriggeredSyncer(
-      storage: storage,
-      account: account,
-      librarySyncer: librarySyncer,
-      notificationManager: localNotificationManager,
-      playableDownloadManager: playableDownloadManager
-    )
   }()
 
   @MainActor

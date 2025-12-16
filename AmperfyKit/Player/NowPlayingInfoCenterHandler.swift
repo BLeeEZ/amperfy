@@ -66,7 +66,7 @@ class NowPlayingInfoCenterHandler {
     )
   }
 
-  func updateNowPlayingInfo(playable: AbstractPlayable) {
+  private func updateNowPlayingInfo(playable: AbstractPlayable) {
     let albumTitle = playable.asSong?.album?.name ?? ""
 
     let artworkImage = LibraryEntityImage.getImageToDisplayImmediately(
@@ -134,14 +134,14 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   func didStartPlayingFromBeginning() {}
 
   func didStartPlaying() {
-    if let curPlayable = musicPlayer.currentlyPlaying {
+    if let curPlayable = musicPlayer.currentlyPlaying, curPlayable.account == account {
       updateNowPlayingInfo(playable: curPlayable)
     }
     nowPlayingInfoCenter.playbackState = .playing
   }
 
   func didPause() {
-    if let curPlayable = musicPlayer.currentlyPlaying {
+    if let curPlayable = musicPlayer.currentlyPlaying, curPlayable.account == account {
       updateNowPlayingInfo(playable: curPlayable)
     }
     nowPlayingInfoCenter.nowPlayingInfo = [:]
@@ -154,7 +154,7 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   }
 
   func didElapsedTimeChange() {
-    if let curPlayable = musicPlayer.currentlyPlaying {
+    if let curPlayable = musicPlayer.currentlyPlaying, curPlayable.account == account {
       updateNowPlayingInfo(playable: curPlayable)
     }
   }

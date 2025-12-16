@@ -215,7 +215,7 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     }
 
     Task { @MainActor in do {
-      let lyricsList = try await appDelegate.librarySyncer
+      let lyricsList = try await appDelegate.getMeta(appDelegate.account.info).librarySyncer
         .parseLyrics(relFilePath: lyricsRelFilePath)
       guard self.isLyricsViewAllowedToDisplay else {
         self.hideLyrics()
@@ -240,12 +240,12 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   var isLyricsViewAllowedToDisplay: Bool {
     displayElement == .lyrics &&
       appDelegate.player.playerMode == .music &&
-      appDelegate.backendApi.selectedApi != .ampache
+      appDelegate.account.apiType.asServerApiType != .ampache
   }
 
   var isLyricsButtonAllowedToDisplay: Bool {
     appDelegate.player.playerMode == .music &&
-      appDelegate.backendApi.selectedApi != .ampache
+      appDelegate.account.apiType.asServerApiType != .ampache
   }
 
   public func getDisplayElementBasedOnConfig() -> LargeDisplayElement {

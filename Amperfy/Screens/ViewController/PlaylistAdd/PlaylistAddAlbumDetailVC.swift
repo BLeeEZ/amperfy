@@ -96,8 +96,9 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
     Task { @MainActor in do {
       try await album.fetch(
         storage: self.appDelegate.storage,
-        librarySyncer: self.appDelegate.librarySyncer,
-        playableDownloadManager: self.appDelegate.playableDownloadManager
+        librarySyncer: self.appDelegate.getMeta(appDelegate.account.info).librarySyncer,
+        playableDownloadManager: self.appDelegate.getMeta(appDelegate.account.info)
+          .playableDownloadManager
       )
     } catch {
       self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)

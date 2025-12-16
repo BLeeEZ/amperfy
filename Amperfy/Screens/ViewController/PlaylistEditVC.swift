@@ -189,10 +189,11 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
       do {
         for item in selectedItemsSorted {
           guard let index = self.playlist.getFirstIndex(item: item) else { continue }
-          try await self.appDelegate.librarySyncer.syncUpload(
-            playlistToDeleteSong: self.playlist,
-            index: index
-          )
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncUpload(
+              playlistToDeleteSong: self.playlist,
+              index: index
+            )
           self.playlist?.remove(at: index)
         }
       } catch {

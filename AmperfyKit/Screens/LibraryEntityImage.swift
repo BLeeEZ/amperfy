@@ -61,35 +61,39 @@ public class LibraryEntityImage: RoundedImage {
   required public init?(coder: NSCoder) {
     self.appDelegate = AmperKit.shared
     super.init(coder: coder)
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.artworkDownloadManager
-    )
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.playableDownloadManager
-    )
+    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).artworkDownloadManager
+      )
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).playableDownloadManager
+      )
+    }
   }
 
   override public init(frame: CGRect) {
     self.appDelegate = AmperKit.shared
     super.init(frame: .zero)
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.artworkDownloadManager
-    )
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.playableDownloadManager
-    )
+    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).artworkDownloadManager
+      )
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).playableDownloadManager
+      )
+    }
   }
 
   public func display(entity: AbstractLibraryEntity) {
@@ -102,8 +106,8 @@ public class LibraryEntityImage: RoundedImage {
     guard self.entity != entity else { return }
 
     display(entity: entity)
-    if let artwork = entity.artwork {
-      appDelegate.artworkDownloadManager.download(object: artwork)
+    if let artwork = entity.artwork, let accountInfo = entity.account?.info {
+      appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
     }
   }
 

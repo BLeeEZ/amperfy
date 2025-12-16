@@ -263,8 +263,9 @@ class BasicTableViewController: KeyCommandTableViewController {
         do {
           try await containable.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
@@ -343,7 +344,8 @@ class BasicTableViewController: KeyCommandTableViewController {
                 .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .download:
-          self.appDelegate.playableDownloadManager.download(objects: actionContext.playables)
+          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            .download(objects: actionContext.playables)
         case .removeFromCache:
           let alert = UIAlertController(
             title: nil,
@@ -351,7 +353,7 @@ class BasicTableViewController: KeyCommandTableViewController {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            self.appDelegate.playableDownloadManager
+            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
               .removeFinishedDownload(for: actionContext.playables)
             self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)
             self.appDelegate.storage.main.saveContext()
@@ -392,7 +394,10 @@ class BasicTableViewController: KeyCommandTableViewController {
           Task { @MainActor in
             do {
               try await actionContext.containable
-                .remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                .remoteToggleFavorite(
+                  syncer: self.appDelegate
+                    .getMeta(self.appDelegate.account.info).librarySyncer
+                )
             } catch {
               self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
             }

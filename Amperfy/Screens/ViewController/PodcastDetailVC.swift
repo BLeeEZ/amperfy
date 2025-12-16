@@ -133,8 +133,9 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
       do {
         try await podcast.fetch(
           storage: self.appDelegate.storage,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate.playableDownloadManager
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            .playableDownloadManager
         )
       } catch {
         self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
@@ -176,7 +177,8 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
   func handleRefresh(refreshControl: UIRefreshControl) {
     Task { @MainActor in
       do {
-        try await self.appDelegate.librarySyncer.sync(podcast: self.podcast)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .sync(podcast: self.podcast)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)
       }

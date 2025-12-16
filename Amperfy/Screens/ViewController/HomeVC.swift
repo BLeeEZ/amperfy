@@ -436,8 +436,9 @@ final class HomeVC: UICollectionViewController {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
             account: self.appDelegate.account,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
           .syncNewestLibraryElements(offset: 0, count: Self.sectionMaxItemCount)
         } catch {
@@ -448,10 +449,11 @@ final class HomeVC: UICollectionViewController {
     if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncRecentAlbums(
-            offset: 0,
-            count: Self.sectionMaxItemCount
-          )
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncRecentAlbums(
+              offset: 0,
+              count: Self.sectionMaxItemCount
+            )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
         }
@@ -459,7 +461,8 @@ final class HomeVC: UICollectionViewController {
     }
     if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .syncDownPlaylistsWithoutSongs()
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
       }}
@@ -469,8 +472,8 @@ final class HomeVC: UICollectionViewController {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.librarySyncer,
-          playableDownloadManager: self.appDelegate
+          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
             .playableDownloadManager
         )
         .syncNewestPodcastEpisodes()
@@ -481,7 +484,8 @@ final class HomeVC: UICollectionViewController {
     if orderedVisibleSections.contains(where: { $0 == .radios }) {
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncRadios()
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncRadios()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
         }
@@ -752,8 +756,9 @@ extension HomeVC: @preconcurrency NSFetchedResultsControllerDelegate {
         do {
           try await containable.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)

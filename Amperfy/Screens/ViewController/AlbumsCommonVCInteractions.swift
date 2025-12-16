@@ -215,8 +215,9 @@ class AlbumsCommonVCInteractions {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
             account: appDelegate.account,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
           .syncNewestLibraryElements(offset: offset, count: count)
         } catch {
@@ -227,7 +228,11 @@ class AlbumsCommonVCInteractions {
     case .recent:
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncRecentAlbums(offset: offset, count: count)
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncRecentAlbums(
+              offset: offset,
+              count: count
+            )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
         }
@@ -236,7 +241,8 @@ class AlbumsCommonVCInteractions {
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
         }
@@ -466,12 +472,14 @@ class AlbumsCommonVCInteractions {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.playableDownloadManager.download(objects: albumSongs)
+            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+              .download(objects: albumSongs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.rootVC?.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.playableDownloadManager.download(objects: albumSongs)
+          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            .download(objects: albumSongs)
         }
       }
     )
@@ -518,7 +526,8 @@ class AlbumsCommonVCInteractions {
     let searchText = searchController.searchBar.text ?? ""
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.librarySyncer.searchAlbums(searchText: searchText)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .searchAlbums(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
       }}
@@ -553,16 +562,18 @@ class AlbumsCommonVCInteractions {
     Task { @MainActor in
       do {
         if self.displayFilter == .recent {
-          try await self.appDelegate.librarySyncer.syncRecentAlbums(
-            offset: 0,
-            count: AmperKit.newestElementsFetchCount
-          )
+          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+            .syncRecentAlbums(
+              offset: 0,
+              count: AmperKit.newestElementsFetchCount
+            )
         } else {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
             account: appDelegate.account,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
           .syncNewestLibraryElements()
         }

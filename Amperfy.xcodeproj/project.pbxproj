@@ -113,6 +113,7 @@
 		5084F70F2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5084F70D2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift */; };
 		5084F7102ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5084F70E2ED9E2F400D8D3DA /* AccountMO+CoreDataProperties.swift */; };
 		5084F7122ED9E47100D8D3DA /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5084F7112ED9E47100D8D3DA /* Account.swift */; };
+		5087DE392EF0437F00644893 /* MetaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5087DE382EF0437F00644893 /* MetaManager.swift */; };
 		508AA57B2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AA57A2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift */; };
 		508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508AA57C2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift */; };
 		508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 508385EE21C5965E00C4BB32 /* Assets.xcassets */; };
@@ -761,6 +762,7 @@
 		5086F884223A1E4600546F5A /* SsPingParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPingParserDelegate.swift; sourceTree = "<group>"; };
 		5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SsArtistParserDelegate.swift; sourceTree = "<group>"; };
 		5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserDelegate.swift; sourceTree = "<group>"; };
+		5087DE382EF0437F00644893 /* MetaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetaManager.swift; sourceTree = "<group>"; };
 		5088A8A426A955AD00B4C8C6 /* DownloadProtocols.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadProtocols.swift; sourceTree = "<group>"; };
 		508AA57A2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayNowPlayingExtension.swift; sourceTree = "<group>"; };
 		508AA57C2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayFetchControllerExtension.swift; sourceTree = "<group>"; };
@@ -1778,6 +1780,7 @@
 				50C9D6E7284FAC9D007F18D0 /* Screens */,
 				50BA92F221CC26BE00E5901D /* Storage */,
 				50C9D6EF28506EBC007F18D0 /* AmperfyKit.swift */,
+				5087DE382EF0437F00644893 /* MetaManager.swift */,
 				50C9D607284FA847007F18D0 /* AmperfyKit.h */,
 				50C9D608284FA847007F18D0 /* AmperfyKit.docc */,
 			);
@@ -2509,6 +2512,7 @@
 				50C9D6D2284FAB0C007F18D0 /* StringHasher.swift in Sources */,
 				50C9D667284FAA0B007F18D0 /* PlaylistSongsParserDelegate.swift in Sources */,
 				50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */,
+				5087DE392EF0437F00644893 /* MetaManager.swift in Sources */,
 				50C9D696284FAA6C007F18D0 /* DownloadMO+CoreDataProperties.swift in Sources */,
 				50C9D6B7284FAA87007F18D0 /* UserStatistics.swift in Sources */,
 				50AE79B02C1F58C60085CBB3 /* SsLyricsParserDelegate.swift in Sources */,

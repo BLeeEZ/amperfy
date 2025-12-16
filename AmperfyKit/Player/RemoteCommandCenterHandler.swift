@@ -28,20 +28,20 @@ import MediaPlayer
 class RemoteCommandCenterHandler {
   private var musicPlayer: PlayerFacade
   private let backendAudioPlayer: BackendAudioPlayer
-  private let librarySyncer: LibrarySyncer
+  private let getLibrarySyncerCB: GetLibrarySyncerCallback
   private let eventLogger: EventLogger
   private let remoteCommandCenter: MPRemoteCommandCenter
 
   init(
     musicPlayer: PlayerFacade,
     backendAudioPlayer: BackendAudioPlayer,
-    librarySyncer: LibrarySyncer,
+    getLibrarySyncerCB: @escaping GetLibrarySyncerCallback,
     eventLogger: EventLogger,
     remoteCommandCenter: MPRemoteCommandCenter
   ) {
     self.musicPlayer = musicPlayer
     self.backendAudioPlayer = backendAudioPlayer
-    self.librarySyncer = librarySyncer
+    self.getLibrarySyncerCB = getLibrarySyncerCB
     self.eventLogger = eventLogger
     self.remoteCommandCenter = remoteCommandCenter
   }
@@ -185,7 +185,10 @@ class RemoteCommandCenterHandler {
       self.remoteCommandCenter.likeCommand.isActive = !command.isNegative
       Task { @MainActor in
         do {
-          try await currentItem.remoteToggleFavorite(syncer: self.librarySyncer)
+          if let accountInfo = currentItem.account?.info {
+            let librarySyncer = self.getLibrarySyncerCB(accountInfo)
+            try await currentItem.remoteToggleFavorite(syncer: librarySyncer)
+          }
         } catch {
           self.eventLogger.report(topic: "Toggle Favorite", error: error)
         }

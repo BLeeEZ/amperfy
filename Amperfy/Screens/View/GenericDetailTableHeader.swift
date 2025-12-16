@@ -151,7 +151,7 @@ class GenericDetailTableHeader: UIView {
     let detailLevel = isCountInfoHidden ? DetailType.noCountInfo : DetailType.long
 
     let infoText = entityContainer.info(
-      for: appDelegate.backendApi.selectedApi,
+      for: appDelegate.account.apiType.asServerApiType,
       details: DetailInfoType(type: detailLevel, settings: appDelegate.storage.settings)
     )
     infoLabel.isHidden = infoText.isEmpty
@@ -224,7 +224,8 @@ class GenericDetailTableHeader: UIView {
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
 
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.syncUpload(playlistToUpdateName: playlist)
+      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+        .syncUpload(playlistToUpdateName: playlist)
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlist Update Name", error: error)
     }}

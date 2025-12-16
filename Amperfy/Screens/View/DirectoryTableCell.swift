@@ -42,12 +42,14 @@ class DirectoryTableCell: BasicTableCell {
 
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-    appDelegate.notificationHandler.register(
-      self,
-      selector: #selector(artworkDownloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: appDelegate.artworkDownloadManager
-    )
+    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(artworkDownloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).artworkDownloadManager
+      )
+    }
   }
 
   func display(folder: MusicFolder) {
@@ -59,8 +61,8 @@ class DirectoryTableCell: BasicTableCell {
   func display(directory: Directory) {
     folder = nil
     self.directory = directory
-    if let artwork = directory.artwork {
-      appDelegate.artworkDownloadManager.download(object: artwork)
+    if let artwork = directory.artwork, let accountInfo = artwork.account?.info {
+      appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
     }
     refresh()
   }

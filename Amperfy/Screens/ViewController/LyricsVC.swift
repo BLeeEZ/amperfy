@@ -69,7 +69,8 @@ class LyricsVC: UIViewController {
     else { return }
 
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.sync(song: song)
+      try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        .sync(song: song)
       self.refreshLyrics()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
@@ -102,7 +103,7 @@ class LyricsVC: UIViewController {
     }
 
     Task { @MainActor in do {
-      let lyricsList = try await appDelegate.librarySyncer
+      let lyricsList = try await appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
         .parseLyrics(relFilePath: lyricsRelFilePath)
       if song == self.player.currentlyPlaying?.asSong,
          let structuredLyrics = lyricsList.getFirstSyncedLyricsOrUnsyncedAsDefault() {

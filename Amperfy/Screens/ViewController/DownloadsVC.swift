@@ -41,7 +41,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
     appDelegate.userStatistics.visited(.downloads)
-    downloadManager = appDelegate.playableDownloadManager
+    downloadManager = appDelegate.getMeta(appDelegate.account.info).playableDownloadManager
 
     fetchedResultsController = DownloadsFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,

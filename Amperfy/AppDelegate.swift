@@ -73,36 +73,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   public var networkMonitor: NetworkMonitorFacade { AmperKit.shared.networkMonitor }
 
-  public var librarySyncer: LibrarySyncer { AmperKit.shared.librarySyncer }
-
-  public lazy var duplicateEntitiesResolver = {
-    AmperKit.shared.duplicateEntitiesResolver
-  }()
-
   public lazy var eventLogger: EventLogger = {
     AmperKit.shared.eventLogger
   }()
 
-  public var backendApi: BackendProxy { AmperKit.shared.backendApi }
-
   public lazy var notificationHandler: EventNotificationHandler = {
     AmperKit.shared.notificationHandler
-  }()
-
-  public lazy var playableDownloadManager: DownloadManageable = {
-    AmperKit.shared.playableDownloadManager
-  }()
-
-  public lazy var artworkDownloadManager: DownloadManageable = {
-    AmperKit.shared.artworkDownloadManager
-  }()
-
-  public lazy var backgroundLibrarySyncer = {
-    AmperKit.shared.backgroundLibrarySyncer
-  }()
-
-  public lazy var scrobbleSyncer = {
-    AmperKit.shared.scrobbleSyncer
   }()
 
   public var libraryUpdater: LibraryUpdater { AmperKit.shared.libraryUpdater }
@@ -115,15 +91,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AmperKit.shared.localNotificationManager
   }()
 
-  public var backgroundFetchTriggeredSyncer: BackgroundFetchTriggeredSyncer {
-    AmperKit.shared.backgroundFetchTriggeredSyncer
+  public func getMeta(_ accountInfo: AccountInfo) -> MetaManager {
+    AmperKit.shared.getMeta(accountInfo)
+  }
+
+  public func resetMeta(_ accountInfo: AccountInfo) {
+    AmperKit.shared.resetMeta(accountInfo)
   }
 
   public lazy var intentManager = {
     IntentManager(
       storage: storage,
-      librarySyncer: librarySyncer,
-      playableDownloadManager: playableDownloadManager,
+      getLibrarySyncerCB: { accountInfo in
+        self.getMeta(accountInfo).librarySyncer
+      },
+      getPlayableDownloadManagerCB: { accountInfo in
+        self.getMeta(accountInfo).playableDownloadManager
+      },
       library: storage.main.library,
       account: account,
       player: player, networkMonitor: networkMonitor,
@@ -204,7 +188,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private func performBackgroundFetchTask(bgTask: BGTask) async {
     os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
     do {
-      try await backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+      for accountInfo in storage.settings.accounts.allAccounts {
+        try await getMeta(accountInfo).backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+      }
       bgTask.setTaskCompleted(success: true)
     } catch {
       bgTask.setTaskCompleted(success: false)
@@ -258,6 +244,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
+  var isNormalInteraction: Bool {
+    storage.settings.accounts.activeSettings.read.loginCredentials != nil && !libraryUpdater
+      .isVisualUpadateNeeded
+  }
+
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -277,18 +268,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     configureBatteryMonitoring()
     configureBackgroundFetch()
     configureNotificationHandling()
-    configureMainMenu()
     initEventLogger()
 
-    guard let credentials = appDelegate.storage.settings.accounts.activeSettings.read
+    guard let _ = appDelegate.storage.settings.accounts.activeSettings.read
       .loginCredentials else {
       return true
     }
 
     setAppTheme(color: storage.settings.accounts.activeSettings.read.themePreference.asColor)
-
-    backendApi.selectedApi = credentials.backendApi
-    backendApi.provideCredentials(credentials: credentials)
 
     guard AmperKit.shared.storage.settings.app.isLibrarySynced else {
       return true
@@ -312,21 +299,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func startManagerAfterSync() {
     os_log("Start background manager after sync", log: self.log, type: .info)
+    configureMainMenu()
     intentManager.registerXCallbackURLs()
-    playableDownloadManager.start()
-    artworkDownloadManager.start()
-    backgroundLibrarySyncer.start()
+    getMeta(account.info).startManagerAfterSync()
     player.addNotifier(notifier: self)
   }
 
   func startManagerForNormalOperation() {
     os_log("Start background manager for normal operation", log: self.log, type: .info)
+    configureMainMenu()
     intentManager.registerXCallbackURLs()
-    duplicateEntitiesResolver.start()
-    artworkDownloadManager.start()
-    playableDownloadManager.start()
-    backgroundLibrarySyncer.start()
-    scrobbleSyncer?.start()
+    getMeta(account.info).startManagerForNormalOperation()
     player.addNotifier(notifier: self)
   }
 
@@ -373,7 +356,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationWillTerminate(_ application: UIApplication) {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     os_log("applicationWillTerminate", log: self.log, type: .info)
-    backgroundLibrarySyncer.stop()
+    for meta in AmperKit.shared.allActiveMetas {
+      meta.value.backgroundLibrarySyncer.stop()
+    }
     storage.main.saveContext()
   }
 
@@ -383,7 +368,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     completionHandler: @Sendable @escaping () -> ()
   ) {
     os_log("handleEventsForBackgroundURLSession: %s", log: self.log, type: .info, identifier)
-    playableDownloadManager.setBackgroundFetchCompletionHandler(completionHandler)
+    let responsibleMeta = AmperKit.shared.allActiveMetas
+      .first(where: { $0.value.playableDownloadManager.urlSessionIdentifier == identifier })
+    responsibleMeta?.value.playableDownloadManager
+      .setBackgroundFetchCompletionHandler(completionHandler)
   }
 
   func application(

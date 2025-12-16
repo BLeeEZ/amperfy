@@ -197,7 +197,7 @@ public class PodcastEpisode: AbstractPlayable {
     return info
   }
 
-  override public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  override public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if details.type == .long {
       infoContent.append("\(publishDate.asShortDayMonthString)")

@@ -92,12 +92,11 @@ public struct AccountInfo: Sendable, Hashable, Codable {
 
 // MARK: - Account
 
-public class Account: NSObject {
+public class Account {
   public let managedObject: AccountMO
 
   public init(managedObject: AccountMO) {
     self.managedObject = managedObject
-    super.init()
   }
 
   func assignAccount(serverUrl: String, userName: String, apiType: BackenApiType) {
@@ -169,5 +168,17 @@ public class Account: NSObject {
 
   public var info: AccountInfo {
     AccountInfo(serverHash: serverHash, userHash: userHash, apiType: apiType)
+  }
+}
+
+// MARK: Hashable, Equatable
+
+extension Account: Hashable, Equatable {
+  public static func == (lhs: Account, rhs: Account) -> Bool {
+    lhs.managedObject == rhs.managedObject && lhs.managedObject == rhs.managedObject
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(managedObject)
   }
 }

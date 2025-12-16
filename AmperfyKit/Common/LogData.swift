@@ -27,7 +27,6 @@ import UIKit
 public struct LogData: Encodable {
   public var basicInfo: BasicInfo?
   public var deviceInfo: DeviceInfo?
-  public var serverInfo: ServerInfo?
   public var playerInfo: PlayerInfo?
   public var libraryInfo: LibraryInfo?
   public var userSettings: UserSettingsLog?
@@ -53,11 +52,6 @@ public struct LogData: Encodable {
     deviceInfo.totalDiskCapacity = currentDevice.totalDiskCapacityInByte?.asByteString
     deviceInfo.availableDiskCapacity = currentDevice.availableDiskCapacityInByte?.asByteString
     logData.deviceInfo = deviceInfo
-
-    var serverInfo = ServerInfo()
-    serverInfo.apiType = amperfyData.backendApi.selectedApi.description
-    serverInfo.apiVersion = amperfyData.backendApi.serverApiVersion
-    logData.serverInfo = serverInfo
 
     logData.libraryInfo = LibraryInfo()
     logData.libraryInfo?.version = amperfyData.storage.settings.app.librarySyncVersion.description
@@ -118,13 +112,6 @@ public struct DeviceInfo: Encodable {
   public var availableDiskCapacity: String?
 }
 
-// MARK: - ServerInfo
-
-public struct ServerInfo: Encodable {
-  public var apiType: String?
-  public var apiVersion: String?
-}
-
 // MARK: - LibraryInfo
 
 public struct LibraryInfo: Encodable {
@@ -135,6 +122,7 @@ public struct LibraryInfo: Encodable {
 // MARK: - AccountLibraryInfo
 
 public struct AccountLibraryInfo: Encodable {
+  public var apiType: String?
   public var genreCount: Int?
   public var artistCount: Int?
   public var albumCount: Int?

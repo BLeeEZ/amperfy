@@ -70,18 +70,21 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         name: .offlineModeChanged,
         object: nil
       )
-      appDelegate.notificationHandler.register(
-        self,
-        selector: #selector(self.downloadFinishedSuccessful(notification:)),
-        name: .downloadFinishedSuccess,
-        object: appDelegate.artworkDownloadManager
-      )
-      appDelegate.notificationHandler.register(
-        self,
-        selector: #selector(self.downloadFinishedSuccessful(notification:)),
-        name: .downloadFinishedSuccess,
-        object: appDelegate.playableDownloadManager
-      )
+      for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+        let meta = appDelegate.getMeta(accountInfo)
+        appDelegate.notificationHandler.register(
+          self,
+          selector: #selector(self.downloadFinishedSuccessful(notification:)),
+          name: .downloadFinishedSuccess,
+          object: meta.artworkDownloadManager
+        )
+        appDelegate.notificationHandler.register(
+          self,
+          selector: #selector(self.downloadFinishedSuccessful(notification:)),
+          name: .downloadFinishedSuccess,
+          object: meta.playableDownloadManager
+        )
+      }
       appDelegate.player.addNotifier(notifier: self)
       CPNowPlayingTemplate.shared.add(self)
 
@@ -103,16 +106,20 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       self.interfaceController = nil
       appDelegate.notificationHandler.remove(self, name: .fetchControllerSortChanged, object: nil)
       appDelegate.notificationHandler.remove(self, name: .offlineModeChanged, object: nil)
-      appDelegate.notificationHandler.remove(
-        self,
-        name: .downloadFinishedSuccess,
-        object: appDelegate.artworkDownloadManager
-      )
-      appDelegate.notificationHandler.remove(
-        self,
-        name: .downloadFinishedSuccess,
-        object: appDelegate.playableDownloadManager
-      )
+      for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+        let meta = appDelegate.getMeta(accountInfo)
+        appDelegate.notificationHandler.remove(
+          self,
+          name: .downloadFinishedSuccess,
+          object: meta.artworkDownloadManager
+        )
+        appDelegate.notificationHandler.remove(
+          self,
+          name: .downloadFinishedSuccess,
+          object: meta.playableDownloadManager
+        )
+      }
+
       CPNowPlayingTemplate.shared.remove(self)
 
       playlistFetchController = nil
@@ -641,8 +648,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
     )
-    if let artwork = artist.artwork {
-      appDelegate.artworkDownloadManager.download(object: artwork)
+    if let artwork = artist.artwork, let accountInfo = artwork.account?.info {
+      appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
     }
     section.userInfo = [
       CarPlayListUserInfoKeys.artworkDownloadID.rawValue: artist.artwork?.uniqueID as Any,
@@ -727,8 +734,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
     )
-    if let artwork = album.artwork {
-      appDelegate.artworkDownloadManager.download(object: artwork)
+    if let artwork = album.artwork, let accountInfo = artwork.account?.info {
+      appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
     }
     section.userInfo = [
       CarPlayListUserInfoKeys.artworkDownloadID.rawValue: album.artwork?.uniqueID as Any,
@@ -816,8 +823,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         accessoryImage: nil,
         accessoryType: .disclosureIndicator
       )
-      if let artwork = podcast.artwork {
-        appDelegate.artworkDownloadManager.download(object: artwork)
+      if let artwork = podcast.artwork, let accountInfo = artwork.account?.info {
+        appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
       }
       section.userInfo = [
         CarPlayListUserInfoKeys.artworkDownloadID.rawValue: podcast.artwork?.uniqueID as Any,
@@ -945,8 +952,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     -> CPListItem {
     let accessoryType: CPListItemAccessoryType = playable.isCached ? .cloud : .none
     let image = getImage(for: playable, isTrackDisplayed: isTrackDisplayed)
-    if let artwork = playable.artwork {
-      appDelegate.artworkDownloadManager.download(object: artwork)
+    if let artwork = playable.artwork, let accountInfo = artwork.account?.info {
+      appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
     }
     let listItem = CPListItem(
       text: playable.title,
@@ -1141,7 +1148,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       ))])
     }
     if templates.contains(songsFavoriteSection),
-       (appDelegate.backendApi.selectedApi != .ampache) ?
+       (appDelegate.account.apiType.asServerApiType != .ampache) ?
        (
          songsFavoritesFetchController?.sortType != appDelegate.storage.settings.user
            .favoriteSongSortSetting
@@ -1158,7 +1165,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         )
     }
     if templates.contains(songsFavoriteCachedSection),
-       (appDelegate.backendApi.selectedApi != .ampache) ?
+       (appDelegate.account.apiType.asServerApiType != .ampache) ?
        (
          songsFavoritesCachedFetchController?.sortType != appDelegate.storage.settings.user
            .favoriteSongSortSetting
@@ -1454,7 +1461,8 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       } else if aTemplate == playlistTab {
         os_log("CarPlay: templateWillAppear playlistTab", log: self.log, type: .info)
         Task { @MainActor in do {
-          try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+            .syncDownPlaylistsWithoutSongs()
         } catch {
           self.appDelegate.eventLogger.report(topic: "CarPlay: Playlists Sync", error: error)
         }}
@@ -1524,10 +1532,11 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       } else if aTemplate == albumsRecentSection {
         os_log("CarPlay: templateWillAppear albumsRecentSection", log: self.log, type: .info)
         Task { @MainActor in do {
-          try await self.appDelegate.librarySyncer.syncRecentAlbums(
-            offset: 0,
-            count: AmperKit.newestElementsFetchCount
-          )
+          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+            .syncRecentAlbums(
+              offset: 0,
+              count: AmperKit.newestElementsFetchCount
+            )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
         }}
@@ -1564,8 +1573,9 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         Task { @MainActor in do {
           try await playlistDetailFetchController.playlist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)
@@ -1580,8 +1590,9 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         Task { @MainActor in do {
           try await podcastDetailFetchController.podcast.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.librarySyncer,
-            playableDownloadManager: self.appDelegate.playableDownloadManager
+            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              .playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Podcast Sync", error: error)

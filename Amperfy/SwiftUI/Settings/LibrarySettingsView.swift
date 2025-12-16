@@ -275,7 +275,8 @@ struct LibrarySettingsView: View {
               primaryButton: .default(Text("OK")) {
                 let allSongsToDownload = appDelegate.storage.main.library
                   .getSongsForCompleteLibraryDownload(for: appDelegate.account)
-                appDelegate.playableDownloadManager.download(objects: allSongsToDownload)
+                appDelegate.getMeta(appDelegate.account.info).playableDownloadManager
+                  .download(objects: allSongsToDownload)
               },
               secondaryButton: .cancel()
             )
@@ -294,12 +295,12 @@ struct LibrarySettingsView: View {
               ),
               primaryButton: .destructive(Text("Delete")) {
                 appDelegate.player.stop()
-                appDelegate.playableDownloadManager.stop()
+                appDelegate.getMeta(appDelegate.account.info).playableDownloadManager.stop()
                 appDelegate.storage.main.library
                   .deletePlayableCachePaths(for: appDelegate.account)
                 appDelegate.storage.main.library.saveContext()
                 fileManager.deletePlayableCache(accountInfo: appDelegate.account.info)
-                appDelegate.playableDownloadManager.start()
+                appDelegate.getMeta(appDelegate.account.info).playableDownloadManager.start()
               }, secondaryButton: .cancel()
             )
           }

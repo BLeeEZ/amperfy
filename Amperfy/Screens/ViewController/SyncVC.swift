@@ -54,10 +54,6 @@ class SyncVC: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
-      self.appDelegate.scrobbleSyncer?.stop()
-      self.appDelegate.backgroundLibrarySyncer.stop()
-      self.appDelegate.artworkDownloadManager.stop()
-      self.appDelegate.playableDownloadManager.stop()
       self.appDelegate.storage.settings.app.isLibrarySynced = false
       self.appDelegate.storage.main.library.cleanStorage()
       self.appDelegate.reinit()
@@ -70,7 +66,8 @@ class SyncVC: UIViewController {
         .getAccount(info: accountInfo)
 
       do {
-        try await self.appDelegate.librarySyncer.syncInitial(statusNotifyier: self)
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          .syncInitial(statusNotifyier: self)
         self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .completed
         }

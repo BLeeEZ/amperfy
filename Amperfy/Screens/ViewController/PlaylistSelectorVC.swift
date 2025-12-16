@@ -164,7 +164,8 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     updateRightBarButtonItems()
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.syncDownPlaylistsWithoutSongs()
+      try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        .syncDownPlaylistsWithoutSongs()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
     }}
@@ -194,7 +195,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     let localCopySelectedPlaylits = selectedPlaylits
     Task { @MainActor in do {
       for (playlist, songs) in localCopySelectedPlaylits {
-        try await self.appDelegate.librarySyncer.syncUpload(
+        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncUpload(
           playlistToAddSongs: playlist,
           songs: songs
         )

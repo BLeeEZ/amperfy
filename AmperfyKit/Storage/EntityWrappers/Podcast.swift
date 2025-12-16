@@ -87,7 +87,7 @@ extension Podcast: PlayableContainable {
   public var name: String { title }
   public var subtitle: String? { nil }
   public var subsubtitle: String? { nil }
-  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if details.type != .noCountInfo {
       if episodeCount == 1 {

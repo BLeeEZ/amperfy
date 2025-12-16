@@ -51,7 +51,10 @@ extension CarPlaySceneDelegate {
               Task { @MainActor in
                 do {
                   try await playableInfo
-                    .remoteToggleFavorite(syncer: self.appDelegate.librarySyncer)
+                    .remoteToggleFavorite(
+                      syncer: self.appDelegate
+                        .getMeta(self.appDelegate.account.info).librarySyncer
+                    )
                 } catch {
                   self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
                 }

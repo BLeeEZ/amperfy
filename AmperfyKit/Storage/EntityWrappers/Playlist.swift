@@ -489,7 +489,7 @@ public class Playlist: Identifyable {
 extension Playlist: PlayableContainable {
   public var subtitle: String? { nil }
   public var subsubtitle: String? { nil }
-  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if songCount == 1 {
       infoContent.append("1 Song")

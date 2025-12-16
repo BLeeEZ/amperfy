@@ -56,7 +56,6 @@ extension UITextField {
 // MARK: - LoginVC
 
 class LoginVC: UIViewController {
-  var backendApi: BackendApi!
   var selectedApiType: BackenApiType = .notDetected
 
   #if targetEnvironment(macCatalyst)
@@ -367,16 +366,18 @@ class LoginVC: UIViewController {
     }
 
     var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
+    let accountInfo = Account.createInfo(credentials: credentials)
     Task { @MainActor in
       do {
-        let authenticatedApiType = try await self.appDelegate.backendApi.login(
+        let meta = self.appDelegate.getMeta(accountInfo)
+        let authenticatedApiType = try await meta.backendApi.login(
           apiType: selectedApiType,
           credentials: credentials
         )
-        self.appDelegate.backendApi.selectedApi = authenticatedApiType
+        meta.backendApi.selectedApi = authenticatedApiType
         credentials.backendApi = authenticatedApiType
         self.appDelegate.storage.settings.accounts.login(credentials)
-        self.appDelegate.backendApi.provideCredentials(credentials: credentials)
+        meta.backendApi.provideCredentials(credentials: credentials)
 
         guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
         mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToSync())
@@ -386,6 +387,7 @@ class LoginVC: UIViewController {
         } else {
           self.showErrorMsg(message: "Not able to login!")
         }
+        self.appDelegate.resetMeta(accountInfo)
       }
     }
   }
@@ -398,7 +400,6 @@ class LoginVC: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    backendApi = appDelegate.backendApi
     updateApiSelectorText()
 
     apiSelectorButton.showsMenuAsPrimaryAction = true

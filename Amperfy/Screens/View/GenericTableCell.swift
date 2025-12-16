@@ -55,7 +55,7 @@ class GenericTableCell: BasicTableCell {
       container: container
     )
     let infoText = container.info(
-      for: appDelegate.backendApi.selectedApi,
+      for: appDelegate.account.apiType.asServerApiType,
       details: DetailInfoType(type: .short, settings: appDelegate.storage.settings)
     )
     infoLabel.isHidden = infoText.isEmpty

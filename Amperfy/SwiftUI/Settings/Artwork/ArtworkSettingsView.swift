@@ -97,7 +97,8 @@ struct ArtworkSettingsView: View {
               primaryButton: .default(Text("OK")) {
                 let allArtworksToDownload = appDelegate.storage.main.library
                   .getArtworksForCompleteLibraryDownload(for: appDelegate.account)
-                appDelegate.artworkDownloadManager.download(objects: allArtworksToDownload)
+                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager
+                  .download(objects: allArtworksToDownload)
               },
               secondaryButton: .cancel()
             )
@@ -112,14 +113,16 @@ struct ArtworkSettingsView: View {
                 "This action will delete downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
               ),
               primaryButton: .destructive(Text("Delete")) {
-                appDelegate.artworkDownloadManager.stop()
-                appDelegate.artworkDownloadManager.cancelDownloads()
-                appDelegate.artworkDownloadManager.clearFinishedDownloads()
+                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager.stop()
+                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager
+                  .cancelDownloads()
+                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager
+                  .clearFinishedDownloads()
                 appDelegate.storage.main.library
                   .deleteRemoteArtworkCachePaths(account: appDelegate.account)
                 appDelegate.storage.main.library.saveContext()
                 fileManager.deleteRemoteArtworkCache(accountInfo: appDelegate.account.info)
-                appDelegate.artworkDownloadManager.start()
+                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager.start()
               },
               secondaryButton: .cancel()
             )

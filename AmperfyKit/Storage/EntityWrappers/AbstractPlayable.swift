@@ -359,7 +359,7 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     }
   }
 
-  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if details.type == .long {
       if year > 0 {

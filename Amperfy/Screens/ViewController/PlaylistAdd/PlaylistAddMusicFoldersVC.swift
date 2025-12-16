@@ -69,7 +69,7 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
 
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.librarySyncer.syncMusicFolders()
+      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer.syncMusicFolders()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
     }}

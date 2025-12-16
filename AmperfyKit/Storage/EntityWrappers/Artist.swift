@@ -121,7 +121,7 @@ public class Artist: AbstractLibraryEntity {
 extension Artist: PlayableContainable {
   public var subtitle: String? { nil }
   public var subsubtitle: String? { nil }
-  public func infoDetails(for api: BackenApiType, details: DetailInfoType) -> [String] {
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
     if let managedObjectContext = managedObject.managedObjectContext, let account {
       let library = LibraryStorage(context: managedObjectContext)

@@ -104,6 +104,10 @@ class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
 // MARK: - MOCK_SongDownloader
 
 class MOCK_SongDownloader: DownloadManageable {
+  var urlSessionIdentifier: String? {
+    ""
+  }
+
   var downloadables = [Downloadable]()
   func isNoDownloadRequested() -> Bool {
     downloadables.isEmpty

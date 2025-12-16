@@ -175,7 +175,7 @@ extension CarPlaySceneDelegate {
 
   func createSongsFavoritesFetchController() {
     var sortSetting = appDelegate.storage.settings.user.songsSortSetting
-    if appDelegate.backendApi.selectedApi != .ampache {
+    if appDelegate.account.apiType.asServerApiType != .ampache {
       sortSetting = appDelegate.storage.settings.user.favoriteSongSortSetting
     }
     songsFavoritesFetchController = SongsFetchedResultsController(
@@ -193,7 +193,7 @@ extension CarPlaySceneDelegate {
 
   func createSongsFavoritesCachedFetchController() {
     var sortSetting = appDelegate.storage.settings.user.songsSortSetting
-    if appDelegate.backendApi.selectedApi != .ampache {
+    if appDelegate.account.apiType.asServerApiType != .ampache {
       sortSetting = appDelegate.storage.settings.user.favoriteSongSortSetting
     }
     songsFavoritesCachedFetchController = SongsFetchedResultsController(

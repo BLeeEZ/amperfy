@@ -101,7 +101,7 @@ class PlainDetailsVC: UIViewController {
       detailsTextView.text = ""
       headerLabel.text = "Lyrics"
       Task { @MainActor in do {
-        let lyricsList = try await appDelegate.librarySyncer
+        let lyricsList = try await appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
           .parseLyrics(relFilePath: lyricsRelFilePath)
         self.displayLyrics(lyricsList: lyricsList)
       } catch {

@@ -77,14 +77,14 @@ struct ServerSettingsView: View {
           }
 
           SettingsRow(title: "Server API Version", splitPercentage: splitPercentage) {
-            Text(appDelegate.backendApi.serverApiVersion)
+            Text(appDelegate.getMeta(appDelegate.account.info).backendApi.serverApiVersion)
               .foregroundColor(.secondary)
-              .help(appDelegate.backendApi.serverApiVersion)
+              .help(appDelegate.getMeta(appDelegate.account.info).backendApi.serverApiVersion)
           }
           SettingsRow(title: "Client API Version", splitPercentage: splitPercentage) {
-            Text(appDelegate.backendApi.clientApiVersion)
+            Text(appDelegate.getMeta(appDelegate.account.info).backendApi.clientApiVersion)
               .foregroundColor(.secondary)
-              .help(appDelegate.backendApi.clientApiVersion)
+              .help(appDelegate.getMeta(appDelegate.account.info).backendApi.clientApiVersion)
           }
         }
 

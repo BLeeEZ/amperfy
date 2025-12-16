@@ -36,14 +36,12 @@ public class LibraryUpdater {
   private static let sleepTimeInMicroSecToReduceCpuLoad: UInt32 = 500
 
   @MainActor
-  private let log = OSLog(subsystem: "Amperfy", category: "BackgroundSyncer")
+  private let log = OSLog(subsystem: "Amperfy", category: "LibraryUpdater")
   private let storage: PersistentStorage
-  private let backendApi: BackendApi
   private let fileManager = CacheFileManager.shared
 
-  init(storage: PersistentStorage, backendApi: BackendApi) {
+  init(storage: PersistentStorage) {
     self.storage = storage
-    self.backendApi = backendApi
   }
 
   public var isVisualUpadateNeeded: Bool {
