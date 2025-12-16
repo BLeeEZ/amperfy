@@ -350,9 +350,9 @@ class MusicPlayerTest: XCTestCase {
       createAudioStreamingPlayerCB: { self.mockAudioStreamingPlayer },
       audioSessionHandler: AudioSessionHandler(),
       eventLogger: eventLogger,
-      backendApi: backendApi,
+      getBackendApiCB: { accountInfo in self.backendApi },
       networkMonitor: networkMonitor,
-      playableDownloader: songDownloader,
+      getPlayableDownloaderCB: { accountInfo in self.songDownloader },
       cacheProxy: library,
       userStatistics: userStatistics
     )
@@ -371,7 +371,6 @@ class MusicPlayerTest: XCTestCase {
       queueHandler: testQueueHandler,
       musicPlayer: testMusicPlayer,
       library: library,
-      playableDownloadManager: songDownloader,
       backendAudioPlayer: backendPlayer,
       userStatistics: userStatistics
     )

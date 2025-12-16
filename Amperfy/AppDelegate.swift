@@ -301,7 +301,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     os_log("Start background manager after sync", log: self.log, type: .info)
     configureMainMenu()
     intentManager.registerXCallbackURLs()
-    getMeta(account.info).startManagerAfterSync()
+    for accountInfo in storage.settings.accounts.allAccounts {
+      getMeta(accountInfo).startManagerAfterSync(player: appDelegate.player)
+    }
     player.addNotifier(notifier: self)
   }
 
@@ -309,7 +311,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     os_log("Start background manager for normal operation", log: self.log, type: .info)
     configureMainMenu()
     intentManager.registerXCallbackURLs()
-    getMeta(account.info).startManagerForNormalOperation()
+    for accountInfo in storage.settings.accounts.allAccounts {
+      getMeta(accountInfo).startManagerForNormalOperation(player: appDelegate.player)
+    }
     player.addNotifier(notifier: self)
   }
 

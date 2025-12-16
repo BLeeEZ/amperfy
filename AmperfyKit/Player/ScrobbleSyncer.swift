@@ -31,8 +31,7 @@ public class ScrobbleSyncer {
     240 // scrobble at 4 min or 50% of duration
 
   private let log = OSLog(subsystem: "Amperfy", category: "ScrobbleSyncer")
-  private let musicPlayer: AudioPlayer
-  private let backendAudioPlayer: BackendAudioPlayer
+  private let player: PlayerFacade
   private let networkMonitor: NetworkMonitorFacade
   private let account: Account
   private let accountObjectId: NSManagedObjectID
@@ -52,16 +51,14 @@ public class ScrobbleSyncer {
   private var songHasBeenListendEnough = false
 
   init(
-    musicPlayer: AudioPlayer,
-    backendAudioPlayer: BackendAudioPlayer,
+    player: PlayerFacade,
     networkMonitor: NetworkMonitorFacade,
     account: Account,
     storage: PersistentStorage,
     librarySyncer: LibrarySyncer,
     eventLogger: EventLogger
   ) {
-    self.musicPlayer = musicPlayer
-    self.backendAudioPlayer = backendAudioPlayer
+    self.player = player
     self.networkMonitor = networkMonitor
     self.account = account
     self.accountObjectId = account.managedObject.objectID
@@ -187,7 +184,7 @@ public class ScrobbleSyncer {
   private func startSongPlayed() async {
     await syncSongStopped(clearCurPlaying: true)
 
-    guard let curPlaying = musicPlayer.currentlyPlaying,
+    guard let curPlaying = player.currentlyPlaying,
           let curPlayingSong = curPlaying.asSong,
           curPlayingSong.account == account
     else { return }
@@ -220,8 +217,8 @@ public class ScrobbleSyncer {
       Task { @MainActor in
         let curPlayingClosureMO = self.storage.main.context.object(with: curPlayingId) as! SongMO
         let curPlayingClosure = Song(managedObject: curPlayingClosureMO)
-        guard curPlayingClosure == self.musicPlayer.currentlyPlaying,
-              self.backendAudioPlayer.playType == .cache || self.storage.settings
+        guard curPlayingClosure == self.player.currentlyPlaying,
+              self.player.playType == .cache || self.storage.settings
               .accounts.getSetting(self.account.info).read.isScrobbleStreamedItems
         else { return }
         self.songHasBeenListendEnough = true
@@ -258,7 +255,7 @@ extension ScrobbleSyncer: MusicPlayable {
   }
 
   public func didStartPlaying() {
-    guard let curPlaying = musicPlayer.currentlyPlaying,
+    guard let curPlaying = player.currentlyPlaying,
           let curPlayingSong = curPlaying.asSong,
           curPlayingSong.account == account
     else { return }

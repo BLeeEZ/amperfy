@@ -73,9 +73,9 @@ enum BackendAudioQueueType {
 
 @MainActor
 class BackendAudioPlayer: NSObject {
-  private let playableDownloader: DownloadManageable
+  private let getPlayableDownloaderCB: GetPlayableDownloadManagerCallback
   private let cacheProxy: PlayableFileCachable
-  private let backendApi: BackendApi
+  private let getBackendApiCB: GetBackendApiCallback
   private let userStatistics: UserStatistics
   private let createAudioStreamingPlayerCB: CreateAudioStreamingPlayerCallback
   private let eventLogger: EventLogger
@@ -197,18 +197,18 @@ class BackendAudioPlayer: NSObject {
     createAudioStreamingPlayerCB: @escaping CreateAudioStreamingPlayerCallback,
     audioSessionHandler: AudioSessionHandler,
     eventLogger: EventLogger,
-    backendApi: BackendApi,
+    getBackendApiCB: @escaping GetBackendApiCallback,
     networkMonitor: NetworkMonitorFacade,
-    playableDownloader: DownloadManageable,
+    getPlayableDownloaderCB: @escaping GetPlayableDownloadManagerCallback,
     cacheProxy: PlayableFileCachable,
     userStatistics: UserStatistics
   ) {
     self.createAudioStreamingPlayerCB = createAudioStreamingPlayerCB
     self.audioSessionHandler = audioSessionHandler
-    self.backendApi = backendApi
+    self.getBackendApiCB = getBackendApiCB
     self.networkMonitor = networkMonitor
     self.eventLogger = eventLogger
-    self.playableDownloader = playableDownloader
+    self.getPlayableDownloaderCB = getPlayableDownloaderCB
     self.cacheProxy = cacheProxy
     self.userStatistics = userStatistics
     self.audioAnalyzer = AudioAnalyzer()
@@ -262,8 +262,9 @@ class BackendAudioPlayer: NSObject {
           Task { @MainActor in
             do {
               try await insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-              if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable {
-                self.playableDownloader.download(object: nextPreloadedPlayable)
+              if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable,
+                 let accountInfo = nextPreloadedPlayable.account?.info {
+                self.getPlayableDownloaderCB(accountInfo).download(object: nextPreloadedPlayable)
               }
             } catch {
               self.nextPreloadedPlayable = nil
@@ -372,7 +373,7 @@ class BackendAudioPlayer: NSObject {
     setupEqualizerBands()
     applyEqualizerSetting(eqSetting: currentEqualizerSetting)
     applyReplayGain()
-    os_log(.default, "Player setup completed with EQ and ReplayGain support")
+    os_log(.debug, "Player setup completed with EQ and ReplayGain support")
   }
 
   var shouldPlaybackStart: Bool {
@@ -462,8 +463,9 @@ class BackendAudioPlayer: NSObject {
           applyReplayGain()
           try await insertStreamPlayable(playable: playable)
           isPlaying = shouldPlaybackStart
-          if self.isAutoCachePlayedItems, !playable.isRadio {
-            self.playableDownloader.download(object: playable)
+          if self.isAutoCachePlayedItems, !playable.isRadio,
+             let accountInfo = playable.account?.info {
+            self.getPlayableDownloaderCB(accountInfo).download(object: playable)
           }
           self.responder?.notifyItemPreparationFinished()
         } catch {
@@ -570,7 +572,10 @@ class BackendAudioPlayer: NSObject {
           perloadedStreamingBitrate = streamingMaxBitrate
           preloadTranscodingFormat = streamingTranscodingFormat
         }
-        return try await backendApi.generateUrl(
+        guard let accountInfo = playable.account?.info else {
+          throw BackendError.noCredentials
+        }
+        return try await getBackendApiCB(accountInfo).generateUrl(
           forStreamingPlayable: playable.info,
           maxBitrate: streamingMaxBitrate,
           formatPreference: streamingTranscodingFormat
@@ -647,7 +652,7 @@ class BackendAudioPlayer: NSObject {
 
   func updateEqualizerEnabled(isEnabled: Bool) {
     isEqualizerEnabled = isEnabled
-    os_log(.default, "Equalizer enabled: %s", isEnabled.description)
+    os_log(.debug, "Equalizer enabled: %s", isEnabled.description)
     applyEqualizerToActiveContent()
   }
 
@@ -655,7 +660,7 @@ class BackendAudioPlayer: NSObject {
     let oldSetting = currentEqualizerSetting
     currentEqualizerSetting = eqSetting
     os_log(
-      .default,
+      .debug,
       "Equalizer changed from %s to %s",
       oldSetting.description,
       eqSetting.description
@@ -704,15 +709,15 @@ class BackendAudioPlayer: NSObject {
 
     equalizerVolumeCompensation = isEqualizerEnabled ? eqSetting.compensatedVolume : 1.0
 
-    os_log(.default, "   EQ '%s'", eqSetting.description)
+    os_log(.debug, "   EQ '%s'", eqSetting.description)
     os_log(
-      .default,
+      .debug,
       "   EQ Gains: [%@] dB",
       eqSetting.gains.map { String(format: "%.1f", $0) }.joined(separator: ", ")
     )
-    os_log(.default, "   EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
-    os_log(.default, "   EQ linear Volume Compensation: %.2f", eqSetting.compensatedVolume)
-    os_log(.default, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
+    os_log(.debug, "   EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
+    os_log(.debug, "   EQ linear Volume Compensation: %.2f", eqSetting.compensatedVolume)
+    os_log(.debug, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
   }
 
   // MARK: - ReplayGain Implementation
@@ -732,7 +737,7 @@ class BackendAudioPlayer: NSObject {
       let linearGain = pow(10.0, currentReplayGainValue / 20.0)
       replayGain.outputVolume = linearGain * eqCompensation
       os_log(
-        .default,
+        .debug,
         "ReplayGain: %.2f dB → %.3f linear gain (EQ Compensation: %.2f)",
         currentReplayGainValue,
         linearGain,
@@ -741,7 +746,7 @@ class BackendAudioPlayer: NSObject {
     } else {
       replayGain.outputVolume = eqCompensation
       os_log(
-        .default,
+        .debug,
         "ReplayGain: disabled or no gain data (EQ Compensation: %.2f)",
         eqCompensation
       )

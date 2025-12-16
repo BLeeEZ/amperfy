@@ -308,7 +308,6 @@ class PlayerFacadeImpl: PlayerFacade {
     queueHandler: PlayQueueHandler,
     musicPlayer: AudioPlayer,
     library: LibraryStorage,
-    playableDownloadManager: DownloadManageable,
     backendAudioPlayer: BackendAudioPlayer,
     userStatistics: UserStatistics
   ) {

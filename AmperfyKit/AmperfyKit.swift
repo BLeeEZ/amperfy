@@ -126,9 +126,13 @@ public class AmperKit {
       createAudioStreamingPlayerCB: { AudioStreamingPlayer() },
       audioSessionHandler: audioSessionHandler,
       eventLogger: eventLogger,
-      backendApi: getMeta(account.info).backendApi,
+      getBackendApiCB: { accountInfo in
+        self.getMeta(accountInfo).backendApi
+      },
       networkMonitor: networkMonitor,
-      playableDownloader: getMeta(account.info).playableDownloadManager,
+      getPlayableDownloaderCB: { accountInfo in
+        self.getMeta(accountInfo).playableDownloadManager
+      },
       cacheProxy: storage.main.library,
       userStatistics: userStatistics
     )
@@ -164,29 +168,33 @@ public class AmperKit {
     let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(
       playerStatus: playerData,
       queueHandler: queueHandler,
-      playableDownloadManager: getMeta(account.info).playableDownloadManager
+      getPlayableDownloaderCB: { accountInfo in
+        self.getMeta(accountInfo).playableDownloadManager
+      }
     )
     curPlayer.addNotifier(notifier: playerDownloadPreparationHandler)
-    let scrobbleSyncer = getMeta(account.info).createScrobbleSyncer(
-      audioPlayer: curPlayer,
-      backendAudioPlayer: backendAudioPlayer
-    )
-    curPlayer.addNotifier(notifier: scrobbleSyncer)
 
     let facadeImpl = PlayerFacadeImpl(
       playerStatus: playerData,
       queueHandler: queueHandler,
       musicPlayer: curPlayer,
       library: storage.main.library,
-      playableDownloadManager: getMeta(account.info).playableDownloadManager,
       backendAudioPlayer: backendAudioPlayer,
       userStatistics: userStatistics
     )
     facadeImpl.isOfflineMode = storage.settings.user.isOfflineMode
 
-    let nowPlayingInfoCenterHandler = getMeta(account.info).createNowPlayingInfoCenterHandler(
-      audioPlayer: curPlayer,
-      backendAudioPlayer: backendAudioPlayer
+    let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(
+      musicPlayer: curPlayer,
+      backendAudioPlayer: backendAudioPlayer,
+      nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(),
+      storage: storage, notificationHandler: notificationHandler,
+      getArtworkDownloaderCB: { accountInfo in
+        self.getMeta(accountInfo).artworkDownloadManager
+      },
+      getPlayableDownloaderCB: { accountInfo in
+        self.getMeta(accountInfo).playableDownloadManager
+      }
     )
     curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
     let remoteCommandCenterHandler = RemoteCommandCenterHandler(

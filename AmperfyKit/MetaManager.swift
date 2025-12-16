@@ -26,6 +26,8 @@ import os.log
 
 public typealias GetLibrarySyncerCallback = (AccountInfo) -> LibrarySyncer
 public typealias GetPlayableDownloadManagerCallback = (AccountInfo) -> DownloadManageable
+public typealias GetArtworkDownloadManagerCallback = (AccountInfo) -> DownloadManageable
+public typealias GetBackendApiCallback = (AccountInfo) -> BackendApi
 
 // MARK: - MetaManager
 
@@ -106,35 +108,14 @@ public class MetaManager {
     self.localNotificationManager = localNotificationManager
   }
 
-  private var nowPlayingInfoCenterHandler: NowPlayingInfoCenterHandler?
-  internal func createNowPlayingInfoCenterHandler(
-    audioPlayer: AudioPlayer,
-    backendAudioPlayer: BackendAudioPlayer
-  )
-    -> NowPlayingInfoCenterHandler {
-    if let nowPlayingInfoCenterHandler { return nowPlayingInfoCenterHandler }
-    nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(
-      musicPlayer: audioPlayer,
-      backendAudioPlayer: backendAudioPlayer,
-      nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(),
-      account: account,
-      storage: storage, notificationHandler: notificationHandler,
-      artworkDownloadManager: artworkDownloadManager,
-      playableDownloadManager: playableDownloadManager
-    )
-    return nowPlayingInfoCenterHandler!
-  }
-
   private var scrobbleSyncer: ScrobbleSyncer?
   internal func createScrobbleSyncer(
-    audioPlayer: AudioPlayer,
-    backendAudioPlayer: BackendAudioPlayer
+    player: PlayerFacade
   )
     -> ScrobbleSyncer {
     if let scrobbleSyncer { return scrobbleSyncer }
     scrobbleSyncer = ScrobbleSyncer(
-      musicPlayer: audioPlayer,
-      backendAudioPlayer: backendAudioPlayer,
+      player: player,
       networkMonitor: networkMonitor,
       account: account,
       storage: storage,
@@ -293,20 +274,24 @@ public class MetaManager {
     )
   }()
 
-  public func startManagerAfterSync() {
+  public func startManagerAfterSync(player: PlayerFacade) {
     os_log("Start background manager after sync", log: self.log, type: .info)
     playableDownloadManager.start()
     artworkDownloadManager.start()
     backgroundLibrarySyncer.start()
+    let scrobbler = createScrobbleSyncer(player: player)
+    player.addNotifier(notifier: scrobbler)
   }
 
-  public func startManagerForNormalOperation() {
+  public func startManagerForNormalOperation(player: PlayerFacade) {
     os_log("Start background manager for normal operation", log: self.log, type: .info)
     duplicateEntitiesResolver.start()
     artworkDownloadManager.start()
     playableDownloadManager.start()
     backgroundLibrarySyncer.start()
-    scrobbleSyncer?.start()
+    let scrobbler = createScrobbleSyncer(player: player)
+    player.addNotifier(notifier: scrobbler)
+    scrobbler.start()
   }
 
   public func stopManager() {

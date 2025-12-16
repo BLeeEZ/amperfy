@@ -29,16 +29,16 @@ class PlayerDownloadPreparationHandler {
 
   private var playerStatus: PlayerStatusPersistent
   private var queueHandler: PlayQueueHandler
-  private var playableDownloadManager: DownloadManageable
+  private var getPlayableDownloaderCB: GetPlayableDownloadManagerCallback
 
   init(
     playerStatus: PlayerStatusPersistent,
     queueHandler: PlayQueueHandler,
-    playableDownloadManager: DownloadManageable
+    getPlayableDownloaderCB: @escaping GetPlayableDownloadManagerCallback
   ) {
     self.playerStatus = playerStatus
     self.queueHandler = queueHandler
-    self.playableDownloadManager = playableDownloadManager
+    self.getPlayableDownloaderCB = getPlayableDownloaderCB
   }
 
   private func preDownloadNextItems() {
@@ -52,8 +52,8 @@ class PlayerDownloadPreparationHandler {
     if userQueueRangeEnd > 0 {
       for i in 0 ... userQueueRangeEnd - 1 {
         let playable = queueHandler.getUserQueueItem(at: i)!
-        if !playable.isCached, !playable.isRadio {
-          playableDownloadManager.download(object: playable)
+        if !playable.isCached, !playable.isRadio, let accountInfo = playable.account?.info {
+          getPlayableDownloaderCB(accountInfo).download(object: playable)
         }
       }
     }
@@ -64,8 +64,8 @@ class PlayerDownloadPreparationHandler {
     if nextQueueRangeEnd > 0 {
       for i in 0 ... nextQueueRangeEnd - 1 {
         let playable = queueHandler.getNextQueueItem(at: i)!
-        if !playable.isCached, !playable.isRadio {
-          playableDownloadManager.download(object: playable)
+        if !playable.isCached, !playable.isRadio, let accountInfo = playable.account?.info {
+          getPlayableDownloaderCB(accountInfo).download(object: playable)
         }
       }
     }

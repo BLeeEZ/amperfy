@@ -28,58 +28,61 @@ import MediaPlayer
 class NowPlayingInfoCenterHandler {
   private let musicPlayer: AudioPlayer
   private let backendAudioPlayer: BackendAudioPlayer
-  private let account: Account
   private let storage: PersistentStorage
   private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
-  private let artworkDownloadManager: DownloadManageable
+  private let getArtworkDownloaderCB: GetArtworkDownloadManagerCallback
 
   init(
     musicPlayer: AudioPlayer,
     backendAudioPlayer: BackendAudioPlayer,
     nowPlayingInfoCenter: MPNowPlayingInfoCenter,
-    account: Account,
     storage: PersistentStorage,
     notificationHandler: EventNotificationHandler,
-    artworkDownloadManager: DownloadManageable,
-    playableDownloadManager: DownloadManageable
+    getArtworkDownloaderCB: @escaping GetArtworkDownloadManagerCallback,
+    getPlayableDownloaderCB: @escaping GetPlayableDownloadManagerCallback
   ) {
     self.musicPlayer = musicPlayer
     self.backendAudioPlayer = backendAudioPlayer
     self.nowPlayingInfoCenter = nowPlayingInfoCenter
-    self.account = account
     self.storage = storage
-    self.artworkDownloadManager = artworkDownloadManager
+    self.getArtworkDownloaderCB = getArtworkDownloaderCB
 
     nowPlayingInfoCenter.playbackState = .stopped
 
-    notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: artworkDownloadManager
-    )
-    notificationHandler.register(
-      self,
-      selector: #selector(downloadFinishedSuccessful(notification:)),
-      name: .downloadFinishedSuccess,
-      object: playableDownloadManager
-    )
+    for accountInfo in storage.settings.accounts.allAccounts {
+      notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: getArtworkDownloaderCB(accountInfo)
+      )
+      notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: getPlayableDownloaderCB(accountInfo)
+      )
+    }
   }
 
   private func updateNowPlayingInfo(playable: AbstractPlayable) {
     let albumTitle = playable.asSong?.album?.name ?? ""
 
-    let artworkImage = LibraryEntityImage.getImageToDisplayImmediately(
-      libraryEntity: playable,
-      themePreference: storage.settings.accounts.getSetting(account.info).read.themePreference,
-      artworkDisplayPreference: storage.settings.accounts.getSetting(account.info).read
-        .artworkDisplayPreference,
-      useCache: true
-    )
-    if let artwork = playable.artwork {
-      artworkDownloadManager.download(object: artwork)
+    var artworkImage = UIImage()
+    if let accountInfo = playable.account?.info {
+      artworkImage = LibraryEntityImage.getImageToDisplayImmediately(
+        libraryEntity: playable,
+        themePreference: storage.settings.accounts.getSetting(accountInfo).read.themePreference,
+        artworkDisplayPreference: storage.settings.accounts.getSetting(accountInfo).read
+          .artworkDisplayPreference,
+        useCache: true
+      )
+      if let artwork = playable.artwork {
+        getArtworkDownloaderCB(accountInfo).download(object: artwork)
+      }
     }
 
+    let concurrentSafeArtworkImage = artworkImage
     nowPlayingInfoCenter.nowPlayingInfo = [
       MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
       MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,
@@ -100,10 +103,10 @@ class NowPlayingInfoCenterHandler {
       ),
 
       MPMediaItemPropertyArtwork: MPMediaItemArtwork(
-        boundsSize: artworkImage.size,
+        boundsSize: concurrentSafeArtworkImage.size,
         requestHandler: { @Sendable size -> UIImage in
           // this completion handler is not called in main thread!
-          return artworkImage
+          return concurrentSafeArtworkImage
         }
       ),
     ]
@@ -134,14 +137,14 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   func didStartPlayingFromBeginning() {}
 
   func didStartPlaying() {
-    if let curPlayable = musicPlayer.currentlyPlaying, curPlayable.account == account {
+    if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
     nowPlayingInfoCenter.playbackState = .playing
   }
 
   func didPause() {
-    if let curPlayable = musicPlayer.currentlyPlaying, curPlayable.account == account {
+    if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
     nowPlayingInfoCenter.nowPlayingInfo = [:]
@@ -154,7 +157,7 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   }
 
   func didElapsedTimeChange() {
-    if let curPlayable = musicPlayer.currentlyPlaying, curPlayable.account == account {
+    if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
   }
