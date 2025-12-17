@@ -52,7 +52,7 @@ public enum ArtworkDisplayPreference: Int, CaseIterable, Sendable, Codable {
   case preferServerArtwork = 2
   case preferId3Tag = 3
 
-  static let defaultValue: ArtworkDisplayPreference = .preferId3Tag
+  public static let defaultValue: ArtworkDisplayPreference = .preferId3Tag
 
   public var description: String {
     switch self {

@@ -81,6 +81,7 @@ public protocol PlayableContainable {
   func info(for api: ServerApiType?, details: DetailInfoType) -> String
   var playables: [AbstractPlayable] { get }
   var playContextType: PlayerMode { get }
+  var account: Account? { get }
   var isRateable: Bool { get }
   var isDownloadAvailable: Bool { get }
   @MainActor

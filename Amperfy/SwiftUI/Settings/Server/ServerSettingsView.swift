@@ -31,6 +31,8 @@ struct ServerSettingsView: View {
   var isPwUpdateDialogVisible = false
   @State
   var isShowLogoutAlert = false
+  @EnvironmentObject
+  var settings: Settings
 
   private func logout() {
     appDelegate.storage.settings.user.isOfflineMode = false
@@ -51,13 +53,13 @@ struct ServerSettingsView: View {
         SettingsSection {
           SettingsRow(title: "URL", orientation: .vertical, splitPercentage: splitPercentage) {
             SecondaryText(
-              appDelegate.storage.settings.accounts.activeSettings.read
+              appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
                 .loginCredentials?.displayServerUrl ?? ""
             )
           }
           SettingsRow(title: "Username", orientation: .vertical, splitPercentage: splitPercentage) {
             SecondaryText(
-              appDelegate.storage.settings.accounts.activeSettings.read
+              appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
                 .loginCredentials?.username ?? ""
             )
           }
@@ -66,12 +68,14 @@ struct ServerSettingsView: View {
         SettingsSection {
           SettingsRow(title: "Backend API", splitPercentage: splitPercentage) {
             Text(
-              appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+              appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+                .loginCredentials?
                 .backendApi.description ?? ""
             )
             .foregroundColor(.secondary)
             .help(
-              appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+              appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+                .loginCredentials?
                 .backendApi.description ?? ""
             )
           }

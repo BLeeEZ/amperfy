@@ -138,9 +138,10 @@ public class LibraryUpdater {
     notifier: LibraryUpdaterCallbacks
   ) async throws {
     isRunning = true
-    if storage.settings.app.librarySyncVersion < .v18 {
+    if storage.settings.app.librarySyncVersion < .v18,
+       let activeAccountInfo = storage.settings.accounts.active {
       // add radios to libraryDisplaySettings to display it for old users
-      var libraryDisplaySettingsInUse = storage.settings.accounts.activeSettings.read
+      var libraryDisplaySettingsInUse = storage.settings.accounts.getSetting(activeAccountInfo).read
         .libraryDisplaySettings.inUse
       if !libraryDisplaySettingsInUse.contains(where: { $0 == .radios }) {
         libraryDisplaySettingsInUse.append(.radios)
@@ -342,10 +343,9 @@ public class LibraryUpdater {
   @MainActor
   func applyAccountSupport(notifier: LibraryUpdaterCallbacks) async throws {
     os_log("Create account (url + user) entry in CoreData", log: log, type: .info)
-    guard let credentials = storage.settings.accounts.activeSettings.read.loginCredentials
+    guard let accountInfo = storage.settings.accounts.active
     else { return }
     var accountObjectIdTemp: NSManagedObjectID!
-    let accountInfo = Account.createInfo(credentials: credentials)
     storage.main.perform { asyncCompanion in
       let account = asyncCompanion.library.getAccount(info: accountInfo)
       accountObjectIdTemp = account.managedObject.objectID

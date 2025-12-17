@@ -245,7 +245,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   var isNormalInteraction: Bool {
-    storage.settings.accounts.activeSettings.read.loginCredentials != nil && !libraryUpdater
+    storage.settings.accounts.active != nil && !libraryUpdater
       .isVisualUpadateNeeded
   }
 
@@ -270,12 +270,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     configureNotificationHandling()
     initEventLogger()
 
-    guard let _ = appDelegate.storage.settings.accounts.activeSettings.read
-      .loginCredentials else {
+    guard let activeAccountInfo = appDelegate.storage.settings.accounts.active else {
       return true
     }
 
-    setAppTheme(color: storage.settings.accounts.activeSettings.read.themePreference.asColor)
+    setAppTheme(
+      color: storage.settings.accounts.getSetting(activeAccountInfo).read.themePreference
+        .asColor
+    )
 
     guard AmperKit.shared.storage.settings.app.isLibrarySynced else {
       return true

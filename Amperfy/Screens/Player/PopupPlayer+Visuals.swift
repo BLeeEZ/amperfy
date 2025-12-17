@@ -107,11 +107,15 @@ extension PopupPlayerVC {
 
   func refreshBackgroundItemArtwork() {
     var artwork: UIImage?
-    if let playableInfo = player.currentlyPlaying {
+    var themePreference: ThemePreference = appDelegate.storage.settings.accounts.activeSetting.read
+      .themePreference
+    if let playableInfo = player.currentlyPlaying, let accountInfo = playableInfo.account?.info {
+      themePreference = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+        .themePreference
       artwork = LibraryEntityImage.getImageToDisplayImmediately(
         libraryEntity: playableInfo,
-        themePreference: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
-        artworkDisplayPreference: appDelegate.storage.settings.accounts.activeSettings.read
+        themePreference: themePreference,
+        artworkDisplayPreference: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
           .artworkDisplayPreference,
         useCache: true
       )
@@ -119,12 +123,12 @@ extension PopupPlayerVC {
       switch player.playerMode {
       case .music:
         artwork = .getGeneratedArtwork(
-          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+          theme: themePreference,
           artworkType: .song
         )
       case .podcast:
         artwork = .getGeneratedArtwork(
-          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+          theme: themePreference,
           artworkType: .podcastEpisode
         )
       }
@@ -132,7 +136,7 @@ extension PopupPlayerVC {
     guard let artwork = artwork else { return }
     backgroundImage.image = artwork
     artworkGradientColors = (try? artwork.dominantColors(max: 2)) ?? [
-      appDelegate.storage.settings.accounts.activeSettings.read.themePreference.asColor,
+      themePreference.asColor,
       UIColor.systemBackground,
     ]
     applyGradientBackground()

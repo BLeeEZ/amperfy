@@ -51,11 +51,12 @@ class GenericTableCell: BasicTableCell {
     subtitleLabel.isHidden = container.subtitle == nil
     subtitleLabel.text = container.subtitle
     entityImage.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(container.account?.info).read
+        .themePreference,
       container: container
     )
     let infoText = container.info(
-      for: appDelegate.account.apiType.asServerApiType,
+      for: container.account?.apiType.asServerApiType,
       details: DetailInfoType(type: .short, settings: appDelegate.storage.settings)
     )
     infoLabel.isHidden = infoText.isEmpty

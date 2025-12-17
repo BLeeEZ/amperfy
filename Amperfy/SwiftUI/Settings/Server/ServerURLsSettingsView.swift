@@ -35,25 +35,32 @@ struct ServerURLsSettingsView: View {
   var isAddDialogVisible: Bool = false
   @State
   private var selection: String?
+  @EnvironmentObject
+  var settings: Settings
 
   func reload() {
-    serverURLs = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+    serverURLs = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+      .loginCredentials?
       .availableServerURLs ?? []
-    activeServerURL = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+    activeServerURL = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo)
+      .read.loginCredentials?
       .activeBackendServerUrl ?? ""
-    accountServerURL = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+    accountServerURL = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo)
+      .read.loginCredentials?
       .serverUrl ?? ""
   }
 
   func setAsActiveURL(url: String) {
     guard url != activeServerURL else { return }
-    if let currentCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+    if let currentCredentials = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo).read
       .loginCredentials {
       appDelegate.storage.settings.accounts
         .updateSetting(Account.createInfo(credentials: currentCredentials)) { accountSettings in
           accountSettings.loginCredentials?.activeBackendServerUrl = url
         }
-      if let updatedCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+      if let updatedCredentials = appDelegate.storage.settings.accounts
+        .getSetting(settings.activeAccountInfo).read
         .loginCredentials {
         appDelegate.getMeta(appDelegate.account.info).backendApi
           .provideCredentials(credentials: updatedCredentials)
@@ -64,7 +71,8 @@ struct ServerURLsSettingsView: View {
 
   func deleteURL(url: String) {
     guard url != activeServerURL, url != accountServerURL else { return }
-    if let currentCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+    if let currentCredentials = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo).read
       .loginCredentials,
       let altIndex = currentCredentials.alternativeServerURLs.firstIndex(of: url) {
       var altURLs = currentCredentials.alternativeServerURLs

@@ -79,7 +79,8 @@ final class HomeVC: UICollectionViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    orderedVisibleSections = appDelegate.storage.settings.accounts.activeSettings.read.homeSections
+    orderedVisibleSections = appDelegate.storage.settings.accounts
+      .getSetting(appDelegate.account.info).read.homeSections
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
@@ -111,7 +112,8 @@ final class HomeVC: UICollectionViewController {
       pointSize: 24,
       weight: .regular
     )).withTintColor(
-      appDelegate.storage.settings.accounts.activeSettings.read.themePreference.asColor,
+      appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+        .themePreference.asColor,
       renderingMode: .alwaysTemplate
     )
 
@@ -145,9 +147,11 @@ final class HomeVC: UICollectionViewController {
 
   private func createUserButtonMenu() -> UIMenu {
     let userInfo = UIAction(
-      title: appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+      title: appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+        .loginCredentials?
         .username ?? "Unknown",
-      subtitle: appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+      subtitle: appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+        .loginCredentials?
         .displayServerUrl ?? "",
       image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
         pointSize: 30,

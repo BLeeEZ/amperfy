@@ -52,7 +52,8 @@ class TabBarVC: UITabBarController {
     fixTabs.append(homeTab!)
 
     var libraryTabs = [UITab]()
-    let libraryTabsShown = appDelegate.storage.settings.accounts.activeSettings.read
+    let libraryTabsShown = appDelegate.storage.settings.accounts
+      .getSetting(appDelegate.account.info).read
       .libraryDisplaySettings.inUse
       .compactMap { item in
         let tab = UITab(
@@ -67,7 +68,8 @@ class TabBarVC: UITabBarController {
       }
     libraryTabs.append(contentsOf: libraryTabsShown)
 
-    let libraryTabsHidden = appDelegate.storage.settings.accounts.activeSettings.read
+    let libraryTabsHidden = appDelegate.storage.settings.accounts
+      .getSetting(appDelegate.account.info).read
       .libraryDisplaySettings.notUsed
       .compactMap { item in
         let tab = UITab(
@@ -205,7 +207,8 @@ class TabBarVC: UITabBarController {
 
   func refresh() {
     guard let libraryGroup else { return }
-    let config = appDelegate.storage.settings.accounts.activeSettings.read.libraryDisplaySettings
+    let config = appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+      .libraryDisplaySettings
     libraryGroup.displayOrderIdentifiers = config.inUse.compactMap { "Tabs.\($0.displayName)" }
     for tab in libraryGroup.displayOrder {
       guard let item = LibraryDisplayType.createByDisplayName(name: tab.title) else { continue }

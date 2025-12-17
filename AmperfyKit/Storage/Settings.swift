@@ -367,14 +367,19 @@ public struct AccountSettings: Sendable, Codable {
     _activeAccount = accountInfo
   }
 
-  public func getSetting(_ accountInfo: AccountInfo) -> ReadOnlyAccountSetting {
-    ReadOnlyAccountSetting(read: _accounts[accountInfo] ?? AccountSetting())
+  public func getSetting(_ accountInfo: AccountInfo?) -> ReadOnlyAccountSetting {
+    let infoToUse = (accountInfo == .defaultAccountInfo) ? nil : accountInfo
+    if let info = infoToUse ?? _activeAccount {
+      return ReadOnlyAccountSetting(read: _accounts[info] ?? AccountSetting())
+    } else {
+      return ReadOnlyAccountSetting(read: AccountSetting())
+    }
   }
 
   public mutating func logout(_ accountInfo: AccountInfo) {
     _accounts[accountInfo] = nil
     if _activeAccount == accountInfo {
-      _activeAccount = nil
+      _activeAccount = _accounts.first?.key
     }
   }
 
@@ -391,7 +396,7 @@ public struct AccountSettings: Sendable, Codable {
     _activeAccount
   }
 
-  public var activeSettings: ReadOnlyAccountSetting {
+  public var activeSetting: ReadOnlyAccountSetting {
     guard let _activeAccount else { return ReadOnlyAccountSetting(read: AccountSetting()) }
     return ReadOnlyAccountSetting(read: _accounts[_activeAccount] ?? AccountSetting())
   }

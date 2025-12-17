@@ -371,9 +371,8 @@ class PlayerControlView: UIView {
   }
 
   func refreshPlayerModeChangeButton() {
-    playerModeButton.isHidden = !appDelegate.storage.settings.accounts.activeSettings.read
-      .libraryDisplaySettings
-      .isVisible(libraryType: .podcasts)
+    playerModeButton.isHidden = appDelegate.player.podcastItemCount == 0 && appDelegate.player
+      .playerMode != .podcast
     switch player.playerMode {
     case .music:
       playerModeButton.setImage(UIImage.musicalNotes, for: .normal)

@@ -81,7 +81,8 @@ class PodcastEpisodeTableCell: BasicTableCell {
     }
     podcastEpisodeLabel.text = episode.title
     entityImage.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(episode.account?.info).read
+        .themePreference,
       container: episode
     )
 

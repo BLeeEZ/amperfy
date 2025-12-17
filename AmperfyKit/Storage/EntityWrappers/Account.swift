@@ -31,7 +31,7 @@ public struct AccountInfo: Sendable, Hashable, Codable {
   let apiType: BackenApiType
 
   static let defaultIdent = "0-0"
-  static let defaultAccountInfo = AccountInfo(
+  public static let defaultAccountInfo = AccountInfo(
     serverHash: "",
     userHash: "",
     apiType: .notDetected

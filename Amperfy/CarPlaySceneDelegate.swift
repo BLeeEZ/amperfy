@@ -26,6 +26,13 @@ import Foundation
 import OSLog
 import UIKit
 
+// MARK: - CarPlayShortPreference
+
+struct CarPlayShortPreference {
+  let theme: ThemePreference
+  let artworkDisplayPreference: ArtworkDisplayPreference
+}
+
 // MARK: - CarPlaySceneDelegate
 
 @MainActor
@@ -42,9 +49,16 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     appDelegate.storage.settings.user.isOfflineMode
   }
 
-  var artworkDisplayPreference: ArtworkDisplayPreference {
-    appDelegate.storage.settings.accounts.activeSettings.read.artworkDisplayPreference
+  func getPreference(_ accountInfo: AccountInfo?) -> CarPlayShortPreference {
+    CarPlayShortPreference(
+      theme: appDelegate.storage.settings.accounts.getSetting(accountInfo).read.themePreference,
+      artworkDisplayPreference: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+        .artworkDisplayPreference
+    )
   }
+
+  private var activeAccountInfo: AccountInfo!
+  private var activeAccount: Account!
 
   var interfaceController: CPInterfaceController?
   var traits: UITraitCollection {
@@ -58,6 +72,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   ) {
     Task { @MainActor in
       os_log("CarPlay: didConnect", log: self.log, type: .info)
+      activeAccountInfo = appDelegate.storage.settings.accounts.active
+      activeAccount = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
+      guard activeAccountInfo != nil, activeAccount != nil else {
+        os_log("CarPlay: no account available", log: self.log, type: .info)
+        return
+      }
       appDelegate.notificationHandler.register(
         self,
         selector: #selector(refreshSort),
@@ -103,6 +123,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   ) {
     Task { @MainActor in
       os_log("CarPlay: didDisconnect", log: self.log, type: .info)
+      guard activeAccountInfo != nil, activeAccount != nil else {
+        os_log("CarPlay: no account available -> do nothing", log: self.log, type: .info)
+        return
+      }
       self.interfaceController = nil
       appDelegate.notificationHandler.remove(self, name: .fetchControllerSortChanged, object: nil)
       appDelegate.notificationHandler.remove(self, name: .offlineModeChanged, object: nil)
@@ -176,7 +200,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   func createLibrarySections() -> [CPListSection] {
     let continuePlayingItems = createContinePlayingItems()
     var librarySections = [
-      appDelegate.storage.settings.accounts.activeSettings.read.libraryDisplaySettings
+      appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
+        .libraryDisplaySettings
         .isVisible(libraryType: .radios) ?
         CPListSection(items: [
           createLibraryItem(text: "Channels", icon: UIImage.radio, sectionToDisplay: radioSection),
@@ -365,7 +390,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         .createArtwork(
           with: icon,
           iconSizeType: .small,
-          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+          theme: getPreference(activeAccountInfo).theme,
           lightDarkMode: traits.userInterfaceStyle.asModeType,
           switchColors: true
         )
@@ -393,7 +418,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         image: UIImage.createArtwork(
           with: UIImage.musicalNotes,
           iconSizeType: .small,
-          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+          theme: getPreference(activeAccountInfo).theme,
           lightDarkMode: traits.userInterfaceStyle.asModeType,
           switchColors: true
         ).carPlayImage(carTraitCollection: traits),
@@ -417,7 +442,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         image: UIImage.createArtwork(
           with: UIImage.podcast,
           iconSizeType: .small,
-          theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+          theme: getPreference(activeAccountInfo).theme,
           lightDarkMode: traits.userInterfaceStyle.asModeType,
           switchColors: true
         ).carPlayImage(carTraitCollection: traits),
@@ -441,7 +466,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let img = UIImage.createArtwork(
       with: UIImage.shuffle,
       iconSizeType: .small,
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: getPreference(activeAccountInfo).theme,
       lightDarkMode: traits.userInterfaceStyle.asModeType,
       switchColors: true
     ).carPlayImage(carTraitCollection: traits)
@@ -470,7 +495,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let img = UIImage.createArtwork(
       with: UIImage.shuffle,
       iconSizeType: .small,
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: getPreference(activeAccountInfo).theme,
       lightDarkMode: traits.userInterfaceStyle.asModeType,
       switchColors: true
     ).carPlayImage(carTraitCollection: traits)
@@ -641,8 +666,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       detailText: artist.subtitle,
       image: LibraryEntityImage.getImageToDisplayImmediately(
         libraryEntity: artist,
-        themePreference: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
-        artworkDisplayPreference: artworkDisplayPreference,
+        themePreference: getPreference(activeAccountInfo).theme,
+        artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
         useCache: false
       ).carPlayImage(carTraitCollection: traits),
       accessoryImage: nil,
@@ -689,7 +714,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       image: UIImage.createArtwork(
         with: UIImage.musicalNotes,
         iconSizeType: .small,
-        theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+        theme: getPreference(activeAccountInfo).theme,
         lightDarkMode: traits.userInterfaceStyle.asModeType,
         switchColors: true
       ).carPlayImage(carTraitCollection: traits),
@@ -727,8 +752,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       detailText: album.subtitle,
       image: LibraryEntityImage.getImageToDisplayImmediately(
         libraryEntity: album,
-        themePreference: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
-        artworkDisplayPreference: artworkDisplayPreference,
+        themePreference: getPreference(activeAccountInfo).theme,
+        artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
         useCache: false
       ).carPlayImage(carTraitCollection: traits),
       accessoryImage: nil,
@@ -815,9 +840,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         detailText: podcast.subtitle,
         image: LibraryEntityImage.getImageToDisplayImmediately(
           libraryEntity: podcast,
-          themePreference: appDelegate.storage.settings.accounts.activeSettings.read
-            .themePreference,
-          artworkDisplayPreference: artworkDisplayPreference,
+          themePreference: getPreference(activeAccountInfo).theme,
+          artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
           useCache: false
         ).carPlayImage(carTraitCollection: traits),
         accessoryImage: nil,
@@ -879,7 +903,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let img = UIImage.createArtwork(
       with: UIImage.shuffle,
       iconSizeType: .small,
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: getPreference(activeAccountInfo).theme,
       lightDarkMode: traits.userInterfaceStyle.asModeType,
       switchColors: true
     ).carPlayImage(carTraitCollection: traits)
@@ -902,7 +926,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let img = UIImage.createArtwork(
       with: UIImage.shuffle,
       iconSizeType: .small,
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: getPreference(activeAccountInfo).theme,
       lightDarkMode: traits.userInterfaceStyle.asModeType,
       switchColors: true
     ).carPlayImage(carTraitCollection: traits)
@@ -984,8 +1008,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     isTrackDisplayed ? UIImage.numberToImage(number: playable.track) :
       LibraryEntityImage.getImageToDisplayImmediately(
         libraryEntity: playable,
-        themePreference: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
-        artworkDisplayPreference: artworkDisplayPreference,
+        themePreference: getPreference(activeAccountInfo).theme,
+        artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
         useCache: false
       )
   }
@@ -1078,9 +1102,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
               item.setImage(
                 LibraryEntityImage.getImageToDisplayImmediately(
                   libraryEntity: entity,
-                  themePreference: appDelegate.storage.settings.accounts.activeSettings.read
-                    .themePreference,
-                  artworkDisplayPreference: artworkDisplayPreference,
+                  themePreference: getPreference(activeAccountInfo).theme,
+                  artworkDisplayPreference: getPreference(activeAccountInfo)
+                    .artworkDisplayPreference,
                   useCache: false
                 ).carPlayImage(carTraitCollection: traits)
               )

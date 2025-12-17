@@ -45,6 +45,8 @@ struct AlternativeURLAddDialogView: View {
   var errorMsg: String = ""
   @State
   var successMsg: String = ""
+  @EnvironmentObject
+  var settings: Settings
 
   func resetStatus() {
     isValidating = false
@@ -56,12 +58,14 @@ struct AlternativeURLAddDialogView: View {
     resetStatus()
     let newAltUrl = urlInput.trimmingCharacters(in: .whitespacesAndNewlines)
     let password = passwordInput
-    let username = appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+    let username = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+      .loginCredentials?
       .username ?? ""
     guard !newAltUrl.isEmpty,
           !username.isEmpty,
           !password.isEmpty,
-          let activeCred = appDelegate.storage.settings.accounts.activeSettings.read
+          let activeCred = appDelegate.storage.settings.accounts
+          .getSetting(settings.activeAccountInfo).read
           .loginCredentials
     else {
       errorMsg = "Inputs are not valid."
@@ -130,7 +134,8 @@ struct AlternativeURLAddDialogView: View {
                 TextField("https://localhost/ampache", text: $urlInput)
                   .textFieldStyle(.roundedBorder)
                 TextField(
-                  appDelegate.storage.settings.accounts.activeSettings.read.loginCredentials?
+                  appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+                    .loginCredentials?
                     .username ?? "",
                   text: $usernameInput
                 )

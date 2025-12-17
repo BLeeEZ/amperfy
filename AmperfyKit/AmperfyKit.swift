@@ -98,8 +98,8 @@ public class AmperKit {
 
   @MainActor
   public lazy var account: Account = {
-    if let credentials = storage.settings.accounts.activeSettings.read.loginCredentials {
-      return storage.main.library.getAccount(info: Account.createInfo(credentials: credentials))
+    if let accountInfo = storage.settings.accounts.active {
+      return storage.main.library.getAccount(info: accountInfo)
     } else {
       return storage.main.library.getAccount(info: AccountInfo.defaultAccountInfo)
     }

@@ -136,7 +136,8 @@ class GenericDetailTableHeader: UIView {
     guard let config = config else { return }
     let entityContainer = config.entityContainer
     entityImage.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(entityContainer.account?.info).read
+        .themePreference,
       container: entityContainer
     )
     titleLabel.text = entityContainer.name

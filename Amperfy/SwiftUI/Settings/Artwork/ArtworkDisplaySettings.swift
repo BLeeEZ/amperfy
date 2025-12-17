@@ -29,10 +29,12 @@ struct ArtworkDisplaySettings: View {
   var settingOptions = [ArtworkDisplayPreference]()
   @State
   var activeOption = ArtworkDisplayPreference.serverArtworkOnly
+  @EnvironmentObject
+  var settings: Settings
 
   func updateValues() {
     settingOptions = ArtworkDisplayPreference.allCases
-    activeOption = appDelegate.storage.settings.accounts.activeSettings.read
+    activeOption = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
       .artworkDisplayPreference
   }
 

@@ -874,14 +874,15 @@ class EntityPreviewVC: UIViewController {
   func refresh() {
     guard let entityContainer = entityContainer else { return }
     entityImageView.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(entityContainer.account?.info).read
+        .themePreference,
       container: entityContainer
     )
     titleLabel.text = entityContainer.name
     artistLabel.text = entityContainer.subtitle
     artistLabel.isHidden = entityContainer.subtitle == nil
     infoLabel.text = entityContainer.info(
-      for: appDelegate.account.apiType.asServerApiType,
+      for: entityContainer.account?.apiType.asServerApiType,
       details: DetailInfoType(type: .long, settings: appDelegate.storage.settings)
     )
   }

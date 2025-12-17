@@ -29,10 +29,13 @@ struct ArtworkDownloadSettingsView: View {
   var settingOptions = [ArtworkDownloadSetting]()
   @State
   var activeOption = ArtworkDownloadSetting.onlyOnce
+  @EnvironmentObject
+  var settings: Settings
 
   func updateValues() {
     settingOptions = ArtworkDownloadSetting.allCases
-    activeOption = appDelegate.storage.settings.accounts.activeSettings.read.artworkDownloadSetting
+    activeOption = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+      .artworkDownloadSetting
   }
 
   var body: some View {

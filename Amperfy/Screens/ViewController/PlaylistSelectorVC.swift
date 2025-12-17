@@ -302,7 +302,8 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     if selectMode == .multi {
       let isMarked = (selectedPlaylits[playlist] != nil)
       let img = UIImageView(image: isMarked ? .checkmark : .circle)
-      img.tintColor = isMarked ? appDelegate.storage.settings.accounts.activeSettings.read
+      img.tintColor = isMarked ? appDelegate.storage.settings.accounts
+        .getSetting(playlist.account?.info).read
         .themePreference
         .asColor : .secondaryLabelColor
       cell.accessoryView = img

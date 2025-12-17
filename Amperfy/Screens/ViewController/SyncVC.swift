@@ -58,7 +58,8 @@ class SyncVC: UIViewController {
       self.appDelegate.storage.main.library.cleanStorage()
       self.appDelegate.reinit()
 
-      guard let credentials = self.appDelegate.storage.settings.accounts.activeSettings.read
+      guard let credentials = self.appDelegate.storage.settings.accounts
+        .getSetting(self.appDelegate.account.info).read
         .loginCredentials
       else { return }
       let accountInfo = Account.createInfo(credentials: credentials)
@@ -121,7 +122,8 @@ class SyncVC: UIViewController {
       preferredStyle: .alert
     )
     let skip = UIAlertAction(title: "Skip", style: .destructive, handler: { action in
-      if let credentials = self.appDelegate.storage.settings.accounts.activeSettings.read
+      if let credentials = self.appDelegate.storage.settings.accounts
+        .getSetting(self.appDelegate.account.info).read
         .loginCredentials {
         let accountInfo = Account.createInfo(credentials: credentials)
         self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in

@@ -36,6 +36,8 @@ struct UpdatePasswordView: View {
   var errorMsg: String = ""
   @State
   var successMsg: String = ""
+  @EnvironmentObject
+  var settings: Settings
 
   func resetStatus() {
     isValidating = false
@@ -46,7 +48,8 @@ struct UpdatePasswordView: View {
   func updatePassword() {
     resetStatus()
     let newPassword = passwordInput
-    guard var loginCredentials = appDelegate.storage.settings.accounts.activeSettings.read
+    guard var loginCredentials = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo).read
       .loginCredentials,
       !newPassword.isEmpty else {
       errorMsg = "Please provide the new password."

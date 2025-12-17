@@ -196,7 +196,7 @@ struct LibrarySettingsView: View {
           }
           SettingsRow(title: "Initial Sync") {
             SecondaryText(
-              appDelegate.storage.settings.accounts.activeSettings.read
+              appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
                 .initialSyncCompletionStatus.description
             )
           }

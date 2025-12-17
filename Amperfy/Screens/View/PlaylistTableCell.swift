@@ -40,11 +40,12 @@ class PlaylistTableCell: BasicTableCell {
     self.rootView = rootView
     nameLabel.text = playlist.name
     entityImage.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(playlist.account?.info).read
+        .themePreference,
       container: playlist
     )
     infoLabel.text = playlist.info(
-      for: appDelegate.account.apiType.asServerApiType,
+      for: playlist.account?.apiType.asServerApiType,
       details: DetailInfoType(type: .short, settings: appDelegate.storage.settings)
     )
     infoLabel.textAlignment = (traitCollection.horizontalSizeClass == .regular) ? .right : .left

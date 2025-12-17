@@ -123,15 +123,25 @@ public class LibraryEntityImage: RoundedImage {
   }
 
   private var placeholderImage: UIImage {
-    UIImage.getGeneratedArtwork(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+    var theme = appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+    if let accountInfo = entity?.account?.info {
+      theme = appDelegate.storage.settings.accounts.getSetting(accountInfo).read.themePreference
+    }
+    return UIImage.getGeneratedArtwork(
+      theme: theme,
       artworkType: backupArtworkType ?? .song
     )
   }
 
   private var entityImagePathToDisplay: String? {
-    entity?.imagePath(
-      setting: appDelegate.storage.settings.accounts.activeSettings.read.artworkDisplayPreference
+    var artworkDisplayPreference = appDelegate.storage.settings.accounts.activeSetting.read
+      .artworkDisplayPreference
+    if let accountInfo = entity?.account?.info {
+      artworkDisplayPreference = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+        .artworkDisplayPreference
+    }
+    return entity?.imagePath(
+      setting: artworkDisplayPreference
     )
   }
 
@@ -172,10 +182,10 @@ public class LibraryEntityImage: RoundedImage {
     guard let downloadNotification = DownloadNotification.fromNotification(notification), let entity
     else { return }
     if let playable = entity as? AbstractPlayable,
-       playable.uniqueID == downloadNotification.id {
+       playable.uniqueID == downloadNotification.id, let accountInfo = playable.account?.info {
       Task { @MainActor in
         guard let imagePath = entity.imagePath(
-          setting: appDelegate.storage.settings.accounts.activeSettings.read
+          setting: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
             .artworkDisplayPreference
         ) else { return }
         await self.loadImageAndCacheIt(
@@ -184,10 +194,10 @@ public class LibraryEntityImage: RoundedImage {
       }
     }
     if let artwork = entity.artwork,
-       artwork.uniqueID == downloadNotification.id {
+       artwork.uniqueID == downloadNotification.id, let accountInfo = artwork.account?.info {
       Task { @MainActor in
         guard let imagePath = entity.imagePath(
-          setting: appDelegate.storage.settings.accounts.activeSettings.read
+          setting: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
             .artworkDisplayPreference
         ) else { return }
         await self.loadImageAndCacheIt(

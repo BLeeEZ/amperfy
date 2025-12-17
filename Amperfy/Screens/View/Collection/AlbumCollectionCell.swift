@@ -79,7 +79,8 @@ class AlbumCollectionCell: BasicCollectionCell {
     titleLabel.text = container.name
     subtitleLabel.text = container.subtitle
     entityImage.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(container.account?.info).read
+        .themePreference,
       container: container,
       cornerRadius: .big
     )

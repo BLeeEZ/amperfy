@@ -184,10 +184,10 @@ class PlayIndicator {
     addIndicatorIfNeeded()
     removeIndicatorIfNeeded()
 
-    if playable == appDelegate.player.currentlyPlaying {
+    if playable == appDelegate.player.currentlyPlaying, let accountInfo = playable?.account?.info {
       let indicator = PlayIndicatorHandler.shared.getIndicator(for: rootViewTypeName)
       indicator.color = isDisplayedOnImage ? .white : appDelegate.storage.settings.accounts
-        .activeSettings.read.themePreference
+        .getSetting(accountInfo).read.themePreference
         .asColor
       if appDelegate.player.isPlaying {
         if indicator.state != .playing {

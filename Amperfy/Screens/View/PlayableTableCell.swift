@@ -274,20 +274,23 @@ class PlayableTableCell: BasicTableCell {
       newStyle: isDislayAlbumTrackNumberStyle ? .trackNumber : .artwork
     )
     entityImage.display(
-      theme: appDelegate.storage.settings.accounts.activeSettings.read.themePreference,
+      theme: appDelegate.storage.settings.accounts.getSetting(playable.account?.info).read
+        .themePreference,
       container: playable
     )
     configurePlayIndicator(playable: playable)
 
     if displayMode == .selection {
       let img = UIImageView(image: isMarked ? .checkmark : .circle)
-      img.tintColor = isMarked ? appDelegate.storage.settings.accounts.activeSettings.read
+      img.tintColor = isMarked ? appDelegate.storage.settings.accounts
+        .getSetting(playable.account?.info).read
         .themePreference
         .asColor : .secondaryLabelColor
       accessoryView = img
     } else if displayMode == .add {
       let img = UIImageView(image: isMarked ? .checkmark : .plusCircle)
-      img.tintColor = appDelegate.storage.settings.accounts.activeSettings.read.themePreference
+      img.tintColor = appDelegate.storage.settings.accounts.getSetting(playable.account?.info).read
+        .themePreference
         .asColor
       accessoryView = img
     } else if displayMode == .reorder || playerIndexCb != nil {
@@ -478,7 +481,7 @@ class PlayableTableCell: BasicTableCell {
           if isDislayAlbumTrackNumberStyle {
             trackNumberLabel.isHidden = true
             playOverNumberButton.isHidden = false
-            playOverNumberButton.imageView?.tintColor = appDelegate.storage.settings.themePreference
+            playOverNumberButton.imageView?.tintColor = appDelegate.storage.settings.accounts.getSetting(playable?.account?.info).read.themePreference
               .asColor
             playOverNumberButton.setImage(buttonImg, for: UIControl.State.normal)
             playOverArtworkButton.isHidden = true
@@ -489,8 +492,8 @@ class PlayableTableCell: BasicTableCell {
             playOverNumberButton.isHidden = true
           }
         }
-        cacheIconImage.tintColor = appDelegate.storage.settings.themePreference.asColor
-        optionsButton.imageView?.tintColor = appDelegate.storage.settings.themePreference.asColor
+        cacheIconImage.tintColor = appDelegate.storage.settings.accounts.getSetting(playable?.account?.info).read.themePreference.asColor
+        optionsButton.imageView?.tintColor = appDelegate.storage.settings.accounts.getSetting(playable?.account?.info).read.themePreference.asColor
         backgroundColor = (rootView is PopupPlayerVC) ?
           .secondarySystemGroupedBackground.withAlphaComponent(0.2) :
           .secondarySystemGroupedBackground
