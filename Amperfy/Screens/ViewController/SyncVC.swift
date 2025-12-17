@@ -31,6 +31,7 @@ class SyncVC: UIViewController {
   var parsedObjectPercent: Float = 0.0
   var libObjectsToParseCount: Int = 1
   var syncFinished = false
+  var account: Account!
 
   @IBOutlet
   weak var progressBar: UIProgressView!
@@ -103,7 +104,8 @@ class SyncVC: UIViewController {
     appDelegate.eventLogger.supressAlerts = false
 
     guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
-    mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow())
+    mainScene
+      .replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow(account: account))
   }
 
   private func updateSyncInfo(infoText: String? = nil, percentParsed: Float = 0.0) {

@@ -122,7 +122,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     common.sceneTitle
   }
 
-  private var common = AlbumsCommonVCInteractions()
+  private let common: AlbumsCommonVCInteractions
   private var detailHeader: LibraryElementDetailTableHeaderView?
 
   public var displayFilter: DisplayCategoryFilter {
@@ -134,12 +134,13 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     diffableDataSource as? AlbumsDiffableDataSource
   }
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    self.common = AlbumsCommonVCInteractions(account: account)
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -298,7 +299,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     guard let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath)
     else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToAlbumDetail(album: album),
+      AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
       animated: true
     )
   }

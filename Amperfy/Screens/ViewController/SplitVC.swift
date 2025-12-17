@@ -30,17 +30,29 @@ class SplitVC: UISplitViewController {
   public static let sidebarWidth: CGFloat = 250
   public static let inspectorWidth: CGFloat = 300
 
-  private var welcomePopupPresenter = WelcomePopupPresenter()
-
   var miniPlayer: MiniPlayerView?
   var miniPlayerLeadingConstraint: NSLayoutConstraint?
   var miniPlayerTrailingConstraint: NSLayoutConstraint?
   var miniPlayerBottomConstraint: NSLayoutConstraint?
   var miniPlayerHeightConstraint: NSLayoutConstraint?
+  var welcomePopupPresenter = WelcomePopupPresenter()
+  private let account: Account!
+
+  init(style: UISplitViewController.Style, account: Account) {
+    self.account = account
+    super.init(style: style)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    setViewController(embeddInNavigation(vc: AppStoryboard.Main.segueToSideBar()), for: .primary)
+    setViewController(
+      embeddInNavigation(vc: AppStoryboard.Main.segueToSideBar(account: account)),
+      for: .primary
+    )
     setViewController(defaultSecondaryVC, for: .secondary)
     primaryEdge = .leading
     primaryBackgroundStyle = .sidebar
@@ -141,7 +153,7 @@ class SplitVC: UISplitViewController {
   }
 
   var defaultSecondaryVC: UINavigationController {
-    embeddInNavigation(vc: TabNavigatorItem.home.controller)
+    embeddInNavigation(vc: TabNavigatorItem.home.getController(account: account))
   }
 
   public func push(vc: UIViewController) {
@@ -162,13 +174,13 @@ extension SplitVC: MainSceneHostingViewController {
   }
 
   func pushTabCategory(tabCategory: TabNavigatorItem) {
-    let vc = tabCategory.controller
+    let vc = tabCategory.getController(account: account)
     setViewController(embeddInNavigation(vc: vc), for: .secondary)
   }
 
   func displaySearch() {
     visualizePopupPlayer(direction: .close, animated: true) {
-      let searchVC = AppStoryboard.Main.segueToSearch()
+      let searchVC = AppStoryboard.Main.segueToSearch(account: self.account)
       self.setViewController(self.embeddInNavigation(vc: searchVC), for: .secondary)
       Task {
         try await Task.sleep(nanoseconds: 500_000_000)

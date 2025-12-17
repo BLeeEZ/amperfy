@@ -29,7 +29,7 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
     common.sceneTitle
   }
 
-  private var common = AlbumsCommonVCInteractions(isSetNavbarButton: false)
+  private var common: AlbumsCommonVCInteractions
   private var doneButton: UIBarButtonItem!
 
   public var addToPlaylistManager = AddToPlaylistManager()
@@ -43,12 +43,13 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
     diffableDataSource as? AlbumsDiffableDataSource
   }
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    self.common = AlbumsCommonVCInteractions(account: account, isSetNavbarButton: false)
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -153,8 +154,7 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
     guard let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath)
     else { return }
 
-    let nextVC = PlaylistAddAlbumDetailVC()
-    nextVC.album = album
+    let nextVC = PlaylistAddAlbumDetailVC(account: account, album: album)
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }

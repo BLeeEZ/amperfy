@@ -252,23 +252,31 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   }
 
   func displayArtistDetail() {
-    if let song = player.currentlyPlaying?.asSong, let artist = song.artist {
-      let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(artist: artist)
+    if let song = player.currentlyPlaying?.asSong, let artist = song.artist,
+       let account = artist.account {
+      let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist)
       closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
     }
   }
 
   func displayAlbumDetail() {
-    if let song = player.currentlyPlaying?.asSong, let album = song.album {
-      let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(album: album, songToScrollTo: song)
+    if let song = player.currentlyPlaying?.asSong, let album = song.album,
+       let account = album.account {
+      let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(
+        account: account,
+        album: album,
+        songToScrollTo: song
+      )
       closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
     }
   }
 
   func displayPodcastDetail() {
     if let podcastEpisode = player.currentlyPlaying?.asPodcastEpisode,
-       let podcast = podcastEpisode.podcast {
+       let podcast = podcastEpisode.podcast,
+       let account = podcastEpisode.account {
       let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(
+        account: account,
         podcast: podcast,
         episodeToScrollTo: podcastEpisode
       )

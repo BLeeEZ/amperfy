@@ -28,12 +28,12 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
 
   private var fetchedResultsController: MusicFolderFetchedResultsController!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -113,7 +113,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToIndexes(musicFolder: musicFolder),
+      AppStoryboard.Main.segueToIndexes(account: account, musicFolder: musicFolder),
       animated: true
     )
   }

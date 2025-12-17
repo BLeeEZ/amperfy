@@ -66,7 +66,13 @@ class UpdateVC: UIViewController {
       self.appDelegate.startManagerForNormalOperation()
 
       guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
-      mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow())
+      if let accountInfo = self.appDelegate.storage.settings.accounts.active {
+        let account = self.appDelegate.storage.main.library.getAccount(info: accountInfo)
+        mainScene
+          .replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow(account: account))
+      } else {
+        mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToLogin())
+      }
     }
   }
 

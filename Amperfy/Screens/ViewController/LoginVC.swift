@@ -380,7 +380,8 @@ class LoginVC: UIViewController {
         meta.backendApi.provideCredentials(credentials: credentials)
 
         guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
-        mainScene.replaceMainRootViewController(vc: AppStoryboard.Main.segueToSync())
+        mainScene
+          .replaceMainRootViewController(vc: AppStoryboard.Main.segueToSync(account: meta.account))
       } catch {
         if error is AuthenticationError {
           self.showErrorMsg(message: error.localizedDescription)

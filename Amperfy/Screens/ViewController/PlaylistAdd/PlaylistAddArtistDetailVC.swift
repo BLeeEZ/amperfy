@@ -26,19 +26,21 @@ import UIKit
 class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddable {
   override var sceneTitle: String? { artist.name }
 
-  public var artist: Artist!
   public var addToPlaylistManager = AddToPlaylistManager()
 
   private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
   private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  private let artist: Artist
+
+  init(account: Account, artist: Artist) {
+    self.artist = artist
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -235,8 +237,7 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
         row: indexPath.row,
         section: 0
       ))
-      let nextVC = PlaylistAddAlbumDetailVC()
-      nextVC.album = album
+      let nextVC = PlaylistAddAlbumDetailVC(account: account, album: album)
       nextVC.addToPlaylistManager = addToPlaylistManager
       navigationController?.pushViewController(nextVC, animated: true)
     case LibraryElement.Song.rawValue:

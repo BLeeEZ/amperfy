@@ -82,10 +82,10 @@ enum TabNavigatorItem: Int, Hashable, CaseIterable {
   }
 
   @MainActor
-  var controller: UIViewController {
+  func getController(account: Account) -> UIViewController {
     switch self {
-    case .home: return AppStoryboard.Main.segueToHome()
-    case .search: return AppStoryboard.Main.segueToSearch()
+    case .home: return AppStoryboard.Main.segueToHome(account: account)
+    case .search: return AppStoryboard.Main.segueToSearch(account: account)
     }
   }
 }

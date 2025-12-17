@@ -116,7 +116,10 @@ class AlbumsCommonVCInteractions {
     }
   }
 
-  init(isSetNavbarButton: Bool = true) {
+  private let account: Account
+
+  init(account: Account, isSetNavbarButton: Bool = true) {
+    self.account = account
     self.isSetNavbarButton = isSetNavbarButton
   }
 
@@ -409,6 +412,7 @@ class AlbumsCommonVCInteractions {
         self.rootVC?.navigationController?.replaceCurrentlyActiveVC(
           with: AppStoryboard.Main
             .createAlbumsVC(
+              account: self.account,
               style: self.appDelegate.storage.settings.user.albumsStyleSetting,
               category: self.displayFilter
             ),
@@ -424,6 +428,7 @@ class AlbumsCommonVCInteractions {
         self.rootVC?.navigationController?.replaceCurrentlyActiveVC(
           with: AppStoryboard.Main
             .createAlbumsVC(
+              account: self.account,
               style: self.appDelegate.storage.settings.user.albumsStyleSetting,
               category: self.displayFilter
             ),

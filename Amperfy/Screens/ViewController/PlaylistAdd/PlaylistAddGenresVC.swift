@@ -31,12 +31,12 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
   private var fetchedResultsController: GenreFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -92,9 +92,7 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
-
-    let nextVC = PlaylistAddGenreDetailVC()
-    nextVC.genre = genre
+    let nextVC = PlaylistAddGenreDetailVC(account: account, genre: genre)
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }

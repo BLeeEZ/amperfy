@@ -31,12 +31,12 @@ class PodcastsVC: MultiSourceTableViewController {
   private var optionsButton: UIBarButtonItem!
   private var showType: PodcastsShowType = .podcasts
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -252,7 +252,7 @@ class PodcastsVC: MultiSourceTableViewController {
     case .podcasts:
       let podcast = podcastsFetchedResultsController.getWrappedEntity(at: indexPath)
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
+        AppStoryboard.Main.segueToPodcastDetail(account: account, podcast: podcast),
         animated: true
       )
     case .episodesSortedByReleaseDate:

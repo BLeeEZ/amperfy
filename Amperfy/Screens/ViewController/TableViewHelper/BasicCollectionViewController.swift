@@ -159,6 +159,16 @@ class SingleSnapshotFetchedResultsCollectionViewController<ResultType>:
   @preconcurrency NSFetchedResultsControllerDelegate where ResultType: NSFetchRequestResult {
   var diffableDataSource: BasicUICollectionViewDiffableDataSource?
   var snapshotDidChange: (() -> ())?
+  let account: Account
+
+  init(collectionViewLayout: UICollectionViewLayout, account: Account) {
+    self.account = account
+    super.init(collectionViewLayout: collectionViewLayout)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()

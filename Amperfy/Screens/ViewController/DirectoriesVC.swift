@@ -26,17 +26,18 @@ import UIKit
 class DirectoriesVC: MultiSourceTableViewController {
   override var sceneTitle: String? { directory.name }
 
-  var directory: Directory!
   private var subdirectoriesFetchedResultsController: DirectorySubdirectoriesFetchedResultsController!
   private var songsFetchedResultsController: DirectorySongsFetchedResultsController!
   private var headerView: LibraryElementDetailTableHeaderView?
+  let directory: Directory
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, directory: Directory) {
+    self.directory = directory
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -344,7 +345,7 @@ class DirectoriesVC: MultiSourceTableViewController {
       section: 0
     ))
     navController.pushViewController(
-      AppStoryboard.Main.segueToDirectories(directory: selectedDirectory),
+      AppStoryboard.Main.segueToDirectories(account: account, directory: selectedDirectory),
       animated: true
     )
   }

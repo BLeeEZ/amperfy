@@ -149,9 +149,10 @@ extension AppDelegate {
   @objc
   private func keyCommandGoToCurrent() {
     let playable = player.currentlyPlaying
-    guard let album = playable?.asSong?.album else { return }
+    guard let album = playable?.asSong?.album, let account = playable?.account else { return }
     appDelegate.userStatistics.usedAction(.alertGoToAlbum)
     let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(
+      account: account,
       album: album,
       songToScrollTo: playable?.asSong
     )

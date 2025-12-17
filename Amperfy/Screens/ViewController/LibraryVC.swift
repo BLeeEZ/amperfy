@@ -24,6 +24,17 @@ import UIKit
 
 @MainActor
 class LibraryVC: KeyCommandCollectionViewController {
+  private let account: Account!
+
+  init(collectionViewLayout: UICollectionViewLayout, account: Account) {
+    self.account = account
+    super.init(collectionViewLayout: collectionViewLayout)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   override var sceneTitle: String? { "Library"
   }
 
@@ -63,6 +74,9 @@ class LibraryVC: KeyCommandCollectionViewController {
     else { return }
     navigationController?.navigationBar.prefersLargeTitles = false
     AppDelegate.mainWindowHostVC?
-      .pushLibraryCategory(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+      .pushLibraryCategory(vc: libraryItem.controller(
+        account: account,
+        settings: appDelegate.storage.settings
+      ))
   }
 }

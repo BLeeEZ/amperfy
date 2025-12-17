@@ -32,48 +32,48 @@ public protocol PlaylistVCAddable: UIViewController {
 }
 
 extension LibraryDisplayType {
-  public var vcForPlaylistAdd: PlaylistVCAddable? {
+  public func getVCForPlaylistAdd(account: Account) -> PlaylistVCAddable? {
     switch self {
     case .genres:
-      let vc = PlaylistAddGenresVC()
+      let vc = PlaylistAddGenresVC(account: account)
       return vc
     case .artists:
-      let vc = PlaylistAddArtistsVC()
+      let vc = PlaylistAddArtistsVC(account: account)
       vc.displayFilter = .all
       return vc
     case .favoriteArtists:
-      let vc = PlaylistAddArtistsVC()
+      let vc = PlaylistAddArtistsVC(account: account)
       vc.displayFilter = .favorites
       return vc
     case .newestAlbums:
-      let vc = PlaylistAddAlbumsVC()
+      let vc = PlaylistAddAlbumsVC(account: account)
       vc.displayFilter = .newest
       return vc
     case .recentAlbums:
-      let vc = PlaylistAddAlbumsVC()
+      let vc = PlaylistAddAlbumsVC(account: account)
       vc.displayFilter = .recent
       return vc
     case .favoriteAlbums:
-      let vc = PlaylistAddAlbumsVC()
+      let vc = PlaylistAddAlbumsVC(account: account)
       vc.displayFilter = .favorites
       return vc
     case .albums:
-      let vc = PlaylistAddAlbumsVC()
+      let vc = PlaylistAddAlbumsVC(account: account)
       vc.displayFilter = .all
       return vc
     case .songs:
-      let vc = PlaylistAddSongsVC()
+      let vc = PlaylistAddSongsVC(account: account)
       vc.displayFilter = .all
       return vc
     case .favoriteSongs:
-      let vc = PlaylistAddSongsVC()
+      let vc = PlaylistAddSongsVC(account: account)
       vc.displayFilter = .favorites
       return vc
     case .playlists:
-      let vc = PlaylistAddPlaylistsVC()
+      let vc = PlaylistAddPlaylistsVC(account: account)
       return vc
     case .directories:
-      let vc = PlaylistAddMusicFoldersVC()
+      let vc = PlaylistAddMusicFoldersVC(account: account)
       return vc
     default:
       return nil
@@ -305,6 +305,16 @@ class PlaylistAddLibraryVC: KeyCommandTableViewController {
   private var libraryItems = [LibraryNavigatorItem]()
 
   public let addToPlaylistManager = AddToPlaylistManager()
+  private let account: Account!
+
+  init(account: Account) {
+    self.account = account
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -372,7 +382,8 @@ class PlaylistAddLibraryVC: KeyCommandTableViewController {
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: false)
-    guard let nextVC = libraryItems[indexPath.row].library?.vcForPlaylistAdd else { return }
+    guard let nextVC = libraryItems[indexPath.row].library?.getVCForPlaylistAdd(account: account)
+    else { return }
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }

@@ -26,19 +26,20 @@ import UIKit
 class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddable {
   override var sceneTitle: String? { directory.name }
 
-  public var directory: Directory!
   public var addToPlaylistManager = AddToPlaylistManager()
 
   private var subdirectoriesFetchedResultsController: DirectorySubdirectoriesFetchedResultsController!
   private var songsFetchedResultsController: DirectorySongsFetchedResultsController!
   private var doneButton: UIBarButtonItem!
+  private let directory: Directory
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, directory: Directory) {
+    self.directory = directory
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -202,8 +203,7 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
         row: indexPath.row,
         section: 0
       ))
-      let nextVC = PlaylistAddDirectoriesVC()
-      nextVC.directory = selectedDirectory
+      let nextVC = PlaylistAddDirectoriesVC(account: account, directory: selectedDirectory)
       nextVC.addToPlaylistManager = addToPlaylistManager
       navigationController?.pushViewController(nextVC, animated: true)
     case 1:

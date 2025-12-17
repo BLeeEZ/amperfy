@@ -37,7 +37,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
 
   private var fetchedResultsController: PlaylistItemsFetchedResultsController!
 
-  var playlist: Playlist!
+  let playlist: Playlist
   var onDoneCB: VoidFunctionCallback?
 
   private var doneButton: UIBarButtonItem!
@@ -50,12 +50,13 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
   private var selectedItems = [PlaylistItem]()
   private var editMode = PlaylistEditMode.reorder
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, playlist: Playlist) {
+    self.playlist = playlist
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -194,7 +195,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
               playlistToDeleteSong: self.playlist,
               index: index
             )
-          self.playlist?.remove(at: index)
+          self.playlist.remove(at: index)
         }
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
@@ -208,7 +209,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
 
   @IBAction
   func addBarButtonPressed(_ sender: Any) {
-    let playlistAddVC = PlaylistAddLibraryVC()
+    let playlistAddVC = PlaylistAddLibraryVC(account: account)
     playlistAddVC.addToPlaylistManager.playlist = playlist
     playlistAddVC.addToPlaylistManager.onDoneCB = {
       self.detailOperationsView?.refresh()

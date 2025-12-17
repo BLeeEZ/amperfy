@@ -23,6 +23,17 @@ import AmperfyKit
 import UIKit
 
 class SideBarVC: KeyCommandCollectionViewController {
+  private let account: Account!
+
+  init(collectionViewLayout: UICollectionViewLayout, account: Account) {
+    self.account = account
+    super.init(collectionViewLayout: collectionViewLayout)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+
   private var offsetData: [LibraryNavigatorItem] = {
     [
       LibraryNavigatorItem(title: "Search", tab: .search),
@@ -83,7 +94,10 @@ class SideBarVC: KeyCommandCollectionViewController {
 
     if let libraryItem = selectedItem.library {
       AppDelegate.mainWindowHostVC?
-        .pushLibraryCategory(vc: libraryItem.controller(settings: appDelegate.storage.settings))
+        .pushLibraryCategory(vc: libraryItem.controller(
+          account: account,
+          settings: appDelegate.storage.settings
+        ))
     } else if let libraryItem = selectedItem.tab {
       AppDelegate.mainWindowHostVC?.pushTabCategory(tabCategory: libraryItem)
     }

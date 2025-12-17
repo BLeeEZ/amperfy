@@ -26,12 +26,12 @@ import UIKit
 class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override var sceneTitle: String? { "Genres" }
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   private var fetchedResultsController: GenreFetchedResultsController!
@@ -144,7 +144,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let genre = fetchedResultsController.getWrappedEntity(at: indexPath)
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToGenreDetail(genre: genre),
+      AppStoryboard.Main.segueToGenreDetail(account: account, genre: genre),
       animated: true
     )
   }

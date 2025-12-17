@@ -25,18 +25,19 @@ import UIKit
 class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO> {
   override var sceneTitle: String? { podcast.name }
 
-  var podcast: Podcast!
+  private let podcast: Podcast
   var episodeToScrollTo: PodcastEpisode?
   private var fetchedResultsController: PodcastEpisodesFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, podcast: Podcast) {
+    self.podcast = podcast
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {

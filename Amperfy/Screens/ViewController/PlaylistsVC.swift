@@ -83,8 +83,8 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   private var optionsButton: UIBarButtonItem!
   private var sortType: PlaylistSortType = .name
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -266,7 +266,7 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let playlist = playlistAt(indexPath: indexPath) else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+      AppStoryboard.Main.segueToPlaylistDetail(account: account, playlist: playlist),
       animated: true
     )
   }

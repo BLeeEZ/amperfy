@@ -27,18 +27,19 @@ class PlaylistAddPlaylistDetailVC: SingleSnapshotFetchedResultsTableViewControll
   PlaylistVCAddable {
   override var sceneTitle: String? { playlist.name }
 
-  public var playlist: Playlist!
+  private let playlist: Playlist
   public var addToPlaylistManager = AddToPlaylistManager()
 
   private var fetchedResultsController: PlaylistItemsFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, playlist: Playlist) {
+    self.playlist = playlist
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {

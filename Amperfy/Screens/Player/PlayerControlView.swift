@@ -336,8 +336,12 @@ class PlayerControlView: UIView {
               itemsToAdd.append(currentSong)
             }
             itemsToAdd.append(contentsOf: self.player.getAllNextQueueItems().filterSongs())
+            // allow add to playlist only if all songs belong to the same account
+            guard let firstItemAccount = itemsToAdd.first?.account,
+                  itemsToAdd.count == itemsToAdd.filter({ $0.account == firstItemAccount }).count
+            else { return }
             let selectPlaylistVC = AppStoryboard.Main
-              .segueToPlaylistSelector(itemsToAdd: itemsToAdd)
+              .segueToPlaylistSelector(account: firstItemAccount, itemsToAdd: itemsToAdd)
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
             self.rootView?.present(selectPlaylistNav, animated: true, completion: nil)
           }

@@ -31,12 +31,12 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   private var fetchedResultsController: RadiosFetchedResultsController!
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {

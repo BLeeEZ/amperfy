@@ -40,18 +40,19 @@ class AlbumDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
 class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
   override var sceneTitle: String? { album.name }
 
-  var album: Album!
   var songToScrollTo: Song?
   private var fetchedResultsController: AlbumSongsFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
+  let album: Album
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, album: Album) {
+    self.album = album
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {

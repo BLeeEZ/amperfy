@@ -40,7 +40,12 @@ enum AppStoryboard: String {
   // MARK: true Storyboard view controller
 
   func segueToLogin() -> UIViewController { LoginVC() }
-  func segueToSync() -> UIViewController { SyncVC.instantiateFromAppStoryboard() }
+  func segueToSync(account: Account) -> UIViewController {
+    let syncVC = SyncVC.instantiateFromAppStoryboard()
+    syncVC.account = account
+    return syncVC
+  }
+
   func segueToUpdate() -> UIViewController { UpdateVC.instantiateFromAppStoryboard() }
   func segueToLibrarySyncPopup() -> LibrarySyncPopupVC { LibrarySyncPopupVC
     .instantiateFromAppStoryboard()
@@ -49,27 +54,28 @@ enum AppStoryboard: String {
   // MARK: create regualar instances
 
   func createAlbumsVC(
+    account: Account,
     style: AlbumsDisplayStyle,
     category: DisplayCategoryFilter
   )
     -> UIViewController {
     switch style {
     case .table:
-      let vc = AlbumsVC()
+      let vc = AlbumsVC(account: account)
       vc.displayFilter = category
       return vc
     case .grid:
-      let vc = AlbumsCollectionVC(collectionViewLayout: .verticalLayout)
+      let vc = AlbumsCollectionVC(collectionViewLayout: .verticalLayout, account: account)
       vc.displayFilter = category
       return vc
     }
   }
 
-  func segueToMainWindow() -> UIViewController {
+  func segueToMainWindow(account: Account) -> UIViewController {
     #if targetEnvironment(macCatalyst) // ok
-      SplitVC(style: .doubleColumn)
+      SplitVC(style: .doubleColumn, account: account)
     #else
-      TabBarVC()
+      TabBarVC(account: account)
     #endif
   }
 
@@ -81,95 +87,102 @@ enum AppStoryboard: String {
     #endif
   }
 
-  func segueToPlaylistSelector(itemsToAdd: [Song]) -> UIViewController {
-    let playlistSelectorVC = PlaylistSelectorVC()
-    playlistSelectorVC.itemsToAdd = itemsToAdd
+  func segueToPlaylistSelector(account: Account, itemsToAdd: [Song]) -> UIViewController {
+    let playlistSelectorVC = PlaylistSelectorVC(account: account, itemsToAdd: itemsToAdd)
     return playlistSelectorVC
   }
 
-  func segueToPlaylistEdit(playlist: Playlist) -> PlaylistEditVC {
-    let playlistEditVC = PlaylistEditVC()
-    playlistEditVC.playlist = playlist
+  func segueToPlaylistEdit(account: Account, playlist: Playlist) -> PlaylistEditVC {
+    let playlistEditVC = PlaylistEditVC(account: account, playlist: playlist)
     return playlistEditVC
   }
 
-  func segueToSideBar() -> UIViewController {
-    SideBarVC(collectionViewLayout: .verticalLayout)
+  func segueToSideBar(account: Account) -> UIViewController {
+    SideBarVC(collectionViewLayout: .verticalLayout, account: account)
   }
 
-  func segueToHome() -> HomeVC { HomeVC() }
-  func segueToLibrary() -> UIViewController { LibraryVC(collectionViewLayout: .verticalLayout) }
-  func segueToSearch() -> SearchVC { SearchVC() }
+  func segueToHome(account: Account) -> HomeVC { HomeVC(account: account) }
+  func segueToLibrary(account: Account) -> UIViewController { LibraryVC(
+    collectionViewLayout: .verticalLayout,
+    account: account
+  ) }
+  func segueToSearch(account: Account) -> SearchVC { SearchVC(account: account) }
   func segueToSettings() -> SettingsHostVC { SettingsHostVC(isForOwnWindow: false) }
-  func segueToDownloads() -> UIViewController { DownloadsVC() }
-  func segueToRadios() -> UIViewController { RadiosVC() }
-  func segueToSongs() -> UIViewController { SongsVC() }
-  func segueToFavoriteSongs() -> UIViewController { let songsVC = SongsVC()
+  func segueToDownloads(account: Account) -> UIViewController { DownloadsVC(account: account) }
+  func segueToRadios(account: Account) -> UIViewController { RadiosVC(account: account) }
+  func segueToSongs(account: Account) -> UIViewController { SongsVC(account: account) }
+  func segueToFavoriteSongs(account: Account)
+    -> UIViewController { let songsVC = SongsVC(account: account)
     songsVC.displayFilter = .favorites
     return songsVC
   }
 
-  func segueToPodcasts() -> UIViewController { PodcastsVC() }
-  func segueToPlaylists() -> UIViewController { PlaylistsVC() }
-  func segueToArtists() -> UIViewController { ArtistsVC() }
-  func segueToFavoriteArtists() -> UIViewController { let artistsVC = ArtistsVC()
+  func segueToPodcasts(account: Account) -> UIViewController { PodcastsVC(account: account) }
+  func segueToPlaylists(account: Account) -> UIViewController { PlaylistsVC(account: account) }
+  func segueToArtists(account: Account) -> UIViewController { ArtistsVC(account: account) }
+  func segueToFavoriteArtists(account: Account)
+    -> UIViewController { let artistsVC = ArtistsVC(account: account)
     artistsVC.displayFilter = .favorites
     return artistsVC
   }
 
-  func segueToMusicFolders() -> UIViewController {
-    MusicFoldersVC()
+  func segueToMusicFolders(account: Account) -> UIViewController {
+    MusicFoldersVC(account: account)
   }
 
-  func segueToGenres() -> UIViewController {
-    GenresVC()
+  func segueToGenres(account: Account) -> UIViewController {
+    GenresVC(account: account)
   }
 
-  func segueToGenreDetail(genre: Genre) -> UIViewController {
-    let genreDetailVC = GenreDetailVC()
-    genreDetailVC.genre = genre
+  func segueToGenreDetail(account: Account, genre: Genre) -> UIViewController {
+    let genreDetailVC = GenreDetailVC(account: account, genre: genre)
     return genreDetailVC
   }
 
-  func segueToArtistDetail(artist: Artist, albumToScrollTo: Album? = nil) -> UIViewController {
-    let artistDetailVC = ArtistDetailVC()
-    artistDetailVC.artist = artist
+  func segueToArtistDetail(
+    account: Account,
+    artist: Artist,
+    albumToScrollTo: Album? = nil
+  )
+    -> UIViewController {
+    let artistDetailVC = ArtistDetailVC(account: account, artist: artist)
     artistDetailVC.albumToScrollTo = albumToScrollTo
     return artistDetailVC
   }
 
-  func segueToAlbumDetail(album: Album, songToScrollTo: Song? = nil) -> UIViewController {
-    let albumDetailVC = AlbumDetailVC()
-    albumDetailVC.album = album
+  func segueToAlbumDetail(
+    account: Account,
+    album: Album,
+    songToScrollTo: Song? = nil
+  )
+    -> UIViewController {
+    let albumDetailVC = AlbumDetailVC(account: account, album: album)
     albumDetailVC.songToScrollTo = songToScrollTo
     return albumDetailVC
   }
 
-  func segueToIndexes(musicFolder: MusicFolder) -> UIViewController {
-    let indexesVC = IndexesVC()
-    indexesVC.musicFolder = musicFolder
+  func segueToIndexes(account: Account, musicFolder: MusicFolder) -> UIViewController {
+    let indexesVC = IndexesVC(account: account, musicFolder: musicFolder)
     return indexesVC
   }
 
-  func segueToDirectories(directory: Directory) -> UIViewController {
-    let directoriesVC = DirectoriesVC()
-    directoriesVC.directory = directory
+  func segueToDirectories(account: Account, directory: Directory) -> UIViewController {
+    let directoriesVC = DirectoriesVC(account: account, directory: directory)
     return directoriesVC
   }
 
-  func segueToPlaylistDetail(playlist: Playlist) -> UIViewController {
-    let playlistDetailVC = PlaylistDetailVC()
-    playlistDetailVC.playlist = playlist
+  func segueToPlaylistDetail(account: Account, playlist: Playlist) -> UIViewController {
+    let playlistDetailVC = PlaylistDetailVC(account: account, playlist: playlist)
     return playlistDetailVC
   }
 
   func segueToPodcastDetail(
+    account: Account,
     podcast: Podcast,
     episodeToScrollTo: PodcastEpisode? = nil
   )
     -> UIViewController {
-    let podcastDetailVC = PodcastDetailVC()
-    podcastDetailVC.podcast = podcast
+    let podcastDetailVC = PodcastDetailVC(account: account, podcast: podcast)
     podcastDetailVC.episodeToScrollTo = episodeToScrollTo
     return podcastDetailVC
   }

@@ -114,14 +114,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     #if false
       windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
     #endif
-    if AmperKit.shared.storage.settings.accounts.active == nil {
-      initialViewController = AppStoryboard.Main.segueToLogin()
-    } else if !AmperKit.shared.storage.settings.app.isLibrarySynced {
-      initialViewController = AppStoryboard.Main.segueToSync()
-    } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
-      initialViewController = AppStoryboard.Main.segueToUpdate()
+    if let activeAccountInfo = AmperKit.shared.storage.settings.accounts.active {
+      let account = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
+      if !AmperKit.shared.storage.settings.app.isLibrarySynced {
+        initialViewController = AppStoryboard.Main.segueToSync(account: account)
+      } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
+        initialViewController = AppStoryboard.Main.segueToUpdate()
+      } else {
+        initialViewController = AppStoryboard.Main.segueToMainWindow(account: account)
+      }
     } else {
-      initialViewController = AppStoryboard.Main.segueToMainWindow()
+      initialViewController = AppStoryboard.Main.segueToLogin()
     }
     replaceMainRootViewController(vc: initialViewController!)
 

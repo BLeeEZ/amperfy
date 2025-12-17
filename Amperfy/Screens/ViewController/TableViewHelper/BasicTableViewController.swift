@@ -366,10 +366,16 @@ class BasicTableViewController: KeyCommandTableViewController {
           }))
           self.present(alert, animated: true, completion: nil)
         case .addToPlaylist:
-          let selectPlaylistVC = AppStoryboard.Main
-            .segueToPlaylistSelector(itemsToAdd: actionContext.playables.filterSongs())
-          let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-          self.present(selectPlaylistNav, animated: true)
+          let filterSongs = actionContext.playables.filterSongs()
+          if let account = filterSongs.first?.account {
+            let selectPlaylistVC = AppStoryboard.Main
+              .segueToPlaylistSelector(
+                account: account,
+                itemsToAdd: filterSongs
+              )
+            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+            self.present(selectPlaylistNav, animated: true)
+          }
         case .play:
           self.appDelegate.player.play(context: actionContext.playContext)
         case .playShuffled:

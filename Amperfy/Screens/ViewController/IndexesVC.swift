@@ -26,15 +26,16 @@ import UIKit
 class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
   override var sceneTitle: String? { musicFolder.name }
 
-  var musicFolder: MusicFolder!
   private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
+  let musicFolder: MusicFolder
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, musicFolder: MusicFolder) {
+    self.musicFolder = musicFolder
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -115,7 +116,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToDirectories(directory: directory),
+      AppStoryboard.Main.segueToDirectories(account: account, directory: directory),
       animated: true
     )
   }

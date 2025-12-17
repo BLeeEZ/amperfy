@@ -60,12 +60,12 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   private var sortType: ArtistElementSortType = .name
   private var filterTitle = "Artists"
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -307,7 +307,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let artist = artistAt(indexPath: indexPath) else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToArtistDetail(artist: artist),
+      AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
       animated: true
     )
   }

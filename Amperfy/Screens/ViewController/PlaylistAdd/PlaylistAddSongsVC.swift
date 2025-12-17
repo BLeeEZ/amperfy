@@ -38,12 +38,12 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
   public var displayFilter: DisplayCategoryFilter = .all
   public var addToPlaylistManager = AddToPlaylistManager()
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {

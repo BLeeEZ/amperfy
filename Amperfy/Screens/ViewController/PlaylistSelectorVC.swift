@@ -44,7 +44,7 @@ class PlaylistsSelectorDiffableDataSource: BasicUITableViewDiffableDataSource {
 class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override var sceneTitle: String? { "Playlists" }
 
-  var itemsToAdd: [Song]?
+  let itemsToAdd: [Song]
   private var selectedPlaylits = [Playlist: [Song]]()
 
   private var fetchedResultsController: PlaylistSelectorFetchedResultsController!
@@ -55,12 +55,13 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
   private var selectBarButton: UIBarButtonItem!
   private var addBarButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, itemsToAdd: [Song]) {
+    self.itemsToAdd = itemsToAdd
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -88,8 +89,8 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
 
     appDelegate.userStatistics.visited(.playlistSelector)
     setNavBarTitle(
-      title: ((itemsToAdd?.count ?? 0) > 1) ?
-        "Add \(itemsToAdd?.count ?? 0) Songs to Playlist" : "Add to Playlist"
+      title: ((itemsToAdd.count) > 1) ?
+        "Add \(itemsToAdd.count) Songs to Playlist" : "Add to Playlist"
     )
 
     change(sortType: appDelegate.storage.settings.user.playlistsSortSetting)
@@ -316,10 +317,6 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: false)
-    guard let itemsToAdd = itemsToAdd else {
-      dismiss()
-      return
-    }
     guard let diffableDataSource else { return }
     let objectID = diffableDataSource.itemIdentifier(for: indexPath)
     guard let objectID,
@@ -369,7 +366,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
           preferredStyle: .alert
         )
         alert.addAction(UIAlertAction(title: "Add Duplicates", style: .default, handler: { _ in
-          handleSuccessfullSelection(playables: itemsToAdd)
+          handleSuccessfullSelection(playables: self.itemsToAdd)
         }))
         alert.addAction(UIAlertAction(title: "Skip Duplicates", style: .default, handler: { _ in
           handleSuccessfullSelection(playables: Array(itemsNotContained))

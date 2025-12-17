@@ -62,17 +62,18 @@ final class HomeVC: UICollectionViewController {
 
   private var userButton: UIButton?
   private var userBarButtonItem: UIBarButtonItem?
+  private let account: Account
 
   // MARK: - Init
 
-  init() {
+  init(account: Account) {
+    self.account = account
     let layout = HomeVC.createLayout()
     super.init(collectionViewLayout: layout)
   }
 
   required init?(coder: NSCoder) {
-    let layout = HomeVC.createLayout()
-    super.init(collectionViewLayout: layout)
+    fatalError("init(coder:) has not been implemented")
   }
 
   // MARK: - Lifecycle
@@ -553,19 +554,19 @@ final class HomeVC: UICollectionViewController {
 
     if let album = playableContainer as? Album {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let artist = playableContainer as? Artist {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let playlist = playableContainer as? Playlist {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+        AppStoryboard.Main.segueToPlaylistDetail(account: account, playlist: playlist),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
@@ -573,6 +574,7 @@ final class HomeVC: UICollectionViewController {
               let podcast = podcastEpisode.podcast {
       navigationController?.pushViewController(
         AppStoryboard.Main.segueToPodcastDetail(
+          account: account,
           podcast: podcast,
           episodeToScrollTo: podcastEpisode
         ),
@@ -581,19 +583,19 @@ final class HomeVC: UICollectionViewController {
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let podcast = playableContainer as? Podcast {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
+        AppStoryboard.Main.segueToPodcastDetail(account: account, podcast: podcast),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let _ = playableContainer as? Radio {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToRadios(),
+        AppStoryboard.Main.segueToRadios(account: account),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let genre = playableContainer as? Genre {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToGenreDetail(genre: genre),
+        AppStoryboard.Main.segueToGenreDetail(account: account, genre: genre),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false

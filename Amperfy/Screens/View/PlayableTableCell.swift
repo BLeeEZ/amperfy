@@ -481,7 +481,8 @@ class PlayableTableCell: BasicTableCell {
           if isDislayAlbumTrackNumberStyle {
             trackNumberLabel.isHidden = true
             playOverNumberButton.isHidden = false
-            playOverNumberButton.imageView?.tintColor = appDelegate.storage.settings.accounts.getSetting(playable?.account?.info).read.themePreference
+            playOverNumberButton.imageView?.tintColor = appDelegate.storage.settings.accounts
+              .getSetting(playable?.account?.info).read.themePreference
               .asColor
             playOverNumberButton.setImage(buttonImg, for: UIControl.State.normal)
             playOverArtworkButton.isHidden = true
@@ -492,8 +493,10 @@ class PlayableTableCell: BasicTableCell {
             playOverNumberButton.isHidden = true
           }
         }
-        cacheIconImage.tintColor = appDelegate.storage.settings.accounts.getSetting(playable?.account?.info).read.themePreference.asColor
-        optionsButton.imageView?.tintColor = appDelegate.storage.settings.accounts.getSetting(playable?.account?.info).read.themePreference.asColor
+        cacheIconImage.tintColor = appDelegate.storage.settings.accounts
+          .getSetting(playable?.account?.info).read.themePreference.asColor
+        optionsButton.imageView?.tintColor = appDelegate.storage.settings.accounts
+          .getSetting(playable?.account?.info).read.themePreference.asColor
         backgroundColor = (rootView is PopupPlayerVC) ?
           .secondarySystemGroupedBackground.withAlphaComponent(0.2) :
           .secondarySystemGroupedBackground

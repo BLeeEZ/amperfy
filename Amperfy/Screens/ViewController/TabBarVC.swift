@@ -28,6 +28,16 @@ class TabBarVC: UITabBarController {
   private var libraryGroup: UITabGroup?
   private var searchTab: UISearchTab?
   private var homeTab: UITab?
+  private let account: Account!
+
+  init(account: Account) {
+    self.account = account
+    super.init(nibName: nil, bundle: nil)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
 
   private var welcomePopupPresenter = WelcomePopupPresenter()
   var miniPlayer: MiniPlayerView?
@@ -37,7 +47,10 @@ class TabBarVC: UITabBarController {
     var fixTabs = [UITab]()
 
     searchTab = UISearchTab { _ in
-      UINavigationController(rootViewController: TabNavigatorItem.search.controller)
+      UINavigationController(
+        rootViewController: TabNavigatorItem.search
+          .getController(account: self.account)
+      )
     }
     searchTab!.automaticallyActivatesSearch = true
     fixTabs.append(searchTab!)
@@ -47,7 +60,10 @@ class TabBarVC: UITabBarController {
       image: TabNavigatorItem.home.icon,
       identifier: "Tabs.\(TabNavigatorItem.home.title)"
     ) { _ in
-      UINavigationController(rootViewController: TabNavigatorItem.home.controller)
+      UINavigationController(
+        rootViewController: TabNavigatorItem.home
+          .getController(account: self.account)
+      )
     }
     fixTabs.append(homeTab!)
 
@@ -61,7 +77,7 @@ class TabBarVC: UITabBarController {
           image: item.image,
           identifier: "Tabs.\(item.displayName)"
         ) { tab in
-          item.controller(settings: self.appDelegate.storage.settings)
+          item.controller(account: self.account, settings: self.appDelegate.storage.settings)
         }
         tab.allowsHiding = true
         return tab
@@ -77,7 +93,7 @@ class TabBarVC: UITabBarController {
           image: item.image,
           identifier: "Tabs.\(item.displayName)"
         ) { tab in
-          item.controller(settings: self.appDelegate.storage.settings)
+          item.controller(account: self.account, settings: self.appDelegate.storage.settings)
         }
         tab.allowsHiding = true
         tab.isHiddenByDefault = true
@@ -91,7 +107,7 @@ class TabBarVC: UITabBarController {
       identifier: "Tabs.Library",
       children: libraryTabs
     ) { tab in
-      AppStoryboard.Main.segueToLibrary()
+      AppStoryboard.Main.segueToLibrary(account: self.account)
     }
     libraryGroup!.managingNavigationController = UINavigationController()
     libraryGroup!.allowsReordering = true

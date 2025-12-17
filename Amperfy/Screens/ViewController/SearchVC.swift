@@ -81,13 +81,15 @@ class SearchVC: BasicTableViewController {
   private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   private var isSearchActive = false
   private var accountObjectId: NSManagedObjectID?
+  private let account: Account
 
-  init() {
+  init(account: Account) {
+    self.account = account
     super.init(style: .grouped)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   func createDiffableDataSource() -> SearchDiffableDataSource {
@@ -450,21 +452,21 @@ class SearchVC: BasicTableViewController {
       let playlist = playlists[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: playlist)
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+        AppStoryboard.Main.segueToPlaylistDetail(account: account, playlist: playlist),
         animated: true
       )
     case .Artist:
       let artist = artists[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: artist)
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
         animated: true
       )
     case .Album:
       let album = albums[indexPath.row]
       let _ = appDelegate.storage.main.library.createOrUpdateSearchHistory(container: album)
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
         animated: true
       )
     case .Song:

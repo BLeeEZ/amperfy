@@ -39,12 +39,12 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
   private var sortType: ArtistElementSortType = .name
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -177,8 +177,7 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let artist = artistAt(indexPath: indexPath) else { return }
 
-    let nextVC = PlaylistAddArtistDetailVC()
-    nextVC.artist = artist
+    let nextVC = PlaylistAddArtistDetailVC(account: account, artist: artist)
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }

@@ -27,18 +27,19 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
   PlaylistVCAddable {
   override var sceneTitle: String? { musicFolder.name }
 
-  public var musicFolder: MusicFolder!
   public var addToPlaylistManager = AddToPlaylistManager()
 
   private var fetchedResultsController: MusicFolderDirectoriesFetchedResultsController!
   private var doneButton: UIBarButtonItem!
+  private let musicFolder: MusicFolder
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, musicFolder: MusicFolder) {
+    self.musicFolder = musicFolder
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -96,8 +97,7 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let directory = fetchedResultsController.getWrappedEntity(at: indexPath)
 
-    let nextVC = PlaylistAddDirectoriesVC()
-    nextVC.directory = directory
+    let nextVC = PlaylistAddDirectoriesVC(account: account, directory: directory)
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }

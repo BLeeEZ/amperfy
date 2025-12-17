@@ -236,11 +236,12 @@ class GenericDetailTableHeader: UIView {
   func subtitleButtonPressed(_ sender: Any) {
     guard let album = config?.entityContainer as? Album,
           let artist = album.artist,
+          let account = album.account,
           let navController = config?.rootView.navigationController
     else { return }
     appDelegate.userStatistics.usedAction(.alertGoToAlbum)
     navController.pushViewController(
-      AppStoryboard.Main.segueToArtistDetail(artist: artist),
+      AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
       animated: true
     )
   }

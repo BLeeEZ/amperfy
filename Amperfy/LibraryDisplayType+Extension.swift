@@ -23,48 +23,52 @@ import AmperfyKit
 import UIKit
 
 extension LibraryDisplayType {
-  public func controller(settings: AmperfySettings) -> UIViewController {
+  public func controller(account: Account, settings: AmperfySettings) -> UIViewController {
     switch self {
     case .artists:
-      return AppStoryboard.Main.segueToArtists()
+      return AppStoryboard.Main.segueToArtists(account: account)
     case .albums:
       return AppStoryboard.Main.createAlbumsVC(
+        account: account,
         style: settings.user.albumsStyleSetting,
         category: .all
       )
     case .songs:
-      return AppStoryboard.Main.segueToSongs()
+      return AppStoryboard.Main.segueToSongs(account: account)
     case .genres:
-      return AppStoryboard.Main.segueToGenres()
+      return AppStoryboard.Main.segueToGenres(account: account)
     case .directories:
-      return AppStoryboard.Main.segueToMusicFolders()
+      return AppStoryboard.Main.segueToMusicFolders(account: account)
     case .playlists:
-      return AppStoryboard.Main.segueToPlaylists()
+      return AppStoryboard.Main.segueToPlaylists(account: account)
     case .podcasts:
-      return AppStoryboard.Main.segueToPodcasts()
+      return AppStoryboard.Main.segueToPodcasts(account: account)
     case .downloads:
-      return AppStoryboard.Main.segueToDownloads()
+      return AppStoryboard.Main.segueToDownloads(account: account)
     case .favoriteSongs:
-      return AppStoryboard.Main.segueToFavoriteSongs()
+      return AppStoryboard.Main.segueToFavoriteSongs(account: account)
     case .favoriteAlbums:
       return AppStoryboard.Main.createAlbumsVC(
+        account: account,
         style: settings.user.albumsStyleSetting,
         category: .favorites
       )
     case .favoriteArtists:
-      return AppStoryboard.Main.segueToFavoriteArtists()
+      return AppStoryboard.Main.segueToFavoriteArtists(account: account)
     case .newestAlbums:
       return AppStoryboard.Main.createAlbumsVC(
+        account: account,
         style: settings.user.albumsStyleSetting,
         category: .newest
       )
     case .recentAlbums:
       return AppStoryboard.Main.createAlbumsVC(
+        account: account,
         style: settings.user.albumsStyleSetting,
         category: .recent
       )
     case .radios:
-      return AppStoryboard.Main.segueToRadios()
+      return AppStoryboard.Main.segueToRadios(account: account)
     }
   }
 }

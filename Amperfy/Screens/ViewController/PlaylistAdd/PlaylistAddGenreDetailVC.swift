@@ -26,7 +26,6 @@ import UIKit
 class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddable {
   override var sceneTitle: String? { genre.name }
 
-  public var genre: Genre!
   public var addToPlaylistManager = AddToPlaylistManager()
 
   private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
@@ -34,12 +33,15 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
   private var songsFetchedResultsController: GenreSongsFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  private let genre: Genre
+
+  init(account: Account, genre: Genre) {
+    self.genre = genre
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -266,8 +268,7 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
         row: indexPath.row,
         section: 0
       ))
-      let nextVC = PlaylistAddArtistDetailVC()
-      nextVC.artist = artist
+      let nextVC = PlaylistAddArtistDetailVC(account: account, artist: artist)
       nextVC.addToPlaylistManager = addToPlaylistManager
       navigationController?.pushViewController(nextVC, animated: true)
     case LibraryElement.Album.rawValue:
@@ -275,8 +276,7 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
         row: indexPath.row,
         section: 0
       ))
-      let nextVC = PlaylistAddAlbumDetailVC()
-      nextVC.album = album
+      let nextVC = PlaylistAddAlbumDetailVC(account: account, album: album)
       nextVC.addToPlaylistManager = addToPlaylistManager
       navigationController?.pushViewController(nextVC, animated: true)
     case LibraryElement.Song.rawValue:

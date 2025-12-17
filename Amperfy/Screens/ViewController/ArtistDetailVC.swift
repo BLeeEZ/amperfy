@@ -26,19 +26,20 @@ import UIKit
 class ArtistDetailVC: MultiSourceTableViewController {
   override var sceneTitle: String? { artist.name }
 
-  var artist: Artist!
+  private let artist: Artist
   var albumToScrollTo: Album?
   private var albumsFetchedResultsController: ArtistAlbumsItemsFetchedResultsController!
   private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, artist: Artist) {
+    self.artist = artist
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -343,7 +344,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
         section: 0
       ))
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
         animated: true
       )
     case LibraryElement.Song.rawValue: break

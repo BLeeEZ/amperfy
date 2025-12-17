@@ -26,19 +26,21 @@ import UIKit
 class GenreDetailVC: MultiSourceTableViewController {
   override var sceneTitle: String? { genre.name }
 
-  var genre: Genre!
+  private let genre: Genre
+
   private var artistsFetchedResultsController: GenreArtistsFetchedResultsController!
   private var albumsFetchedResultsController: GenreAlbumsFetchedResultsController!
   private var songsFetchedResultsController: GenreSongsFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, genre: Genre) {
+    self.genre = genre
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -387,7 +389,7 @@ class GenreDetailVC: MultiSourceTableViewController {
         section: 0
       ))
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
         animated: true
       )
     case LibraryElement.Album.rawValue:
@@ -396,7 +398,7 @@ class GenreDetailVC: MultiSourceTableViewController {
         section: 0
       ))
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
         animated: true
       )
     case LibraryElement.Song.rawValue: break

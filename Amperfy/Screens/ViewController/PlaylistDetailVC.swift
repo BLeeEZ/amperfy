@@ -87,18 +87,19 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   override var sceneTitle: String? { playlist.name }
 
   private var fetchedResultsController: PlaylistItemsFetchedResultsController!
-  var playlist: Playlist!
+  let playlist: Playlist
 
   private var editButton: UIBarButtonItem!
   private var optionsButton: UIBarButtonItem!
   var detailOperationsView: GenericDetailTableHeader?
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account, playlist: Playlist) {
+    self.playlist = playlist
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -235,7 +236,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       edititingBarButton = editButton
       edititingBarButton?.title = "Edit"
       edititingBarButton?.style = .plain
-      if playlist?.isSmartPlaylist ?? false {
+      if playlist.isSmartPlaylist {
         edititingBarButton?.isEnabled = false
       }
     }
@@ -258,7 +259,10 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
   @objc
   private func openEditView(sender: UIBarButtonItem) {
-    let playlistDetailVC = AppStoryboard.Main.segueToPlaylistEdit(playlist: playlist)
+    let playlistDetailVC = AppStoryboard.Main.segueToPlaylistEdit(
+      account: account,
+      playlist: playlist
+    )
     let playlistDetailNav = UINavigationController(rootViewController: playlistDetailVC)
     playlistDetailVC.onDoneCB = {
       self.detailOperationsView?.refresh()

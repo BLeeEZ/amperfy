@@ -61,8 +61,8 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
   private var sortType: PlaylistSortType = .name
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -167,8 +167,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
 
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let playlist = playlistAt(indexPath: indexPath) else { return }
-    let nextVC = PlaylistAddPlaylistDetailVC()
-    nextVC.playlist = playlist
+    let nextVC = PlaylistAddPlaylistDetailVC(account: account, playlist: playlist)
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }

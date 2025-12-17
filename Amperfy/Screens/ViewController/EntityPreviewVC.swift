@@ -176,34 +176,34 @@ class EntityPreviewActionBuilder {
       } else if let _ = playable.asPodcastEpisode, !(rootView is PodcastDetailVC) {
         showArtist()
       }
-    } else if let album = entityContainer as? Album {
+    } else if let album = entityContainer as? Album, let account = album.account {
       rootView.navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(album: album),
+        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
         animated: true
       )
-    } else if let artist = entityContainer as? Artist {
+    } else if let artist = entityContainer as? Artist, let account = artist.account {
       rootView.navigationController?.pushViewController(
-        AppStoryboard.Main.segueToArtistDetail(artist: artist),
+        AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
         animated: true
       )
-    } else if let genre = entityContainer as? Genre {
+    } else if let genre = entityContainer as? Genre, let account = genre.account {
       rootView.navigationController?.pushViewController(
-        AppStoryboard.Main.segueToGenreDetail(genre: genre),
+        AppStoryboard.Main.segueToGenreDetail(account: account, genre: genre),
         animated: true
       )
-    } else if let playlist = entityContainer as? Playlist {
+    } else if let playlist = entityContainer as? Playlist, let account = playlist.account {
       rootView.navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPlaylistDetail(playlist: playlist),
+        AppStoryboard.Main.segueToPlaylistDetail(account: account, playlist: playlist),
         animated: true
       )
-    } else if let podcast = entityContainer as? Podcast {
+    } else if let podcast = entityContainer as? Podcast, let account = podcast.account {
       rootView.navigationController?.pushViewController(
-        AppStoryboard.Main.segueToPodcastDetail(podcast: podcast),
+        AppStoryboard.Main.segueToPodcastDetail(account: account, podcast: podcast),
         animated: true
       )
-    } else if let directory = entityContainer as? Directory {
+    } else if let directory = entityContainer as? Directory, let account = directory.account {
       rootView.navigationController?.pushViewController(
-        AppStoryboard.Main.segueToDirectories(directory: directory),
+        AppStoryboard.Main.segueToDirectories(account: account, directory: directory),
         animated: true
       )
     }
@@ -587,9 +587,10 @@ class EntityPreviewActionBuilder {
 
   private func createAddToPlaylistAction() -> UIAction {
     UIAction(title: "Add to Playlist", image: .playlistPlus) { action in
-      guard !self.entityPlayables.isEmpty else { return }
+      guard !self.entityPlayables.isEmpty,
+            let account = self.entityContainer.account else { return }
       let selectPlaylistVC = AppStoryboard.Main
-        .segueToPlaylistSelector(itemsToAdd: self.entityPlayables.filterSongs())
+        .segueToPlaylistSelector(account: account, itemsToAdd: self.entityPlayables.filterSongs())
       let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
       self.rootView.present(selectPlaylistNav, animated: true)
     }
@@ -604,9 +605,10 @@ class EntityPreviewActionBuilder {
   private func showAlbum() {
     let playable = entityContainer as? AbstractPlayable
     let album = playable?.asSong?.album
-    guard let album = album else { return }
+    guard let album = album, let account = album.account else { return }
     appDelegate.userStatistics.usedAction(.alertGoToAlbum)
     let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(
+      account: account,
       album: album,
       songToScrollTo: playable?.asSong
     )
@@ -633,9 +635,10 @@ class EntityPreviewActionBuilder {
   private func showArtist() {
     let playable = entityContainer as? AbstractPlayable
     let album = entityContainer as? Album
-    if let artist = playable?.asSong?.artist ?? album?.artist {
+    if let artist = playable?.asSong?.artist ?? album?.artist, let account = artist.account {
       appDelegate.userStatistics.usedAction(.alertGoToArtist)
       let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(
+        account: account,
         artist: artist,
         albumToScrollTo: album
       )
@@ -647,9 +650,10 @@ class EntityPreviewActionBuilder {
         guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
         hostingSplitVC.pushNavLibrary(vc: artistDetailVC)
       }
-    } else if let podcast = playable?.asPodcastEpisode?.podcast {
+    } else if let podcast = playable?.asPodcastEpisode?.podcast, let account = podcast.account {
       appDelegate.userStatistics.usedAction(.alertGoToPodcast)
       let podcastDetailVC = AppStoryboard.Main.segueToPodcastDetail(
+        account: account,
         podcast: podcast,
         episodeToScrollTo: playable?.asPodcastEpisode
       )

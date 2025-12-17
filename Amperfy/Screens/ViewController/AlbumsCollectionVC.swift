@@ -167,7 +167,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     common.sceneTitle
   }
 
-  fileprivate var common = AlbumsCommonVCInteractions()
+  fileprivate var common: AlbumsCommonVCInteractions
 
   private var previousSize: CGSize = .zero
 
@@ -178,6 +178,15 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
   private var albumsDataSource: AlbumsCollectionDiffableDataSource? {
     diffableDataSource as? AlbumsCollectionDiffableDataSource
+  }
+
+  override init(collectionViewLayout: UICollectionViewLayout, account: Account) {
+    self.common = AlbumsCommonVCInteractions(account: account)
+    super.init(collectionViewLayout: collectionViewLayout, account: account)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func createDiffableDataSource() -> BasicUICollectionViewDiffableDataSource {
@@ -308,7 +317,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
           let album = albumsDataSource.getAlbum(at: indexPath)
     else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToAlbumDetail(album: album),
+      AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
       animated: true
     )
   }

@@ -32,12 +32,12 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
   private var fetchedResultsController: MusicFolderFetchedResultsController!
   private var doneButton: UIBarButtonItem!
 
-  init() {
-    super.init(style: .grouped)
+  init(account: Account) {
+    super.init(style: .grouped, account: account)
   }
 
   required init?(coder: NSCoder) {
-    super.init(coder: coder)
+    fatalError("init(coder:) has not been implemented")
   }
 
   override func viewDidLoad() {
@@ -93,8 +93,7 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let musicFolder = fetchedResultsController.getWrappedEntity(at: indexPath)
 
-    let nextVC = PlaylistAddIndexesVC()
-    nextVC.musicFolder = musicFolder
+    let nextVC = PlaylistAddIndexesVC(account: account, musicFolder: musicFolder)
     nextVC.addToPlaylistManager = addToPlaylistManager
     navigationController?.pushViewController(nextVC, animated: true)
   }
