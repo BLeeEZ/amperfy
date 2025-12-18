@@ -59,6 +59,8 @@ final class Settings: ObservableObject {
   @Published
   var isPlaybackStartOnlyOnPlay = false
   @Published
+  var isPlayerSongPlaybackResumeEnabled = false
+  @Published
   var isShowMusicPlayerSkipButtons = false
   @Published
   var isLyricsSmoothScrolling = true

@@ -488,7 +488,6 @@ class PlayerFacadeImpl: PlayerFacade {
     musicPlayer.stopButRemainIndex()
     playerStatus.setPlayerMode(newValue)
     musicPlayer.notifyPlaylistUpdated()
-    musicPlayer.activateSongContinueProgress()
   }
 
   var streamingMaxBitrates: StreamingMaxBitrates { backendAudioPlayer.streamingMaxBitrates }

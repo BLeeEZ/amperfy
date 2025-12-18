@@ -207,6 +207,10 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$isPlaybackStartOnlyOnPlay.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.isPlaybackStartOnlyOnPlay = newValue
     }))
+    settings.isPlayerSongPlaybackResumeEnabled = appDelegate.storage.settings.user.isPlayerSongPlaybackResumeEnabled
+    changesAgent.append(settings.$isPlayerSongPlaybackResumeEnabled.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.isPlayerSongPlaybackResumeEnabled = newValue
+    }))
 
     settings.swipeActionSettings = appDelegate.storage.settings.user.swipeActionSettings
 

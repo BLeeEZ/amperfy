@@ -152,6 +152,12 @@ public struct UserSettings: Sendable, Codable {
     get { _isPlaybackStartOnlyOnPlay }
     set { _isPlaybackStartOnlyOnPlay = newValue }
   }
+  
+  private var _isPlayerSongPlaybackResumeEnabled: Bool = false
+  public var isPlayerSongPlaybackResumeEnabled: Bool {
+    get { _isPlayerSongPlaybackResumeEnabled }
+    set { _isPlayerSongPlaybackResumeEnabled = newValue }
+  }
 
   private var _isHapticsEnabled: Bool = true
   public var isHapticsEnabled: Bool {
