@@ -167,40 +167,9 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.cacheTranscodingFormatPreference = newValue
     }))
 
-    settings.isAutoCacheLatestSongs = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info).read
-      .isAutoDownloadLatestSongsActive
-    changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.accounts
-        .updateSetting(self.appDelegate.account.info) { accountSettings in
-          accountSettings.isAutoDownloadLatestSongsActive = newValue
-        }
-    }))
-
-    settings.isAutoCacheLatestPodcastEpisodes = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info)
-      .read
-      .isAutoDownloadLatestPodcastEpisodesActive
-    changesAgent.append(settings.$isAutoCacheLatestPodcastEpisodes.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.accounts
-        .updateSetting(self.appDelegate.account.info) { accountSettings in
-          accountSettings.isAutoDownloadLatestPodcastEpisodesActive = newValue
-        }
-    }))
-
     settings.isPlayerAutoCachePlayedItems = appDelegate.player.isAutoCachePlayedItems
     changesAgent.append(settings.$isPlayerAutoCachePlayedItems.sink(receiveValue: { newValue in
       self.appDelegate.player.isAutoCachePlayedItems = newValue
-    }))
-
-    settings.isScrobbleStreamedItems = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info).read
-      .isScrobbleStreamedItems
-    changesAgent.append(settings.$isScrobbleStreamedItems.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.accounts
-        .updateSetting(self.appDelegate.account.info) { accountSettings in
-          accountSettings.isScrobbleStreamedItems = newValue
-        }
     }))
 
     settings.isPlaybackStartOnlyOnPlay = appDelegate.storage.settings.user.isPlaybackStartOnlyOnPlay
@@ -252,22 +221,54 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isHapticsEnabled = newValue
     }))
 
-    // account can only be changed from outside of settings
-    settings.activeAccountInfo = appDelegate.storage.settings.accounts.active ?? .defaultAccountInfo
-
-    settings.themePreference = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info).read
-      .themePreference
-    changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
-      self.appDelegate.storage.settings.accounts
-        .updateSetting(self.appDelegate.account.info) { accountSettings in
-          accountSettings.themePreference = newValue
-        }
-    }))
     settings.appearanceMode = appDelegate.storage.settings.user.appearanceMode
     changesAgent.append(settings.$appearanceMode.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.appearanceMode = newValue
       self.appDelegate.setAppAppearanceMode(style: newValue)
+    }))
+
+    // account can only be changed from outside of settings
+    settings.activeAccountInfo = appDelegate.storage.settings.accounts.active ?? .defaultAccountInfo
+
+    settings.themePreference = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo).read
+      .themePreference
+    changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+          accountSettings.themePreference = newValue
+        }
+    }))
+
+    settings.isAutoCacheLatestSongs = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo).read
+      .isAutoDownloadLatestSongsActive
+    changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+          accountSettings.isAutoDownloadLatestSongsActive = newValue
+        }
+    }))
+
+    settings.isAutoCacheLatestPodcastEpisodes = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo)
+      .read
+      .isAutoDownloadLatestPodcastEpisodesActive
+    changesAgent.append(settings.$isAutoCacheLatestPodcastEpisodes.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+          accountSettings.isAutoDownloadLatestPodcastEpisodesActive = newValue
+        }
+    }))
+
+    settings.isScrobbleStreamedItems = appDelegate.storage.settings.accounts
+      .getSetting(settings.activeAccountInfo).read
+      .isScrobbleStreamedItems
+    changesAgent.append(settings.$isScrobbleStreamedItems.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+          accountSettings.isScrobbleStreamedItems = newValue
+        }
     }))
   }
 

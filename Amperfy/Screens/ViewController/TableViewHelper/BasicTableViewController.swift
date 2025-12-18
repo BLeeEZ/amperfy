@@ -261,12 +261,14 @@ class BasicTableViewController: KeyCommandTableViewController {
 
       Task { @MainActor in
         do {
-          try await containable.fetch(
-            storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
-              .playableDownloadManager
-          )
+          if let account = containable.account {
+            try await containable.fetch(
+              storage: self.appDelegate.storage,
+              librarySyncer: self.appDelegate.getMeta(account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(account.info)
+                .playableDownloadManager
+            )
+          }
         } catch {
           self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
         }
@@ -344,8 +346,10 @@ class BasicTableViewController: KeyCommandTableViewController {
                 .filterCached(dependigOn: self.appDelegate.storage.settings.user.isOfflineMode)
             )
         case .download:
-          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
-            .download(objects: actionContext.playables)
+          if let account = actionContext.containable.account {
+            self.appDelegate.getMeta(account.info).playableDownloadManager
+              .download(objects: actionContext.playables)
+          }
         case .removeFromCache:
           let alert = UIAlertController(
             title: nil,
@@ -353,8 +357,10 @@ class BasicTableViewController: KeyCommandTableViewController {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
-              .removeFinishedDownload(for: actionContext.playables)
+            if let account = actionContext.containable.account {
+              self.appDelegate.getMeta(account.info).playableDownloadManager
+                .removeFinishedDownload(for: actionContext.playables)
+            }
             self.appDelegate.storage.main.library.deleteCache(of: actionContext.playables)
             self.appDelegate.storage.main.saveContext()
             if let cell = self.tableView.cellForRow(at: indexPath) as? PlayableTableCell {
@@ -399,11 +405,13 @@ class BasicTableViewController: KeyCommandTableViewController {
         case .favorite:
           Task { @MainActor in
             do {
-              try await actionContext.containable
-                .remoteToggleFavorite(
-                  syncer: self.appDelegate
-                    .getMeta(self.appDelegate.account.info).librarySyncer
-                )
+              if let account = actionContext.containable.account {
+                try await actionContext.containable
+                  .remoteToggleFavorite(
+                    syncer: self.appDelegate
+                      .getMeta(account.info).librarySyncer
+                  )
+              }
             } catch {
               self.appDelegate.eventLogger.report(topic: "Toggle Favorite", error: error)
             }

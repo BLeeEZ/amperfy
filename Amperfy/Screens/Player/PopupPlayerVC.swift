@@ -197,11 +197,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
   func fetchSongInfoAndUpdateViews() {
     guard appDelegate.storage.settings.user.isOnlineMode,
-          let song = player.currentlyPlaying?.asSong
+          let song = player.currentlyPlaying?.asSong,
+          let account = song.account
     else { return }
 
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer.sync(song: song)
+      try await self.appDelegate.getMeta(account.info).librarySyncer.sync(song: song)
       self.refreshCurrentlyPlayingInfoView()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
@@ -225,12 +226,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     switch player.playerMode {
     case .music:
       guard let playableInfo = player.currentlyPlaying else { return }
-      if playableInfo.isSong {
+      if playableInfo.isSong, let account = playableInfo.account {
         Task { @MainActor in
           do {
             try await playableInfo
               .remoteToggleFavorite(
-                syncer: self.appDelegate.getMeta(appDelegate.account.info)
+                syncer: self.appDelegate.getMeta(account.info)
                   .librarySyncer
               )
           } catch {

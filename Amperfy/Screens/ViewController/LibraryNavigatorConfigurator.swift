@@ -98,6 +98,7 @@ typealias SideBarDiffableDataSource = UICollectionViewDiffableDataSource<Int, Li
 class LibraryNavigatorConfigurator: NSObject {
   static let sectionHeaderElementKind = "section-header-element-kind"
 
+  private let account: Account
   private var data = [LibraryNavigatorItem]()
   private let offsetData: [LibraryNavigatorItem]
   private var collectionView: UICollectionView!
@@ -115,11 +116,13 @@ class LibraryNavigatorConfigurator: NSObject {
   private var libraryNotUsed = [LibraryNavigatorItem]()
 
   init(
+    account: Account,
     offsetData: [LibraryNavigatorItem],
     librarySettings: LibraryDisplaySettings,
     layoutConfig: UICollectionLayoutListConfiguration,
     pressedOnLibraryItemCB: @escaping (@MainActor (_: LibraryNavigatorItem) -> ())
   ) {
+    self.account = account
     self.offsetData = offsetData
     self.librarySettings = librarySettings
     self.layoutConfig = layoutConfig
@@ -138,7 +141,7 @@ class LibraryNavigatorConfigurator: NSObject {
   func handleLibraryItemsChanged(notification: Notification) {
     refresh(
       librarySettings: appDelegate.storage.settings.accounts
-        .getSetting(appDelegate.account.info).read.libraryDisplaySettings
+        .getSetting(account.info).read.libraryDisplaySettings
     )
   }
 
@@ -225,7 +228,7 @@ class LibraryNavigatorConfigurator: NSObject {
       snapshot.delete(libraryNotUsed)
 
       appDelegate.storage.settings.accounts
-        .updateSetting(appDelegate.account.info) { accountSetting in
+        .updateSetting(account.info) { accountSetting in
           accountSetting.libraryDisplaySettings = LibraryDisplaySettings(
             inUse: libraryInUse
               .compactMap { $0.library }

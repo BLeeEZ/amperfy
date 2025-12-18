@@ -44,7 +44,7 @@ class SideBarVC: KeyCommandCollectionViewController {
 
   lazy var layoutConfig = UICollectionLayoutListConfiguration(appearance: .sidebar)
   lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
-    offsetData: offsetData,
+    account: account, offsetData: offsetData,
     librarySettings: appDelegate.storage.settings.accounts.getSetting(self.account.info)
       .read
       .libraryDisplaySettings,

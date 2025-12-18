@@ -333,8 +333,8 @@ class PlayerUIHandler: NSObject {
   }
 
   var isLyricsButtonAllowedToDisplay: Bool {
-    appDelegate.player.playerMode == .music &&
-      appDelegate.account.apiType.asServerApiType != .ampache
+    appDelegate.player.playerMode == .music && appDelegate.storage.settings.accounts
+      .availableApiTypes.contains(.subsonic)
   }
 
   private var remainingTime: Int? {

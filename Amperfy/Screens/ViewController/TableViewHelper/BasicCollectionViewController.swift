@@ -94,12 +94,14 @@ class BasicCollectionViewController: UICollectionViewController {
       vc.display(container: containable, on: self)
       Task { @MainActor in
         do {
-          try await containable.fetch(
-            storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
-              .playableDownloadManager
-          )
+          if let account = containable.account {
+            try await containable.fetch(
+              storage: self.appDelegate.storage,
+              librarySyncer: self.appDelegate.getMeta(account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(account.info)
+                .playableDownloadManager
+            )
+          }
         } catch {
           self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
         }

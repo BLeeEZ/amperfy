@@ -407,6 +407,10 @@ public struct AccountSettings: Sendable, Codable {
     return ReadOnlyAccountSetting(read: _accounts[_activeAccount] ?? AccountSetting())
   }
 
+  public var availableApiTypes: Set<ServerApiType> {
+    Set(_accounts.compactMap { $0.value.loginCredentials?.backendApi.asServerApiType })
+  }
+
   public var allAccounts: [AccountInfo] {
     _accounts.compactMap { $0.key }
   }
