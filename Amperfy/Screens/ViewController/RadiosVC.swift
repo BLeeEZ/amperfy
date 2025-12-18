@@ -49,7 +49,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     appDelegate.userStatistics.visited(.radios)
 
     fetchedResultsController = RadiosFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       isGroupedInAlphabeticSections: true
     )
     singleFetchedResultsController = fetchedResultsController
@@ -139,7 +139,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in
       do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncRadios()
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer.syncRadios()
       } catch {
         self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
       }
@@ -216,7 +216,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     }
     Task { @MainActor in
       do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncRadios()
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer.syncRadios()
       } catch {
         self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
       }

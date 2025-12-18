@@ -101,9 +101,9 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
     change(sortType: appDelegate.storage.settings.user.playlistsSortSetting)
 
     var searchTiles: [String]? = nil
-    if appDelegate.account.apiType.asServerApiType == .ampache {
+    if account.apiType.asServerApiType == .ampache {
       searchTiles = ["All", "Cached", "User", "Smart"]
-    } else if appDelegate.account.apiType.asServerApiType == .subsonic {
+    } else if account.apiType.asServerApiType == .subsonic {
       searchTiles = ["All", "Cached"]
     }
     configureSearchController(
@@ -126,7 +126,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
 
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+      try await self.appDelegate.getMeta(account.info).librarySyncer
         .syncDownPlaylistsWithoutSongs()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
@@ -143,7 +143,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = PlaylistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       sortType: sortType,
       isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none
     )

@@ -46,11 +46,11 @@ class PodcastsVC: MultiSourceTableViewController {
     optionsButton = UIBarButtonItem.createSortBarButton()
 
     podcastsFetchedResultsController = PodcastFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       isGroupedInAlphabeticSections: false
     )
     episodesFetchedResultsController = PodcastEpisodesReleaseDateFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       isGroupedInAlphabeticSections: false
     )
 
@@ -94,8 +94,8 @@ class PodcastsVC: MultiSourceTableViewController {
           do {
             try await podcast.fetch(
               storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(self.account.info)
                 .playableDownloadManager
             )
           } catch {
@@ -194,9 +194,9 @@ class PodcastsVC: MultiSourceTableViewController {
       Task { @MainActor in do {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
-          account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+          account: self.account,
+          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
             .playableDownloadManager
         )
         .syncNewestPodcastEpisodes()

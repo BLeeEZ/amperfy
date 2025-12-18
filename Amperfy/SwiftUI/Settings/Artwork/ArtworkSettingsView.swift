@@ -27,6 +27,9 @@ import SwiftUI
 struct ArtworkSettingsView: View {
   nonisolated static let artworkNotCheckedThreshold = 10
 
+  @EnvironmentObject
+  private var settings: Settings
+
   let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
   let fileManager = CacheFileManager.shared
 
@@ -44,7 +47,8 @@ struct ArtworkSettingsView: View {
 
   func updateValues() {
     Task { @MainActor in do {
-      let accountObjectId = appDelegate.account.managedObject.objectID
+      let accountObjectId = appDelegate.storage.main.library
+        .getAccount(info: settings.activeAccountInfo).managedObject.objectID
       (
         artworkCountText,
         artworkNotCheckedCountText,
@@ -95,9 +99,11 @@ struct ArtworkSettingsView: View {
                 "This action will add all uncached artworks to the download queue. With this action a lot network traffic can be generated and device storage capacity will be taken. Continue?"
               ),
               primaryButton: .default(Text("OK")) {
+                let account = appDelegate.storage.main.library
+                  .getAccount(info: settings.activeAccountInfo)
                 let allArtworksToDownload = appDelegate.storage.main.library
-                  .getArtworksForCompleteLibraryDownload(for: appDelegate.account)
-                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager
+                  .getArtworksForCompleteLibraryDownload(for: account)
+                appDelegate.getMeta(account.info).artworkDownloadManager
                   .download(objects: allArtworksToDownload)
               },
               secondaryButton: .cancel()
@@ -113,16 +119,18 @@ struct ArtworkSettingsView: View {
                 "This action will delete downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
               ),
               primaryButton: .destructive(Text("Delete")) {
-                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager.stop()
-                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager
+                let account = appDelegate.storage.main.library
+                  .getAccount(info: settings.activeAccountInfo)
+                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager.stop()
+                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager
                   .cancelDownloads()
-                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager
+                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager
                   .clearFinishedDownloads()
                 appDelegate.storage.main.library
-                  .deleteRemoteArtworkCachePaths(account: appDelegate.account)
+                  .deleteRemoteArtworkCachePaths(account: account)
                 appDelegate.storage.main.library.saveContext()
-                fileManager.deleteRemoteArtworkCache(accountInfo: appDelegate.account.info)
-                appDelegate.getMeta(appDelegate.account.info).artworkDownloadManager.start()
+                fileManager.deleteRemoteArtworkCache(accountInfo: settings.activeAccountInfo)
+                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager.start()
               },
               secondaryButton: .cancel()
             )

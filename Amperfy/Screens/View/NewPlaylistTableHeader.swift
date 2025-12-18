@@ -30,6 +30,8 @@ class NewPlaylistTableHeader: UIView {
   @IBOutlet
   weak var nameTextField: UITextField!
 
+  var account: Account!
+
   static let frameHeight: CGFloat = 30.0 + margin.top + margin.bottom
   static let margin = UIEdgeInsets(
     top: 10,
@@ -52,7 +54,7 @@ class NewPlaylistTableHeader: UIView {
     guard let playlistName = nameTextField.text, !playlistName.isEmpty else {
       return
     }
-    let playlist = appDelegate.storage.main.library.createPlaylist(account: appDelegate.account)
+    let playlist = appDelegate.storage.main.library.createPlaylist(account: account)
     appDelegate.storage.main.saveContext()
     playlist.name = playlistName
     nameTextField.text = ""

@@ -27,7 +27,7 @@ import Foundation
 extension CarPlaySceneDelegate {
   func createPlaylistFetchController() {
     playlistFetchController = PlaylistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: appDelegate.storage.settings.user.playlistsSortSetting,
       isGroupedInAlphabeticSections: false
     )
@@ -41,7 +41,7 @@ extension CarPlaySceneDelegate {
 
   func createPodcastFetchController() {
     podcastFetchController = PodcastFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       isGroupedInAlphabeticSections: false
     )
     podcastFetchController?.delegate = self
@@ -54,7 +54,7 @@ extension CarPlaySceneDelegate {
 
   func createRadiosFetchController() {
     radiosFetchController = RadiosFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       isGroupedInAlphabeticSections: false
     )
     radiosFetchController?.delegate = self
@@ -63,7 +63,7 @@ extension CarPlaySceneDelegate {
 
   func createArtistsFavoritesFetchController() {
     artistsFavoritesFetchController = ArtistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: appDelegate.storage.settings.user.artistsSortSetting,
       isGroupedInAlphabeticSections: false
     )
@@ -77,7 +77,7 @@ extension CarPlaySceneDelegate {
 
   func createArtistsFavoritesCachedFetchController() {
     artistsFavoritesCachedFetchController = ArtistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: appDelegate.storage.settings.user.artistsSortSetting,
       isGroupedInAlphabeticSections: false
     )
@@ -91,7 +91,7 @@ extension CarPlaySceneDelegate {
 
   func createAlbumsFavoritesFetchController() {
     albumsFavoritesFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: appDelegate.storage.settings.user.albumsSortSetting,
       isGroupedInAlphabeticSections: false
     )
@@ -105,7 +105,7 @@ extension CarPlaySceneDelegate {
 
   func createAlbumsFavoritesCachedFetchController() {
     albumsFavoritesCachedFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: appDelegate.storage.settings.user.albumsSortSetting,
       isGroupedInAlphabeticSections: false
     )
@@ -119,7 +119,7 @@ extension CarPlaySceneDelegate {
 
   func createAlbumsNewestFetchController() {
     albumsNewestFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: .newest,
       isGroupedInAlphabeticSections: false
     )
@@ -133,7 +133,7 @@ extension CarPlaySceneDelegate {
 
   func createAlbumsNewestCachedFetchController() {
     albumsNewestCachedFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: .newest,
       isGroupedInAlphabeticSections: false
     )
@@ -147,7 +147,7 @@ extension CarPlaySceneDelegate {
 
   func createAlbumsRecentFetchController() {
     albumsRecentFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: .recent,
       isGroupedInAlphabeticSections: false
     )
@@ -161,7 +161,7 @@ extension CarPlaySceneDelegate {
 
   func createAlbumsRecentCachedFetchController() {
     albumsRecentCachedFetchController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: .recent,
       isGroupedInAlphabeticSections: false
     )
@@ -175,11 +175,11 @@ extension CarPlaySceneDelegate {
 
   func createSongsFavoritesFetchController() {
     var sortSetting = appDelegate.storage.settings.user.songsSortSetting
-    if appDelegate.account.apiType.asServerApiType != .ampache {
+    if activeAccount.apiType.asServerApiType != .ampache {
       sortSetting = appDelegate.storage.settings.user.favoriteSongSortSetting
     }
     songsFavoritesFetchController = SongsFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: sortSetting,
       isGroupedInAlphabeticSections: false
     )
@@ -193,11 +193,11 @@ extension CarPlaySceneDelegate {
 
   func createSongsFavoritesCachedFetchController() {
     var sortSetting = appDelegate.storage.settings.user.songsSortSetting
-    if appDelegate.account.apiType.asServerApiType != .ampache {
+    if activeAccount.apiType.asServerApiType != .ampache {
       sortSetting = appDelegate.storage.settings.user.favoriteSongSortSetting
     }
     songsFavoritesCachedFetchController = SongsFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
       sortType: sortSetting,
       isGroupedInAlphabeticSections: false
     )

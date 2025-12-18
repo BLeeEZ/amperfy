@@ -45,7 +45,7 @@ struct ArtworkDisplaySettings: View {
           ForEach(settingOptions, id: \.self) { option in
             Button(action: {
               appDelegate.storage.settings.accounts
-                .updateSetting(appDelegate.account.info) { accountSettings in
+                .updateSetting(settings.activeAccountInfo) { accountSettings in
                   accountSettings.artworkDisplayPreference = option
                 }
               updateValues()

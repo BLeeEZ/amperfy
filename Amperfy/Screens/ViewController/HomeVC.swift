@@ -81,7 +81,7 @@ final class HomeVC: UICollectionViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     orderedVisibleSections = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info).read.homeSections
+      .getSetting(account.info).read.homeSections
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
@@ -113,7 +113,7 @@ final class HomeVC: UICollectionViewController {
       pointSize: 24,
       weight: .regular
     )).withTintColor(
-      appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+      appDelegate.storage.settings.accounts.getSetting(account.info).read
         .themePreference.asColor,
       renderingMode: .alwaysTemplate
     )
@@ -148,10 +148,10 @@ final class HomeVC: UICollectionViewController {
 
   private func createUserButtonMenu() -> UIMenu {
     let userInfo = UIAction(
-      title: appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+      title: appDelegate.storage.settings.accounts.getSetting(account.info).read
         .loginCredentials?
         .username ?? "Unknown",
-      subtitle: appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+      subtitle: appDelegate.storage.settings.accounts.getSetting(account.info).read
         .loginCredentials?
         .displayServerUrl ?? "",
       image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
@@ -325,7 +325,7 @@ final class HomeVC: UICollectionViewController {
   func createFetchController() {
     if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
       albumsRecentFetchController = AlbumFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+        coreDataCompanion: appDelegate.storage.main, account: account,
         sortType: .recent,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
@@ -344,7 +344,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
       albumsLatestFetchController = AlbumFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+        coreDataCompanion: appDelegate.storage.main, account: account,
         sortType: .recent,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
@@ -376,7 +376,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
       playlistsLastTimePlayedFetchController = PlaylistFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+        coreDataCompanion: appDelegate.storage.main, account: account,
         sortType: .lastPlayed,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
@@ -394,7 +394,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .latestPodcastEpisodes }) {
       podcastEpisodesFetchedController = PodcastEpisodesReleaseDateFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+        coreDataCompanion: appDelegate.storage.main, account: account,
         isGroupedInAlphabeticSections: false,
         fetchLimit: Self.sectionMaxItemCount
       )
@@ -408,7 +408,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .podcasts }) {
       podcastsFetchedController = PodcastFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+        coreDataCompanion: appDelegate.storage.main, account: account,
         isGroupedInAlphabeticSections: false
       )
       podcastsFetchedController?.delegate = self
@@ -421,7 +421,7 @@ final class HomeVC: UICollectionViewController {
 
     if orderedVisibleSections.contains(where: { $0 == .radios }) {
       radiosFetchedController = RadiosFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+        coreDataCompanion: appDelegate.storage.main, account: account,
         isGroupedInAlphabeticSections: true
       )
       radiosFetchedController?.delegate = self
@@ -440,9 +440,9 @@ final class HomeVC: UICollectionViewController {
         do {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
-            account: self.appDelegate.account,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            account: self.account,
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
           .syncNewestLibraryElements(offset: 0, count: Self.sectionMaxItemCount)
@@ -454,7 +454,7 @@ final class HomeVC: UICollectionViewController {
     if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncRecentAlbums(
               offset: 0,
               count: Self.sectionMaxItemCount
@@ -466,7 +466,7 @@ final class HomeVC: UICollectionViewController {
     }
     if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .syncDownPlaylistsWithoutSongs()
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
@@ -476,9 +476,9 @@ final class HomeVC: UICollectionViewController {
       Task { @MainActor in do {
         let _ = try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
-          account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+          account: self.account,
+          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
             .playableDownloadManager
         )
         .syncNewestPodcastEpisodes()
@@ -489,7 +489,7 @@ final class HomeVC: UICollectionViewController {
     if orderedVisibleSections.contains(where: { $0 == .radios }) {
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncRadios()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
@@ -625,7 +625,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomAlbums(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
-        for: self.appDelegate.account,
+        for: self.account,
         count: Self.sectionMaxItemCount,
         onlyCached: isOfflineMode
       )
@@ -639,7 +639,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomArtists(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomArtists = appDelegate.storage.main.library.getRandomArtists(
-        for: self.appDelegate.account,
+        for: self.account,
         count: Self.sectionMaxItemCount,
         onlyCached: isOfflineMode
       )
@@ -653,7 +653,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomGenres() {
     Task { @MainActor in
       let randomGenres = appDelegate.storage.main.library.getRandomGenres(
-        for: appDelegate.account,
+        for: account,
         count: Self.sectionMaxItemCount
       )
       data[.randomGenres] = randomGenres.compactMap {
@@ -666,7 +666,7 @@ final class HomeVC: UICollectionViewController {
   func updateRandomSongs(isOfflineMode: Bool) {
     Task { @MainActor in
       let randomSongs = appDelegate.storage.main.library.getRandomSongs(
-        for: appDelegate.account,
+        for: account,
         count: Self.sectionMaxItemCount,
         onlyCached: isOfflineMode
       )
@@ -762,8 +762,8 @@ extension HomeVC: @preconcurrency NSFetchedResultsControllerDelegate {
         do {
           try await containable.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
         } catch {

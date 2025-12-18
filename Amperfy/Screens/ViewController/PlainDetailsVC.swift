@@ -37,6 +37,7 @@ class PlainDetailsVC: UIViewController {
   private var podcastEpisode: PodcastEpisode?
   private var player: PlayerFacade?
   private var lyricsRelFilePath: URL?
+  private var lyricsAccount: Account?
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -82,12 +83,13 @@ class PlainDetailsVC: UIViewController {
     lyricsRelFilePath = nil
   }
 
-  func display(lyricsRelFilePath: URL, on rootView: UIViewController) {
+  func display(lyricsRelFilePath: URL, lyricsAccount: Account, on rootView: UIViewController) {
     self.rootView = rootView
     podcast = nil
     podcastEpisode = nil
     player = nil
     self.lyricsRelFilePath = lyricsRelFilePath
+    self.lyricsAccount = lyricsAccount
   }
 
   func refresh() {
@@ -97,11 +99,11 @@ class PlainDetailsVC: UIViewController {
     } else if let podcastEpisode = podcastEpisode {
       detailsTextView.text = podcastEpisode.depiction
       headerLabel.text = "Description"
-    } else if let lyricsRelFilePath = lyricsRelFilePath {
+    } else if let lyricsRelFilePath = lyricsRelFilePath, let lyricsAccount {
       detailsTextView.text = ""
       headerLabel.text = "Lyrics"
       Task { @MainActor in do {
-        let lyricsList = try await appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        let lyricsList = try await appDelegate.getMeta(lyricsAccount.info).librarySyncer
           .parseLyrics(relFilePath: lyricsRelFilePath)
         self.displayLyrics(lyricsList: lyricsList)
       } catch {

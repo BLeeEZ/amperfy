@@ -48,9 +48,10 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     exectueAfterAnimation {
       self.playlist?.movePlaylistItem(fromIndex: sourceIndexPath.row, to: destinationIndexPath.row)
 
-      guard self.appDelegate.storage.settings.user.isOnlineMode else { return }
+      guard self.appDelegate.storage.settings.user.isOnlineMode,
+            let account = self.playlist.account else { return }
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(account.info).librarySyncer
           .syncUpload(playlistToUpdateOrder: self.playlist)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlist Upload Order Update", error: error)
@@ -67,9 +68,10 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
     guard editingStyle == .delete else { return }
     exectueAfterAnimation {
       self.playlist?.remove(at: indexPath.row)
-      guard self.appDelegate.storage.settings.user.isOnlineMode else { return }
+      guard self.appDelegate.storage.settings.user.isOnlineMode,
+            let account = self.playlist.account else { return }
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncUpload(
+        try await self.appDelegate.getMeta(account.info).librarySyncer.syncUpload(
           playlistToDeleteSong: self.playlist,
           index: indexPath.row
         )
@@ -218,8 +220,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       do {
         try await playlist.fetch(
           storage: self.appDelegate.storage,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
             .playableDownloadManager
         )
       } catch {
@@ -294,7 +296,7 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   func handleRefresh(refreshControl: UIRefreshControl) {
     Task { @MainActor in
       do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .syncDown(playlist: playlist)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Playlist Sync", error: error)

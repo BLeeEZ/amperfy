@@ -41,7 +41,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     appDelegate.userStatistics.visited(.musicFolders)
 
     fetchedResultsController = MusicFolderFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       isGroupedInAlphabeticSections: false
     )
     singleFetchedResultsController = fetchedResultsController
@@ -92,7 +92,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     updateContentUnavailable()
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+      try await self.appDelegate.getMeta(self.account.info).librarySyncer
         .syncMusicFolders()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)

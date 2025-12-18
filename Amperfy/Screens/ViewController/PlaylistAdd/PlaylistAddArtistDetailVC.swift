@@ -87,8 +87,8 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
     Task { @MainActor in do {
       try await artist.fetch(
         storage: self.appDelegate.storage,
-        librarySyncer: self.appDelegate.getMeta(appDelegate.account.info).librarySyncer,
-        playableDownloadManager: self.appDelegate.getMeta(appDelegate.account.info)
+        librarySyncer: self.appDelegate.getMeta(account.info).librarySyncer,
+        playableDownloadManager: self.appDelegate.getMeta(account.info)
           .playableDownloadManager
       )
     } catch {

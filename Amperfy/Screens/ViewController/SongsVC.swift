@@ -137,7 +137,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     case .favorites:
       filterTitle = "Favorite Songs"
       isIndexTitelsHidden = false
-      if appDelegate.account.apiType.asServerApiType != .ampache {
+      if account.apiType.asServerApiType != .ampache {
         change(sortType: appDelegate.storage.settings.user.favoriteSongSortSetting)
       } else {
         change(sortType: appDelegate.storage.settings.user.songsSortSetting)
@@ -151,7 +151,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = SongsFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       sortType: sortType,
       isGroupedInAlphabeticSections: sortType.hasSectionTitles
     )
@@ -208,7 +208,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
@@ -297,7 +297,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     guard let searchText = searchController.searchBar.text else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchSongs(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
@@ -328,7 +328,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   }
 
   private func saveSortPreference(preference: SongElementSortType) {
-    if appDelegate.account.apiType.asServerApiType != .ampache, displayFilter == .favorites {
+    if account.apiType.asServerApiType != .ampache, displayFilter == .favorites {
       appDelegate.storage.settings.user.favoriteSongSortSetting = preference
     } else {
       appDelegate.storage.settings.user.songsSortSetting = preference
@@ -436,14 +436,14 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         )
       }
     )
-    if displayFilter == .favorites, appDelegate.account.apiType.asServerApiType != .ampache {
+    if displayFilter == .favorites, account.apiType.asServerApiType != .ampache {
       return UIMenu(
         title: "Sort",
         image: .sort,
         options: [],
         children: [sortByName, sortByRating, sortByDuration, sortByStarredDate, sortByAddedDate]
       )
-    } else if appDelegate.account.apiType.asServerApiType != .ampache {
+    } else if account.apiType.asServerApiType != .ampache {
       return UIMenu(
         title: "Sort",
         image: .sort,
@@ -468,12 +468,12 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         var songs = [Song]()
         switch self.displayFilter {
         case .all:
-          songs = self.appDelegate.storage.main.library.getSongs(for: self.appDelegate.account)
+          songs = self.appDelegate.storage.main.library.getSongs(for: self.account)
         case .newest, .recent:
           break
         case .favorites:
           songs = self.appDelegate.storage.main.library
-            .getFavoriteSongs(for: self.appDelegate.account)
+            .getFavoriteSongs(for: self.account)
         }
         if songs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
           let alert = UIAlertController(
@@ -482,13 +482,13 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            self.appDelegate.getMeta(self.account.info).playableDownloadManager
               .download(objects: songs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+          self.appDelegate.getMeta(self.account.info).playableDownloadManager
             .download(objects: songs)
         }
       }
@@ -506,9 +506,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       do {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
-          account: self.appDelegate.account,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+          account: self.account,
+          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
             .playableDownloadManager
         )
         .syncNewestLibraryElements()

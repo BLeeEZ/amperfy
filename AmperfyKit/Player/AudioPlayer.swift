@@ -250,7 +250,12 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   private func seekToLastStoppedPlayTime() {
     if let playable = currentlyPlaying,
        playable.playProgress > 0,
-        playable.isPodcastEpisode || ((playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user.isPlayerSongPlaybackResumeEnabled) {
+       playable
+       .isPodcastEpisode ||
+       (
+         (playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user
+           .isPlayerSongPlaybackResumeEnabled
+       ) {
       backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
     }
   }

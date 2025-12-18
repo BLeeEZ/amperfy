@@ -47,7 +47,7 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
     navigationItem.rightBarButtonItems = [doneButton]
 
     fetchedResultsController = MusicFolderFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       isGroupedInAlphabeticSections: false
     )
     singleFetchedResultsController = fetchedResultsController
@@ -69,7 +69,7 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
 
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer.syncMusicFolders()
+      try await self.appDelegate.getMeta(account.info).librarySyncer.syncMusicFolders()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Music Folders Sync", error: error)
     }}

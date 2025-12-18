@@ -114,8 +114,8 @@ class DirectoriesVC: MultiSourceTableViewController {
           do {
             try await subdirectory.fetch(
               storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(self.account.info)
                 .playableDownloadManager
             )
           } catch {
@@ -143,8 +143,8 @@ class DirectoriesVC: MultiSourceTableViewController {
           do {
             try await subdirectory.fetch(
               storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(self.account.info)
                 .playableDownloadManager
             )
           } catch {
@@ -214,7 +214,7 @@ class DirectoriesVC: MultiSourceTableViewController {
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in
       do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .sync(directory: directory)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Directories Sync", error: error)

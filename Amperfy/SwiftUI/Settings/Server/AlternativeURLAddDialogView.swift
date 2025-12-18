@@ -89,13 +89,13 @@ struct AlternativeURLAddDialogView: View {
     isValidating = true
     Task { @MainActor in
       do {
-        try await appDelegate.getMeta(appDelegate.account.info).backendApi
+        try await appDelegate.getMeta(settings.activeAccountInfo).backendApi
           .isAuthenticationValid(credentials: credentialsToCheck)
         appDelegate.storage.settings.accounts
           .updateSetting(Account.createInfo(credentials: credentialsToCheck)) { accountSettings in
             accountSettings.loginCredentials = credentialsToCheck
           }
-        appDelegate.getMeta(appDelegate.account.info).backendApi
+        appDelegate.getMeta(settings.activeAccountInfo).backendApi
           .provideCredentials(credentials: credentialsToCheck)
         activeServerURL = credentialsToCheck.activeBackendServerUrl
         serverURLs = credentialsToCheck.availableServerURLs

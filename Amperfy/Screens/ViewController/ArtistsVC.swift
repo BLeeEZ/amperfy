@@ -135,8 +135,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         do {
           try await artist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
         } catch {
@@ -188,7 +188,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = ArtistFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       sortType: sortType,
       isGroupedInAlphabeticSections: true
     )
@@ -244,7 +244,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
@@ -322,7 +322,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     tableView.reloadData()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
@@ -410,13 +410,13 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         var artists = [Artist]()
         switch self.displayFilter {
         case .all:
-          artists = self.appDelegate.storage.main.library.getArtists(for: self.appDelegate.account)
+          artists = self.appDelegate.storage.main.library.getArtists(for: self.account)
         case .albumArtists:
           artists = self.appDelegate.storage.main.library
-            .getAlbumArtists(for: self.appDelegate.account)
+            .getAlbumArtists(for: self.account)
         case .favorites:
           artists = self.appDelegate.storage.main.library
-            .getFavoriteArtists(for: self.appDelegate.account)
+            .getFavoriteArtists(for: self.account)
         }
         let artistSongs = Array(artists.compactMap { $0.playables }.joined())
         if artistSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
@@ -426,13 +426,13 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            self.appDelegate.getMeta(self.account.info).playableDownloadManager
               .download(objects: artistSongs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+          self.appDelegate.getMeta(self.account.info).playableDownloadManager
             .download(objects: artistSongs)
         }
       }
@@ -451,9 +451,9 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
       do {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
-          account: appDelegate.account,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+          account: account,
+          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
             .playableDownloadManager
         )
         .syncNewestLibraryElements()

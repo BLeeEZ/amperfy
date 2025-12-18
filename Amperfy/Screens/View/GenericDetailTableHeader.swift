@@ -152,7 +152,7 @@ class GenericDetailTableHeader: UIView {
     let detailLevel = isCountInfoHidden ? DetailType.noCountInfo : DetailType.long
 
     let infoText = entityContainer.info(
-      for: appDelegate.account.apiType.asServerApiType,
+      for: entityContainer.account?.apiType.asServerApiType,
       details: DetailInfoType(type: detailLevel, settings: appDelegate.storage.settings)
     )
     infoLabel.isHidden = infoText.isEmpty
@@ -219,13 +219,13 @@ class GenericDetailTableHeader: UIView {
     isEditing = false
     defer { refresh() }
     guard let nameText = nameTextField.text, let playlist = config?.entityContainer as? Playlist,
-          nameText != playlist.name else { return }
+          nameText != playlist.name, let account = playlist.account else { return }
     playlist.name = nameText
     titleLabel.text = nameText
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
 
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+      try await self.appDelegate.getMeta(account.info).librarySyncer
         .syncUpload(playlistToUpdateName: playlist)
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlist Update Name", error: error)

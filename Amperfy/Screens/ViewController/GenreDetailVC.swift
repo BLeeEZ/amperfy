@@ -167,8 +167,8 @@ class GenreDetailVC: MultiSourceTableViewController {
           do {
             try await artist.fetch(
               storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(self.account.info)
                 .playableDownloadManager
             )
           } catch {
@@ -185,8 +185,8 @@ class GenreDetailVC: MultiSourceTableViewController {
           do {
             try await album.fetch(
               storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+              librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(self.account.info)
                 .playableDownloadManager
             )
           } catch {
@@ -221,8 +221,8 @@ class GenreDetailVC: MultiSourceTableViewController {
       do {
         try await genre.fetch(
           storage: self.appDelegate.storage,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
             .playableDownloadManager
         )
       } catch {

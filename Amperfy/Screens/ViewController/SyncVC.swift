@@ -59,18 +59,10 @@ class SyncVC: UIViewController {
       self.appDelegate.storage.main.library.cleanStorage()
       self.appDelegate.reinit()
 
-      guard let credentials = self.appDelegate.storage.settings.accounts
-        .getSetting(self.appDelegate.account.info).read
-        .loginCredentials
-      else { return }
-      let accountInfo = Account.createInfo(credentials: credentials)
-      let _ = self.appDelegate.storage.main.library
-        .getAccount(info: accountInfo)
-
       do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(account.info).librarySyncer
           .syncInitial(statusNotifyier: self)
-        self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+        self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .completed
         }
       } catch {
@@ -80,7 +72,7 @@ class SyncVC: UIViewController {
           error: error,
           displayPopup: false
         )
-        self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+        self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .aborded
         }
       }
@@ -124,14 +116,10 @@ class SyncVC: UIViewController {
       preferredStyle: .alert
     )
     let skip = UIAlertAction(title: "Skip", style: .destructive, handler: { action in
-      if let credentials = self.appDelegate.storage.settings.accounts
-        .getSetting(self.appDelegate.account.info).read
-        .loginCredentials {
-        let accountInfo = Account.createInfo(credentials: credentials)
-        self.appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+      self.appDelegate.storage.settings.accounts
+        .updateSetting(self.account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .skipped
         }
-      }
       self.finishSync()
     })
     let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)

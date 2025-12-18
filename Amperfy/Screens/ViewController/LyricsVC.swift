@@ -65,11 +65,12 @@ class LyricsVC: UIViewController {
 
   private func fetchSongInfoAndUpdateLyrics() {
     guard appDelegate.storage.settings.user.isOnlineMode,
-          let song = player.currentlyPlaying?.asSong
+          let song = player.currentlyPlaying?.asSong,
+          let account = song.account
     else { return }
 
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+      try await self.appDelegate.getMeta(account.info).librarySyncer
         .sync(song: song)
       self.refreshLyrics()
     } catch {
@@ -97,13 +98,14 @@ class LyricsVC: UIViewController {
   func refreshLyrics() {
     guard let playable = player.currentlyPlaying,
           let song = playable.asSong,
+          let account = song.account,
           let lyricsRelFilePath = song.lyricsRelFilePath else {
       showLyricsAreNotAvailable()
       return
     }
 
     Task { @MainActor in do {
-      let lyricsList = try await appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+      let lyricsList = try await appDelegate.getMeta(account.info).librarySyncer
         .parseLyrics(relFilePath: lyricsRelFilePath)
       if song == self.player.currentlyPlaying?.asSong,
          let structuredLyrics = lyricsList.getFirstSyncedLyricsOrUnsyncedAsDefault() {

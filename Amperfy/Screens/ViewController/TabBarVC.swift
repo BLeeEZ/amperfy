@@ -28,7 +28,7 @@ class TabBarVC: UITabBarController {
   private var libraryGroup: UITabGroup?
   private var searchTab: UISearchTab?
   private var homeTab: UITab?
-  private let account: Account!
+  private let account: Account
 
   init(account: Account) {
     self.account = account
@@ -69,7 +69,7 @@ class TabBarVC: UITabBarController {
 
     var libraryTabs = [UITab]()
     let libraryTabsShown = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info).read
+      .getSetting(account.info).read
       .libraryDisplaySettings.inUse
       .compactMap { item in
         let tab = UITab(
@@ -85,7 +85,7 @@ class TabBarVC: UITabBarController {
     libraryTabs.append(contentsOf: libraryTabsShown)
 
     let libraryTabsHidden = appDelegate.storage.settings.accounts
-      .getSetting(appDelegate.account.info).read
+      .getSetting(account.info).read
       .libraryDisplaySettings.notUsed
       .compactMap { item in
         let tab = UITab(
@@ -223,7 +223,7 @@ class TabBarVC: UITabBarController {
 
   func refresh() {
     guard let libraryGroup else { return }
-    let config = appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+    let config = appDelegate.storage.settings.accounts.getSetting(account.info).read
       .libraryDisplaySettings
     libraryGroup.displayOrderIdentifiers = config.inUse.compactMap { "Tabs.\($0.displayName)" }
     for tab in libraryGroup.displayOrder {
@@ -256,7 +256,7 @@ extension TabBarVC: UITabBarControllerDelegate {
       }
     }
     appDelegate.storage.settings.accounts
-      .updateSetting(appDelegate.account.info) { accountSettings in
+      .updateSetting(account.info) { accountSettings in
         accountSettings.libraryDisplaySettings = LibraryDisplaySettings(inUse: visibleItems)
       }
     NotificationCenter.default.post(name: .LibraryItemsChanged, object: nil, userInfo: nil)

@@ -26,9 +26,9 @@ import Foundation
 // MARK: - AccountInfo
 
 public struct AccountInfo: Sendable, Hashable, Codable {
-  let serverHash: String
-  let userHash: String
-  let apiType: BackenApiType
+  public let serverHash: String
+  public let userHash: String
+  public let apiType: BackenApiType
 
   static let defaultIdent = "0-0"
   public static let defaultAccountInfo = AccountInfo(

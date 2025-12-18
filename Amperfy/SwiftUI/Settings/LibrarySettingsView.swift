@@ -74,55 +74,35 @@ struct LibrarySettingsView: View {
 
   private func updateValues() {
     Task { @MainActor in do {
-      let accountObjectId = appDelegate.account.managedObject.objectID
+      let accountObjectId = appDelegate.storage.main.library
+        .getAccount(info: settings.activeAccountInfo).managedObject.objectID
       playlistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getPlaylistCount(for: accountAsync)
       }
       artistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getArtistCount(for: accountAsync)
       }
       albumCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getAlbumCount(for: accountAsync)
       }
       podcastCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getPodcastCount(for: accountAsync)
       }
       podcastEpisodeCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getPodcastEpisodeCount(for: accountAsync)
       }
       songCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getSongCount(for: accountAsync)
       }
       albumWithSyncedSongsCount = try await appDelegate.storage.async
         .performAndGet { asyncCompanion in
-          let accountAsync = Account(
-            managedObject: asyncCompanion.context
-              .object(with: accountObjectId) as! AccountMO
-          )
+          let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
           return asyncCompanion.library.getAlbumWithSyncedSongsCount(for: accountAsync)
         }
 
@@ -134,10 +114,7 @@ struct LibrarySettingsView: View {
       }
 
       cachedSongCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: accountObjectId) as! AccountMO
-        )
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getCachedSongCount(for: accountAsync)
       }
       cachedPodcastEpisodesCount = try await appDelegate.storage.async
@@ -196,7 +173,7 @@ struct LibrarySettingsView: View {
           }
           SettingsRow(title: "Initial Sync") {
             SecondaryText(
-              appDelegate.storage.settings.accounts.getSetting(appDelegate.account.info).read
+              appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
                 .initialSyncCompletionStatus.description
             )
           }
@@ -273,9 +250,11 @@ struct LibrarySettingsView: View {
                 "This will add all uncached songs in your library to the download queue. This may use a lot of data and storage. Continue?"
               ),
               primaryButton: .default(Text("OK")) {
+                let account = appDelegate.storage.main.library
+                  .getAccount(info: settings.activeAccountInfo)
                 let allSongsToDownload = appDelegate.storage.main.library
-                  .getSongsForCompleteLibraryDownload(for: appDelegate.account)
-                appDelegate.getMeta(appDelegate.account.info).playableDownloadManager
+                  .getSongsForCompleteLibraryDownload(for: account)
+                appDelegate.getMeta(account.info).playableDownloadManager
                   .download(objects: allSongsToDownload)
               },
               secondaryButton: .cancel()
@@ -295,12 +274,14 @@ struct LibrarySettingsView: View {
               ),
               primaryButton: .destructive(Text("Delete")) {
                 appDelegate.player.stop()
-                appDelegate.getMeta(appDelegate.account.info).playableDownloadManager.stop()
+                let account = appDelegate.storage.main.library
+                  .getAccount(info: settings.activeAccountInfo)
+                appDelegate.getMeta(account.info).playableDownloadManager.stop()
                 appDelegate.storage.main.library
-                  .deletePlayableCachePaths(for: appDelegate.account)
+                  .deletePlayableCachePaths(for: account)
                 appDelegate.storage.main.library.saveContext()
-                fileManager.deletePlayableCache(accountInfo: appDelegate.account.info)
-                appDelegate.getMeta(appDelegate.account.info).playableDownloadManager.start()
+                fileManager.deletePlayableCache(accountInfo: account.info)
+                appDelegate.getMeta(account.info).playableDownloadManager.start()
               }, secondaryButton: .cancel()
             )
           }

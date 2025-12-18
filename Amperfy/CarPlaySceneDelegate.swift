@@ -57,8 +57,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     )
   }
 
-  private var activeAccountInfo: AccountInfo!
-  private var activeAccount: Account!
+  var activeAccountInfo: AccountInfo!
+  var activeAccount: Account!
 
   var interfaceController: CPInterfaceController?
   var traits: UITraitCollection {
@@ -480,7 +480,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     item.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       let songs = appDelegate.storage.main.library
-        .getRandomSongs(for: appDelegate.account, onlyCached: onlyCached || isOfflineMode)
+        .getRandomSongs(for: activeAccount, onlyCached: onlyCached || isOfflineMode)
       let playContext = PlayContext(
         name: "Random\(onlyCached ? " Cached" : "") Songs",
         playables: songs
@@ -509,7 +509,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     item.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
-        for: appDelegate.account,
+        for: activeAccount,
         count: 5,
         onlyCached: onlyCached || isOfflineMode
       )
@@ -690,7 +690,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       )))
       albumItems.append(createDetailAllSongsTemplate(for: artist, onlyCached: onlyCached))
       let artistAlbums = appDelegate.storage.main.library.getAlbums(
-        for: appDelegate.account,
+        for: activeAccount,
         whichContainsSongsWithArtist: artist,
         onlyCached: onlyCached || isOfflineMode
       ).prefix(LibraryStorage.carPlayMaxElements)
@@ -1172,7 +1172,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       ))])
     }
     if templates.contains(songsFavoriteSection),
-       (appDelegate.account.apiType.asServerApiType != .ampache) ?
+       (activeAccount.apiType.asServerApiType != .ampache) ?
        (
          songsFavoritesFetchController?.sortType != appDelegate.storage.settings.user
            .favoriteSongSortSetting
@@ -1189,7 +1189,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         )
     }
     if templates.contains(songsFavoriteCachedSection),
-       (appDelegate.account.apiType.asServerApiType != .ampache) ?
+       (activeAccount.apiType.asServerApiType != .ampache) ?
        (
          songsFavoritesCachedFetchController?.sortType != appDelegate.storage.settings.user
            .favoriteSongSortSetting
@@ -1485,7 +1485,7 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       } else if aTemplate == playlistTab {
         os_log("CarPlay: templateWillAppear playlistTab", log: self.log, type: .info)
         Task { @MainActor in do {
-          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(activeAccountInfo).librarySyncer
             .syncDownPlaylistsWithoutSongs()
         } catch {
           self.appDelegate.eventLogger.report(topic: "CarPlay: Playlists Sync", error: error)
@@ -1556,7 +1556,7 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       } else if aTemplate == albumsRecentSection {
         os_log("CarPlay: templateWillAppear albumsRecentSection", log: self.log, type: .info)
         Task { @MainActor in do {
-          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(activeAccountInfo).librarySyncer
             .syncRecentAlbums(
               offset: 0,
               count: AmperKit.newestElementsFetchCount
@@ -1597,8 +1597,8 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         Task { @MainActor in do {
           try await playlistDetailFetchController.playlist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.activeAccountInfo).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.activeAccountInfo)
               .playableDownloadManager
           )
         } catch {
@@ -1614,8 +1614,8 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         Task { @MainActor in do {
           try await podcastDetailFetchController.podcast.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.activeAccountInfo).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.activeAccountInfo)
               .playableDownloadManager
           )
         } catch {

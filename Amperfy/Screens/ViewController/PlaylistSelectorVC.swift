@@ -119,6 +119,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
         height: NewPlaylistTableHeader.frameHeight
       )) {
       tableView.tableHeaderView?.addSubview(newPlaylistTableHeaderView)
+      newPlaylistTableHeaderView.account = account
     }
 
     navigationController?.setToolbarHidden(false, animated: false)
@@ -149,7 +150,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = PlaylistSelectorFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       sortType: sortType,
       isGroupedInAlphabeticSections: sortType.asSectionIndexType != .none
     )
@@ -165,7 +166,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     updateRightBarButtonItems()
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+      try await self.appDelegate.getMeta(self.account.info).librarySyncer
         .syncDownPlaylistsWithoutSongs()
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
@@ -196,7 +197,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     let localCopySelectedPlaylits = selectedPlaylits
     Task { @MainActor in do {
       for (playlist, songs) in localCopySelectedPlaylits {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.syncUpload(
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer.syncUpload(
           playlistToAddSongs: playlist,
           songs: songs
         )

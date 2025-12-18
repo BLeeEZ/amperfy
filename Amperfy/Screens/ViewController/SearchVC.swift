@@ -142,8 +142,8 @@ class SearchVC: BasicTableViewController {
     /// Assign the data source to your collection view.
     tableView.dataSource = diffableDataSource
 
-    accountObjectId = appDelegate.account.managedObject.objectID
-    searchHistory = appDelegate.storage.main.library.getSearchHistory(for: appDelegate.account)
+    accountObjectId = account.managedObject.objectID
+    searchHistory = appDelegate.storage.main.library.getSearchHistory(for: account)
     updateDataSource(animated: false)
     navigationController?.navigationItem.searchBarPlacementAllowsExternalIntegration = true
 
@@ -262,8 +262,8 @@ class SearchVC: BasicTableViewController {
         do {
           try await container.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
         } catch {
@@ -277,8 +277,8 @@ class SearchVC: BasicTableViewController {
         do {
           try await playlist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
         } catch {
@@ -292,8 +292,8 @@ class SearchVC: BasicTableViewController {
         do {
           try await artist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
         } catch {
@@ -307,8 +307,8 @@ class SearchVC: BasicTableViewController {
         do {
           try await album.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
         } catch {
@@ -488,21 +488,21 @@ class SearchVC: BasicTableViewController {
     guard let searchText = searchController.searchBar.text, let accountObjectId else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
       }}
 
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchAlbums(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
       }}
 
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchSongs(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
@@ -649,7 +649,7 @@ class SearchVC: BasicTableViewController {
       }}
     } else {
       isSearchActive = false
-      searchHistory = appDelegate.storage.main.library.getSearchHistory(for: appDelegate.account)
+      searchHistory = appDelegate.storage.main.library.getSearchHistory(for: account)
       artists = []
       albums = []
       playlists = []

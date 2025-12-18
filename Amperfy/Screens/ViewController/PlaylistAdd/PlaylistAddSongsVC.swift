@@ -104,7 +104,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(account.info).librarySyncer
             .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Songs Sync", error: error)
@@ -123,7 +123,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
       break
     case .favorites:
       isIndexTitelsHidden = false
-      if appDelegate.account.apiType.asServerApiType != .ampache {
+      if account.apiType.asServerApiType != .ampache {
         change(sortType: appDelegate.storage.settings.user.favoriteSongSortSetting)
       } else {
         change(sortType: appDelegate.storage.settings.user.songsSortSetting)
@@ -140,7 +140,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = SongsFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       sortType: sortType,
       isGroupedInAlphabeticSections: sortType.hasSectionTitles
     )
@@ -226,7 +226,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     guard let searchText = searchController.searchBar.text else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(account.info).librarySyncer
           .searchSongs(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)

@@ -95,7 +95,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     updateContentUnavailable()
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
-      try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+      try await self.appDelegate.getMeta(self.account.info).librarySyncer
         .syncIndexes(musicFolder: musicFolder)
     } catch {
       self.appDelegate.eventLogger.report(topic: "Indexes Sync", error: error)

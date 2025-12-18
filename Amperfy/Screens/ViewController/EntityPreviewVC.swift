@@ -484,12 +484,13 @@ class EntityPreviewActionBuilder {
   }
 
   private func toggleFavorite() {
-    guard appDelegate.storage.settings.user.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode,
+          let account = entityContainer.account else { return }
     Task { @MainActor in
       do {
         try await entityContainer
           .remoteToggleFavorite(
-            syncer: self.appDelegate.getMeta(self.appDelegate.account.info)
+            syncer: self.appDelegate.getMeta(account.info)
               .librarySyncer
           )
       } catch {
@@ -548,12 +549,13 @@ class EntityPreviewActionBuilder {
   }
 
   private func setRating(rating: Int) {
-    guard appDelegate.storage.settings.user.isOnlineMode else { return }
+    guard appDelegate.storage.settings.user.isOnlineMode,
+          let account = entityContainer.account else { return }
     if let song = (entityContainer as? AbstractPlayable)?.asSong {
       song.rating = rating
       appDelegate.storage.main.saveContext()
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.setRating(
+        try await self.appDelegate.getMeta(account.info).librarySyncer.setRating(
           song: song,
           rating: rating
         )
@@ -564,7 +566,7 @@ class EntityPreviewActionBuilder {
       album.rating = rating
       appDelegate.storage.main.saveContext()
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.setRating(
+        try await self.appDelegate.getMeta(account.info).librarySyncer.setRating(
           album: album,
           rating: rating
         )
@@ -575,7 +577,7 @@ class EntityPreviewActionBuilder {
       artist.rating = rating
       appDelegate.storage.main.saveContext()
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer.setRating(
+        try await self.appDelegate.getMeta(account.info).librarySyncer.setRating(
           artist: artist,
           rating: rating
         )
@@ -680,7 +682,8 @@ class EntityPreviewActionBuilder {
 
   private func createDeleteCacheAction() -> UIAction {
     UIAction(title: "Delete Cache", image: .trash) { action in
-      guard self.entityPlayables.hasCachedItems else { return }
+      guard self.entityPlayables.hasCachedItems,
+            let account = self.entityContainer.account else { return }
 
       let alert = UIAlertController(
         title: nil,
@@ -688,7 +691,7 @@ class EntityPreviewActionBuilder {
         preferredStyle: .alert
       )
       alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-        self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+        self.appDelegate.getMeta(account.info).playableDownloadManager
           .removeFinishedDownload(for: self.entityPlayables)
         self.appDelegate.storage.main.library.deleteCache(of: self.entityPlayables)
         self.appDelegate.storage.main.saveContext()
@@ -704,7 +707,9 @@ class EntityPreviewActionBuilder {
   private func createDeleteOnServerAction() -> UIAction {
     UIAction(title: "Delete on Server", image: .cloudX) { action in
       guard let playable = self.entityContainer as? AbstractPlayable,
-            let podcastEpisode = playable.asPodcastEpisode else { return }
+            let podcastEpisode = playable.asPodcastEpisode,
+            let account = podcastEpisode.account
+      else { return }
 
       let alert = UIAlertController(
         title: nil,
@@ -713,10 +718,10 @@ class EntityPreviewActionBuilder {
       )
       alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
         Task { @MainActor in do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(account.info).librarySyncer
             .requestPodcastEpisodeDelete(podcastEpisode: podcastEpisode)
           guard let podcast = podcastEpisode.podcast else { return }
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(account.info).librarySyncer
             .sync(podcast: podcast)
         } catch {
           self.appDelegate.eventLogger.report(topic: "Podcast Episode Delete Sync", error: error)
@@ -766,17 +771,22 @@ class EntityPreviewActionBuilder {
   private func createShowLyricsAction(song: Song) -> UIAction? {
     guard let playable = entityContainer as? AbstractPlayable,
           let song = playable.asSong,
-          let lyricsRelFilePath = song.lyricsRelFilePath
+          let lyricsRelFilePath = song.lyricsRelFilePath,
+          let lyricsAccount = song.account
     else { return nil }
 
     return UIAction(title: "Show Lyrics", image: .lyrics) { action in
-      self.showLyrics(lyricsRelFilePath: lyricsRelFilePath)
+      self.showLyrics(lyricsRelFilePath: lyricsRelFilePath, lyricsAccount: lyricsAccount)
     }
   }
 
-  private func showLyrics(lyricsRelFilePath: URL) {
+  private func showLyrics(lyricsRelFilePath: URL, lyricsAccount: Account) {
     let lyricsVC = PlainDetailsVC()
-    lyricsVC.display(lyricsRelFilePath: lyricsRelFilePath, on: rootView)
+    lyricsVC.display(
+      lyricsRelFilePath: lyricsRelFilePath,
+      lyricsAccount: lyricsAccount,
+      on: rootView
+    )
     rootView.present(lyricsVC, animated: true)
   }
 

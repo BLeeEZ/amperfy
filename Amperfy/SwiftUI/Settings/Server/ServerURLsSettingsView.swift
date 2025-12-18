@@ -62,7 +62,7 @@ struct ServerURLsSettingsView: View {
       if let updatedCredentials = appDelegate.storage.settings.accounts
         .getSetting(settings.activeAccountInfo).read
         .loginCredentials {
-        appDelegate.getMeta(appDelegate.account.info).backendApi
+        appDelegate.getMeta(settings.activeAccountInfo).backendApi
           .provideCredentials(credentials: updatedCredentials)
       }
     }

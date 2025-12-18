@@ -235,10 +235,12 @@ public class AddToPlaylistManager {
 
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(appDelegate.account.info).librarySyncer.syncUpload(
-            playlistToAddSongs: playlist,
-            songs: songsToAdd
-          )
+          if let account = playlist.account {
+            try await self.appDelegate.getMeta(account.info).librarySyncer.syncUpload(
+              playlistToAddSongs: playlist,
+              songs: songsToAdd
+            )
+          }
           self.playlist.append(playables: songsToAdd)
           self.onDoneCB?()
         } catch {

@@ -181,7 +181,7 @@ class AlbumsCommonVCInteractions {
     }
 
     fetchedResultsController = AlbumFetchedResultsController(
-      coreDataCompanion: appDelegate.storage.main, account: appDelegate.account,
+      coreDataCompanion: appDelegate.storage.main, account: account,
       sortType: sortType,
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
@@ -217,9 +217,9 @@ class AlbumsCommonVCInteractions {
         do {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
-            account: appDelegate.account,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            account: account,
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
           .syncNewestLibraryElements(offset: offset, count: count)
@@ -231,7 +231,7 @@ class AlbumsCommonVCInteractions {
     case .recent:
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncRecentAlbums(
               offset: offset,
               count: count
@@ -244,7 +244,7 @@ class AlbumsCommonVCInteractions {
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Albums Sync", error: error)
@@ -458,16 +458,16 @@ class AlbumsCommonVCInteractions {
         var albums = [Album]()
         switch self.displayFilter {
         case .all:
-          albums = self.appDelegate.storage.main.library.getAlbums(for: self.appDelegate.account)
+          albums = self.appDelegate.storage.main.library.getAlbums(for: self.account)
         case .newest:
           albums = self.appDelegate.storage.main.library
-            .getNewestAlbums(for: self.appDelegate.account)
+            .getNewestAlbums(for: self.account)
         case .recent:
           albums = self.appDelegate.storage.main.library
-            .getRecentAlbums(for: self.appDelegate.account)
+            .getRecentAlbums(for: self.account)
         case .favorites:
           albums = self.appDelegate.storage.main.library
-            .getFavoriteAlbums(for: self.appDelegate.account)
+            .getFavoriteAlbums(for: self.account)
         }
         let albumSongs = Array(albums.compactMap { $0.playables }.joined())
         if albumSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {
@@ -477,13 +477,13 @@ class AlbumsCommonVCInteractions {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+            self.appDelegate.getMeta(self.account.info).playableDownloadManager
               .download(objects: albumSongs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.rootVC?.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
+          self.appDelegate.getMeta(self.account.info).playableDownloadManager
             .download(objects: albumSongs)
         }
       }
@@ -531,7 +531,7 @@ class AlbumsCommonVCInteractions {
     let searchText = searchController.searchBar.text ?? ""
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchAlbums(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
@@ -567,7 +567,7 @@ class AlbumsCommonVCInteractions {
     Task { @MainActor in
       do {
         if self.displayFilter == .recent {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
             .syncRecentAlbums(
               offset: 0,
               count: AmperKit.newestElementsFetchCount
@@ -575,9 +575,9 @@ class AlbumsCommonVCInteractions {
         } else {
           try await AutoDownloadLibrarySyncer(
             storage: self.appDelegate.storage,
-            account: appDelegate.account,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
+            account: account,
+            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
+            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
               .playableDownloadManager
           )
           .syncNewestLibraryElements()

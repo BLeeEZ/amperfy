@@ -48,7 +48,7 @@ class LibraryVC: KeyCommandCollectionViewController {
 
   lazy var libraryItemConfigurator = LibraryNavigatorConfigurator(
     offsetData: offsetData,
-    librarySettings: appDelegate.storage.settings.accounts.getSetting(self.appDelegate.account.info)
+    librarySettings: appDelegate.storage.settings.accounts.getSetting(account.info)
       .read
       .libraryDisplaySettings,
     layoutConfig: self.layoutConfig,

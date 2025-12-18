@@ -59,13 +59,13 @@ struct UpdatePasswordView: View {
     loginCredentials.changePasswordAndHash(password: newPassword)
     Task { @MainActor in
       do {
-        try await appDelegate.getMeta(appDelegate.account.info).backendApi
+        try await appDelegate.getMeta(settings.activeAccountInfo).backendApi
           .isAuthenticationValid(credentials: loginCredentials)
         let accountInfo = Account.createInfo(credentials: loginCredentials)
         appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
           accountSettings.loginCredentials = loginCredentials
         }
-        appDelegate.getMeta(appDelegate.account.info).backendApi
+        appDelegate.getMeta(settings.activeAccountInfo).backendApi
           .provideCredentials(credentials: loginCredentials)
         successMsg = "Password updated!"
       } catch {
