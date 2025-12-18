@@ -28,6 +28,7 @@ public typealias GetLibrarySyncerCallback = (AccountInfo) -> LibrarySyncer
 public typealias GetPlayableDownloadManagerCallback = (AccountInfo) -> DownloadManageable
 public typealias GetArtworkDownloadManagerCallback = (AccountInfo) -> DownloadManageable
 public typealias GetBackendApiCallback = (AccountInfo) -> BackendApi
+public typealias GetActiveAccountCallback = () -> Account?
 
 // MARK: - MetaManager
 

@@ -99,7 +99,7 @@ public class IntentManager {
   private let getLibrarySyncerCB: GetLibrarySyncerCallback
   private let getPlayableDownloadManagerCB: GetPlayableDownloadManagerCallback
   private let library: LibraryStorage
-  private let account: Account
+  private let getActiveAccountCallback: GetActiveAccountCallback
   private let player: PlayerFacade
   private let networkMonitor: NetworkMonitorFacade
   private let eventLogger: EventLogger
@@ -110,7 +110,7 @@ public class IntentManager {
     getLibrarySyncerCB: @escaping GetLibrarySyncerCallback,
     getPlayableDownloadManagerCB: @escaping GetPlayableDownloadManagerCallback,
     library: LibraryStorage,
-    account: Account,
+    getActiveAccountCallback: @escaping GetActiveAccountCallback,
     player: PlayerFacade,
     networkMonitor: NetworkMonitorFacade,
     eventLogger: EventLogger
@@ -119,7 +119,7 @@ public class IntentManager {
     self.getLibrarySyncerCB = getLibrarySyncerCB
     self.getPlayableDownloadManagerCB = getPlayableDownloadManagerCB
     self.library = library
-    self.account = account
+    self.getActiveAccountCallback = getActiveAccountCallback
     self.player = player
     self.networkMonitor = networkMonitor
     self.eventLogger = eventLogger
@@ -184,6 +184,14 @@ public class IntentManager {
       var shuffleOption = false
       var repeatOption = RepeatMode.off
 
+      guard let account = self.getActiveAccountCallback() else {
+        failure(NSError.error(
+          code: .missingErrorCode,
+          failureReason: "You are not yet logged in."
+        ))
+        return
+      }
+
       guard let searchTerm = parameters
         .first(where: { $0.key == NSUserActivity.ActivityKeys.searchTerm.rawValue })?.value
       else {
@@ -224,7 +232,7 @@ public class IntentManager {
       let playableContainer = self.getPlayableContainer(
         searchTerm: searchTerm,
         searchCategory: searchCategory,
-        account: self.account
+        account: account
       )
       Task { @MainActor in
         let playSuccess = await self.play(
@@ -286,6 +294,14 @@ public class IntentManager {
       var shuffleOption = false
       var repeatOption = RepeatMode.off
 
+      guard let account = self.getActiveAccountCallback() else {
+        failure(NSError.error(
+          code: .missingErrorCode,
+          failureReason: "You are not yet logged in."
+        ))
+        return
+      }
+
       guard let id = parameters.first(where: { $0.key == NSUserActivity.ActivityKeys.id.rawValue })?
         .value else {
         failure(NSError.error(code: .missingParameter, failureReason: "Parameter id not provided."))
@@ -322,7 +338,7 @@ public class IntentManager {
         repeatOption = repeatInput
       }
       let playableContainer = self.getPlayableContainer(
-        id: id,
+        account: account, id: id,
         libraryElementType: libraryElementType
       )
       Task { @MainActor in
@@ -363,6 +379,14 @@ public class IntentManager {
       )
     )
     CallbackURLKit.register(action: "playRandomSongs") { parameters, success, failure, cancel in
+      guard let account = self.getActiveAccountCallback() else {
+        failure(NSError.error(
+          code: .missingErrorCode,
+          failureReason: "You are not yet logged in."
+        ))
+        return
+      }
+
       var isOnlyUseCached = false
       if let onlyCachedStringRaw = parameters
         .first(where: { $0.key == NSUserActivity.ActivityKeys.onlyCached.rawValue })?.value,
@@ -372,7 +396,7 @@ public class IntentManager {
       }
 
       let songs = self.library.getRandomSongs(
-        for: self.account,
+        for: account,
         count: self.player.maxSongsToAddOnce,
         onlyCached: isOnlyUseCached
       )
@@ -752,6 +776,10 @@ public class IntentManager {
 
   public func handleIncomingPlayMediaIntent(playMediaIntent: INPlayMediaIntent)
     -> AmperfyMediaIntentItemResult? {
+    guard let account = getActiveAccountCallback() else {
+      eventLogger.info(topic: "Siri Play Media Intent", message: "Error: not yet logged in")
+      return nil
+    }
     // intent interpretion is only working if media search is provided
     guard let mediaSearch = playMediaIntent.mediaSearch else {
       eventLogger.debug(topic: "Siri Play Media Intent", message: "Error: No media search provided")
@@ -881,7 +909,11 @@ public class IntentManager {
             artistName,
             mediaName
           )
-          if let playableContainer = getSong(songName: mediaName, artistName: artistName) {
+          if let playableContainer = getSong(
+            account: account,
+            songName: mediaName,
+            artistName: artistName
+          ) {
             result = AmperfyMediaIntentItemResult(
               playableContainer: playableContainer,
               item: INMediaItem(
@@ -1063,12 +1095,13 @@ public class IntentManager {
 
   @MainActor
   public func handleIncomingIntent(userActivity: NSUserActivity) async -> Bool {
-    guard userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
-      userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
-      userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
-      userActivity.activityType == NSUserActivity.playIdActivityType ||
-      userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
-      userActivity.activityType == NSUserActivity.playRandomSongsActivityType
+    guard let account = getActiveAccountCallback(),
+          userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
+          userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
+          userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
+          userActivity.activityType == NSUserActivity.playIdActivityType ||
+          userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
+          userActivity.activityType == NSUserActivity.playRandomSongsActivityType
     else {
       return false
     }
@@ -1123,7 +1156,11 @@ public class IntentManager {
         repeatOption = RepeatMode.fromIntent(type: repeatUser)
       }
 
-      let playableContainer = getPlayableContainer(id: id, libraryElementType: libraryElementType)
+      let playableContainer = getPlayableContainer(
+        account: account,
+        id: id,
+        libraryElementType: libraryElementType
+      )
       return await play(
         container: playableContainer,
         shuffleOption: shuffleOption,
@@ -1197,7 +1234,12 @@ public class IntentManager {
     return playableContainer
   }
 
-  private func getSong(songName: String, artistName: String) -> PlayableContainable? {
+  private func getSong(
+    account: Account,
+    songName: String,
+    artistName: String
+  )
+    -> PlayableContainable? {
     let foundPlayables = FuzzySearcher.findBestMatch(
       in: library.getSongs(for: account),
       search: songName
@@ -1212,6 +1254,7 @@ public class IntentManager {
   }
 
   private func getPlayableContainer(
+    account: Account,
     id: String,
     libraryElementType: PlayableContainerType
   )

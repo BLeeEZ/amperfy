@@ -63,10 +63,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AmperKit.shared.log
   }()
 
-  public lazy var account = {
-    AmperKit.shared.account
-  }()
-
   public lazy var storage = {
     AmperKit.shared.storage
   }()
@@ -109,7 +105,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.getMeta(accountInfo).playableDownloadManager
       },
       library: storage.main.library,
-      account: account,
+      getActiveAccountCallback: {
+        guard let activeAccountInfo = self.storage.settings.accounts.active else { return nil }
+        return self.storage.main.library.getAccount(info: activeAccountInfo)
+      },
       player: player, networkMonitor: networkMonitor,
       eventLogger: eventLogger
     )
