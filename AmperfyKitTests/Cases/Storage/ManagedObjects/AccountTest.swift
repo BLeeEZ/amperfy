@@ -80,17 +80,17 @@ class AccountTest: XCTestCase {
     XCTAssertEqual(testAccount.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(testAccount.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(testAccount.apiType, TestAccountInfo.test1ApiType)
-    XCTAssertEqual(library.getAllAccounts().count, 1) // still 1: the default one is overriden
+    XCTAssertEqual(library.getAllAccounts().count, 2)
 
-    XCTAssertEqual(defaultAccount.serverHash, TestAccountInfo.test1ServerHash)
-    XCTAssertEqual(defaultAccount.userHash, TestAccountInfo.test1UserHash)
-    XCTAssertEqual(defaultAccount.apiType, TestAccountInfo.test1ApiType)
-    XCTAssertEqual(defaultAccount.managedObject, testAccount.managedObject)
+    XCTAssertEqual(defaultAccount.serverHash, "")
+    XCTAssertEqual(defaultAccount.userHash, "")
+    XCTAssertEqual(defaultAccount.apiType, .notDetected)
+    XCTAssertNotEqual(defaultAccount.managedObject, testAccount.managedObject)
 
     let secondAccount = library.getAccount(info: TestAccountInfo.create2())
     XCTAssertEqual(secondAccount.serverHash, TestAccountInfo.test2ServerHash)
     XCTAssertEqual(secondAccount.userHash, TestAccountInfo.test2UserHash)
     XCTAssertEqual(secondAccount.apiType, TestAccountInfo.test2ApiType)
-    XCTAssertEqual(library.getAllAccounts().count, 2)
+    XCTAssertEqual(library.getAllAccounts().count, 3)
   }
 }

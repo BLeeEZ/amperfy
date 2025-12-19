@@ -74,8 +74,9 @@ struct LibrarySettingsView: View {
 
   private func updateValues() {
     Task { @MainActor in do {
+      guard let activeAccountInfo = settings.activeAccountInfo else { return }
       let accountObjectId = appDelegate.storage.main.library
-        .getAccount(info: settings.activeAccountInfo).managedObject.objectID
+        .getAccount(info: activeAccountInfo).managedObject.objectID
       playlistCount = try await appDelegate.storage.async.performAndGet { asyncCompanion in
         let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         return asyncCompanion.library.getPlaylistCount(for: accountAsync)
@@ -188,17 +189,6 @@ struct LibrarySettingsView: View {
         }, header: "Background song sync")
 
         SettingsSection(content: {
-          SettingsCheckBoxRow(
-            title: "Newest Songs",
-            isOn: $settings.isAutoCacheLatestSongs
-          )
-          SettingsCheckBoxRow(
-            title: "Newest Podcast Episodes",
-            isOn: $settings.isAutoCacheLatestPodcastEpisodes
-          )
-        }, header: "Auto Cache")
-
-        SettingsSection(content: {
           let changeHandler: ([String], [String]) -> () = { oldCacheString, newCacheString in
             if newCacheString[1] == "" {
               settings.cacheSizeLimit = 0
@@ -240,50 +230,52 @@ struct LibrarySettingsView: View {
             .onChange(of: cacheSelection, changeHandler)
           #endif
 
-          SettingsButtonRow(title: "Download all songs in library") {
-            isShowDownloadSongsAlert = true
-          }
-          .alert(isPresented: $isShowDownloadSongsAlert) {
-            Alert(
-              title: Text("Download all songs in library"),
-              message: Text(
-                "This will add all uncached songs in your library to the download queue. This may use a lot of data and storage. Continue?"
-              ),
-              primaryButton: .default(Text("OK")) {
-                let account = appDelegate.storage.main.library
-                  .getAccount(info: settings.activeAccountInfo)
-                let allSongsToDownload = appDelegate.storage.main.library
-                  .getSongsForCompleteLibraryDownload(for: account)
-                appDelegate.getMeta(account.info).playableDownloadManager
-                  .download(objects: allSongsToDownload)
-              },
-              secondaryButton: .cancel()
-            )
-          }
+          if let activeAccountInfo = settings.activeAccountInfo {
+            SettingsButtonRow(title: "Download all songs in library") {
+              isShowDownloadSongsAlert = true
+            }
+            .alert(isPresented: $isShowDownloadSongsAlert) {
+              Alert(
+                title: Text("Download all songs in library"),
+                message: Text(
+                  "This will add all uncached songs in your library to the download queue. This may use a lot of data and storage. Continue?"
+                ),
+                primaryButton: .default(Text("OK")) {
+                  let account = appDelegate.storage.main.library
+                    .getAccount(info: activeAccountInfo)
+                  let allSongsToDownload = appDelegate.storage.main.library
+                    .getSongsForCompleteLibraryDownload(for: account)
+                  appDelegate.getMeta(account.info).playableDownloadManager
+                    .download(objects: allSongsToDownload)
+                },
+                secondaryButton: .cancel()
+              )
+            }
 
-          SettingsButtonRow(
-            title: "Delete downloaded songs and podcast episodes",
-            actionType: .destructive
-          ) {
-            isShowDeleteCacheAlert = true
-          }.alert(isPresented: $isShowDeleteCacheAlert) {
-            Alert(
-              title: Text("Delete Cache"),
-              message: Text(
-                "Are you sure you want to delete this account’s downloaded songs and podcast episodes?"
-              ),
-              primaryButton: .destructive(Text("Delete")) {
-                appDelegate.player.stop()
-                let account = appDelegate.storage.main.library
-                  .getAccount(info: settings.activeAccountInfo)
-                appDelegate.getMeta(account.info).playableDownloadManager.stop()
-                appDelegate.storage.main.library
-                  .deletePlayableCachePaths(for: account)
-                appDelegate.storage.main.library.saveContext()
-                fileManager.deletePlayableCache(accountInfo: account.info)
-                appDelegate.getMeta(account.info).playableDownloadManager.start()
-              }, secondaryButton: .cancel()
-            )
+            SettingsButtonRow(
+              title: "Delete downloaded songs and podcast episodes",
+              actionType: .destructive
+            ) {
+              isShowDeleteCacheAlert = true
+            }.alert(isPresented: $isShowDeleteCacheAlert) {
+              Alert(
+                title: Text("Delete Cache"),
+                message: Text(
+                  "Are you sure you want to delete this account’s downloaded songs and podcast episodes?"
+                ),
+                primaryButton: .destructive(Text("Delete")) {
+                  appDelegate.player.stop()
+                  let account = appDelegate.storage.main.library
+                    .getAccount(info: activeAccountInfo)
+                  appDelegate.getMeta(account.info).playableDownloadManager.stop()
+                  appDelegate.storage.main.library
+                    .deletePlayableCachePaths(for: account)
+                  appDelegate.storage.main.library.saveContext()
+                  fileManager.deletePlayableCache(accountInfo: account.info)
+                  appDelegate.getMeta(account.info).playableDownloadManager.start()
+                }, secondaryButton: .cancel()
+              )
+            }
           }
         }, header: "Cache")
 

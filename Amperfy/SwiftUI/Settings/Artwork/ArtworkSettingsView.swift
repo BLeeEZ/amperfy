@@ -47,8 +47,9 @@ struct ArtworkSettingsView: View {
 
   func updateValues() {
     Task { @MainActor in do {
+      guard let activeAccountInfo = settings.activeAccountInfo else { return }
       let accountObjectId = appDelegate.storage.main.library
-        .getAccount(info: settings.activeAccountInfo).managedObject.objectID
+        .getAccount(info: activeAccountInfo).managedObject.objectID
       (
         artworkCountText,
         artworkNotCheckedCountText,
@@ -89,51 +90,54 @@ struct ArtworkSettingsView: View {
           SettingsRow(title: "Cached Artworks") {
             SecondaryText(cachedArtworksCountText)
           }
-          SettingsButtonRow(title: "Download all artworks in library") {
-            isShowDownloadArtworksAlert = true
-          }
-          .alert(isPresented: $isShowDownloadArtworksAlert) {
-            Alert(
-              title: Text("Download all artworks in library"),
-              message: Text(
-                "This action will add all uncached artworks to the download queue. With this action a lot network traffic can be generated and device storage capacity will be taken. Continue?"
-              ),
-              primaryButton: .default(Text("OK")) {
-                let account = appDelegate.storage.main.library
-                  .getAccount(info: settings.activeAccountInfo)
-                let allArtworksToDownload = appDelegate.storage.main.library
-                  .getArtworksForCompleteLibraryDownload(for: account)
-                appDelegate.getMeta(account.info).artworkDownloadManager
-                  .download(objects: allArtworksToDownload)
-              },
-              secondaryButton: .cancel()
-            )
-          }
-          SettingsButtonRow(title: "Delete all downloaded artworks", actionType: .destructive) {
-            isShowDeleteArtworksAlert = true
-          }
-          .alert(isPresented: $isShowDeleteArtworksAlert) {
-            Alert(
-              title: Text("Delete all downloaded artworks"),
-              message: Text(
-                "This action will delete downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
-              ),
-              primaryButton: .destructive(Text("Delete")) {
-                let account = appDelegate.storage.main.library
-                  .getAccount(info: settings.activeAccountInfo)
-                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager.stop()
-                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager
-                  .cancelDownloads()
-                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager
-                  .clearFinishedDownloads()
-                appDelegate.storage.main.library
-                  .deleteRemoteArtworkCachePaths(account: account)
-                appDelegate.storage.main.library.saveContext()
-                fileManager.deleteRemoteArtworkCache(accountInfo: settings.activeAccountInfo)
-                appDelegate.getMeta(settings.activeAccountInfo).artworkDownloadManager.start()
-              },
-              secondaryButton: .cancel()
-            )
+
+          if let activeAccountInfo = settings.activeAccountInfo {
+            SettingsButtonRow(title: "Download all artworks in library") {
+              isShowDownloadArtworksAlert = true
+            }
+            .alert(isPresented: $isShowDownloadArtworksAlert) {
+              Alert(
+                title: Text("Download all artworks in library"),
+                message: Text(
+                  "This action will add all uncached artworks to the download queue. With this action a lot network traffic can be generated and device storage capacity will be taken. Continue?"
+                ),
+                primaryButton: .default(Text("OK")) {
+                  let account = appDelegate.storage.main.library
+                    .getAccount(info: activeAccountInfo)
+                  let allArtworksToDownload = appDelegate.storage.main.library
+                    .getArtworksForCompleteLibraryDownload(for: account)
+                  appDelegate.getMeta(account.info).artworkDownloadManager
+                    .download(objects: allArtworksToDownload)
+                },
+                secondaryButton: .cancel()
+              )
+            }
+            SettingsButtonRow(title: "Delete all downloaded artworks", actionType: .destructive) {
+              isShowDeleteArtworksAlert = true
+            }
+            .alert(isPresented: $isShowDeleteArtworksAlert) {
+              Alert(
+                title: Text("Delete all downloaded artworks"),
+                message: Text(
+                  "This action will delete downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
+                ),
+                primaryButton: .destructive(Text("Delete")) {
+                  let account = appDelegate.storage.main.library
+                    .getAccount(info: activeAccountInfo)
+                  appDelegate.getMeta(activeAccountInfo).artworkDownloadManager.stop()
+                  appDelegate.getMeta(activeAccountInfo).artworkDownloadManager
+                    .cancelDownloads()
+                  appDelegate.getMeta(activeAccountInfo).artworkDownloadManager
+                    .clearFinishedDownloads()
+                  appDelegate.storage.main.library
+                    .deleteRemoteArtworkCachePaths(account: account)
+                  appDelegate.storage.main.library.saveContext()
+                  fileManager.deleteRemoteArtworkCache(accountInfo: activeAccountInfo)
+                  appDelegate.getMeta(activeAccountInfo).artworkDownloadManager.start()
+                },
+                secondaryButton: .cancel()
+              )
+            }
           }
         }
         SettingsSection {

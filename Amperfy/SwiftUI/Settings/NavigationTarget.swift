@@ -23,8 +23,8 @@ import SwiftUI
 @MainActor
 enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
   case general
+  case account
   case displayAndInteraction
-  case server
   case library
   case player
   case equalizer
@@ -43,7 +43,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     switch self {
     case .general: SettingsView()
     case .displayAndInteraction: DisplaySettingsView()
-    case .server: ServerSettingsView()
+    case .account: AccountSettingsView()
     case .library: LibrarySettingsView()
     case .player: PlayerSettingsView()
     case .equalizer: EqualizerSettingsView()
@@ -62,7 +62,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     switch self {
     case .general: "General"
     case .displayAndInteraction: "Display & Interaction"
-    case .server: "Server"
+    case .account: "Account"
     case .library: "Library"
     case .swipe: "Swipe"
     case .artwork: "Artwork"
@@ -82,7 +82,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     switch self {
     case .general: .settings
     case .displayAndInteraction: .display
-    case .server: .server
+    case .account: .userPerson
     case .library: .musicLibrary
     case .player: .playCircle
     case .equalizer: .equalizer
@@ -101,7 +101,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     switch self {
     case .general: "gear"
     case .displayAndInteraction: "display"
-    case .server: "server.rack"
+    case .account: "person.fill"
     case .library: "music.note.house"
     case .player: "play.circle.fill"
     case .equalizer: "chart.bar.xaxis"

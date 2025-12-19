@@ -56,9 +56,10 @@ struct AlternativeURLAddDialogView: View {
 
   func handleAdd() {
     resetStatus()
+    guard let activeAccountInfo = settings.activeAccountInfo else { return }
     let newAltUrl = urlInput.trimmingCharacters(in: .whitespacesAndNewlines)
     let password = passwordInput
-    let username = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+    let username = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
       .loginCredentials?
       .username ?? ""
     guard !newAltUrl.isEmpty,
@@ -89,13 +90,13 @@ struct AlternativeURLAddDialogView: View {
     isValidating = true
     Task { @MainActor in
       do {
-        try await appDelegate.getMeta(settings.activeAccountInfo).backendApi
+        try await appDelegate.getMeta(activeAccountInfo).backendApi
           .isAuthenticationValid(credentials: credentialsToCheck)
         appDelegate.storage.settings.accounts
-          .updateSetting(Account.createInfo(credentials: credentialsToCheck)) { accountSettings in
+          .updateSetting(activeAccountInfo) { accountSettings in
             accountSettings.loginCredentials = credentialsToCheck
           }
-        appDelegate.getMeta(settings.activeAccountInfo).backendApi
+        appDelegate.getMeta(activeAccountInfo).backendApi
           .provideCredentials(credentials: credentialsToCheck)
         activeServerURL = credentialsToCheck.activeBackendServerUrl
         serverURLs = credentialsToCheck.availableServerURLs

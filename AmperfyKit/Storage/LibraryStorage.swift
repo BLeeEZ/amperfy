@@ -540,25 +540,10 @@ public class LibraryStorage: PlayableFileCachable {
        let accountMO = accounts.lazy.first {
       return Account(managedObject: accountMO)
     } else {
-      // search for an "empty" Account
-      let fetchRequestForEmptyAccount = AccountMO.fetchRequest()
-      fetchRequestForEmptyAccount.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-        NSPredicate(format: "%K == %@", #keyPath(AccountMO.serverHash), ""),
-        NSPredicate(format: "%K == %@", #keyPath(AccountMO.userHash), ""),
-      ])
-      fetchRequestForEmptyAccount.fetchLimit = 1
-      if let accounts = try? context.fetch(fetchRequestForEmptyAccount),
-         let accountMO = accounts.lazy.first {
-        let account = Account(managedObject: accountMO)
-        account.assignInfo(info: info)
-        saveContext()
-        return account
-      } else {
-        // create an "empty" Account
-        let account = createAccount(info: info)
-        saveContext()
-        return account
-      }
+      // create an "empty" Account
+      let account = createAccount(info: info)
+      saveContext()
+      return account
     }
   }
 

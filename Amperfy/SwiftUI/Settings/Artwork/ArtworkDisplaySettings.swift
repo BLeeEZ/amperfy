@@ -42,23 +42,25 @@ struct ArtworkDisplaySettings: View {
     ZStack {
       List {
         Section {
-          ForEach(settingOptions, id: \.self) { option in
-            Button(action: {
-              appDelegate.storage.settings.accounts
-                .updateSetting(settings.activeAccountInfo) { accountSettings in
-                  accountSettings.artworkDisplayPreference = option
+          if let activeAccountInfo = settings.activeAccountInfo {
+            ForEach(settingOptions, id: \.self) { option in
+              Button(action: {
+                appDelegate.storage.settings.accounts
+                  .updateSetting(activeAccountInfo) { accountSettings in
+                    accountSettings.artworkDisplayPreference = option
+                  }
+                updateValues()
+              }) {
+                HStack {
+                  Text(option.description)
+                  Spacer()
+                  if option == activeOption {
+                    Image.checkmark
+                  }
                 }
-              updateValues()
-            }) {
-              HStack {
-                Text(option.description)
-                Spacer()
-                if option == activeOption {
-                  Image.checkmark
-                }
+                .contentShape(Rectangle())
+                .foregroundColor(.primary)
               }
-              .contentShape(Rectangle())
-              .foregroundColor(.primary)
             }
           }
         }

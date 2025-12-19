@@ -28,22 +28,6 @@ struct DisplaySettingsView: View {
   @EnvironmentObject
   private var settings: Settings
 
-  func setThemePreference(preference: ThemePreference) {
-    settings.themePreference = preference
-    appDelegate.setAppTheme(color: preference.asColor)
-
-    // the following applies the tint color to already loaded views in all windows (UIKit)
-    let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-    let windows = windowScene.flatMap { $0.windows }
-
-    for window in windows {
-      for view in window.subviews {
-        view.removeFromSuperview()
-        window.addSubview(view)
-      }
-    }
-  }
-
   func setAppearanceMode(style: UIUserInterfaceStyle) {
     settings.appearanceMode = style
     appDelegate.setAppAppearanceMode(style: style)
@@ -52,31 +36,6 @@ struct DisplaySettingsView: View {
   var body: some View {
     ZStack {
       SettingsList {
-        SettingsSection {
-          SettingsRow(title: "Theme Color") {
-            Menu(settings.themePreference.description) {
-              Button(ThemePreference.blue.description) {
-                setThemePreference(preference: .blue)
-              }
-              Button(ThemePreference.green.description) {
-                setThemePreference(preference: .green)
-              }
-              Button(ThemePreference.red.description) {
-                setThemePreference(preference: .red)
-              }
-              Button(ThemePreference.yellow.description) {
-                setThemePreference(preference: .yellow)
-              }
-              Button(ThemePreference.orange.description) {
-                setThemePreference(preference: .orange)
-              }
-              Button(ThemePreference.purple.description) {
-                setThemePreference(preference: .purple)
-              }
-            }
-          }
-        }
-
         SettingsSection {
           SettingsRow(title: "Appearance") {
             Menu(
@@ -117,7 +76,8 @@ struct DisplaySettingsView: View {
           "Add skip forward and skip backward buttons to the music player, along with the previous/next buttons."
         )
 
-        if settings.activeAccountInfo.apiType.asServerApiType != .ampache {
+        if let activeAccountInfo = settings.activeAccountInfo,
+           activeAccountInfo.apiType.asServerApiType != .ampache {
           SettingsSection(
             content: {
               SettingsCheckBoxRow(

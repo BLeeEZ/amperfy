@@ -48,10 +48,11 @@ struct UpdatePasswordView: View {
   func updatePassword() {
     resetStatus()
     let newPassword = passwordInput
-    guard var loginCredentials = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo).read
-      .loginCredentials,
-      !newPassword.isEmpty else {
+    guard let activeAccountInfo = settings.activeAccountInfo,
+          var loginCredentials = appDelegate.storage.settings.accounts
+          .getSetting(activeAccountInfo).read
+          .loginCredentials,
+          !newPassword.isEmpty else {
       errorMsg = "Please provide the new password."
       return
     }
@@ -59,13 +60,12 @@ struct UpdatePasswordView: View {
     loginCredentials.changePasswordAndHash(password: newPassword)
     Task { @MainActor in
       do {
-        try await appDelegate.getMeta(settings.activeAccountInfo).backendApi
+        try await appDelegate.getMeta(activeAccountInfo).backendApi
           .isAuthenticationValid(credentials: loginCredentials)
-        let accountInfo = Account.createInfo(credentials: loginCredentials)
-        appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
+        appDelegate.storage.settings.accounts.updateSetting(activeAccountInfo) { accountSettings in
           accountSettings.loginCredentials = loginCredentials
         }
-        appDelegate.getMeta(settings.activeAccountInfo).backendApi
+        appDelegate.getMeta(activeAccountInfo).backendApi
           .provideCredentials(credentials: loginCredentials)
         successMsg = "Password updated!"
       } catch {

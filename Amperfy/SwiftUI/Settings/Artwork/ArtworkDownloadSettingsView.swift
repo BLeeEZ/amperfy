@@ -42,23 +42,25 @@ struct ArtworkDownloadSettingsView: View {
     ZStack {
       List {
         Section {
-          ForEach(settingOptions, id: \.self) { option in
-            Button(action: {
-              appDelegate.storage.settings.accounts
-                .updateSetting(settings.activeAccountInfo) { accountSettings in
-                  accountSettings.artworkDownloadSetting = option
+          if let activeAccountInfo = settings.activeAccountInfo {
+            ForEach(settingOptions, id: \.self) { option in
+              Button(action: {
+                appDelegate.storage.settings.accounts
+                  .updateSetting(activeAccountInfo) { accountSettings in
+                    accountSettings.artworkDownloadSetting = option
+                  }
+                updateValues()
+              }) {
+                HStack {
+                  Text(option.description)
+                  Spacer()
+                  if option == activeOption {
+                    Image.checkmark
+                  }
                 }
-              updateValues()
-            }) {
-              HStack {
-                Text(option.description)
-                Spacer()
-                if option == activeOption {
-                  Image.checkmark
-                }
+                .contentShape(Rectangle())
+                .foregroundColor(.primary)
               }
-              .contentShape(Rectangle())
-              .foregroundColor(.primary)
             }
           }
         }

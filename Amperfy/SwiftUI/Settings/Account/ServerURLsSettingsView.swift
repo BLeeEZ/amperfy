@@ -39,49 +39,52 @@ struct ServerURLsSettingsView: View {
   var settings: Settings
 
   func reload() {
-    serverURLs = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo).read
+    guard let activeAccountInfo = settings.activeAccountInfo else {
+      serverURLs = []
+      activeServerURL = ""
+      accountServerURL = ""
+      return
+    }
+    serverURLs = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
       .loginCredentials?
       .availableServerURLs ?? []
-    activeServerURL = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo)
+    activeServerURL = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo)
       .read.loginCredentials?
       .activeBackendServerUrl ?? ""
-    accountServerURL = appDelegate.storage.settings.accounts.getSetting(settings.activeAccountInfo)
+    accountServerURL = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo)
       .read.loginCredentials?
       .serverUrl ?? ""
   }
 
   func setAsActiveURL(url: String) {
-    guard url != activeServerURL else { return }
-    if let currentCredentials = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo).read
-      .loginCredentials {
-      appDelegate.storage.settings.accounts
-        .updateSetting(Account.createInfo(credentials: currentCredentials)) { accountSettings in
-          accountSettings.loginCredentials?.activeBackendServerUrl = url
-        }
-      if let updatedCredentials = appDelegate.storage.settings.accounts
-        .getSetting(settings.activeAccountInfo).read
-        .loginCredentials {
-        appDelegate.getMeta(settings.activeAccountInfo).backendApi
-          .provideCredentials(credentials: updatedCredentials)
+    guard url != activeServerURL, let activeAccountInfo = settings.activeAccountInfo else { return }
+    appDelegate.storage.settings.accounts
+      .updateSetting(activeAccountInfo) { accountSettings in
+        accountSettings.loginCredentials?.activeBackendServerUrl = url
       }
+    if let updatedCredentials = appDelegate.storage.settings.accounts
+      .getSetting(activeAccountInfo).read
+      .loginCredentials {
+      appDelegate.getMeta(activeAccountInfo).backendApi
+        .provideCredentials(credentials: updatedCredentials)
     }
     reload()
   }
 
   func deleteURL(url: String) {
-    guard url != activeServerURL, url != accountServerURL else { return }
-    if let currentCredentials = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo).read
-      .loginCredentials,
-      let altIndex = currentCredentials.alternativeServerURLs.firstIndex(of: url) {
-      var altURLs = currentCredentials.alternativeServerURLs
-      altURLs.remove(at: altIndex)
-      appDelegate.storage.settings.accounts
-        .updateSetting(Account.createInfo(credentials: currentCredentials)) { accountSettings in
-          accountSettings.loginCredentials?.alternativeServerURLs = altURLs
-        }
-    }
+    guard url != activeServerURL, url != accountServerURL,
+          let activeAccountInfo = settings.activeAccountInfo,
+          let currentCredentials = appDelegate.storage.settings.accounts
+          .getSetting(activeAccountInfo).read
+          .loginCredentials,
+          let altIndex = currentCredentials.alternativeServerURLs.firstIndex(of: url)
+    else { return }
+    var altURLs = currentCredentials.alternativeServerURLs
+    altURLs.remove(at: altIndex)
+    appDelegate.storage.settings.accounts
+      .updateSetting(activeAccountInfo) { accountSettings in
+        accountSettings.loginCredentials?.alternativeServerURLs = altURLs
+      }
   }
 
   var body: some View {

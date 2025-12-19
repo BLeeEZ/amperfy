@@ -228,14 +228,15 @@ class SettingsHostVC: UIViewController {
     }))
 
     // account can only be changed from outside of settings
-    settings.activeAccountInfo = appDelegate.storage.settings.accounts.active ?? .defaultAccountInfo
+    settings.activeAccountInfo = appDelegate.storage.settings.accounts.active
 
     settings.themePreference = appDelegate.storage.settings.accounts
       .getSetting(settings.activeAccountInfo).read
       .themePreference
     changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
+      guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
-        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+        .updateSetting(activeAccountInfo) { accountSettings in
           accountSettings.themePreference = newValue
         }
     }))
@@ -244,8 +245,9 @@ class SettingsHostVC: UIViewController {
       .getSetting(settings.activeAccountInfo).read
       .isAutoDownloadLatestSongsActive
     changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
+      guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
-        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+        .updateSetting(activeAccountInfo) { accountSettings in
           accountSettings.isAutoDownloadLatestSongsActive = newValue
         }
     }))
@@ -255,8 +257,9 @@ class SettingsHostVC: UIViewController {
       .read
       .isAutoDownloadLatestPodcastEpisodesActive
     changesAgent.append(settings.$isAutoCacheLatestPodcastEpisodes.sink(receiveValue: { newValue in
+      guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
-        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+        .updateSetting(activeAccountInfo) { accountSettings in
           accountSettings.isAutoDownloadLatestPodcastEpisodesActive = newValue
         }
     }))
@@ -265,8 +268,9 @@ class SettingsHostVC: UIViewController {
       .getSetting(settings.activeAccountInfo).read
       .isScrobbleStreamedItems
     changesAgent.append(settings.$isScrobbleStreamedItems.sink(receiveValue: { newValue in
+      guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
-        .updateSetting(self.settings.activeAccountInfo) { accountSettings in
+        .updateSetting(activeAccountInfo) { accountSettings in
           accountSettings.isScrobbleStreamedItems = newValue
         }
     }))

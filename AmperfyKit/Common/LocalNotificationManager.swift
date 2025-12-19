@@ -87,16 +87,17 @@ public class LocalNotificationManager {
       content.title = podcastEpisode.creatorName
       content.body = podcastEpisode.title
       content.sound = .default
-      let accountInfo = podcastEpisode.account?.info ?? AccountInfo.defaultAccountInfo
+      guard let account = podcastEpisode.account else { return }
       let identifier =
-        "account-\(podcastEpisode.account?.ident ?? AccountInfo.defaultIdent)podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
+        "account-\(account.ident)-podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
       do {
         let fileIdentifier = identifier + ".png"
         let artworkUrl = createLocalUrl(
           forImage: LibraryEntityImage.getImageToDisplayImmediately(
             libraryEntity: podcastEpisode,
-            themePreference: storage.settings.accounts.getSetting(accountInfo).read.themePreference,
-            artworkDisplayPreference: storage.settings.accounts.getSetting(accountInfo).read
+            themePreference: storage.settings.accounts.getSetting(account.info).read
+              .themePreference,
+            artworkDisplayPreference: storage.settings.accounts.getSetting(account.info).read
               .artworkDisplayPreference,
             useCache: false
           ),
@@ -113,7 +114,7 @@ public class LocalNotificationManager {
       }
       content.userInfo = [
         NotificationUserInfo.type: NotificationContentType.podcastEpisode.rawValue,
-        NotificationUserInfo.account: podcastEpisode.account?.ident ?? AccountInfo.defaultIdent,
+        NotificationUserInfo.account: account.ident,
         NotificationUserInfo.id: podcastEpisode.id,
       ]
       let trigger = UNTimeIntervalNotificationTrigger(

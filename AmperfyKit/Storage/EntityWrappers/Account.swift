@@ -30,13 +30,6 @@ public struct AccountInfo: Sendable, Hashable, Codable {
   public let userHash: String
   public let apiType: BackenApiType
 
-  static let defaultIdent = "0-0"
-  public static let defaultAccountInfo = AccountInfo(
-    serverHash: "",
-    userHash: "",
-    apiType: .notDetected
-  )
-
   private enum CodingKeys: String, CodingKey {
     case serverHash
     case userHash
@@ -54,11 +47,7 @@ public struct AccountInfo: Sendable, Hashable, Codable {
     if parts.count == 2 {
       let server = String(parts[0])
       let user = String(parts[1])
-      if server == "0", user == "0" {
-        return Self.defaultAccountInfo
-      } else {
-        return AccountInfo(serverHash: server, userHash: user, apiType: .notDetected)
-      }
+      return AccountInfo(serverHash: server, userHash: user, apiType: .notDetected)
     } else {
       return nil
     }

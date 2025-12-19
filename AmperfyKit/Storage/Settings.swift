@@ -374,9 +374,12 @@ public struct AccountSettings: Sendable, Codable {
   }
 
   public func getSetting(_ accountInfo: AccountInfo?) -> ReadOnlyAccountSetting {
-    let infoToUse = (accountInfo == .defaultAccountInfo) ? nil : accountInfo
-    if let info = infoToUse ?? _activeAccount {
-      return ReadOnlyAccountSetting(read: _accounts[info] ?? AccountSetting())
+    // Settings Priority:
+    // 1.: provided account settings (if not nil)
+    // 2.: active account settings (if logged in)
+    // 3.: default settings
+    if let info = accountInfo ?? _activeAccount, let accountSettings = _accounts[info] {
+      return ReadOnlyAccountSetting(read: accountSettings)
     } else {
       return ReadOnlyAccountSetting(read: AccountSetting())
     }

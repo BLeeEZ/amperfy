@@ -72,7 +72,7 @@ final class Settings: ObservableObject {
   var isHapticsEnabled = true
 
   @Published
-  var activeAccountInfo: AccountInfo = .defaultAccountInfo
+  var activeAccountInfo: AccountInfo?
   @Published
   var themePreference: ThemePreference = .defaultValue
   @Published

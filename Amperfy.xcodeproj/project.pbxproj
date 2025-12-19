@@ -92,7 +92,7 @@
 		5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* DownloadsVC.swift */; };
 		5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */; };
 		5078AFB42B44AE260038FD17 /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5078AFB32B44AE260038FD17 /* AppIntentVocabulary.plist */; };
-		50791E7828D25845006CE6E5 /* ServerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E7728D25845006CE6E5 /* ServerSettingsView.swift */; };
+		50791E7828D25845006CE6E5 /* AccountSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E7728D25845006CE6E5 /* AccountSettingsView.swift */; };
 		50791E7A28D31090006CE6E5 /* ServerURLsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E7928D31090006CE6E5 /* ServerURLsSettingsView.swift */; };
 		50791E7C28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E7B28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift */; };
 		50791E7F28D363F0006CE6E5 /* InfoBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E7E28D363F0006CE6E5 /* InfoBannerView.swift */; };
@@ -727,7 +727,7 @@
 		5077F954222C58A10099CA91 /* GenericXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericXmlParser.swift; sourceTree = "<group>"; };
 		5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplaySettingsView.swift; sourceTree = "<group>"; };
 		5078AFB32B44AE260038FD17 /* AppIntentVocabulary.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = AppIntentVocabulary.plist; sourceTree = "<group>"; };
-		50791E7728D25845006CE6E5 /* ServerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerSettingsView.swift; sourceTree = "<group>"; };
+		50791E7728D25845006CE6E5 /* AccountSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSettingsView.swift; sourceTree = "<group>"; };
 		50791E7928D31090006CE6E5 /* ServerURLsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerURLsSettingsView.swift; sourceTree = "<group>"; };
 		50791E7B28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeURLAddDialogView.swift; sourceTree = "<group>"; };
 		50791E7E28D363F0006CE6E5 /* InfoBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoBannerView.swift; sourceTree = "<group>"; };
@@ -1325,22 +1325,22 @@
 				502041962E2A37D6003CE29A /* Player */,
 				50CFB59828D5006100A47D44 /* Artwork */,
 				50CFB59528D4848300A47D44 /* Swipe */,
-				50791E8328D36EBD006CE6E5 /* Server */,
+				50791E8328D36EBD006CE6E5 /* Account */,
 				504B441E28D8E7480033982C /* Support */,
 				50AC4E5728D9D12D0091FF33 /* ObservableSettings.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		50791E8328D36EBD006CE6E5 /* Server */ = {
+		50791E8328D36EBD006CE6E5 /* Account */ = {
 			isa = PBXGroup;
 			children = (
-				50791E7728D25845006CE6E5 /* ServerSettingsView.swift */,
+				50791E7728D25845006CE6E5 /* AccountSettingsView.swift */,
 				50791E7928D31090006CE6E5 /* ServerURLsSettingsView.swift */,
 				50791E7B28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift */,
 				50791E8028D365E9006CE6E5 /* UpdatePasswordView.swift */,
 			);
-			path = Server;
+			path = Account;
 			sourceTree = "<group>";
 		};
 		508385DB21C5965B00C4BB32 = {
@@ -2316,7 +2316,7 @@
 				508FDE4C21F58AFC005A0724 /* AppStoryboard.swift in Sources */,
 				632F51242C83A7970032860D /* QueueVC.swift in Sources */,
 				509357522E3BF48900CD4075 /* MiniPlayerView.swift in Sources */,
-				50791E7828D25845006CE6E5 /* ServerSettingsView.swift in Sources */,
+				50791E7828D25845006CE6E5 /* AccountSettingsView.swift in Sources */,
 				50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */,
 				505CA20A2B88E94800AA81CD /* MultiSourceTableViewController.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,

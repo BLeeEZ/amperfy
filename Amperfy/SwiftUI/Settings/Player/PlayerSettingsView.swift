@@ -98,16 +98,6 @@ struct PlayerSettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              title: "Scrobble streamed Songs",
-              isOn: $settings.isScrobbleStreamedItems
-            )
-          },
-          footer: "Enable to scrobble all streamed songs, even if the server already marks them as played."
-        )
-
-        SettingsSection(
-          content: {
-            SettingsCheckBoxRow(
               title: "Song Playback Resume",
               isOn: $settings.isPlayerSongPlaybackResumeEnabled
             )

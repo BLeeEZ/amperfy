@@ -93,8 +93,8 @@ struct SettingsView: View {
 
         #if !targetEnvironment(macCatalyst) // ok
           SettingsSection {
+            navigationLink(.account)
             navigationLink(.displayAndInteraction)
-            navigationLink(.server)
             navigationLink(.library)
             navigationLink(.player)
             navigationLink(.equalizer)
