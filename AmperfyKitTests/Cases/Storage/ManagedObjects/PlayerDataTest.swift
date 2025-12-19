@@ -37,7 +37,7 @@ class PlayerDataTest: XCTestCase {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
     account = library.getAccount(info: TestAccountInfo.create1())
-    testPlayer = library.getPlayerData(account: account)
+    testPlayer = library.getPlayerData()
     testPlayer.setShuffle(true)
     testShuffledPlaylist = testPlayer.activeQueue
     testPlayer.setShuffle(false)
@@ -69,8 +69,6 @@ class PlayerDataTest: XCTestCase {
 
   func testCreation() {
     XCTAssertNotEqual(testNormalPlaylist, testShuffledPlaylist)
-    XCTAssertEqual(testPlayer.account?.serverHash, TestAccountInfo.test1ServerHash)
-    XCTAssertEqual(testPlayer.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(testPlayer.activeQueue, testNormalPlaylist)
     XCTAssertEqual(testPlayer.currentItem, nil)
     XCTAssertFalse(testPlayer.isShuffle)

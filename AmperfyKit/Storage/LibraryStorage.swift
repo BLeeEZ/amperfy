@@ -1754,13 +1754,14 @@ public class LibraryStorage: PlayableFileCachable {
   // MARK: Playlists
 
   public func getAllPlaylists(
-    isFaultsOptimized: Bool = false
+    isFaultsOptimized: Bool = false,
+    areSystemPlaylistsIncluded: Bool
   )
     -> [Playlist] {
     getPlaylists(
       account: nil,
       isFaultsOptimized: true,
-      areSystemPlaylistsIncluded: true
+      areSystemPlaylistsIncluded: areSystemPlaylistsIncluded
     )
   }
 
@@ -2031,13 +2032,7 @@ public class LibraryStorage: PlayableFileCachable {
 
   // MARK: PlayerData
 
-  func getAllPlayerData() -> [PlayerMO] {
-    let fetchRequest = PlayerMO.fetchRequest()
-    let fetchResults = try? context.fetch(fetchRequest)
-    return fetchResults ?? [PlayerMO]()
-  }
-
-  func getPlayerData(account: Account) -> PlayerData {
+  func getPlayerData() -> PlayerData {
     let fetchRequest = PlayerMO.fetchRequest()
     fetchRequest.relationshipKeyPathsForPrefetching = PlayerMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
@@ -2049,42 +2044,31 @@ public class LibraryStorage: PlayableFileCachable {
         playerMO = fetchResults[0]
       } else if fetchResults.isEmpty {
         playerMO = PlayerMO(context: context)
-        playerMO.account = account.managedObject
         saveContext()
       } else {
-        if let accountPlayerData = fetchResults
-          .first(where: { $0.account == account.managedObject }) {
-          playerMO = accountPlayerData
-        } else {
-          playerMO = PlayerMO(context: context)
-          playerMO.account = account.managedObject
-          saveContext()
-        }
+        clearStorage(ofType: PlayerData.entityName)
+        playerMO = PlayerMO(context: context)
+        saveContext()
       }
     } else {
       playerMO = PlayerMO(context: context)
-      playerMO.account = account.managedObject
       saveContext()
     }
 
     if playerMO.userQueuePlaylist == nil {
       playerMO.userQueuePlaylist = PlaylistMO(context: context)
-      playerMO.userQueuePlaylist?.account = account.managedObject
       saveContext()
     }
     if playerMO.contextPlaylist == nil {
       playerMO.contextPlaylist = PlaylistMO(context: context)
-      playerMO.contextPlaylist?.account = account.managedObject
       saveContext()
     }
     if playerMO.shuffledContextPlaylist == nil {
       playerMO.shuffledContextPlaylist = PlaylistMO(context: context)
-      playerMO.shuffledContextPlaylist?.account = account.managedObject
       saveContext()
     }
     if playerMO.podcastPlaylist == nil {
       playerMO.podcastPlaylist = PlaylistMO(context: context)
-      playerMO.podcastPlaylist?.account = account.managedObject
       saveContext()
     }
 

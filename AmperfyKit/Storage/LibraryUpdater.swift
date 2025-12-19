@@ -227,14 +227,14 @@ public class LibraryUpdater {
     let directories = storage.main.library.getAllDirectories()
     directories.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     os_log("Library update: Playlists", log: log, type: .info)
-    let playlists = storage.main.library.getAllPlaylists()
+    let playlists = storage.main.library.getAllPlaylists(areSystemPlaylistsIncluded: false)
     playlists.forEach { $0.updateAlphabeticSectionInitial(section: $0.name) }
     storage.main.saveContext()
   }
 
   @MainActor
   private func updatePlaylistArtworkItems() {
-    let playlists = storage.main.library.getAllPlaylists()
+    let playlists = storage.main.library.getAllPlaylists(areSystemPlaylistsIncluded: false)
     playlists.forEach {
       $0.updateArtworkItems()
     }
@@ -252,7 +252,7 @@ public class LibraryUpdater {
     }
     os_log("Playlist items sort", log: log, type: .info)
     try await storage.async.perform { asyncCompanion in
-      let playlists = asyncCompanion.library.getAllPlaylists()
+      let playlists = asyncCompanion.library.getAllPlaylists(areSystemPlaylistsIncluded: true)
       notifier.startOperation(name: "Playlist Update", totalCount: playlists.count)
       for playlist in playlists {
         usleep(Self.sleepTimeInMicroSecToReduceCpuLoad)
@@ -532,21 +532,10 @@ public class LibraryUpdater {
       }
     }
     try await storage.async.perform { asyncCompanion in
-      let playerDatas = asyncCompanion.library.getAllPlayerData()
-      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
-      notifier.startOperation(name: "Player Update", totalCount: playerDatas.count)
-      for (index, playerData) in playerDatas.enumerated() {
-        sleepConditionally(index)
-        playerData.account = accountAsync.managedObject
-        playerData.contextPlaylist?.account = accountAsync.managedObject
-        playerData.shuffledContextPlaylist?.account = accountAsync.managedObject
-        playerData.userQueuePlaylist?.account = accountAsync.managedObject
-        playerData.podcastPlaylist?.account = accountAsync.managedObject
-        notifier.tickOperation()
-      }
-    }
-    try await storage.async.perform { asyncCompanion in
-      let playlists = asyncCompanion.library.getAllPlaylists(isFaultsOptimized: false)
+      let playlists = asyncCompanion.library.getAllPlaylists(
+        isFaultsOptimized: false,
+        areSystemPlaylistsIncluded: false
+      )
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
       notifier.startOperation(name: "Playlists Update", totalCount: playlists.count)
       for (index, playlist) in playlists.enumerated() {

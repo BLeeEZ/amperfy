@@ -155,17 +155,6 @@ extension PlayerData: PlayerStatusPersistent {
     library.saveContext()
   }
 
-  public var account: Account? {
-    get {
-      guard let accountMO = managedObject.account else { return nil }
-      return Account(managedObject: accountMO)
-    }
-    set {
-      if managedObject.account != newValue?
-        .managedObject { managedObject.account = newValue?.managedObject }
-    }
-  }
-
   var isAutoCachePlayedItems: Bool { managedObject.autoCachePlayedItemSetting == 1 }
 
   func setAutoCachePlayedItems(_ newValue: Bool) {

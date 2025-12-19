@@ -37,7 +37,7 @@ class PlayQueueHandlerTest: XCTestCase {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
     account = library.getAccount(info: TestAccountInfo.create1())
-    testPlayer = library.getPlayerData(account: account)
+    testPlayer = library.getPlayerData()
     testPlayer.setShuffle(true)
     testShuffledPlaylist = testPlayer.contextQueue
     testPlayer.setShuffle(false)

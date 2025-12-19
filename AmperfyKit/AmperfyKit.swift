@@ -97,15 +97,6 @@ public class AmperKit {
   }
 
   @MainActor
-  public lazy var account: Account = {
-    if let accountInfo = storage.settings.accounts.active {
-      return storage.main.library.getAccount(info: accountInfo)
-    } else {
-      return storage.main.library.getAccount(info: AccountInfo.defaultAccountInfo)
-    }
-  }()
-
-  @MainActor
   public lazy var eventLogger = {
     EventLogger(storage: storage)
   }()
@@ -146,7 +137,7 @@ public class AmperKit {
       cellular: storage.settings.user.streamingFormatCellularPreference
     ))
 
-    let playerData = storage.main.library.getPlayerData(account: account)
+    let playerData = storage.main.library.getPlayerData()
     let queueHandler = PlayQueueHandler(playerData: playerData)
     let curPlayer = AudioPlayer(
       coreData: playerData,
@@ -230,7 +221,7 @@ public class AmperKit {
 
   @MainActor
   public func reinit() {
-    let playerData = storage.main.library.getPlayerData(account: account)
+    let playerData = storage.main.library.getPlayerData()
     let queueHandler = PlayQueueHandler(playerData: playerData)
     player.reinit(playerStatus: playerData, queueHandler: queueHandler)
   }

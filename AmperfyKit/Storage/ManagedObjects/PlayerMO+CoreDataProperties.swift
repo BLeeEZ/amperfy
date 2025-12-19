@@ -29,7 +29,7 @@ extension PlayerMO {
   }
 
   @NSManaged
-  public var account: AccountMO?
+  public var account: AccountMO? // currentyl not used -> global Player
   @NSManaged
   public var autoCachePlayedItemSetting: Int16
   @NSManaged

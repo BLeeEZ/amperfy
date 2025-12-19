@@ -357,7 +357,7 @@ class MusicPlayerTest: XCTestCase {
       userStatistics: userStatistics
     )
     mockMusicPlayable = MOCK_MusicPlayable()
-    playerData = library.getPlayerData(account: account)
+    playerData = library.getPlayerData()
     testQueueHandler = PlayQueueHandler(playerData: playerData)
     testMusicPlayer = AudioPlayer(
       coreData: playerData,
