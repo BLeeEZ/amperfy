@@ -88,7 +88,6 @@ extension CarPlaySceneDelegate {
       })
     )
     CPNowPlayingTemplate.shared.updateNowPlayingButtons(buttons)
-    CPNowPlayingTemplate.shared.upNextTitle = Self.queueButtonText
     CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
   }
 
