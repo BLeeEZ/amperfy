@@ -44,13 +44,30 @@ class HelperTest: XCTestCase {
       cdHelper.seeder.playlists.count
     )
     let account = library.getAccount(info: TestAccountInfo.create1())
-    XCTAssertEqual(account.managedObject.playlists?.count, cdHelper.seeder.playlists.count)
-    let playlistItemCount = cdHelper.seeder.playlists.reduce(0) { $0 + $1.songIds.count }
-    XCTAssertEqual(account.managedObject.playlistItems?.count, playlistItemCount)
+    XCTAssertEqual(account.managedObject.playlists?.count, 4)
+    let account1PlaylistItemCount = cdHelper.seeder.playlists.filter { $0.accountIndex == 0 }
+      .reduce(0) { $0 + $1.songIds.count }
+    XCTAssertEqual(account.managedObject.playlistItems?.count, account1PlaylistItemCount)
+    let account1EntityCount = cdHelper.seeder.artists.filter { $0.accountIndex == 0 }
+      .count + cdHelper.seeder.albums
+      .filter { $0.accountIndex == 0 }.count + cdHelper.seeder.songs
+      .filter { $0.accountIndex == 0 }
+      .count + cdHelper.seeder.radios.filter { $0.accountIndex == 0 }.count
     XCTAssertEqual(
       account.managedObject.entities?.count,
-      cdHelper.seeder.artists.count + cdHelper.seeder.albums.count + cdHelper.seeder.songs
-        .count + cdHelper.seeder.radios.count
+      account1EntityCount
     )
+
+    XCTAssertEqual(library.getArtists(for: account).count, 3)
+    XCTAssertEqual(library.getAlbums(for: account).count, 4)
+    XCTAssertEqual(library.getSongs(for: account).count, 16)
+    XCTAssertEqual(library.getPlaylists(for: account).count, 4)
+    XCTAssertEqual(library.getRadios(for: account).count, 4)
+    let account2 = library.getAccount(info: TestAccountInfo.create2())
+    XCTAssertEqual(library.getArtists(for: account2).count, 2)
+    XCTAssertEqual(library.getAlbums(for: account2).count, 2)
+    XCTAssertEqual(library.getSongs(for: account2).count, 4)
+    XCTAssertEqual(library.getPlaylists(for: account2).count, 2)
+    XCTAssertEqual(library.getRadios(for: account2).count, 2)
   }
 }

@@ -40,12 +40,16 @@ class CoreDataSeeder {
     (accountIndex: 0, id: "4", name: "My Dream"),
     (accountIndex: 0, id: "RopLcTz92", name: "She or He"),
     (accountIndex: 0, id: "93", name: "Bang!"),
+    (accountIndex: 1, id: "4", name: "My Dream acc2"),
+    (accountIndex: 1, id: "Acc2Artist", name: "Acc 2 Artist"),
   ]
   let albums = [
     (accountIndex: 0, id: "12", artistId: "4", name: "High Voltage", year: 2018),
     (accountIndex: 0, id: "34", artistId: "RopLcTz92", name: "Du Hast", year: 1987),
     (accountIndex: 0, id: "59", artistId: "93", name: "Dreams", year: 2002),
     (accountIndex: 0, id: "6BTR0", artistId: "93", name: "Let it go", year: 2007),
+    (accountIndex: 1, id: "12", artistId: "4", name: "High Voltage acc2", year: 2018),
+    (accountIndex: 1, id: "acc2", artistId: "acc2Album", name: "Dreams for acc 2", year: 2002),
   ]
   let songs = [
     (
@@ -208,6 +212,47 @@ class CoreDataSeeder {
       title: "3lldll",
       url: "www.blub.de/aajds324hrf"
     ),
+    // Account 2
+    (
+      accountIndex: 1,
+      id: "3",
+      artistId: "4",
+      albumId: "12",
+      track: 3,
+      isCached: false,
+      title: "go home acc2",
+      url: "www.blub.de/ahhh"
+    ),
+    (
+      accountIndex: 1,
+      id: "5",
+      artistId: "4",
+      albumId: "12",
+      track: 4,
+      isCached: false,
+      title: "well acc2",
+      url: "www.blub.de/ahhh2"
+    ),
+    (
+      accountIndex: 1,
+      id: "10T",
+      artistId: "4",
+      albumId: "12",
+      track: 8,
+      isCached: false,
+      title: "maybe alright acc2",
+      url: "www.blub.de/dd"
+    ),
+    (
+      accountIndex: 1,
+      id: "acc2Song",
+      artistId: "Acc2Artist",
+      albumId: "acc2",
+      track: 0,
+      isCached: false,
+      title: "baby acc2",
+      url: "www.blub.de/dddtd"
+    ),
   ]
   let playlists = [
     (accountIndex: 0, id: "3", name: "With One Cached", songIds: ["3", "5", "10T", "36", "19"]),
@@ -219,6 +264,18 @@ class CoreDataSeeder {
     ),
     (accountIndex: 0, id: "dRsa11", name: "No Cached", songIds: ["3", "10T", "19"]),
     (accountIndex: 0, id: "d23884", name: "All Cached", songIds: ["99", "5a9", "59e", "5e9lll"]),
+    (
+      accountIndex: 1,
+      id: "3",
+      name: "With One Cached for Acc2",
+      songIds: ["3", "5", "10T", "acc2Song"]
+    ),
+    (
+      accountIndex: 1,
+      id: "acc2playlist",
+      name: "With Three Cached",
+      songIds: ["acc2Song", "5", "10T", "acc2Song"]
+    ),
   ]
   let radios = [
     (
@@ -242,6 +299,20 @@ class CoreDataSeeder {
       title: "Radio Channel 2",
       url: "www.blub.de/ffhnnnza",
       siteUrl: "www.blub.de/44re4t"
+    ),
+    (
+      accountIndex: 1,
+      id: "12",
+      title: "GoGo Radio Acc 2",
+      url: "www.blub.de/aaa",
+      siteUrl: "www.blub.de/ddf"
+    ),
+    (
+      accountIndex: 1,
+      id: "3445",
+      title: "WauWau",
+      url: "www.blub.de/fjjssuf",
+      siteUrl: "www.blub.de/2s3452"
     ),
   ]
 
