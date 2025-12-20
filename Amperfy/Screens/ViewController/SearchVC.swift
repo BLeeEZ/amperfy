@@ -79,6 +79,8 @@ class SearchVC: BasicTableViewController {
   fileprivate var songs: [Song] = []
 
   private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
+  private var userButton: UIButton?
+  private var userBarButtonItem: UIBarButtonItem?
   private var isSearchActive = false
   private var accountObjectId: NSManagedObjectID?
   private let account: Account
@@ -201,6 +203,11 @@ class SearchVC: BasicTableViewController {
       }
     }
     updateContentUnavailable()
+    setupUserNavButton(
+      currentAccount: account,
+      userButton: &userButton,
+      userBarButtonItem: &userBarButtonItem
+    )
   }
 
   override func viewWillAppear(_ animated: Bool) {

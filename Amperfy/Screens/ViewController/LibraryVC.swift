@@ -24,6 +24,8 @@ import UIKit
 
 @MainActor
 class LibraryVC: KeyCommandCollectionViewController {
+  private var userButton: UIButton?
+  private var userBarButtonItem: UIBarButtonItem?
   private let account: Account!
 
   init(collectionViewLayout: UICollectionViewLayout, account: Account) {
@@ -61,6 +63,11 @@ class LibraryVC: KeyCommandCollectionViewController {
     libraryItemConfigurator.viewDidLoad(
       navigationItem: navigationItem,
       collectionView: collectionView
+    )
+    setupUserNavButton(
+      currentAccount: account,
+      userButton: &userButton,
+      userBarButtonItem: &userBarButtonItem
     )
   }
 

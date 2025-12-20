@@ -24,6 +24,84 @@ import CoreData
 import OSLog
 import UIKit
 
+extension UIViewController {
+  private func createUserButtonMenu() -> UIMenu {
+    var accountActions = [UIMenuElement]()
+    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      let action = UIAction(
+        title: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+          .loginCredentials?
+          .username ?? "Unknown",
+        subtitle: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+          .loginCredentials?
+          .displayServerUrl ?? "",
+        image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
+          pointSize: 30,
+          weight: .regular
+        )),
+        attributes: [UIMenuElement.Attributes.disabled],
+        state: (accountInfo == appDelegate.storage.settings.accounts.active) ? .on : .off,
+        handler: { _ in }
+      )
+      accountActions.append(action)
+    }
+    let openSettings = UIAction(
+      title: "Settings",
+      image: .settings,
+      handler: { _ in
+        #if targetEnvironment(macCatalyst)
+          self.appDelegate.showSettings(sender: "")
+        #else
+          let nav = AppStoryboard.Main.segueToSettings()
+          nav.modalPresentationStyle = .formSheet
+          self.present(nav, animated: true)
+        #endif
+      }
+    )
+
+    let settingsMenu = UIMenu(options: [.displayInline], children: [openSettings])
+    accountActions.append(settingsMenu)
+
+    return UIMenu(
+      title: "",
+      image: nil,
+      options: [.displayInline],
+      children: accountActions
+    )
+  }
+
+  public func setupUserNavButton(
+    currentAccount: Account,
+    userButton: inout UIButton?,
+    userBarButtonItem: inout UIBarButtonItem?
+  ) {
+    let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(
+      pointSize: 24,
+      weight: .regular
+    )).withTintColor(
+      appDelegate.storage.settings.accounts.getSetting(currentAccount.info).read
+        .themePreference.asColor,
+      renderingMode: .alwaysTemplate
+    )
+
+    let button = UIButton(type: .system)
+    button.setImage(image, for: .normal)
+    button.layer.cornerRadius = 20
+    button.clipsToBounds = true
+    #if targetEnvironment(macCatalyst)
+      button.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+    #else
+      button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
+    #endif
+    button.menu = createUserButtonMenu()
+    button.showsMenuAsPrimaryAction = true
+    userButton = button
+
+    userBarButtonItem = UIBarButtonItem(customView: button)
+    navigationItem.leftBarButtonItem = userBarButtonItem!
+  }
+}
+
 // MARK: - HomeVC
 
 final class HomeVC: UICollectionViewController {
@@ -86,7 +164,11 @@ final class HomeVC: UICollectionViewController {
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
 
-    setupUserNavButton()
+    setupUserNavButton(
+      currentAccount: account,
+      userButton: &userButton,
+      userBarButtonItem: &userBarButtonItem
+    )
 
     navigationController?.navigationBar.prefersLargeTitles = true
     navigationItem.rightBarButtonItem = UIBarButtonItem(
@@ -108,33 +190,6 @@ final class HomeVC: UICollectionViewController {
     )
   }
 
-  private func setupUserNavButton() {
-    let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(
-      pointSize: 24,
-      weight: .regular
-    )).withTintColor(
-      appDelegate.storage.settings.accounts.getSetting(account.info).read
-        .themePreference.asColor,
-      renderingMode: .alwaysTemplate
-    )
-
-    let button = UIButton(type: .system)
-    button.setImage(image, for: .normal)
-    button.layer.cornerRadius = 20
-    button.clipsToBounds = true
-    #if targetEnvironment(macCatalyst)
-      button.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-    #else
-      button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-    #endif
-    button.menu = createUserButtonMenu()
-    button.showsMenuAsPrimaryAction = true
-    userButton = button
-
-    userBarButtonItem = UIBarButtonItem(customView: button)
-    navigationItem.leftBarButtonItem = userBarButtonItem!
-  }
-
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navigationController?.navigationBar.prefersLargeTitles = true
@@ -144,46 +199,6 @@ final class HomeVC: UICollectionViewController {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
     updateFromRemote()
-  }
-
-  private func createUserButtonMenu() -> UIMenu {
-    let userInfo = UIAction(
-      title: appDelegate.storage.settings.accounts.getSetting(account.info).read
-        .loginCredentials?
-        .username ?? "Unknown",
-      subtitle: appDelegate.storage.settings.accounts.getSetting(account.info).read
-        .loginCredentials?
-        .displayServerUrl ?? "",
-      image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
-        pointSize: 30,
-        weight: .regular
-      )),
-      attributes: [UIMenuElement.Attributes.disabled],
-      state: .on,
-      handler: { _ in }
-    )
-    let openSettings = UIAction(
-      title: "Settings",
-      image: .settings,
-      handler: { _ in
-        #if targetEnvironment(macCatalyst)
-          self.appDelegate.showSettings(sender: "")
-        #else
-          let nav = AppStoryboard.Main.segueToSettings()
-          nav.modalPresentationStyle = .formSheet
-          self.present(nav, animated: true)
-        #endif
-      }
-    )
-
-    let settingsMenu = UIMenu(options: [.displayInline], children: [openSettings])
-
-    return UIMenu(
-      title: "",
-      image: nil,
-      options: [.displayInline],
-      children: [userInfo, settingsMenu]
-    )
   }
 
   // MARK: - Layout
