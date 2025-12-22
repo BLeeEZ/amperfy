@@ -40,9 +40,16 @@ class DirectoryTableCell: BasicTableCell {
     directory
   }
 
+  private var accountNotificationHandler: AccountNotificationHandler?
+
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
-    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+    self.accountNotificationHandler = AccountNotificationHandler(
+      storage: appDelegate.storage,
+      notificationHandler: appDelegate.notificationHandler
+    )
+    accountNotificationHandler?.registerCallbackForAllAccounts { [weak self] accountInfo in
+      guard let self else { return }
       appDelegate.notificationHandler.register(
         self,
         selector: #selector(artworkDownloadFinishedSuccessful(notification:)),

@@ -27,6 +27,7 @@ class LibraryVC: KeyCommandCollectionViewController {
   private var userButton: UIButton?
   private var userBarButtonItem: UIBarButtonItem?
   private let account: Account!
+  private var accountNotificationHandler: AccountNotificationHandler?
 
   init(collectionViewLayout: UICollectionViewLayout, account: Account) {
     self.account = account
@@ -64,11 +65,18 @@ class LibraryVC: KeyCommandCollectionViewController {
       navigationItem: navigationItem,
       collectionView: collectionView
     )
-    setupUserNavButton(
-      currentAccount: account,
-      userButton: &userButton,
-      userBarButtonItem: &userBarButtonItem
+    accountNotificationHandler = AccountNotificationHandler(
+      storage: appDelegate.storage,
+      notificationHandler: appDelegate.notificationHandler
     )
+    accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
+      guard let self else { return }
+      setupUserNavButton(
+        currentAccount: account,
+        userButton: &userButton,
+        userBarButtonItem: &userBarButtonItem
+      )
+    }
   }
 
   override func viewIsAppearing(_ animated: Bool) {

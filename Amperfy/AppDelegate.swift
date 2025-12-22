@@ -186,20 +186,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   @MainActor
   private func performBackgroundFetchTask(bgTask: BGTask) async {
     os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
-    do {
-      for accountInfo in storage.settings.accounts.allAccounts {
+    var success = true
+    for accountInfo in storage.settings.accounts.allAccounts {
+      do {
         try await getMeta(accountInfo).backgroundFetchTriggeredSyncer.syncAndNotifyPodcastEpisodes()
+      } catch {
+        success = false
+        eventLogger.error(
+          topic: "Background Task",
+          statusCode: .connectionError,
+          message: error.localizedDescription,
+          displayPopup: false
+        )
       }
-      bgTask.setTaskCompleted(success: true)
-    } catch {
-      bgTask.setTaskCompleted(success: false)
-      eventLogger.error(
-        topic: "Background Task",
-        statusCode: .connectionError,
-        message: error.localizedDescription,
-        displayPopup: false
-      )
     }
+    bgTask.setTaskCompleted(success: success)
     userStatistics.backgroundFetchPerformed(result: UIBackgroundFetchResult.newData)
     scheduleAppRefresh()
   }
@@ -304,14 +305,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
 
+  private var isAlreadyRegisteredToPlayer = false
   func startManagerAfterSync() {
     os_log("Start background manager after sync", log: self.log, type: .info)
     configureMainMenu()
     intentManager.registerXCallbackURLs()
-    for accountInfo in storage.settings.accounts.allAccounts {
-      getMeta(accountInfo).startManagerAfterSync(player: appDelegate.player)
+    if !isAlreadyRegisteredToPlayer {
+      isAlreadyRegisteredToPlayer = true
+      player.addNotifier(notifier: self)
     }
-    player.addNotifier(notifier: self)
   }
 
   func startManagerForNormalOperation() {
@@ -321,6 +323,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     for accountInfo in storage.settings.accounts.allAccounts {
       getMeta(accountInfo).startManagerForNormalOperation(player: appDelegate.player)
     }
+    isAlreadyRegisteredToPlayer = true
     player.addNotifier(notifier: self)
   }
 

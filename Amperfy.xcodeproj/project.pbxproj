@@ -88,6 +88,7 @@
 		507148AD2B767FE200557904 /* ContextQueuePrevSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */; };
 		507148AE2B76800A00557904 /* ContextQueuePrevSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */; };
 		50722747286794FC00910574 /* AppDelegateKeyboardCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* AppDelegateKeyboardCommands.swift */; };
+		507252E02EF9888200FFFA4D /* AccountNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507252DF2EF9888200FFFA4D /* AccountNotificationHandler.swift */; };
 		507361E02632BA3B005F151D /* GenresVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507361DF2632BA3B005F151D /* GenresVC.swift */; };
 		5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* DownloadsVC.swift */; };
 		5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */; };
@@ -717,6 +718,7 @@
 		507148AB2B767FE200557904 /* ContextQueuePrevSectionHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ContextQueuePrevSectionHeader.xib; sourceTree = "<group>"; };
 		507148AC2B767FE200557904 /* ContextQueuePrevSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextQueuePrevSectionHeader.swift; sourceTree = "<group>"; };
 		50722746286794FC00910574 /* AppDelegateKeyboardCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateKeyboardCommands.swift; sourceTree = "<group>"; };
+		507252DF2EF9888200FFFA4D /* AccountNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountNotificationHandler.swift; sourceTree = "<group>"; };
 		507361C72632AB08005F151D /* GenreParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreParserDelegate.swift; sourceTree = "<group>"; };
 		507361CB2632AB91005F151D /* Genre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genre.swift; sourceTree = "<group>"; };
 		507361DF2632BA3B005F151D /* GenresVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenresVC.swift; sourceTree = "<group>"; };
@@ -1235,6 +1237,7 @@
 				5029288826564F3600DA3A8F /* JSONConverter.swift */,
 				5029288626564C6800DA3A8F /* LogData.swift */,
 				5040B2C3269CD19600911451 /* LocalNotificationManager.swift */,
+				507252DF2EF9888200FFFA4D /* AccountNotificationHandler.swift */,
 				50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */,
 				505CA1F42B848B8300AA81CD /* QuickActionsHandler.swift */,
 				5021B1272BC723F400893C33 /* FuzzySearcher.swift */,
@@ -2576,6 +2579,7 @@
 				50C9D648284FAA02007F18D0 /* SsPingParserDelegate.swift in Sources */,
 				50C9D6A8284FAA7F007F18D0 /* CoreDataMigrationExtensions.swift in Sources */,
 				50C9D698284FAA6C007F18D0 /* DirectoryMO+CoreDataClass.swift in Sources */,
+				507252E02EF9888200FFFA4D /* AccountNotificationHandler.swift in Sources */,
 				50C9D6A2284FAA77007F18D0 /* MappingModelV4toV5.xcmappingmodel in Sources */,
 				50C9D685284FAA6C007F18D0 /* AlbumMO+CoreDataClass.swift in Sources */,
 				5084F70F2ED9E2F400D8D3DA /* AccountMO+CoreDataClass.swift in Sources */,

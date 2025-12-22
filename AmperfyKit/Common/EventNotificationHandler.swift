@@ -22,6 +22,12 @@
 import Foundation
 
 extension Notification.Name {
+  public static let accountActiveChanged = Notification
+    .Name(rawValue: "de.amperfy.account.active.changed")
+  public static let accountAdded = Notification
+    .Name(rawValue: "de.amperfy.account.added")
+  public static let accountDeleted = Notification
+    .Name(rawValue: "de.amperfy.account.deleted")
   public static let downloadFinishedSuccess = Notification
     .Name(rawValue: "de.amperfy.download.finished.success")
   public static let playerPlay = Notification.Name(rawValue: "de.amperfy.player.play")

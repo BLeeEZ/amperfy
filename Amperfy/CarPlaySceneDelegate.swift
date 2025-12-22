@@ -59,6 +59,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
   var activeAccountInfo: AccountInfo!
   var activeAccount: Account!
+  var accountNotificationHandler: AccountNotificationHandler?
 
   var interfaceController: CPInterfaceController?
   var traits: UITraitCollection {
@@ -90,21 +91,27 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         name: .offlineModeChanged,
         object: nil
       )
-      for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      accountNotificationHandler = AccountNotificationHandler(
+        storage: appDelegate.storage,
+        notificationHandler: appDelegate.notificationHandler
+      )
+      accountNotificationHandler?.registerCallbackForAllAccounts { [weak self] accountInfo in
+        guard let self else { return }
         let meta = appDelegate.getMeta(accountInfo)
         appDelegate.notificationHandler.register(
           self,
-          selector: #selector(self.downloadFinishedSuccessful(notification:)),
+          selector: #selector(downloadFinishedSuccessful(notification:)),
           name: .downloadFinishedSuccess,
           object: meta.artworkDownloadManager
         )
         appDelegate.notificationHandler.register(
           self,
-          selector: #selector(self.downloadFinishedSuccessful(notification:)),
+          selector: #selector(downloadFinishedSuccessful(notification:)),
           name: .downloadFinishedSuccess,
           object: meta.playableDownloadManager
         )
       }
+
       appDelegate.player.addNotifier(notifier: self)
       CPNowPlayingTemplate.shared.add(self)
 
@@ -130,7 +137,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       self.interfaceController = nil
       appDelegate.notificationHandler.remove(self, name: .fetchControllerSortChanged, object: nil)
       appDelegate.notificationHandler.remove(self, name: .offlineModeChanged, object: nil)
-      for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      accountNotificationHandler?.performOnAllRegisteredAccounts { [weak self] accountInfo in
+        guard let self else { return }
         let meta = appDelegate.getMeta(accountInfo)
         appDelegate.notificationHandler.remove(
           self,

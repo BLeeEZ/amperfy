@@ -31,6 +31,7 @@ class NowPlayingInfoCenterHandler {
   private let storage: PersistentStorage
   private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
   private let getArtworkDownloaderCB: GetArtworkDownloadManagerCallback
+  private var accountNotificationHandler: AccountNotificationHandler?
 
   init(
     musicPlayer: AudioPlayer,
@@ -49,7 +50,12 @@ class NowPlayingInfoCenterHandler {
 
     nowPlayingInfoCenter.playbackState = .stopped
 
-    for accountInfo in storage.settings.accounts.allAccounts {
+    self.accountNotificationHandler = AccountNotificationHandler(
+      storage: storage,
+      notificationHandler: notificationHandler
+    )
+    accountNotificationHandler?.registerCallbackForAllAccounts { [weak self] accountInfo in
+      guard let self else { return }
       notificationHandler.register(
         self,
         selector: #selector(downloadFinishedSuccessful(notification:)),

@@ -382,6 +382,13 @@ class LoginVC: UIViewController {
         self.appDelegate.storage.settings.accounts.login(credentials)
         meta.backendApi.provideCredentials(credentials: credentials)
 
+        self.appDelegate.notificationHandler.post(name: .accountAdded, object: nil, userInfo: nil)
+        self.appDelegate.notificationHandler.post(
+          name: .accountActiveChanged,
+          object: nil,
+          userInfo: nil
+        )
+
         guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
         mainScene
           .replaceMainRootViewController(vc: AppStoryboard.Main.segueToSync(account: meta.account))

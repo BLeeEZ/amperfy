@@ -84,6 +84,7 @@ class SearchVC: BasicTableViewController {
   private var isSearchActive = false
   private var accountObjectId: NSManagedObjectID?
   private let account: Account
+  private var accountNotificationHandler: AccountNotificationHandler?
 
   init(account: Account) {
     self.account = account
@@ -203,11 +204,18 @@ class SearchVC: BasicTableViewController {
       }
     }
     updateContentUnavailable()
-    setupUserNavButton(
-      currentAccount: account,
-      userButton: &userButton,
-      userBarButtonItem: &userBarButtonItem
+    accountNotificationHandler = AccountNotificationHandler(
+      storage: appDelegate.storage,
+      notificationHandler: appDelegate.notificationHandler
     )
+    accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
+      guard let self else { return }
+      setupUserNavButton(
+        currentAccount: account,
+        userButton: &userButton,
+        userBarButtonItem: &userBarButtonItem
+      )
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {

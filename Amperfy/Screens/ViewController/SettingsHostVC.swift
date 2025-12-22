@@ -32,11 +32,20 @@ class SettingsHostVC: UIViewController {
 
   var changesAgent: [AnyCancellable] = []
   private var isForOwnWindow = false
+  private var accountNotificationHandler: AccountNotificationHandler?
 
   override var sceneTitle: String { windowSettingsTitle }
 
   init(isForOwnWindow: Bool) {
     super.init(nibName: nil, bundle: nil)
+    self.accountNotificationHandler = AccountNotificationHandler(
+      storage: appDelegate.storage,
+      notificationHandler: appDelegate.notificationHandler
+    )
+    accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
+      guard let self else { return }
+      settings.activeAccountInfo = accountInfo
+    }
 
     self.isForOwnWindow = isForOwnWindow
 
@@ -227,7 +236,7 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.setAppAppearanceMode(style: newValue)
     }))
 
-    // account can only be changed from outside of settings
+    // account is changed via the active account changed callback
     settings.activeAccountInfo = appDelegate.storage.settings.accounts.active
 
     settings.themePreference = appDelegate.storage.settings.accounts

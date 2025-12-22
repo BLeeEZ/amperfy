@@ -85,6 +85,8 @@ struct AccountSettingsView: View {
     CacheFileManager.shared.deleteAccountCache(accountInfo: accountInfo)
     // reset login credentials -> at new start the login view is presented to auth and resync library
     appDelegate.storage.settings.accounts.logout(accountInfo)
+    appDelegate.notificationHandler.post(name: .accountDeleted, object: nil, userInfo: nil)
+    appDelegate.notificationHandler.post(name: .accountActiveChanged, object: nil, userInfo: nil)
 
     // force resync after login
     appDelegate.storage.settings.app.isLibrarySynced = false

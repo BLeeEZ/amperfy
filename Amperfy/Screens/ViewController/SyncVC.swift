@@ -92,6 +92,7 @@ class SyncVC: UIViewController {
     appDelegate.storage.settings.app.librarySyncVersion = .newestVersion
     appDelegate.storage.settings.app.isLibrarySynced = true
     appDelegate.startManagerAfterSync()
+    appDelegate.getMeta(account.info).startManagerAfterSync(player: appDelegate.player)
     appDelegate.isKeepScreenAlive = false
     appDelegate.eventLogger.supressAlerts = false
 

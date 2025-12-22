@@ -54,6 +54,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   var playerHandler: PlayerUIHandler?
   var controlView: PlayerControlView?
   var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
+  var accountNotificationHandler: AccountNotificationHandler?
 
   var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
   var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -142,7 +143,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       contextNextQueueSectionHeader?.prepare(toWorkOnRootView: self)
     }
 
-    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+    accountNotificationHandler = AccountNotificationHandler(
+      storage: appDelegate.storage,
+      notificationHandler: appDelegate.notificationHandler
+    )
+    accountNotificationHandler?.registerCallbackForAllAccounts { [weak self] accountInfo in
+      guard let self else { return }
       appDelegate.notificationHandler.register(
         self,
         selector: #selector(downloadFinishedSuccessful(notification:)),
