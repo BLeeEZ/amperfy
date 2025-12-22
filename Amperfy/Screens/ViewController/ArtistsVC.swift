@@ -26,6 +26,8 @@ import UIKit
 // MARK: - ArtistDiffableDataSource
 
 class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
+  var sortType: ArtistElementSortType = .name
+
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
     false
@@ -41,6 +43,66 @@ class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
       return nil
     }
     return Artist(managedObject: artistMO)
+  }
+
+  func getFirstArtist(in section: Int) -> Artist? {
+    artistAt(indexPath: IndexPath(row: 0, section: section))
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    titleForHeaderInSection section: Int
+  )
+    -> String? {
+    guard let artist = getFirstArtist(in: section) else { return nil }
+    switch sortType {
+    case .name:
+      return artist.name.prefix(1).uppercased()
+    case .rating:
+      if artist.rating > 0 {
+        return "\(artist.rating) Star\(artist.rating != 1 ? "s" : "")"
+      } else {
+        return "Not rated"
+      }
+    case .duration:
+      return artist.duration.description
+    case .newest:
+      return nil
+    }
+  }
+
+  override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+    let sectionCount = numberOfSections(in: tableView)
+    var indexTitles = [String]()
+    for i in 0 ..< sectionCount {
+      if let sectionName = self.tableView(tableView, titleForHeaderInSection: i) {
+        var indexTitle = ""
+        switch sortType {
+        case .name:
+          indexTitle = sectionName.prefix(1).uppercased()
+          if let _ = Int(indexTitle) {
+            indexTitle = "#"
+          }
+        case .rating:
+          indexTitle = IndexHeaderNameGenerator.sortByRating(forSectionName: sectionName)
+        case .duration:
+          indexTitle = IndexHeaderNameGenerator.sortByDurationArtist(forSectionName: sectionName)
+        case .newest:
+          break
+        }
+        indexTitles.append(indexTitle)
+      }
+    }
+    return indexTitles.isEmpty ? nil : indexTitles
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    sectionForSectionIndexTitle title: String,
+    at index: Int
+  )
+    -> Int {
+    index
   }
 }
 
@@ -82,6 +144,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         )
         return self.createCell(tableView, forRowAt: indexPath, artist: artist)
       }
+    source.sortType = self.sortType
     return source
   }
 
@@ -185,6 +248,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   func change(sortType: ArtistElementSortType) {
     self.sortType = sortType
     appDelegate.storage.settings.user.artistsSortSetting = sortType
+    (diffableDataSource as? ArtistDiffableDataSource)?.sortType = sortType
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = ArtistFetchedResultsController(
