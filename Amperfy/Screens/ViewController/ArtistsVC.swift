@@ -26,6 +26,8 @@ import UIKit
 // MARK: - ArtistDiffableDataSource
 
 class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
+  var sortType: ArtistElementSortType = .name
+
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
     // Return false if you do not want the item to be re-orderable.
     false
@@ -41,6 +43,66 @@ class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
       return nil
     }
     return Artist(managedObject: artistMO)
+  }
+
+  func getFirstArtist(in section: Int) -> Artist? {
+    artistAt(indexPath: IndexPath(row: 0, section: section))
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    titleForHeaderInSection section: Int
+  )
+    -> String? {
+    guard let artist = getFirstArtist(in: section) else { return nil }
+    switch sortType {
+    case .name:
+      return artist.name.prefix(1).uppercased()
+    case .rating:
+      if artist.rating > 0 {
+        return "\(artist.rating) Star\(artist.rating != 1 ? "s" : "")"
+      } else {
+        return "Not rated"
+      }
+    case .duration:
+      return artist.duration.description
+    case .newest:
+      return nil
+    }
+  }
+
+  override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
+    let sectionCount = numberOfSections(in: tableView)
+    var indexTitles = [String]()
+    for i in 0 ..< sectionCount {
+      if let sectionName = self.tableView(tableView, titleForHeaderInSection: i) {
+        var indexTitle = ""
+        switch sortType {
+        case .name:
+          indexTitle = sectionName.prefix(1).uppercased()
+          if let _ = Int(indexTitle) {
+            indexTitle = "#"
+          }
+        case .rating:
+          indexTitle = IndexHeaderNameGenerator.sortByRating(forSectionName: sectionName)
+        case .duration:
+          indexTitle = IndexHeaderNameGenerator.sortByDurationArtist(forSectionName: sectionName)
+        case .newest:
+          break
+        }
+        indexTitles.append(indexTitle)
+      }
+    }
+    return indexTitles.isEmpty ? nil : indexTitles
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    sectionForSectionIndexTitle title: String,
+    at index: Int
+  )
+    -> Int {
+    index
   }
 }
 
@@ -60,12 +122,12 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   private var sortType: ArtistElementSortType = .name
   private var filterTitle = "Artists"
 
-  init(account: Account) {
-    super.init(style: .grouped, account: account)
+  init() {
+    super.init(style: .grouped)
   }
 
   required init?(coder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.init(coder: coder)
   }
 
   override func createDiffableDataSource() -> BasicUITableViewDiffableDataSource {
@@ -82,6 +144,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         )
         return self.createCell(tableView, forRowAt: indexPath, artist: artist)
       }
+    source.sortType = self.sortType
     return source
   }
 
@@ -96,8 +159,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     optionsButton = UIBarButtonItem.createOptionsBarButton()
 
     applyFilter()
-    change(sortType: appDelegate.storage.settings.user.artistsSortSetting)
-    change(filterType: appDelegate.storage.settings.user.artistsFilterSetting)
+    change(sortType: appDelegate.storage.settings.artistsSortSetting)
+    change(filterType: appDelegate.storage.settings.artistsFilterSetting)
     configureSearchController(
       placeholder: "Search in \"\(filterTitle)\"",
       scopeButtonTitles: ["All", "Cached"]
@@ -135,9 +198,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         do {
           try await artist.fetch(
             storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
-              .playableDownloadManager
+            librarySyncer: self.appDelegate.librarySyncer,
+            playableDownloadManager: self.appDelegate.playableDownloadManager
           )
         } catch {
           self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
@@ -184,7 +246,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   func change(sortType: ArtistElementSortType) {
     self.sortType = sortType
-    appDelegate.storage.settings.user.artistsSortSetting = sortType
+    appDelegate.storage.settings.artistsSortSetting = sortType
+    (diffableDataSource as? ArtistDiffableDataSource)?.sortType = sortType
     singleFetchedResultsController?.clearResults()
     tableView.reloadData()
     fetchedResultsController = ArtistFetchedResultsController(
@@ -204,7 +267,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     // favorite views can't change the display filter
     guard displayFilter != .favorites else { return }
     displayFilter = filterType
-    appDelegate.storage.settings.user.artistsFilterSetting = filterType
+    appDelegate.storage.settings.artistsFilterSetting = filterType
     updateSearchResults(for: searchController)
     updateRightBarButtonItems()
   }
@@ -228,7 +291,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     if displayFilter != .favorites {
       actions.append(createFilterButtonMenu())
     }
-    if appDelegate.storage.settings.user.isOnlineMode {
+    if appDelegate.storage.settings.isOnlineMode {
       actions.append(createActionButtonMenu())
     }
     optionsButton = UIBarButtonItem.createOptionsBarButton()
@@ -237,15 +300,14 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   }
 
   func updateFromRemote() {
-    guard appDelegate.storage.settings.user.isOnlineMode else { return }
+    guard appDelegate.storage.settings.isOnlineMode else { return }
     switch displayFilter {
     case .albumArtists, .all:
       break
     case .favorites:
       Task { @MainActor in
         do {
-          try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
-            .syncFavoriteLibraryElements()
+          try await self.appDelegate.librarySyncer.syncFavoriteLibraryElements()
         } catch {
           self.appDelegate.eventLogger.report(topic: "Favorite Artists Sync", error: error)
         }
@@ -307,7 +369,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let artist = artistAt(indexPath: indexPath) else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
+      AppStoryboard.Main.segueToArtistDetail(artist: artist),
       animated: true
     )
   }
@@ -322,8 +384,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     tableView.reloadData()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer
-          .searchArtists(searchText: searchText)
+        try await self.appDelegate.librarySyncer.searchArtists(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
       }}
@@ -426,14 +487,12 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
             preferredStyle: .alert
           )
           alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
-              .download(objects: artistSongs)
+            self.appDelegate.playableDownloadManager.download(objects: artistSongs)
           }))
           alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
           self.present(alert, animated: true, completion: nil)
         } else {
-          self.appDelegate.getMeta(self.appDelegate.account.info).playableDownloadManager
-            .download(objects: artistSongs)
+          self.appDelegate.playableDownloadManager.download(objects: artistSongs)
         }
       }
     )
@@ -442,7 +501,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.user.isOnlineMode else {
+    guard appDelegate.storage.settings.isOnlineMode else {
       self.refreshControl?.endRefreshing()
       return
     }
@@ -452,9 +511,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         try await AutoDownloadLibrarySyncer(
           storage: self.appDelegate.storage,
           account: appDelegate.account,
-          librarySyncer: self.appDelegate.getMeta(self.appDelegate.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.appDelegate.account.info)
-            .playableDownloadManager
+          librarySyncer: self.appDelegate.librarySyncer,
+          playableDownloadManager: self.appDelegate.playableDownloadManager
         )
         .syncNewestLibraryElements()
       } catch {
