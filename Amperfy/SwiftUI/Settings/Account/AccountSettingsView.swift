@@ -53,6 +53,7 @@ struct AccountSettingsView: View {
   }
 
   private func resyncLibrary(accountInfo: AccountInfo) {
+    appDelegate.closeAllButActiveMainTabs()
     appDelegate.stopForInit()
 
     let meta = appDelegate.getMeta(accountInfo)
@@ -73,6 +74,7 @@ struct AccountSettingsView: View {
   }
 
   private func logout(accountInfo: AccountInfo) {
+    appDelegate.closeAllButActiveMainTabs()
     appDelegate.stopForInit()
 
     let meta = appDelegate.getMeta(accountInfo)

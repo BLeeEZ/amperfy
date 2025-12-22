@@ -22,6 +22,7 @@
 import AmperfyKit
 import Foundation
 import NotificationBannerSwift
+import OSLog
 import UIKit
 
 extension AppDelegate {
@@ -34,6 +35,38 @@ extension AppDelegate {
       .sorted { $0.activationState.rawValue < $1.activationState.rawValue }
       // only "main" scene delegates
       .compactMap { $0.delegate as? SceneDelegate }.first
+  }
+
+  public func closeAllButActiveMainTabs() {
+    var allMainScenes = UIApplication.shared.connectedScenes
+      // only scenes that are attached
+      .filter { $0.activationState.rawValue >= 0 }
+      // sort order: foregroundActive < foregroundInactive < background
+      // this places the active tab first
+      .sorted { $0.activationState.rawValue < $1.activationState.rawValue }
+      // only "main" scene delegates
+      .filter { $0.delegate is SceneDelegate }
+    if !allMainScenes.isEmpty {
+      allMainScenes.removeFirst()
+    }
+    for scene in allMainScenes {
+      terminateScene(scene)
+    }
+  }
+
+  private func terminateScene(_ scene: UIScene) {
+    UIApplication.shared.requestSceneSessionDestruction(
+      scene.session,
+      options: nil,
+      errorHandler: { error in
+        os_log(
+          "AppDelegate: terminateScene failed: %s",
+          log: self.log,
+          type: .info,
+          error.localizedDescription
+        )
+      }
+    )
   }
 
   static var window: UIWindow? {
