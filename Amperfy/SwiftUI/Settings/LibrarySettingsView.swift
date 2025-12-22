@@ -62,8 +62,6 @@ struct LibrarySettingsView: View {
   var isShowDeleteCacheAlert = false
   @State
   var isShowDownloadSongsAlert = false
-  @State
-  var isShowResyncLibraryAlert = false
 
   let byteValues = (
     stride(from: 0, through: 20, by: 1).map { $0.description } +
@@ -139,15 +137,6 @@ struct LibrarySettingsView: View {
     } catch {
       // do nothing
     }}
-  }
-
-  private func resyncLibrary() {
-    appDelegate.storage.settings.user.isOfflineMode = false
-    // reset library sync flag -> rest library at new start and continue with sync
-    appDelegate.storage.settings.app.isLibrarySynced = false
-    // reset quick actions
-    appDelegate.quickActionsManager.configureQuickActions()
-    appDelegate.restartByUser()
   }
 
   var body: some View {
@@ -278,23 +267,6 @@ struct LibrarySettingsView: View {
             }
           }
         }, header: "Cache")
-
-        SettingsSection {
-          SettingsButtonRow(title: "Resync Library") {
-            isShowResyncLibraryAlert = true
-          }.alert(isPresented: $isShowResyncLibraryAlert) {
-            Alert(
-              title: Text("Resync Library"),
-              message: Text(
-                "This action resets your local library and starts the sync process from remote. Amperfy needs to restart to perform a resync.\n\nDo you want to resync your library and restart Amperfy?"
-              ),
-              primaryButton: .destructive(Text("Resync")) {
-                resyncLibrary()
-              },
-              secondaryButton: .cancel()
-            )
-          }
-        }
       }
     }
     .navigationTitle("Library")

@@ -401,6 +401,15 @@ public class PlayQueueHandler {
     }
   }
 
+  func logout(account: Account) {
+    // if one playlist contain an element from the logout account -> reset complete player
+    if playerQueues.contextQueue.playables.contains(where: { $0.account == account }) ||
+      playerQueues.userQueuePlaylist.playables.contains(where: { $0.account == account }) ||
+      playerQueues.podcastQueue.playables.contains(where: { $0.account == account }) {
+      removeAllItems()
+    }
+  }
+
   private var currentIndex: Int { playerQueues.currentIndex }
 
   func setCurrentIndex(_ newValue: Int) {

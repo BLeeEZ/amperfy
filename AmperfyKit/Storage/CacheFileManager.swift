@@ -273,6 +273,12 @@ final public class CacheFileManager: Sendable {
     return url
   }
 
+  public func deleteAccountCache(accountInfo: AccountInfo) {
+    if let absAccountDir = getOrCreateAbsoluteAccountDirectory(for: accountInfo) {
+      try? FileManager.default.removeItem(at: absAccountDir)
+    }
+  }
+
   public func deletePlayableCache(accountInfo: AccountInfo) {
     if let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo) {
       try? FileManager.default.removeItem(at: absSongsDir)
@@ -320,8 +326,19 @@ final public class CacheFileManager: Sendable {
     getOrCreateSubDirectory(subDirectoryNames: [Self.accountsDir.path, server])
   }
 
-  private func getRelAccountPaths(for account: AccountInfo, dirName: String) -> [String] {
-    [Self.accountsDir.path, account.serverHash, account.userHash, dirName]
+  private func getRelAccountPaths(for account: AccountInfo, dirName: String?) -> [String] {
+    if let dirName {
+      return [Self.accountsDir.path, account.serverHash, account.userHash, dirName]
+    } else {
+      return [Self.accountsDir.path, account.serverHash, account.userHash]
+    }
+  }
+
+  public func getOrCreateAbsoluteAccountDirectory(for account: AccountInfo) -> URL? {
+    getOrCreateSubDirectory(subDirectoryNames: getRelAccountPaths(
+      for: account,
+      dirName: nil
+    ))
   }
 
   public func getRelPath(for account: AccountInfo) -> URL? {

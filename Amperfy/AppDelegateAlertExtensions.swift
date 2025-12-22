@@ -25,16 +25,19 @@ import NotificationBannerSwift
 import UIKit
 
 extension AppDelegate {
-  static var window: UIWindow? {
-    let mainSceneDelegates: [SceneDelegate] = UIApplication.shared.connectedScenes
+  static var mainSceneDelegate: SceneDelegate? {
+    UIApplication.shared.connectedScenes
       // only scenes that are attached
       .filter { $0.activationState.rawValue >= 0 }
       // sort order: foregroundActive < foregroundInactive < background
       // this places the active tab first
       .sorted { $0.activationState.rawValue < $1.activationState.rawValue }
       // only "main" scene delegates
-      .compactMap { $0.delegate as? SceneDelegate }
-    return mainSceneDelegates.first?.window
+      .compactMap { $0.delegate as? SceneDelegate }.first
+  }
+
+  static var window: UIWindow? {
+    mainSceneDelegate?.window
   }
 
   static func rootViewController() -> UIViewController? {

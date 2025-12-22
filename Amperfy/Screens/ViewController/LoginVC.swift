@@ -366,7 +366,7 @@ class LoginVC: UIViewController {
     }
 
     var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
-    let accountInfo = Account.createInfo(credentials: credentials)
+    var accountInfo = Account.createInfo(credentials: credentials)
     Task { @MainActor in
       do {
         let meta = self.appDelegate.getMeta(accountInfo)
@@ -374,8 +374,11 @@ class LoginVC: UIViewController {
           apiType: selectedApiType,
           credentials: credentials
         )
-        meta.backendApi.selectedApi = authenticatedApiType
         credentials.backendApi = authenticatedApiType
+        accountInfo = Account.createInfo(credentials: credentials)
+        meta.backendApi.selectedApi = authenticatedApiType
+        meta.account.assignInfo(info: accountInfo)
+        self.appDelegate.storage.main.saveContext()
         self.appDelegate.storage.settings.accounts.login(credentials)
         meta.backendApi.provideCredentials(credentials: credentials)
 

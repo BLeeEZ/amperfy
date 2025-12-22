@@ -229,15 +229,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AmperKit.shared.reinit()
   }
 
+  func stopForInit() {
+    sleepTimer?.invalidate()
+    sleepTimer = nil
+    player.stop()
+  }
+
+  // deprecated
   func restartByUser() {
     Task {
       await localNotificationManager.notifyDebugAndWait(
         title: "Amperfy Restart",
         body: "Tap to reopen Amperfy"
       )
-      sleepTimer?.invalidate()
-      sleepTimer = nil
-      player.stop()
+      stopForInit()
       // close Amperfy
       exit(0)
     }
@@ -262,6 +267,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     storage.applyMultiAccountSettingsUpdateIfNeeded()
+    libraryUpdater.performAccountCleanUpIfNeccessaryInBackground()
 
     configureDefaultNavigationBarStyle()
     configureBatteryMonitoring()

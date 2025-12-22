@@ -522,6 +522,10 @@ public class LibraryStorage: PlayableFileCachable {
     return account
   }
 
+  func deleteAccount(account: Account) {
+    context.delete(account.managedObject)
+  }
+
   public func getAccount(managedObjectId: NSManagedObjectID) -> Account {
     Account(
       managedObject: context
@@ -2863,6 +2867,120 @@ public class LibraryStorage: PlayableFileCachable {
     return absFileURL
   }
 
+  public func cleanStorageOfObsoleteAccountEntries(account: Account) {
+    // Genres
+    do {
+      let request: NSFetchRequest<GenreMO> = GenreMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Artists
+    do {
+      let request: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Albums
+    do {
+      let request: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Songs
+    do {
+      let request: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Artworks
+    do {
+      let request: NSFetchRequest<ArtworkMO> = ArtworkMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Embedded Artworks
+    do {
+      let request: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Playlists
+    do {
+      let request: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Playlist Items
+    do {
+      let request: NSFetchRequest<PlaylistItemMO> = PlaylistItemMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Music Folders
+    do {
+      let request: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Directories
+    do {
+      let request: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Podcasts
+    do {
+      let request: NSFetchRequest<PodcastMO> = PodcastMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Podcast Episodes
+    do {
+      let request: NSFetchRequest<PodcastEpisodeMO> = PodcastEpisodeMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Radios
+    do {
+      let request: NSFetchRequest<RadioMO> = RadioMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Downloads
+    do {
+      let request: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Scrobble Entries
+    do {
+      let request: NSFetchRequest<ScrobbleEntryMO> = ScrobbleEntryMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+
+    // Search History Items
+    do {
+      let request: NSFetchRequest<SearchHistoryItemMO> = SearchHistoryItemMO.fetchRequest()
+      request.predicate = getFetchPredicate(forAccount: account)
+      clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
+    }
+  }
+
   public func cleanStorage() {
     for entityToDelete in LibraryStorage.entitiesToDelete {
       clearStorage(ofType: entityToDelete)
@@ -2872,6 +2990,15 @@ public class LibraryStorage: PlayableFileCachable {
 
   private func clearStorage(ofType entityToDelete: String) {
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityToDelete)
+    let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+    do {
+      try context.execute(deleteRequest)
+    } catch let error as NSError {
+      os_log("Fetch failed: %s", log: log, type: .error, error.localizedDescription)
+    }
+  }
+
+  private func clearStorage(fetchRequest: NSFetchRequest<NSFetchRequestResult>) {
     let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
     do {
       try context.execute(deleteRequest)

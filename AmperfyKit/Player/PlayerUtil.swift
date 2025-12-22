@@ -26,7 +26,7 @@ import MediaPlayer
 // MARK: - MusicPlayable
 
 @MainActor
-public protocol MusicPlayable {
+public protocol MusicPlayable: AnyObject {
   func didStartPlayingFromBeginning()
   func didStartPlaying()
   func didPause()

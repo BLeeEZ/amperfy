@@ -24,6 +24,17 @@ import Foundation
 import MediaPlayer
 import os.log
 
+// MARK: - WeakMusicPlayable
+
+final class WeakMusicPlayable {
+  weak var value: MusicPlayable?
+  init(_ value: MusicPlayable) {
+    self.value = value
+  }
+}
+
+// MARK: - AudioPlayer
+
 @MainActor
 public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   public static let replayInsteadPlayPreviousTimeInSec = 5.0
@@ -49,7 +60,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   private let backendAudioPlayer: BackendAudioPlayer
   private let settings: AmperfySettings
   private let userStatistics: UserStatistics
-  private var notifierList = [MusicPlayable]()
+  private var notifierList: [WeakMusicPlayable] = []
 
   init(
     coreData: PlayerStatusPersistent,
@@ -290,7 +301,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   var audioAnalyzer: AudioAnalyzer { backendAudioPlayer.audioAnalyzer }
 
   func addNotifier(notifier: MusicPlayable) {
-    notifierList.append(notifier)
+    notifierList.append(WeakMusicPlayable(notifier))
   }
 
   func removeAllNotifier() {
@@ -298,76 +309,88 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   func notifyItemStartedPlayingFromBeginning() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didStartPlayingFromBeginning()
+      notifier.value?.didStartPlayingFromBeginning()
     }
     seekToLastStoppedPlayTime()
   }
 
   func notifyItemStartedPlaying() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didStartPlaying()
+      notifier.value?.didStartPlaying()
     }
   }
 
   // BackendAudioPlayerNotifiable
   func notifyErrorOccurred(error: Error) {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.errorOccurred(error: error)
+      notifier.value?.errorOccurred(error: error)
     }
   }
 
   func notifyItemPaused() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didPause()
+      notifier.value?.didPause()
     }
   }
 
   func notifyPlayerStopped() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didStopPlaying()
+      notifier.value?.didStopPlaying()
     }
   }
 
   func notifyArtworkChanged() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didArtworkChange()
+      notifier.value?.didArtworkChange()
     }
   }
 
   func notifyElapsedTimeChanged() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didElapsedTimeChange()
+      notifier.value?.didElapsedTimeChange()
     }
   }
 
   func notifyLyricsTimeChanged(time: CMTime) {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didLyricsTimeChange(time: time)
+      notifier.value?.didLyricsTimeChange(time: time)
     }
   }
 
   func notifyPlaylistUpdated() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didPlaylistChange()
+      notifier.value?.didPlaylistChange()
     }
   }
 
   func notifyShuffleUpdated() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didShuffleChange()
+      notifier.value?.didShuffleChange()
     }
   }
 
   func notifyRepeatUpdated() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didRepeatChange()
+      notifier.value?.didRepeatChange()
     }
   }
 
   func notifyPlaybackRateUpdated() {
+    notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
-      notifier.didPlaybackRateChange()
+      notifier.value?.didPlaybackRateChange()
     }
   }
 }

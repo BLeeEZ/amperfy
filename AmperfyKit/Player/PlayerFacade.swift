@@ -196,6 +196,7 @@ public protocol PlayerFacade {
   func setStreamingTranscodings(to: StreamingTranscodings)
 
   func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
+  func logout(account: Account)
   func seek(toSecond: Double)
 
   func insertContextQueue(playables: [AbstractPlayable])
@@ -516,6 +517,10 @@ class PlayerFacadeImpl: PlayerFacade {
     self.playerStatus = playerStatus
     self.queueHandler = queueHandler
     musicPlayer.reinit(playerStatus: playerStatus, queueHandler: queueHandler)
+  }
+
+  func logout(account: Account) {
+    queueHandler.logout(account: account)
   }
 
   func seek(toSecond: Double) {

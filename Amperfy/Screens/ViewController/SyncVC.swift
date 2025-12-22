@@ -56,7 +56,7 @@ class SyncVC: UIViewController {
     Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
       self.appDelegate.storage.settings.app.isLibrarySynced = false
-      self.appDelegate.storage.main.library.cleanStorage()
+      self.appDelegate.storage.main.library.cleanStorageOfObsoleteAccountEntries(account: account)
       self.appDelegate.reinit()
 
       do {

@@ -298,6 +298,7 @@ public class MetaManager {
   public func stopManager() {
     os_log("Start meta managers", log: self.log, type: .info)
     scrobbleSyncer?.stop()
+    scrobbleSyncer = nil
     backgroundLibrarySyncer.stop()
     artworkDownloadManager.stop()
     playableDownloadManager.stop()

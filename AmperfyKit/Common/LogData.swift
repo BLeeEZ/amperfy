@@ -55,8 +55,9 @@ public struct LogData: Encodable {
 
     logData.libraryInfo = LibraryInfo()
     logData.libraryInfo?.version = amperfyData.storage.settings.app.librarySyncVersion.description
-    let accounts = amperfyData.storage.main.library.getAllAccounts()
-    for account in accounts {
+    let allAccountInfos = amperfyData.storage.settings.accounts.allAccounts
+    for accountInfo in allAccountInfos {
+      let account = amperfyData.storage.main.library.getAccount(info: accountInfo)
       let accountLibraryInfo = amperfyData.storage.main.library.getInfo(account: account)
       logData.libraryInfo?.accounts?.append(accountLibraryInfo)
     }

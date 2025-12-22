@@ -31,6 +31,8 @@ struct AccountSettingsView: View {
   var isPwUpdateDialogVisible = false
   @State
   var isShowLogoutAlert = false
+  @State
+  var isShowResyncLibraryAlert = false
   @EnvironmentObject
   var settings: Settings
 
@@ -50,15 +52,49 @@ struct AccountSettingsView: View {
     }
   }
 
-  private func logout(accountInfo: AccountInfo) {
+  private func resyncLibrary(accountInfo: AccountInfo) {
+    appDelegate.stopForInit()
+
+    let meta = appDelegate.getMeta(accountInfo)
+    meta.stopManager()
+    appDelegate.resetMeta(accountInfo)
+
+    // reset library sync flag -> rest library at new start and continue with sync
+    appDelegate.storage.settings.app.isLibrarySynced = false
+    // reset quick actions
+    appDelegate.quickActionsManager.configureQuickActions()
+    appDelegate.configureMainMenu()
+
     appDelegate.storage.settings.user.isOfflineMode = false
+    let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
+    appDelegate.player.logout(account: account)
+    let syncVC = AppStoryboard.Main.segueToSync(account: account)
+    AppDelegate.mainSceneDelegate?.replaceMainRootViewController(vc: syncVC)
+  }
+
+  private func logout(accountInfo: AccountInfo) {
+    appDelegate.stopForInit()
+
+    let meta = appDelegate.getMeta(accountInfo)
+    meta.stopManager()
+    appDelegate.resetMeta(accountInfo)
+
+    // delete cached files
+    CacheFileManager.shared.deleteAccountCache(accountInfo: accountInfo)
     // reset login credentials -> at new start the login view is presented to auth and resync library
     appDelegate.storage.settings.accounts.logout(accountInfo)
+
     // force resync after login
     appDelegate.storage.settings.app.isLibrarySynced = false
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
-    appDelegate.restartByUser()
+    appDelegate.configureMainMenu()
+
+    appDelegate.storage.settings.user.isOfflineMode = false
+    let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
+    appDelegate.player.logout(account: account)
+    let loginVC = AppStoryboard.Main.segueToLogin()
+    AppDelegate.mainSceneDelegate?.replaceMainRootViewController(vc: loginVC)
   }
 
   var body: some View {
@@ -167,6 +203,23 @@ struct AccountSettingsView: View {
             SettingsButtonRow(title: "Update Password") {
               withPopupAnimation { isPwUpdateDialogVisible = true }
             }
+            SettingsButtonRow(title: "Resync Library") {
+              isShowResyncLibraryAlert = true
+            }.alert(isPresented: $isShowResyncLibraryAlert) {
+              Alert(
+                title: Text("Resync Library"),
+                message: Text(
+                  "This will reset your local library and start syncing again from the server. Your downloaded files will remain on this device.\n\nDo you want to resync your library?"
+                ),
+                primaryButton: .destructive(Text("Resync")) {
+                  resyncLibrary(accountInfo: activeAccountInfo)
+                },
+                secondaryButton: .cancel()
+              )
+            }
+          }
+
+          SettingsSection {
             SettingsButtonRow(title: "Logout", actionType: .destructive) {
               isShowLogoutAlert = true
             }
@@ -174,7 +227,7 @@ struct AccountSettingsView: View {
               Alert(
                 title: Text("Logout"),
                 message: Text(
-                  "This action leads to a user logout. Login credentials of the current user are removed. Amperfy needs to restart to perform a logout. After a successful login a resync of the remote library is neccessary.\n\nDo you want to logout and restart Amperfy?"
+                  "Logging out will sign you out of the current account. Your login credentials will be removed, and all downloaded files for this account will be deleted.\n\nDo you want to log out?"
                 ),
                 primaryButton: .destructive(Text("Logout")) {
                   logout(accountInfo: activeAccountInfo)

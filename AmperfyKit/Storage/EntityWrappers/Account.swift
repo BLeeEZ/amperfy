@@ -53,6 +53,10 @@ public struct AccountInfo: Sendable, Hashable, Codable {
     }
   }
 
+  public var ident: String {
+    "\(serverHash)-\(userHash)"
+  }
+
   public static func == (lhs: AccountInfo, rhs: AccountInfo) -> Bool {
     lhs.serverHash == rhs.serverHash && lhs.userHash == rhs.userHash
   }
@@ -96,7 +100,7 @@ public class Account {
     assignInfo(info: info)
   }
 
-  func assignInfo(info: AccountInfo) {
+  public func assignInfo(info: AccountInfo) {
     managedObject.serverHash = info.serverHash
     managedObject.userHash = info.userHash
     managedObject.apiType = Int16(clamping: info.apiType.rawValue)

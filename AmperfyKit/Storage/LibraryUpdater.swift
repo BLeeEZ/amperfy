@@ -48,6 +48,38 @@ public class LibraryUpdater {
     storage.settings.app.librarySyncVersion != .newestVersion
   }
 
+  /// perfom obsolete accounts delete only at the beginning of App start
+  /// later these accounts could still/already be used
+  @MainActor
+  public func performAccountCleanUpIfNeccessaryInBackground() {
+    let allCoreDataAccounts = storage.main.library.getAllAccounts()
+    let allAccountInfosFromCoreData = Set(allCoreDataAccounts.compactMap { $0.info })
+    let allSettingAccounts = Set(storage.settings.accounts.allAccounts)
+
+    let obsoleteCoreDataAccountInfos = allAccountInfosFromCoreData.subtracting(allSettingAccounts)
+    Task { @MainActor in
+      for obsoleteAccountInfo in obsoleteCoreDataAccountInfos {
+        os_log(
+          "Delete obsolete account (START): %s",
+          log: log,
+          type: .info,
+          obsoleteAccountInfo.ident,
+        )
+        try? await storage.async.perform { asyncCompanion in
+          let obsoleteAccount = asyncCompanion.library.getAccount(info: obsoleteAccountInfo)
+          asyncCompanion.library.cleanStorageOfObsoleteAccountEntries(account: obsoleteAccount)
+          asyncCompanion.library.deleteAccount(account: obsoleteAccount)
+        }
+        os_log(
+          "Delete obsolete account (DONE): %s",
+          log: log,
+          type: .info,
+          obsoleteAccountInfo.ident,
+        )
+      }
+    }
+  }
+
   /// This function will block the execution before the scene handler
   /// Perform here only small/fast operations
   /// Use UpdateVC for longer operations to display progress to user
