@@ -1230,6 +1230,12 @@ public class IntentManager {
         search: searchTerm
       )
       .first
+    case .radio:
+      playableContainer = FuzzySearcher.findBestMatch(
+        in: library.getRadios(for: account),
+        search: searchTerm
+      )
+      .first
     }
     return playableContainer
   }
@@ -1295,6 +1301,8 @@ public class IntentManager {
       }
     case .podcast:
       playableContainer = library.getPodcast(for: account, id: id)
+    case .radio:
+      playableContainer = library.getRadio(for: account, id: id)
     }
     return playableContainer
   }
@@ -1427,6 +1435,8 @@ extension PlayableContainerType {
       return "genre"
     case .podcast:
       return "podcast"
+    case .radio:
+      return "radio"
     }
   }
 }
