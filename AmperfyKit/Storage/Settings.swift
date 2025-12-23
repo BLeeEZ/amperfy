@@ -365,10 +365,16 @@ public struct AccountSettings: Sendable, Codable {
   fileprivate var _accounts: [AccountInfo: AccountSetting] = [:]
   fileprivate var _activeAccount: AccountInfo?
 
+  public mutating func switchActiveAccount(_ accountInfo: AccountInfo) {
+    _activeAccount = accountInfo
+  }
+
   public mutating func login(_ loginCredentials: LoginCredentials) {
     let accountInfo = Account.createInfo(credentials: loginCredentials)
+    let newTheme = themeColorForNextNewAccount
     updateSetting(accountInfo) { accountSettings in
       accountSettings.loginCredentials = loginCredentials
+      accountSettings.themePreference = newTheme
     }
     _activeAccount = accountInfo
   }
@@ -416,6 +422,21 @@ public struct AccountSettings: Sendable, Codable {
 
   public var allAccounts: [AccountInfo] {
     _accounts.compactMap { $0.key }
+  }
+
+  private var themeColorForNextNewAccount: ThemePreference {
+    var theme = ThemePreference.blue
+    let usedThemes = Set(_accounts.compactMap { $0.value.themePreference })
+    let allThemes = Set(ThemePreference.allCases)
+    let availableThemes = allThemes.subtracting(usedThemes)
+    if let firstAvailable = availableThemes.sorted(by: { $0.rawValue < $1.rawValue }).first {
+      theme = firstAvailable
+    } else if let activeAccount = _activeAccount {
+      let activeTheme = getSetting(activeAccount).read.themePreference
+      theme = allThemes.subtracting(Set([activeTheme])).sorted(by: { $0.rawValue < $1.rawValue })
+        .first ?? .blue
+    }
+    return theme
   }
 }
 

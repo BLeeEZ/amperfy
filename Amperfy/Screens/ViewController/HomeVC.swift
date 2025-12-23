@@ -28,6 +28,7 @@ extension UIViewController {
   private func createUserButtonMenu() -> UIMenu {
     var accountActions = [UIMenuElement]()
     for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
+      let isActiveAccount = (accountInfo == appDelegate.storage.settings.accounts.active)
       let action = UIAction(
         title: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
           .loginCredentials?
@@ -39,12 +40,49 @@ extension UIViewController {
           pointSize: 30,
           weight: .regular
         )),
-        attributes: [UIMenuElement.Attributes.disabled],
-        state: (accountInfo == appDelegate.storage.settings.accounts.active) ? .on : .off,
-        handler: { _ in }
+        attributes: isActiveAccount ? [UIMenuElement.Attributes.disabled] : [],
+        state: isActiveAccount ? .on : .off,
+        handler: { _ in
+          self.appDelegate.storage.settings.accounts.switchActiveAccount(accountInfo)
+          self.appDelegate.notificationHandler.post(
+            name: .accountActiveChanged,
+            object: nil,
+            userInfo: nil
+          )
+          let account = self.appDelegate.storage.main.library.getAccount(info: accountInfo)
+
+          self.appDelegate.closeAllButActiveMainTabs()
+          self.appDelegate
+            .setAppTheme(
+              color: self.appDelegate.storage.settings.accounts.getSetting(accountInfo)
+                .read.themePreference.asColor
+            )
+          self.appDelegate.applyAppThemeToAlreadyLoadedViews()
+          guard let mainScene = AppDelegate.mainSceneDelegate else { return }
+          mainScene
+            .replaceMainRootViewController(
+              vc: AppStoryboard.Main
+                .segueToMainWindow(account: account)
+            )
+        }
       )
       accountActions.append(action)
     }
+
+    #if targetEnvironment(macCatalyst)
+      let addAccountImage = UIImage.plus
+    #else
+      let addAccountImage = UIImage.userPersonPlus
+    #endif
+    let openAddAccount = UIAction(
+      title: "Add Account",
+      image: addAccountImage,
+      handler: { _ in
+        let loginVC = AppStoryboard.Main.segueToLogin()
+        loginVC.modalPresentationStyle = .formSheet
+        self.present(loginVC, animated: true)
+      }
+    )
     let openSettings = UIAction(
       title: "Settings",
       image: .settings,
@@ -58,8 +96,7 @@ extension UIViewController {
         #endif
       }
     )
-
-    let settingsMenu = UIMenu(options: [.displayInline], children: [openSettings])
+    let settingsMenu = UIMenu(options: [.displayInline], children: [openAddAccount, openSettings])
     accountActions.append(settingsMenu)
 
     return UIMenu(

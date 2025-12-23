@@ -65,7 +65,7 @@ class UpdateVC: UIViewController {
       self.appDelegate.eventLogger.supressAlerts = false
       self.appDelegate.startManagerForNormalOperation()
 
-      guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
+      guard let mainScene = AppDelegate.mainSceneDelegate else { return }
       if let accountInfo = self.appDelegate.storage.settings.accounts.active {
         let account = self.appDelegate.storage.main.library.getAccount(info: accountInfo)
         mainScene

@@ -144,7 +144,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         )
         return self.createCell(tableView, forRowAt: indexPath, artist: artist)
       }
-    source.sortType = self.sortType
+    source.sortType = sortType
     return source
   }
 

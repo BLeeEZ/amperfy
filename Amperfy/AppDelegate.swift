@@ -226,10 +226,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AmperKit.shared.eventLogger.alertDisplayer = self
   }
 
-  func reinit() {
-    AmperKit.shared.reinit()
-  }
-
   func stopForInit() {
     sleepTimer?.invalidate()
     sleepTimer = nil
@@ -329,6 +325,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func setAppTheme(color: UIColor) {
     UIView.appearance().tintColor = color
+  }
+
+  // the following applies the tint color to already loaded views in all windows (UIKit)
+  func applyAppThemeToAlreadyLoadedViews() {
+    let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+    let windows = windowScene.flatMap { $0.windows }
+
+    for window in windows {
+      for view in window.subviews {
+        view.removeFromSuperview()
+        window.addSubview(view)
+      }
+    }
   }
 
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {

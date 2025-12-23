@@ -45,6 +45,7 @@ class SettingsHostVC: UIViewController {
     accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
       guard let self else { return }
       settings.activeAccountInfo = accountInfo
+      refreshAccountSettings(accountInfo: accountInfo)
     }
 
     self.isForOwnWindow = isForOwnWindow
@@ -236,12 +237,9 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.setAppAppearanceMode(style: newValue)
     }))
 
-    // account is changed via the active account changed callback
-    settings.activeAccountInfo = appDelegate.storage.settings.accounts.active
+    // following account specific setting sinks are assigned.
+    // the correct assignment is done in the account switched callback
 
-    settings.themePreference = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo).read
-      .themePreference
     changesAgent.append(settings.$themePreference.sink(receiveValue: { newValue in
       guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
@@ -249,10 +247,6 @@ class SettingsHostVC: UIViewController {
           accountSettings.themePreference = newValue
         }
     }))
-
-    settings.isAutoCacheLatestSongs = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo).read
-      .isAutoDownloadLatestSongsActive
     changesAgent.append(settings.$isAutoCacheLatestSongs.sink(receiveValue: { newValue in
       guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
@@ -260,11 +254,6 @@ class SettingsHostVC: UIViewController {
           accountSettings.isAutoDownloadLatestSongsActive = newValue
         }
     }))
-
-    settings.isAutoCacheLatestPodcastEpisodes = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo)
-      .read
-      .isAutoDownloadLatestPodcastEpisodesActive
     changesAgent.append(settings.$isAutoCacheLatestPodcastEpisodes.sink(receiveValue: { newValue in
       guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
@@ -272,10 +261,6 @@ class SettingsHostVC: UIViewController {
           accountSettings.isAutoDownloadLatestPodcastEpisodesActive = newValue
         }
     }))
-
-    settings.isScrobbleStreamedItems = appDelegate.storage.settings.accounts
-      .getSetting(settings.activeAccountInfo).read
-      .isScrobbleStreamedItems
     changesAgent.append(settings.$isScrobbleStreamedItems.sink(receiveValue: { newValue in
       guard let activeAccountInfo = self.settings.activeAccountInfo else { return }
       self.appDelegate.storage.settings.accounts
@@ -283,6 +268,28 @@ class SettingsHostVC: UIViewController {
           accountSettings.isScrobbleStreamedItems = newValue
         }
     }))
+  }
+
+  // account is changed via the active account changed callback
+  func refreshAccountSettings(accountInfo: AccountInfo?) {
+    settings.activeAccountInfo = accountInfo
+
+    settings.themePreference = appDelegate.storage.settings.accounts
+      .getSetting(accountInfo).read
+      .themePreference
+
+    settings.isAutoCacheLatestSongs = appDelegate.storage.settings.accounts
+      .getSetting(accountInfo).read
+      .isAutoDownloadLatestSongsActive
+
+    settings.isAutoCacheLatestPodcastEpisodes = appDelegate.storage.settings.accounts
+      .getSetting(accountInfo)
+      .read
+      .isAutoDownloadLatestPodcastEpisodesActive
+
+    settings.isScrobbleStreamedItems = appDelegate.storage.settings.accounts
+      .getSetting(accountInfo).read
+      .isScrobbleStreamedItems
   }
 
   @IBSegueAction

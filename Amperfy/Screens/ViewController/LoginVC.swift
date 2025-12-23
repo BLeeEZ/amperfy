@@ -172,10 +172,32 @@ class LoginVC: UIViewController {
     config.imagePadding = 20.0
     let button = UIButton(configuration: config)
     button.setTitle("Login", for: .normal)
+    button.accessibilityLabel = "Login"
     button.addTarget(self, action: #selector(Self.loginPressed), for: .touchUpInside)
     button.preferredBehavioralStyle = .pad
     return button
   }()
+
+  // Close button shown when presented as a sheet/modal
+  fileprivate lazy var closeButton: UIButton = {
+    var config = UIButton.Configuration.prominentGlass()
+    config.image = .xmark
+    config.imagePadding = 20.0
+    let button = UIButton(configuration: config)
+    button.accessibilityLabel = "Close"
+    button.addTarget(self, action: #selector(Self.closePressed), for: .touchUpInside)
+    button.preferredBehavioralStyle = .pad
+    button.isHidden = true
+    return button
+  }()
+
+  @IBAction
+  func closePressed() {
+    // Dismiss when presented modally (e.g., as a sheet)
+    if presentingViewController != nil || navigationController?.presentingViewController != nil {
+      dismiss(animated: true)
+    }
+  }
 
   @IBAction
   func loginPressed() {
@@ -367,6 +389,13 @@ class LoginVC: UIViewController {
 
     var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
     var accountInfo = Account.createInfo(credentials: credentials)
+
+    guard !appDelegate.storage.settings.accounts.allAccounts.contains(where: { $0 == accountInfo })
+    else {
+      showErrorMsg(message: "Account already added!")
+      return
+    }
+
     Task { @MainActor in
       do {
         let meta = self.appDelegate.getMeta(accountInfo)
@@ -389,9 +418,17 @@ class LoginVC: UIViewController {
           userInfo: nil
         )
 
-        guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
-        mainScene
-          .replaceMainRootViewController(vc: AppStoryboard.Main.segueToSync(account: meta.account))
+        let syncVC = AppStoryboard.Main.segueToSync(account: meta.account)
+        if let rootVC = presentingViewController {
+          syncVC.modalPresentationStyle = self.modalPresentationStyle
+          rootVC.dismiss(animated: false) {
+            rootVC.present(syncVC, animated: false)
+          }
+        } else {
+          guard let mainScene = AppDelegate.mainSceneDelegate else { return }
+          mainScene
+            .replaceMainRootViewController(vc: syncVC)
+        }
       } catch {
         if error is AuthenticationError {
           self.showErrorMsg(message: error.localizedDescription)
@@ -439,10 +476,12 @@ class LoginVC: UIViewController {
     iconView.translatesAutoresizingMaskIntoConstraints = false
     formGlassContainer.translatesAutoresizingMaskIntoConstraints = false
     loginGlassContainer.translatesAutoresizingMaskIntoConstraints = false
+    closeButton.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(amperfyLabel)
     view.addSubview(iconView)
     view.addSubview(formGlassContainer)
     view.addSubview(loginGlassContainer)
+    view.addSubview(closeButton)
 
     formLeadingConstraing = formGlassContainer.leadingAnchor.constraint(
       equalTo: view.leadingAnchor,
@@ -488,7 +527,19 @@ class LoginVC: UIViewController {
       iconView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
       iconView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
       iconView.heightAnchor.constraint(equalTo: formGlassContainer.heightAnchor, constant: 40),
+
+      // Close button top-right
+      closeButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+      closeButton.trailingAnchor.constraint(
+        equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+        constant: -16
+      ),
     ])
+
+    // Show close button only when presented as a sheet/modal
+    let isModal = presentingViewController != nil || navigationController?
+      .presentingViewController != nil
+    closeButton.isHidden = !isModal
   }
 
   override func updateProperties() {
@@ -533,6 +584,13 @@ class LoginVC: UIViewController {
       serverUrlTF.text = credentials.serverUrl
       usernameTF.text = credentials.username
     }
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    let isModal = presentingViewController != nil || navigationController?
+      .presentingViewController != nil
+    closeButton.isHidden = !isModal
   }
 
   func updateApiSelectorText() {

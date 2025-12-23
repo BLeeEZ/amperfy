@@ -39,29 +39,19 @@ struct AccountSettingsView: View {
   func setThemePreference(preference: ThemePreference) {
     settings.themePreference = preference
     appDelegate.setAppTheme(color: preference.asColor)
-
-    // the following applies the tint color to already loaded views in all windows (UIKit)
-    let windowScene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
-    let windows = windowScene.flatMap { $0.windows }
-
-    for window in windows {
-      for view in window.subviews {
-        view.removeFromSuperview()
-        window.addSubview(view)
-      }
-    }
+    appDelegate.applyAppThemeToAlreadyLoadedViews()
   }
 
   private func resyncLibrary(accountInfo: AccountInfo) {
     appDelegate.closeAllButActiveMainTabs()
-    appDelegate.stopForInit()
+    if appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
+      appDelegate.stopForInit()
+    }
 
     let meta = appDelegate.getMeta(accountInfo)
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
 
-    // reset library sync flag -> rest library at new start and continue with sync
-    appDelegate.storage.settings.app.isLibrarySynced = false
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.configureMainMenu()
@@ -70,12 +60,16 @@ struct AccountSettingsView: View {
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)
     let syncVC = AppStoryboard.Main.segueToSync(account: account)
-    AppDelegate.mainSceneDelegate?.replaceMainRootViewController(vc: syncVC)
+    syncVC.modalPresentationStyle = .formSheet
+    AppDelegate.mainSceneDelegate?.window?.rootViewController?.dismiss(animated: false)
+    AppDelegate.mainSceneDelegate?.window?.rootViewController?.present(syncVC, animated: true)
   }
 
   private func logout(accountInfo: AccountInfo) {
     appDelegate.closeAllButActiveMainTabs()
-    appDelegate.stopForInit()
+    if appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
+      appDelegate.stopForInit()
+    }
 
     let meta = appDelegate.getMeta(accountInfo)
     meta.stopManager()
@@ -88,8 +82,6 @@ struct AccountSettingsView: View {
     appDelegate.notificationHandler.post(name: .accountDeleted, object: nil, userInfo: nil)
     appDelegate.notificationHandler.post(name: .accountActiveChanged, object: nil, userInfo: nil)
 
-    // force resync after login
-    appDelegate.storage.settings.app.isLibrarySynced = false
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.configureMainMenu()
@@ -97,8 +89,28 @@ struct AccountSettingsView: View {
     appDelegate.storage.settings.user.isOfflineMode = false
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)
-    let loginVC = AppStoryboard.Main.segueToLogin()
-    AppDelegate.mainSceneDelegate?.replaceMainRootViewController(vc: loginVC)
+    if let newActiveAccountInfo = appDelegate.storage.settings.accounts.active {
+      let newActiveAccount = appDelegate.storage.main.library.getAccount(info: newActiveAccountInfo)
+      appDelegate.closeAllButActiveMainTabs()
+      appDelegate
+        .setAppTheme(
+          color: appDelegate.storage.settings.accounts.getSetting(newActiveAccountInfo)
+            .read.themePreference.asColor
+        )
+      appDelegate.applyAppThemeToAlreadyLoadedViews()
+      guard let mainScene = AppDelegate.mainSceneDelegate else { return }
+      mainScene
+        .replaceMainRootViewController(
+          vc: AppStoryboard.Main
+            .segueToMainWindow(account: newActiveAccount)
+        )
+    } else {
+      // No other account: Behave like initial App start
+      // force resync after login
+      appDelegate.storage.settings.app.isLibrarySynced = false
+      let loginVC = AppStoryboard.Main.segueToLogin()
+      AppDelegate.mainSceneDelegate?.replaceMainRootViewController(vc: loginVC)
+    }
   }
 
   var body: some View {

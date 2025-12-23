@@ -218,11 +218,4 @@ public class AmperKit {
   public lazy var localNotificationManager = {
     LocalNotificationManager(userStatistics: userStatistics, storage: storage)
   }()
-
-  @MainActor
-  public func reinit() {
-    let playerData = storage.main.library.getPlayerData()
-    let queueHandler = PlayQueueHandler(playerData: playerData)
-    player.reinit(playerStatus: playerData, queueHandler: queueHandler)
-  }
 }

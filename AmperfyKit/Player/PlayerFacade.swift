@@ -195,7 +195,6 @@ public protocol PlayerFacade {
   var streamingTranscodings: StreamingTranscodings { get }
   func setStreamingTranscodings(to: StreamingTranscodings)
 
-  func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler)
   func logout(account: Account)
   func seek(toSecond: Double)
 
@@ -513,14 +512,10 @@ class PlayerFacadeImpl: PlayerFacade {
     backendAudioPlayer.updateReplayGainEnabled(isEnabled: isEnabled)
   }
 
-  func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler) {
-    self.playerStatus = playerStatus
-    self.queueHandler = queueHandler
-    musicPlayer.reinit(playerStatus: playerStatus, queueHandler: queueHandler)
-  }
-
   func logout(account: Account) {
-    queueHandler.logout(account: account)
+    if queueHandler.logout(account: account) {
+      stop()
+    }
   }
 
   func seek(toSecond: Double) {

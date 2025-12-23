@@ -55,9 +55,10 @@ class SyncVC: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
-      self.appDelegate.storage.settings.app.isLibrarySynced = false
+      if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
+        self.appDelegate.storage.settings.app.isLibrarySynced = false
+      }
       self.appDelegate.storage.main.library.cleanStorageOfObsoleteAccountEntries(account: account)
-      self.appDelegate.reinit()
 
       do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
@@ -96,7 +97,13 @@ class SyncVC: UIViewController {
     appDelegate.isKeepScreenAlive = false
     appDelegate.eventLogger.supressAlerts = false
 
-    guard let mainScene = view.window?.windowScene?.delegate as? SceneDelegate else { return }
+    appDelegate
+      .setAppTheme(
+        color: appDelegate.storage.settings.accounts.getSetting(account.info).read
+          .themePreference.asColor
+      )
+    appDelegate.applyAppThemeToAlreadyLoadedViews()
+    guard let mainScene = AppDelegate.mainSceneDelegate else { return }
     mainScene
       .replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow(account: account))
   }

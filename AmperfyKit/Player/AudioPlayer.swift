@@ -85,11 +85,6 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
   }
 
-  func reinit(playerStatus: PlayerData, queueHandler: PlayQueueHandler) {
-    self.playerStatus = playerStatus
-    self.queueHandler = queueHandler
-  }
-
   private func shouldCurrentItemReplayedInsteadOfPrevious() -> Bool {
     if let currentlyPlaying = currentlyPlaying,
        currentlyPlaying.isRadio {

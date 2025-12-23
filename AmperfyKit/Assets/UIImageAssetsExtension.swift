@@ -145,6 +145,9 @@ extension UIImage {
     UIImage(systemName: "person.circle.fill", withConfiguration: withConfiguration) ?? UIImage()
   }
 
+  public static let userPersonPlus = UIImage
+    .create(systemName: "person.crop.circle.fill.badge.plus")
+
   public static let login = UIImage.create(systemName: "arrow.right.to.line")
 
   public static let ellipsis = UIImage.create(systemName: "ellipsis")
