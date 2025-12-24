@@ -110,6 +110,12 @@ public class AmperKit {
     createPlayer()
   }()
 
+  // internal player helper classes that interact only via player callbacks
+  private var playerDownloadPreparationHandler: PlayerDownloadPreparationHandler?
+  private var playerNowPlayingInfoCenterHandler: NowPlayingInfoCenterHandler?
+  private var playerRemoteCommandCenterHandler: RemoteCommandCenterHandler?
+  private var playerNotificationAdapter: PlayerNotificationAdapter?
+
   @MainActor
   private func createPlayer() -> PlayerFacade {
     let audioSessionHandler = AudioSessionHandler()
@@ -156,14 +162,14 @@ public class AmperKit {
     backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.user.isReplayGainEnabled)
     backendAudioPlayer.volume = storage.settings.user.playerVolume
 
-    let playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(
+    playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(
       playerStatus: playerData,
       queueHandler: queueHandler,
       getPlayableDownloaderCB: { accountInfo in
         self.getMeta(accountInfo).playableDownloadManager
       }
     )
-    curPlayer.addNotifier(notifier: playerDownloadPreparationHandler)
+    curPlayer.addNotifier(notifier: playerDownloadPreparationHandler!)
 
     let facadeImpl = PlayerFacadeImpl(
       playerStatus: playerData,
@@ -175,7 +181,7 @@ public class AmperKit {
     )
     facadeImpl.isOfflineMode = storage.settings.user.isOfflineMode
 
-    let nowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(
+    playerNowPlayingInfoCenterHandler = NowPlayingInfoCenterHandler(
       musicPlayer: curPlayer,
       backendAudioPlayer: backendAudioPlayer,
       nowPlayingInfoCenter: MPNowPlayingInfoCenter.default(),
@@ -187,8 +193,8 @@ public class AmperKit {
         self.getMeta(accountInfo).playableDownloadManager
       }
     )
-    curPlayer.addNotifier(notifier: nowPlayingInfoCenterHandler)
-    let remoteCommandCenterHandler = RemoteCommandCenterHandler(
+    curPlayer.addNotifier(notifier: playerNowPlayingInfoCenterHandler!)
+    playerRemoteCommandCenterHandler = RemoteCommandCenterHandler(
       musicPlayer: facadeImpl,
       backendAudioPlayer: backendAudioPlayer,
       getLibrarySyncerCB: { accountInfo in
@@ -197,10 +203,10 @@ public class AmperKit {
       eventLogger: eventLogger,
       remoteCommandCenter: MPRemoteCommandCenter.shared()
     )
-    remoteCommandCenterHandler.configureRemoteCommands()
-    curPlayer.addNotifier(notifier: remoteCommandCenterHandler)
-    let notificationAdapter = PlayerNotificationAdapter(notificationHandler: notificationHandler)
-    curPlayer.addNotifier(notifier: notificationAdapter)
+    playerRemoteCommandCenterHandler?.configureRemoteCommands()
+    curPlayer.addNotifier(notifier: playerRemoteCommandCenterHandler!)
+    playerNotificationAdapter = PlayerNotificationAdapter(notificationHandler: notificationHandler)
+    curPlayer.addNotifier(notifier: playerNotificationAdapter!)
 
     return facadeImpl
   }

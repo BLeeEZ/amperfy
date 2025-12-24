@@ -825,7 +825,7 @@ public class IntentManager {
       } else if mediaSearch.mediaType == .podcastShow ||
         mediaSearch.mediaType == .podcastEpisode ||
         mediaSearch.mediaType == .podcastStation ||
-                  mediaSearch.mediaType == .podcastPlaylist {
+        mediaSearch.mediaType == .podcastPlaylist {
         os_log("Play Podcasts", log: self.log, type: .info)
         let playableElements = library.getNewestPodcastEpisode(for: account, count: 1)
         if !playableElements.isEmpty {
@@ -840,8 +840,9 @@ public class IntentManager {
             )
           )
         }
-      } else if (mediaSearch.mediaName == nil) && (mediaSearch.mediaType == .musicStation || mediaSearch.mediaType == .radioStation ||
-              mediaSearch.mediaType == .station) {
+      } else if mediaSearch.mediaName == nil,
+                mediaSearch.mediaType == .musicStation || mediaSearch.mediaType == .radioStation ||
+                mediaSearch.mediaType == .station {
         os_log("Play random Radio", log: self.log, type: .info)
         let randomRadio = library.getRadios(for: account).randomElement()
         if let randomRadio {
