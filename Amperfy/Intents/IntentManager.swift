@@ -1,6 +1,6 @@
 //
 //  IntentManager.swift
-//  AmperfyKit
+//  Amperfy
 //
 //  Created by Maximilian Bauer on 06.06.22.
 //  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
@@ -27,10 +27,8 @@ import Intents
 import OSLog
 
 extension RepeatMode {
-  public static func fromIntent(type: RepeatType) -> RepeatMode {
+  public static func fromIntent(type: RepeatTypeAppEnum) -> RepeatMode {
     switch type {
-    case .unknown:
-      return .off
     case .single:
       return .single
     case .all:
@@ -41,8 +39,8 @@ extension RepeatMode {
   }
 }
 
-extension PlayableContainerType {
-  public static func from(string: String) -> PlayableContainerType? {
+extension PlayableContainerTypeAppEnum {
+  public static func from(string: String) -> PlayableContainerTypeAppEnum? {
     switch string {
     case "artist":
       return .artist
@@ -161,7 +159,7 @@ public class IntentManager {
             name: NSUserActivity.ActivityKeys.searchCategory.rawValue,
             type: "String",
             isMandatory: true,
-            description: PlayableContainerType.allCasesDescription
+            description: PlayableContainerTypeAppEnum.allCasesDescription
           ),
           XCallbackActionParameterDocu(
             name: NSUserActivity.ActivityKeys.shuffleOption.rawValue,
@@ -210,7 +208,8 @@ public class IntentManager {
         ))
         return
       }
-      guard let searchCategory = PlayableContainerType.from(string: searchCategoryStringRaw) else {
+      guard let searchCategory = PlayableContainerTypeAppEnum.from(string: searchCategoryStringRaw)
+      else {
         failure(NSError.error(
           code: .missingParameter,
           failureReason: "Parameter searchCategory is not valid."
@@ -271,7 +270,7 @@ public class IntentManager {
             name: NSUserActivity.ActivityKeys.libraryElementType.rawValue,
             type: "String",
             isMandatory: true,
-            description: PlayableContainerType.allCasesDescription
+            description: PlayableContainerTypeAppEnum.allCasesDescription
           ),
           XCallbackActionParameterDocu(
             name: NSUserActivity.ActivityKeys.shuffleOption.rawValue,
@@ -317,7 +316,8 @@ public class IntentManager {
         ))
         return
       }
-      guard let libraryElementType = PlayableContainerType.from(string: libraryElementTypeRaw)
+      guard let libraryElementType = PlayableContainerTypeAppEnum
+        .from(string: libraryElementTypeRaw)
       else {
         failure(NSError.error(
           code: .missingParameter,
@@ -792,9 +792,9 @@ public class IntentManager {
     )
 
     var result: AmperfyMediaIntentItemResult?
-    let playableContainerType = PlayableContainerType
+    let playableContainerType = PlayableContainerTypeAppEnum
       .fromINMediaItemType(type: mediaSearch.mediaType)
-    if playableContainerType != .unknown ||
+    if playableContainerType != nil ||
       mediaSearch.mediaType == .music {
       // media type is provided by user
       // "play music" => mediaType: 18
@@ -862,7 +862,7 @@ public class IntentManager {
           "Search explicitly in %ss: <%s>",
           log: self.log,
           type: .info,
-          playableContainerType.description,
+          playableContainerType?.description ?? "unknown",
           mediaName
         )
         if let playableContainer = getPlayableContainer(
@@ -1127,33 +1127,29 @@ public class IntentManager {
   @MainActor
   public func handleIncomingIntent(userActivity: NSUserActivity) async -> Bool {
     guard let account = getActiveAccountCallback(),
-          userActivity.activityType == NSStringFromClass(SearchAndPlayIntent.self) ||
           userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
-          userActivity.activityType == NSStringFromClass(PlayIDIntent.self) ||
           userActivity.activityType == NSUserActivity.playIdActivityType ||
-          userActivity.activityType == NSStringFromClass(PlayRandomSongsIntent.self) ||
           userActivity.activityType == NSUserActivity.playRandomSongsActivityType
     else {
       return false
     }
-    if userActivity.activityType == NSUserActivity.searchAndPlayActivityType || userActivity
-      .activityType == NSStringFromClass(SearchAndPlayIntent.self),
-      let searchTerm = userActivity
-      .userInfo?[NSUserActivity.ActivityKeys.searchTerm.rawValue] as? String,
-      let searchCategoryRaw = userActivity
-      .userInfo?[NSUserActivity.ActivityKeys.searchCategory.rawValue] as? Int,
-      let searchCategory = PlayableContainerType(rawValue: searchCategoryRaw) {
+    if userActivity.activityType == NSUserActivity.searchAndPlayActivityType,
+       let searchTerm = userActivity
+       .userInfo?[NSUserActivity.ActivityKeys.searchTerm.rawValue] as? String,
+       let searchCategoryRaw = userActivity
+       .userInfo?[NSUserActivity.ActivityKeys.searchCategory.rawValue] as? Int,
+       let searchCategory = PlayableContainerTypeAppEnum(rawValue: searchCategoryRaw) {
       var shuffleOption = false
       var repeatOption = RepeatMode.off
 
       if let shuffleUserRaw = userActivity
         .userInfo?[NSUserActivity.ActivityKeys.shuffleOption.rawValue] as? Int,
-        let shuffleUser = ShuffleType(rawValue: shuffleUserRaw) {
+        let shuffleUser = ShuffleTypeAppEnum(rawValue: shuffleUserRaw) {
         shuffleOption = shuffleUser == .on
       }
       if let repeatUserRaw = userActivity
         .userInfo?[NSUserActivity.ActivityKeys.repeatOption.rawValue] as? Int,
-        let repeatUser = RepeatType(rawValue: repeatUserRaw) {
+        let repeatUser = RepeatTypeAppEnum(rawValue: repeatUserRaw) {
         repeatOption = RepeatMode.fromIntent(type: repeatUser)
       }
 
@@ -1167,23 +1163,23 @@ public class IntentManager {
         shuffleOption: shuffleOption,
         repeatOption: repeatOption
       )
-    } else if userActivity.activityType == NSUserActivity.playIdActivityType || userActivity
-      .activityType == NSStringFromClass(PlayIDIntent.self),
-      let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
-      let libraryElementTypeRaw = userActivity
-      .userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
-      let libraryElementType = PlayableContainerType(rawValue: libraryElementTypeRaw) {
+    } else if userActivity.activityType == NSUserActivity.playIdActivityType,
+              let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
+              let libraryElementTypeRaw = userActivity
+              .userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
+              let libraryElementType =
+              PlayableContainerTypeAppEnum(rawValue: libraryElementTypeRaw) {
       var shuffleOption = false
       var repeatOption = RepeatMode.off
 
       if let shuffleUserRaw = userActivity
         .userInfo?[NSUserActivity.ActivityKeys.shuffleOption.rawValue] as? Int,
-        let shuffleUser = ShuffleType(rawValue: shuffleUserRaw) {
+        let shuffleUser = ShuffleTypeAppEnum(rawValue: shuffleUserRaw) {
         shuffleOption = shuffleUser == .on
       }
       if let repeatUserRaw = userActivity
         .userInfo?[NSUserActivity.ActivityKeys.repeatOption.rawValue] as? Int,
-        let repeatUser = RepeatType(rawValue: repeatUserRaw) {
+        let repeatUser = RepeatTypeAppEnum(rawValue: repeatUserRaw) {
         repeatOption = RepeatMode.fromIntent(type: repeatUser)
       }
 
@@ -1197,12 +1193,21 @@ public class IntentManager {
         shuffleOption: shuffleOption,
         repeatOption: repeatOption
       )
-    } else if let playRandomSongsIntent = userActivity.playRandomSongsIntent {
-      let cacheOnly = playRandomSongsIntent.filterOption == .cache
+    } else if userActivity.activityType == NSUserActivity.playRandomSongsActivityType {
+      var cacheOnlyOption = PlayRandomSongsFilterTypeAppEnum.all
+
+      if let cacheOnlyRaw = userActivity
+        .userInfo?[NSUserActivity.ActivityKeys.onlyCached.rawValue] as? Int,
+        let cacheOnly = PlayRandomSongsFilterTypeAppEnum(rawValue: cacheOnlyRaw) {
+        cacheOnlyOption = cacheOnly
+      }
+
+      let isCacheOnly = cacheOnlyOption == .cache
+
       let songs = library.getRandomSongs(
         for: account,
         count: player.maxSongsToAddOnce,
-        onlyCached: cacheOnly
+        onlyCached: isCacheOnly
       )
       let playerContext = PlayContext(name: "Random Songs", playables: songs)
       return play(context: playerContext, shuffleOption: true, repeatOption: .off)
@@ -1214,15 +1219,14 @@ public class IntentManager {
 
   private func getPlayableContainer(
     searchTerm: String,
-    searchCategory: PlayableContainerType,
+    searchCategory: PlayableContainerTypeAppEnum?,
     account: Account
   )
     -> PlayableContainable? {
+    guard let searchCategory else { return nil }
     var playableContainer: PlayableContainable?
 
     switch searchCategory {
-    case .unknown:
-      fallthrough
     case .song:
       playableContainer = FuzzySearcher.findBestMatch(
         in: library.getSongs(for: account),
@@ -1293,14 +1297,12 @@ public class IntentManager {
   private func getPlayableContainer(
     account: Account,
     id: String,
-    libraryElementType: PlayableContainerType
+    libraryElementType: PlayableContainerTypeAppEnum
   )
     -> PlayableContainable? {
     var playableContainer: PlayableContainable?
 
     switch libraryElementType {
-    case .unknown:
-      fallthrough
     case .song:
       playableContainer = library.getSong(for: account, id: id)
     case .artist:
@@ -1447,11 +1449,9 @@ public class IntentManager {
   }
 }
 
-extension PlayableContainerType {
+extension PlayableContainerTypeAppEnum {
   public var description: String {
     switch self {
-    case .unknown:
-      return "unknown"
     case .artist:
       return "artist"
     case .song:
@@ -1472,11 +1472,11 @@ extension PlayableContainerType {
   }
 }
 
-extension PlayableContainerType {
-  static public func fromINMediaItemType(type: INMediaItemType) -> PlayableContainerType {
+extension PlayableContainerTypeAppEnum {
+  static public func fromINMediaItemType(type: INMediaItemType) -> PlayableContainerTypeAppEnum? {
     switch type {
     case .unknown:
-      return .unknown
+      return nil
     case .song:
       return .song
     case .album:
@@ -1496,15 +1496,15 @@ extension PlayableContainerType {
     case .musicStation:
       return .radio
     case .audioBook:
-      return .unknown
+      return nil
     case .movie:
-      return .unknown
+      return nil
     case .tvShow:
-      return .unknown
+      return nil
     case .tvShowEpisode:
-      return .unknown
+      return nil
     case .musicVideo:
-      return .unknown
+      return nil
     case .podcastStation:
       return .podcast
     case .radioStation:
@@ -1512,19 +1512,13 @@ extension PlayableContainerType {
     case .station:
       return .radio
     case .music:
-      return .unknown
+      return nil
     case .algorithmicRadioStation:
-      return .unknown
+      return nil
     case .news:
-      return .unknown
+      return nil
     @unknown default:
-      return .unknown
+      return nil
     }
-  }
-}
-
-extension NSUserActivity {
-  var playRandomSongsIntent: PlayRandomSongsIntent? {
-    interaction?.intent as? PlayRandomSongsIntent
   }
 }

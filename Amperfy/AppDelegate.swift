@@ -445,17 +445,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     os_log("application handlerFor intent", log: self.log, type: .info)
     // This is the default implementation.  If you want different objects to handle different intents,
     // you can override this and return the handler you want for that particular intent.
-    if intent is SearchAndPlayIntent {
-      return SearchAndPlayIntentHandler(intentManager: intentManager)
-    }
-    if intent is PlayIDIntent {
-      return PlayIDIntentHandler(intentManager: intentManager)
-    }
     if intent is INPlayMediaIntent {
       return PlayMediaIntentHandler(intentManager: intentManager)
-    }
-    if intent is PlayRandomSongsIntent {
-      return PlayRandomSongsIntentHandler(intentManager: intentManager)
     }
     return nil
   }

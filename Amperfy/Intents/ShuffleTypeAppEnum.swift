@@ -1,9 +1,9 @@
 //
-//  NSUserActivity+IntentData.swift
+//  ShuffleTypeAppEnum.swift
 //  Amperfy
 //
-//  Created by Maximilian Bauer on 06.06.22.
-//  Copyright (c) 2022 Maximilian Bauer. All rights reserved.
+//  Created by Maximilian Bauer on 24.12.25.
+//  Copyright (c) 2025 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,24 +19,17 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AppIntents
 import Foundation
 
-extension NSUserActivity {
-  public enum ActivityKeys: String {
-    case searchTerm
-    case searchCategory
-    case id
-    case libraryElementType
-    case shuffleOption
-    case repeatOption
-    case offlineMode
-    case onlyCached
-    case rating
-    case favorite
-  }
+@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
+enum ShuffleTypeAppEnum: Int, AppEnum {
+  case on
+  case off
 
-  public static let searchAndPlayActivityType = "de.familie-zimba.Amperfy.SearchAndPlay"
-  public static let playIdActivityType = "de.familie-zimba.Amperfy.PlayID"
-  public static let playRandomSongsActivityType =
-    "de.familie-zimba.Amperfy.PlayRandomSongsActivityType"
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Shuffle Type")
+  static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+    .on: "On",
+    .off: "Off",
+  ]
 }

@@ -1,0 +1,47 @@
+//
+//  PlayableContainerTypeAppEnum.swift
+//  Amperfy
+//
+//  Created by Maximilian Bauer on 24.12.25.
+//  Copyright (c) 2025 Maximilian Bauer. All rights reserved.
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+
+import AppIntents
+import Foundation
+
+@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
+enum PlayableContainerTypeAppEnum: Int, AppEnum {
+  case artist
+  case song
+  case podcastEpisode
+  case playlist
+  case album
+  case genre
+  case podcast
+  case radio
+
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Playable Container Type")
+  static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+    .artist: "Artist",
+    .song: "Song",
+    .podcastEpisode: "Podcast Episode",
+    .playlist: "Playlist",
+    .album: "Album",
+    .genre: "Genre",
+    .podcast: "Podcast",
+    .radio: "Radio",
+  ]
+}
