@@ -795,10 +795,7 @@ public class IntentManager {
     let playableContainerType = PlayableContainerType
       .fromINMediaItemType(type: mediaSearch.mediaType)
     if playableContainerType != .unknown ||
-      mediaSearch.mediaType == .music ||
-      mediaSearch.mediaType == .radioStation ||
-      mediaSearch.mediaType == .station ||
-      mediaSearch.mediaType == .algorithmicRadioStation {
+      mediaSearch.mediaType == .music {
       // media type is provided by user
       // "play music" => mediaType: 18
       // "play podcasts" => mediaType: 6
@@ -809,10 +806,8 @@ public class IntentManager {
       // "play <Rock>" => mediaType: 4; mediaName: -; artistNames: -; genreNames: Rock
       // "play playlist <blub>" => mediaType: 5; mediaName: blub; artistNames: -
       // "play podcast <blub>" => mediaType: 6; mediaName: blub; artistNames: -
-      if mediaSearch.mediaType == .music ||
-        mediaSearch.mediaType == .radioStation ||
-        mediaSearch.mediaType == .station ||
-        mediaSearch.mediaType == .algorithmicRadioStation {
+      // "play radio <blub>" => mediaType: 16; mediaName: blub; artistNames: -
+      if mediaSearch.mediaType == .music {
         os_log("Play Music", log: self.log, type: .info)
         let playableElements = library.getRandomSongs(
           for: account,
@@ -830,7 +825,7 @@ public class IntentManager {
       } else if mediaSearch.mediaType == .podcastShow ||
         mediaSearch.mediaType == .podcastEpisode ||
         mediaSearch.mediaType == .podcastStation ||
-        mediaSearch.mediaType == .podcastPlaylist {
+                  mediaSearch.mediaType == .podcastPlaylist {
         os_log("Play Podcasts", log: self.log, type: .info)
         let playableElements = library.getNewestPodcastEpisode(for: account, count: 1)
         if !playableElements.isEmpty {
@@ -842,6 +837,22 @@ public class IntentManager {
               type: INMediaItemType.podcastEpisode,
               artwork: nil,
               artist: playableElements[0].creatorName
+            )
+          )
+        }
+      } else if (mediaSearch.mediaName == nil) && (mediaSearch.mediaType == .musicStation || mediaSearch.mediaType == .radioStation ||
+              mediaSearch.mediaType == .station) {
+        os_log("Play random Radio", log: self.log, type: .info)
+        let randomRadio = library.getRadios(for: account).randomElement()
+        if let randomRadio {
+          result = AmperfyMediaIntentItemResult(
+            playableElements: [randomRadio],
+            item: INMediaItem(
+              identifier: nil,
+              title: "Random radio \(randomRadio.title)",
+              type: INMediaItemType.radioStation,
+              artwork: nil,
+              artist: nil
             )
           )
         }
@@ -1013,6 +1024,25 @@ public class IntentManager {
                 type: INMediaItemType.song,
                 artwork: nil,
                 artist: playableContainer.subtitle
+              )
+            )
+          }
+        }
+        if result == nil {
+          os_log("Search implicitly in radios: <%s>", log: self.log, type: .info, mediaName)
+          if let playableContainer = getPlayableContainer(
+            searchTerm: mediaName,
+            searchCategory: .radio,
+            account: account
+          ) {
+            result = AmperfyMediaIntentItemResult(
+              playableContainer: playableContainer,
+              item: INMediaItem(
+                identifier: nil,
+                title: playableContainer.name,
+                type: INMediaItemType.radioStation,
+                artwork: nil,
+                artist: nil
               )
             )
           }
@@ -1463,7 +1493,7 @@ extension PlayableContainerType {
     case .podcastPlaylist:
       return .podcast
     case .musicStation:
-      return .unknown
+      return .radio
     case .audioBook:
       return .unknown
     case .movie:
@@ -1477,9 +1507,9 @@ extension PlayableContainerType {
     case .podcastStation:
       return .podcast
     case .radioStation:
-      return .unknown
+      return .radio
     case .station:
-      return .unknown
+      return .radio
     case .music:
       return .unknown
     case .algorithmicRadioStation:
