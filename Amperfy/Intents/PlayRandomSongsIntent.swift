@@ -1,5 +1,5 @@
 //
-//  PlayRandomSongs.swift
+//  PlayRandomSongsIntent.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 24.12.25.
@@ -23,24 +23,15 @@ import AppIntents
 import Foundation
 import UIKit
 
-extension AppIntent {
-  @MainActor
-  var appDelegate: AppDelegate {
-    (UIApplication.shared.delegate as! AppDelegate)
-  }
-}
+// MARK: - PlayRandomSongsIntent
 
-// MARK: - PlayRandomSongs
-
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
-struct PlayRandomSongs: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent {
+struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent {
   static let intentClassName = "PlayRandomSongsIntent"
-
   static let title: LocalizedStringResource = "Play Random Songs"
-  static let description = IntentDescription("Plays random songs from the user library")
+  static let description = IntentDescription("Plays random songs from the user library.")
 
   @Parameter(title: "Filter", default: .all)
-  var filterOption: PlayRandomSongsFilterTypeAppEnum?
+  var filterOption: PlayRandomSongsFilterTypeAppEnum
 
   static var parameterSummary: some ParameterSummary {
     Summary("Plays random songs") {
@@ -70,7 +61,7 @@ struct PlayRandomSongs: AppIntent, CustomIntentMigratedAppIntent, PredictableInt
     userActivity
       .addUserInfoEntries(from: [
         NSUserActivity.ActivityKeys.onlyCached.rawValue:
-          filterOption?.rawValue ?? PlayRandomSongsFilterTypeAppEnum.all.rawValue,
+          filterOption.rawValue,
       ])
 
     let _ = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
@@ -78,7 +69,6 @@ struct PlayRandomSongs: AppIntent, CustomIntentMigratedAppIntent, PredictableInt
   }
 }
 
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 extension IntentDialog {
   fileprivate static func filterOptionParameterDisambiguationIntro(
     count: Int,

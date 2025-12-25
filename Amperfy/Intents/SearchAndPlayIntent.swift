@@ -1,5 +1,5 @@
 //
-//  PlayID.swift
+//  SearchAndPlayIntent.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 24.12.25.
@@ -22,31 +22,29 @@
 import AppIntents
 import Foundation
 
-// MARK: - PlayID
+// MARK: - SearchAndPlayIntent
 
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
-struct PlayID: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent {
-  static let intentClassName = "PlayIDIntent"
-
-  static let title: LocalizedStringResource = "Play ID"
+struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent {
+  static let intentClassName = "SearchAndPlayIntent"
+  static let title: LocalizedStringResource = "Search And Play"
   static let description =
-    IntentDescription("Plays the library element with the given ID and player options")
+    IntentDescription("Searches and plays the first result with the given player options.")
 
-  @Parameter(title: "ID")
-  var id: String?
+  @Parameter(title: "Search Term", default: "")
+  var searchTerm: String
 
-  @Parameter(title: "Library Element Type", default: .song)
-  var libraryElementType: PlayableContainerTypeAppEnum?
+  @Parameter(title: "Search Category", default: .song)
+  var searchCategory: PlayableContainerTypeAppEnum
 
   @Parameter(title: "Shuffle", default: .off)
-  var shuffleOption: ShuffleTypeAppEnum?
+  var shuffleOption: ShuffleTypeAppEnum
 
   @Parameter(title: "Repeat", default: .off)
-  var repeatOption: RepeatTypeAppEnum?
+  var repeatOption: RepeatTypeAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Play ID \(\.$id)") {
-      \.$libraryElementType
+    Summary("Search And Play \(\.$searchTerm)") {
+      \.$searchCategory
       \.$shuffleOption
       \.$repeatOption
     }
@@ -54,13 +52,13 @@ struct PlayID: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent {
 
   static var predictionConfiguration: some IntentPredictionConfiguration {
     IntentPrediction(parameters: (
-      \.$id,
-      \.$libraryElementType,
+      \.$searchTerm,
+      \.$searchCategory,
       \.$shuffleOption,
       \.$repeatOption
-    )) { id, libraryElementType, shuffleOption, repeatOption in
+    )) { searchTerm, searchCategory, shuffleOption, repeatOption in
       DisplayRepresentation(
-        title: "Play ID \(id!)",
+        title: "Search and play \(searchTerm)",
         subtitle: ""
       )
     }
@@ -68,49 +66,54 @@ struct PlayID: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent {
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    let userActivity = NSUserActivity(activityType: NSUserActivity.playIdActivityType)
-    userActivity
-      .addUserInfoEntries(from: [NSUserActivity.ActivityKeys.id.rawValue: id ?? ""])
+    let userActivity = NSUserActivity(activityType: NSUserActivity.searchAndPlayActivityType)
     userActivity
       .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.libraryElementType.rawValue: libraryElementType?
-          .rawValue ?? PlayableContainerTypeAppEnum.song.rawValue,
+        NSUserActivity.ActivityKeys.searchTerm.rawValue: searchTerm,
       ])
     userActivity
       .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.shuffleOption.rawValue: shuffleOption?
-          .rawValue ?? ShuffleTypeAppEnum.off.rawValue,
+        NSUserActivity.ActivityKeys.searchCategory.rawValue: searchCategory
+          .rawValue,
+      ])
+    userActivity
+      .addUserInfoEntries(from: [
+        NSUserActivity.ActivityKeys.shuffleOption.rawValue: shuffleOption
+          .rawValue,
       ])
     userActivity
       .addUserInfoEntries(from: [
         NSUserActivity.ActivityKeys.repeatOption.rawValue:
-          repeatOption?.rawValue ?? RepeatTypeAppEnum.off.rawValue,
+          repeatOption.rawValue,
       ])
 
-    let _ = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
-    return .result()
+    let success = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
+    if success {
+      return .result()
+    } else {
+      throw AmperfyAppIntentError.notFound
+    }
   }
 }
 
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 extension IntentDialog {
-  fileprivate static var idParameterPrompt: Self {
-    "Which ID do you want to play?"
+  fileprivate static var searchTermParameterPrompt: Self {
+    "What do you want to search and play?"
   }
 
-  fileprivate static func libraryElementTypeParameterDisambiguationIntro(
+  fileprivate static func searchCategoryParameterDisambiguationIntro(
     count: Int,
-    libraryElementType: PlayableContainerTypeAppEnum
+    searchCategory: PlayableContainerTypeAppEnum
   )
     -> Self {
-    "There are \(count) options matching ‘\(libraryElementType)’."
+    "There are \(count) options matching ‘\(searchCategory)’."
   }
 
-  fileprivate static func libraryElementTypeParameterConfirmation(
-    libraryElementType: PlayableContainerTypeAppEnum
+  fileprivate static func searchCategoryParameterConfirmation(
+    searchCategory: PlayableContainerTypeAppEnum
   )
     -> Self {
-    "Just to confirm, you wanted ‘\(libraryElementType)’?"
+    "Just to confirm, you wanted ‘\(searchCategory)’?"
   }
 
   fileprivate static func shuffleOptionParameterDisambiguationIntro(
@@ -119,6 +122,10 @@ extension IntentDialog {
   )
     -> Self {
     "There are \(count) options matching ‘\(shuffleOption)’."
+  }
+
+  fileprivate static var shuffleOptionParameterDisambiguationSelection: Self {
+    "Shuffled?"
   }
 
   fileprivate static func shuffleOptionParameterConfirmation(shuffleOption: ShuffleTypeAppEnum)
@@ -132,6 +139,10 @@ extension IntentDialog {
   )
     -> Self {
     "There are \(count) options matching ‘\(repeatOption)’."
+  }
+
+  fileprivate static var repeatOptionParameterDisambiguationSelection: Self {
+    "Repeat?"
   }
 
   fileprivate static func repeatOptionParameterConfirmation(repeatOption: RepeatTypeAppEnum)

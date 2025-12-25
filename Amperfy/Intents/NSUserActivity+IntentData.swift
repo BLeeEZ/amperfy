@@ -19,7 +19,9 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AppIntents
 import Foundation
+import UIKit
 
 extension NSUserActivity {
   public enum ActivityKeys: String {
@@ -39,4 +41,18 @@ extension NSUserActivity {
   public static let playIdActivityType = "de.familie-zimba.Amperfy.PlayID"
   public static let playRandomSongsActivityType =
     "de.familie-zimba.Amperfy.PlayRandomSongsActivityType"
+}
+
+extension AppIntent {
+  @MainActor
+  var appDelegate: AppDelegate {
+    (UIApplication.shared.delegate as! AppDelegate)
+  }
+}
+
+extension EntityQuery {
+  @MainActor
+  var appDelegate: AppDelegate {
+    (UIApplication.shared.delegate as! AppDelegate)
+  }
 }

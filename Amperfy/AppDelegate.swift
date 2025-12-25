@@ -340,6 +340,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
+  func switchAccount(accountInfo: AccountInfo) {
+    storage.settings.accounts.switchActiveAccount(accountInfo)
+    notificationHandler.post(
+      name: .accountActiveChanged,
+      object: nil,
+      userInfo: nil
+    )
+    let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
+
+    closeAllButActiveMainTabs()
+    setAppTheme(
+      color: appDelegate.storage.settings.accounts.getSetting(accountInfo)
+        .read.themePreference.asColor
+    )
+    applyAppThemeToAlreadyLoadedViews()
+    guard let mainScene = AppDelegate.mainSceneDelegate else { return }
+    mainScene
+      .replaceMainRootViewController(
+        vc: AppStoryboard.Main
+          .segueToMainWindow(account: account)
+      )
+  }
+
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
     if #available(iOS 13.0, *) {
       UIApplication.shared.connectedScenes

@@ -88,6 +88,26 @@ public struct XCallbackActionDocu: Hashable {
   public var parameters: [XCallbackActionParameterDocu]
 }
 
+// MARK: - AmperfyAppIntentError
+
+enum AmperfyAppIntentError: Error, LocalizedError {
+  case notFound
+  case accountNotValid
+
+  var errorDescription: String? {
+    switch self {
+    case .notFound:
+      return "I couldn’t find an element with the provided information."
+    case .accountNotValid:
+      return "The provided account is not valid."
+    }
+  }
+
+  var failureReason: String? {
+    errorDescription
+  }
+}
+
 // MARK: - IntentManager
 
 @MainActor

@@ -43,27 +43,7 @@ extension UIViewController {
         attributes: isActiveAccount ? [UIMenuElement.Attributes.disabled] : [],
         state: isActiveAccount ? .on : .off,
         handler: { _ in
-          self.appDelegate.storage.settings.accounts.switchActiveAccount(accountInfo)
-          self.appDelegate.notificationHandler.post(
-            name: .accountActiveChanged,
-            object: nil,
-            userInfo: nil
-          )
-          let account = self.appDelegate.storage.main.library.getAccount(info: accountInfo)
-
-          self.appDelegate.closeAllButActiveMainTabs()
-          self.appDelegate
-            .setAppTheme(
-              color: self.appDelegate.storage.settings.accounts.getSetting(accountInfo)
-                .read.themePreference.asColor
-            )
-          self.appDelegate.applyAppThemeToAlreadyLoadedViews()
-          guard let mainScene = AppDelegate.mainSceneDelegate else { return }
-          mainScene
-            .replaceMainRootViewController(
-              vc: AppStoryboard.Main
-                .segueToMainWindow(account: account)
-            )
+          self.appDelegate.switchAccount(accountInfo: accountInfo)
         }
       )
       accountActions.append(action)
