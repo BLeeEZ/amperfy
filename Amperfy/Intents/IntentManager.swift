@@ -162,7 +162,7 @@ public class IntentManager {
     documentation.append(
       XCallbackActionDocu(
         name: "SearchAndPlay",
-        description: "Plays the first search result for searchTerm in searchCategory with the given player options",
+        description: "Plays the first search result for searchTerm in searchCategory from the currently active account with the given player options",
         exampleURLs: [
           "amperfy://x-callback-url/searchAndPlay?searchTerm=Awesome&searchCategory=playlist",
           "amperfy://x-callback-url/searchAndPlay?searchTerm=Example&searchCategory=artist&shuffleOption=1&repeatOption=2",
@@ -273,7 +273,7 @@ public class IntentManager {
     documentation.append(
       XCallbackActionDocu(
         name: "PlayID",
-        description: "Plays the library element with the given ID and player options",
+        description: "Plays the library element with the given ID from the currently active account with the provided player options",
         exampleURLs: [
           "amperfy://x-callback-url/playID?id=123456&libraryElementType=playlist",
           "amperfy://x-callback-url/playID?id=aa2349&libraryElementType=artist&shuffleOption=1&repeatOption=2",
@@ -381,7 +381,7 @@ public class IntentManager {
     documentation.append(
       XCallbackActionDocu(
         name: "PlayRandomSongs",
-        description: "Plays \(player.maxSongsToAddOnce) random songs from library",
+        description: "Plays \(player.maxSongsToAddOnce) random songs from the currently active account",
         exampleURLs: [
           "amperfy://x-callback-url/playRandomSongs",
           "amperfy://x-callback-url/playRandomSongs?onlyCached=1",
@@ -1143,101 +1143,16 @@ public class IntentManager {
     lastResult = result
     return result
   }
-
-  @MainActor
-  public func handleIncomingIntent(userActivity: NSUserActivity) async -> Bool {
-    guard let account = getActiveAccountCallback(),
-          userActivity.activityType == NSUserActivity.searchAndPlayActivityType ||
-          userActivity.activityType == NSUserActivity.playIdActivityType ||
-          userActivity.activityType == NSUserActivity.playRandomSongsActivityType
-    else {
-      return false
+  
+  func getAccount(fromIntent accountIntent: AccountAppEntity?) -> Account? {
+    if let accountIntentId = accountIntent?.id,
+       let account = library.getAccount(ident: accountIntentId) {
+      return account
     }
-    if userActivity.activityType == NSUserActivity.searchAndPlayActivityType,
-       let searchTerm = userActivity
-       .userInfo?[NSUserActivity.ActivityKeys.searchTerm.rawValue] as? String,
-       let searchCategoryRaw = userActivity
-       .userInfo?[NSUserActivity.ActivityKeys.searchCategory.rawValue] as? Int,
-       let searchCategory = PlayableContainerTypeAppEnum(rawValue: searchCategoryRaw) {
-      var shuffleOption = false
-      var repeatOption = RepeatMode.off
-
-      if let shuffleUserRaw = userActivity
-        .userInfo?[NSUserActivity.ActivityKeys.shuffleOption.rawValue] as? Int,
-        let shuffleUser = ShuffleTypeAppEnum(rawValue: shuffleUserRaw) {
-        shuffleOption = shuffleUser == .on
-      }
-      if let repeatUserRaw = userActivity
-        .userInfo?[NSUserActivity.ActivityKeys.repeatOption.rawValue] as? Int,
-        let repeatUser = RepeatTypeAppEnum(rawValue: repeatUserRaw) {
-        repeatOption = RepeatMode.fromIntent(type: repeatUser)
-      }
-
-      let playableContainer = getPlayableContainer(
-        searchTerm: searchTerm,
-        searchCategory: searchCategory,
-        account: account
-      )
-      return await play(
-        container: playableContainer,
-        shuffleOption: shuffleOption,
-        repeatOption: repeatOption
-      )
-    } else if userActivity.activityType == NSUserActivity.playIdActivityType,
-              let id = userActivity.userInfo?[NSUserActivity.ActivityKeys.id.rawValue] as? String,
-              let libraryElementTypeRaw = userActivity
-              .userInfo?[NSUserActivity.ActivityKeys.libraryElementType.rawValue] as? Int,
-              let libraryElementType =
-              PlayableContainerTypeAppEnum(rawValue: libraryElementTypeRaw) {
-      var shuffleOption = false
-      var repeatOption = RepeatMode.off
-
-      if let shuffleUserRaw = userActivity
-        .userInfo?[NSUserActivity.ActivityKeys.shuffleOption.rawValue] as? Int,
-        let shuffleUser = ShuffleTypeAppEnum(rawValue: shuffleUserRaw) {
-        shuffleOption = shuffleUser == .on
-      }
-      if let repeatUserRaw = userActivity
-        .userInfo?[NSUserActivity.ActivityKeys.repeatOption.rawValue] as? Int,
-        let repeatUser = RepeatTypeAppEnum(rawValue: repeatUserRaw) {
-        repeatOption = RepeatMode.fromIntent(type: repeatUser)
-      }
-
-      let playableContainer = getPlayableContainer(
-        account: account,
-        id: id,
-        libraryElementType: libraryElementType
-      )
-      return await play(
-        container: playableContainer,
-        shuffleOption: shuffleOption,
-        repeatOption: repeatOption
-      )
-    } else if userActivity.activityType == NSUserActivity.playRandomSongsActivityType {
-      var cacheOnlyOption = PlayRandomSongsFilterTypeAppEnum.all
-
-      if let cacheOnlyRaw = userActivity
-        .userInfo?[NSUserActivity.ActivityKeys.onlyCached.rawValue] as? Int,
-        let cacheOnly = PlayRandomSongsFilterTypeAppEnum(rawValue: cacheOnlyRaw) {
-        cacheOnlyOption = cacheOnly
-      }
-
-      let isCacheOnly = cacheOnlyOption == .cache
-
-      let songs = library.getRandomSongs(
-        for: account,
-        count: player.maxSongsToAddOnce,
-        onlyCached: isCacheOnly
-      )
-      let playerContext = PlayContext(name: "Random Songs", playables: songs)
-      return play(context: playerContext, shuffleOption: true, repeatOption: .off)
-
-    } else {
-      return false
-    }
+    return getActiveAccountCallback()
   }
 
-  private func getPlayableContainer(
+  func getPlayableContainer(
     searchTerm: String,
     searchCategory: PlayableContainerTypeAppEnum?,
     account: Account
@@ -1314,7 +1229,7 @@ public class IntentManager {
     return foundSong
   }
 
-  private func getPlayableContainer(
+  func getPlayableContainer(
     account: Account,
     id: String,
     libraryElementType: PlayableContainerTypeAppEnum
@@ -1402,7 +1317,7 @@ public class IntentManager {
   }
 
   @MainActor
-  private func play(
+  func play(
     container: PlayableContainable?,
     shuffleOption: Bool,
     repeatOption: RepeatMode
@@ -1458,7 +1373,7 @@ public class IntentManager {
     )
   }
 
-  private func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) -> Bool {
+  func play(context: PlayContext, shuffleOption: Bool, repeatOption: RepeatMode) -> Bool {
     if shuffleOption {
       player.playShuffled(context: context)
     } else {

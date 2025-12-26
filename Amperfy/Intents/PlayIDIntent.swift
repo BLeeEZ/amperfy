@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import AppIntents
 import Foundation
 
@@ -32,6 +33,9 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
 
   @Parameter(title: "ID")
   var id: String
+  
+  @Parameter(title: "Account", description: "Account used to search for ID. If not provided the active account will be used.")
+  var account: AccountAppEntity?
 
   @Parameter(title: "Library Element Type", default: .song)
   var libraryElementType: PlayableContainerTypeAppEnum
@@ -43,8 +47,8 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
   var repeatOption: RepeatTypeAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Play ID \(\.$id)") {
-      \.$libraryElementType
+    Summary("Play ID \(\.$id) of type \(\.$libraryElementType)") {
+      \.$account
       \.$shuffleOption
       \.$repeatOption
     }
@@ -54,11 +58,12 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
     IntentPrediction(parameters: (
       \.$id,
       \.$libraryElementType,
+      \.$account,
       \.$shuffleOption,
       \.$repeatOption
-    )) { id, libraryElementType, shuffleOption, repeatOption in
+    )) { id, libraryElementType, account, shuffleOption, repeatOption in
       DisplayRepresentation(
-        title: "Play ID \(id)",
+        title: "Play ID \(id) of type \(libraryElementType)",
         subtitle: ""
       )
     }
@@ -66,31 +71,22 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    let userActivity = NSUserActivity(activityType: NSUserActivity.playIdActivityType)
-    userActivity
-      .addUserInfoEntries(from: [NSUserActivity.ActivityKeys.id.rawValue: id])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.libraryElementType.rawValue: libraryElementType
-          .rawValue,
-      ])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.shuffleOption.rawValue: shuffleOption
-          .rawValue,
-      ])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.repeatOption.rawValue:
-          repeatOption.rawValue,
-      ])
-
-    let success = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
-    if success {
-      return .result()
-    } else {
-      throw AmperfyAppIntentError.notFound
-    }
+    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account) else { throw AmperfyAppIntentError.accountNotValid }
+    let isShuffle = shuffleOption == .on
+    let repeatUser = RepeatMode.fromIntent(type: repeatOption)
+    
+    let playableContainer = appDelegate.intentManager.getPlayableContainer(
+      account: accountCoreData,
+      id: id,
+      libraryElementType: libraryElementType
+    )
+    let success = await appDelegate.intentManager.play(
+      container: playableContainer,
+      shuffleOption: isShuffle,
+      repeatOption: repeatUser
+    )
+    guard success else { throw AmperfyAppIntentError.notFound }
+    return .result()
   }
 }
 

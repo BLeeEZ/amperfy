@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import AppIntents
 import Foundation
 
@@ -35,6 +36,9 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
 
   @Parameter(title: "Search Category", default: .song)
   var searchCategory: PlayableContainerTypeAppEnum
+  
+  @Parameter(title: "Account", description: "Account used for search. If not provided the active account will be used.")
+  var account: AccountAppEntity?
 
   @Parameter(title: "Shuffle", default: .off)
   var shuffleOption: ShuffleTypeAppEnum
@@ -43,8 +47,9 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
   var repeatOption: RepeatTypeAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Search And Play \(\.$searchTerm)") {
+    Summary("Search and play \(\.$searchTerm) of type \(\.$searchCategory)") {
       \.$searchCategory
+      \.$account
       \.$shuffleOption
       \.$repeatOption
     }
@@ -54,11 +59,12 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
     IntentPrediction(parameters: (
       \.$searchTerm,
       \.$searchCategory,
+      \.$account,
       \.$shuffleOption,
       \.$repeatOption
-    )) { searchTerm, searchCategory, shuffleOption, repeatOption in
+    )) { searchTerm, searchCategory, account, shuffleOption, repeatOption in
       DisplayRepresentation(
-        title: "Search and play \(searchTerm)",
+        title: "Search and play \(searchTerm) of type \(searchCategory)",
         subtitle: ""
       )
     }
@@ -66,33 +72,22 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    let userActivity = NSUserActivity(activityType: NSUserActivity.searchAndPlayActivityType)
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.searchTerm.rawValue: searchTerm,
-      ])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.searchCategory.rawValue: searchCategory
-          .rawValue,
-      ])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.shuffleOption.rawValue: shuffleOption
-          .rawValue,
-      ])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.repeatOption.rawValue:
-          repeatOption.rawValue,
-      ])
+    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account) else { throw AmperfyAppIntentError.accountNotValid }
+    let isShuffle = shuffleOption == .on
+    let repeatUser = RepeatMode.fromIntent(type: repeatOption)
 
-    let success = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
-    if success {
-      return .result()
-    } else {
-      throw AmperfyAppIntentError.notFound
-    }
+    let playableContainer = appDelegate.intentManager.getPlayableContainer(
+      searchTerm: searchTerm,
+      searchCategory: searchCategory,
+      account: accountCoreData
+    )
+    let success = await appDelegate.intentManager.play(
+      container: playableContainer,
+      shuffleOption: isShuffle,
+      repeatOption: repeatUser
+    )
+    guard success else { throw AmperfyAppIntentError.notFound }
+    return .result()
   }
 }
 

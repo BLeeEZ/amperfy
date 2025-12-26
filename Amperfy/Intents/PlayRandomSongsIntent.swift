@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import AppIntents
 import Foundation
 import UIKit
@@ -32,15 +33,19 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
 
   @Parameter(title: "Filter", default: .all)
   var filterOption: PlayRandomSongsFilterTypeAppEnum
+  
+  @Parameter(title: "Account", description: "Account used to select songs from. If not provided the active account will be used.")
+  var account: AccountAppEntity?
 
   static var parameterSummary: some ParameterSummary {
     Summary("Plays random songs") {
+      \.$account
       \.$filterOption
     }
   }
 
   static var predictionConfiguration: some IntentPredictionConfiguration {
-    IntentPrediction(parameters: \.$filterOption) { filterOption in
+    IntentPrediction(parameters: (\.$filterOption, \.$account)) { filterOption, account in
       DisplayRepresentation(
         title: "Plays random songs",
         subtitle: ""
@@ -50,21 +55,17 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    let userActivity = NSUserActivity(activityType: NSUserActivity.playRandomSongsActivityType)
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.libraryElementType
-          .rawValue: PlayableContainerTypeAppEnum.song.rawValue,
-      ])
-    userActivity
-      .addUserInfoEntries(from: [NSUserActivity.ActivityKeys.shuffleOption.rawValue: true])
-    userActivity
-      .addUserInfoEntries(from: [
-        NSUserActivity.ActivityKeys.onlyCached.rawValue:
-          filterOption.rawValue,
-      ])
+    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account) else { throw AmperfyAppIntentError.accountNotValid }
+    let isCacheOnly = filterOption == .cache
 
-    let _ = await appDelegate.intentManager.handleIncomingIntent(userActivity: userActivity)
+    let songs = appDelegate.storage.main.library.getRandomSongs(
+      for: accountCoreData,
+      count: appDelegate.player.maxSongsToAddOnce,
+      onlyCached: isCacheOnly
+    )
+    let playerContext = PlayContext(name: "Random Songs", playables: songs)
+    let success = appDelegate.intentManager.play(context: playerContext, shuffleOption: true, repeatOption: .off)
+    guard success else { throw AmperfyAppIntentError.notFound }
     return .result()
   }
 }

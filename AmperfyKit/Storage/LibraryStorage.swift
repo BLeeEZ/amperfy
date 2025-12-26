@@ -532,6 +532,20 @@ public class LibraryStorage: PlayableFileCachable {
         .object(with: managedObjectId) as! AccountMO
     )
   }
+  
+  public func getAccount(ident: String) -> Account? {
+    guard let accountInfo = AccountInfo.create(basedOnIdent: ident) else { return nil }
+    let fetchRequest = AccountMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: "%K == %@", #keyPath(AccountMO.serverHash), accountInfo.serverHash),
+      NSPredicate(format: "%K == %@", #keyPath(AccountMO.userHash), accountInfo.userHash),
+    ])
+    fetchRequest.fetchLimit = 1
+    guard let accounts = try? context.fetch(fetchRequest),
+          let accountMO = accounts.lazy.first
+    else { return nil }
+    return Account(managedObject: accountMO)
+  }
 
   public func getAccount(info: AccountInfo) -> Account {
     let fetchRequest = AccountMO.fetchRequest()
