@@ -73,12 +73,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   ) {
     Task { @MainActor in
       os_log("CarPlay: didConnect", log: self.log, type: .info)
-      activeAccountInfo = appDelegate.storage.settings.accounts.active
-      activeAccount = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
-      guard activeAccountInfo != nil, activeAccount != nil else {
-        os_log("CarPlay: no account available", log: self.log, type: .info)
-        return
-      }
       appDelegate.notificationHandler.register(
         self,
         selector: #selector(refreshSort),
@@ -111,15 +105,27 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
           object: meta.playableDownloadManager
         )
       }
-
+      
       appDelegate.player.addNotifier(notifier: self)
       CPNowPlayingTemplate.shared.add(self)
-
       self.interfaceController = interfaceController
       self.interfaceController?.delegate = self
       self.configureNowPlayingTemplate()
-
-      self.interfaceController?.setRootTemplate(rootBarTemplate, animated: true, completion: nil)
+      
+      accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
+        guard let self else { return }
+        resetFetchController()
+        activeAccountInfo = accountInfo
+        guard let accountInfo else {
+          os_log("CarPlay: no account available -> display Disconnected", log: self.log, type: .info)
+          activeAccount = nil
+          self.interfaceController?.setRootTemplate(disconnectedTemplate, animated: true, completion: nil)
+          return
+        }
+        activeAccount = appDelegate.storage.main.library.getAccount(info: accountInfo)
+        refreshOfflineMode()
+        self.interfaceController?.setRootTemplate(rootBarTemplate, animated: true, completion: nil)
+      }
     }
   }
 
@@ -154,26 +160,18 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
       CPNowPlayingTemplate.shared.remove(self)
 
-      playlistFetchController = nil
-      podcastFetchController = nil
-      artistsFavoritesFetchController = nil
-      artistsFavoritesCachedFetchController = nil
-      albumsFavoritesFetchController = nil
-      albumsFavoritesCachedFetchController = nil
-      albumsNewestFetchController = nil
-      albumsNewestCachedFetchController = nil
-      albumsRecentFetchController = nil
-      albumsRecentCachedFetchController = nil
-      songsFavoritesFetchController = nil
-      songsFavoritesCachedFetchController = nil
-      playlistDetailFetchController = nil
-      podcastDetailFetchController = nil
+      resetFetchController()
     }
   }
 
   lazy var playerQueueSection = {
     let queueTemplate = CPListTemplate(title: Self.queueButtonText, sections: [CPListSection]())
     return queueTemplate
+  }()
+  
+  lazy var disconnectedTemplate = {
+    let disconnectedList = CPListTemplate(title: "Disconnected", sections: [])
+    return disconnectedList
   }()
 
   lazy var rootBarTemplate = {
@@ -562,6 +560,41 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     "Queue",
     comment: "Button title on CarPlay player to display queue"
   )
+  
+  private func resetFetchController() {
+    playlistFetchController?.delegate = nil
+    playlistFetchController = nil
+    podcastFetchController?.delegate = nil
+    podcastFetchController = nil
+    radiosFetchController?.delegate = nil
+    radiosFetchController = nil
+    //
+    artistsFavoritesFetchController?.delegate = nil
+    artistsFavoritesFetchController = nil
+    artistsFavoritesCachedFetchController?.delegate = nil
+    artistsFavoritesCachedFetchController = nil
+    albumsFavoritesFetchController?.delegate = nil
+    albumsFavoritesFetchController = nil
+    albumsFavoritesCachedFetchController?.delegate = nil
+    albumsFavoritesCachedFetchController = nil
+    albumsNewestFetchController?.delegate = nil
+    albumsNewestFetchController = nil
+    albumsNewestCachedFetchController?.delegate = nil
+    albumsNewestCachedFetchController = nil
+    albumsRecentFetchController?.delegate = nil
+    albumsRecentFetchController = nil
+    albumsRecentCachedFetchController?.delegate = nil
+    albumsRecentCachedFetchController = nil
+    songsFavoritesFetchController?.delegate = nil
+    songsFavoritesFetchController = nil
+    songsFavoritesCachedFetchController?.delegate = nil
+    songsFavoritesCachedFetchController = nil
+    //
+    playlistDetailFetchController?.delegate = nil
+    playlistDetailFetchController = nil
+    podcastDetailFetchController?.delegate = nil
+    podcastDetailFetchController = nil
+  }
 
   private func createArtistItems(
     from fetchedController: BasicFetchedResultsController<ArtistMO>?,
