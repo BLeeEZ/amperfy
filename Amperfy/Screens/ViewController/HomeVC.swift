@@ -52,7 +52,7 @@ extension UIViewController {
     #if targetEnvironment(macCatalyst)
       let addAccountImage = UIImage.plus
     #else
-      let addAccountImage = UIImage.userPersonPlus
+      let addAccountImage = UIImage.userCirclePlus
     #endif
     let openAddAccount = UIAction(
       title: "Add Account",

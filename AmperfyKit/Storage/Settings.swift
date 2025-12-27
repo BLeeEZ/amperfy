@@ -421,7 +421,17 @@ public struct AccountSettings: Sendable, Codable {
   }
 
   public var allAccounts: [AccountInfo] {
-    _accounts.compactMap { $0.key }
+    _accounts.compactMap { $0.key }.sorted(by: {
+      guard let cred0 = getSetting($0).read.loginCredentials,
+            let cred1 = getSetting($1).read.loginCredentials
+      else { return false }
+      
+      if cred0.displayServerUrl != cred1.displayServerUrl {
+        return cred0.displayServerUrl < cred1.displayServerUrl
+      } else {
+        return cred0.username < cred1.username
+      }
+    })
   }
 
   private var themeColorForNextNewAccount: ThemePreference {

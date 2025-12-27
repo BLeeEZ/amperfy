@@ -57,7 +57,7 @@ struct AccountEntityQuery: EntityQuery {
     return filteredCredentials.map {
       AccountAppEntity(
         id: Account.createInfo(credentials: $0).ident,
-        serverUrl: $0.serverUrl,
+        serverUrl: $0.displayServerUrl,
         userName: $0.username
       )
     }
@@ -71,7 +71,7 @@ struct AccountEntityQuery: EntityQuery {
     return credentials.map {
       AccountAppEntity(
         id: Account.createInfo(credentials: $0).ident,
-        serverUrl: $0.serverUrl,
+        serverUrl: $0.displayServerUrl,
         userName: $0.username
       )
     }

@@ -206,6 +206,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   func createLibrarySections() -> [CPListSection] {
     let continuePlayingItems = createContinePlayingItems()
     var librarySections = [
+      appDelegate.storage.settings.accounts.allAccounts.count > 1 ?
+        CPListSection(items: [
+          createLibraryItem(text: "Switch Account", icon: UIImage.userPerson, sectionToDisplay: accountSection),
+        ], header: "Account", sectionIndexTitle: nil)
+        : nil,
       appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
         .libraryDisplaySettings
         .isVisible(libraryType: .radios) ?
@@ -302,6 +307,46 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     ]
     return librarySections
   }
+
+  func createAccountsSections() -> [CPListSection] {
+    let accountInfos = appDelegate.storage.settings.accounts.allAccounts
+    var items: [CPListItem] = []
+    for accountInfo in accountInfos {
+      let name = appDelegate.storage.settings.accounts.getSetting(accountInfo).read.loginCredentials?.username ?? ""
+      let displayServerUrl = appDelegate.storage.settings.accounts.getSetting(accountInfo).read.loginCredentials?.displayServerUrl ?? ""
+      let isActive = (accountInfo == activeAccountInfo)
+      let item = CPListItem(
+        text: name,
+        detailText: displayServerUrl,
+        image: UIImage.createArtwork(
+          with: isActive ? UIImage.userCircleCheckmark : UIImage.userCircle(),
+          iconSizeType: .big,
+          theme: getPreference(accountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        accessoryImage: nil,
+        accessoryType: isActive ? .none : .disclosureIndicator
+      )
+      item.handler = { [weak self] _, completion in
+        guard let self = self,
+              appDelegate.storage.settings.accounts.active != accountInfo
+        else { completion(); return }
+        self.appDelegate.switchAccount(accountInfo: accountInfo)
+        self.accountSection.updateSections(createAccountsSections())
+        completion()
+      }
+      items.append(item)
+    }
+    return [CPListSection(items: items)]
+  }
+  
+  lazy var accountSection = {
+    let template = CPListTemplate(title: "Switch Account", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
 
   lazy var artistsFavoriteSection = {
     let template = CPListTemplate(title: "Favorite Artists", sections: [
@@ -1537,6 +1582,9 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         os_log("CarPlay: templateWillAppear podcastTab", log: self.log, type: .info)
         if podcastFetchController == nil { createPodcastFetchController() }
         podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+      } else if aTemplate == accountSection {
+        os_log("CarPlay: templateWillAppear accountSection", log: self.log, type: .info)
+        accountSection.updateSections(createAccountsSections())
       } else if aTemplate == radioSection {
         os_log("CarPlay: templateWillAppear radioSection", log: self.log, type: .info)
         if radiosFetchController == nil { createRadiosFetchController() }
