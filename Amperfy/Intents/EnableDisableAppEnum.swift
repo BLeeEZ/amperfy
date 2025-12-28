@@ -1,8 +1,8 @@
 //
-//  RepeatTypeAppEnum.swift
+//  EnableDisableAppEnum.swift
 //  Amperfy
 //
-//  Created by Maximilian Bauer on 24.12.25.
+//  Created by Maximilian Bauer on 27.12.25.
 //  Copyright (c) 2025 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -22,16 +22,13 @@
 import AppIntents
 import Foundation
 
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
-enum RepeatTypeAppEnum: Int, AppEnum {
-  case single
-  case all
-  case off
+enum EnableDisableAppEnum: Int, AppEnum {
+  case enable
+  case disable
 
-  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Repeat")
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Enable/Disable")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .single: "One",
-    .all: "All",
-    .off: "Off",
+    .enable: "Enable",
+    .disable: "Disable",
   ]
 }

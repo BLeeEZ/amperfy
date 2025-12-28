@@ -106,6 +106,9 @@
 		50791E8528D36F1F006CE6E5 /* LibrarySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */; };
 		50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */; };
 		50791E8928D3BC4D006CE6E5 /* SwipeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8828D3BC4D006CE6E5 /* SwipeSettingsView.swift */; };
+		507BA5C32F01B9A400B4EA8B /* SetShuffleIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */; };
+		507BA5C52F01BAD200B4EA8B /* EnableDisableAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */; };
+		507BA5C72F01BCA300B4EA8B /* SetRepeatIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */; };
 		507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */; };
 		507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */; };
 		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
@@ -760,6 +763,9 @@
 		50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySettingsView.swift; sourceTree = "<group>"; };
 		50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSettingsView.swift; sourceTree = "<group>"; };
 		50791E8828D3BC4D006CE6E5 /* SwipeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeSettingsView.swift; sourceTree = "<group>"; };
+		507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetShuffleIntent.swift; sourceTree = "<group>"; };
+		507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableDisableAppEnum.swift; sourceTree = "<group>"; };
+		507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRepeatIntent.swift; sourceTree = "<group>"; };
 		507C9AD82E29905D001589F8 /* Amperfy v47.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v47.xcdatamodel"; sourceTree = "<group>"; };
 		50814C9E27D9FE460072738F /* Amperfy v23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v23.xcdatamodel"; sourceTree = "<group>"; };
 		50814C9F27D9FF660072738F /* ScrobbleEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrobbleEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -1491,6 +1497,7 @@
 			children = (
 				50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */,
 				50A7BB30284F3F6400C02990 /* NSUserActivity+IntentData.swift */,
+				507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */,
 				50B136F32EFC36D500738475 /* PlayableContainerTypeAppEnum.swift */,
 				50B136F62EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift */,
 				50B136F72EFC36D500738475 /* RepeatTypeAppEnum.swift */,
@@ -1509,6 +1516,8 @@
 				507414982EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift */,
 				507414A02F004C07007AEC5D /* NextPreviousTrackIntent.swift */,
 				50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */,
+				507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */,
+				507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */,
 				50253F7A284A566700BCCFB2 /* Intents.intentdefinition */,
 				50BE5D442850EFE100156FC6 /* PlayMediaIntentHandler.swift */,
 			);
@@ -2433,6 +2442,7 @@
 				50AE79C22C20709C0085CBB3 /* LyricsView.swift in Sources */,
 				50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */,
 				50C1714E2D1070A500C0C53A /* PlaylistAddGenresVC.swift in Sources */,
+				507BA5C32F01B9A400B4EA8B /* SetShuffleIntent.swift in Sources */,
 				508FDE3621F1E130005A0724 /* NewPlaylistTableHeader.swift in Sources */,
 				50722747286794FC00910574 /* AppDelegateKeyboardCommands.swift in Sources */,
 				50C9D7102850759B007F18D0 /* OptionsButton.swift in Sources */,
@@ -2451,6 +2461,7 @@
 				504262B42BF5FC3D00B5EF38 /* NSUserActivity+IntentData.swift in Sources */,
 				50C16C1021E5463E00F086F0 /* ArtistsVC.swift in Sources */,
 				50065EB421F0584D0066FC32 /* PlaylistSelectorVC.swift in Sources */,
+				507BA5C72F01BCA300B4EA8B /* SetRepeatIntent.swift in Sources */,
 				631C166F2C6D63510085F62E /* SettingsSection.swift in Sources */,
 				50A30E542B7408DB00722894 /* ContextQueueNextSectionHeader.swift in Sources */,
 				50CEC64B2D1F4C0A00D0E696 /* RadiosVC.swift in Sources */,
@@ -2484,6 +2495,7 @@
 				50B166AC2ED4E68400F7A1D6 /* HomeVC.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50C171502D10718C00C0C53A /* PlaylistAddGenreDetailVC.swift in Sources */,
+				507BA5C52F01BAD200B4EA8B /* EnableDisableAppEnum.swift in Sources */,
 				50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */,
 				50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */,
 				503BAF342E4A1EB000AE50B4 /* SettingsTabView.swift in Sources */,

@@ -41,7 +41,7 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
   var account: AccountAppEntity?
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Plays random songs") {
+    Summary("Play random songs") {
       \.$account
       \.$filterOption
     }
