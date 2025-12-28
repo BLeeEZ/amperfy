@@ -425,7 +425,7 @@ public struct AccountSettings: Sendable, Codable {
       guard let cred0 = getSetting($0).read.loginCredentials,
             let cred1 = getSetting($1).read.loginCredentials
       else { return false }
-      
+
       if cred0.displayServerUrl != cred1.displayServerUrl {
         return cred0.displayServerUrl < cred1.displayServerUrl
       } else {

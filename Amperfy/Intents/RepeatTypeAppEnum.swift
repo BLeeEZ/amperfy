@@ -23,13 +23,13 @@ import AppIntents
 import Foundation
 
 @available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
-public enum RepeatTypeAppEnum: Int, AppEnum {
+enum RepeatTypeAppEnum: Int, AppEnum {
   case single
   case all
   case off
 
-  public static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Repeat Type")
-  public static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Repeat Type")
+  static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
     .single: "Single",
     .all: "All",
     .off: "Off",

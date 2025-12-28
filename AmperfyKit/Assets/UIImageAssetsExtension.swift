@@ -144,6 +144,7 @@ extension UIImage {
   public static func userCircle(withConfiguration: UIImage.SymbolConfiguration? = nil) -> UIImage {
     UIImage(systemName: "person.circle.fill", withConfiguration: withConfiguration) ?? UIImage()
   }
+
   public static let userCirclePlus = UIImage
     .create(systemName: "person.crop.circle.fill.badge.plus")
   public static let userCircleCheckmark = UIImage

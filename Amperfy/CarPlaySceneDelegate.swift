@@ -105,27 +105,40 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
           object: meta.playableDownloadManager
         )
       }
-      
+
       appDelegate.player.addNotifier(notifier: self)
       CPNowPlayingTemplate.shared.add(self)
       self.interfaceController = interfaceController
       self.interfaceController?.delegate = self
       self.configureNowPlayingTemplate()
-      
-      accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
-        guard let self else { return }
-        resetFetchController()
-        activeAccountInfo = accountInfo
-        guard let accountInfo else {
-          os_log("CarPlay: no account available -> display Disconnected", log: self.log, type: .info)
-          activeAccount = nil
-          self.interfaceController?.setRootTemplate(disconnectedTemplate, animated: true, completion: nil)
-          return
+
+      accountNotificationHandler?
+        .registerCallbackForActiveAccountChange { [weak self] accountInfo in
+          guard let self else { return }
+          resetFetchController()
+          activeAccountInfo = accountInfo
+          guard let accountInfo else {
+            os_log(
+              "CarPlay: no account available -> display Disconnected",
+              log: self.log,
+              type: .info
+            )
+            activeAccount = nil
+            self.interfaceController?.setRootTemplate(
+              disconnectedTemplate,
+              animated: true,
+              completion: nil
+            )
+            return
+          }
+          activeAccount = appDelegate.storage.main.library.getAccount(info: accountInfo)
+          refreshOfflineMode()
+          self.interfaceController?.setRootTemplate(
+            rootBarTemplate,
+            animated: true,
+            completion: nil
+          )
         }
-        activeAccount = appDelegate.storage.main.library.getAccount(info: accountInfo)
-        refreshOfflineMode()
-        self.interfaceController?.setRootTemplate(rootBarTemplate, animated: true, completion: nil)
-      }
     }
   }
 
@@ -168,7 +181,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let queueTemplate = CPListTemplate(title: Self.queueButtonText, sections: [CPListSection]())
     return queueTemplate
   }()
-  
+
   lazy var disconnectedTemplate = {
     let disconnectedList = CPListTemplate(title: "Disconnected", sections: [])
     return disconnectedList
@@ -208,7 +221,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     var librarySections = [
       appDelegate.storage.settings.accounts.allAccounts.count > 1 ?
         CPListSection(items: [
-          createLibraryItem(text: "Switch Account", icon: UIImage.userPerson, sectionToDisplay: accountSection),
+          createLibraryItem(
+            text: "Switch Account",
+            icon: UIImage.userPerson,
+            sectionToDisplay: accountSection
+          ),
         ], header: "Account", sectionIndexTitle: nil)
         : nil,
       appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
@@ -312,8 +329,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let accountInfos = appDelegate.storage.settings.accounts.allAccounts
     var items: [CPListItem] = []
     for accountInfo in accountInfos {
-      let name = appDelegate.storage.settings.accounts.getSetting(accountInfo).read.loginCredentials?.username ?? ""
-      let displayServerUrl = appDelegate.storage.settings.accounts.getSetting(accountInfo).read.loginCredentials?.displayServerUrl ?? ""
+      let name = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+        .loginCredentials?.username ?? ""
+      let displayServerUrl = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+        .loginCredentials?.displayServerUrl ?? ""
       let isActive = (accountInfo == activeAccountInfo)
       let item = CPListItem(
         text: name,
@@ -332,15 +351,15 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         guard let self = self,
               appDelegate.storage.settings.accounts.active != accountInfo
         else { completion(); return }
-        self.appDelegate.switchAccount(accountInfo: accountInfo)
-        self.accountSection.updateSections(createAccountsSections())
+        appDelegate.switchAccount(accountInfo: accountInfo)
+        accountSection.updateSections(createAccountsSections())
         completion()
       }
       items.append(item)
     }
     return [CPListSection(items: items)]
   }
-  
+
   lazy var accountSection = {
     let template = CPListTemplate(title: "Switch Account", sections: [
       CPListSection(items: [CPListTemplateItem]()),
@@ -605,7 +624,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     "Queue",
     comment: "Button title on CarPlay player to display queue"
   )
-  
+
   private func resetFetchController() {
     playlistFetchController?.delegate = nil
     playlistFetchController = nil

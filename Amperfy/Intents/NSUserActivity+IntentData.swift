@@ -23,6 +23,8 @@ import AppIntents
 import Foundation
 import UIKit
 
+// MARK: - NSUserActivity.ActivityKeys
+
 extension NSUserActivity {
   public enum ActivityKeys: String {
     case searchTerm

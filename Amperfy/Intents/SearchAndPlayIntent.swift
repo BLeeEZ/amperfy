@@ -36,8 +36,11 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
 
   @Parameter(title: "Search Category", default: .song)
   var searchCategory: PlayableContainerTypeAppEnum
-  
-  @Parameter(title: "Account", description: "Account used for search. If not provided the active account will be used.")
+
+  @Parameter(
+    title: "Account",
+    description: "Account used for search. If not provided the active account will be used."
+  )
   var account: AccountAppEntity?
 
   @Parameter(title: "Shuffle", default: .off)
@@ -72,7 +75,8 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account) else { throw AmperfyAppIntentError.accountNotValid }
+    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account)
+    else { throw AmperfyAppIntentError.accountNotValid }
     let isShuffle = shuffleOption == .on
     let repeatUser = RepeatMode.fromIntent(type: repeatOption)
 

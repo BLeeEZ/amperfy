@@ -33,8 +33,11 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
 
   @Parameter(title: "Filter", default: .all)
   var filterOption: PlayRandomSongsFilterTypeAppEnum
-  
-  @Parameter(title: "Account", description: "Account used to select songs from. If not provided the active account will be used.")
+
+  @Parameter(
+    title: "Account",
+    description: "Account used to select songs from. If not provided the active account will be used."
+  )
   var account: AccountAppEntity?
 
   static var parameterSummary: some ParameterSummary {
@@ -55,7 +58,8 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account) else { throw AmperfyAppIntentError.accountNotValid }
+    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account)
+    else { throw AmperfyAppIntentError.accountNotValid }
     let isCacheOnly = filterOption == .cache
 
     let songs = appDelegate.storage.main.library.getRandomSongs(
@@ -64,7 +68,11 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
       onlyCached: isCacheOnly
     )
     let playerContext = PlayContext(name: "Random Songs", playables: songs)
-    let success = appDelegate.intentManager.play(context: playerContext, shuffleOption: true, repeatOption: .off)
+    let success = appDelegate.intentManager.play(
+      context: playerContext,
+      shuffleOption: true,
+      repeatOption: .off
+    )
     guard success else { throw AmperfyAppIntentError.notFound }
     return .result()
   }

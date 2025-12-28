@@ -33,8 +33,11 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
 
   @Parameter(title: "ID")
   var id: String
-  
-  @Parameter(title: "Account", description: "Account used to search for ID. If not provided the active account will be used.")
+
+  @Parameter(
+    title: "Account",
+    description: "Account used to search for ID. If not provided the active account will be used."
+  )
   var account: AccountAppEntity?
 
   @Parameter(title: "Library Element Type", default: .song)
@@ -71,10 +74,11 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account) else { throw AmperfyAppIntentError.accountNotValid }
+    guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account)
+    else { throw AmperfyAppIntentError.accountNotValid }
     let isShuffle = shuffleOption == .on
     let repeatUser = RepeatMode.fromIntent(type: repeatOption)
-    
+
     let playableContainer = appDelegate.intentManager.getPlayableContainer(
       account: accountCoreData,
       id: id,

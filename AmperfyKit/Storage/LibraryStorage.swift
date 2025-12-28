@@ -532,7 +532,7 @@ public class LibraryStorage: PlayableFileCachable {
         .object(with: managedObjectId) as! AccountMO
     )
   }
-  
+
   public func getAccount(ident: String) -> Account? {
     guard let accountInfo = AccountInfo.create(basedOnIdent: ident) else { return nil }
     let fetchRequest = AccountMO.fetchRequest()
