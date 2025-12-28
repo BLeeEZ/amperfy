@@ -27,7 +27,7 @@ import Intents
 import OSLog
 
 extension RepeatMode {
-  public static func fromIntent(type: RepeatTypeAppEnum) -> RepeatMode {
+  static func fromIntent(type: RepeatTypeAppEnum) -> RepeatMode {
     switch type {
     case .single:
       return .single
@@ -35,6 +35,17 @@ extension RepeatMode {
       return .all
     case .off:
       return .off
+    }
+  }
+}
+
+extension PlayerMode {
+  static func fromIntent(type: PlaybackModeAppEnum) -> PlayerMode {
+    switch type {
+    case .music:
+      return .music
+    case .podcast:
+      return .podcast
     }
   }
 }
@@ -1143,7 +1154,7 @@ public class IntentManager {
     lastResult = result
     return result
   }
-  
+
   func getAccount(fromIntent accountIntent: AccountAppEntity?) -> Account? {
     if let accountIntentId = accountIntent?.id,
        let account = library.getAccount(ident: accountIntentId) {

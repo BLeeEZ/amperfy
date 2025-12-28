@@ -196,7 +196,6 @@ public protocol PlayerFacade {
   func setStreamingTranscodings(to: StreamingTranscodings)
 
   func logout(account: Account)
-  func seek(toSecond: Double)
 
   func insertContextQueue(playables: [AbstractPlayable])
   func appendContextQueue(playables: [AbstractPlayable])
@@ -217,10 +216,12 @@ public protocol PlayerFacade {
   func pause()
   func togglePlayPause()
   func stop()
+  func playPrevious()
   func playPreviousOrReplay()
   func playNext()
   func skipForward(interval: Double)
   func skipBackward(interval: Double)
+  func seek(toSecond: Double)
 
   var audioAnalyzer: AudioAnalyzer { get }
 
@@ -638,6 +639,10 @@ class PlayerFacadeImpl: PlayerFacade {
 
   func stop() {
     musicPlayer.stop()
+  }
+
+  func playPrevious() {
+    musicPlayer.playPrevious()
   }
 
   func playPreviousOrReplay() {

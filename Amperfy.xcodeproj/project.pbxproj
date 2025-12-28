@@ -90,6 +90,11 @@
 		50722747286794FC00910574 /* AppDelegateKeyboardCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50722746286794FC00910574 /* AppDelegateKeyboardCommands.swift */; };
 		507252E02EF9888200FFFA4D /* AccountNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507252DF2EF9888200FFFA4D /* AccountNotificationHandler.swift */; };
 		507361E02632BA3B005F151D /* GenresVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507361DF2632BA3B005F151D /* GenresVC.swift */; };
+		507414992EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507414982EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift */; };
+		5074149B2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5074149A2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift */; };
+		5074149D2EFFC772007AEC5D /* PlaybackModeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5074149C2EFFC772007AEC5D /* PlaybackModeAppEnum.swift */; };
+		507414A12F004C07007AEC5D /* NextPreviousTrackIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507414A02F004C07007AEC5D /* NextPreviousTrackIntent.swift */; };
+		507414A32F013C94007AEC5D /* PlayPausePlaybackAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507414A22F013C93007AEC5D /* PlayPausePlaybackAppEnum.swift */; };
 		5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077F935221E6D0E0099CA91 /* DownloadsVC.swift */; };
 		5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */; };
 		5078AFB42B44AE260038FD17 /* AppIntentVocabulary.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5078AFB32B44AE260038FD17 /* AppIntentVocabulary.plist */; };
@@ -134,6 +139,10 @@
 		50A30E5C2B7556FB00722894 /* PopupPlayer+TableViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A30E5B2B7556FB00722894 /* PopupPlayer+TableViewExtension.swift */; };
 		50A30E622B756CA400722894 /* CurrentlyPlayingTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50A30E612B756CA400722894 /* CurrentlyPlayingTableCell.swift */; };
 		50A30E642B756CF100722894 /* CurrentlyPlayingTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 50A30E632B756CE700722894 /* CurrentlyPlayingTableCell.xib */; };
+		50AAB9F12F013F68004A39C6 /* NextPreviousTrackAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */; };
+		50AAB9F32F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */; };
+		50AAB9F52F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */; };
+		50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */; };
 		50AC4E5328D909730091FF33 /* EventLogSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5128D909720091FF33 /* EventLogSettingsView.swift */; };
 		50AC4E5428D909730091FF33 /* EventLogCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5228D909730091FF33 /* EventLogCellView.swift */; };
 		50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5528D99A410091FF33 /* ButtonStyles.swift */; };
@@ -731,6 +740,11 @@
 		507361C72632AB08005F151D /* GenreParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreParserDelegate.swift; sourceTree = "<group>"; };
 		507361CB2632AB91005F151D /* Genre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Genre.swift; sourceTree = "<group>"; };
 		507361DF2632BA3B005F151D /* GenresVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenresVC.swift; sourceTree = "<group>"; };
+		507414982EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPausePlaybackIntent.swift; sourceTree = "<group>"; };
+		5074149A2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuePlaybackIntent.swift; sourceTree = "<group>"; };
+		5074149C2EFFC772007AEC5D /* PlaybackModeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaybackModeAppEnum.swift; sourceTree = "<group>"; };
+		507414A02F004C07007AEC5D /* NextPreviousTrackIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextPreviousTrackIntent.swift; sourceTree = "<group>"; };
+		507414A22F013C93007AEC5D /* PlayPausePlaybackAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayPausePlaybackAppEnum.swift; sourceTree = "<group>"; };
 		5077F933221DAB5C0099CA91 /* DownloadManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
 		5077F935221E6D0E0099CA91 /* DownloadsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsVC.swift; sourceTree = "<group>"; };
 		5077F937221F24C10099CA91 /* Download.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Download.swift; sourceTree = "<group>"; };
@@ -827,6 +841,10 @@
 		50A85F04268A4B8D00FB3E31 /* CoreDataMigrationVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataMigrationVersion.swift; sourceTree = "<group>"; };
 		50A85F06268A4BA800FB3E31 /* CoreDataMigrationStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataMigrationStep.swift; sourceTree = "<group>"; };
 		50A85F08268A4BE400FB3E31 /* CoreDataMigrationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataMigrationExtensions.swift; sourceTree = "<group>"; };
+		50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextPreviousTrackAppEnum.swift; sourceTree = "<group>"; };
+		50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekToPlaybackTimeIntent.swift; sourceTree = "<group>"; };
+		50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekToPlaybackTimeAppEnum.swift; sourceTree = "<group>"; };
+		50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekTimeUnitAppEnum.swift; sourceTree = "<group>"; };
 		50AB92BB26660FD800DCE45C /* artists_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = artists_example_1.xml; sourceTree = "<group>"; };
 		50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsArtistParserTest.swift; sourceTree = "<group>"; };
 		50AB92BF2666126300DCE45C /* album_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_example_1.xml; sourceTree = "<group>"; };
@@ -1477,11 +1495,20 @@
 				50B136F62EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift */,
 				50B136F72EFC36D500738475 /* RepeatTypeAppEnum.swift */,
 				50B136F92EFC36D500738475 /* ShuffleTypeAppEnum.swift */,
+				5074149C2EFFC772007AEC5D /* PlaybackModeAppEnum.swift */,
+				507414A22F013C93007AEC5D /* PlayPausePlaybackAppEnum.swift */,
+				50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */,
+				50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */,
+				50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */,
 				50B137012EFC85D700738475 /* AccountAppEntity.swift */,
 				50B136F42EFC36D500738475 /* PlayIDIntent.swift */,
 				50B136F82EFC36D500738475 /* SearchAndPlayIntent.swift */,
 				50B136F52EFC36D500738475 /* PlayRandomSongsIntent.swift */,
 				50B137032EFC8A4800738475 /* SwitchAccountIntent.swift */,
+				5074149A2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift */,
+				507414982EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift */,
+				507414A02F004C07007AEC5D /* NextPreviousTrackIntent.swift */,
+				50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */,
 				50253F7A284A566700BCCFB2 /* Intents.intentdefinition */,
 				50BE5D442850EFE100156FC6 /* PlayMediaIntentHandler.swift */,
 			);
@@ -2304,6 +2331,7 @@
 				50B136FB2EFC36D500738475 /* PlayIDIntent.swift in Sources */,
 				50B136FC2EFC36D500738475 /* PlayRandomSongsIntent.swift in Sources */,
 				50B136FD2EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift in Sources */,
+				507414992EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift in Sources */,
 				50B136FE2EFC36D500738475 /* RepeatTypeAppEnum.swift in Sources */,
 				50B136FF2EFC36D500738475 /* SearchAndPlayIntent.swift in Sources */,
 				50B137002EFC36D500738475 /* ShuffleTypeAppEnum.swift in Sources */,
@@ -2316,7 +2344,9 @@
 				5077F936221E6D0E0099CA91 /* DownloadsVC.swift in Sources */,
 				50791E7F28D363F0006CE6E5 /* InfoBannerView.swift in Sources */,
 				50C16C1E21E7A35C00F086F0 /* GenericTableCell.swift in Sources */,
+				507414A32F013C94007AEC5D /* PlayPausePlaybackAppEnum.swift in Sources */,
 				505CA2092B88E8F400AA81CD /* BasicCollectionViewController.swift in Sources */,
+				50AAB9F12F013F68004A39C6 /* NextPreviousTrackAppEnum.swift in Sources */,
 				5064F3982B96FBAE00DE61C1 /* NotificationDetailVC.swift in Sources */,
 				50C171462D0F809600C0C53A /* PlaylistAddAlbumsVC.swift in Sources */,
 				5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */,
@@ -2326,6 +2356,7 @@
 				50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */,
 				50C16C1A21E704EC00F086F0 /* ArtistDetailVC.swift in Sources */,
 				50DEEE04265E25A40073FF20 /* MusicFoldersVC.swift in Sources */,
+				50AAB9F52F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift in Sources */,
 				50DEEE0A265E392C0073FF20 /* IndexesVC.swift in Sources */,
 				50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */,
 				50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */,
@@ -2356,6 +2387,7 @@
 				50791E7828D25845006CE6E5 /* AccountSettingsView.swift in Sources */,
 				50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */,
 				505CA20A2B88E94800AA81CD /* MultiSourceTableViewController.swift in Sources */,
+				5074149D2EFFC772007AEC5D /* PlaybackModeAppEnum.swift in Sources */,
 				50DEEE0C265E3F9D0073FF20 /* DirectoriesVC.swift in Sources */,
 				500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */,
 				50791E7C28D32B8A006CE6E5 /* AlternativeURLAddDialogView.swift in Sources */,
@@ -2389,6 +2421,7 @@
 				504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */,
 				50C9D70F2850759B007F18D0 /* BasicButton.swift in Sources */,
 				50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */,
+				5074149B2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift in Sources */,
 				50BA92FA21CC37F800E5901D /* SongsVC.swift in Sources */,
 				50C171422D0E143200C0C53A /* PlaylistAddLibraryVC.swift in Sources */,
 				50C171522D10777400C0C53A /* PlaylistAddPlaylistsVC.swift in Sources */,
@@ -2431,6 +2464,7 @@
 				50C9D70D2850759B007F18D0 /* NotificationBannerCustomization.swift in Sources */,
 				50BE5D9728511C3200156FC6 /* Amperfy.xcdatamodeld in Sources */,
 				5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */,
+				50AAB9F32F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift in Sources */,
 				5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */,
 				50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */,
 				5019441B2B7A049A00082D2E /* PopupPlayer+Visuals.swift in Sources */,
@@ -2441,10 +2475,12 @@
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
 				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,
+				50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */,
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
 				50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */,
 				505CA2082B88E8F400AA81CD /* BasicTableViewController.swift in Sources */,
+				507414A12F004C07007AEC5D /* NextPreviousTrackIntent.swift in Sources */,
 				50B166AC2ED4E68400F7A1D6 /* HomeVC.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50C171502D10718C00C0C53A /* PlaylistAddGenreDetailVC.swift in Sources */,
