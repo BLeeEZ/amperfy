@@ -153,7 +153,6 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
     if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
-    nowPlayingInfoCenter.nowPlayingInfo = [:]
     nowPlayingInfoCenter.playbackState = .paused
   }
 
