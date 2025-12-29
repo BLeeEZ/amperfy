@@ -251,6 +251,27 @@ class PlayerControlView: UIView {
     )
   }
 
+  func createVisualizerTypeMenu() -> UIMenuElement {
+    let currentType = appDelegate.storage.settings.user.selectedVisualizerType
+    let availableTypes: [UIAction] = VisualizerType.allCases.reversed().compactMap { visualizerType in
+      UIAction(
+        title: visualizerType.displayName,
+        image: UIImage(systemName: visualizerType.iconName),
+        state: visualizerType == currentType ? .on : .off,
+        handler: { _ in
+          self.appDelegate.storage.settings.user.selectedVisualizerType = visualizerType
+          self.rootView?.largeCurrentlyPlayingView?.showVisualizer()
+        }
+      )
+    }
+    return UIMenu(
+      title: "Visualizer Style",
+      subtitle: currentType.displayName,
+      image: UIImage(systemName: "sparkles"),
+      children: availableTypes
+    )
+  }
+
   func createPlayerOptionsMenu() -> [UIMenuElement] {
     var menuActions = [UIMenuElement]()
     if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player
@@ -320,6 +341,9 @@ class PlayerControlView: UIView {
         }
       )
       menuActions.append(hideVisualizerAction)
+
+      // Add visualizer type selector submenu
+      menuActions.append(createVisualizerTypeMenu())
     }
 
     switch player.playerMode {

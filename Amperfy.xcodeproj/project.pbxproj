@@ -149,6 +149,9 @@
 		50AAB9F52F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */; };
 		50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */; };
 		50AB3B3C2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */; };
+		50AB3B462F03119800556CE4 /* GenerativeArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B412F03119800556CE4 /* GenerativeArtView.swift */; };
+		50AB3B472F03119800556CE4 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B442F03119800556CE4 /* WaveformView.swift */; };
+		50AB3B482F03119800556CE4 /* SpectrumBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */; };
 		50AB3B3E2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */; };
 		50AB3B402F02BC8600556CE4 /* FavoriteTypeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */; };
 		50AB3B4B2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */; };
@@ -860,6 +863,9 @@
 		50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekToPlaybackTimeAppEnum.swift; sourceTree = "<group>"; };
 		50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekTimeUnitAppEnum.swift; sourceTree = "<group>"; };
 		50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAppWithConfigurationIntent.swift; sourceTree = "<group>"; };
+		50AB3B412F03119800556CE4 /* GenerativeArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerativeArtView.swift; sourceTree = "<group>"; };
+		50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumBarsView.swift; sourceTree = "<group>"; };
+		50AB3B442F03119800556CE4 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetFavoriteForCurrentlyPlayingSongIntent.swift; sourceTree = "<group>"; };
 		50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTypeAppEnum.swift; sourceTree = "<group>"; };
 		50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRatingForCurrentlyPlayingSongIntent.swift; sourceTree = "<group>"; };
@@ -1630,6 +1636,16 @@
 			path = Migration;
 			sourceTree = "<group>";
 		};
+		50AB3B452F03119800556CE4 /* AudioVisualizerViews */ = {
+			isa = PBXGroup;
+			children = (
+				50AB3B412F03119800556CE4 /* GenerativeArtView.swift */,
+				50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */,
+				50AB3B442F03119800556CE4 /* WaveformView.swift */,
+			);
+			path = AudioVisualizerViews;
+			sourceTree = "<group>";
+		};
 		50AE79BE2C206ECB0085CBB3 /* Lyrics */ = {
 			isa = PBXGroup;
 			children = (
@@ -2065,6 +2081,7 @@
 			isa = PBXGroup;
 			children = (
 				50D54B602E30F90D0078631E /* AudioVisualizerKit */,
+				50AB3B452F03119800556CE4 /* AudioVisualizerViews */,
 				5011712F27565B2A00B7C08D /* PlayerFacade.swift */,
 				50C9D6E5284FABCB007F18D0 /* AudioPlayer.swift */,
 				508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */,
@@ -2659,6 +2676,9 @@
 				50AE79AE2C1E23930085CBB3 /* SsOpenSubsonicExtensionsParserDelegate.swift in Sources */,
 				50C9D671284FAA4D007F18D0 /* Identifyable.swift in Sources */,
 				50C9D6B2284FAA87007F18D0 /* ScrobbleEntry.swift in Sources */,
+				50AB3B462F03119800556CE4 /* GenerativeArtView.swift in Sources */,
+				50AB3B472F03119800556CE4 /* WaveformView.swift in Sources */,
+				50AB3B482F03119800556CE4 /* SpectrumBarsView.swift in Sources */,
 				50C9D6A9284FAA87007F18D0 /* PlaylistItem.swift in Sources */,
 				50C9D6A6284FAA7F007F18D0 /* CoreDataMigrationVersion.swift in Sources */,
 				50C9D692284FAA6C007F18D0 /* DownloadMO+CoreDataClass.swift in Sources */,

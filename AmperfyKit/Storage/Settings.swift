@@ -137,6 +137,12 @@ public struct UserSettings: Sendable, Codable {
     set { _isPlayerVisualizerDisplayed = newValue }
   }
 
+  private var _selectedVisualizerType: VisualizerType = .defaultValue
+  public var selectedVisualizerType: VisualizerType {
+    get { _selectedVisualizerType }
+    set { _selectedVisualizerType = newValue }
+  }
+
   private var _isOfflineMode: Bool = false
   public var isOfflineMode: Bool {
     get { _isOfflineMode }

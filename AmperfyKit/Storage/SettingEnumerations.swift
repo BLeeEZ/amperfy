@@ -343,6 +343,36 @@ public enum CacheTranscodingFormatPreference: Int, CaseIterable, Sendable, Codab
   }
 }
 
+// MARK: - VisualizerType
+
+public enum VisualizerType: String, CaseIterable, Sendable, Codable {
+  case ring
+  case waveform
+  case spectrumBars
+  case generativeArt
+  
+  public static let defaultValue: VisualizerType = .ring
+
+  public var displayName: String {
+    switch self {
+    case .ring: return "Ring"
+    case .waveform: return "Waveform"
+    case .spectrumBars: return "Spectrum Bars"
+    case .generativeArt: return "Generative Art"
+    }
+  }
+
+  public var iconName: String {
+    switch self {
+    case .ring: return "circle.dashed"
+    case .waveform: return "waveform.path"
+    case .spectrumBars: return "chart.bar.fill"
+    case .generativeArt: return "sparkles"
+    }
+  }
+}
+
+
 // MARK: - UIUserInterfaceStyle
 
 extension UIUserInterfaceStyle: @retroactive Encodable, @retroactive Decodable {

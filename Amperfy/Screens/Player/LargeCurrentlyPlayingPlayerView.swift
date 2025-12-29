@@ -39,14 +39,35 @@ enum LargeDisplayElement {
 struct AudioAnalyzerView: View {
   @EnvironmentObject
   var audioAnalyzer: AudioAnalyzer
+  let visualizerType: VisualizerType
 
   var body: some View {
-    AmplitudeSpectrumView(
-      shapeType: .ring, // .straight,
-      magnitudes: audioAnalyzer.magnitudes,
-      range: 0 ..< 75,
-      rms: nil // audioAnalyzer.rms
-    )
+    Group {
+      switch visualizerType {
+      case .waveform:
+        WaveformView(
+          magnitudes: audioAnalyzer.magnitudes,
+          rms: audioAnalyzer.rms
+        )
+      case .spectrumBars:
+        SpectrumBarsView(
+          magnitudes: audioAnalyzer.magnitudes,
+          barCount: 32
+        )
+      case .generativeArt:
+        GenerativeArtView(
+          magnitudes: audioAnalyzer.magnitudes,
+          rms: audioAnalyzer.rms
+        )
+      case .ring:
+        AmplitudeSpectrumView(
+          shapeType: .ring,
+          magnitudes: audioAnalyzer.magnitudes,
+          range: 0..<75,
+          rms: audioAnalyzer.rms
+        )
+      }
+    }
     .padding()
   }
 }
@@ -54,11 +75,12 @@ struct AudioAnalyzerView: View {
 // MARK: - AudioAnalyzerWrapperView
 
 struct AudioAnalyzerWrapperView: View {
+  let visualizerType: VisualizerType
+
   var body: some View {
     VStack {
-      AudioAnalyzerView(
-      )
-      .environmentObject(appDelegate.player.audioAnalyzer)
+      AudioAnalyzerView(visualizerType: visualizerType)
+        .environmentObject(appDelegate.player.audioAnalyzer)
     }
   }
 }
@@ -68,8 +90,12 @@ struct AudioAnalyzerWrapperView: View {
 class SwiftUIContentView: UIView {
   var hostingController: UIHostingController<AudioAnalyzerWrapperView>?
 
-  public func setupSwiftUIView(parentVC: UIViewController, parentView: UIView) {
-    let swiftUIView = AudioAnalyzerWrapperView()
+  public func setupSwiftUIView(
+    parentVC: UIViewController,
+    parentView: UIView,
+    visualizerType: VisualizerType
+  ) {
+    let swiftUIView = AudioAnalyzerWrapperView(visualizerType: visualizerType)
     let hostingController = UIHostingController(rootView: swiftUIView)
     self.hostingController = hostingController
 
@@ -81,6 +107,10 @@ class SwiftUIContentView: UIView {
 
     hostingController.view.translatesAutoresizingMaskIntoConstraints = false
     hostingController.didMove(toParent: parentVC)
+  }
+
+  public func updateVisualizerType(_ visualizerType: VisualizerType) {
+    hostingController?.rootView = AudioAnalyzerWrapperView(visualizerType: visualizerType)
   }
 }
 
@@ -148,7 +178,11 @@ class LargeCurrentlyPlayingPlayerView: UIView {
     visualizerHostingView = SwiftUIContentView()
     visualizerHostingView!.hostingController?.view.frame = upperContainerView.bounds
     if let toWorkOnRootView {
-      visualizerHostingView!.setupSwiftUIView(parentVC: toWorkOnRootView, parentView: self)
+      visualizerHostingView!.setupSwiftUIView(
+        parentVC: toWorkOnRootView,
+        parentView: self,
+        visualizerType: appDelegate.storage.settings.user.selectedVisualizerType
+      )
     }
 
     addSwipeGesturesToArtwork()
@@ -292,6 +326,9 @@ class LargeCurrentlyPlayingPlayerView: UIView {
   }
 
   public func showVisualizer() {
+    visualizerHostingView?.updateVisualizerType(
+      appDelegate.storage.settings.user.selectedVisualizerType
+    )
     visualizerHostingView?.hostingController?.view.isHidden = false
     appDelegate.player.audioAnalyzer
       .isActive = (appDelegate.storage.settings.user.playerDisplayStyle == .large)
