@@ -95,12 +95,7 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$isOfflineMode.sink(receiveValue: { newValue in
       let hasValueChanged = self.appDelegate.storage.settings.user.isOfflineMode != newValue
       guard hasValueChanged else { return }
-      self.appDelegate.storage.settings.user.isOfflineMode = newValue
-      self.appDelegate.notificationHandler.post(
-        name: .offlineModeChanged,
-        object: nil,
-        userInfo: nil
-      )
+      self.appDelegate.switchOnlineOfflineMode(isOfflineMode: newValue)
     }))
 
     settings.isShowDetailedInfo = appDelegate.storage.settings.user.isShowDetailedInfo

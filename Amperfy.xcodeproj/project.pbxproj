@@ -109,6 +109,8 @@
 		507BA5C32F01B9A400B4EA8B /* SetShuffleIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */; };
 		507BA5C52F01BAD200B4EA8B /* EnableDisableAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */; };
 		507BA5C72F01BCA300B4EA8B /* SetRepeatIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */; };
+		507BA5C92F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */; };
+		507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */; };
 		507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */; };
 		507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */; };
 		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
@@ -146,6 +148,7 @@
 		50AAB9F32F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */; };
 		50AAB9F52F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */; };
 		50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */; };
+		50AB3B3C2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */; };
 		50AC4E5328D909730091FF33 /* EventLogSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5128D909720091FF33 /* EventLogSettingsView.swift */; };
 		50AC4E5428D909730091FF33 /* EventLogCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5228D909730091FF33 /* EventLogCellView.swift */; };
 		50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5528D99A410091FF33 /* ButtonStyles.swift */; };
@@ -766,6 +769,8 @@
 		507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetShuffleIntent.swift; sourceTree = "<group>"; };
 		507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableDisableAppEnum.swift; sourceTree = "<group>"; };
 		507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRepeatIntent.swift; sourceTree = "<group>"; };
+		507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetOnlineOfflineModeIntent.swift; sourceTree = "<group>"; };
+		507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineOfflineModeAppEnum.swift; sourceTree = "<group>"; };
 		507C9AD82E29905D001589F8 /* Amperfy v47.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v47.xcdatamodel"; sourceTree = "<group>"; };
 		50814C9E27D9FE460072738F /* Amperfy v23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v23.xcdatamodel"; sourceTree = "<group>"; };
 		50814C9F27D9FF660072738F /* ScrobbleEntryMO+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScrobbleEntryMO+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -851,6 +856,7 @@
 		50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekToPlaybackTimeIntent.swift; sourceTree = "<group>"; };
 		50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekToPlaybackTimeAppEnum.swift; sourceTree = "<group>"; };
 		50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekTimeUnitAppEnum.swift; sourceTree = "<group>"; };
+		50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAppWithConfigurationIntent.swift; sourceTree = "<group>"; };
 		50AB92BB26660FD800DCE45C /* artists_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = artists_example_1.xml; sourceTree = "<group>"; };
 		50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsArtistParserTest.swift; sourceTree = "<group>"; };
 		50AB92BF2666126300DCE45C /* album_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_example_1.xml; sourceTree = "<group>"; };
@@ -1507,6 +1513,7 @@
 				50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */,
 				50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */,
 				50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */,
+				507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */,
 				50B137012EFC85D700738475 /* AccountAppEntity.swift */,
 				50B136F42EFC36D500738475 /* PlayIDIntent.swift */,
 				50B136F82EFC36D500738475 /* SearchAndPlayIntent.swift */,
@@ -1518,6 +1525,8 @@
 				50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */,
 				507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */,
 				507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */,
+				507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */,
+				50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */,
 				50253F7A284A566700BCCFB2 /* Intents.intentdefinition */,
 				50BE5D442850EFE100156FC6 /* PlayMediaIntentHandler.swift */,
 			);
@@ -2436,6 +2445,7 @@
 				50C171522D10777400C0C53A /* PlaylistAddPlaylistsVC.swift in Sources */,
 				500B7D4921EDD6250083ED6F /* ViewCreator.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
+				507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */,
 				50B137022EFC85D700738475 /* AccountAppEntity.swift in Sources */,
 				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
 				5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */,
@@ -2495,6 +2505,7 @@
 				50B166AC2ED4E68400F7A1D6 /* HomeVC.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50C171502D10718C00C0C53A /* PlaylistAddGenreDetailVC.swift in Sources */,
+				507BA5C92F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift in Sources */,
 				507BA5C52F01BAD200B4EA8B /* EnableDisableAppEnum.swift in Sources */,
 				50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */,
 				50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */,
@@ -2507,6 +2518,7 @@
 				63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */,
 				505CA20C2B88E9D300AA81CD /* FetchUpdateHandler.swift in Sources */,
 				508385E821C5965B00C4BB32 /* AppDelegate.swift in Sources */,
+				50AB3B3C2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift in Sources */,
 				50C171482D10644600C0C53A /* PlaylistAddAlbumDetailVC.swift in Sources */,
 				50DE29EB2B8FCEB700ABA78E /* LibraryNavigatorConfigurator.swift in Sources */,
 			);

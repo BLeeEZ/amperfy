@@ -363,6 +363,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       )
   }
 
+  func switchOnlineOfflineMode(isOfflineMode: Bool) {
+    appDelegate.storage.settings.user.isOfflineMode = isOfflineMode
+    appDelegate.notificationHandler.post(
+      name: .offlineModeChanged,
+      object: nil,
+      userInfo: nil
+    )
+  }
+
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
     if #available(iOS 13.0, *) {
       UIApplication.shared.connectedScenes
