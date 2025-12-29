@@ -253,10 +253,11 @@ class PlayerControlView: UIView {
 
   func createVisualizerTypeMenu() -> UIMenuElement {
     let currentType = appDelegate.storage.settings.user.selectedVisualizerType
-    let availableTypes: [UIAction] = VisualizerType.allCases.compactMap { visualizerType in
+    let availableTypes: [UIAction] = VisualizerType.allCases.reversed().compactMap { visualizerType in
       UIAction(
         title: visualizerType.displayName,
-        image: visualizerType == currentType ? .check : UIImage(systemName: visualizerType.iconName),
+        image: UIImage(systemName: visualizerType.iconName),
+        state: visualizerType == currentType ? .on : .off,
         handler: { _ in
           self.appDelegate.storage.settings.user.selectedVisualizerType = visualizerType
           self.rootView?.largeCurrentlyPlayingView?.showVisualizer()

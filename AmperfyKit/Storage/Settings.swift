@@ -21,37 +21,6 @@
 
 import UIKit
 
-// MARK: - VisualizerType
-
-/// Defines all available audio visualizer types
-public enum VisualizerType: String, CaseIterable, Codable, Sendable {
-  case waveform
-  case spectrumBars
-  case radial
-  case generativeArt
-  case ring
-
-  public var displayName: String {
-    switch self {
-    case .waveform: return "Waveform"
-    case .spectrumBars: return "Spectrum Bars"
-    case .radial: return "Radial"
-    case .generativeArt: return "Generative Art"
-    case .ring: return "Ring"
-    }
-  }
-
-  public var iconName: String {
-    switch self {
-    case .waveform: return "waveform.path"
-    case .spectrumBars: return "chart.bar.fill"
-    case .radial: return "circle.hexagongrid.fill"
-    case .generativeArt: return "sparkles"
-    case .ring: return "circle.dashed"
-    }
-  }
-}
-
 // MARK: - AppSettings
 
 public struct AppSettings: Sendable, Codable {
@@ -168,10 +137,10 @@ public struct UserSettings: Sendable, Codable {
     set { _isPlayerVisualizerDisplayed = newValue }
   }
 
-  private var _selectedVisualizerTypeRaw: String = "radial"
+  private var _selectedVisualizerType: VisualizerType = .defaultValue
   public var selectedVisualizerType: VisualizerType {
-    get { VisualizerType(rawValue: _selectedVisualizerTypeRaw) ?? .radial }
-    set { _selectedVisualizerTypeRaw = newValue.rawValue }
+    get { _selectedVisualizerType }
+    set { _selectedVisualizerType = newValue }
   }
 
   private var _isOfflineMode: Bool = false
