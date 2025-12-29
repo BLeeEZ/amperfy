@@ -104,6 +104,9 @@ public struct XCallbackActionDocu: Hashable {
 enum AmperfyAppIntentError: Error, LocalizedError {
   case notFound
   case accountNotValid
+  case changesOnlyInOnlineMode
+  case noItemIsPlaying
+  case serverSyncFailed
 
   var errorDescription: String? {
     switch self {
@@ -111,6 +114,12 @@ enum AmperfyAppIntentError: Error, LocalizedError {
       return "I couldn’t find an element with the provided information."
     case .accountNotValid:
       return "The provided account is not valid."
+    case .changesOnlyInOnlineMode:
+      return "Can only be changed in online mode."
+    case .noItemIsPlaying:
+      return "There is currently no item playing."
+    case .serverSyncFailed:
+      return "Changes could not be send to server."
     }
   }
 
