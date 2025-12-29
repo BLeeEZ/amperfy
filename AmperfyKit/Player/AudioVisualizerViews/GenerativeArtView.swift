@@ -33,18 +33,18 @@ public struct GenerativeArtView: View {
 
   private func bassEnergy() -> Float {
     guard magnitudes.count > 10 else { return 0.3 }
-    return magnitudes[0..<10].reduce(0) { $0 + $1.value } / 10.0
+    return magnitudes[0 ..< 10].reduce(0) { $0 + $1.value } / 10.0
   }
 
   private func midEnergy() -> Float {
     guard magnitudes.count > 50 else { return 0.3 }
-    return magnitudes[10..<50].reduce(0) { $0 + $1.value } / 40.0
+    return magnitudes[10 ..< 50].reduce(0) { $0 + $1.value } / 40.0
   }
 
   private func trebleEnergy() -> Float {
     guard magnitudes.count > 50 else { return 0.3 }
     let end = min(magnitudes.count, 100)
-    return magnitudes[50..<end].reduce(0) { $0 + $1.value } / Float(end - 50)
+    return magnitudes[50 ..< end].reduce(0) { $0 + $1.value } / Float(end - 50)
   }
 
   public var body: some View {
@@ -60,13 +60,13 @@ public struct GenerativeArtView: View {
 
         // Draw flowing organic shapes
         let layers = 5
-        for layer in 0..<layers {
+        for layer in 0 ..< layers {
           let layerOffset = Double(layer) * 0.5
           let baseRadius = min(size.width, size.height) * 0.15 * (1 + CGFloat(layer) * 0.3)
 
           var path = Path()
           let points = 60
-          for i in 0...points {
+          for i in 0 ... points {
             let angle = Double(i) / Double(points) * 2 * .pi
             let noise1 = sin(angle * 3 + time * 2 + layerOffset) * bass * 30
             let noise2 = cos(angle * 5 + time * 1.5) * mid * 20
@@ -98,7 +98,7 @@ public struct GenerativeArtView: View {
 
         // Draw particle-like dots
         let particleCount = 30
-        for i in 0..<particleCount {
+        for i in 0 ..< particleCount {
           let seed = Double(i) * 1.618
           let angle = seed + time * (0.2 + bass * 0.5)
           let distance =

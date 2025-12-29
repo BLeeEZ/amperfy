@@ -39,11 +39,11 @@ public struct SpectrumBarsView: View {
     let groupSize = max(1, magnitudes.count / barCount)
     var grouped = [Float]()
 
-    for i in 0..<barCount {
+    for i in 0 ..< barCount {
       let startIndex = i * groupSize
       let endIndex = min(startIndex + groupSize, magnitudes.count)
       if startIndex < magnitudes.count {
-        let slice = magnitudes[startIndex..<endIndex]
+        let slice = magnitudes[startIndex ..< endIndex]
         let avg = slice.reduce(0) { $0 + $1.value } / Float(max(1, slice.count))
         grouped.append(avg)
       } else {

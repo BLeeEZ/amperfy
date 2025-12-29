@@ -350,7 +350,7 @@ public enum VisualizerType: String, CaseIterable, Sendable, Codable {
   case waveform
   case spectrumBars
   case generativeArt
-  
+
   public static let defaultValue: VisualizerType = .ring
 
   public var displayName: String {
@@ -371,7 +371,6 @@ public enum VisualizerType: String, CaseIterable, Sendable, Codable {
     }
   }
 }
-
 
 // MARK: - UIUserInterfaceStyle
 

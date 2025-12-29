@@ -63,7 +63,7 @@ struct AudioAnalyzerView: View {
         AmplitudeSpectrumView(
           shapeType: .ring,
           magnitudes: audioAnalyzer.magnitudes,
-          range: 0..<75,
+          range: 0 ..< 75,
           rms: audioAnalyzer.rms
         )
       }
