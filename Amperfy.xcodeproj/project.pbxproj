@@ -152,6 +152,9 @@
 		50AB3B462F03119800556CE4 /* GenerativeArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B412F03119800556CE4 /* GenerativeArtView.swift */; };
 		50AB3B472F03119800556CE4 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B442F03119800556CE4 /* WaveformView.swift */; };
 		50AB3B482F03119800556CE4 /* SpectrumBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */; };
+		50AB3B3E2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */; };
+		50AB3B402F02BC8600556CE4 /* FavoriteTypeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */; };
+		50AB3B4B2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */; };
 		50AC4E5328D909730091FF33 /* EventLogSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5128D909720091FF33 /* EventLogSettingsView.swift */; };
 		50AC4E5428D909730091FF33 /* EventLogCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5228D909730091FF33 /* EventLogCellView.swift */; };
 		50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AC4E5528D99A410091FF33 /* ButtonStyles.swift */; };
@@ -863,6 +866,9 @@
 		50AB3B412F03119800556CE4 /* GenerativeArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerativeArtView.swift; sourceTree = "<group>"; };
 		50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumBarsView.swift; sourceTree = "<group>"; };
 		50AB3B442F03119800556CE4 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
+		50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetFavoriteForCurrentlyPlayingSongIntent.swift; sourceTree = "<group>"; };
+		50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTypeAppEnum.swift; sourceTree = "<group>"; };
+		50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRatingForCurrentlyPlayingSongIntent.swift; sourceTree = "<group>"; };
 		50AB92BB26660FD800DCE45C /* artists_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = artists_example_1.xml; sourceTree = "<group>"; };
 		50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsArtistParserTest.swift; sourceTree = "<group>"; };
 		50AB92BF2666126300DCE45C /* album_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_example_1.xml; sourceTree = "<group>"; };
@@ -1514,6 +1520,7 @@
 				50B136F62EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift */,
 				50B136F72EFC36D500738475 /* RepeatTypeAppEnum.swift */,
 				50B136F92EFC36D500738475 /* ShuffleTypeAppEnum.swift */,
+				50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */,
 				5074149C2EFFC772007AEC5D /* PlaybackModeAppEnum.swift */,
 				507414A22F013C93007AEC5D /* PlayPausePlaybackAppEnum.swift */,
 				50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */,
@@ -1531,6 +1538,8 @@
 				50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */,
 				507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */,
 				507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */,
+				50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */,
+				50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */,
 				507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */,
 				50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */,
 				50253F7A284A566700BCCFB2 /* Intents.intentdefinition */,
@@ -2369,6 +2378,7 @@
 				507414992EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift in Sources */,
 				50B136FE2EFC36D500738475 /* RepeatTypeAppEnum.swift in Sources */,
 				50B136FF2EFC36D500738475 /* SearchAndPlayIntent.swift in Sources */,
+				50AB3B402F02BC8600556CE4 /* FavoriteTypeAppEnum.swift in Sources */,
 				50B137002EFC36D500738475 /* ShuffleTypeAppEnum.swift in Sources */,
 				504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */,
 				631C166B2C6D3D9A0085F62E /* SettingsRow.swift in Sources */,
@@ -2394,6 +2404,7 @@
 				50AAB9F52F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift in Sources */,
 				50DEEE0A265E392C0073FF20 /* IndexesVC.swift in Sources */,
 				50E1D39A2B8BEA540001A572 /* SplitVC.swift in Sources */,
+				50AB3B3E2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift in Sources */,
 				50CFB59728D4FC0100A47D44 /* ArtworkSettingsView.swift in Sources */,
 				5005939128E42F66008C8DF6 /* BasicCollectionCell.swift in Sources */,
 				5059A31E28ABDDCD0068E4D2 /* CarPlaySceneDelegate.swift in Sources */,
@@ -2456,6 +2467,7 @@
 				504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */,
 				50C9D70F2850759B007F18D0 /* BasicButton.swift in Sources */,
 				50BA930021CFDEBD00E5901D /* LibraryVC.swift in Sources */,
+				50AB3B4B2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift in Sources */,
 				5074149B2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift in Sources */,
 				50BA92FA21CC37F800E5901D /* SongsVC.swift in Sources */,
 				50C171422D0E143200C0C53A /* PlaylistAddLibraryVC.swift in Sources */,
