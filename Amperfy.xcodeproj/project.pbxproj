@@ -149,6 +149,9 @@
 		50AAB9F52F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */; };
 		50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */; };
 		50AB3B3C2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */; };
+		50AB3B462F03119800556CE4 /* GenerativeArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B412F03119800556CE4 /* GenerativeArtView.swift */; };
+		50AB3B472F03119800556CE4 /* WaveformView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B442F03119800556CE4 /* WaveformView.swift */; };
+		50AB3B482F03119800556CE4 /* SpectrumBarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */; };
 		50AB3B3E2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */; };
 		50AB3B402F02BC8600556CE4 /* FavoriteTypeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */; };
 		50AB3B462F03119800556CE4 /* GenerativeArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB3B412F03119800556CE4 /* GenerativeArtView.swift */; };
@@ -863,6 +866,9 @@
 		50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekToPlaybackTimeAppEnum.swift; sourceTree = "<group>"; };
 		50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeekTimeUnitAppEnum.swift; sourceTree = "<group>"; };
 		50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAppWithConfigurationIntent.swift; sourceTree = "<group>"; };
+		50AB3B412F03119800556CE4 /* GenerativeArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerativeArtView.swift; sourceTree = "<group>"; };
+		50AB3B432F03119800556CE4 /* SpectrumBarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrumBarsView.swift; sourceTree = "<group>"; };
+		50AB3B442F03119800556CE4 /* WaveformView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaveformView.swift; sourceTree = "<group>"; };
 		50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetFavoriteForCurrentlyPlayingSongIntent.swift; sourceTree = "<group>"; };
 		50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTypeAppEnum.swift; sourceTree = "<group>"; };
 		50AB3B412F03119800556CE4 /* GenerativeArtView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerativeArtView.swift; sourceTree = "<group>"; };
