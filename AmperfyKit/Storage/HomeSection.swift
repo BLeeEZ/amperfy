@@ -55,4 +55,23 @@ public enum HomeSection: Int, Sendable, CaseIterable, Codable {
     case .randomSongs: return "Random Songs"
     }
   }
+
+  public static func create(fromTitle: String) -> HomeSection? {
+    allCases.first(where: { $0.title == fromTitle })
+  }
+
+  public var isRandomSection: Bool {
+    switch self {
+    case .recentAlbums: return false
+    case .latestAlbums: return false
+    case .randomAlbums: return true
+    case .lastTimePlayedPlaylists: return false
+    case .latestPodcastEpisodes: return false
+    case .podcasts: return false
+    case .radios: return false
+    case .randomArtists: return true
+    case .randomGenres: return true
+    case .randomSongs: return true
+    }
+  }
 }

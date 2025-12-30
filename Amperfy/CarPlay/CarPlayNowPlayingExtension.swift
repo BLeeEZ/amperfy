@@ -94,8 +94,7 @@ extension CarPlaySceneDelegate {
   func displayNowPlaying(completion: @escaping (() -> ())) {
     configureNowPlayingTemplate()
     Task { @MainActor in
-      guard let _ = try? await interfaceController?.popToRootTemplate(animated: false)
-      else { return }
+      let _ = try? await interfaceController?.popToRootTemplate(animated: false)
       let _ = try? await self.interfaceController?
         .pushTemplate(CPNowPlayingTemplate.shared, animated: true)
     }

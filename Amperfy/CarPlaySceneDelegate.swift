@@ -60,6 +60,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   var activeAccountInfo: AccountInfo!
   var activeAccount: Account!
   var accountNotificationHandler: AccountNotificationHandler?
+  var sharedHome: HomeManager?
 
   var interfaceController: CPInterfaceController?
   var traits: UITraitCollection {
@@ -132,6 +133,16 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             return
           }
           activeAccount = appDelegate.storage.main.library.getAccount(info: accountInfo)
+          sharedHome = HomeManager(
+            account: activeAccount,
+            storage: appDelegate.storage,
+            getMeta: appDelegate.getMeta,
+            eventLogger: appDelegate.eventLogger
+          )
+          sharedHome?.applySnapshotCB = { [weak self] in
+            guard let self else { return }
+            updateHomeSections()
+          }
           refreshOfflineMode()
           self.interfaceController?.setRootTemplate(
             rootBarTemplate,
@@ -189,10 +200,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
   lazy var rootBarTemplate = {
     let bar = CPTabBarTemplate(templates: [
+      homeTab,
       libraryTab,
       cachedTab,
       playlistTab,
-      podcastTab,
     ].prefix(upToAsArray: CPTabBarTemplate.maximumTabCount))
     return bar
   }()
@@ -203,18 +214,169 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return playlistTab
   }()
 
-  lazy var podcastTab = {
-    let podcastsTab = CPListTemplate(title: "Podcasts", sections: [CPListSection]())
-    podcastsTab.tabImage = UIImage.podcast
-    return podcastsTab
-  }()
-
   lazy var libraryTab = {
     let libraryTab = CPListTemplate(title: "Library", sections: createLibrarySections())
     libraryTab.tabImage = UIImage.musicLibrary
     libraryTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
     return libraryTab
   }()
+
+  lazy var homeTab = {
+    let libraryTab = CPListTemplate(title: "Home", sections: createHomeSections())
+    libraryTab.tabImage = UIImage.home
+    libraryTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
+    return libraryTab
+  }()
+
+  func updateHomeSections() {
+    let homeRows = createHomeImageRows()
+    let homeSection = CPListSection(items: homeRows, header: nil, sectionIndexTitle: nil)
+    homeTab.updateSections([homeSection])
+  }
+
+  func createHomeSections() -> [CPListSection] {
+    let listSection = CPListSection(
+      items: createHomeImageRows(),
+      header: nil,
+      sectionIndexTitle: nil
+    )
+    return [listSection]
+  }
+
+  var homeImageRows: [HomeSection: CPListImageRowItem] = [:]
+
+  func createHomeRowImageElements(section: HomeSection) -> [CPListImageRowItemRowElement] {
+    guard let sharedHome else { return [] }
+    var imageRowElements = [CPListImageRowItemRowElement]()
+
+    let items = sharedHome.data[section] ?? []
+    for item in items {
+      var image: UIImage?
+      if let entity = item.playableContainable as? AbstractLibraryEntity {
+        image = LibraryEntityImage.getImageToDisplayImmediately(
+          libraryEntity: entity,
+          themePreference: getPreference(activeAccountInfo).theme,
+          artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
+          useCache: false
+        )
+        if let artwork = entity.artwork, let accountInfo = artwork.account?.info {
+          appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
+        }
+      }
+      let displayImage = image?.carPlayImage(carTraitCollection: traits) ?? UIImage
+        .getGeneratedArtwork(
+          theme: getPreference(activeAccountInfo).theme,
+          artworkType: item.playableContainable
+            .getArtworkCollection(theme: getPreference(activeAccountInfo).theme).defaultArtworkType
+        )
+
+      let element = CPListImageRowItemRowElement(
+        image: displayImage,
+        title: item.playableContainable.name,
+        subtitle: item.playableContainable.subtitle
+      )
+      imageRowElements.append(element)
+    }
+    return imageRowElements
+  }
+
+  func createHomeRow(section: HomeSection, isDetailTemplate: Bool) -> CPListImageRowItem? {
+    let imageRowElements = createHomeRowImageElements(section: section)
+    let isRandomSection = section.isRandomSection
+
+    var title: String?
+    if !isDetailTemplate {
+      title = section.title
+    } else if isRandomSection {
+      title = "Refresh"
+    }
+
+    let row = CPListImageRowItem(
+      text: title,
+      elements: imageRowElements,
+      allowsMultipleLines: isDetailTemplate
+    )
+    // handler CB is called when user pressed the section title
+    row.handler = { [weak self] selectedRow, completion in
+      guard let self else { completion(); return }
+      if !isDetailTemplate {
+        Task { @MainActor in
+          let detailSectionRow = createHomeRow(section: section, isDetailTemplate: true)
+          let detailListTemplate = CPListTemplate(title: section.title, sections: [
+            CPListSection(items: detailSectionRow != nil ? [detailSectionRow!] : []),
+          ])
+          let _ = try? await interfaceController?
+            .pushTemplate(detailListTemplate, animated: true)
+          completion()
+        }
+      } else if isRandomSection {
+        Task { @MainActor in
+          guard let sharedHome else { completion(); return }
+          switch section {
+          case .randomAlbums:
+            await sharedHome.updateRandomAlbums(isOfflineMode: isOfflineMode)
+          case .randomArtists:
+            await sharedHome.updateRandomArtists(isOfflineMode: isOfflineMode)
+          case .randomGenres:
+            await sharedHome.updateRandomGenres()
+          case .randomSongs:
+            await sharedHome.updateRandomSongs(isOfflineMode: isOfflineMode)
+          case .lastTimePlayedPlaylists, .latestAlbums, .latestPodcastEpisodes, .podcasts, .radios,
+               .recentAlbums:
+            // do nothing
+            break
+          }
+          if section.isRandomSection {
+            row.elements = createHomeRowImageElements(section: section)
+          }
+          completion()
+        }
+      } else {
+        completion()
+      }
+    }
+    // listImageRowHandler CB is called when user pressed on a image inside the row
+    row.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self,
+            let selectedPlayable = sharedHome?.data[section]?[index].playableContainable
+      else { completion(); return }
+      Task { @MainActor in
+        if !isOfflineMode {
+          do {
+            try await selectedPlayable.fetch(
+              storage: self.appDelegate.storage,
+              librarySyncer: self.appDelegate.getMeta(activeAccountInfo).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(activeAccountInfo)
+                .playableDownloadManager
+            )
+          } catch {
+            // ignore online fetch in CarPlay
+          }
+        }
+        self.appDelegate.player.play(context: PlayContext(containable: selectedPlayable))
+        displayNowPlaying {
+          completion()
+        }
+      }
+    }
+    return row
+  }
+
+  func createHomeImageRows() -> [CPListImageRowItem] {
+    guard let sharedHome else { return [] }
+    var imageRows = [CPListImageRowItem]()
+    for section in sharedHome.orderedVisibleSections {
+      let imageRowElements = createHomeRowImageElements(section: section)
+      if let row = homeImageRows[section] {
+        row.elements = imageRowElements
+        imageRows.append(row)
+      } else if let row = createHomeRow(section: section, isDetailTemplate: false) {
+        homeImageRows[section] = row
+        imageRows.append(row)
+      }
+    }
+    return imageRows
+  }
 
   func createLibrarySections() -> [CPListSection] {
     let continuePlayingItems = createContinePlayingItems()
@@ -234,6 +396,17 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         CPListSection(items: [
           createLibraryItem(text: "Channels", icon: UIImage.radio, sectionToDisplay: radioSection),
         ], header: "Radio", sectionIndexTitle: nil)
+        : nil,
+      appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
+        .libraryDisplaySettings
+        .isVisible(libraryType: .podcasts) ?
+        CPListSection(items: [
+          createLibraryItem(
+            text: "Podcasts",
+            icon: UIImage.podcast,
+            sectionToDisplay: podcastSection
+          ),
+        ], header: "Podcasts", sectionIndexTitle: nil)
         : nil,
       CPListSection(items: [
         createPlayRandomSongsItem(onlyCached: false),
@@ -367,6 +540,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return template
   }()
 
+  lazy var podcastSection = {
+    let template = CPListTemplate(title: "Podcasts", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
+
   lazy var artistsFavoriteSection = {
     let template = CPListTemplate(title: "Favorite Artists", sections: [
       CPListSection(items: [CPListTemplateItem]()),
@@ -471,8 +651,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     item.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       Task { @MainActor in
-        guard let _ = try? await interfaceController?
-          .pushTemplate(sectionToDisplay, animated: true) else { return }
+        let _ = try? await interfaceController?
+          .pushTemplate(sectionToDisplay, animated: true)
         completion()
       }
     }
@@ -1125,6 +1305,32 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     else { return }
     guard let templates = interfaceController?.templates else { return }
 
+    #if false // deactivate Image Row update for now
+      if templates.count >= 1,
+         let tabBarTemplate = templates.first as? CPTabBarTemplate,
+         homeTab == tabBarTemplate.selectedTemplate {
+        // self.updateHomeSections()
+        if templates.count == 2,
+           let listTemplate = templates.last as? CPListTemplate,
+           listTemplate.sections.count == 1,
+           let detailRow = listTemplate.sections.first?.items.first as? CPListImageRowItem,
+           let detailSectionName = listTemplate.title,
+           let homeSection = HomeSection.create(fromTitle: detailSectionName) {
+          if let dataIndex = sharedHome?.data[homeSection]?.firstIndex(where: {
+            guard let abstractEntity = $0.playableContainable as? AbstractLibraryEntity,
+                  let artwork = abstractEntity.artwork
+            else { return false }
+            return artwork.uniqueID == downloadNotification.id
+          }), dataIndex < detailRow.elements.count {
+            let createdRowItems = createHomeRowImageElements(section: homeSection)
+            if detailRow.elements.count == createdRowItems.count {
+              detailRow.elements[dataIndex].image = createdRowItems[dataIndex].image
+            }
+          }
+        }
+      }
+    #endif
+
     for template in templates {
       var sections: [CPListSection]?
 
@@ -1223,6 +1429,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   @objc
   private func refreshSort() {
     guard let templates = interfaceController?.templates else { return }
+
     if let root = interfaceController?.rootTemplate as? CPTabBarTemplate,
        root.selectedTemplate == playlistTab,
        playlistFetchController?.sortType != appDelegate.storage.settings.user.playlistsSortSetting {
@@ -1321,17 +1528,23 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     os_log("CarPlay: OfflineModeChanged", log: self.log, type: .info)
     guard let templates = interfaceController?.templates else { return }
 
+    sharedHome?.createFetchController()
+
+    if let root = interfaceController?.rootTemplate as? CPTabBarTemplate,
+       root.selectedTemplate == homeTab {
+      os_log("CarPlay: OfflineModeChanged: HomeSections", log: self.log, type: .info)
+      updateHomeSections()
+    }
     if let root = interfaceController?.rootTemplate as? CPTabBarTemplate,
        root.selectedTemplate == playlistTab {
       os_log("CarPlay: OfflineModeChanged: playlistFetchController", log: self.log, type: .info)
       createPlaylistFetchController()
       playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
     }
-    if let root = interfaceController?.rootTemplate as? CPTabBarTemplate,
-       root.selectedTemplate == podcastTab {
+    if templates.contains(podcastSection) {
       os_log("CarPlay: OfflineModeChanged: podcastFetchController", log: self.log, type: .info)
       createPodcastFetchController()
-      podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+      podcastSection.updateSections([CPListSection(items: createPodcastsSections())])
     }
     if templates.contains(artistsFavoriteSection) {
       os_log(
@@ -1418,12 +1631,10 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
         os_log("CarPlay: FetchedResults: playlistFetchController", log: self.log, type: .info)
         playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
       }
-      if let root = self.interfaceController?.rootTemplate as? CPTabBarTemplate,
-         root.selectedTemplate == podcastTab,
-         let podcastFetchController = podcastFetchController,
+      if templates.contains(podcastSection), let podcastFetchController = podcastFetchController,
          controller == podcastFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: podcastFetchController", log: self.log, type: .info)
-        podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+        podcastSection.updateSections([CPListSection(items: createPodcastsSections())])
       }
 
       if templates.contains(radioSection), let radiosFetchController = radiosFetchController,
@@ -1581,6 +1792,9 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       if aTemplate == playerQueueSection {
         os_log("CarPlay: templateWillAppear playerQueueSection", log: self.log, type: .info)
         playerQueueSection.updateSections(createPlayerQueueSections())
+      } else if aTemplate == homeTab {
+        os_log("CarPlay: templateWillAppear: homeTab", log: self.log, type: .info)
+        self.updateHomeSections()
       } else if aTemplate == libraryTab {
         os_log("CarPlay: templateWillAppear libraryTab", log: self.log, type: .info)
         libraryTab.updateSections(createLibrarySections())
@@ -1597,10 +1811,10 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         }}
         if playlistFetchController == nil { createPlaylistFetchController() }
         playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
-      } else if aTemplate == podcastTab {
-        os_log("CarPlay: templateWillAppear podcastTab", log: self.log, type: .info)
+      } else if aTemplate == podcastSection {
+        os_log("CarPlay: templateWillAppear podcastSection", log: self.log, type: .info)
         if podcastFetchController == nil { createPodcastFetchController() }
-        podcastTab.updateSections([CPListSection(items: createPodcastsSections())])
+        podcastSection.updateSections([CPListSection(items: createPodcastsSections())])
       } else if aTemplate == accountSection {
         os_log("CarPlay: templateWillAppear accountSection", log: self.log, type: .info)
         accountSection.updateSections(createAccountsSections())

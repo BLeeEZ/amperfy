@@ -23,9 +23,9 @@ import Foundation
 import UIKit
 
 public class ArtworkCollection {
-  let defaultArtworkType: ArtworkType
-  let singleImageEntity: AbstractLibraryEntity?
-  let quadImageEntity: [AbstractLibraryEntity]?
+  public let defaultArtworkType: ArtworkType
+  public let singleImageEntity: AbstractLibraryEntity?
+  public let quadImageEntity: [AbstractLibraryEntity]?
 
   init(
     defaultArtworkType: ArtworkType,

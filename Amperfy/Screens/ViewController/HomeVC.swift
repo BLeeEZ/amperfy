@@ -24,148 +24,39 @@ import CoreData
 import OSLog
 import UIKit
 
-extension UIViewController {
-  private func createUserButtonMenu() -> UIMenu {
-    var accountActions = [UIMenuElement]()
-    for accountInfo in appDelegate.storage.settings.accounts.allAccounts {
-      let isActiveAccount = (accountInfo == appDelegate.storage.settings.accounts.active)
-      let action = UIAction(
-        title: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
-          .loginCredentials?
-          .username ?? "Unknown",
-        subtitle: appDelegate.storage.settings.accounts.getSetting(accountInfo).read
-          .loginCredentials?
-          .displayServerUrl ?? "",
-        image: .userCircle(withConfiguration: UIImage.SymbolConfiguration(
-          pointSize: 30,
-          weight: .regular
-        )),
-        attributes: isActiveAccount ? [UIMenuElement.Attributes.disabled] : [],
-        state: isActiveAccount ? .on : .off,
-        handler: { _ in
-          self.appDelegate.switchAccount(accountInfo: accountInfo)
-        }
-      )
-      accountActions.append(action)
-    }
-
-    #if targetEnvironment(macCatalyst)
-      let addAccountImage = UIImage.plus
-    #else
-      let addAccountImage = UIImage.userCirclePlus
-    #endif
-    let openAddAccount = UIAction(
-      title: "Add Account",
-      image: addAccountImage,
-      handler: { _ in
-        let loginVC = AppStoryboard.Main.segueToLogin()
-        loginVC.modalPresentationStyle = .formSheet
-        self.present(loginVC, animated: true)
-      }
-    )
-    let openSettings = UIAction(
-      title: "Settings",
-      image: .settings,
-      handler: { _ in
-        #if targetEnvironment(macCatalyst)
-          self.appDelegate.showSettings(sender: "")
-        #else
-          let nav = AppStoryboard.Main.segueToSettings()
-          nav.modalPresentationStyle = .formSheet
-          self.present(nav, animated: true)
-        #endif
-      }
-    )
-    let settingsMenu = UIMenu(options: [.displayInline], children: [openAddAccount, openSettings])
-    accountActions.append(settingsMenu)
-
-    return UIMenu(
-      title: "",
-      image: nil,
-      options: [.displayInline],
-      children: accountActions
-    )
-  }
-
-  public func setupUserNavButton(
-    currentAccount: Account,
-    userButton: inout UIButton?,
-    userBarButtonItem: inout UIBarButtonItem?
-  ) {
-    let image = UIImage.userCircle(withConfiguration: UIImage.SymbolConfiguration(
-      pointSize: 24,
-      weight: .regular
-    )).withTintColor(
-      appDelegate.storage.settings.accounts.getSetting(currentAccount.info).read
-        .themePreference.asColor,
-      renderingMode: .alwaysTemplate
-    )
-
-    let button = UIButton(type: .system)
-    button.setImage(image, for: .normal)
-    button.layer.cornerRadius = 20
-    button.clipsToBounds = true
-    #if targetEnvironment(macCatalyst)
-      button.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
-    #else
-      button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-    #endif
-    button.menu = createUserButtonMenu()
-    button.showsMenuAsPrimaryAction = true
-    userButton = button
-
-    userBarButtonItem = UIBarButtonItem(customView: button)
-    navigationItem.leftBarButtonItem = userBarButtonItem!
-  }
-}
-
 // MARK: - HomeVC
 
 final class HomeVC: UICollectionViewController {
-  // MARK: - Types
-
-  struct Item: Hashable, @unchecked Sendable {
-    let id = UUID()
-    var playableContainable: PlayableContainable
-
-    static func == (lhs: HomeVC.Item, rhs: HomeVC.Item) -> Bool {
-      lhs.id == rhs.id
-    }
-
-    func hash(into hasher: inout Hasher) {
-      hasher.combine(id)
-    }
-  }
-
   // MARK: - Properties
 
-  private var data: [HomeSection: [Item]] = [:]
-  private var dataSource: UICollectionViewDiffableDataSource<HomeSection, Item>!
+  private var dataSource: UICollectionViewDiffableDataSource<HomeSection, HomeItem>!
   private let log = OSLog(subsystem: "Amperfy", category: "HomeVC")
 
   private static let itemWidth: CGFloat = 160.0
-  private static let sectionMaxItemCount = 20
-
-  private var albumsRecentFetchController: AlbumFetchedResultsController?
-  private var albumsLatestFetchController: AlbumFetchedResultsController?
-  private var playlistsLastTimePlayedFetchController: PlaylistFetchedResultsController?
-  private var podcastEpisodesFetchedController: PodcastEpisodesReleaseDateFetchedResultsController?
-  private var podcastsFetchedController: PodcastFetchedResultsController?
-  private var radiosFetchedController: RadiosFetchedResultsController?
-
-  private var orderedVisibleSections: [HomeSection]!
 
   private var userButton: UIButton?
   private var userBarButtonItem: UIBarButtonItem?
   private let account: Account
   private var accountNotificationHandler: AccountNotificationHandler?
+  private let sharedHome: HomeManager
 
   // MARK: - Init
 
   init(account: Account) {
     self.account = account
+    let appDelegate = (UIApplication.shared.delegate as! AppDelegate)
+    self.sharedHome = HomeManager(
+      account: account,
+      storage: appDelegate.storage,
+      getMeta: appDelegate.getMeta,
+      eventLogger: appDelegate.eventLogger
+    )
     let layout = HomeVC.createLayout()
     super.init(collectionViewLayout: layout)
+    sharedHome.applySnapshotCB = { [weak self] in
+      guard let self else { return }
+      applySnapshot(animated: true)
+    }
   }
 
   required init?(coder: NSCoder) {
@@ -176,8 +67,6 @@ final class HomeVC: UICollectionViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    orderedVisibleSections = appDelegate.storage.settings.accounts
-      .getSetting(account.info).read.homeSections
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
@@ -204,7 +93,7 @@ final class HomeVC: UICollectionViewController {
     )
     configureCollectionView()
     configureDataSource()
-    createFetchController()
+    sharedHome.createFetchController()
     applySnapshot(animated: false)
 
     appDelegate.notificationHandler.register(
@@ -223,7 +112,7 @@ final class HomeVC: UICollectionViewController {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
-    updateFromRemote()
+    sharedHome.updateFromRemote()
   }
 
   // MARK: - Layout
@@ -296,7 +185,7 @@ final class HomeVC: UICollectionViewController {
   private func configureDataSource() {
     dataSource = UICollectionViewDiffableDataSource<
       HomeSection,
-      Item
+      HomeItem
     >(collectionView: collectionView) { collectionView, indexPath, item in
       let cell = collectionView.dequeueReusableCell(
         withReuseIdentifier: AlbumCollectionCell.typeName,
@@ -318,7 +207,8 @@ final class HomeVC: UICollectionViewController {
               withReuseIdentifier: SectionHeaderView.reuseID,
               for: indexPath
             ) as? SectionHeaderView,
-            let section = self.orderedVisibleSections.element(at: indexPath.section) else {
+            let section = self.sharedHome.orderedVisibleSections.element(at: indexPath.section)
+      else {
         return nil
       }
       header.title = section.title
@@ -343,199 +233,19 @@ final class HomeVC: UICollectionViewController {
   }
 
   private func applySnapshot(animated: Bool = true) {
-    var snapshot = NSDiffableDataSourceSnapshot<HomeSection, Item>()
-    snapshot.appendSections(orderedVisibleSections)
-    for section in orderedVisibleSections {
-      let items = data[section] ?? []
+    var snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>()
+    snapshot.appendSections(sharedHome.orderedVisibleSections)
+    for section in sharedHome.orderedVisibleSections {
+      let items = sharedHome.data[section] ?? []
       snapshot.appendItems(items, toSection: section)
     }
     dataSource.apply(snapshot, animatingDifferences: animated)
   }
 
-  var isOfflineMode: Bool {
-    appDelegate.storage.settings.user.isOfflineMode
-  }
-
   @objc
   private func refreshOfflineMode() {
     os_log("HomeVC: OfflineModeChanged", log: self.log, type: .info)
-    createFetchController()
-  }
-
-  func createFetchController() {
-    if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
-      albumsRecentFetchController = AlbumFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: account,
-        sortType: .recent,
-        isGroupedInAlphabeticSections: false,
-        fetchLimit: Self.sectionMaxItemCount
-      )
-      albumsRecentFetchController?.delegate = self
-      albumsRecentFetchController?.search(
-        searchText: "",
-        onlyCached: isOfflineMode,
-        displayFilter: .recent
-      )
-      updateAlbumsRecent()
-    } else {
-      albumsRecentFetchController?.delegate = nil
-      albumsRecentFetchController = nil
-    }
-
-    if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
-      albumsLatestFetchController = AlbumFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: account,
-        sortType: .recent,
-        isGroupedInAlphabeticSections: false,
-        fetchLimit: Self.sectionMaxItemCount
-      )
-      albumsLatestFetchController?.delegate = self
-      albumsLatestFetchController?.search(
-        searchText: "",
-        onlyCached: isOfflineMode,
-        displayFilter: .newest
-      )
-      updateAlbumsLatest()
-    } else {
-      albumsLatestFetchController?.delegate = nil
-      albumsLatestFetchController = nil
-    }
-
-    if orderedVisibleSections.contains(where: { $0 == .randomAlbums }) {
-      updateRandomAlbums(isOfflineMode: isOfflineMode)
-    }
-    if orderedVisibleSections.contains(where: { $0 == .randomArtists }) {
-      updateRandomArtists(isOfflineMode: isOfflineMode)
-    }
-    if orderedVisibleSections.contains(where: { $0 == .randomGenres }) {
-      updateRandomGenres()
-    }
-    if orderedVisibleSections.contains(where: { $0 == .randomSongs }) {
-      updateRandomSongs(isOfflineMode: isOfflineMode)
-    }
-
-    if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
-      playlistsLastTimePlayedFetchController = PlaylistFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: account,
-        sortType: .lastPlayed,
-        isGroupedInAlphabeticSections: false,
-        fetchLimit: Self.sectionMaxItemCount
-      )
-      playlistsLastTimePlayedFetchController?.delegate = self
-      playlistsLastTimePlayedFetchController?.search(
-        searchText: "",
-        playlistSearchCategory: isOfflineMode ? .cached : .all
-      )
-      updatePlaylistsLastTimePlayed()
-    } else {
-      playlistsLastTimePlayedFetchController?.delegate = nil
-      playlistsLastTimePlayedFetchController = nil
-    }
-
-    if orderedVisibleSections.contains(where: { $0 == .latestPodcastEpisodes }) {
-      podcastEpisodesFetchedController = PodcastEpisodesReleaseDateFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: account,
-        isGroupedInAlphabeticSections: false,
-        fetchLimit: Self.sectionMaxItemCount
-      )
-      podcastEpisodesFetchedController?.delegate = self
-      podcastEpisodesFetchedController?.search(searchText: "", onlyCachedSongs: isOfflineMode)
-      updatePodcastEpisodesLatest()
-    } else {
-      podcastEpisodesFetchedController?.delegate = nil
-      podcastEpisodesFetchedController = nil
-    }
-
-    if orderedVisibleSections.contains(where: { $0 == .podcasts }) {
-      podcastsFetchedController = PodcastFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: account,
-        isGroupedInAlphabeticSections: false
-      )
-      podcastsFetchedController?.delegate = self
-      podcastsFetchedController?.search(searchText: "", onlyCached: isOfflineMode)
-      updatePodcasts()
-    } else {
-      podcastsFetchedController?.delegate = nil
-      podcastsFetchedController = nil
-    }
-
-    if orderedVisibleSections.contains(where: { $0 == .radios }) {
-      radiosFetchedController = RadiosFetchedResultsController(
-        coreDataCompanion: appDelegate.storage.main, account: account,
-        isGroupedInAlphabeticSections: true
-      )
-      radiosFetchedController?.delegate = self
-      radiosFetchedController?.fetch()
-      updateRadios()
-    } else {
-      radiosFetchedController?.delegate = nil
-      radiosFetchedController = nil
-    }
-  }
-
-  func updateFromRemote() {
-    guard appDelegate.storage.settings.user.isOnlineMode else { return }
-    if orderedVisibleSections.contains(where: { $0 == .latestAlbums }) {
-      Task { @MainActor in
-        do {
-          try await AutoDownloadLibrarySyncer(
-            storage: self.appDelegate.storage,
-            account: self.account,
-            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
-              .playableDownloadManager
-          )
-          .syncNewestLibraryElements(offset: 0, count: Self.sectionMaxItemCount)
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Newest Albums Sync", error: error)
-        }
-      }
-    }
-    if orderedVisibleSections.contains(where: { $0 == .recentAlbums }) {
-      Task { @MainActor in
-        do {
-          try await self.appDelegate.getMeta(self.account.info).librarySyncer
-            .syncRecentAlbums(
-              offset: 0,
-              count: Self.sectionMaxItemCount
-            )
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
-        }
-      }
-    }
-    if orderedVisibleSections.contains(where: { $0 == .lastTimePlayedPlaylists }) {
-      Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.account.info).librarySyncer
-          .syncDownPlaylistsWithoutSongs()
-      } catch {
-        self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
-      }}
-    }
-    if orderedVisibleSections.contains(where: { $0 == .latestPodcastEpisodes }) {
-      Task { @MainActor in do {
-        let _ = try await AutoDownloadLibrarySyncer(
-          storage: self.appDelegate.storage,
-          account: self.account,
-          librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
-          playableDownloadManager: self.appDelegate.getMeta(self.account.info)
-            .playableDownloadManager
-        )
-        .syncNewestPodcastEpisodes()
-      } catch {
-        self.appDelegate.eventLogger.report(topic: "Podcasts Sync", error: error)
-      }}
-    }
-    if orderedVisibleSections.contains(where: { $0 == .radios }) {
-      Task { @MainActor in
-        do {
-          try await self.appDelegate.getMeta(self.account.info).librarySyncer
-            .syncRadios()
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Radios Sync", error: error)
-        }
-      }
-    }
+    sharedHome.createFetchController()
   }
 
   @objc
@@ -545,9 +255,9 @@ final class HomeVC: UICollectionViewController {
 
   private func presentSectionEditor() {
     // Build a simple editor using a temporary UIViewController with a table view
-    let editor = HomeEditorVC(current: orderedVisibleSections) { [weak self] newOrder in
+    let editor = HomeEditorVC(current: sharedHome.orderedVisibleSections) { [weak self] newOrder in
       guard let self else { return }
-      orderedVisibleSections = newOrder
+      sharedHome.orderedVisibleSections = newOrder
       if let accountInfo = appDelegate.storage.settings.accounts.active {
         appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
           accountSettings.homeSections = newOrder
@@ -555,8 +265,8 @@ final class HomeVC: UICollectionViewController {
       }
       applySnapshot(animated: true)
 
-      createFetchController()
-      updateFromRemote()
+      sharedHome.createFetchController()
+      sharedHome.updateFromRemote()
     }
     let nav = UINavigationController(rootViewController: editor)
     nav.modalPresentationStyle = .formSheet
@@ -565,22 +275,30 @@ final class HomeVC: UICollectionViewController {
 
   @objc
   func refreshRandomAlbumsSection() {
-    updateRandomAlbums(isOfflineMode: isOfflineMode)
+    Task { @MainActor in
+      await sharedHome.updateRandomAlbums(isOfflineMode: sharedHome.isOfflineMode)
+    }
   }
 
   @objc
   func refreshRandomArtistsSection() {
-    updateRandomArtists(isOfflineMode: isOfflineMode)
+    Task { @MainActor in
+      await sharedHome.updateRandomArtists(isOfflineMode: sharedHome.isOfflineMode)
+    }
   }
 
   @objc
   func refreshRandomGenresSection() {
-    updateRandomGenres()
+    Task { @MainActor in
+      await sharedHome.updateRandomGenres()
+    }
   }
 
   @objc
   func refreshRandomSongsSection() {
-    updateRandomSongs(isOfflineMode: isOfflineMode)
+    Task { @MainActor in
+      await sharedHome.updateRandomSongs(isOfflineMode: sharedHome.isOfflineMode)
+    }
   }
 
   // MARK: - Selection Handling
@@ -641,147 +359,9 @@ final class HomeVC: UICollectionViewController {
       navigationController?.navigationBar.prefersLargeTitles = false
     }
   }
-
-  func updateAlbumsRecent() {
-    if let albums = albumsRecentFetchController?.fetchedObjects as? [AlbumMO] {
-      data[.recentAlbums] = albums.prefix(Self.sectionMaxItemCount)
-        .compactMap { Album(managedObject: $0) }.compactMap {
-          Item(playableContainable: $0)
-        }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updateAlbumsLatest() {
-    if let albums = albumsLatestFetchController?.fetchedObjects as? [AlbumMO] {
-      data[.latestAlbums] = albums.prefix(Self.sectionMaxItemCount)
-        .compactMap { Album(managedObject: $0) }.compactMap {
-          Item(playableContainable: $0)
-        }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updateRandomAlbums(isOfflineMode: Bool) {
-    Task { @MainActor in
-      let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
-        for: self.account,
-        count: Self.sectionMaxItemCount,
-        onlyCached: isOfflineMode
-      )
-      data[.randomAlbums] = randomAlbums.compactMap {
-        Item(playableContainable: $0)
-      }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updateRandomArtists(isOfflineMode: Bool) {
-    Task { @MainActor in
-      let randomArtists = appDelegate.storage.main.library.getRandomArtists(
-        for: self.account,
-        count: Self.sectionMaxItemCount,
-        onlyCached: isOfflineMode
-      )
-      data[.randomArtists] = randomArtists.compactMap {
-        Item(playableContainable: $0)
-      }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updateRandomGenres() {
-    Task { @MainActor in
-      let randomGenres = appDelegate.storage.main.library.getRandomGenres(
-        for: account,
-        count: Self.sectionMaxItemCount
-      )
-      data[.randomGenres] = randomGenres.compactMap {
-        Item(playableContainable: $0)
-      }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updateRandomSongs(isOfflineMode: Bool) {
-    Task { @MainActor in
-      let randomSongs = appDelegate.storage.main.library.getRandomSongs(
-        for: account,
-        count: Self.sectionMaxItemCount,
-        onlyCached: isOfflineMode
-      )
-      data[.randomSongs] = randomSongs.compactMap {
-        Item(playableContainable: $0)
-      }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updatePlaylistsLastTimePlayed() {
-    if let playlists = playlistsLastTimePlayedFetchController?.fetchedObjects as? [PlaylistMO] {
-      data[.lastTimePlayedPlaylists] = playlists.prefix(Self.sectionMaxItemCount)
-        .compactMap { Playlist(
-          library: appDelegate.storage.main.library,
-          managedObject: $0
-        ) }.compactMap {
-          Item(playableContainable: $0)
-        }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updatePodcastEpisodesLatest() {
-    if let podcastEpisodes = podcastEpisodesFetchedController?
-      .fetchedObjects as? [PodcastEpisodeMO] {
-      data[.latestPodcastEpisodes] = podcastEpisodes.prefix(Self.sectionMaxItemCount)
-        .compactMap { PodcastEpisode(managedObject: $0) }.compactMap {
-          Item(playableContainable: $0)
-        }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updatePodcasts() {
-    if let podcasts = podcastsFetchedController?.fetchedObjects as? [PodcastMO] {
-      data[.podcasts] = podcasts.prefix(Self.sectionMaxItemCount)
-        .compactMap { Podcast(managedObject: $0) }.compactMap {
-          Item(playableContainable: $0)
-        }
-      applySnapshot(animated: true)
-    }
-  }
-
-  func updateRadios() {
-    if let radios = radiosFetchedController?.fetchedObjects as? [RadioMO] {
-      data[.radios] = radios.prefix(Self.sectionMaxItemCount)
-        .compactMap { Radio(managedObject: $0) }.compactMap {
-          Item(playableContainable: $0)
-        }
-      applySnapshot(animated: true)
-    }
-  }
 }
 
-extension HomeVC: @preconcurrency NSFetchedResultsControllerDelegate {
-  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-    // fetch controller is created on Main thread -> Runtime Error if this function call is not on Main thread
-    MainActor.assumeIsolated {
-      if controller == albumsRecentFetchController?.fetchResultsController {
-        updateAlbumsRecent()
-      } else if controller == albumsLatestFetchController?.fetchResultsController {
-        updateAlbumsLatest()
-      } else if controller == playlistsLastTimePlayedFetchController?.fetchResultsController {
-        updatePlaylistsLastTimePlayed()
-      } else if controller == podcastEpisodesFetchedController?.fetchResultsController {
-        updatePodcastEpisodesLatest()
-      } else if controller == podcastsFetchedController?.fetchResultsController {
-        updatePodcasts()
-      } else if controller == radiosFetchedController?.fetchResultsController {
-        updateRadios()
-      }
-    }
-  }
-
+extension HomeVC {
   override func collectionView(
     _ collectionView: UICollectionView,
     contextMenuConfigurationForItemAt indexPath: IndexPath,
