@@ -354,7 +354,7 @@ class BackendAudioPlayer: NSObject {
     guard player == nil else { return }
     player = createAudioStreamingPlayerCB()
 
-    equalizer = AVAudioUnitEQ(numberOfBands: 10)
+    equalizer = AVAudioUnitEQ(numberOfBands: 32)
     replayGainNode = AVAudioMixerNode()
     audioAnalyzer = AudioAnalyzer()
 
@@ -370,7 +370,6 @@ class BackendAudioPlayer: NSObject {
 
     audioAnalyzer.install(on: equalizer!)
 
-    setupEqualizerBands()
     applyEqualizerSetting(eqSetting: currentEqualizerSetting)
     applyReplayGain()
     os_log(.debug, "Player setup completed with EQ and ReplayGain support")
@@ -677,46 +676,77 @@ class BackendAudioPlayer: NSObject {
     applyReplayGain()
   }
 
-  private func setupEqualizerBands() {
+  private func setupEqualizerBands(for setting: EqualizerSetting) {
     guard let equalizer else { return }
 
-    for (index, frequency) in EqualizerSetting.frequencies.enumerated() {
+    // Re-create equalizer if band count changed significantly, or just update bands
+    // For simplicity, we'll try to use existing bands if possible, or re-init if needed.
+    // AVAudioUnitEQ supports a fixed number of bands once initialized.
+    // However, we can bypass unused bands.
+    
+    let requiredBands = setting.bands.count
+    if equalizer.bands.count < requiredBands {
+      // We might need to restart the player to change the number of bands,
+      // but let's try to initialize with a reasonable max (e.g. 32) if the engine is restarted.
+      // For now, let's keep it at 10 and log a warning if more are needed.
+      os_log(.error, "Required bands (%d) exceeds available bands (%d)", requiredBands, equalizer.bands.count)
+    }
+
+    for (index, bandSetting) in setting.bands.enumerated() {
       guard index < equalizer.bands.count else { break }
 
       let band = equalizer.bands[index]
-      band.frequency = frequency
-      band.bandwidth = 1.0
-      band.filterType = .parametric
-      band.gain = 0.0
-      band.bypass = false
+      band.frequency = bandSetting.frequency
+      band.gain = bandSetting.gain
+      band.bypass = bandSetting.bypass
+      
+      switch bandSetting.filterType {
+      case .parametric:
+        band.filterType = .parametric
+        // Convert Q to bandwidth in octaves
+        // Relationship: N = log2((2Q^2 + 1 + sqrt(4Q^2 + 1)) / (2Q^2))
+        let q = bandSetting.bandwidth
+        if q > 0 {
+          let n = log2((2 * pow(q, 2) + 1 + sqrt(4 * pow(q, 2) + 1)) / (2 * pow(q, 2)))
+          band.bandwidth = n
+        } else {
+          band.bandwidth = 1.0
+        }
+      case .lowShelf:
+        band.filterType = .lowShelf
+        // For shelf filters, bandwidth property is slope in dB/octave.
+        // AutoEQ Q for shelves is often intended as a standard 12dB/oct slope.
+        band.bandwidth = 12.0
+      case .highShelf:
+        band.filterType = .highShelf
+        band.bandwidth = 12.0
+      case .lowPass:
+        band.filterType = .lowPass
+        band.bandwidth = 1.0 // Standard resonance
+      case .highPass:
+        band.filterType = .highPass
+        band.bandwidth = 1.0
+      }
+    }
+    
+    // Bypass remaining bands
+    if equalizer.bands.count > requiredBands {
+      for index in requiredBands ..< equalizer.bands.count {
+        equalizer.bands[index].bypass = true
+      }
     }
   }
 
   private func applyEqualizerSetting(eqSetting: EqualizerSetting) {
     guard let equalizer else { return }
 
-    // EQ band gains
-    for (index, gain) in eqSetting.gains.enumerated() {
-      guard index < equalizer.bands.count else { break }
-
-      let band = equalizer.bands[index]
-
-      band.filterType = .parametric
-      band.bandwidth = 1.0
-      band.gain = gain
-      band.bypass = false
-    }
+    equalizer.bypass = !isEqualizerEnabled
+    setupEqualizerBands(for: eqSetting)
 
     equalizerVolumeCompensation = isEqualizerEnabled ? eqSetting.compensatedVolume : 1.0
 
     os_log(.debug, "   EQ '%s'", eqSetting.description)
-    os_log(
-      .debug,
-      "   EQ Gains: [%@] dB",
-      eqSetting.gains.map { String(format: "%.1f", $0) }.joined(separator: ", ")
-    )
     os_log(.debug, "   EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
-    os_log(.debug, "   EQ linear Volume Compensation: %.2f", eqSetting.compensatedVolume)
     os_log(.debug, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
   }
 

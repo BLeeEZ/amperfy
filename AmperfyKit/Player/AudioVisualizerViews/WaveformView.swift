@@ -39,16 +39,23 @@ public struct WaveformView: View {
       guard magnitudes.count > 1 else { return }
 
       var path = Path()
-      let step = size.width / CGFloat(magnitudes.count - 1)
+      let count = magnitudes.count
+      let step = size.width / CGFloat(max(1, count - 1))
+      guard !step.isNaN else { return }
 
       for (index, magnitude) in magnitudes.enumerated() {
+        let magVal = CGFloat(magnitude.value)
+        guard !magVal.isNaN else { continue }
+        
         let x = CGFloat(index) * step
-        let amplitude = CGFloat(magnitude.value) * size.height * 0.4
+        let amplitude = magVal * size.height * 0.4
         let y = midY + (index % 2 == 0 ? amplitude : -amplitude)
+        
+        guard !x.isNaN && !y.isNaN else { continue }
 
         if index == 0 {
           path.move(to: CGPoint(x: x, y: y))
-        } else {
+        } else if !path.isEmpty {
           let prevX = CGFloat(index - 1) * step
           let prevMagnitude = magnitudes[index - 1]
           let prevAmplitude = CGFloat(prevMagnitude.value) * size.height * 0.4

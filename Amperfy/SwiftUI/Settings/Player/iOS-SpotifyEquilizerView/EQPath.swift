@@ -67,14 +67,15 @@ extension Shape {
     let totalSpacing = sliderWidth + sliderSpacing
 
     func calcYPos(sliderValue: CGFloat) -> CGFloat {
-      (0.05 * rect.height) +
+      let safeValue = sliderValue.isNaN ? 0 : sliderValue
+      return (0.05 * rect.height) +
         (
           0.90 *
             (
               rect
                 .height -
                 (
-                  ((0.5 * (sliderValue / CGFloat(EqualizerSetting.rangeFromZero))) + 0.5) *
+                  ((0.5 * (safeValue / CGFloat(EqualizerSetting.legacyRangeFromZero))) + 0.5) *
                     sliderFrameH
                 )
             )

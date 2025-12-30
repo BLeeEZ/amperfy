@@ -32,19 +32,24 @@ public struct GenerativeArtView: View {
   }
 
   private func bassEnergy() -> Float {
-    guard magnitudes.count > 10 else { return 0.3 }
-    return magnitudes[0..<10].reduce(0) { $0 + $1.value } / 10.0
+    let slice = magnitudes.prefix(10).map { $0.value }.filter { !$0.isNaN }
+    guard !slice.isEmpty else { return 0.2 }
+    return slice.reduce(0, +) / Float(slice.count)
   }
 
   private func midEnergy() -> Float {
-    guard magnitudes.count > 50 else { return 0.3 }
-    return magnitudes[10..<50].reduce(0) { $0 + $1.value } / 40.0
+    guard magnitudes.count > 10 else { return 0.2 }
+    let slice = magnitudes[10..<min(magnitudes.count, 50)].map { $0.value }.filter { !$0.isNaN }
+    guard !slice.isEmpty else { return 0.2 }
+    return slice.reduce(0, +) / Float(slice.count)
   }
 
   private func trebleEnergy() -> Float {
-    guard magnitudes.count > 50 else { return 0.3 }
+    guard magnitudes.count > 50 else { return 0.2 }
     let end = min(magnitudes.count, 100)
-    return magnitudes[50..<end].reduce(0) { $0 + $1.value } / Float(end - 50)
+    let slice = magnitudes[50..<end].map { $0.value }.filter { !$0.isNaN }
+    guard !slice.isEmpty else { return 0.2 }
+    return slice.reduce(0, +) / Float(slice.count)
   }
 
   public var body: some View {
@@ -73,8 +78,11 @@ public struct GenerativeArtView: View {
             let noise3 = sin(angle * 7 + time * 3) * treble * 15
 
             let radius = baseRadius + noise1 + noise2 + noise3 + rmsVal * 20
+            guard !radius.isNaN else { continue }
+            
             let x = center.x + radius * cos(angle)
             let y = center.y + radius * sin(angle)
+            guard !x.isNaN && !y.isNaN else { continue }
 
             if i == 0 {
               path.move(to: CGPoint(x: x, y: y))
@@ -82,7 +90,9 @@ public struct GenerativeArtView: View {
               path.addLine(to: CGPoint(x: x, y: y))
             }
           }
-          path.closeSubpath()
+          if !path.isEmpty {
+            path.closeSubpath()
+          }
 
           let hue = (time * 0.1 + Double(layer) * 0.15).truncatingRemainder(dividingBy: 1.0)
           let color = Color(hue: hue, saturation: 0.6, brightness: 0.85)

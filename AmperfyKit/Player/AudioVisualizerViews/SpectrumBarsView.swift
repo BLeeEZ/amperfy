@@ -62,14 +62,23 @@ public struct SpectrumBarsView: View {
     Canvas { context, size in
       let bars = groupedMagnitudes()
       let spacing: CGFloat = 2
-      let totalSpacing = spacing * CGFloat(bars.count - 1)
-      let barWidth = (size.width - totalSpacing) / CGFloat(bars.count)
+      let count = CGFloat(max(1, bars.count))
+      let totalSpacing = spacing * (count - 1)
+      let barWidth = (size.width - totalSpacing) / count
+      
+      guard barWidth > 0 && !barWidth.isNaN else { return }
+      
       let cornerRadius = barWidth * 0.3
 
       for (index, value) in bars.enumerated() {
+        let val = CGFloat(value)
+        guard !val.isNaN else { continue }
+        
         let x = CGFloat(index) * (barWidth + spacing)
-        let height = max(4, CGFloat(value) * size.height * 0.9)
+        let height = max(4, val * size.height * 0.9)
         let y = size.height - height
+
+        guard !x.isNaN && !y.isNaN && !height.isNaN else { continue }
 
         let rect = CGRect(x: x, y: y, width: barWidth, height: height)
         let path = Path(roundedRect: rect, cornerRadius: cornerRadius)

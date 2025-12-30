@@ -76,15 +76,21 @@ struct PlayerSettingsView: View {
           content: {
             SettingsCheckBoxRow(
               title: "Enable ReplayGain",
-              isOn: Binding(
-                get: { settings.isReplayGainEnabled },
-                set: { isEnabled in
-                  settings.isReplayGainEnabled = isEnabled
-                }
-              )
+              isOn: $settings.isReplayGainEnabled
             )
           },
           footer: "Automatically normalize track volume based on replay gain information for consistent loudness."
+        )
+
+        // Equalizer Settings
+        SettingsSection(
+          content: {
+            SettingsCheckBoxRow(
+              title: "Enable Equalizer",
+              isOn: $settings.isEqualizerEnabled
+            )
+          },
+          footer: "Enable the audio equalizer to customize sound frequencies."
         )
 
         // General Settings

@@ -17,6 +17,8 @@ public struct AmplitudeSpectrumView: View {
 
   public var body: some View {
     Canvas { context, size in
+      guard !magnitudes.isEmpty, range.count > 0 else { return }
+      
       let color = if let hue {
         Color(hue: hue, saturation: 0.7, brightness: 0.8)
       } else {
@@ -28,8 +30,12 @@ public struct AmplitudeSpectrumView: View {
         let width = 0.8 * unit
         let radius = 0.5 * width
         range.forEach { index in
+          guard index < magnitudes.count else { return }
+          let val = CGFloat(magnitudes[index].value)
+          guard !val.isNaN else { return }
+          
           let x = unit * CGFloat(index)
-          let height = size.height * CGFloat(magnitudes[index].value)
+          let height = size.height * val
           let y = 0.5 * (size.height - height)
           let path = Path(
             roundedRect: CGRect(x: x, y: y, width: width, height: height),
@@ -43,11 +49,15 @@ public struct AmplitudeSpectrumView: View {
         let radiusInner = sideLength / 4.0
         let radiusOuter = 0.95 * (sideLength / 2.0)
         let availableBarLenght = radiusOuter - radiusInner
-        let width = 1.6 * CGFloat.pi * radiusInner / CGFloat(range.count)
+        let width = 1.6 * CGFloat.pi * radiusInner / CGFloat(max(1, range.count))
         let strokeStyle = StrokeStyle(lineWidth: width, lineCap: .round)
         range.forEach { index in
-          let phi = (2.0 * CGFloat.pi * CGFloat(index) / CGFloat(range.count)) + (CGFloat.pi / 2)
-          let radius2 = radiusInner + (availableBarLenght * CGFloat(magnitudes[index].value))
+          guard index < magnitudes.count else { return }
+          let val = CGFloat(magnitudes[index].value)
+          guard !val.isNaN else { return }
+          
+          let phi = (2.0 * CGFloat.pi * CGFloat(index) / CGFloat(max(1, range.count))) + (CGFloat.pi / 2)
+          let radius2 = radiusInner + (availableBarLenght * val)
           var path = Path()
           path.move(to: CGPoint(
             x: center.x + radiusInner * cos(phi),
@@ -59,7 +69,7 @@ public struct AmplitudeSpectrumView: View {
           ))
           context.stroke(path, with: .color(color), style: strokeStyle)
         }
-        if let rms {
+        if let rms, !rms.isNaN {
           let loudnessSideLength = radiusInner * CGFloat(rms)
           let loudnessRectOrigin = CGPoint(
             x: center.x - (loudnessSideLength / 2),
@@ -69,8 +79,10 @@ public struct AmplitudeSpectrumView: View {
             origin: loudnessRectOrigin,
             size: CGSizeMake(loudnessSideLength, loudnessSideLength)
           )
-          let path = Circle().path(in: loudnessRect)
-          context.fill(path, with: .color(color))
+          if !loudnessRect.origin.x.isNaN && !loudnessRect.size.width.isNaN {
+            let path = Circle().path(in: loudnessRect)
+            context.fill(path, with: .color(color))
+          }
         }
       }
     }
