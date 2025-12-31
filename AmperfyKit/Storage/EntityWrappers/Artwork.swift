@@ -138,7 +138,10 @@ public class Artwork: NSObject {
 extension Artwork: Downloadable {
   public var objectID: NSManagedObjectID { managedObject.objectID }
   public var isCached: Bool { false }
-  public var displayString: String { "Artwork id: \(id), type: \(type)" }
+  public var displayString: String {
+    "Artwork account: \(account?.shortLogIdent ?? "-"), id: \(id), type: \(type)"
+  }
+
   public var threadSafeInfo: DownloadElementInfo? { DownloadElementInfo(
     objectId: objectID,
     type: .artwork

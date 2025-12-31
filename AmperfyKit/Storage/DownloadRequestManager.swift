@@ -137,11 +137,13 @@ final class DownloadRequestManager: Sendable {
   func getRequestedDownloads() async -> [DownloadRequest] {
     let predicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     let requestedDownloads = try? await storage.performAndGet { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: predicateFormat),
         NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
         NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+        asyncCompanion.library.getFetchPredicate(forAccount: account),
         // ignore start date -> reset it after fetched
       ])
       let downloadsMO = try? asyncCompanion.context.fetch(fetchRequest)
@@ -166,12 +168,14 @@ final class DownloadRequestManager: Sendable {
   func clearFinishedDownloads() async {
     let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: downloadPredicateFormat),
         NSCompoundPredicate(orPredicateWithSubpredicates: [
           NSPredicate(format: "%K != nil", #keyPath(DownloadMO.finishDate)),
           NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
+          asyncCompanion.library.getFetchPredicate(forAccount: account),
         ]),
       ])
       let results = try? asyncCompanion.context.fetch(fetchRequest)
@@ -185,10 +189,12 @@ final class DownloadRequestManager: Sendable {
     Task {
       let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
       let notStartedDownloadCount = try? await storage.performAndGet { asyncCompanion in
+        let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
         let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
         request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
           NSPredicate(format: downloadPredicateFormat),
           NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
+          asyncCompanion.library.getFetchPredicate(forAccount: account),
         ])
         return (try? asyncCompanion.context.count(for: request)) ?? 0
       }
@@ -202,9 +208,11 @@ final class DownloadRequestManager: Sendable {
   func clearAllDownloads() async {
     let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: downloadPredicateFormat),
+        asyncCompanion.library.getFetchPredicate(forAccount: account),
       ])
       let results = try? asyncCompanion.context.fetch(fetchRequest)
       let downloads = results?.compactMap { Download(managedObject: $0) }
@@ -216,11 +224,13 @@ final class DownloadRequestManager: Sendable {
   func cancelDownloads() async {
     let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: downloadPredicateFormat),
         NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
         NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+        asyncCompanion.library.getFetchPredicate(forAccount: account),
       ])
       let results = try? asyncCompanion.context.fetch(fetchRequest)
       let downloads = results?.compactMap { Download(managedObject: $0) }
@@ -232,10 +242,12 @@ final class DownloadRequestManager: Sendable {
   func getAndResetFailedDownloads() async -> [DownloadRequest] {
     let predicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     let failedDownloads = try? await storage.performAndGet { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: predicateFormat),
         NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
+        asyncCompanion.library.getFetchPredicate(forAccount: account),
       ])
       let downloadsMO = try? asyncCompanion.context.fetch(fetchRequest)
       let downloadRequests = downloadsMO?.compactMap { downloadMo -> DownloadRequest? in

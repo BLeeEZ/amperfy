@@ -139,6 +139,10 @@ public class Account {
     "\(serverHash)-\(userHash)"
   }
 
+  public var shortLogIdent: String {
+    "\(serverHash.prefix(4))\(userHash.prefix(2))"
+  }
+
   public var apiType: BackenApiType {
     BackenApiType(rawValue: Int(managedObject.apiType)) ?? .notDetected
   }
