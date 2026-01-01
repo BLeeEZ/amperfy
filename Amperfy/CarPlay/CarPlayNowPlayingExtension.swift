@@ -91,13 +91,19 @@ extension CarPlaySceneDelegate {
     CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
   }
 
-  func displayNowPlaying(completion: @escaping (() -> ())) {
+  func displayNowPlaying(immediately: Bool = false, completion: @escaping (() -> ())) {
     configureNowPlayingTemplate()
-    Task { @MainActor in
-      let _ = try? await interfaceController?.popToRootTemplate(animated: false)
-      let _ = try? await self.interfaceController?
-        .pushTemplate(CPNowPlayingTemplate.shared, animated: true)
+    if immediately {
+      interfaceController?
+        .pushTemplate(CPNowPlayingTemplate.shared, animated: false) { _, _ in }
       completion()
+    } else {
+      Task { @MainActor in
+        let _ = try? await interfaceController?.popToRootTemplate(animated: false)
+        let _ = try? await self.interfaceController?
+          .pushTemplate(CPNowPlayingTemplate.shared, animated: true)
+        completion()
+      }
     }
   }
 }

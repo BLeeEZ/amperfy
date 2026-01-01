@@ -143,17 +143,19 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             guard let self else { return }
             updateHomeSections()
           }
-          refreshOfflineMode()
           self.interfaceController?.setRootTemplate(
             rootBarTemplate,
-            animated: true,
+            animated: false,
             completion: nil
           )
+          Task { @MainActor in
+            self.refreshOfflineMode()
+          }
         }
-      
+
       if self.appDelegate.player.currentlyPlaying != nil {
         AmperKit.shared.playerNowPlayingInfoCenterHandler?.didElapsedTimeChange()
-        self.displayNowPlaying {}
+        self.displayNowPlaying(immediately: true) {}
       }
     }
   }
@@ -227,7 +229,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }()
 
   lazy var homeTab = {
-    let homeTab = CPListTemplate(title: "Home", sections: createHomeSections())
+    let homeTab = CPListTemplate(title: "Home", sections: [])
     homeTab.tabImage = UIImage.home
     homeTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
     return homeTab
@@ -237,15 +239,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let homeRows = createHomeImageRows()
     let homeSection = CPListSection(items: homeRows, header: nil, sectionIndexTitle: nil)
     homeTab.updateSections([homeSection])
-  }
-
-  func createHomeSections() -> [CPListSection] {
-    let listSection = CPListSection(
-      items: createHomeImageRows(),
-      header: nil,
-      sectionIndexTitle: nil
-    )
-    return [listSection]
   }
 
   var homeImageRows: [HomeSection: CPListImageRowItem] = [:]
