@@ -244,23 +244,59 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }
 
   var homeImageRows: [HomeSection: CPListImageRowItem] = [:]
+  var homeRowData: [HomeSection: [HomeItem]] = [:]
 
-  func createHomeRowImageElements(section: HomeSection) -> [CPListImageRowItemRowElement] {
+  struct EntityImageRowContainer {
+    let entity: AbstractLibraryEntity
+    let item: HomeItem
+    var homeRow: [CPListImageRowItemRowElement]
+    var detailRow: [CPListImageRowItemRowElement]
+  }
+
+  var homeArtworkUpdate: [String: EntityImageRowContainer] = [:] // String is Artwork.uniqueID
+
+  func createHomeRowImageElements(
+    section: HomeSection,
+    isDetail: Bool
+  )
+    -> [CPListImageRowItemRowElement] {
     guard let sharedHome else { return [] }
-    var imageRowElements = [CPListImageRowItemRowElement]()
 
-    let items = sharedHome.data[section] ?? []
+    let alreadyCreatedData = homeRowData[section]
+    let requestedData = sharedHome.data[section]
+    if !isDetail,
+       alreadyCreatedData ==
+       requestedData {
+      return homeImageRows[section]?.elements as? [CPListImageRowItemRowElement] ?? []
+    }
+    if !isDetail {
+      homeRowData[section] = requestedData
+    } else {
+      for var container in homeArtworkUpdate {
+        container.value.detailRow.removeAll()
+      }
+    }
+
+    var imageRowElements = [CPListImageRowItemRowElement]()
+    let items = requestedData ?? []
     for item in items {
       var image: UIImage?
-      if let entity = item.playableContainable as? AbstractLibraryEntity {
+      var artwork: Artwork?
+      var entity: AbstractLibraryEntity?
+      if let libEntity = item.playableContainable as? AbstractLibraryEntity {
         image = LibraryEntityImage.getImageToDisplayImmediately(
-          libraryEntity: entity,
+          libraryEntity: libEntity,
           themePreference: getPreference(activeAccountInfo).theme,
           artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
           useCache: false
         )
-        if let artwork = entity.artwork, let accountInfo = artwork.account?.info {
-          appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
+        if let entityArtwork = libEntity.artwork, let accountInfo = entityArtwork.account?.info {
+          artwork = entityArtwork
+          entity = libEntity
+          // trigger download only once
+          if homeArtworkUpdate[entityArtwork.uniqueID] == nil {
+            appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: entityArtwork)
+          }
         }
       }
       let displayImage = image?.carPlayImage(carTraitCollection: traits) ?? UIImage
@@ -275,13 +311,27 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         title: item.playableContainable.name,
         subtitle: item.playableContainable.subtitle
       )
+      if let artwork, let entity {
+        if homeArtworkUpdate[artwork.uniqueID] == nil {
+          homeArtworkUpdate[artwork.uniqueID] = EntityImageRowContainer(
+            entity: entity,
+            item: item,
+            homeRow: isDetail ? [] : [element],
+            detailRow: isDetail ? [element] : []
+          )
+        } else if isDetail {
+          homeArtworkUpdate[artwork.uniqueID]?.detailRow.append(element)
+        } else {
+          homeArtworkUpdate[artwork.uniqueID]?.homeRow.append(element)
+        }
+      }
       imageRowElements.append(element)
     }
     return imageRowElements
   }
 
   func createHomeRow(section: HomeSection, isDetailTemplate: Bool) -> CPListImageRowItem? {
-    let imageRowElements = createHomeRowImageElements(section: section)
+    let imageRowElements = createHomeRowImageElements(section: section, isDetail: isDetailTemplate)
     let isRandomSection = section.isRandomSection
 
     var title: String?
@@ -327,7 +377,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             break
           }
           if section.isRandomSection {
-            row.elements = createHomeRowImageElements(section: section)
+            row.elements = createHomeRowImageElements(section: section, isDetail: true)
           }
           completion()
         }
@@ -366,8 +416,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     guard let sharedHome else { return [] }
     var imageRows = [CPListImageRowItem]()
     for section in sharedHome.orderedVisibleSections {
-      let imageRowElements = createHomeRowImageElements(section: section)
       if let row = homeImageRows[section] {
+        let imageRowElements = createHomeRowImageElements(section: section, isDetail: false)
         row.elements = imageRowElements
         imageRows.append(row)
       } else if let row = createHomeRow(section: section, isDetailTemplate: false) {
@@ -418,6 +468,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       ], header: "Songs", sectionIndexTitle: nil),
       CPListSection(items: [
         createPlayRandomAlbumsItem(onlyCached: false),
+        createLibraryItem(
+          text: "All",
+          subtitle: "Display limit per section",
+          icon: UIImage.album,
+          sectionToDisplay: albumsSection
+        ),
         createLibraryItem(
           text: "Favorites",
           icon: UIImage.heartFill,
@@ -561,6 +617,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return template
   }()
 
+  lazy var albumsSection = {
+    let template = CPListTemplate(title: "Albums", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
+
   lazy var albumsFavoriteSection = {
     let template = CPListTemplate(title: "Favorite Albums", sections: [
       CPListSection(items: [CPListTemplateItem]()),
@@ -629,13 +692,14 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
   func createLibraryItem(
     text: String,
+    subtitle: String? = nil,
     icon: UIImage,
     sectionToDisplay: CPListTemplate
   )
     -> CPListItem {
     let item = CPListItem(
       text: text,
-      detailText: nil,
+      detailText: subtitle,
       image: UIImage
         .createArtwork(
           with: icon,
@@ -788,6 +852,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   //
   var artistsFavoritesFetchController: ArtistFetchedResultsController?
   var artistsFavoritesCachedFetchController: ArtistFetchedResultsController?
+  var albumsFetchController: AlbumFetchedResultsController?
   var albumsFavoritesFetchController: AlbumFetchedResultsController?
   var albumsFavoritesCachedFetchController: AlbumFetchedResultsController?
   var albumsNewestFetchController: AlbumFetchedResultsController?
@@ -817,6 +882,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     artistsFavoritesFetchController = nil
     artistsFavoritesCachedFetchController?.delegate = nil
     artistsFavoritesCachedFetchController = nil
+    albumsFetchController?.delegate = nil
+    albumsFetchController = nil
     albumsFavoritesFetchController?.delegate = nil
     albumsFavoritesFetchController = nil
     albumsFavoritesCachedFetchController?.delegate = nil
@@ -856,18 +923,36 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }
 
   private func createAlbumItems(
-    from fetchedController: BasicFetchedResultsController<AlbumMO>?,
+    from fetchedController: AlbumFetchedResultsController?,
     onlyCached: Bool
   )
-    -> [CPListTemplateItem] {
-    var items = [CPListTemplateItem]()
-    guard let fetchedController = fetchedController else { return items }
-    for index in 0 ... (CPListTemplate.maximumSectionCount - 1) {
-      guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
-      let detailTemplate = createDetailTemplate(for: entity, onlyCached: onlyCached)
-      items.append(detailTemplate)
+    -> [CPListSection] {
+    var sections = [CPListSection]()
+    guard let fetchedController = fetchedController,
+          let fetchSections = fetchedController.sections else { return sections }
+    let maxSectionCount = CPListTemplate
+      .maximumItemCount / (!fetchSections.isEmpty ? fetchSections.count : 1)
+    for fetchSection in fetchSections {
+      guard let fetchObjects = fetchSection.objects as? [AlbumMO] else { continue }
+      var items = [CPListTemplateItem]()
+
+      var indexTitle: String?
+      if fetchedController.sortType.asSectionIndexType == .alphabet {
+        indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
+        if let _ = Int(indexTitle ?? "-") {
+          indexTitle = "#"
+        }
+      }
+      for (index, fetchObject) in fetchObjects.enumerated() {
+        let album = Album(managedObject: fetchObject)
+        let detailTemplate = createDetailTemplate(for: album, onlyCached: onlyCached)
+        items.append(detailTemplate)
+        if index >= maxSectionCount { break }
+      }
+      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
+      sections.append(section)
     }
-    return items
+    return sections
   }
 
   private func createSongItems(from fetchedController: BasicFetchedResultsController<SongMO>?)
@@ -1305,32 +1390,51 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     else { return }
     guard let templates = interfaceController?.templates else { return }
 
-    #if false // deactivate Image Row update for now
-      if templates.count >= 1,
-         let tabBarTemplate = templates.first as? CPTabBarTemplate,
-         homeTab == tabBarTemplate.selectedTemplate {
-        // self.updateHomeSections()
-        if templates.count == 2,
-           let listTemplate = templates.last as? CPListTemplate,
-           listTemplate.sections.count == 1,
-           let detailRow = listTemplate.sections.first?.items.first as? CPListImageRowItem,
-           let detailSectionName = listTemplate.title,
-           let homeSection = HomeSection.create(fromTitle: detailSectionName) {
-          if let dataIndex = sharedHome?.data[homeSection]?.firstIndex(where: {
-            guard let abstractEntity = $0.playableContainable as? AbstractLibraryEntity,
-                  let artwork = abstractEntity.artwork
-            else { return false }
-            return artwork.uniqueID == downloadNotification.id
-          }), dataIndex < detailRow.elements.count {
-            let createdRowItems = createHomeRowImageElements(section: homeSection)
-            if detailRow.elements.count == createdRowItems.count {
-              detailRow.elements[dataIndex].image = createdRowItems[dataIndex].image
-            }
-          }
+    // refresh Home image rows
+    if let container = homeArtworkUpdate[downloadNotification.id] {
+      var imageRowImages = container.homeRow
+      imageRowImages.append(contentsOf: container.detailRow)
+      let image = LibraryEntityImage.getImageToDisplayImmediately(
+        libraryEntity: container.entity,
+        themePreference: getPreference(activeAccountInfo).theme,
+        artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
+        useCache: false
+      )
+      for rowImage in imageRowImages {
+        rowImage.image = image.carPlayImage(carTraitCollection: traits)
+      }
+    }
+
+    // refresh Home Detail rows
+    if templates.count == 2,
+       let tabBarTemplate = templates.first as? CPTabBarTemplate,
+       homeTab == tabBarTemplate.selectedTemplate,
+       let listTemplate = templates.last as? CPListTemplate,
+       listTemplate.sections.count == 1,
+       let detailRow = listTemplate.sections.first?.items.first as? CPListImageRowItem,
+       var container = homeArtworkUpdate[downloadNotification.id] {
+      var newCreatedRowImages = [CPListImageRowItemRowElement]()
+      for detailRowImage in container.detailRow {
+        if let elementIndex = detailRow.elements.firstIndex(where: { $0 == detailRowImage }) {
+          let image = LibraryEntityImage.getImageToDisplayImmediately(
+            libraryEntity: container.entity,
+            themePreference: getPreference(activeAccountInfo).theme,
+            artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
+            useCache: false
+          )
+          let newElement = CPListImageRowItemRowElement(
+            image: image.carPlayImage(carTraitCollection: traits),
+            title: container.item.playableContainable.name,
+            subtitle: container.item.playableContainable.subtitle
+          )
+          detailRow.elements[elementIndex] = newElement
+          newCreatedRowImages.append(newElement)
         }
       }
-    #endif
+      container.detailRow = newCreatedRowImages
+    }
 
+    // refresh List items
     for template in templates {
       var sections: [CPListSection]?
 
@@ -1464,10 +1568,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
        .albumsSortSetting {
       os_log("CarPlay: RefreshSort: AlbumsFavoritesFetchController", log: self.log, type: .info)
       createAlbumsFavoritesFetchController()
-      albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(
+      albumsFavoriteSection.updateSections(createAlbumItems(
         from: albumsFavoritesFetchController,
         onlyCached: isOfflineMode
-      ))])
+      ))
     }
     if templates.contains(albumsFavoriteCachedSection),
        albumsFavoritesCachedFetchController?.sortType != appDelegate.storage.settings.user
@@ -1478,10 +1582,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         type: .info
       )
       createAlbumsFavoritesCachedFetchController()
-      albumsFavoriteCachedSection.updateSections([CPListSection(items: createAlbumItems(
+      albumsFavoriteCachedSection.updateSections(createAlbumItems(
         from: albumsFavoritesCachedFetchController,
         onlyCached: true
-      ))])
+      ))
     }
     if templates.contains(songsFavoriteSection),
        (activeAccount.apiType.asServerApiType != .ampache) ?
@@ -1558,6 +1662,18 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         onlyCached: isOfflineMode
       ))])
     }
+    if templates.contains(albumsSection) {
+      os_log(
+        "CarPlay: OfflineModeChanged: albumsFetchController",
+        log: self.log,
+        type: .info
+      )
+      createAlbumsFetchController()
+      albumsSection.updateSections(createAlbumItems(
+        from: albumsFetchController,
+        onlyCached: isOfflineMode
+      ))
+    }
     if templates.contains(albumsFavoriteSection) {
       os_log(
         "CarPlay: OfflineModeChanged: albumsFavoritesFetchController",
@@ -1565,26 +1681,26 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         type: .info
       )
       createAlbumsFavoritesFetchController()
-      albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(
+      albumsFavoriteSection.updateSections(createAlbumItems(
         from: albumsFavoritesFetchController,
         onlyCached: isOfflineMode
-      ))])
+      ))
     }
     if templates.contains(albumsNewestSection) {
       os_log("CarPlay: OfflineModeChanged: albumsNewestFetchController", log: self.log, type: .info)
       createAlbumsNewestFetchController()
-      albumsNewestSection.updateSections([CPListSection(items: createAlbumItems(
+      albumsNewestSection.updateSections(createAlbumItems(
         from: albumsNewestFetchController,
         onlyCached: isOfflineMode
-      ))])
+      ))
     }
     if templates.contains(albumsRecentSection) {
       os_log("CarPlay: OfflineModeChanged: albumsRecentFetchController", log: self.log, type: .info)
       createAlbumsRecentFetchController()
-      albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(
+      albumsRecentSection.updateSections(createAlbumItems(
         from: albumsRecentFetchController,
         onlyCached: isOfflineMode
-      ))])
+      ))
     }
     if templates.contains(songsFavoriteSection) {
       os_log(
@@ -1669,6 +1785,19 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           onlyCached: true
         ))])
       }
+      if templates.contains(albumsSection),
+         let albumsFetchController = albumsFetchController,
+         controller == albumsFetchController.fetchResultsController {
+        os_log(
+          "CarPlay: FetchedResults: albumsFetchController",
+          log: self.log,
+          type: .info
+        )
+        albumsSection.updateSections(createAlbumItems(
+          from: albumsFetchController,
+          onlyCached: isOfflineMode
+        ))
+      }
       if templates.contains(albumsFavoriteSection),
          let albumsFavoritesFetchController = albumsFavoritesFetchController,
          controller == albumsFavoritesFetchController.fetchResultsController {
@@ -1677,10 +1806,10 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsFavoriteSection.updateSections(createAlbumItems(
           from: albumsFavoritesFetchController,
           onlyCached: isOfflineMode
-        ))])
+        ))
       }
       if templates.contains(albumsFavoriteCachedSection),
          let albumsFavoritesCachedFetchController = albumsFavoritesCachedFetchController,
@@ -1690,19 +1819,19 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsFavoriteCachedSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsFavoriteCachedSection.updateSections(createAlbumItems(
           from: albumsFavoritesCachedFetchController,
           onlyCached: true
-        ))])
+        ))
       }
       if templates.contains(albumsNewestSection),
          let albumsNewestFetchController = albumsNewestFetchController,
          controller == albumsNewestFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: albumsNewestFetchController", log: self.log, type: .info)
-        albumsNewestSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsNewestSection.updateSections(createAlbumItems(
           from: albumsNewestFetchController,
           onlyCached: isOfflineMode
-        ))])
+        ))
       }
       if templates.contains(albumsNewestCachedSection),
          let albumsNewestCachedFetchController = albumsNewestCachedFetchController,
@@ -1712,19 +1841,19 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsNewestCachedSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsNewestCachedSection.updateSections(createAlbumItems(
           from: albumsNewestCachedFetchController,
           onlyCached: true
-        ))])
+        ))
       }
       if templates.contains(albumsRecentSection),
          let albumsRecentFetchController = albumsRecentFetchController,
          controller == albumsRecentFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: albumsRecentFetchController", log: self.log, type: .info)
-        albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsRecentSection.updateSections(createAlbumItems(
           from: albumsRecentFetchController,
           onlyCached: isOfflineMode
-        ))])
+        ))
       }
       if templates.contains(albumsRecentCachedSection),
          let albumsRecentCachedFetchController = albumsRecentCachedFetchController,
@@ -1734,10 +1863,10 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsRecentCachedSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsRecentCachedSection.updateSections(createAlbumItems(
           from: albumsRecentCachedFetchController,
           onlyCached: true
-        ))])
+        ))
       }
       if templates.contains(songsFavoriteSection),
          let songsFavoritesFetchController = songsFavoritesFetchController,
@@ -1842,13 +1971,20 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
           from: artistsFavoritesCachedFetchController,
           onlyCached: true
         ))])
+      } else if aTemplate == albumsSection {
+        os_log("CarPlay: templateWillAppear albumsSection", log: self.log, type: .info)
+        if albumsFetchController == nil { createAlbumsFetchController() }
+        albumsSection.updateSections(createAlbumItems(
+          from: albumsFetchController,
+          onlyCached: isOfflineMode
+        ))
       } else if aTemplate == albumsFavoriteSection {
         os_log("CarPlay: templateWillAppear albumsFavoriteSection", log: self.log, type: .info)
         if albumsFavoritesFetchController == nil { createAlbumsFavoritesFetchController() }
-        albumsFavoriteSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsFavoriteSection.updateSections(createAlbumItems(
           from: albumsFavoritesFetchController,
           onlyCached: isOfflineMode
-        ))])
+        ))
       } else if aTemplate == albumsFavoriteCachedSection {
         os_log(
           "CarPlay: templateWillAppear albumsFavoriteCachedSection",
@@ -1857,24 +1993,24 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         )
         if albumsFavoritesCachedFetchController ==
           nil { createAlbumsFavoritesCachedFetchController() }
-        albumsFavoriteCachedSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsFavoriteCachedSection.updateSections(createAlbumItems(
           from: albumsFavoritesCachedFetchController,
           onlyCached: true
-        ))])
+        ))
       } else if aTemplate == albumsNewestSection {
         os_log("CarPlay: templateWillAppear albumsNewestSection", log: self.log, type: .info)
         if albumsNewestFetchController == nil { createAlbumsNewestFetchController() }
-        albumsNewestSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsNewestSection.updateSections(createAlbumItems(
           from: albumsNewestFetchController,
           onlyCached: isOfflineMode
-        ))])
+        ))
       } else if aTemplate == albumsNewestCachedSection {
         os_log("CarPlay: templateWillAppear albumsNewestCachedSection", log: self.log, type: .info)
         if albumsNewestCachedFetchController == nil { createAlbumsNewestCachedFetchController() }
-        albumsNewestCachedSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsNewestCachedSection.updateSections(createAlbumItems(
           from: albumsNewestCachedFetchController,
           onlyCached: true
-        ))])
+        ))
       } else if aTemplate == albumsRecentSection {
         os_log("CarPlay: templateWillAppear albumsRecentSection", log: self.log, type: .info)
         Task { @MainActor in do {
@@ -1887,17 +2023,17 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
           self.appDelegate.eventLogger.report(topic: "Recent Albums Sync", error: error)
         }}
         if albumsRecentFetchController == nil { createAlbumsRecentFetchController() }
-        albumsRecentSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsRecentSection.updateSections(createAlbumItems(
           from: albumsRecentFetchController,
           onlyCached: isOfflineMode
-        ))])
+        ))
       } else if aTemplate == albumsRecentCachedSection {
         os_log("CarPlay: templateWillAppear albumsRecentCachedSection", log: self.log, type: .info)
         if albumsRecentCachedFetchController == nil { createAlbumsRecentCachedFetchController() }
-        albumsRecentCachedSection.updateSections([CPListSection(items: createAlbumItems(
+        albumsRecentCachedSection.updateSections(createAlbumItems(
           from: albumsRecentCachedFetchController,
           onlyCached: true
-        ))])
+        ))
       } else if aTemplate == songsFavoriteSection {
         os_log("CarPlay: templateWillAppear songsFavoriteSection", log: self.log, type: .info)
         if songsFavoritesFetchController == nil { createSongsFavoritesFetchController() }
