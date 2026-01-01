@@ -1161,34 +1161,52 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return section
   }
 
-  private func createPlaylistsSections() -> [CPListTemplateItem] {
-    var sections = [CPListTemplateItem]()
+  private func createPlaylistsSections() -> [CPListSection] {
+    var sections = [CPListSection]()
+    var itemCount = 0
+    guard let fetchedController = playlistFetchController,
+          let fetchSections = fetchedController.sections else { return sections }
+    for fetchSection in fetchSections {
+      guard let fetchObjects = fetchSection.objects as? [PlaylistMO] else { continue }
+      var items = [CPListTemplateItem]()
 
-    guard let fetchedPlaylists = playlistFetchController?.fetchedObjects else { return sections }
-    let sectionCount = min(fetchedPlaylists.count, CPListTemplate.maximumSectionCount)
-    guard sectionCount > 0 else { return sections }
-    for playlistIndex in 0 ... (sectionCount - 1) {
-      let playlistMO = fetchedPlaylists[playlistIndex]
-      let playlist = Playlist(library: appDelegate.storage.main.library, managedObject: playlistMO)
-
-      let section = CPListItem(
-        text: playlist.name,
-        detailText: playlist.subtitle,
-        image: nil,
-        accessoryImage: nil,
-        accessoryType: .disclosureIndicator
-      )
-      section.handler = { [weak self] item, completion in
-        guard let self = self else { completion(); return }
-        let playlistDetailTemplate = CPListTemplate(title: playlist.name, sections: [
-          CPListSection(items: [CPListTemplateItem]()),
-        ])
-        playlistDetailSection = playlistDetailTemplate
-        createPlaylistDetailFetchController(playlist: playlist)
-        interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
-        completion()
+      var indexTitle: String?
+      if fetchedController.sortType.asSectionIndexType == .alphabet {
+        indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
+        if let _ = Int(indexTitle ?? "-") {
+          indexTitle = "#"
+        }
       }
+
+      for fetchObject in fetchObjects {
+        let playlist = Playlist(
+          library: appDelegate.storage.main.library,
+          managedObject: fetchObject
+        )
+        let item = CPListItem(
+          text: playlist.name,
+          detailText: playlist.subtitle,
+          image: nil,
+          accessoryImage: nil,
+          accessoryType: .disclosureIndicator
+        )
+        item.handler = { [weak self] item, completion in
+          guard let self = self else { completion(); return }
+          let playlistDetailTemplate = CPListTemplate(title: playlist.name, sections: [
+            CPListSection(items: [CPListTemplateItem]()),
+          ])
+          playlistDetailSection = playlistDetailTemplate
+          createPlaylistDetailFetchController(playlist: playlist)
+          interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
+          completion()
+        }
+        items.append(item)
+        itemCount += 1
+        if itemCount > CPListTemplate.maximumItemCount { break }
+      }
+      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
       sections.append(section)
+      if itemCount > CPListTemplate.maximumItemCount { break }
     }
     return sections
   }
@@ -1537,7 +1555,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
        playlistFetchController?.sortType != appDelegate.storage.settings.user.playlistsSortSetting {
       os_log("CarPlay: RefreshSort: PlaylistFetchController", log: self.log, type: .info)
       createPlaylistFetchController()
-      playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
+      playlistTab.updateSections(createPlaylistsSections())
     }
     if artistsFavoritesFetchController?.sortType != appDelegate.storage.settings.user
       .artistsSortSetting {
@@ -1641,7 +1659,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
        root.selectedTemplate == playlistTab {
       os_log("CarPlay: OfflineModeChanged: playlistFetchController", log: self.log, type: .info)
       createPlaylistFetchController()
-      playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
+      playlistTab.updateSections(createPlaylistsSections())
     }
     if templates.contains(podcastSection) {
       os_log("CarPlay: OfflineModeChanged: podcastFetchController", log: self.log, type: .info)
@@ -1743,7 +1761,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          let playlistFetchController = playlistFetchController,
          controller == playlistFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: playlistFetchController", log: self.log, type: .info)
-        playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
+        playlistTab.updateSections(createPlaylistsSections())
       }
       if templates.contains(podcastSection), let podcastFetchController = podcastFetchController,
          controller == podcastFetchController.fetchResultsController {
@@ -1937,7 +1955,7 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
           self.appDelegate.eventLogger.report(topic: "CarPlay: Playlists Sync", error: error)
         }}
         if playlistFetchController == nil { createPlaylistFetchController() }
-        playlistTab.updateSections([CPListSection(items: createPlaylistsSections())])
+        playlistTab.updateSections(createPlaylistsSections())
       } else if aTemplate == podcastSection {
         os_log("CarPlay: templateWillAppear podcastSection", log: self.log, type: .info)
         if podcastFetchController == nil { createPodcastFetchController() }

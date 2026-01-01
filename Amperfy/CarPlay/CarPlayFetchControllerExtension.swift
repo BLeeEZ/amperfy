@@ -26,10 +26,11 @@ import Foundation
 
 extension CarPlaySceneDelegate {
   func createPlaylistFetchController() {
+    let sortType = appDelegate.storage.settings.user.playlistsSortSetting
     playlistFetchController = PlaylistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,
-      sortType: appDelegate.storage.settings.user.playlistsSortSetting,
-      isGroupedInAlphabeticSections: false
+      sortType: sortType,
+      isGroupedInAlphabeticSections: sortType.asSectionIndexType == .alphabet
     )
     playlistFetchController?.delegate = self
     if isOfflineMode {
