@@ -25,7 +25,7 @@ import MediaPlayer
 // MARK: - NowPlayingInfoCenterHandler
 
 @MainActor
-class NowPlayingInfoCenterHandler {
+public class NowPlayingInfoCenterHandler {
   private let musicPlayer: AudioPlayer
   private let backendAudioPlayer: BackendAudioPlayer
   private let storage: PersistentStorage
@@ -140,34 +140,40 @@ class NowPlayingInfoCenterHandler {
 // MARK: MusicPlayable
 
 extension NowPlayingInfoCenterHandler: MusicPlayable {
-  func didStartPlayingFromBeginning() {}
+  public func didStartPlayingFromBeginning() {}
 
-  func didStartPlaying() {
+  public func didStartPlaying() {
     if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
     nowPlayingInfoCenter.playbackState = .playing
   }
 
-  func didPause() {
+  public func didPause() {
     if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
     nowPlayingInfoCenter.playbackState = .paused
   }
 
-  func didStopPlaying() {
+  public func didStopPlaying() {
     nowPlayingInfoCenter.nowPlayingInfo = nil
     nowPlayingInfoCenter.playbackState = .stopped
   }
 
-  func didElapsedTimeChange() {
+  public func didElapsedTimeChange() {
     if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }
   }
 
-  func didPlaylistChange() {}
+  public func didPlaylistChange() {}
 
-  func didArtworkChange() {}
+  public func didArtworkChange() {}
+  
+  public func didShuffleChange() {}
+  
+  public func didRepeatChange() {}
+  
+  public func didPlaybackRateChange() {}
 }

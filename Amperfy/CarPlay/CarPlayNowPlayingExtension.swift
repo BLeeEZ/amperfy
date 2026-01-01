@@ -97,6 +97,7 @@ extension CarPlaySceneDelegate {
       let _ = try? await interfaceController?.popToRootTemplate(animated: false)
       let _ = try? await self.interfaceController?
         .pushTemplate(CPNowPlayingTemplate.shared, animated: true)
+      completion()
     }
   }
 }

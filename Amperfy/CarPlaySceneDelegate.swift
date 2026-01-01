@@ -150,6 +150,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             completion: nil
           )
         }
+      
+      if self.appDelegate.player.currentlyPlaying != nil {
+        AmperKit.shared.playerNowPlayingInfoCenterHandler?.didElapsedTimeChange()
+        self.displayNowPlaying {}
+      }
     }
   }
 
@@ -222,10 +227,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }()
 
   lazy var homeTab = {
-    let libraryTab = CPListTemplate(title: "Home", sections: createHomeSections())
-    libraryTab.tabImage = UIImage.home
-    libraryTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
-    return libraryTab
+    let homeTab = CPListTemplate(title: "Home", sections: createHomeSections())
+    homeTab.tabImage = UIImage.home
+    homeTab.assistantCellConfiguration = CarPlaySceneDelegate.assistantConfig
+    return homeTab
   }()
 
   func updateHomeSections() {
@@ -510,9 +515,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }
 
   lazy var cachedTab = {
-    let libraryTab = CPListTemplate(title: "Cached", sections: createCachedSections())
-    libraryTab.tabImage = UIImage.cache
-    return libraryTab
+    let cachedTab = CPListTemplate(title: "Cached", sections: createCachedSections())
+    cachedTab.tabImage = UIImage.cache
+    return cachedTab
   }()
 
   func createCachedSections() -> [CPListSection] {
@@ -1929,7 +1934,7 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         libraryTab.updateSections(createLibrarySections())
       } else if aTemplate == cachedTab {
         os_log("CarPlay: templateWillAppear cachedTab", log: self.log, type: .info)
-        libraryTab.updateSections(createCachedSections())
+        cachedTab.updateSections(createCachedSections())
       } else if aTemplate == playlistTab {
         os_log("CarPlay: templateWillAppear playlistTab", log: self.log, type: .info)
         Task { @MainActor in do {
