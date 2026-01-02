@@ -1271,28 +1271,51 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return sections
   }
 
-  private func createRadioItems(from fetchedController: BasicFetchedResultsController<RadioMO>?)
-    -> [CPListTemplateItem] {
-    var items = [CPListTemplateItem]()
-    guard let fetchedController = fetchedController else { return items }
-    guard let fetchedRadios = fetchedController.fetchedObjects else { return items }
-    let itemCount = min(fetchedRadios.count, CPListTemplate.maximumSectionCount - 2)
-    guard itemCount > 0 else { return items }
-    let radios = fetchedRadios.prefix(itemCount).compactMap { Radio(managedObject: $0) }
+  private func createRadioSections(from fetchedController: BasicFetchedResultsController<RadioMO>?)
+    -> [CPListSection] {
+      var sections = [CPListSection]()
+        guard let fetchedController = fetchedController,
+              let fetchSections = fetchedController.sections,
+              fetchSections.count > 0 else { return sections }
+      
+      guard let fetchedRadios = fetchedController.fetchedObjects else { return sections }
+      let radios = fetchedRadios.prefix(CPListTemplate.maximumItemCount).compactMap { Radio(managedObject: $0) }
 
-    items.append(createPlayRandomListItem(playContext: PlayContext(
-      name: "Radios",
-      playables: radios
-    )))
-    for (index, radio) in radios.enumerated() {
-      let listItem = createDetailTemplate(
-        for: radio,
-        playContext: PlayContext(name: "Radios", index: index, playables: Array(radios)),
-        isTrackDisplayed: false
-      )
-      items.append(listItem)
-    }
-    return items
+      let playRandomItem = createPlayRandomListItem(playContext: PlayContext(
+        name: "Radios",
+        playables: radios
+      ))
+      let randomSection = CPListSection(items: [playRandomItem], header: nil, sectionIndexTitle: nil)
+      sections.append(randomSection)
+      var itemCount = 1
+
+      
+      for fetchSection in fetchSections {
+        guard let fetchObjects = fetchSection.objects as? [RadioMO] else { continue }
+        var items = [CPListTemplateItem]()
+        
+        var indexTitle: String?
+        indexTitle = fetchObjects.first?.title?.prefix(1).uppercased()
+        if let _ = Int(indexTitle ?? "-") {
+          indexTitle = "#"
+        }
+        
+        for fetchObject in fetchObjects {
+          let radio = Radio(managedObject: fetchObject)
+            let listItem = createDetailTemplate(
+              for: radio,
+              playContext: PlayContext(name: "Radios", index: itemCount - 1, playables: Array(radios)),
+              isTrackDisplayed: false
+            )
+            items.append(listItem)
+          itemCount += 1
+          if itemCount > CPListTemplate.maximumItemCount { break }
+        }
+        let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
+        sections.append(section)
+        if itemCount > CPListTemplate.maximumItemCount { break }
+      }
+    return sections
   }
 
   private func createPlayRandomListItem(
@@ -1787,7 +1810,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          controller == radiosFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: radiosFetchController", log: self.log, type: .info)
         radioSection
-          .updateSections([CPListSection(items: createRadioItems(from: radiosFetchController))])
+          .updateSections(createRadioSections(from: radiosFetchController))
       }
       if templates.contains(artistsFavoriteSection),
          let artistsFavoritesFetchController = artistsFavoritesFetchController,
@@ -1981,7 +2004,7 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         os_log("CarPlay: templateWillAppear radioSection", log: self.log, type: .info)
         if radiosFetchController == nil { createRadiosFetchController() }
         radioSection
-          .updateSections([CPListSection(items: createRadioItems(from: radiosFetchController))])
+          .updateSections(createRadioSections(from: radiosFetchController))
       } else if aTemplate == artistsFavoriteSection {
         os_log("CarPlay: templateWillAppear artistsFavoriteSection", log: self.log, type: .info)
         if artistsFavoritesFetchController == nil { createArtistsFavoritesFetchController() }

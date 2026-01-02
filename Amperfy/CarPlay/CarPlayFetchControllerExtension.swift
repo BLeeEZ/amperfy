@@ -56,7 +56,7 @@ extension CarPlaySceneDelegate {
   func createRadiosFetchController() {
     radiosFetchController = RadiosFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,
-      isGroupedInAlphabeticSections: false
+      isGroupedInAlphabeticSections: true
     )
     radiosFetchController?.delegate = self
     radiosFetchController?.fetch()
