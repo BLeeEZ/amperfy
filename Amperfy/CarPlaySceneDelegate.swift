@@ -240,7 +240,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let alreadyCreatedData = homeRowData
     let requestedData = sharedHome.data
     guard alreadyCreatedData !=
-       requestedData else {
+      requestedData else {
       return
     }
     let homeRows = createHomeImageRows()
@@ -344,7 +344,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
        requestedData {
       return homeImageRows[section]
     }
-      
+
     let imageRowElements = createHomeRowImageElements(section: section, isDetail: isDetailTemplate)
     let isRandomSection = section.isRandomSection
 
@@ -433,7 +433,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         let alreadyCreatedData = homeRowData[section]
         let requestedData = sharedHome.data[section]
         if alreadyCreatedData !=
-           requestedData {
+          requestedData {
           let imageRowElements = createHomeRowImageElements(section: section, isDetail: false)
           row.elements = imageRowElements
         }
@@ -446,18 +446,142 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return imageRows
   }
 
+  static let switchAccountTitle = "Switch Account"
+  static let continuePlaybackMusicTitle = "Continue Music"
+  static let continuePlaybackPodcastTitle = "Continue Podcasts"
+  static let playRandomAlbumsTitle = "Albums"
+  static let playRandomSongsTitle = "Songs"
+
   func createLibrarySections() -> [CPListSection] {
-    let continuePlayingItems = createContinePlayingItems()
-    var librarySections = [
-      appDelegate.storage.settings.accounts.allAccounts.count > 1 ?
-        CPListSection(items: [
-          createLibraryItem(
-            text: "Switch Account",
-            icon: UIImage.userPerson,
-            sectionToDisplay: accountSection
-          ),
-        ], header: "Account", sectionIndexTitle: nil)
-        : nil,
+    var quickActionItems = [CPListImageRowItemRowElement]()
+    if appDelegate.player.musicItemCount > 0 {
+      let item = CPListImageRowItemRowElement(
+        image: UIImage.createArtwork(
+          with: UIImage.musicalNotes,
+          iconSizeType: .small,
+          theme: getPreference(activeAccountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        title: Self.continuePlaybackMusicTitle, subtitle: nil
+      )
+      quickActionItems.append(item)
+    }
+    if appDelegate.player.podcastItemCount > 0 {
+      let item = CPListImageRowItemRowElement(
+        image: UIImage.createArtwork(
+          with: UIImage.podcast,
+          iconSizeType: .small,
+          theme: getPreference(activeAccountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        title: Self.continuePlaybackPodcastTitle, subtitle: nil
+      )
+      quickActionItems.append(item)
+    }
+    if appDelegate.storage.settings.accounts.allAccounts.count > 1 {
+      let switchAccountItem = CPListImageRowItemRowElement(
+        image: UIImage.createArtwork(
+          with: UIImage.userPerson,
+          iconSizeType: .small,
+          theme: getPreference(activeAccountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        title: Self.switchAccountTitle, subtitle: nil
+      )
+      quickActionItems.append(switchAccountItem)
+    }
+
+    let quickActionsRow = CPListImageRowItem(
+      text: nil,
+      elements: quickActionItems,
+      allowsMultipleLines: false
+    )
+    quickActionsRow.handler = { selectedRow, completion in completion() }
+    quickActionsRow.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self else { completion(); return }
+
+      Task { @MainActor in
+        if quickActionItems[index].title == Self.switchAccountTitle {
+          let _ = try? await interfaceController?
+            .pushTemplate(accountSection, animated: true)
+        }
+        if quickActionItems[index].title == Self.continuePlaybackMusicTitle ||
+          quickActionItems[index].title == Self.continuePlaybackPodcastTitle {
+          if quickActionItems[index].title == Self.continuePlaybackMusicTitle,
+             appDelegate.player.playerMode != .music {
+            appDelegate.player.setPlayerMode(.music)
+          } else if quickActionItems[index].title == Self.continuePlaybackPodcastTitle,
+                    appDelegate.player.playerMode != .podcast {
+            appDelegate.player.setPlayerMode(.podcast)
+          }
+          appDelegate.player.play()
+          displayNowPlaying {}
+        }
+      }
+
+      completion()
+    }
+    let quickActionsSection = CPListSection(
+      items: [quickActionsRow],
+      header: "Quick Actions",
+      sectionIndexTitle: nil
+    )
+
+    var playRandomItems = [CPListImageRowItemRowElement]()
+    let playRandomAlbumsItem = CPListImageRowItemRowElement(
+      image: UIImage.createArtwork(
+        with: UIImage.album,
+        iconSizeType: .small,
+        theme: getPreference(activeAccountInfo).theme,
+        lightDarkMode: traits.userInterfaceStyle.asModeType,
+        switchColors: true
+      ).carPlayImage(carTraitCollection: traits),
+      title: Self.playRandomAlbumsTitle, subtitle: nil
+    )
+    playRandomItems.append(playRandomAlbumsItem)
+    let playRandomSongsItem = CPListImageRowItemRowElement(
+      image: UIImage.createArtwork(
+        with: UIImage.musicalNotes,
+        iconSizeType: .small,
+        theme: getPreference(activeAccountInfo).theme,
+        lightDarkMode: traits.userInterfaceStyle.asModeType,
+        switchColors: true
+      ).carPlayImage(carTraitCollection: traits),
+      title: Self.playRandomSongsTitle, subtitle: nil
+    )
+    playRandomItems.append(playRandomSongsItem)
+
+    let playRandomRow = CPListImageRowItem(
+      text: nil,
+      elements: playRandomItems,
+      allowsMultipleLines: false
+    )
+    playRandomRow.handler = { selectedRow, completion in completion() }
+    playRandomRow.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self else { completion(); return }
+
+      Task { @MainActor in
+        if playRandomItems[index].title == Self.playRandomAlbumsTitle {
+          triggerPlayRandomAlbums(onlyCached: false)
+        }
+        if playRandomItems[index].title == Self.playRandomSongsTitle {
+          triggerPlayRandomSongsItem(onlyCached: false)
+        }
+      }
+      completion()
+    }
+    let playRandomSection = CPListSection(
+      items: [playRandomRow],
+      header: "Play Random",
+      sectionIndexTitle: nil
+    )
+
+    let librarySections = [
+      !quickActionItems.isEmpty ? quickActionsSection : nil,
+      playRandomSection,
       appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
         .libraryDisplaySettings
         .isVisible(libraryType: .radios) ?
@@ -477,7 +601,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         ], header: "Podcasts", sectionIndexTitle: nil)
         : nil,
       CPListSection(items: [
-        createPlayRandomSongsItem(onlyCached: false),
         createLibraryItem(
           text: "Favorites",
           icon: UIImage.heartFill,
@@ -485,7 +608,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         ),
       ], header: "Songs", sectionIndexTitle: nil),
       CPListSection(items: [
-        createPlayRandomAlbumsItem(onlyCached: false),
         createLibraryItem(
           text: "All",
           subtitle: "Display limit per section",
@@ -516,14 +638,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         ),
       ], header: "Artists", sectionIndexTitle: nil),
     ].compactMap { $0 }
-    if !continuePlayingItems.isEmpty {
-      let continuePlayingSection = CPListSection(
-        items: continuePlayingItems,
-        header: "Continue Playing",
-        sectionIndexTitle: nil
-      )
-      librarySections.insert(continuePlayingSection, at: 0)
-    }
+
     return librarySections
   }
 
@@ -534,9 +649,57 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }()
 
   func createCachedSections() -> [CPListSection] {
+    var playRandomItems = [CPListImageRowItemRowElement]()
+    let playRandomAlbumsItem = CPListImageRowItemRowElement(
+      image: UIImage.createArtwork(
+        with: UIImage.album,
+        iconSizeType: .small,
+        theme: getPreference(activeAccountInfo).theme,
+        lightDarkMode: traits.userInterfaceStyle.asModeType,
+        switchColors: true
+      ).carPlayImage(carTraitCollection: traits),
+      title: Self.playRandomAlbumsTitle, subtitle: nil
+    )
+    playRandomItems.append(playRandomAlbumsItem)
+    let playRandomSongsItem = CPListImageRowItemRowElement(
+      image: UIImage.createArtwork(
+        with: UIImage.musicalNotes,
+        iconSizeType: .small,
+        theme: getPreference(activeAccountInfo).theme,
+        lightDarkMode: traits.userInterfaceStyle.asModeType,
+        switchColors: true
+      ).carPlayImage(carTraitCollection: traits),
+      title: Self.playRandomSongsTitle, subtitle: nil
+    )
+    playRandomItems.append(playRandomSongsItem)
+
+    let playRandomRow = CPListImageRowItem(
+      text: nil,
+      elements: playRandomItems,
+      allowsMultipleLines: false
+    )
+    playRandomRow.handler = { selectedRow, completion in completion() }
+    playRandomRow.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self else { completion(); return }
+      Task { @MainActor in
+        if playRandomItems[index].title == Self.playRandomAlbumsTitle {
+          triggerPlayRandomAlbums(onlyCached: true)
+        }
+        if playRandomItems[index].title == Self.playRandomSongsTitle {
+          triggerPlayRandomSongsItem(onlyCached: true)
+        }
+      }
+      completion()
+    }
+    let playRandomSection = CPListSection(
+      items: [playRandomRow],
+      header: "Play Random Cached",
+      sectionIndexTitle: nil
+    )
+
     let librarySections = [
+      playRandomSection,
       CPListSection(items: [
-        createPlayRandomSongsItem(onlyCached: true),
         createLibraryItem(
           text: "Favorites",
           icon: UIImage.heartFill,
@@ -544,7 +707,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         ),
       ], header: "Cached Songs", sectionIndexTitle: nil),
       CPListSection(items: [
-        createPlayRandomAlbumsItem(onlyCached: true),
         createLibraryItem(
           text: "Favorites",
           icon: UIImage.heartFill,
@@ -741,127 +903,38 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return item
   }
 
-  func createContinePlayingItems() -> [CPListItem] {
-    var continuePlayingItems = [CPListItem]()
-    if appDelegate.player.musicItemCount > 0 {
-      let item = CPListItem(
-        text: "Music",
-        detailText: "",
-        image: UIImage.createArtwork(
-          with: UIImage.musicalNotes,
-          iconSizeType: .small,
-          theme: getPreference(activeAccountInfo).theme,
-          lightDarkMode: traits.userInterfaceStyle.asModeType,
-          switchColors: true
-        ).carPlayImage(carTraitCollection: traits),
-        accessoryImage: nil,
-        accessoryType: .none
-      )
-      item.handler = { [weak self] item, completion in
-        guard let self = self else { completion(); return }
-        if appDelegate.player.playerMode != .music {
-          appDelegate.player.setPlayerMode(.music)
-        }
-        appDelegate.player.play()
-        displayNowPlaying { completion() }
-      }
-      continuePlayingItems.append(item)
-    }
-    if appDelegate.player.podcastItemCount > 0 {
-      let item = CPListItem(
-        text: "Podcasts",
-        detailText: "",
-        image: UIImage.createArtwork(
-          with: UIImage.podcast,
-          iconSizeType: .small,
-          theme: getPreference(activeAccountInfo).theme,
-          lightDarkMode: traits.userInterfaceStyle.asModeType,
-          switchColors: true
-        ).carPlayImage(carTraitCollection: traits),
-        accessoryImage: nil,
-        accessoryType: .none
-      )
-      item.handler = { [weak self] item, completion in
-        guard let self = self else { completion(); return }
-        if appDelegate.player.playerMode != .podcast {
-          appDelegate.player.setPlayerMode(.podcast)
-        }
-        appDelegate.player.play()
-        displayNowPlaying { completion() }
-      }
-      continuePlayingItems.append(item)
-    }
-    return continuePlayingItems
+  func triggerPlayRandomSongsItem(onlyCached: Bool) {
+    let songs = appDelegate.storage.main.library
+      .getRandomSongs(for: activeAccount, onlyCached: onlyCached || isOfflineMode)
+    let playContext = PlayContext(
+      name: "Random\(onlyCached ? " Cached" : "") Songs",
+      playables: songs
+    )
+    appDelegate.player.playShuffled(context: playContext)
+    displayNowPlaying {}
   }
 
-  func createPlayRandomSongsItem(onlyCached: Bool) -> CPListItem {
-    let img = UIImage.createArtwork(
-      with: UIImage.shuffle,
-      iconSizeType: .small,
-      theme: getPreference(activeAccountInfo).theme,
-      lightDarkMode: traits.userInterfaceStyle.asModeType,
-      switchColors: true
-    ).carPlayImage(carTraitCollection: traits)
-    let item = CPListItem(
-      text: "Play Random\(onlyCached ? " Cached" : "") Songs",
-      detailText: nil,
-      image: img,
-      accessoryImage: nil,
-      accessoryType: .disclosureIndicator
+  func triggerPlayRandomAlbums(onlyCached: Bool) {
+    let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
+      for: activeAccount,
+      count: 5,
+      onlyCached: onlyCached || isOfflineMode
     )
-    item.handler = { [weak self] item, completion in
-      guard let self = self else { completion(); return }
-      let songs = appDelegate.storage.main.library
-        .getRandomSongs(for: activeAccount, onlyCached: onlyCached || isOfflineMode)
-      let playContext = PlayContext(
-        name: "Random\(onlyCached ? " Cached" : "") Songs",
-        playables: songs
-      )
-      appDelegate.player.playShuffled(context: playContext)
-      displayNowPlaying { completion() }
-    }
-    return item
-  }
-
-  func createPlayRandomAlbumsItem(onlyCached: Bool) -> CPListItem {
-    let img = UIImage.createArtwork(
-      with: UIImage.shuffle,
-      iconSizeType: .small,
-      theme: getPreference(activeAccountInfo).theme,
-      lightDarkMode: traits.userInterfaceStyle.asModeType,
-      switchColors: true
-    ).carPlayImage(carTraitCollection: traits)
-    let item = CPListItem(
-      text: "Play Random\(onlyCached ? " Cached" : "") Albums",
-      detailText: nil,
-      image: img,
-      accessoryImage: nil,
-      accessoryType: .disclosureIndicator
+    var songs = [AbstractPlayable]()
+    randomAlbums
+      .forEach {
+        songs
+          .append(
+            contentsOf: $0.playables
+              .filterCached(dependigOn: onlyCached || self.isOfflineMode)
+          )
+      }
+    let playContext = PlayContext(
+      name: "Random\(onlyCached ? " Cached" : "") Albums",
+      playables: songs
     )
-    item.handler = { [weak self] item, completion in
-      guard let self = self else { completion(); return }
-      let randomAlbums = appDelegate.storage.main.library.getRandomAlbums(
-        for: activeAccount,
-        count: 5,
-        onlyCached: onlyCached || isOfflineMode
-      )
-      var songs = [AbstractPlayable]()
-      randomAlbums
-        .forEach {
-          songs
-            .append(
-              contentsOf: $0.playables
-                .filterCached(dependigOn: onlyCached || self.isOfflineMode)
-            )
-        }
-      let playContext = PlayContext(
-        name: "Random\(onlyCached ? " Cached" : "") Albums",
-        playables: songs
-      )
-      appDelegate.player.play(context: playContext)
-      displayNowPlaying { completion() }
-    }
-    return item
+    appDelegate.player.play(context: playContext)
+    displayNowPlaying {}
   }
 
   var playlistFetchController: PlaylistFetchedResultsController?
@@ -1293,48 +1366,48 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
 
   private func createRadioSections(from fetchedController: BasicFetchedResultsController<RadioMO>?)
     -> [CPListSection] {
-      var sections = [CPListSection]()
-        guard let fetchedController = fetchedController,
-              let fetchSections = fetchedController.sections,
-              fetchSections.count > 0 else { return sections }
-      
-      guard let fetchedRadios = fetchedController.fetchedObjects else { return sections }
-      let radios = fetchedRadios.prefix(CPListTemplate.maximumItemCount).compactMap { Radio(managedObject: $0) }
+    var sections = [CPListSection]()
+    guard let fetchedController = fetchedController,
+          let fetchSections = fetchedController.sections,
+          !fetchSections.isEmpty else { return sections }
 
-      let playRandomItem = createPlayRandomListItem(playContext: PlayContext(
-        name: "Radios",
-        playables: radios
-      ))
-      let randomSection = CPListSection(items: [playRandomItem], header: nil, sectionIndexTitle: nil)
-      sections.append(randomSection)
-      var itemCount = 1
+    guard let fetchedRadios = fetchedController.fetchedObjects else { return sections }
+    let radios = fetchedRadios.prefix(CPListTemplate.maximumItemCount)
+      .compactMap { Radio(managedObject: $0) }
 
-      
-      for fetchSection in fetchSections {
-        guard let fetchObjects = fetchSection.objects as? [RadioMO] else { continue }
-        var items = [CPListTemplateItem]()
-        
-        var indexTitle: String?
-        indexTitle = fetchObjects.first?.title?.prefix(1).uppercased()
-        if let _ = Int(indexTitle ?? "-") {
-          indexTitle = "#"
-        }
-        
-        for fetchObject in fetchObjects {
-          let radio = Radio(managedObject: fetchObject)
-            let listItem = createDetailTemplate(
-              for: radio,
-              playContext: PlayContext(name: "Radios", index: itemCount - 1, playables: Array(radios)),
-              isTrackDisplayed: false
-            )
-            items.append(listItem)
-          itemCount += 1
-          if itemCount > CPListTemplate.maximumItemCount { break }
-        }
-        let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
-        sections.append(section)
+    let playRandomItem = createPlayRandomListItem(playContext: PlayContext(
+      name: "Radios",
+      playables: radios
+    ))
+    let randomSection = CPListSection(items: [playRandomItem], header: nil, sectionIndexTitle: nil)
+    sections.append(randomSection)
+    var itemCount = 1
+
+    for fetchSection in fetchSections {
+      guard let fetchObjects = fetchSection.objects as? [RadioMO] else { continue }
+      var items = [CPListTemplateItem]()
+
+      var indexTitle: String?
+      indexTitle = fetchObjects.first?.title?.prefix(1).uppercased()
+      if let _ = Int(indexTitle ?? "-") {
+        indexTitle = "#"
+      }
+
+      for fetchObject in fetchObjects {
+        let radio = Radio(managedObject: fetchObject)
+        let listItem = createDetailTemplate(
+          for: radio,
+          playContext: PlayContext(name: "Radios", index: itemCount - 1, playables: Array(radios)),
+          isTrackDisplayed: false
+        )
+        items.append(listItem)
+        itemCount += 1
         if itemCount > CPListTemplate.maximumItemCount { break }
       }
+      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
+      sections.append(section)
+      if itemCount > CPListTemplate.maximumItemCount { break }
+    }
     return sections
   }
 
