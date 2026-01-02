@@ -1211,48 +1211,62 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return sections
   }
 
-  private func createPodcastsSections() -> [CPListTemplateItem] {
-    var sections = [CPListTemplateItem]()
+  private func createPodcastsSections() -> [CPListSection] {
+    var sections = [CPListSection]()
+    var itemCount = 0
+    guard let fetchedController = podcastFetchController,
+          let fetchSections = fetchedController.sections else { return sections }
+    for fetchSection in fetchSections {
+      guard let fetchObjects = fetchSection.objects as? [PodcastMO] else { continue }
+      var items = [CPListTemplateItem]()
 
-    guard let fetchedPodcasts = podcastFetchController?.fetchedObjects else { return sections }
-    let sectionCount = min(fetchedPodcasts.count, CPListTemplate.maximumSectionCount)
-    guard sectionCount > 0 else { return sections }
-    for podcastIndex in 0 ... (sectionCount - 1) {
-      let podcastMO = fetchedPodcasts[podcastIndex]
-      let podcast = Podcast(managedObject: podcastMO)
+      var indexTitle: String?
+      indexTitle = fetchObjects.first?.title?.prefix(1).uppercased()
+      if let _ = Int(indexTitle ?? "-") {
+        indexTitle = "#"
+      }
 
-      let section = CPListItem(
-        text: podcast.title,
-        detailText: podcast.subtitle,
-        image: LibraryEntityImage.getImageToDisplayImmediately(
-          libraryEntity: podcast,
-          themePreference: getPreference(activeAccountInfo).theme,
-          artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-          useCache: false
-        ).carPlayImage(carTraitCollection: traits),
-        accessoryImage: nil,
-        accessoryType: .disclosureIndicator
-      )
-      if let artwork = podcast.artwork, let accountInfo = artwork.account?.info {
-        appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
+      for fetchObject in fetchObjects {
+        let podcast = Podcast(managedObject: fetchObject)
+
+        let item = CPListItem(
+          text: podcast.title,
+          detailText: podcast.subtitle,
+          image: LibraryEntityImage.getImageToDisplayImmediately(
+            libraryEntity: podcast,
+            themePreference: getPreference(activeAccountInfo).theme,
+            artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
+            useCache: false
+          ).carPlayImage(carTraitCollection: traits),
+          accessoryImage: nil,
+          accessoryType: .disclosureIndicator
+        )
+        if let artwork = podcast.artwork, let accountInfo = artwork.account?.info {
+          appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
+        }
+        item.userInfo = [
+          CarPlayListUserInfoKeys.artworkDownloadID.rawValue: podcast.artwork?.uniqueID as Any,
+          CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue: podcast.managedObject
+            .objectID as Any,
+          CarPlayListUserInfoKeys.artworkOwnerType.rawValue: ArtworkType.podcast as Any,
+        ]
+        item.handler = { [weak self] item, completion in
+          guard let self = self else { completion(); return }
+          let podcastDetailTemplate = CPListTemplate(title: podcast.name, sections: [
+            CPListSection(items: [CPListTemplateItem]()),
+          ])
+          podcastDetailSection = podcastDetailTemplate
+          createPodcastDetailFetchController(podcast: podcast)
+          interfaceController?.pushTemplate(podcastDetailTemplate, animated: true, completion: nil)
+          completion()
+        }
+        items.append(item)
+        itemCount += 1
+        if itemCount > CPListTemplate.maximumItemCount { break }
       }
-      section.userInfo = [
-        CarPlayListUserInfoKeys.artworkDownloadID.rawValue: podcast.artwork?.uniqueID as Any,
-        CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue: podcast.managedObject
-          .objectID as Any,
-        CarPlayListUserInfoKeys.artworkOwnerType.rawValue: ArtworkType.podcast as Any,
-      ]
-      section.handler = { [weak self] item, completion in
-        guard let self = self else { completion(); return }
-        let podcastDetailTemplate = CPListTemplate(title: podcast.name, sections: [
-          CPListSection(items: [CPListTemplateItem]()),
-        ])
-        podcastDetailSection = podcastDetailTemplate
-        createPodcastDetailFetchController(podcast: podcast)
-        interfaceController?.pushTemplate(podcastDetailTemplate, animated: true, completion: nil)
-        completion()
-      }
+      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
       sections.append(section)
+      if itemCount > CPListTemplate.maximumItemCount { break }
     }
     return sections
   }
@@ -1664,7 +1678,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     if templates.contains(podcastSection) {
       os_log("CarPlay: OfflineModeChanged: podcastFetchController", log: self.log, type: .info)
       createPodcastFetchController()
-      podcastSection.updateSections([CPListSection(items: createPodcastsSections())])
+      podcastSection.updateSections(createPodcastsSections())
     }
     if templates.contains(artistsFavoriteSection) {
       os_log(
@@ -1766,7 +1780,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
       if templates.contains(podcastSection), let podcastFetchController = podcastFetchController,
          controller == podcastFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: podcastFetchController", log: self.log, type: .info)
-        podcastSection.updateSections([CPListSection(items: createPodcastsSections())])
+        podcastSection.updateSections(createPodcastsSections())
       }
 
       if templates.contains(radioSection), let radiosFetchController = radiosFetchController,
@@ -1959,7 +1973,7 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       } else if aTemplate == podcastSection {
         os_log("CarPlay: templateWillAppear podcastSection", log: self.log, type: .info)
         if podcastFetchController == nil { createPodcastFetchController() }
-        podcastSection.updateSections([CPListSection(items: createPodcastsSections())])
+        podcastSection.updateSections(createPodcastsSections())
       } else if aTemplate == accountSection {
         os_log("CarPlay: templateWillAppear accountSection", log: self.log, type: .info)
         accountSection.updateSections(createAccountsSections())

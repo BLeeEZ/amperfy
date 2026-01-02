@@ -43,7 +43,7 @@ extension CarPlaySceneDelegate {
   func createPodcastFetchController() {
     podcastFetchController = PodcastFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,
-      isGroupedInAlphabeticSections: false
+      isGroupedInAlphabeticSections: true
     )
     podcastFetchController?.delegate = self
     if isOfflineMode {
