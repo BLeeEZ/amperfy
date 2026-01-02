@@ -236,6 +236,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }()
 
   func updateHomeSections() {
+    guard let sharedHome else { return }
+    let alreadyCreatedData = homeRowData
+    let requestedData = sharedHome.data
+    guard alreadyCreatedData !=
+       requestedData else {
+      return
+    }
     let homeRows = createHomeImageRows()
     let homeSection = CPListSection(items: homeRows, header: nil, sectionIndexTitle: nil)
     homeTab.updateSections([homeSection])
@@ -329,6 +336,15 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   }
 
   func createHomeRow(section: HomeSection, isDetailTemplate: Bool) -> CPListImageRowItem? {
+    guard let sharedHome else { return nil }
+    let alreadyCreatedData = homeRowData[section]
+    let requestedData = sharedHome.data[section]
+    if !isDetailTemplate,
+       alreadyCreatedData ==
+       requestedData {
+      return homeImageRows[section]
+    }
+      
     let imageRowElements = createHomeRowImageElements(section: section, isDetail: isDetailTemplate)
     let isRandomSection = section.isRandomSection
 
@@ -359,7 +375,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         }
       } else if isRandomSection {
         Task { @MainActor in
-          guard let sharedHome else { completion(); return }
           switch section {
           case .randomAlbums:
             await sharedHome.updateRandomAlbums(isOfflineMode: isOfflineMode)
@@ -386,7 +401,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     // listImageRowHandler CB is called when user pressed on a image inside the row
     row.listImageRowHandler = { [weak self] item, index, completion in
       guard let self,
-            let selectedPlayable = sharedHome?.data[section]?[index].playableContainable
+            let selectedPlayable = sharedHome.data[section]?[index].playableContainable
       else { completion(); return }
       Task { @MainActor in
         if !isOfflineMode {
@@ -415,8 +430,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     var imageRows = [CPListImageRowItem]()
     for section in sharedHome.orderedVisibleSections {
       if let row = homeImageRows[section] {
-        let imageRowElements = createHomeRowImageElements(section: section, isDetail: false)
-        row.elements = imageRowElements
+        let alreadyCreatedData = homeRowData[section]
+        let requestedData = sharedHome.data[section]
+        if alreadyCreatedData !=
+           requestedData {
+          let imageRowElements = createHomeRowImageElements(section: section, isDetail: false)
+          row.elements = imageRowElements
+        }
         imageRows.append(row)
       } else if let row = createHomeRow(section: section, isDetailTemplate: false) {
         homeImageRows[section] = row
