@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -138,7 +138,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="ZVN-JG-VAA" userLabel="Display Playlist Button">
-                            <rect key="frame" x="90.5" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="68" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="ZVN-JG-VAA" secondAttribute="height" multiplier="1:1" id="dHI-Uf-EN9"/>
                                 <constraint firstAttribute="height" constant="28" id="dOb-nc-wBt"/>
@@ -158,7 +158,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="7xb-YR-9X6" userLabel="Player Mode Change">
-                            <rect key="frame" x="181.5" y="0.0" width="28" height="28"/>
+                            <rect key="frame" x="136" y="0.0" width="28" height="28"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="7xb-YR-9X6" secondAttribute="height" multiplier="1:1" id="Iye-f4-Rd2"/>
                                 <constraint firstAttribute="width" constant="28" id="O0l-F2-ebZ"/>
@@ -172,6 +172,23 @@
                             </state>
                             <connections>
                                 <action selector="playerModeChangePressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="WMf-zb-HxJ"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="6Pl-OT-ev0" userLabel="Volume Button">
+                            <rect key="frame" x="204" y="0.0" width="28" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="28" id="Pf6-ox-Kmc"/>
+                                <constraint firstAttribute="width" secondItem="6Pl-OT-ev0" secondAttribute="height" multiplier="1:1" id="rZT-aA-wsC"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="tintColor" systemColor="labelColor"/>
+                            <inset key="contentEdgeInsets" minX="2" minY="2" maxX="2" maxY="2"/>
+                            <state key="normal">
+                                <color key="titleColor" systemColor="labelColor"/>
+                                <imageReference key="image" image="volume.3.fill" catalog="system" symbolScale="medium"/>
+                            </state>
+                            <connections>
+                                <action selector="volumeButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="hyp-0o-Z8e"/>
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="0xq-hb-FZa" userLabel="Options Button">
@@ -188,6 +205,7 @@
                         </button>
                     </subviews>
                     <constraints>
+                        <constraint firstItem="6Pl-OT-ev0" firstAttribute="width" secondItem="6Pl-OT-ev0" secondAttribute="height" multiplier="1:1" id="17H-kZ-Fa5"/>
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
                     </constraints>
                 </stackView>
@@ -263,6 +281,7 @@
                 <outlet property="skipBackwardButton" destination="PZj-JS-NGq" id="q0L-Ve-YvK"/>
                 <outlet property="skipForwardButton" destination="QO0-Ep-X2s" id="idR-HQ-cSv"/>
                 <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>
+                <outlet property="volumeButton" destination="6Pl-OT-ev0" id="5TF-KD-MEC"/>
                 <outletCollection property="gestureRecognizers" destination="UMb-bk-6ia" appends="YES" id="Btr-RL-2lg"/>
             </connections>
             <point key="canvasLocation" x="138.40000000000001" y="99.400299850074973"/>
@@ -285,6 +304,7 @@
         <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="play.fill" catalog="system" width="120" height="128"/>
         <image name="podcast" width="10" height="11"/>
+        <image name="volume.3.fill" catalog="system" width="128" height="84"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

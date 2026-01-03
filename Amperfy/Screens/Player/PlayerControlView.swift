@@ -75,6 +75,8 @@ class PlayerControlView: UIView {
   @IBOutlet
   weak var displayPlaylistButton: UIButton!
   @IBOutlet
+  weak var volumeButton: UIButton!
+  @IBOutlet
   weak var optionsButton: UIButton!
 
   required init?(coder aDecoder: NSCoder) {
@@ -106,6 +108,7 @@ class PlayerControlView: UIView {
     skipForwardButton.tintColor = .label
     airplayButton.tintColor = .label
     playerModeButton.tintColor = .label
+    volumeButton.tintColor = .label
     optionsButton.imageView?.tintColor = .label
     refreshPlayer()
     playerHandler?.refreshPlayerOptions(
@@ -186,6 +189,39 @@ class PlayerControlView: UIView {
     #else
       playerHandler?.airplayButtonPushed(rootView: self, airplayButton: airplayButton)
     #endif
+  }
+
+  @IBAction
+  func volumeButtonPressed(_ sender: Any) {
+    showVolumeSliderMenu()
+  }
+
+  func showVolumeSliderMenu() {
+    let popoverContentController = SliderMenuPopover()
+    let sliderMenuView = popoverContentController.sliderMenuView
+    sliderMenuView.frame = CGRect(x: 0, y: 0, width: 250, height: 60)
+
+    sliderMenuView.slider.minimumValue = 0
+    sliderMenuView.slider.maximumValue = 100
+    sliderMenuView.slider.value = appDelegate.player.volume * 100
+
+    sliderMenuView.sliderValueChangedCB = {
+      self.appDelegate.player.volume = Float(sliderMenuView.slider.value) / 100.0
+    }
+
+    popoverContentController.modalPresentationStyle = .popover
+    popoverContentController.preferredContentSize = sliderMenuView.frame.size
+
+    if let popoverPresentationController = popoverContentController.popoverPresentationController {
+      popoverPresentationController.permittedArrowDirections = .down
+      popoverPresentationController.delegate = popoverContentController
+      popoverPresentationController.sourceView = volumeButton
+      rootView?.present(
+        popoverContentController,
+        animated: true,
+        completion: nil
+      )
+    }
   }
 
   @IBAction
