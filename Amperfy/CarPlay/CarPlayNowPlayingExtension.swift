@@ -24,12 +24,11 @@ import CarPlay
 import Foundation
 
 extension CarPlaySceneDelegate {
-  
   static let queueButtonText = NSLocalizedString(
     "Queue",
     comment: "Button title on CarPlay player to display queue"
   )
-  
+
   func configureNowPlayingTemplate() {
     var buttons: [CPNowPlayingButton] = []
     buttons.append(

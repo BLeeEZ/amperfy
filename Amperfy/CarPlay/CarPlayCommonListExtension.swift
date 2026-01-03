@@ -25,7 +25,6 @@ import CoreData
 import Foundation
 
 extension CarPlaySceneDelegate {
-
   func createArtistItems(
     from fetchedController: BasicFetchedResultsController<ArtistMO>?,
     onlyCached: Bool
@@ -503,7 +502,7 @@ extension CarPlaySceneDelegate {
     }
     return listItem
   }
-  
+
   func createLibraryItem(
     text: String,
     subtitle: String? = nil,
@@ -536,7 +535,7 @@ extension CarPlaySceneDelegate {
     }
     return item
   }
-  
+
   enum CarPlayListUserInfoKeys: String {
     case playableDownloadID
     case artworkDownloadID
@@ -590,7 +589,7 @@ extension CarPlaySceneDelegate {
         useCache: false
       )
   }
-  
+
   func triggerPlayRandomSongsItem(onlyCached: Bool) {
     let songs = appDelegate.storage.main.library
       .getRandomSongs(for: activeAccount, onlyCached: onlyCached || isOfflineMode)
@@ -624,5 +623,4 @@ extension CarPlaySceneDelegate {
     appDelegate.player.play(context: playContext)
     displayNowPlaying {}
   }
-
 }

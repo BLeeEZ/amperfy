@@ -25,8 +25,68 @@ import CoreData
 import Foundation
 
 extension CarPlaySceneDelegate {
-  
   func createCachedSections() -> [CPListSection] {
+    let librarySections = [
+      createPlayRandomCachedSection(),
+      createCachedLibraryNavigationTypeSection(),
+    ]
+    return librarySections
+  }
+
+  func createCachedLibraryNavigationTypeSection() -> CPListSection {
+    var libDisplayItems = [CPListImageRowItemRowElement]()
+    for libDisplayType in appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
+      .libraryDisplaySettings.inUse {
+      guard libDisplayType.isVisibleInCachedCarPlay else { continue }
+      let element = createLibraryTypeImageRowElement(type: libDisplayType)
+      libDisplayItems.append(element)
+    }
+    let libDisplayRow = CPListImageRowItem(
+      text: nil,
+      elements: libDisplayItems,
+      allowsMultipleLines: true
+    )
+    libDisplayRow.handler = { selectedRow, completion in completion() }
+    libDisplayRow.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self,
+            let selectedTitle = libDisplayItems[index].title,
+            let displayType = LibraryDisplayType.createByDisplayName(name: selectedTitle)
+      else { completion(); return }
+
+      var sectionToDisplay: CPListTemplate?
+      switch displayType {
+      case .favoriteSongs:
+        sectionToDisplay = songsFavoriteCachedSection
+      case .favoriteAlbums:
+        sectionToDisplay = albumsFavoriteCachedSection
+      case .favoriteArtists:
+        sectionToDisplay = artistsFavoriteCachedSection
+      case .newestAlbums:
+        sectionToDisplay = albumsNewestCachedSection
+      case .recentAlbums:
+        sectionToDisplay = albumsRecentCachedSection
+      case .radios:
+        sectionToDisplay = radioSection
+      case .albums, .artists, .directories, .downloads, .genres, .playlists, .podcasts, .songs:
+        break // do nothing
+      }
+      guard let sectionToDisplay else { completion(); return }
+
+      Task { @MainActor in
+        let _ = try? await interfaceController?
+          .pushTemplate(sectionToDisplay, animated: true)
+      }
+      completion()
+    }
+    let libDisplaySection = CPListSection(
+      items: [libDisplayRow],
+      header: "Cached Library",
+      sectionIndexTitle: nil
+    )
+    return libDisplaySection
+  }
+
+  func createPlayRandomCachedSection() -> CPListSection {
     var playRandomItems = [CPListImageRowItemRowElement]()
     let playRandomAlbumsItem = CPListImageRowItemRowElement(
       image: UIImage.createArtwork(
@@ -74,41 +134,6 @@ extension CarPlaySceneDelegate {
       header: "Play Random Cached",
       sectionIndexTitle: nil
     )
-
-    let librarySections = [
-      playRandomSection,
-      CPListSection(items: [
-        createLibraryItem(
-          text: "Favorites",
-          icon: UIImage.heartFill,
-          sectionToDisplay: songsFavoriteCachedSection
-        ),
-      ], header: "Cached Songs", sectionIndexTitle: nil),
-      CPListSection(items: [
-        createLibraryItem(
-          text: "Favorites",
-          icon: UIImage.heartFill,
-          sectionToDisplay: albumsFavoriteCachedSection
-        ),
-        createLibraryItem(
-          text: "Newest",
-          icon: UIImage.albumNewest,
-          sectionToDisplay: albumsNewestCachedSection
-        ),
-        createLibraryItem(
-          text: "Recently Played",
-          icon: UIImage.albumRecent,
-          sectionToDisplay: albumsRecentCachedSection
-        ),
-      ], header: "Cached Albums", sectionIndexTitle: nil),
-      CPListSection(items: [
-        createLibraryItem(
-          text: "Favorites",
-          icon: UIImage.heartFill,
-          sectionToDisplay: artistsFavoriteCachedSection
-        ),
-      ], header: "Cached Artists", sectionIndexTitle: nil),
-    ]
-    return librarySections
+    return playRandomSection
   }
 }

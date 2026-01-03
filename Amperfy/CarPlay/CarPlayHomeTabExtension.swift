@@ -25,7 +25,6 @@ import CoreData
 import Foundation
 
 extension CarPlaySceneDelegate {
- 
   func updateHomeSections() {
     guard let sharedHome else { return }
     let alreadyCreatedData = homeRowData
@@ -38,7 +37,7 @@ extension CarPlaySceneDelegate {
     let homeSection = CPListSection(items: homeRows, header: nil, sectionIndexTitle: nil)
     homeTab.updateSections([homeSection])
   }
-  
+
   func createHomeImageRows() -> [CPListImageRowItem] {
     guard let sharedHome else { return [] }
     var imageRows = [CPListImageRowItem]()
@@ -59,7 +58,7 @@ extension CarPlaySceneDelegate {
     }
     return imageRows
   }
-  
+
   func createHomeRow(section: HomeSection, isDetailTemplate: Bool) -> CPListImageRowItem? {
     guard let sharedHome else { return nil }
     let alreadyCreatedData = homeRowData[section]
@@ -149,7 +148,7 @@ extension CarPlaySceneDelegate {
     }
     return row
   }
-  
+
   func createHomeRowImageElements(
     section: HomeSection,
     isDetail: Bool
@@ -224,5 +223,4 @@ extension CarPlaySceneDelegate {
     }
     return imageRowElements
   }
-
 }

@@ -24,8 +24,32 @@ import CarPlay
 import CoreData
 import Foundation
 
+extension LibraryDisplayType {
+  public var isVisibleInCarPlay: Bool {
+    switch self {
+    case .albums, .favoriteAlbums, .favoriteArtists, .favoriteSongs, .newestAlbums, .podcasts,
+         .radios, .recentAlbums:
+      return true
+    case .artists, .directories, .downloads, .genres, .songs:
+      return false
+    case .playlists:
+      return false // playlists have their own tab
+    }
+  }
+
+  public var isVisibleInCachedCarPlay: Bool {
+    switch self {
+    case .favoriteAlbums, .favoriteArtists, .favoriteSongs, .newestAlbums, .recentAlbums:
+      return true
+    case .albums, .artists, .directories, .downloads, .genres, .podcasts, .radios, .songs:
+      return false
+    case .playlists:
+      return false // playlists have their own tab
+    }
+  }
+}
+
 extension CarPlaySceneDelegate {
- 
   static let switchAccountTitle = "Switch Account"
   static let continuePlaybackMusicTitle = "Continue Music"
   static let continuePlaybackPodcastTitle = "Continue Podcasts"
@@ -33,83 +57,88 @@ extension CarPlaySceneDelegate {
   static let playRandomSongsTitle = "Songs"
 
   func createLibrarySections() -> [CPListSection] {
-    var quickActionItems = [CPListImageRowItemRowElement]()
-    if appDelegate.player.musicItemCount > 0 {
-      let item = CPListImageRowItemRowElement(
-        image: UIImage.createArtwork(
-          with: UIImage.musicalNotes,
-          iconSizeType: .small,
-          theme: getPreference(activeAccountInfo).theme,
-          lightDarkMode: traits.userInterfaceStyle.asModeType,
-          switchColors: true
-        ).carPlayImage(carTraitCollection: traits),
-        title: Self.continuePlaybackMusicTitle, subtitle: nil
-      )
-      quickActionItems.append(item)
-    }
-    if appDelegate.player.podcastItemCount > 0 {
-      let item = CPListImageRowItemRowElement(
-        image: UIImage.createArtwork(
-          with: UIImage.podcast,
-          iconSizeType: .small,
-          theme: getPreference(activeAccountInfo).theme,
-          lightDarkMode: traits.userInterfaceStyle.asModeType,
-          switchColors: true
-        ).carPlayImage(carTraitCollection: traits),
-        title: Self.continuePlaybackPodcastTitle, subtitle: nil
-      )
-      quickActionItems.append(item)
-    }
-    if appDelegate.storage.settings.accounts.allAccounts.count > 1 {
-      let switchAccountItem = CPListImageRowItemRowElement(
-        image: UIImage.createArtwork(
-          with: UIImage.userPerson,
-          iconSizeType: .small,
-          theme: getPreference(activeAccountInfo).theme,
-          lightDarkMode: traits.userInterfaceStyle.asModeType,
-          switchColors: true
-        ).carPlayImage(carTraitCollection: traits),
-        title: Self.switchAccountTitle, subtitle: nil
-      )
-      quickActionItems.append(switchAccountItem)
-    }
+    let librarySections = [
+      createQuickActionsSection(),
+      createPlayRandomSection(),
+      createLibraryNavigationTypeSection(),
+    ].compactMap { $0 }
 
-    let quickActionsRow = CPListImageRowItem(
-      text: nil,
-      elements: quickActionItems,
-      allowsMultipleLines: false
+    return librarySections
+  }
+
+  func createLibraryTypeImageRowElement(type: LibraryDisplayType) -> CPListImageRowItemRowElement {
+    let baseImage = type.image
+    let element = CPListImageRowItemRowElement(
+      image: UIImage.createArtwork(
+        with: baseImage,
+        iconSizeType: .small,
+        theme: getPreference(activeAccountInfo).theme,
+        lightDarkMode: traits.userInterfaceStyle.asModeType,
+        switchColors: true
+      ).carPlayImage(carTraitCollection: traits),
+      title: type.displayName, subtitle: nil
     )
-    quickActionsRow.handler = { selectedRow, completion in completion() }
-    quickActionsRow.listImageRowHandler = { [weak self] item, index, completion in
-      guard let self else { completion(); return }
+    return element
+  }
+
+  func createLibraryNavigationTypeSection() -> CPListSection {
+    var libDisplayItems = [CPListImageRowItemRowElement]()
+    for libDisplayType in appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
+      .libraryDisplaySettings.inUse {
+      guard libDisplayType.isVisibleInCarPlay else { continue }
+      let element = createLibraryTypeImageRowElement(type: libDisplayType)
+      libDisplayItems.append(element)
+    }
+    let libDisplayRow = CPListImageRowItem(
+      text: nil,
+      elements: libDisplayItems,
+      allowsMultipleLines: true
+    )
+    libDisplayRow.handler = { selectedRow, completion in completion() }
+    libDisplayRow.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self,
+            let selectedTitle = libDisplayItems[index].title,
+            let displayType = LibraryDisplayType.createByDisplayName(name: selectedTitle)
+      else { completion(); return }
+
+      var sectionToDisplay: CPListTemplate?
+      switch displayType {
+      case .albums:
+        sectionToDisplay = albumsSection
+      case .podcasts:
+        sectionToDisplay = podcastSection
+      case .favoriteSongs:
+        sectionToDisplay = songsFavoriteSection
+      case .favoriteAlbums:
+        sectionToDisplay = albumsFavoriteSection
+      case .favoriteArtists:
+        sectionToDisplay = artistsFavoriteSection
+      case .newestAlbums:
+        sectionToDisplay = albumsNewestSection
+      case .recentAlbums:
+        sectionToDisplay = albumsRecentSection
+      case .radios:
+        sectionToDisplay = radioSection
+      case .artists, .directories, .downloads, .genres, .playlists, .songs:
+        break // do nothing
+      }
+      guard let sectionToDisplay else { completion(); return }
 
       Task { @MainActor in
-        if quickActionItems[index].title == Self.switchAccountTitle {
-          let _ = try? await interfaceController?
-            .pushTemplate(accountSection, animated: true)
-        }
-        if quickActionItems[index].title == Self.continuePlaybackMusicTitle ||
-          quickActionItems[index].title == Self.continuePlaybackPodcastTitle {
-          if quickActionItems[index].title == Self.continuePlaybackMusicTitle,
-             appDelegate.player.playerMode != .music {
-            appDelegate.player.setPlayerMode(.music)
-          } else if quickActionItems[index].title == Self.continuePlaybackPodcastTitle,
-                    appDelegate.player.playerMode != .podcast {
-            appDelegate.player.setPlayerMode(.podcast)
-          }
-          appDelegate.player.play()
-          displayNowPlaying {}
-        }
+        let _ = try? await interfaceController?
+          .pushTemplate(sectionToDisplay, animated: true)
       }
-
       completion()
     }
-    let quickActionsSection = CPListSection(
-      items: [quickActionsRow],
-      header: "Quick Actions",
+    let libDisplaySection = CPListSection(
+      items: [libDisplayRow],
+      header: "Library",
       sectionIndexTitle: nil
     )
+    return libDisplaySection
+  }
 
+  func createPlayRandomSection() -> CPListSection {
     var playRandomItems = [CPListImageRowItemRowElement]()
     let playRandomAlbumsItem = CPListImageRowItemRowElement(
       image: UIImage.createArtwork(
@@ -158,70 +187,91 @@ extension CarPlaySceneDelegate {
       header: "Play Random",
       sectionIndexTitle: nil
     )
-
-    let librarySections = [
-      !quickActionItems.isEmpty ? quickActionsSection : nil,
-      playRandomSection,
-      appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
-        .libraryDisplaySettings
-        .isVisible(libraryType: .radios) ?
-        CPListSection(items: [
-          createLibraryItem(text: "Channels", icon: UIImage.radio, sectionToDisplay: radioSection),
-        ], header: "Radio", sectionIndexTitle: nil)
-        : nil,
-      appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read
-        .libraryDisplaySettings
-        .isVisible(libraryType: .podcasts) ?
-        CPListSection(items: [
-          createLibraryItem(
-            text: "Podcasts",
-            icon: UIImage.podcast,
-            sectionToDisplay: podcastSection
-          ),
-        ], header: "Podcasts", sectionIndexTitle: nil)
-        : nil,
-      CPListSection(items: [
-        createLibraryItem(
-          text: "Favorites",
-          icon: UIImage.heartFill,
-          sectionToDisplay: songsFavoriteSection
-        ),
-      ], header: "Songs", sectionIndexTitle: nil),
-      CPListSection(items: [
-        createLibraryItem(
-          text: "All",
-          subtitle: "Display limit per section",
-          icon: UIImage.album,
-          sectionToDisplay: albumsSection
-        ),
-        createLibraryItem(
-          text: "Favorites",
-          icon: UIImage.heartFill,
-          sectionToDisplay: albumsFavoriteSection
-        ),
-        createLibraryItem(
-          text: "Newest",
-          icon: UIImage.albumNewest,
-          sectionToDisplay: albumsNewestSection
-        ),
-        createLibraryItem(
-          text: "Recently Played",
-          icon: UIImage.albumRecent,
-          sectionToDisplay: albumsRecentSection
-        ),
-      ], header: "Albums", sectionIndexTitle: nil),
-      CPListSection(items: [
-        createLibraryItem(
-          text: "Favorites",
-          icon: UIImage.heartFill,
-          sectionToDisplay: artistsFavoriteSection
-        ),
-      ], header: "Artists", sectionIndexTitle: nil),
-    ].compactMap { $0 }
-
-    return librarySections
+    return playRandomSection
   }
-  
+
+  func createQuickActionsSection() -> CPListSection? {
+    var quickActionItems = [CPListImageRowItemRowElement]()
+    if appDelegate.player.musicItemCount > 0 {
+      let item = CPListImageRowItemRowElement(
+        image: UIImage.createArtwork(
+          with: UIImage.musicalNotes,
+          iconSizeType: .small,
+          theme: getPreference(activeAccountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        title: Self.continuePlaybackMusicTitle, subtitle: nil
+      )
+      quickActionItems.append(item)
+    }
+    if appDelegate.player.podcastItemCount > 0 {
+      let item = CPListImageRowItemRowElement(
+        image: UIImage.createArtwork(
+          with: UIImage.podcast,
+          iconSizeType: .small,
+          theme: getPreference(activeAccountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        title: Self.continuePlaybackPodcastTitle, subtitle: nil
+      )
+      quickActionItems.append(item)
+    }
+    if appDelegate.storage.settings.accounts.allAccounts.count > 1 {
+      let switchAccountItem = CPListImageRowItemRowElement(
+        image: UIImage.createArtwork(
+          with: UIImage.userPerson,
+          iconSizeType: .small,
+          theme: getPreference(activeAccountInfo).theme,
+          lightDarkMode: traits.userInterfaceStyle.asModeType,
+          switchColors: true
+        ).carPlayImage(carTraitCollection: traits),
+        title: Self.switchAccountTitle, subtitle: nil
+      )
+      quickActionItems.append(switchAccountItem)
+    }
+
+    guard !quickActionItems.isEmpty else { return nil }
+
+    let quickActionsRow = CPListImageRowItem(
+      text: nil,
+      elements: quickActionItems,
+      allowsMultipleLines: false
+    )
+    quickActionsRow.handler = { selectedRow, completion in completion() }
+    quickActionsRow.listImageRowHandler = { [weak self] item, index, completion in
+      guard let self else { completion(); return }
+
+      Task { @MainActor in
+        if quickActionItems[index].title == Self.switchAccountTitle {
+          let _ = try? await interfaceController?
+            .pushTemplate(accountSection, animated: true)
+        }
+        if quickActionItems[index].title == Self.continuePlaybackMusicTitle ||
+          quickActionItems[index].title == Self.continuePlaybackPodcastTitle {
+          if quickActionItems[index].title == Self.continuePlaybackMusicTitle,
+             appDelegate.player.playerMode != .music {
+            appDelegate.player.setPlayerMode(.music)
+          } else if quickActionItems[index].title == Self.continuePlaybackPodcastTitle,
+                    appDelegate.player.playerMode != .podcast {
+            appDelegate.player.setPlayerMode(.podcast)
+          }
+          appDelegate.player.play()
+          displayNowPlaying {}
+        }
+      }
+
+      completion()
+    }
+    let quickActionsSection = CPListSection(
+      items: [quickActionsRow],
+      header: "Quick Actions",
+      sectionIndexTitle: nil
+    )
+    return quickActionsSection
+  }
+
   func createAccountsSections() -> [CPListSection] {
     let accountInfos = appDelegate.storage.settings.accounts.allAccounts
     var items: [CPListItem] = []
@@ -256,5 +306,4 @@ extension CarPlaySceneDelegate {
     }
     return [CPListSection(items: items)]
   }
-
 }

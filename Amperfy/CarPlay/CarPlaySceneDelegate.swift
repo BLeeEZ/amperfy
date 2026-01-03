@@ -241,7 +241,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     var homeRow: [CPListImageRowItemRowElement]
     var detailRow: [CPListImageRowItemRowElement]
   }
-  
+
   var homeImageRows: [HomeSection: CPListImageRowItem] = [:]
   var homeRowData: [HomeSection: [HomeItem]] = [:]
   var homeArtworkUpdate: [String: EntityImageRowContainer] = [:] // String is Artwork.uniqueID
