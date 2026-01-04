@@ -69,7 +69,11 @@ class SliderMenuView: UIView {
     addSubview(slider)
     slider.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10).isActive = true
     slider.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10).isActive = true
-    slider.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+    #if targetEnvironment(macCatalyst)
+      slider.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+    #else
+      slider.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -6).isActive = true
+    #endif
     slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
   }
 

@@ -199,7 +199,7 @@ class PlayerControlView: UIView {
   func showVolumeSliderMenu() {
     let popoverContentController = SliderMenuPopover()
     let sliderMenuView = popoverContentController.sliderMenuView
-    sliderMenuView.frame = CGRect(x: 0, y: 0, width: 250, height: 60)
+    sliderMenuView.frame = CGRect(x: 0, y: 0, width: 250, height: 50)
 
     sliderMenuView.slider.minimumValue = 0
     sliderMenuView.slider.maximumValue = 100
