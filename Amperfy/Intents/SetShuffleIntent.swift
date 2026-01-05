@@ -22,7 +22,38 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+extension EnableDisableAppEnum {
+  var spokenString: String {
+    switch self {
+    case .enable:
+      return "Shuffle is enabled."
+    case .disable:
+      return "Shuffle is disabled."
+    }
+  }
+}
+
+// MARK: - SetShuffleResultView
+
+struct SetShuffleResultView: View {
+  var enabled: EnableDisableAppEnum
+
+  var body: some View {
+    VStack {
+      AmperfyImage.shuffle.asImage
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text("\(enabled.spokenString)")
+    }
+    .padding()
+  }
+}
 
 // MARK: - SetShuffleIntent
 
@@ -42,13 +73,17 @@ struct SetShuffleIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard appDelegate.player.playerMode == .music
-    else { return .result() }
+    else { return .result(dialog: "This option is not available for podcasts.") }
     let isEnabled = enabled == .enable
     if appDelegate.player.isShuffle != isEnabled {
       appDelegate.player.toggleShuffle()
     }
-    return .result()
+    return .result(
+      dialog: "\(enabled.spokenString)",
+      view:
+      SetShuffleResultView(enabled: enabled)
+    )
   }
 }

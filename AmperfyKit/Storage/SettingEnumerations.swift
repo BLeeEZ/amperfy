@@ -21,6 +21,7 @@
 
 import CoreData
 import Foundation
+import SwiftUI
 import UIKit
 
 // MARK: - ArtworkDownloadSetting
@@ -284,6 +285,23 @@ public enum ThemePreference: Int, CaseIterable, Sendable, Codable {
       return "Orange"
     case .purple:
       return "Purple"
+    }
+  }
+
+  public var asSwiftUIColor: Color {
+    switch self {
+    case .blue:
+      return .blue
+    case .green:
+      return .green
+    case .red:
+      return .red
+    case .yellow:
+      return .yellow
+    case .orange:
+      return .orange
+    case .purple:
+      return .purple
     }
   }
 

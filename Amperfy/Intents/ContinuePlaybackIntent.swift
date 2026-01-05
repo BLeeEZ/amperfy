@@ -22,7 +22,47 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+extension PlaybackModeAppEnum {
+  var image: Image {
+    switch self {
+    case .music:
+      return AmperfyImage.musicalNotes.asImage
+    case .podcast:
+      return AmperfyImage.podcast.asImage
+    }
+  }
+
+  var spokenString: String {
+    switch self {
+    case .music:
+      return "Continue Music playback."
+    case .podcast:
+      return "Continue Podcast playback."
+    }
+  }
+}
+
+// MARK: - ContinuePlaybackResultView
+
+struct ContinuePlaybackResultView: View {
+  var playbackMode: PlaybackModeAppEnum
+
+  var body: some View {
+    VStack {
+      playbackMode.image
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text(playbackMode.spokenString)
+    }
+    .padding()
+  }
+}
 
 // MARK: - ContinuePlaybackIntent
 
@@ -44,12 +84,16 @@ struct ContinuePlaybackIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     let playerMode = PlayerMode.fromIntent(type: playbackMode)
     if appDelegate.player.playerMode != playerMode {
       appDelegate.player.setPlayerMode(playerMode)
     }
     appDelegate.player.play()
-    return .result()
+    return .result(
+      dialog: "\(playbackMode.spokenString)",
+      view:
+      ContinuePlaybackResultView(playbackMode: playbackMode)
+    )
   }
 }

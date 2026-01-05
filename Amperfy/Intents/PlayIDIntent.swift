@@ -22,6 +22,70 @@
 import AmperfyKit
 import AppIntents
 import Foundation
+import SwiftUI
+
+extension PlayableContainable {
+  var spokenString: String {
+    var spoken = "Now playing"
+    spoken += " \(name)"
+    if let subtitle, subtitle != "" {
+      spoken += " by \(subtitle)"
+    }
+    spoken += "."
+    return spoken
+  }
+}
+
+// MARK: - PlayPlayableContainableResultView
+
+struct PlayPlayableContainableResultView: View {
+  static let maxImageSize: CGFloat = 150
+  var playableContainable: PlayableContainable
+
+  func getImage() -> Image? {
+    let account = playableContainable.account
+    let theme = appDelegate.storage.settings.accounts.getSetting(account?.info).read.themePreference
+    let artworkCollection = playableContainable.getArtworkCollection(theme: theme)
+    if let singleImage = artworkCollection.singleImageEntity,
+       playableContainable.containerIdentifier.type != .playlist {
+      let uiImage = LibraryEntityImage.getImageToDisplayImmediately(
+        libraryEntity: singleImage,
+        themePreference: theme,
+        artworkDisplayPreference: appDelegate.storage.settings.accounts.getSetting(account?.info)
+          .read.artworkDisplayPreference,
+        useCache: false
+      )
+      return Image(uiImage: uiImage)
+    }
+    return nil
+  }
+
+  func getAltImage() -> Image {
+    playableContainable.containerIdentifier.type?.image.asImage ?? AmperfyImage.musicalNotes.asImage
+  }
+
+  var body: some View {
+    VStack {
+      if let img = getImage() {
+        img
+          .resizable()
+          .scaledToFit()
+          .frame(maxWidth: Self.maxImageSize, maxHeight: Self.maxImageSize)
+          .clipShape(RoundedRectangle(cornerRadius: 10))
+      } else {
+        getAltImage()
+          .font(intentResultViewHeaderImageFont)
+          .foregroundStyle(
+            appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+              .asSwiftUIColor
+          )
+      }
+      Spacer()
+      Text("\(playableContainable.spokenString)")
+    }
+    .padding()
+  }
+}
 
 // MARK: - PlayIDIntent
 
@@ -73,7 +137,7 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account)
     else { throw AmperfyAppIntentError.accountNotValid }
     let isShuffle = shuffleOption == .on
@@ -84,13 +148,17 @@ struct PlayIDIntent: AppIntent, CustomIntentMigratedAppIntent, PredictableIntent
       id: id,
       libraryElementType: libraryElementType
     )
-    let success = await appDelegate.intentManager.play(
+    guard let playableContainer else { throw AmperfyAppIntentError.notFound }
+    let _ = await appDelegate.intentManager.play(
       container: playableContainer,
       shuffleOption: isShuffle,
       repeatOption: repeatUser
     )
-    guard success else { throw AmperfyAppIntentError.notFound }
-    return .result()
+    return .result(
+      dialog: IntentDialog(stringLiteral: playableContainer.spokenString),
+      view:
+      PlayPlayableContainableResultView(playableContainable: playableContainer)
+    )
   }
 }
 

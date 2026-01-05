@@ -22,7 +22,41 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+// MARK: - SetRatingForCurrentlyPlayingSongResultView
+
+struct SetRatingForCurrentlyPlayingSongResultView: View {
+  var rating: Int
+  var displayString: String
+
+  var body: some View {
+    VStack {
+      if rating == 0 {
+        AmperfyImage.starSlash.asImage
+          .font(intentResultViewHeaderImageFont)
+          .foregroundStyle(
+            appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+              .asSwiftUIColor
+          )
+      } else {
+        HStack {
+          ForEach(0 ..< rating, id: \.self) { _ in
+            AmperfyImage.starFill.asImage
+              .font(intentResultViewHeaderImageFont)
+              .foregroundStyle(
+                appDelegate.storage.settings.accounts.activeSetting.read
+                  .themePreference.asSwiftUIColor
+              )
+          }
+        }
+      }
+      Spacer()
+      Text(displayString)
+    }
+    .padding()
+  }
+}
 
 // MARK: - SetRatingForCurrentlyPlayingSongIntent
 
@@ -45,10 +79,10 @@ struct SetRatingForCurrentlyPlayingSongIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard rating >= 0,
           rating <= 5 else {
-      return .result()
+      return .result(dialog: "Rating must be between 0 and 5.")
     }
     guard appDelegate.storage.settings.user.isOnlineMode else {
       throw AmperfyAppIntentError.changesOnlyInOnlineMode
@@ -58,7 +92,7 @@ struct SetRatingForCurrentlyPlayingSongIntent: AppIntent {
     }
     guard let song = currentlyPlaying.asSong else {
       // ignore
-      return .result()
+      return .result(dialog: "This option is only available for songs.")
     }
 
     song.rating = rating
@@ -71,6 +105,12 @@ struct SetRatingForCurrentlyPlayingSongIntent: AppIntent {
     } catch {
       throw AmperfyAppIntentError.serverSyncFailed
     }
-    return .result()
+
+    let dialog =
+      "The song \(song.title)\(song.creatorName != "" ? " by \(song.creatorName)" : "") has been rated with \(rating) stars."
+    return .result(
+      dialog: IntentDialog(stringLiteral: dialog),
+      view: SetRatingForCurrentlyPlayingSongResultView(rating: rating, displayString: dialog)
+    )
   }
 }

@@ -22,7 +22,39 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+extension FavoriteTypeAppEnum {
+  var image: Image {
+    switch self {
+    case .favorite:
+      return AmperfyImage.heartFill.asImage
+    case .removeFromFavorites:
+      return AmperfyImage.heartSlash.asImage
+    }
+  }
+}
+
+// MARK: - SetFavoriteForCurrentlyPlayingSongResultView
+
+struct SetFavoriteForCurrentlyPlayingSongResultView: View {
+  var isFavorite: FavoriteTypeAppEnum
+  var displayString: String
+
+  var body: some View {
+    VStack {
+      isFavorite.image
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text(displayString)
+    }
+    .padding()
+  }
+}
 
 // MARK: - SetFavoriteForCurrentlyPlayingSongIntent
 
@@ -42,20 +74,27 @@ struct SetFavoriteForCurrentlyPlayingSongIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard appDelegate.storage.settings.user.isOnlineMode else {
       throw AmperfyAppIntentError.changesOnlyInOnlineMode
     }
     guard let currentlyPlaying = appDelegate.player.currentlyPlaying else {
       throw AmperfyAppIntentError.noItemIsPlaying
     }
-    guard currentlyPlaying.isSong else {
+    guard let song = currentlyPlaying.asSong else {
       // ignore
-      return .result()
+      return .result(dialog: "This option is only available for songs.")
     }
-    guard currentlyPlaying.isFavorite != (isFavorite == .favorite) else {
+    let isFavoriteBool = isFavorite == .favorite
+    let dialog =
+      "The song \(song.title)\(song.creatorName != "" ? " by \(song.creatorName)" : "") has been \(isFavoriteBool ? "added to" : "removed from") favorites."
+    guard currentlyPlaying.isFavorite != isFavoriteBool else {
       // do nothing
-      return .result()
+      return .result(
+        dialog: IntentDialog(stringLiteral: dialog),
+        view:
+        SetFavoriteForCurrentlyPlayingSongResultView(isFavorite: isFavorite, displayString: dialog)
+      )
     }
 
     do {
@@ -66,6 +105,10 @@ struct SetFavoriteForCurrentlyPlayingSongIntent: AppIntent {
     } catch {
       throw AmperfyAppIntentError.serverSyncFailed
     }
-    return .result()
+    return .result(
+      dialog: IntentDialog(stringLiteral: dialog),
+      view:
+      SetFavoriteForCurrentlyPlayingSongResultView(isFavorite: isFavorite, displayString: dialog)
+    )
   }
 }

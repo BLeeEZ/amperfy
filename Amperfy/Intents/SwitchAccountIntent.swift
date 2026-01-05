@@ -22,7 +22,28 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+// MARK: - SwitchAccounResultView
+
+struct SwitchAccounResultView: View {
+  var account: AccountAppEntity
+
+  var body: some View {
+    VStack {
+      AmperfyImage.account.asImage
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts
+            .getSetting(AccountInfo.create(basedOnIdent: account.id)).read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text("Switched to \(account.userName) account.")
+    }
+    .padding()
+  }
+}
 
 // MARK: - SwitchAccountIntent
 
@@ -43,10 +64,14 @@ struct SwitchAccountIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard let accountInfo = AccountInfo.create(basedOnIdent: account.id)
     else { throw AmperfyAppIntentError.accountNotValid }
     appDelegate.switchAccount(accountInfo: accountInfo)
-    return .result()
+    return .result(
+      dialog: "Switched to \(account.userName) account.",
+      view:
+      SwitchAccounResultView(account: account)
+    )
   }
 }

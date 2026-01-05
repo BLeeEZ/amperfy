@@ -22,7 +22,51 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+extension RepeatTypeAppEnum {
+  var image: Image {
+    switch self {
+    case .single:
+      return AmperfyImage.repeatOne.asImage
+    case .all:
+      return AmperfyImage.repeatAll.asImage
+    case .off:
+      return AmperfyImage.repeatOff.asImage
+    }
+  }
+
+  var spokenString: String {
+    switch self {
+    case .single:
+      return "Repeat one track is active."
+    case .all:
+      return "Repeat all is active."
+    case .off:
+      return "Repeat is disabled."
+    }
+  }
+}
+
+// MARK: - SetRepeatResultView
+
+struct SetRepeatResultView: View {
+  var mode: RepeatTypeAppEnum
+
+  var body: some View {
+    VStack {
+      mode.image
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text("\(mode.spokenString)")
+    }
+    .padding()
+  }
+}
 
 // MARK: - SetRepeatIntent
 
@@ -42,12 +86,16 @@ struct SetRepeatIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard appDelegate.player.playerMode == .music
-    else { return .result() }
+    else { return .result(dialog: "This option is not available for podcasts.") }
 
     let repeatMode = RepeatMode.fromIntent(type: mode)
     appDelegate.player.setRepeatMode(repeatMode)
-    return .result()
+    return .result(
+      dialog: "\(mode.spokenString)",
+      view:
+      SetRepeatResultView(mode: mode)
+    )
   }
 }

@@ -20,6 +20,7 @@
 //
 
 import Foundation
+import SwiftUI
 import UIKit
 
 // MARK: - ArtworkIconSizeType
@@ -100,6 +101,67 @@ public enum ArtworkType: CaseIterable {
   }
 }
 
+// MARK: - AmperfyImage
+
+public struct AmperfyImage: Sendable {
+  public let systemName: String
+  public let assetName: String
+
+  private init(_ systemName: String = "", assetName: String = "") {
+    self.systemName = systemName
+    self.assetName = assetName
+  }
+
+  // MARK: use Image(: bundle: ) for the following images because these are in the asset catalog
+
+  public static let podcast = Self(assetName: "podcast")
+  public static let podcastEpisode = Self(assetName: "podcast")
+
+  // MARK: use Image(systemName: ) for the following images
+
+  public static let account = Self("person.circle.fill")
+  public static let offlineMode = Self("network.slash")
+  public static let onlineMode = Self("network")
+
+  public static let starEmpty = Self("star")
+  public static let starFill = Self("star.fill")
+  public static let starSlash = Self("star.slash")
+  public static let shuffle = Self("shuffle")
+  public static let repeatOne = Self("repeat.1")
+  public static let repeatAll = Self("repeat")
+  public static let repeatOff = Self("repeat.badge.xmark")
+
+  public static let heartFill = Self("heart.fill")
+  public static let heartEmpty = Self("heart")
+  public static let heartSlash = Self("heart.slash")
+
+  public static let musicLibrary = Self("music.note.square.stack.fill")
+  public static let musicalNotes = Self("music.note")
+  public static let album = Self("square.stack")
+  public static let genre = Self("guitars.fill")
+  public static let artist = Self("music.mic")
+  public static let folder = Self("folder.fill")
+  public static let radio = Self("dot.radiowaves.left.and.right")
+  public static let playlist = Self("music.note.list")
+
+  public var asImage: Image {
+    if !assetName.isEmpty {
+      return Image(assetName)
+    } else {
+      return Image(systemName: systemName)
+    }
+  }
+
+  @MainActor
+  public var asUIImage: UIImage {
+    if !assetName.isEmpty {
+      return UIImage(named: assetName) ?? UIImage()
+    } else {
+      return UIImage.create(systemName: systemName)
+    }
+  }
+}
+
 @MainActor
 extension UIImage {
   public static func symbolImageSize(scale: UIImage.SymbolScale) -> CGSize {
@@ -129,8 +191,9 @@ extension UIImage {
   public static let clipboard = UIImage.create(systemName: "doc.on.doc")
   public static let info = UIImage.create(systemName: "info.circle")
   public static let ban = UIImage.create(systemName: "circle.slash")
-  public static let starEmpty = UIImage.create(systemName: "star")
-  public static let starFill = UIImage.create(systemName: "star.fill")
+  public static let starEmpty = UIImage.create(systemName: AmperfyImage.starEmpty.systemName)
+  public static let starFill = UIImage.create(systemName: AmperfyImage.starFill.systemName)
+  public static let starSlash = UIImage.create(systemName: AmperfyImage.starSlash.systemName)
   public static let bars = UIImage.create(systemName: "line.3.horizontal")
   public static let triangleDown = UIImage.create(systemName: "arrowtriangle.down.fill")
   public static let playlistDisplayStyle = UIImage.create(systemName: "list.bullet")
@@ -157,15 +220,15 @@ extension UIImage {
   public static let settings = UIImage.create(systemName: "gear")
   public static let search = UIImage.create(systemName: "magnifyingglass")
   public static let home = UIImage.create(systemName: "house.fill")
-  public static let genre = UIImage.create(systemName: "guitars.fill")
-  public static let artist = UIImage.create(systemName: "music.mic")
-  public static let album = UIImage.create(systemName: "square.stack")
-  public static let folder = UIImage.create(systemName: "folder.fill")
-  public static let radio = UIImage.create(systemName: "dot.radiowaves.left.and.right")
-  public static let playlist = UIImage.create(systemName: "music.note.list")
+  public static let genre = UIImage.create(systemName: AmperfyImage.genre.systemName)
+  public static let artist = UIImage.create(systemName: AmperfyImage.artist.systemName)
+  public static let album = UIImage.create(systemName: AmperfyImage.album.systemName)
+  public static let folder = UIImage.create(systemName: AmperfyImage.folder.systemName)
+  public static let radio = UIImage.create(systemName: AmperfyImage.radio.systemName)
+  public static let playlist = UIImage.create(systemName: AmperfyImage.playlist.systemName)
   public static let lyrics = UIImage.create(systemName: "quote.bubble")
-  public static let musicLibrary = UIImage.create(systemName: "music.note.square.stack.fill")
-  public static let musicalNotes = UIImage.create(systemName: "music.note")
+  public static let musicLibrary = UIImage.create(systemName: AmperfyImage.musicLibrary.systemName)
+  public static let musicalNotes = UIImage.create(systemName: AmperfyImage.musicalNotes.systemName)
   public static let download = UIImage.create(systemName: "arrow.down.circle")
   public static let trash = UIImage.create(systemName: "trash")
   public static let cloudX = UIImage.create(systemName: "xmark.icloud")
@@ -182,15 +245,15 @@ extension UIImage {
   public static let skipForward30 = UIImage.create(systemName: "goforward.30")
   public static let skipBackward10 = UIImage.create(systemName: "gobackward.10")
   public static let skipBackward15 = UIImage.create(systemName: "gobackward.15")
-  public static let repeatAll = UIImage.create(systemName: "repeat")
-  public static let repeatOne = UIImage.create(systemName: "repeat.1")
-  public static let repeatOff = UIImage.create(systemName: "repeat")
-  public static let shuffle = UIImage.create(systemName: "shuffle")
+  public static let repeatAll = UIImage.create(systemName: AmperfyImage.repeatAll.systemName)
+  public static let repeatOne = UIImage.create(systemName: AmperfyImage.repeatOne.systemName)
+  public static let repeatOff = UIImage.create(systemName: AmperfyImage.repeatOff.systemName)
+  public static let shuffle = UIImage.create(systemName: AmperfyImage.shuffle.systemName)
   public static let airplayaudio = UIImage.create(systemName: "airplayaudio")
   public static let sort = UIImage.create(systemName: "arrow.up.arrow.down")
-  public static let heartFill = UIImage.create(systemName: "heart.fill")
-  public static let heartEmpty = UIImage.create(systemName: "heart")
-  public static let heartSlash = UIImage.create(systemName: "heart.slash")
+  public static let heartFill = UIImage.create(systemName: AmperfyImage.heartFill.systemName)
+  public static let heartEmpty = UIImage.create(systemName: AmperfyImage.heartEmpty.systemName)
+  public static let heartSlash = UIImage.create(systemName: AmperfyImage.heartSlash.systemName)
   public static let followLink = UIImage.create(systemName: "arrowshape.turn.up.forward.fill")
   public static let clock = UIImage.create(systemName: "clock")
   public static let refresh = UIImage.create(systemName: "arrow.triangle.2.circlepath")
@@ -465,7 +528,7 @@ extension UIImage {
     UIImage(named: named) ?? UIImage()
   }
 
-  private static func create(systemName: String) -> UIImage {
+  fileprivate static func create(systemName: String) -> UIImage {
     UIImage(systemName: systemName) ?? UIImage()
   }
 

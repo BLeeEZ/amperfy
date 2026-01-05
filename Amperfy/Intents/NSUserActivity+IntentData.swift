@@ -21,6 +21,7 @@
 
 import AppIntents
 import Foundation
+import SwiftUI
 import UIKit
 
 // MARK: - NSUserActivity.ActivityKeys
@@ -51,5 +52,11 @@ extension EntityQuery {
   @MainActor
   var appDelegate: AppDelegate {
     (UIApplication.shared.delegate as! AppDelegate)
+  }
+}
+
+extension View {
+  var intentResultViewHeaderImageFont: Font {
+    .system(size: 30, weight: .bold)
   }
 }

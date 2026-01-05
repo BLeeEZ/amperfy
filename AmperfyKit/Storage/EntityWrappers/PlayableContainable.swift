@@ -61,6 +61,34 @@ public enum PlayableContainerBaseType: Int, Codable {
   case podcast
   case directory
   case radio
+
+  public var displayString: String {
+    switch self {
+    case .song: return "Song"
+    case .podcastEpisode: return "Podcast Episode"
+    case .album: return "Album"
+    case .artist: return "Artist"
+    case .genre: return "Genre"
+    case .playlist: return "Playlist"
+    case .podcast: return "Podcast"
+    case .directory: return "Directory"
+    case .radio: return "Radio"
+    }
+  }
+
+  public var image: AmperfyImage {
+    switch self {
+    case .song: return .musicalNotes
+    case .podcastEpisode: return .podcastEpisode
+    case .album: return .album
+    case .artist: return .artist
+    case .genre: return .genre
+    case .playlist: return .playlist
+    case .podcast: return .podcast
+    case .directory: return .folder
+    case .radio: return .radio
+    }
+  }
 }
 
 // MARK: - PlayableContainerIdentifier

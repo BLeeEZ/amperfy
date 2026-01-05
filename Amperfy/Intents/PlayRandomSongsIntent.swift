@@ -22,7 +22,27 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+// MARK: - PlayRandomSongsResultView
+
+struct PlayRandomSongsResultView: View {
+  let spokenString: String
+
+  var body: some View {
+    VStack {
+      AmperfyImage.shuffle.asImage
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text(spokenString)
+    }
+    .padding()
+  }
+}
 
 // MARK: - PlayRandomSongsIntent
 
@@ -57,7 +77,7 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account)
     else { throw AmperfyAppIntentError.accountNotValid }
     let isCacheOnly = filterOption == .cache
@@ -74,7 +94,11 @@ struct PlayRandomSongsIntent: AppIntent, CustomIntentMigratedAppIntent, Predicta
       repeatOption: .off
     )
     guard success else { throw AmperfyAppIntentError.notFound }
-    return .result()
+    let spokenString = "Now playing \(appDelegate.player.maxSongsToAddOnce) random songs."
+    return .result(
+      dialog: IntentDialog(stringLiteral: spokenString),
+      view: PlayRandomSongsResultView(spokenString: spokenString)
+    )
   }
 }
 

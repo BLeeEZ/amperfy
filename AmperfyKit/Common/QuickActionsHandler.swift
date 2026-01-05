@@ -112,7 +112,7 @@ public class QuickActionsHandler {
         type: QuickActionType.onlineModeAction.rawValue,
         localizedTitle: "Start in Online Mode",
         localizedSubtitle: nil,
-        icon: UIApplicationShortcutIcon(systemImageName: "network"),
+        icon: UIApplicationShortcutIcon(systemImageName: AmperfyImage.onlineMode.systemName),
         userInfo: nil
       ))
     } else {
@@ -120,7 +120,7 @@ public class QuickActionsHandler {
         type: QuickActionType.offlineModeAction.rawValue,
         localizedTitle: "Start in Offline Mode",
         localizedSubtitle: nil,
-        icon: UIApplicationShortcutIcon(systemImageName: "network.slash"),
+        icon: UIApplicationShortcutIcon(systemImageName: AmperfyImage.offlineMode.systemName),
         userInfo: nil
       ))
     }

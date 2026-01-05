@@ -22,7 +22,47 @@
 import AmperfyKit
 import AppIntents
 import Foundation
-import UIKit
+import SwiftUI
+
+extension OnlineOfflineModeAppEnum {
+  var image: Image {
+    switch self {
+    case .online:
+      return AmperfyImage.onlineMode.asImage
+    case .offline:
+      return AmperfyImage.offlineMode.asImage
+    }
+  }
+
+  var spokenString: String {
+    switch self {
+    case .online:
+      return "Online mode is active."
+    case .offline:
+      return "Offline mode is active."
+    }
+  }
+}
+
+// MARK: - SetOnlineOfflineResultView
+
+struct SetOnlineOfflineResultView: View {
+  var mode: OnlineOfflineModeAppEnum
+
+  var body: some View {
+    VStack {
+      mode.image
+        .font(intentResultViewHeaderImageFont)
+        .foregroundStyle(
+          appDelegate.storage.settings.accounts.activeSetting.read.themePreference
+            .asSwiftUIColor
+        )
+      Spacer()
+      Text("\(mode.spokenString)")
+    }
+    .padding()
+  }
+}
 
 // MARK: - SetOnlineOfflineModeIntent
 
@@ -42,9 +82,12 @@ struct SetOnlineOfflineModeIntent: AppIntent {
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     let isOfflineMode = mode == .offline
     appDelegate.switchOnlineOfflineMode(isOfflineMode: isOfflineMode)
-    return .result()
+    return .result(
+      dialog: "\(mode.spokenString)",
+      view: SetOnlineOfflineResultView(mode: mode)
+    )
   }
 }

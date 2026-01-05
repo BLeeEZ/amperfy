@@ -31,10 +31,14 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
   static let description =
     IntentDescription("Searches and plays the first result with the given player options.")
 
-  @Parameter(title: "Search Term", default: "")
+  @Parameter(
+    title: "Search Term",
+    default: "",
+    requestValueDialog: "What do you want to search for?"
+  )
   var searchTerm: String
 
-  @Parameter(title: "Search Category", default: .song)
+  @Parameter(title: "Search Category", default: .song, requestValueDialog: "In which category?")
   var searchCategory: PlayableContainerTypeAppEnum
 
   @Parameter(
@@ -74,7 +78,7 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
   }
 
   @MainActor
-  func perform() async throws -> some IntentResult {
+  func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard let accountCoreData = appDelegate.intentManager.getAccount(fromIntent: account)
     else { throw AmperfyAppIntentError.accountNotValid }
     let isShuffle = shuffleOption == .on
@@ -85,13 +89,17 @@ struct SearchAndPlayIntent: AppIntent, CustomIntentMigratedAppIntent, Predictabl
       searchCategory: searchCategory,
       account: accountCoreData
     )
-    let success = await appDelegate.intentManager.play(
+    let _ = await appDelegate.intentManager.play(
       container: playableContainer,
       shuffleOption: isShuffle,
       repeatOption: repeatUser
     )
-    guard success else { throw AmperfyAppIntentError.notFound }
-    return .result()
+    guard let playableContainer else { throw AmperfyAppIntentError.notFound }
+    return .result(
+      dialog: IntentDialog(stringLiteral: playableContainer.spokenString),
+      view:
+      PlayPlayableContainableResultView(playableContainable: playableContainer)
+    )
   }
 }
 
