@@ -95,7 +95,7 @@ struct ServerURLsSettingsView: View {
             Text(url)
             Spacer()
             if url == activeServerURL {
-              Image.checkmark
+              AmperfyImage.check.asImage
             }
           }
           .id(url)
@@ -128,7 +128,7 @@ struct ServerURLsSettingsView: View {
         Button(action: {
           withPopupAnimation { isAddDialogVisible = true }
         }) {
-          Image.plus
+          AmperfyImage.plus.asImage
         }
       }
     }

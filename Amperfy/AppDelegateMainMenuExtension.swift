@@ -53,14 +53,14 @@ extension AppDelegate {
         UIMenu(options: .displayInline, children: [
           UIAction(
             title: "Open Player Window",
-            image: UIImage(systemName: "macwindow"),
+            image: AmperfyImage.openPlayerWindow.asUIImage,
             attributes: isMainOrMiniPlayerPlayerOpen ? .disabled : []
           ) { _ in
             self.openMainWindow()
           },
           UIKeyCommand(
             title: "Close Player Window",
-            image: UIImage(systemName: "xmark"),
+            image: AmperfyImage.xmark.asUIImage,
             action: #selector(closePlayerWindow),
             input: "W",
             modifierFlags: .command,
@@ -70,7 +70,7 @@ extension AppDelegate {
         UIMenu(options: .displayInline, children: [
           UIAction(
             title: "Switch Library/Mini Player",
-            image: UIImage(systemName: "play.rectangle.on.rectangle")
+            image: AmperfyImage.switchPlayerWindow.asUIImage
           ) { _ in
             if self.isShowingMiniPlayer {
               self.closeMiniPlayer()
@@ -87,7 +87,7 @@ extension AppDelegate {
       let openSettingsMenu = UIMenu(options: .displayInline, children: [
         UIKeyCommand(
           title: "Settings…",
-          image: UIImage(systemName: "gear"),
+          image: AmperfyImage.settings.asUIImage,
           action: #selector(showSettings),
           input: ",",
           modifierFlags: .command

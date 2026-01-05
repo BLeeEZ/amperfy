@@ -83,7 +83,7 @@ struct SwipeSettingsView: View {
               addPositionType = .leading
               isShowingAddView = true
             }) {
-              Image.plus
+              AmperfyImage.plus.asImage
             }
           }
         ) {
@@ -108,7 +108,7 @@ struct SwipeSettingsView: View {
               addPositionType = .trailing
               isShowingAddView = true
             }) {
-              Image.plus
+              AmperfyImage.plus.asImage
             }
           }
         ) {

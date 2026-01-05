@@ -304,7 +304,7 @@ class PlayerControlView: UIView {
     return UIMenu(
       title: "Visualizer Style",
       subtitle: currentType.displayName,
-      image: UIImage(systemName: "sparkles"),
+      image: .sparkles,
       children: availableTypes
     )
   }

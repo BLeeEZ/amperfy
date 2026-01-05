@@ -55,7 +55,7 @@ struct ArtworkDownloadSettingsView: View {
                   Text(option.description)
                   Spacer()
                   if option == activeOption {
-                    Image.checkmark
+                    AmperfyImage.check.asImage
                   }
                 }
                 .contentShape(Rectangle())

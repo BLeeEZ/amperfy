@@ -99,6 +99,20 @@ public enum ArtworkType: CaseIterable {
       return "Radio"
     }
   }
+
+  public var image: AmperfyImage {
+    switch self {
+    case .song: return .musicalNotes
+    case .podcastEpisode: return .podcastEpisode
+    case .album: return .album
+    case .artist: return .artist
+    case .genre: return .genre
+    case .playlist: return .playlist
+    case .podcast: return .podcast
+    case .folder: return .folder
+    case .radio: return .radio
+    }
+  }
 }
 
 // MARK: - AmperfyImage
@@ -116,6 +130,10 @@ public struct AmperfyImage: Sendable {
 
   public static let podcast = Self(assetName: "podcast")
   public static let podcastEpisode = Self(assetName: "podcast")
+  public static let podcastQueueInsert = Self(assetName: "contextQueueInsert")
+  public static let podcastQueueAppend = Self(assetName: "contextQueueAppend")
+  public static let albumNewest = Self(assetName: "albumNewest")
+  public static let albumRecent = Self(assetName: "albumRecent")
 
   // MARK: use Image(systemName: ) for the following images
 
@@ -143,6 +161,18 @@ public struct AmperfyImage: Sendable {
   public static let folder = Self("folder.fill")
   public static let radio = Self("dot.radiowaves.left.and.right")
   public static let playlist = Self("music.note.list")
+  public static let download = Self("arrow.down.circle")
+
+  public static let openPlayerWindow = Self("macwindow")
+  public static let switchPlayerWindow = Self("play.rectangle.on.rectangle")
+  public static let xmark = Self("xmark")
+  public static let settings = Self("gear")
+  public static let plus = Self("plus")
+  public static let plusCircle = Self("plus.circle")
+  public static let minus = Self("minus")
+  public static let check = Self("checkmark")
+  public static let sparkles = Self("sparkles")
+  public static let documents = Self("document.on.document")
 
   public var asImage: Image {
     if !assetName.isEmpty {
@@ -174,11 +204,13 @@ extension UIImage {
   public static let appIconTemplate = UIImage.create("Icon-monocolor")
     .withRenderingMode(.alwaysTemplate)
 
-  public static let xmark = UIImage.create(systemName: "xmark")
+  public static let xmark = UIImage.create(systemName: AmperfyImage.xmark.systemName)
   public static let unSelected = UIImage.create(systemName: "circle")
   public static let isSelected = UIImage.create(systemName: "checkmark.circle.fill")
-  public static let systemPlus = UIImage.create(systemName: "plus")
-  public static let check = UIImage.create(systemName: "checkmark")
+  public static let plus = UIImage.create(systemName: AmperfyImage.plus.systemName)
+  public static let plusCircle = UIImage.create(systemName: AmperfyImage.plusCircle.systemName)
+  public static let check = UIImage.create(systemName: AmperfyImage.check.systemName)
+  public static let minus = UIImage.create(systemName: AmperfyImage.minus.systemName)
   public static let backwardFill = UIImage.create(systemName: "backward.fill")
   public static let forwardFill = UIImage.create(systemName: "forward.fill")
   public static let goBackward15 = UIImage.create(systemName: "gobackward.15")
@@ -195,6 +227,8 @@ extension UIImage {
   public static let starFill = UIImage.create(systemName: AmperfyImage.starFill.systemName)
   public static let starSlash = UIImage.create(systemName: AmperfyImage.starSlash.systemName)
   public static let bars = UIImage.create(systemName: "line.3.horizontal")
+  public static let sparkles = UIImage.create(systemName: AmperfyImage.sparkles.systemName)
+  public static let documents = UIImage.create(systemName: AmperfyImage.documents.systemName)
   public static let triangleDown = UIImage.create(systemName: "arrowtriangle.down.fill")
   public static let playlistDisplayStyle = UIImage.create(systemName: "list.bullet")
   public static let playlistX = UIImage.create(systemName: "text.badge.xmark")
@@ -217,7 +251,7 @@ extension UIImage {
 
   public static let ellipsis = UIImage.create(systemName: "ellipsis")
   public static let filter = UIImage.create(systemName: "line.3.horizontal.decrease")
-  public static let settings = UIImage.create(systemName: "gear")
+  public static let settings = UIImage.create(systemName: AmperfyImage.settings.systemName)
   public static let search = UIImage.create(systemName: "magnifyingglass")
   public static let home = UIImage.create(systemName: "house.fill")
   public static let genre = UIImage.create(systemName: AmperfyImage.genre.systemName)
@@ -229,11 +263,9 @@ extension UIImage {
   public static let lyrics = UIImage.create(systemName: "quote.bubble")
   public static let musicLibrary = UIImage.create(systemName: AmperfyImage.musicLibrary.systemName)
   public static let musicalNotes = UIImage.create(systemName: AmperfyImage.musicalNotes.systemName)
-  public static let download = UIImage.create(systemName: "arrow.down.circle")
+  public static let download = UIImage.create(systemName: AmperfyImage.download.systemName)
   public static let trash = UIImage.create(systemName: "trash")
   public static let cloudX = UIImage.create(systemName: "xmark.icloud")
-  public static let plus = UIImage.create(systemName: "plus")
-  public static let plusCircle = UIImage.create(systemName: "plus.circle")
   public static let play = UIImage.create(systemName: "play.fill")
   public static let pause = UIImage.create(systemName: "pause.fill")
   public static let stop = UIImage.create(systemName: "stop.fill")
@@ -315,137 +347,8 @@ extension UIImage {
     artworkType: ArtworkType
   )
     -> UIImage {
-    var img = UIImage()
-    switch theme {
-    case .blue:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "BlueSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "BlueAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "BlueGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "BlueArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "BluePodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "BluePodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "BluePlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "BlueFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "BlueRadio")
-      }
-    case .green:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "GreenSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "GreenAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "GreenGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "GreenArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "GreenPodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "GreenPodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "GreenPlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "GreenFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "GreenRadio")
-      }
-    case .red:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "RedSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "RedAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "RedGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "RedArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "RedPodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "RedPodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "RedPlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "RedFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "RedRadio")
-      }
-    case .yellow:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "YellowSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "YellowAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "YellowGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "YellowArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "YellowPodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "YellowPodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "YellowPlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "YellowFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "YellowRadio")
-      }
-    case .orange:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "OrangeSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "OrangeAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "OrangeGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "OrangeArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "OrangePodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "OrangePodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "OrangePlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "OrangeFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "OrangeRadio")
-      }
-    case .purple:
-      switch artworkType {
-      case .song:
-        img = UIImage(imageLiteralResourceName: "PurpleSong")
-      case .album:
-        img = UIImage(imageLiteralResourceName: "PurpleAlbum")
-      case .genre:
-        img = UIImage(imageLiteralResourceName: "PurpleGenre")
-      case .artist:
-        img = UIImage(imageLiteralResourceName: "PurpleArtist")
-      case .podcast:
-        img = UIImage(imageLiteralResourceName: "PurplePodcast")
-      case .podcastEpisode:
-        img = UIImage(imageLiteralResourceName: "PurplePodcastEpisode")
-      case .playlist:
-        img = UIImage(imageLiteralResourceName: "PurplePlaylist")
-      case .folder:
-        img = UIImage(imageLiteralResourceName: "PurpleFolder")
-      case .radio:
-        img = UIImage(imageLiteralResourceName: "PurpleRadio")
-      }
-    }
-
-    return img
+    let resourceName = "\(theme.description)\(artworkType.description)"
+    return UIImage(imageLiteralResourceName: resourceName)
   }
 
   public static func generateArtwork(
@@ -456,44 +359,16 @@ extension UIImage {
     -> UIImage {
     var generatedArtwork: UIImage?
     switch artworkType {
-    case .song:
+    case .album, .artist, .folder, .genre, .podcast, .radio:
       generatedArtwork = UIImage.createArtwork(
-        with: UIImage.musicalNotes,
-        iconSizeType: .small,
-        theme: theme,
-        lightDarkMode: lightDarkMode
-      )
-    case .album:
-      generatedArtwork = UIImage.createArtwork(
-        with: UIImage.album,
+        with: artworkType.image.asUIImage,
         iconSizeType: .big,
         theme: theme,
         lightDarkMode: lightDarkMode
       )
-    case .genre:
+    case .podcastEpisode, .song:
       generatedArtwork = UIImage.createArtwork(
-        with: UIImage.genre,
-        iconSizeType: .big,
-        theme: theme,
-        lightDarkMode: lightDarkMode
-      )
-    case .artist:
-      generatedArtwork = UIImage.createArtwork(
-        with: UIImage.artist,
-        iconSizeType: .big,
-        theme: theme,
-        lightDarkMode: lightDarkMode
-      )
-    case .podcast:
-      generatedArtwork = UIImage.createArtwork(
-        with: UIImage.podcast,
-        iconSizeType: .big,
-        theme: theme,
-        lightDarkMode: lightDarkMode
-      )
-    case .podcastEpisode:
-      generatedArtwork = UIImage.createArtwork(
-        with: UIImage.podcastEpisode,
+        with: artworkType.image.asUIImage,
         iconSizeType: .small,
         theme: theme,
         lightDarkMode: lightDarkMode
@@ -505,20 +380,6 @@ extension UIImage {
         theme: theme,
         lightDarkMode: lightDarkMode,
         switchColors: true
-      )
-    case .folder:
-      generatedArtwork = UIImage.createArtwork(
-        with: UIImage.folder,
-        iconSizeType: .big,
-        theme: theme,
-        lightDarkMode: lightDarkMode
-      )
-    case .radio:
-      generatedArtwork = UIImage.createArtwork(
-        with: UIImage.radio,
-        iconSizeType: .big,
-        theme: theme,
-        lightDarkMode: lightDarkMode
       )
     }
     return generatedArtwork ?? UIImage()

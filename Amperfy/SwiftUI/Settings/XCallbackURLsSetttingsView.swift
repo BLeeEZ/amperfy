@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import SwiftUI
 
 // MARK: - XCallbackURLsSetttingsView
@@ -101,7 +102,7 @@ extension XCallbackURLsSetttingsView {
     Button(action: {
       copyToPasteBoard(url: url)
     }, label: {
-      Image(systemName: "document.on.document")
+      AmperfyImage.documents.asImage
     })
     .buttonStyle(.borderless)
   }

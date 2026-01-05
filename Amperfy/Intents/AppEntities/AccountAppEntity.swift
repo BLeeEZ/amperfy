@@ -39,7 +39,6 @@ struct AccountAppEntity: AppEntity, Identifiable {
     DisplayRepresentation(
       title: "\(userName)",
       subtitle: "\(serverUrl)"
-      // ,image: DisplayRepresentation.Image.init(systemName: "person.circle.fill")
     )
   }
 }

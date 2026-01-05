@@ -115,12 +115,6 @@ extension Color {
   static let systemIndigo = Color(UIColor.systemIndigo)
 }
 
-extension Image {
-  static let plus = Image(systemName: "plus")
-  static let minus = Image(systemName: "minus")
-  static let checkmark = Image(systemName: "checkmark")
-}
-
 public func withPopupAnimation<Result>(_ body: () throws -> Result) rethrows -> Result {
   try withAnimation(.easeInOut(duration: 0.2)) {
     try body()
