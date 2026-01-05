@@ -1529,33 +1529,9 @@
 			children = (
 				50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */,
 				50A7BB30284F3F6400C02990 /* NSUserActivity+IntentData.swift */,
-				507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */,
-				50B136F32EFC36D500738475 /* PlayableContainerTypeAppEnum.swift */,
-				50B136F62EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift */,
-				50B136F72EFC36D500738475 /* RepeatTypeAppEnum.swift */,
-				50B136F92EFC36D500738475 /* ShuffleTypeAppEnum.swift */,
-				50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */,
-				5074149C2EFFC772007AEC5D /* PlaybackModeAppEnum.swift */,
-				507414A22F013C93007AEC5D /* PlayPausePlaybackAppEnum.swift */,
-				50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */,
-				50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */,
-				50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */,
-				507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */,
-				50B137012EFC85D700738475 /* AccountAppEntity.swift */,
-				50B136F42EFC36D500738475 /* PlayIDIntent.swift */,
-				50B136F82EFC36D500738475 /* SearchAndPlayIntent.swift */,
-				50B136F52EFC36D500738475 /* PlayRandomSongsIntent.swift */,
-				50B137032EFC8A4800738475 /* SwitchAccountIntent.swift */,
-				5074149A2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift */,
-				507414982EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift */,
-				507414A02F004C07007AEC5D /* NextPreviousTrackIntent.swift */,
-				50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */,
-				507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */,
-				507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */,
-				50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */,
-				50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */,
-				507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */,
-				50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */,
+				50DB15E62F0C56A800A44DED /* AppEnums */,
+				50DB15E72F0C572900A44DED /* AppEntities */,
+				50DB15E82F0C573B00A44DED /* AppIntents */,
 				50253F7A284A566700BCCFB2 /* Intents.intentdefinition */,
 				50BE5D442850EFE100156FC6 /* PlayMediaIntentHandler.swift */,
 			);
@@ -2058,6 +2034,54 @@
 				50CEC6392D1EDB0000D0E696 /* internetRadioStations_example_1.xml */,
 			);
 			path = Samples;
+			sourceTree = "<group>";
+		};
+		50DB15E62F0C56A800A44DED /* AppEnums */ = {
+			isa = PBXGroup;
+			children = (
+				507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */,
+				50B136F32EFC36D500738475 /* PlayableContainerTypeAppEnum.swift */,
+				50B136F62EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift */,
+				50B136F72EFC36D500738475 /* RepeatTypeAppEnum.swift */,
+				50B136F92EFC36D500738475 /* ShuffleTypeAppEnum.swift */,
+				50AB3B3F2F02BC8600556CE4 /* FavoriteTypeAppEnum.swift */,
+				5074149C2EFFC772007AEC5D /* PlaybackModeAppEnum.swift */,
+				507414A22F013C93007AEC5D /* PlayPausePlaybackAppEnum.swift */,
+				50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */,
+				50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */,
+				50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */,
+				507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */,
+			);
+			path = AppEnums;
+			sourceTree = "<group>";
+		};
+		50DB15E72F0C572900A44DED /* AppEntities */ = {
+			isa = PBXGroup;
+			children = (
+				50B137012EFC85D700738475 /* AccountAppEntity.swift */,
+			);
+			path = AppEntities;
+			sourceTree = "<group>";
+		};
+		50DB15E82F0C573B00A44DED /* AppIntents */ = {
+			isa = PBXGroup;
+			children = (
+				50B136F42EFC36D500738475 /* PlayIDIntent.swift */,
+				50B136F82EFC36D500738475 /* SearchAndPlayIntent.swift */,
+				50B136F52EFC36D500738475 /* PlayRandomSongsIntent.swift */,
+				50B137032EFC8A4800738475 /* SwitchAccountIntent.swift */,
+				5074149A2EFFC6D9007AEC5D /* ContinuePlaybackIntent.swift */,
+				507414982EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift */,
+				507414A02F004C07007AEC5D /* NextPreviousTrackIntent.swift */,
+				50AAB9F22F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift */,
+				507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */,
+				507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */,
+				50AB3B3D2F02BBFD00556CE4 /* SetFavoriteForCurrentlyPlayingSongIntent.swift */,
+				50AB3B4A2F031D0C00556CE4 /* SetRatingForCurrentlyPlayingSongIntent.swift */,
+				507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */,
+				50AB3B3B2F01D5AC00556CE4 /* OpenAppWithConfigurationIntent.swift */,
+			);
+			path = AppIntents;
 			sourceTree = "<group>";
 		};
 		50E6BCA223B8F22E005C1DDA /* Cases */ = {
