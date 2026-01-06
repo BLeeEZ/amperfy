@@ -179,7 +179,7 @@ class PlayerUIHandler: NSObject {
     var image: UIImage?
     switch player.repeatMode {
     case .off:
-      image = .repeatOff
+      image = .repeatMenu
     case .all:
       image = .repeatAll
     case .single:

@@ -247,7 +247,7 @@ class MiniPlayerView: UIView {
 
   fileprivate lazy var repeatButton: UIButton = {
     var config = UIButton.Configuration.plain()
-    config.image = .repeatOff.withConfiguration(UIImage.SymbolConfiguration(scale: .medium))
+    config.image = .repeatMenu.withConfiguration(UIImage.SymbolConfiguration(scale: .medium))
     let button = UIButton(configuration: config)
     button.addTarget(self, action: #selector(Self.repeatButtonPushed), for: .touchUpInside)
     button
