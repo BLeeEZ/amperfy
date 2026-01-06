@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dimitris-c/AudioStreaming",
       "state" : {
-        "revision" : "633018df2efc923f7f2e0b66864eb32ae56ffd84",
-        "version" : "1.4.3"
+        "revision" : "a729ee28fece29d80a749419d96df0693200f124",
+        "version" : "1.4.4"
       }
     },
     {
