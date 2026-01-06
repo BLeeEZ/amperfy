@@ -58,7 +58,11 @@ class BasicCollectionViewController: UICollectionViewController {
   ) {
     searchController.searchResultsUpdater = self
     searchController.searchBar.autocapitalizationType = .none
-    searchController.searchBar.scopeButtonTitles = scopeButtonTitles
+    #if !targetEnvironment(macCatalyst)
+      // On mac catalyist scopeButtonTitle together with fullscreen will trigger the following exception:
+      // FAULT: NSInternalInconsistencyException: titlebarViewController not supported for this window style;
+      searchController.searchBar.scopeButtonTitles = scopeButtonTitles
+    #endif
     searchController.searchBar.placeholder = placeholder
 
     navigationItem.searchController = searchController
