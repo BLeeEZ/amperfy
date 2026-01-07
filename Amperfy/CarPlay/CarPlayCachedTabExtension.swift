@@ -28,10 +28,9 @@ extension LibraryDisplayType {
   fileprivate var isVisibleInCachedCarPlay: Bool {
     switch self {
     case .albums, .artists, .favoriteAlbums, .favoriteArtists, .favoriteSongs, .genres,
-         .newestAlbums,
-         .recentAlbums:
+         .newestAlbums, .podcasts, .recentAlbums:
       return true
-    case .directories, .downloads, .podcasts, .radios, .songs:
+    case .directories, .downloads, .radios, .songs:
       return false
     case .playlists:
       return false // playlists have their own tab
@@ -72,6 +71,8 @@ extension CarPlaySceneDelegate {
       switch displayType {
       case .genres:
         sectionToDisplay = genresCachedSection
+      case .podcasts:
+        sectionToDisplay = podcastCachedSection
       case .artists:
         sectionToDisplay = artistsCachedSection
       case .albums:
@@ -88,7 +89,7 @@ extension CarPlaySceneDelegate {
         sectionToDisplay = albumsRecentCachedSection
       case .radios:
         sectionToDisplay = radioSection
-      case .directories, .downloads, .playlists, .podcasts, .songs:
+      case .directories, .downloads, .playlists, .songs:
         break // do nothing
       }
       guard let sectionToDisplay else { completion(); return }

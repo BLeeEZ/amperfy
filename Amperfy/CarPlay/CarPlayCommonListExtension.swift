@@ -349,10 +349,14 @@ extension CarPlaySceneDelegate {
     return sections
   }
 
-  func createPodcastsSections() -> [CPListSection] {
+  func createPodcastsSections(
+    from fetchedController: BasicFetchedResultsController<PodcastMO>?,
+    onlyCached: Bool
+  )
+    -> [CPListSection] {
     var sections = [CPListSection]()
     var itemCount = 0
-    guard let fetchedController = podcastFetchController,
+    guard let fetchedController,
           let fetchSections = fetchedController.sections else { return sections }
     for fetchSection in fetchSections {
       guard let fetchObjects = fetchSection.objects as? [PodcastMO] else { continue }
@@ -394,7 +398,7 @@ extension CarPlaySceneDelegate {
             CPListSection(items: [CPListTemplateItem]()),
           ])
           podcastDetailSection = podcastDetailTemplate
-          createPodcastDetailFetchController(podcast: podcast)
+          createPodcastDetailFetchController(podcast: podcast, onlyCached: onlyCached)
           interfaceController?.pushTemplate(podcastDetailTemplate, animated: true, completion: nil)
           completion()
         }

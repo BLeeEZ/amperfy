@@ -53,6 +53,15 @@ extension CarPlaySceneDelegate {
     }
   }
 
+  func createPodcastCachedFetchController() {
+    podcastCachedFetchController = PodcastFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
+      isGroupedInAlphabeticSections: true
+    )
+    podcastCachedFetchController?.delegate = self
+    podcastCachedFetchController?.search(searchText: "", onlyCached: true)
+  }
+
   func createRadiosFetchController() {
     radiosFetchController = RadiosFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,
@@ -301,13 +310,13 @@ extension CarPlaySceneDelegate {
     playlistDetailFetchController?.search(onlyCachedSongs: isOfflineMode)
   }
 
-  func createPodcastDetailFetchController(podcast: Podcast) {
+  func createPodcastDetailFetchController(podcast: Podcast, onlyCached: Bool) {
     podcastDetailFetchController = PodcastEpisodesFetchedResultsController(
       forPodcast: podcast,
       coreDataCompanion: appDelegate.storage.main,
       isGroupedInAlphabeticSections: false
     )
     podcastDetailFetchController?.delegate = self
-    podcastDetailFetchController?.search(searchText: "", onlyCachedSongs: isOfflineMode)
+    podcastDetailFetchController?.search(searchText: "", onlyCachedSongs: onlyCached)
   }
 }

@@ -266,6 +266,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return template
   }()
 
+  lazy var podcastCachedSection = {
+    let template = CPListTemplate(title: "Cached Podcasts", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
+
   lazy var genresSection = {
     let template = CPListTemplate(title: "Genres", sections: [
       CPListSection(items: [CPListTemplateItem]()),
@@ -389,8 +396,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   var podcastDetailSection: CPListTemplate?
 
   var playlistFetchController: PlaylistFetchedResultsController?
-  var podcastFetchController: PodcastFetchedResultsController?
   var radiosFetchController: RadiosFetchedResultsController?
+  var podcastFetchController: PodcastFetchedResultsController?
+  var podcastCachedFetchController: PodcastFetchedResultsController?
   //
   var genresFetchController: GenreFetchedResultsController?
   var genresCachedFetchController: GenreFetchedResultsController?
@@ -415,10 +423,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   private func resetFetchController() {
     playlistFetchController?.delegate = nil
     playlistFetchController = nil
-    podcastFetchController?.delegate = nil
-    podcastFetchController = nil
     radiosFetchController?.delegate = nil
     radiosFetchController = nil
+    podcastFetchController?.delegate = nil
+    podcastFetchController = nil
+    podcastCachedFetchController?.delegate = nil
+    podcastCachedFetchController = nil
     //
     genresFetchController?.delegate = nil
     genresFetchController = nil
@@ -723,7 +733,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     if templates.contains(podcastSection) {
       os_log("CarPlay: OfflineModeChanged: podcastFetchController", log: self.log, type: .info)
       createPodcastFetchController()
-      podcastSection.updateSections(createPodcastsSections())
+      podcastSection.updateSections(createPodcastsSections(
+        from: podcastFetchController,
+        onlyCached: isOfflineMode
+      ))
     }
     if templates.contains(genresSection) {
       os_log(
@@ -849,7 +862,19 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
       if templates.contains(podcastSection), let podcastFetchController = podcastFetchController,
          controller == podcastFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: podcastFetchController", log: self.log, type: .info)
-        podcastSection.updateSections(createPodcastsSections())
+        podcastSection.updateSections(createPodcastsSections(
+          from: podcastFetchController,
+          onlyCached: isOfflineMode
+        ))
+      }
+      if templates.contains(podcastCachedSection),
+         let podcastCachedFetchController = podcastCachedFetchController,
+         controller == podcastCachedFetchController.fetchResultsController {
+        os_log("CarPlay: FetchedResults: podcastCachedFetchController", log: self.log, type: .info)
+        podcastCachedSection.updateSections(createPodcastsSections(
+          from: podcastCachedFetchController,
+          onlyCached: true
+        ))
       }
 
       if templates.contains(radioSection), let radiosFetchController = radiosFetchController,
@@ -1107,7 +1132,17 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
       } else if aTemplate == podcastSection {
         os_log("CarPlay: templateWillAppear podcastSection", log: self.log, type: .info)
         if podcastFetchController == nil { createPodcastFetchController() }
-        podcastSection.updateSections(createPodcastsSections())
+        podcastSection.updateSections(createPodcastsSections(
+          from: podcastFetchController,
+          onlyCached: isOfflineMode
+        ))
+      } else if aTemplate == podcastCachedSection {
+        os_log("CarPlay: templateWillAppear podcastCachedSection", log: self.log, type: .info)
+        if podcastCachedFetchController == nil { createPodcastCachedFetchController() }
+        podcastCachedSection.updateSections(createPodcastsSections(
+          from: podcastCachedFetchController,
+          onlyCached: true
+        ))
       } else if aTemplate == accountSection {
         os_log("CarPlay: templateWillAppear accountSection", log: self.log, type: .info)
         accountSection.updateSections(createAccountsSections())
