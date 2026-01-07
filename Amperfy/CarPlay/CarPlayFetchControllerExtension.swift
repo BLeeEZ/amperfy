@@ -62,11 +62,39 @@ extension CarPlaySceneDelegate {
     radiosFetchController?.fetch()
   }
 
+  func createArtistsFetchController() {
+    artistsFetchController = ArtistFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
+      sortType: .name,
+      isGroupedInAlphabeticSections: true
+    )
+    artistsFetchController?.delegate = self
+    artistsFetchController?.search(
+      searchText: "",
+      onlyCached: isOfflineMode,
+      displayFilter: appDelegate.storage.settings.user.artistsFilterSetting
+    )
+  }
+
+  func createArtistsCachedFetchController() {
+    artistsCachedFetchController = ArtistFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
+      sortType: .name,
+      isGroupedInAlphabeticSections: true
+    )
+    artistsCachedFetchController?.delegate = self
+    artistsCachedFetchController?.search(
+      searchText: "",
+      onlyCached: true,
+      displayFilter: appDelegate.storage.settings.user.artistsFilterSetting
+    )
+  }
+
   func createArtistsFavoritesFetchController() {
     artistsFavoritesFetchController = ArtistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,
-      sortType: appDelegate.storage.settings.user.artistsSortSetting,
-      isGroupedInAlphabeticSections: false
+      sortType: .name,
+      isGroupedInAlphabeticSections: true
     )
     artistsFavoritesFetchController?.delegate = self
     artistsFavoritesFetchController?.search(
@@ -79,8 +107,8 @@ extension CarPlaySceneDelegate {
   func createArtistsFavoritesCachedFetchController() {
     artistsFavoritesCachedFetchController = ArtistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,
-      sortType: appDelegate.storage.settings.user.artistsSortSetting,
-      isGroupedInAlphabeticSections: false
+      sortType: .name,
+      isGroupedInAlphabeticSections: true
     )
     artistsFavoritesCachedFetchController?.delegate = self
     artistsFavoritesCachedFetchController?.search(

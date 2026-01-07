@@ -26,18 +26,36 @@ import Foundation
 
 extension CarPlaySceneDelegate {
   func createArtistItems(
-    from fetchedController: BasicFetchedResultsController<ArtistMO>?,
+    from fetchedController: ArtistFetchedResultsController?,
     onlyCached: Bool
   )
-    -> [CPListTemplateItem] {
-    var items = [CPListTemplateItem]()
-    guard let fetchedController = fetchedController else { return items }
-    for index in 0 ... (CPListTemplate.maximumSectionCount - 1) {
-      guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
-      let detailTemplate = createDetailTemplate(for: entity, onlyCached: onlyCached)
-      items.append(detailTemplate)
+    -> [CPListSection] {
+    var sections = [CPListSection]()
+    guard let fetchedController = fetchedController,
+          let fetchSections = fetchedController.sections else { return sections }
+    let maxSectionCount = CPListTemplate
+      .maximumItemCount / (!fetchSections.isEmpty ? fetchSections.count : 1)
+    for fetchSection in fetchSections {
+      guard let fetchObjects = fetchSection.objects as? [ArtistMO] else { continue }
+      var items = [CPListTemplateItem]()
+
+      var indexTitle: String?
+      if fetchedController.sortType.asSectionIndexType == .alphabet {
+        indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
+        if let _ = Int(indexTitle ?? "-") {
+          indexTitle = "#"
+        }
+      }
+      for (index, fetchObject) in fetchObjects.enumerated() {
+        let artist = Artist(managedObject: fetchObject)
+        let detailTemplate = createDetailTemplate(for: artist, onlyCached: onlyCached)
+        items.append(detailTemplate)
+        if index >= maxSectionCount { break }
+      }
+      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
+      sections.append(section)
     }
-    return items
+    return sections
   }
 
   func createAlbumItems(
