@@ -27,10 +27,11 @@ import Foundation
 extension LibraryDisplayType {
   fileprivate var isVisibleInCachedCarPlay: Bool {
     switch self {
-    case .albums, .artists, .favoriteAlbums, .favoriteArtists, .favoriteSongs, .newestAlbums,
+    case .albums, .artists, .favoriteAlbums, .favoriteArtists, .favoriteSongs, .genres,
+         .newestAlbums,
          .recentAlbums:
       return true
-    case .directories, .downloads, .genres, .podcasts, .radios, .songs:
+    case .directories, .downloads, .podcasts, .radios, .songs:
       return false
     case .playlists:
       return false // playlists have their own tab
@@ -69,6 +70,8 @@ extension CarPlaySceneDelegate {
 
       var sectionToDisplay: CPListTemplate?
       switch displayType {
+      case .genres:
+        sectionToDisplay = genresCachedSection
       case .artists:
         sectionToDisplay = artistsCachedSection
       case .albums:
@@ -85,7 +88,7 @@ extension CarPlaySceneDelegate {
         sectionToDisplay = albumsRecentCachedSection
       case .radios:
         sectionToDisplay = radioSection
-      case .directories, .downloads, .genres, .playlists, .podcasts, .songs:
+      case .directories, .downloads, .playlists, .podcasts, .songs:
         break // do nothing
       }
       guard let sectionToDisplay else { completion(); return }

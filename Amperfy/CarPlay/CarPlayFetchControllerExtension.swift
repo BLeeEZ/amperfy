@@ -62,6 +62,30 @@ extension CarPlaySceneDelegate {
     radiosFetchController?.fetch()
   }
 
+  func createGenresFetchController() {
+    genresFetchController = GenreFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
+      isGroupedInAlphabeticSections: true
+    )
+    genresFetchController?.delegate = self
+    genresFetchController?.search(
+      searchText: "",
+      onlyCached: isOfflineMode
+    )
+  }
+
+  func createGenresCachedFetchController() {
+    genresCachedFetchController = GenreFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
+      isGroupedInAlphabeticSections: true
+    )
+    genresCachedFetchController?.delegate = self
+    genresCachedFetchController?.search(
+      searchText: "",
+      onlyCached: true
+    )
+  }
+
   func createArtistsFetchController() {
     artistsFetchController = ArtistFetchedResultsController(
       coreDataCompanion: appDelegate.storage.main, account: activeAccount,

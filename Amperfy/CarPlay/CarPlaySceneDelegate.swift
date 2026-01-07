@@ -266,6 +266,20 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return template
   }()
 
+  lazy var genresSection = {
+    let template = CPListTemplate(title: "Genres", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
+
+  lazy var genresCachedSection = {
+    let template = CPListTemplate(title: "Cached Genres", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
+
   lazy var artistsSection = {
     let template = CPListTemplate(title: "Artists", sections: [
       CPListSection(items: [CPListTemplateItem]()),
@@ -378,6 +392,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   var podcastFetchController: PodcastFetchedResultsController?
   var radiosFetchController: RadiosFetchedResultsController?
   //
+  var genresFetchController: GenreFetchedResultsController?
+  var genresCachedFetchController: GenreFetchedResultsController?
   var artistsFetchController: ArtistFetchedResultsController?
   var artistsCachedFetchController: ArtistFetchedResultsController?
   var artistsFavoritesFetchController: ArtistFetchedResultsController?
@@ -404,6 +420,10 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     radiosFetchController?.delegate = nil
     radiosFetchController = nil
     //
+    genresFetchController?.delegate = nil
+    genresFetchController = nil
+    genresCachedFetchController?.delegate = nil
+    genresCachedFetchController = nil
     artistsFetchController?.delegate = nil
     artistsFetchController = nil
     artistsCachedFetchController?.delegate = nil
@@ -705,6 +725,18 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       createPodcastFetchController()
       podcastSection.updateSections(createPodcastsSections())
     }
+    if templates.contains(genresSection) {
+      os_log(
+        "CarPlay: OfflineModeChanged: genresFetchController",
+        log: self.log,
+        type: .info
+      )
+      createGenresFetchController()
+      genresSection.updateSections(createGenreSections(
+        from: genresFetchController,
+        onlyCached: isOfflineMode
+      ))
+    }
     if templates.contains(artistsSection) {
       os_log(
         "CarPlay: OfflineModeChanged: artistsFetchController",
@@ -825,6 +857,32 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
         os_log("CarPlay: FetchedResults: radiosFetchController", log: self.log, type: .info)
         radioSection
           .updateSections(createRadioSections(from: radiosFetchController))
+      }
+      if templates.contains(genresSection),
+         let genresFetchController = genresFetchController,
+         controller == genresFetchController.fetchResultsController {
+        os_log(
+          "CarPlay: FetchedResults: genresFetchController",
+          log: self.log,
+          type: .info
+        )
+        genresSection.updateSections(createGenreSections(
+          from: genresFetchController,
+          onlyCached: isOfflineMode
+        ))
+      }
+      if templates.contains(genresCachedSection),
+         let genresCachedFetchController = genresCachedFetchController,
+         controller == genresCachedFetchController.fetchResultsController {
+        os_log(
+          "CarPlay: FetchedResults: genresCachedFetchController",
+          log: self.log,
+          type: .info
+        )
+        genresCachedSection.updateSections(createGenreSections(
+          from: genresCachedFetchController,
+          onlyCached: true
+        ))
       }
       if templates.contains(artistsSection),
          let artistsFetchController = artistsFetchController,
@@ -1064,6 +1122,30 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         artistsFavoriteSection.updateSections(createArtistItems(
           from: artistsFavoritesFetchController,
           onlyCached: isOfflineMode
+        ))
+      } else if aTemplate == genresSection {
+        os_log(
+          "CarPlay: templateWillAppear genresSection",
+          log: self.log,
+          type: .info
+        )
+        if genresFetchController ==
+          nil { createGenresFetchController() }
+        genresSection.updateSections(createGenreSections(
+          from: genresFetchController,
+          onlyCached: isOfflineMode
+        ))
+      } else if aTemplate == genresCachedSection {
+        os_log(
+          "CarPlay: templateWillAppear genresCachedSection",
+          log: self.log,
+          type: .info
+        )
+        if genresCachedFetchController ==
+          nil { createGenresCachedFetchController() }
+        genresCachedSection.updateSections(createGenreSections(
+          from: genresCachedFetchController,
+          onlyCached: true
         ))
       } else if aTemplate == artistsSection {
         os_log(

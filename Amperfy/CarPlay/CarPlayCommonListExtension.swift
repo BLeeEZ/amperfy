@@ -409,6 +409,67 @@ extension CarPlaySceneDelegate {
     return sections
   }
 
+  func createGenreSections(
+    from fetchedController: BasicFetchedResultsController<GenreMO>?,
+    onlyCached: Bool
+  )
+    -> [CPListSection] {
+    var sections = [CPListSection]()
+    var itemCount = 0
+    guard let fetchedController = fetchedController,
+          let fetchSections = fetchedController.sections,
+          !fetchSections.isEmpty else { return sections }
+
+    for fetchSection in fetchSections {
+      guard let fetchObjects = fetchSection.objects as? [GenreMO] else { continue }
+      var items = [CPListTemplateItem]()
+
+      var indexTitle: String?
+      indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
+      if let _ = Int(indexTitle ?? "-") {
+        indexTitle = "#"
+      }
+
+      for fetchObject in fetchObjects {
+        let genre = Genre(managedObject: fetchObject)
+        let genreInfo = genre.info(
+          for: activeAccount.apiType.asServerApiType,
+          details: DetailInfoType(
+            type: .short,
+            settings: appDelegate.storage.settings
+          )
+        )
+        let listItem = CPListItem(
+          text: genre.name,
+          detailText: genreInfo,
+          image: LibraryEntityImage.getImageToDisplayImmediately(
+            libraryEntity: genre,
+            themePreference: getPreference(activeAccountInfo).theme,
+            artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
+            useCache: false
+          ).carPlayImage(carTraitCollection: traits),
+          accessoryImage: nil,
+          accessoryType: .none
+        )
+        listItem.handler = { [weak self] item, completion in
+          guard let self = self else { completion(); return }
+          let songs = genre.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+          let genrePlayContext = PlayContext(name: genre.name, playables: songs)
+          appDelegate.player.play(context: genrePlayContext)
+          displayNowPlaying {}
+          completion()
+        }
+        items.append(listItem)
+        itemCount += 1
+        if itemCount > CPListTemplate.maximumItemCount { break }
+      }
+      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
+      sections.append(section)
+      if itemCount > CPListTemplate.maximumItemCount { break }
+    }
+    return sections
+  }
+
   func createRadioSections(from fetchedController: BasicFetchedResultsController<RadioMO>?)
     -> [CPListSection] {
     var sections = [CPListSection]()
