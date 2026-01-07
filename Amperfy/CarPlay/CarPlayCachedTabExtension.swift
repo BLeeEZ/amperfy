@@ -24,6 +24,19 @@ import CarPlay
 import CoreData
 import Foundation
 
+extension LibraryDisplayType {
+  fileprivate var isVisibleInCachedCarPlay: Bool {
+    switch self {
+    case .albums, .favoriteAlbums, .favoriteArtists, .favoriteSongs, .newestAlbums, .recentAlbums:
+      return true
+    case .artists, .directories, .downloads, .genres, .podcasts, .radios, .songs:
+      return false
+    case .playlists:
+      return false // playlists have their own tab
+    }
+  }
+}
+
 extension CarPlaySceneDelegate {
   func createCachedSections() -> [CPListSection] {
     let librarySections = [
@@ -55,6 +68,8 @@ extension CarPlaySceneDelegate {
 
       var sectionToDisplay: CPListTemplate?
       switch displayType {
+      case .albums:
+        sectionToDisplay = albumsCachedSection
       case .favoriteSongs:
         sectionToDisplay = songsFavoriteCachedSection
       case .favoriteAlbums:
@@ -67,7 +82,7 @@ extension CarPlaySceneDelegate {
         sectionToDisplay = albumsRecentCachedSection
       case .radios:
         sectionToDisplay = radioSection
-      case .albums, .artists, .directories, .downloads, .genres, .playlists, .podcasts, .songs:
+      case .artists, .directories, .downloads, .genres, .playlists, .podcasts, .songs:
         break // do nothing
       }
       guard let sectionToDisplay else { completion(); return }

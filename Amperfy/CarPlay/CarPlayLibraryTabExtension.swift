@@ -25,23 +25,12 @@ import CoreData
 import Foundation
 
 extension LibraryDisplayType {
-  public var isVisibleInCarPlay: Bool {
+  fileprivate var isVisibleInCarPlay: Bool {
     switch self {
     case .albums, .favoriteAlbums, .favoriteArtists, .favoriteSongs, .newestAlbums, .podcasts,
          .radios, .recentAlbums:
       return true
     case .artists, .directories, .downloads, .genres, .songs:
-      return false
-    case .playlists:
-      return false // playlists have their own tab
-    }
-  }
-
-  public var isVisibleInCachedCarPlay: Bool {
-    switch self {
-    case .favoriteAlbums, .favoriteArtists, .favoriteSongs, .newestAlbums, .recentAlbums:
-      return true
-    case .albums, .artists, .directories, .downloads, .genres, .podcasts, .radios, .songs:
       return false
     case .playlists:
       return false // playlists have their own tab

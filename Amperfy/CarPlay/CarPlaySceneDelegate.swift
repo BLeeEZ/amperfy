@@ -287,6 +287,13 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     return template
   }()
 
+  lazy var albumsCachedSection = {
+    let template = CPListTemplate(title: "Cached Albums", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    return template
+  }()
+
   lazy var albumsFavoriteSection = {
     let template = CPListTemplate(title: "Favorite Albums", sections: [
       CPListSection(items: [CPListTemplateItem]()),
@@ -360,6 +367,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   var artistsFavoritesFetchController: ArtistFetchedResultsController?
   var artistsFavoritesCachedFetchController: ArtistFetchedResultsController?
   var albumsFetchController: AlbumFetchedResultsController?
+  var albumsCachedFetchController: AlbumFetchedResultsController?
   var albumsFavoritesFetchController: AlbumFetchedResultsController?
   var albumsFavoritesCachedFetchController: AlbumFetchedResultsController?
   var albumsNewestFetchController: AlbumFetchedResultsController?
@@ -386,6 +394,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     artistsFavoritesCachedFetchController = nil
     albumsFetchController?.delegate = nil
     albumsFetchController = nil
+    albumsCachedFetchController?.delegate = nil
+    albumsCachedFetchController = nil
     albumsFavoritesFetchController?.delegate = nil
     albumsFavoritesFetchController = nil
     albumsFavoritesCachedFetchController?.delegate = nil
@@ -823,6 +833,19 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           onlyCached: isOfflineMode
         ))
       }
+      if templates.contains(albumsCachedSection),
+         let albumsCachedFetchController = albumsCachedFetchController,
+         controller == albumsCachedFetchController.fetchResultsController {
+        os_log(
+          "CarPlay: FetchedResults: albumsCachedFetchController",
+          log: self.log,
+          type: .info
+        )
+        albumsCachedSection.updateSections(createAlbumItems(
+          from: albumsCachedFetchController,
+          onlyCached: true
+        ))
+      }
       if templates.contains(albumsFavoriteSection),
          let albumsFavoritesFetchController = albumsFavoritesFetchController,
          controller == albumsFavoritesFetchController.fetchResultsController {
@@ -1002,6 +1025,13 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         albumsSection.updateSections(createAlbumItems(
           from: albumsFetchController,
           onlyCached: isOfflineMode
+        ))
+      } else if aTemplate == albumsCachedSection {
+        os_log("CarPlay: templateWillAppear albumsCachedSection", log: self.log, type: .info)
+        if albumsCachedFetchController == nil { createAlbumsCachedFetchController() }
+        albumsCachedSection.updateSections(createAlbumItems(
+          from: albumsCachedFetchController,
+          onlyCached: true
         ))
       } else if aTemplate == albumsFavoriteSection {
         os_log("CarPlay: templateWillAppear albumsFavoriteSection", log: self.log, type: .info)

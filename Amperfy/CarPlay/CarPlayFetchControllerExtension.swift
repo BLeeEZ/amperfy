@@ -104,6 +104,20 @@ extension CarPlaySceneDelegate {
     )
   }
 
+  func createAlbumsCachedFetchController() {
+    albumsCachedFetchController = AlbumFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main, account: activeAccount,
+      sortType: .name,
+      isGroupedInAlphabeticSections: true
+    )
+    albumsCachedFetchController?.delegate = self
+    albumsCachedFetchController?.search(
+      searchText: "",
+      onlyCached: true,
+      displayFilter: .all
+    )
+  }
+
   func createAlbumsFavoritesFetchController() {
     let sortType = appDelegate.storage.settings.user.albumsSortSetting
     albumsFavoritesFetchController = AlbumFetchedResultsController(
