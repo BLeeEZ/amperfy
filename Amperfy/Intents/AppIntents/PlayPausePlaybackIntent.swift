@@ -35,15 +35,15 @@ struct PlayPausePlaybackIntent: AppIntent {
     title: "Play/Pause",
     default: .toggle
   )
-  var mode: PlayPausePlaybackAppEnum
+  var playPauseMode: PlayPausePlaybackAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("\(\.$mode) playback") {}
+    Summary("\(\.$playPauseMode) playback") {}
   }
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    switch mode {
+    switch playPauseMode {
     case .play:
       appDelegate.player.play()
     case .pause:

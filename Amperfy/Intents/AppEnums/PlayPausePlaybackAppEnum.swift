@@ -24,14 +24,18 @@ import Foundation
 
 @available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 enum PlayPausePlaybackAppEnum: Int, AppEnum {
+  case toggle
   case play
   case pause
-  case toggle
 
   static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Play/Pause Playback")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .play: "Play",
-    .pause: "Pause",
-    .toggle: "Play/Pause",
+    .play: DisplayRepresentation(title: "Play", image: .init(systemName: "play.fill")),
+    .pause: DisplayRepresentation(title: "Pause", image: .init(systemName: "pause.fill")),
+    .toggle: DisplayRepresentation(
+      title: "Play/Pause",
+      image: .init(systemName: "playpause.fill"),
+      synonyms: ["toggle"]
+    ),
   ]
 }

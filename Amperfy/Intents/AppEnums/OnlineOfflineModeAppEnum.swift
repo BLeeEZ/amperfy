@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AmperfyKit
 import AppIntents
 import Foundation
 
@@ -26,9 +27,9 @@ enum OnlineOfflineModeAppEnum: Int, AppEnum {
   case online
   case offline
 
-  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Online/Offline Mode")
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Online/Offline Mode",)
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .online: "online",
-    .offline: "offline",
+    .online: DisplayRepresentation(title: "Online", image: .init(systemName: "network")),
+    .offline: DisplayRepresentation(title: "Offline", image: .init(systemName: "network.slash")),
   ]
 }

@@ -417,6 +417,7 @@ class LoginVC: UIViewController {
           object: nil,
           userInfo: nil
         )
+        AmperfyAppShortcuts.updateAppShortcutParameters()
 
         let syncVC = AppStoryboard.Main.segueToSync(account: meta.account)
         if let rootVC = presentingViewController {

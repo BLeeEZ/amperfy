@@ -124,6 +124,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     window?.makeKeyAndVisible()
 
     appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.user.appearanceMode)
+    AmperfyAppShortcuts.updateAppShortcutParameters()
   }
 
   func replaceMainRootViewController(vc: UIViewController) {

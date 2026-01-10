@@ -46,6 +46,22 @@ struct AccountAppEntity: AppEntity, Identifiable {
 // MARK: - AccountEntityQuery
 
 struct AccountEntityQuery: EntityQuery {
+  func createAppEntity(
+    for credential: LoginCredentials,
+    allCredentials credentials: [LoginCredentials]
+  )
+    -> AccountAppEntity {
+    var userName = credential.username
+    if credentials.count(where: { $0.username == credential.username }) > 1 {
+      userName = userName + " (" + credential.displayServerUrl + ")"
+    }
+    return AccountAppEntity(
+      id: Account.createInfo(credentials: credential).ident,
+      serverUrl: credential.displayServerUrl,
+      userName: userName
+    )
+  }
+
   @MainActor
   func entities(for identifiers: [AccountAppEntity.ID]) async throws -> [AccountAppEntity] {
     let accountInfos = appDelegate.storage.settings.accounts.allAccounts
@@ -53,12 +69,8 @@ struct AccountEntityQuery: EntityQuery {
       .compactMap { appDelegate.storage.settings.accounts.getSetting($0).read.loginCredentials }
     let filteredCredentials = credentials
       .filter { identifiers.contains(Account.createInfo(credentials: $0).ident) }
-    return filteredCredentials.map {
-      AccountAppEntity(
-        id: Account.createInfo(credentials: $0).ident,
-        serverUrl: $0.displayServerUrl,
-        userName: $0.username
-      )
+    return filteredCredentials.map { credential in
+      createAppEntity(for: credential, allCredentials: credentials)
     }
   }
 
@@ -67,12 +79,8 @@ struct AccountEntityQuery: EntityQuery {
     let accountInfos = appDelegate.storage.settings.accounts.allAccounts
     let credentials = accountInfos
       .compactMap { appDelegate.storage.settings.accounts.getSetting($0).read.loginCredentials }
-    return credentials.map {
-      AccountAppEntity(
-        id: Account.createInfo(credentials: $0).ident,
-        serverUrl: $0.displayServerUrl,
-        userName: $0.username
-      )
+    return credentials.map { credential in
+      createAppEntity(for: credential, allCredentials: credentials)
     }
   }
 }

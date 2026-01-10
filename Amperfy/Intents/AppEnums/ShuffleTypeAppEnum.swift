@@ -27,9 +27,9 @@ enum ShuffleTypeAppEnum: Int, AppEnum {
   case on
   case off
 
-  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Shuffle Type")
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Shuffle")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .on: "On",
-    .off: "Off",
+    .on: DisplayRepresentation(title: "On", image: .init(systemName: "shuffle.circle.fill")),
+    .off: DisplayRepresentation(title: "Off", image: .init(systemName: "shuffle.circle")),
   ]
 }

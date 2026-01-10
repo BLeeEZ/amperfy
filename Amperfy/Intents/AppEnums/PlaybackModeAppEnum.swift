@@ -29,7 +29,7 @@ enum PlaybackModeAppEnum: Int, AppEnum {
 
   static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Playback Mode")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .music: "Music",
-    .podcast: "Podcast",
+    .music: DisplayRepresentation(title: "Music"),
+    .podcast: DisplayRepresentation(title: "Podcast"),
   ]
 }

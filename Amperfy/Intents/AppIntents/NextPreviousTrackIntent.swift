@@ -35,15 +35,15 @@ struct NextPreviousTrackIntent: AppIntent {
     title: "Mode",
     default: .next
   )
-  var mode: NextPreviousTrackAppEnum
+  var nextPreviousMode: NextPreviousTrackAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Play \(\.$mode) track") {}
+    Summary("Play \(\.$nextPreviousMode) track") {}
   }
 
   @MainActor
   func perform() async throws -> some IntentResult {
-    switch mode {
+    switch nextPreviousMode {
     case .next:
       appDelegate.player.playNext()
     case .previousOrReplay:

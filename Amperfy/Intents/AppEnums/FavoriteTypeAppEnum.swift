@@ -28,7 +28,10 @@ enum FavoriteTypeAppEnum: Int, AppEnum {
 
   static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Favorite")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .favorite: "Favorite",
-    .removeFromFavorites: "Stop favoriting",
+    .favorite: DisplayRepresentation(title: "Favorite", image: .init(systemName: "heart.fill")),
+    .removeFromFavorites: DisplayRepresentation(
+      title: "Stop favoriting",
+      image: .init(systemName: "heart.slash.fill")
+    ),
   ]
 }

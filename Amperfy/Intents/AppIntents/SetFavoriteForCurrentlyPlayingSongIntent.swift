@@ -64,8 +64,7 @@ struct SetFavoriteForCurrentlyPlayingSongIntent: AppIntent {
   static let description = IntentDescription("Favorite or stop favoriting currently playing song.")
 
   @Parameter(
-    title: "Favorite",
-    default: .favorite
+    title: "Favorite"
   )
   var isFavorite: FavoriteTypeAppEnum
 
@@ -87,7 +86,7 @@ struct SetFavoriteForCurrentlyPlayingSongIntent: AppIntent {
     }
     let isFavoriteBool = isFavorite == .favorite
     let dialog =
-      "The song \(song.title)\(song.creatorName != "" ? " by \(song.creatorName)" : "") has been \(isFavoriteBool ? "added to" : "removed from") favorites."
+      "\(song.title)\(song.creatorName != "" ? " by \(song.creatorName)" : "") has been \(isFavoriteBool ? "added to" : "removed from") favorites."
     guard currentlyPlaying.isFavorite != isFavoriteBool else {
       // do nothing
       return .result(

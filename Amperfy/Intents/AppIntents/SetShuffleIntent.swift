@@ -24,7 +24,7 @@ import AppIntents
 import Foundation
 import SwiftUI
 
-extension EnableDisableAppEnum {
+extension EnableDisableShuffleAppEnum {
   var spokenString: String {
     switch self {
     case .enable:
@@ -38,7 +38,7 @@ extension EnableDisableAppEnum {
 // MARK: - SetShuffleResultView
 
 struct SetShuffleResultView: View {
-  var enabled: EnableDisableAppEnum
+  var enabled: EnableDisableShuffleAppEnum
 
   var body: some View {
     VStack {
@@ -64,26 +64,25 @@ struct SetShuffleIntent: AppIntent {
 
   @Parameter(
     title: "Shuffle",
-    default: .enable
   )
-  var enabled: EnableDisableAppEnum
+  var isShuffle: EnableDisableShuffleAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("\(\.$enabled) shuffle") {}
+    Summary("\(\.$isShuffle) shuffle") {}
   }
 
   @MainActor
   func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
     guard appDelegate.player.playerMode == .music
     else { return .result(dialog: "This option is not available for podcasts.") }
-    let isEnabled = enabled == .enable
+    let isEnabled = isShuffle == .enable
     if appDelegate.player.isShuffle != isEnabled {
       appDelegate.player.toggleShuffle()
     }
     return .result(
-      dialog: "\(enabled.spokenString)",
+      dialog: "\(isShuffle.spokenString)",
       view:
-      SetShuffleResultView(enabled: enabled)
+      SetShuffleResultView(enabled: isShuffle)
     )
   }
 }

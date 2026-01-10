@@ -77,12 +77,12 @@ struct SetRepeatIntent: AppIntent {
 
   @Parameter(
     title: "Repeat",
-    default: .all
+    requestValueDialog: "Which repeat mode?"
   )
-  var mode: RepeatTypeAppEnum
+  var repeatMode: RepeatTypeAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Set repeat to \(\.$mode)") {}
+    Summary("Set repeat to \(\.$repeatMode)") {}
   }
 
   @MainActor
@@ -90,12 +90,12 @@ struct SetRepeatIntent: AppIntent {
     guard appDelegate.player.playerMode == .music
     else { return .result(dialog: "This option is not available for podcasts.") }
 
-    let repeatMode = RepeatMode.fromIntent(type: mode)
-    appDelegate.player.setRepeatMode(repeatMode)
+    let repeatModePlayer = RepeatMode.fromIntent(type: repeatMode)
+    appDelegate.player.setRepeatMode(repeatModePlayer)
     return .result(
-      dialog: "\(mode.spokenString)",
+      dialog: "\(repeatMode.spokenString)",
       view:
-      SetRepeatResultView(mode: mode)
+      SetRepeatResultView(mode: repeatMode)
     )
   }
 }

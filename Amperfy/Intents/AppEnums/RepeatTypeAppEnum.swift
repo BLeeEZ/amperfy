@@ -24,14 +24,18 @@ import Foundation
 
 @available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 enum RepeatTypeAppEnum: Int, AppEnum {
-  case single
   case all
+  case single
   case off
 
   static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Repeat")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .single: "One",
-    .all: "All",
-    .off: "Off",
+    .single: DisplayRepresentation(title: "One", image: .init(systemName: "repeat.1")),
+    .all: DisplayRepresentation(
+      title: "All",
+      image: .init(systemName: "repeat"),
+      synonyms: ["on", "repeat"]
+    ),
+    .off: DisplayRepresentation(title: "Off", image: .init(systemName: "repeat.badge.xmark")),
   ]
 }

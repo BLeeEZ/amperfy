@@ -111,7 +111,7 @@
 		50791E8728D3B7BF006CE6E5 /* PlayerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */; };
 		50791E8928D3BC4D006CE6E5 /* SwipeSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50791E8828D3BC4D006CE6E5 /* SwipeSettingsView.swift */; };
 		507BA5C32F01B9A400B4EA8B /* SetShuffleIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */; };
-		507BA5C52F01BAD200B4EA8B /* EnableDisableAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */; };
+		507BA5C52F01BAD200B4EA8B /* EnableDisableShuffleAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C42F01BAD200B4EA8B /* EnableDisableShuffleAppEnum.swift */; };
 		507BA5C72F01BCA300B4EA8B /* SetRepeatIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */; };
 		507BA5C92F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */; };
 		507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */; };
@@ -510,6 +510,8 @@
 		50E77DB428D1B63200BDF882 /* LibraryDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */; };
 		50E77DB728D2163F00BDF882 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB628D2163F00BDF882 /* SettingsView.swift */; };
 		50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */; };
+		50E936D92F0FF9F200C1C504 /* AmperfyAppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E936D82F0FF9F200C1C504 /* AmperfyAppShortcuts.swift */; };
+		50E936DB2F100C7800C1C504 /* RatingAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E936DA2F100C7800C1C504 /* RatingAppEnum.swift */; };
 		50ED03132E278C6B0092E6DC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50ED030C2E2788200092E6DC /* CoreAudio.framework */; };
 		50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */; };
 		50F40A3B2C9088B30097FE63 /* IfritStatic in Frameworks */ = {isa = PBXBuildFile; productRef = 50F40A3A2C9088B30097FE63 /* IfritStatic */; };
@@ -782,7 +784,7 @@
 		50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSettingsView.swift; sourceTree = "<group>"; };
 		50791E8828D3BC4D006CE6E5 /* SwipeSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeSettingsView.swift; sourceTree = "<group>"; };
 		507BA5C22F01B9A400B4EA8B /* SetShuffleIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetShuffleIntent.swift; sourceTree = "<group>"; };
-		507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableDisableAppEnum.swift; sourceTree = "<group>"; };
+		507BA5C42F01BAD200B4EA8B /* EnableDisableShuffleAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnableDisableShuffleAppEnum.swift; sourceTree = "<group>"; };
 		507BA5C62F01BCA300B4EA8B /* SetRepeatIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetRepeatIntent.swift; sourceTree = "<group>"; };
 		507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetOnlineOfflineModeIntent.swift; sourceTree = "<group>"; };
 		507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineOfflineModeAppEnum.swift; sourceTree = "<group>"; };
@@ -1085,6 +1087,8 @@
 		50E77DB328D1B63200BDF882 /* LibraryDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryDisplaySettings.swift; sourceTree = "<group>"; };
 		50E77DB628D2163F00BDF882 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		50E77DB828D21A9300BDF882 /* SettingsHostVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsHostVC.swift; sourceTree = "<group>"; };
+		50E936D82F0FF9F200C1C504 /* AmperfyAppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmperfyAppShortcuts.swift; sourceTree = "<group>"; };
+		50E936DA2F100C7800C1C504 /* RatingAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingAppEnum.swift; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
 		50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersionTest.swift; sourceTree = "<group>"; };
 		50ED030C2E2788200092E6DC /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
@@ -1528,6 +1532,7 @@
 			isa = PBXGroup;
 			children = (
 				50BE5D9D2851D5DE00156FC6 /* IntentManager.swift */,
+				50E936D82F0FF9F200C1C504 /* AmperfyAppShortcuts.swift */,
 				50A7BB30284F3F6400C02990 /* NSUserActivity+IntentData.swift */,
 				50DB15E62F0C56A800A44DED /* AppEnums */,
 				50DB15E72F0C572900A44DED /* AppEntities */,
@@ -2039,7 +2044,7 @@
 		50DB15E62F0C56A800A44DED /* AppEnums */ = {
 			isa = PBXGroup;
 			children = (
-				507BA5C42F01BAD200B4EA8B /* EnableDisableAppEnum.swift */,
+				507BA5C42F01BAD200B4EA8B /* EnableDisableShuffleAppEnum.swift */,
 				50B136F32EFC36D500738475 /* PlayableContainerTypeAppEnum.swift */,
 				50B136F62EFC36D500738475 /* PlayRandomSongsFilterTypeAppEnum.swift */,
 				50B136F72EFC36D500738475 /* RepeatTypeAppEnum.swift */,
@@ -2050,6 +2055,7 @@
 				50AAB9F02F013F68004A39C6 /* NextPreviousTrackAppEnum.swift */,
 				50AAB9F42F015517004A39C6 /* SeekToPlaybackTimeAppEnum.swift */,
 				50AAB9FA2F016071004A39C6 /* SeekTimeUnitAppEnum.swift */,
+				50E936DA2F100C7800C1C504 /* RatingAppEnum.swift */,
 				507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */,
 			);
 			path = AppEnums;
@@ -2499,6 +2505,8 @@
 				5047B7082E3CB90C00D5090C /* PlayerUIHandler.swift in Sources */,
 				504B442228D8EBB20033982C /* MailView.swift in Sources */,
 				5058709021DEBBCA0043896F /* PopupPlayerVC.swift in Sources */,
+				50E936DB2F100C7800C1C504 /* RatingAppEnum.swift in Sources */,
+				50E936D92F0FF9F200C1C504 /* AmperfyAppShortcuts.swift in Sources */,
 				50CFB59A28D5009200A47D44 /* ArtworkDownloadSettingsView.swift in Sources */,
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
 				502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */,
@@ -2578,7 +2586,7 @@
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,
 				50C171502D10718C00C0C53A /* PlaylistAddGenreDetailVC.swift in Sources */,
 				507BA5C92F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift in Sources */,
-				507BA5C52F01BAD200B4EA8B /* EnableDisableAppEnum.swift in Sources */,
+				507BA5C52F01BAD200B4EA8B /* EnableDisableShuffleAppEnum.swift in Sources */,
 				50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */,
 				50CFB59428D4846300A47D44 /* SwipeCellView.swift in Sources */,
 				503BAF342E4A1EB000AE50B4 /* SettingsTabView.swift in Sources */,

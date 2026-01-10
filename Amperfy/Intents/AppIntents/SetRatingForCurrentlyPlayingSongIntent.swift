@@ -24,6 +24,25 @@ import AppIntents
 import Foundation
 import SwiftUI
 
+extension RatingAppEnum {
+  var numeric: Int {
+    switch self {
+    case .zero:
+      return 0
+    case .one:
+      return 1
+    case .two:
+      return 2
+    case .three:
+      return 3
+    case .four:
+      return 4
+    case .five:
+      return 5
+    }
+  }
+}
+
 // MARK: - SetRatingForCurrentlyPlayingSongResultView
 
 struct SetRatingForCurrentlyPlayingSongResultView: View {
@@ -68,11 +87,9 @@ struct SetRatingForCurrentlyPlayingSongIntent: AppIntent {
   @Parameter(
     title: "Rating",
     description: "Song rating between 0 and 5 stars.",
-    default: 5,
-    inclusiveRange: (lowerBound: 0, upperBound: 5),
     requestValueDialog: "What rating would you like to give this song, from 0 to 5?",
   )
-  var rating: Int
+  var rating: RatingAppEnum
 
   static var parameterSummary: some ParameterSummary {
     Summary("Rate the currently playing song \(\.$rating) stars") {}
@@ -80,10 +97,6 @@ struct SetRatingForCurrentlyPlayingSongIntent: AppIntent {
 
   @MainActor
   func perform() async throws -> some IntentResult & ProvidesDialog & ShowsSnippetView {
-    guard rating >= 0,
-          rating <= 5 else {
-      return .result(dialog: "Rating must be between 0 and 5.")
-    }
     guard appDelegate.storage.settings.user.isOnlineMode else {
       throw AmperfyAppIntentError.changesOnlyInOnlineMode
     }
@@ -95,22 +108,25 @@ struct SetRatingForCurrentlyPlayingSongIntent: AppIntent {
       return .result(dialog: "This option is only available for songs.")
     }
 
-    song.rating = rating
+    song.rating = rating.numeric
     appDelegate.storage.main.saveContext()
     do {
       if let accountInfo = song.account?.info {
         let librarySyncer = appDelegate.getMeta(accountInfo).librarySyncer
-        try await librarySyncer.setRating(song: song, rating: rating)
+        try await librarySyncer.setRating(song: song, rating: rating.numeric)
       }
     } catch {
       throw AmperfyAppIntentError.serverSyncFailed
     }
 
     let dialog =
-      "The song \(song.title)\(song.creatorName != "" ? " by \(song.creatorName)" : "") has been rated with \(rating) stars."
+      "\(song.title)\(song.creatorName != "" ? " by \(song.creatorName)" : "") has been rated with \(rating) stars."
     return .result(
       dialog: IntentDialog(stringLiteral: dialog),
-      view: SetRatingForCurrentlyPlayingSongResultView(rating: rating, displayString: dialog)
+      view: SetRatingForCurrentlyPlayingSongResultView(
+        rating: rating.numeric,
+        displayString: dialog
+      )
     )
   }
 }

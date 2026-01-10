@@ -23,14 +23,26 @@ import AppIntents
 import Foundation
 
 enum SeekToPlaybackTimeAppEnum: Int, AppEnum {
-  case toTime
   case forward
   case backward
+  case toTime
 
   static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Seek to playback time")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .toTime: "To Time",
-    .forward: "Forwards By",
-    .backward: "Backward By",
+    .toTime: DisplayRepresentation(
+      title: "To time",
+      image: .init(systemName: "clock"),
+      synonyms: ["time"]
+    ),
+    .forward: DisplayRepresentation(
+      title: "Forward by",
+      image: .init(systemName: "arrow.trianglehead.clockwise"),
+      synonyms: ["forward"]
+    ),
+    .backward: DisplayRepresentation(
+      title: "Backward by",
+      image: .init(systemName: "arrow.trianglehead.counterclockwise"),
+      synonyms: ["backward"]
+    ),
   ]
 }

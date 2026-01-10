@@ -33,9 +33,8 @@ struct SeekToPlaybackTimeIntent: AppIntent {
 
   @Parameter(
     title: "Direction",
-    default: .toTime
   )
-  var mode: SeekToPlaybackTimeAppEnum
+  var direction: SeekToPlaybackTimeAppEnum
 
   @Parameter(
     title: "30",
@@ -50,7 +49,7 @@ struct SeekToPlaybackTimeIntent: AppIntent {
   var timeUnit: SeekTimeUnitAppEnum
 
   static var parameterSummary: some ParameterSummary {
-    Summary("Seek \(\.$mode) \(\.$interval) \(\.$timeUnit)") {}
+    Summary("Seek \(\.$direction) \(\.$interval) \(\.$timeUnit)") {}
   }
 
   @MainActor
@@ -65,7 +64,7 @@ struct SeekToPlaybackTimeIntent: AppIntent {
       timeInSeconds = interval * 60.0 * 60.0
     }
 
-    switch mode {
+    switch direction {
     case .toTime:
       appDelegate.player.seek(toSecond: timeInSeconds)
     case .forward:

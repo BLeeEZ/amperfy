@@ -1,5 +1,5 @@
 //
-//  EnableDisableAppEnum.swift
+//  EnableDisableShuffleAppEnum.swift
 //  Amperfy
 //
 //  Created by Maximilian Bauer on 27.12.25.
@@ -22,13 +22,16 @@
 import AppIntents
 import Foundation
 
-enum EnableDisableAppEnum: Int, AppEnum {
+enum EnableDisableShuffleAppEnum: Int, AppEnum {
   case enable
   case disable
 
-  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Enable/Disable")
+  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Enable/Disable Shuffle")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .enable: "Enable",
-    .disable: "Disable",
+    .enable: DisplayRepresentation(
+      title: "Enable",
+      image: .init(systemName: "shuffle.circle.fill")
+    ),
+    .disable: DisplayRepresentation(title: "Disable", image: .init(systemName: "shuffle.circle")),
   ]
 }

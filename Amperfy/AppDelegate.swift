@@ -355,6 +355,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         .read.themePreference.asColor
     )
     applyAppThemeToAlreadyLoadedViews()
+    AmperfyAppShortcuts.updateAppShortcutParameters()
     guard let mainScene = AppDelegate.mainSceneDelegate else { return }
     mainScene
       .replaceMainRootViewController(

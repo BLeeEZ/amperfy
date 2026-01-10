@@ -27,9 +27,13 @@ enum PlayRandomSongsFilterTypeAppEnum: Int, AppEnum {
   case cache
 
   static let typeDisplayRepresentation =
-    TypeDisplayRepresentation(name: "Play Random Songs Filter Type")
+    TypeDisplayRepresentation(name: "Play Random Songs Filter")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .all: "All",
-    .cache: "Cached only",
+    .all: DisplayRepresentation(title: "All", image: .init(systemName: "circle.circle")),
+    .cache: DisplayRepresentation(
+      title: "Cached only",
+      image: .init(systemName: "arrow.down.circle"),
+      synonyms: ["cached", "cache", "downloaded"]
+    ),
   ]
 }

@@ -29,8 +29,11 @@ enum NextPreviousTrackAppEnum: Int, AppEnum {
 
   static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Next/Previous Track")
   static let caseDisplayRepresentations: [Self: DisplayRepresentation] = [
-    .next: "next",
-    .previousOrReplay: "previous or replay",
-    .previous: "previous",
+    .next: DisplayRepresentation(title: "next", image: .init(systemName: "forward.fill")),
+    .previousOrReplay: DisplayRepresentation(
+      title: "previous or replay",
+      image: .init(systemName: "backward.end.alt.fill")
+    ),
+    .previous: DisplayRepresentation(title: "previous", image: .init(systemName: "backward.fill")),
   ]
 }

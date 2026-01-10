@@ -73,7 +73,7 @@ struct SetOnlineOfflineModeIntent: AppIntent {
 
   @Parameter(
     title: "Mode",
-    default: .offline
+    requestValueDialog: "Which mode?"
   )
   var mode: OnlineOfflineModeAppEnum
 
