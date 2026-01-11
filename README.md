@@ -24,21 +24,17 @@ Amperfy is an iOS/iPadOS/macOS app written in Swift to interact with an [Ampache
 
 ## Features
 
-- Offline support
-- Support for music and podcasts
-- CarPlay support
+- Multi account
+- Offline mode
+- CarPlay
+- Gapless playback (for supported audio file types)
+- Music, Podcast and Radio support
+- Siri play media command, Siri Shortcuts and App Intents
 - Equalizer
 - Replay gain
-- Syncing the database after first login
-- Update library in background
-- Siri voice commands: "play \<example artist\>"
-- Siri shortcuts: play id, search and play
-- Player interaction from lock screen
 - Sleep timer
-- Adjustable playback rate
-- Home Screen Quick Actions
-- Remote controlable
-- Dark mode support
+- 5 star song rating
+- Favorite song
 
 ## Requirements
 
