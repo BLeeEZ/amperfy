@@ -24,10 +24,10 @@ import Foundation
 public enum HomeSection: Int, Sendable, CaseIterable, Codable {
   // add new section always at the end to keep the Int consitent
   case lastTimePlayedPlaylists
-  case recentAlbums
-  case latestAlbums
+  case recentlyPlayedAlbums
+  case newestAlbums
   case randomAlbums
-  case latestPodcastEpisodes
+  case newestPodcastEpisodes
   case podcasts
   case radios
   case randomArtists
@@ -36,18 +36,18 @@ public enum HomeSection: Int, Sendable, CaseIterable, Codable {
 
   static let defaultValue: [HomeSection] = [
     .randomAlbums,
-    .recentAlbums,
+    .recentlyPlayedAlbums,
     .lastTimePlayedPlaylists,
-    .latestAlbums,
+    .newestAlbums,
   ]
 
   public var title: String {
     switch self {
-    case .recentAlbums: return "Recently played Albums"
-    case .latestAlbums: return "Latest Albums"
+    case .recentlyPlayedAlbums: return "Recently Played Albums"
+    case .newestAlbums: return "Newest Albums"
     case .randomAlbums: return "Random Albums"
-    case .lastTimePlayedPlaylists: return "Recently played Playlists"
-    case .latestPodcastEpisodes: return "Latest Podcast Episodes"
+    case .lastTimePlayedPlaylists: return "Recently Played Playlists"
+    case .newestPodcastEpisodes: return "Newest Podcast Episodes"
     case .podcasts: return "Podcasts"
     case .radios: return "Radios"
     case .randomArtists: return "Random Artists"
@@ -62,11 +62,11 @@ public enum HomeSection: Int, Sendable, CaseIterable, Codable {
 
   public var isRandomSection: Bool {
     switch self {
-    case .recentAlbums: return false
-    case .latestAlbums: return false
+    case .recentlyPlayedAlbums: return false
+    case .newestAlbums: return false
     case .randomAlbums: return true
     case .lastTimePlayedPlaylists: return false
-    case .latestPodcastEpisodes: return false
+    case .newestPodcastEpisodes: return false
     case .podcasts: return false
     case .radios: return false
     case .randomArtists: return true
