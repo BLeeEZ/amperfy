@@ -71,20 +71,53 @@ final class DownloadRequestManager: Sendable {
     guard !downloadInfos.isEmpty else { return [] }
     return try! await storage.performAndGet { asyncCompanion in
       var asyncRequests = [DownloadRequest]()
-      for downloadInfo in downloadInfos {
-        let object = Download.createDownloadableObject(
+      var objects = [(DownloadElementInfo, Downloadable)]()
+      downloadInfos.forEach {
+        let downloadable = Download.createDownloadableObject(
           inContext: asyncCompanion.context,
-          info: downloadInfo
+          info: $0
         )
-        let asyncDownload = self.addLowPrio(object: object, library: asyncCompanion.library)
-        guard let asyncDownload else { continue }
+        objects.append(($0, downloadable))
+      }
+      let asyncDownloads = self.addLowPrio(objects: objects, library: asyncCompanion.library)
+      asyncDownloads.forEach {
         asyncRequests.append(DownloadRequest(
-          objectID: asyncDownload.managedObject.objectID,
-          id: object.uniqueID, title: asyncDownload.title, info: downloadInfo
+          objectID: $0.2.managedObject.objectID,
+          id: $0.1.uniqueID, title: $0.2.title, info: $0.0
         ))
       }
       return asyncRequests
     }
+  }
+  
+  nonisolated private func addLowPrio(objects: [(DownloadElementInfo, Downloadable)], library: LibraryStorage) -> [(DownloadElementInfo, Downloadable, Download)] {
+    var hasCoreDataChanges = false
+    let account = library.getAccount(managedObjectId: accountObjectId)
+    let ids = Set(objects.compactMap{ $0.1.uniqueID })
+    let existingDownloadsDict = library.getDownloadsDict(account: account, ids: ids)
+    
+    var downloadMapping = [(DownloadElementInfo, Downloadable, Download)]()
+    for (info, object) in objects {
+      if let existingDownload = existingDownloadsDict[object.uniqueID] {
+        if existingDownload.errorDate != nil || !object.isCached {
+          existingDownload.reset()
+          hasCoreDataChanges = true
+          downloadMapping.append((info, object, existingDownload))
+        } else {
+          // do nothing: the download has already an unused request
+        }
+      } else {
+        hasCoreDataChanges = true
+        let newDownload = library.createDownload(account: account, id: object.uniqueID)
+        newDownload.element = object
+        downloadMapping.append((info, object, newDownload))
+      }
+    }
+    
+    if hasCoreDataChanges {
+      library.saveContext()
+    }
+    return downloadMapping
   }
 
   nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) -> Download? {

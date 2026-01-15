@@ -812,6 +812,34 @@ public class LibraryStorage: PlayableFileCachable {
     return nil
   }
 
+  func getDownloads(account: Account, ids: Set<String>) -> [Download] {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(
+        format: "%K IN %@",
+        #keyPath(DownloadMO.id),
+        ids
+      ),
+    ])
+    let downloadMOs = try? context.fetch(fetchRequest)
+    return downloadMOs?.compactMap { Download(managedObject: $0) } ?? [Download]()
+  }
+  
+  func getDownloadsDict(
+    account: Account,
+    ids: Set<String>
+  )
+    -> [String: Download] {
+    let downloads = getDownloads(account: account, ids: ids)
+
+    var downloadDict = [String: Download]()
+    for download in downloads {
+      downloadDict[download.id] = download
+    }
+    return downloadDict
+  }
+
   func deleteDownload(_ download: Download) {
     context.delete(download.managedObject)
   }
