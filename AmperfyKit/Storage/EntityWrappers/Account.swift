@@ -28,7 +28,7 @@ import Foundation
 public struct AccountInfo: Sendable, Hashable, Codable {
   public let serverHash: String
   public let userHash: String
-  public let apiType: BackenApiType
+  fileprivate let apiType: BackenApiType
 
   private enum CodingKeys: String, CodingKey {
     case serverHash

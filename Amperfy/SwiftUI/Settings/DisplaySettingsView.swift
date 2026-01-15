@@ -77,7 +77,8 @@ struct DisplaySettingsView: View {
         )
 
         if let activeAccountInfo = settings.activeAccountInfo,
-           activeAccountInfo.apiType.asServerApiType != .ampache {
+           let credentials = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read.loginCredentials,
+           credentials.backendApi.asServerApiType != .ampache {
           SettingsSection(
             content: {
               SettingsCheckBoxRow(

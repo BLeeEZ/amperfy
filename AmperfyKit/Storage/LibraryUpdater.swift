@@ -375,11 +375,17 @@ public class LibraryUpdater {
   @MainActor
   func applyAccountSupport(notifier: LibraryUpdaterCallbacks) async throws {
     os_log("Create account (url + user) entry in CoreData", log: log, type: .info)
-    guard let accountInfo = storage.settings.accounts.active
+    guard let loginCredentials  = storage.settings.accounts.activeSetting.read.loginCredentials
     else { return }
+    // create account info to have the api type from credentials
+    let accountInfo = Account.createInfo(credentials: loginCredentials)
     var accountObjectIdTemp: NSManagedObjectID!
     storage.main.perform { asyncCompanion in
       let account = asyncCompanion.library.getAccount(info: accountInfo)
+      // the account is propably already created
+      // make sure to assign the login credential information to core data
+      // needed because AccountInfo doesn't store the API type information
+      account.assignInfo(info: accountInfo)
       accountObjectIdTemp = account.managedObject.objectID
     }
     let accountObjectId: NSManagedObjectID = accountObjectIdTemp
