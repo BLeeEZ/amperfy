@@ -375,7 +375,7 @@ public class LibraryUpdater {
   @MainActor
   func applyAccountSupport(notifier: LibraryUpdaterCallbacks) async throws {
     os_log("Create account (url + user) entry in CoreData", log: log, type: .info)
-    guard let loginCredentials  = storage.settings.accounts.activeSetting.read.loginCredentials
+    guard let loginCredentials = storage.settings.accounts.activeSetting.read.loginCredentials
     else { return }
     // create account info to have the api type from credentials
     let accountInfo = Account.createInfo(credentials: loginCredentials)

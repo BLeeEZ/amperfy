@@ -135,6 +135,16 @@ public class NowPlayingInfoCenterHandler {
       }
     }
   }
+
+  public func updateInfo() {
+    if let curPlayable = musicPlayer.currentlyPlaying {
+      updateNowPlayingInfo(playable: curPlayable)
+      nowPlayingInfoCenter.playbackState = backendAudioPlayer.isPlaying ? .playing : .paused
+    } else {
+      nowPlayingInfoCenter.nowPlayingInfo = nil
+      nowPlayingInfoCenter.playbackState = .stopped
+    }
+  }
 }
 
 // MARK: MusicPlayable

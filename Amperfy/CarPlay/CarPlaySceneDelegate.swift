@@ -154,7 +154,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         }
 
       if self.appDelegate.player.currentlyPlaying != nil {
-        AmperKit.shared.playerNowPlayingInfoCenterHandler?.didElapsedTimeChange()
+        AmperKit.shared.playerAudioSessionHandler?.configureBackgroundPlayback()
+        AmperKit.shared.playerNowPlayingInfoCenterHandler?.updateInfo()
+        AmperKit.shared.playerRemoteCommandCenterHandler?
+          .changeRemoteCommandCenterControlsBasedOnCurrentPlayableType()
+        self.updatePlayerQueueSection()
         self.displayNowPlaying(immediately: true) {}
       }
     }

@@ -77,7 +77,8 @@ struct DisplaySettingsView: View {
         )
 
         if let activeAccountInfo = settings.activeAccountInfo,
-           let credentials = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo).read.loginCredentials,
+           let credentials = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo)
+           .read.loginCredentials,
            credentials.backendApi.asServerApiType != .ampache {
           SettingsSection(
             content: {

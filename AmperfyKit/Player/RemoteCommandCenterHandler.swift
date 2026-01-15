@@ -25,7 +25,7 @@ import MediaPlayer
 // MARK: - RemoteCommandCenterHandler
 
 @MainActor
-class RemoteCommandCenterHandler {
+public class RemoteCommandCenterHandler {
   private var musicPlayer: PlayerFacade
   private let backendAudioPlayer: BackendAudioPlayer
   private let getLibrarySyncerCB: GetLibrarySyncerCallback
@@ -197,7 +197,7 @@ class RemoteCommandCenterHandler {
     })
   }
 
-  private func changeRemoteCommandCenterControlsBasedOnCurrentPlayableType() {
+  public func changeRemoteCommandCenterControlsBasedOnCurrentPlayableType() {
     guard let currentItem = musicPlayer.currentlyPlaying else { return }
     switch currentItem.derivedType {
     case .song:
@@ -264,22 +264,24 @@ class RemoteCommandCenterHandler {
 // MARK: MusicPlayable
 
 extension RemoteCommandCenterHandler: MusicPlayable {
-  func didStartPlayingFromBeginning() {}
-  func didStartPlaying() {
+  public func didStartPlayingFromBeginning() {}
+  public func didStartPlaying() {
     changeRemoteCommandCenterControlsBasedOnCurrentPlayableType()
   }
 
-  func didPause() {}
-  func didStopPlaying() {}
-  func didElapsedTimeChange() {}
-  func didPlaylistChange() {}
-  func didArtworkChange() {}
+  public func didPause() {}
+  public func didStopPlaying() {}
+  public func didElapsedTimeChange() {}
+  public func didPlaylistChange() {}
+  public func didArtworkChange() {}
 
-  func didShuffleChange() {
+  public func didShuffleChange() {
     updateShuffle()
   }
 
-  func didRepeatChange() {
+  public func didRepeatChange() {
     updateRepeat()
   }
+
+  public func didPlaybackRateChange() {}
 }

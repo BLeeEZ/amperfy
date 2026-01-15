@@ -112,16 +112,17 @@ public class AmperKit {
 
   // internal player helper classes that interact only via player callbacks
   private var playerDownloadPreparationHandler: PlayerDownloadPreparationHandler?
-  public var playerNowPlayingInfoCenterHandler: NowPlayingInfoCenterHandler?
-  private var playerRemoteCommandCenterHandler: RemoteCommandCenterHandler?
+  public private(set) var playerAudioSessionHandler: AudioSessionHandler?
+  public private(set) var playerNowPlayingInfoCenterHandler: NowPlayingInfoCenterHandler?
+  public private(set) var playerRemoteCommandCenterHandler: RemoteCommandCenterHandler?
   private var playerNotificationAdapter: PlayerNotificationAdapter?
 
   @MainActor
   private func createPlayer() -> PlayerFacade {
-    let audioSessionHandler = AudioSessionHandler()
+    playerAudioSessionHandler = AudioSessionHandler()
     let backendAudioPlayer = BackendAudioPlayer(
       createAudioStreamingPlayerCB: { AudioStreamingPlayer() },
-      audioSessionHandler: audioSessionHandler,
+      audioSessionHandler: playerAudioSessionHandler!,
       eventLogger: eventLogger,
       getBackendApiCB: { accountInfo in
         self.getMeta(accountInfo).backendApi
@@ -152,9 +153,9 @@ public class AmperKit {
       settings: storage.settings,
       userStatistics: userStatistics
     )
-    audioSessionHandler.musicPlayer = curPlayer
-    audioSessionHandler.eventLogger = eventLogger
-    audioSessionHandler.configureObserverForAudioSessionInterruption()
+    playerAudioSessionHandler!.musicPlayer = curPlayer
+    playerAudioSessionHandler!.eventLogger = eventLogger
+    playerAudioSessionHandler!.configureObserverForAudioSessionInterruption()
     backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
     backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.user.isEqualizerEnabled)
     backendAudioPlayer

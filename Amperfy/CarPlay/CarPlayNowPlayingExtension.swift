@@ -29,6 +29,10 @@ extension CarPlaySceneDelegate {
     comment: "Button title on CarPlay player to display queue"
   )
 
+  func updatePlayerQueueSection() {
+    playerQueueSection.updateSections(createPlayerQueueSections())
+  }
+
   func configureNowPlayingTemplate() {
     var buttons: [CPNowPlayingButton] = []
     buttons.append(
@@ -208,14 +212,14 @@ extension CarPlaySceneDelegate: MusicPlayable {
   func didStartPlayingFromBeginning() {}
   func didStartPlaying() {
     configureNowPlayingTemplate()
-    playerQueueSection.updateSections(createPlayerQueueSections())
+    updatePlayerQueueSection()
   }
 
   func didPause() {}
   func didStopPlaying() {}
   func didElapsedTimeChange() {}
   func didPlaylistChange() {
-    playerQueueSection.updateSections(createPlayerQueueSections())
+    updatePlayerQueueSection()
   }
 
   func didArtworkChange() {}

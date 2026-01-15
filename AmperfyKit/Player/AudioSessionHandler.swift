@@ -24,7 +24,7 @@ import MediaPlayer
 import os.log
 
 @MainActor
-class AudioSessionHandler {
+public class AudioSessionHandler {
   var musicPlayer: AudioPlayer?
   var eventLogger: EventLogger?
 
@@ -116,7 +116,7 @@ class AudioSessionHandler {
     }
   }
 
-  func configureBackgroundPlayback() {
+  public func configureBackgroundPlayback() {
     do {
       try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
       try AVAudioSession.sharedInstance().setActive(true)
