@@ -74,7 +74,7 @@ class SyncVC: UIViewController {
           displayPopup: false
         )
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
-          accountSettings.initialSyncCompletionStatus = .aborded
+          accountSettings.initialSyncCompletionStatus = .aborted
         }
       }
       self.finishSync()

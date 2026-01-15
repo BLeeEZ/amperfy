@@ -243,7 +243,7 @@ public enum EqualizerPreset: Int, CaseIterable, Sendable, Codable {
 public enum SyncCompletionStatus: Int, CaseIterable, Sendable, Codable {
   case completed = 0
   case skipped = 1
-  case aborded = 2
+  case aborted = 2
 
   public static let defaultValue: SyncCompletionStatus = .completed
 
@@ -253,8 +253,8 @@ public enum SyncCompletionStatus: Int, CaseIterable, Sendable, Codable {
       return "Completed"
     case .skipped:
       return "Skipped"
-    case .aborded:
-      return "Aborded"
+    case .aborted:
+      return "Aborted"
     }
   }
 }
