@@ -680,44 +680,62 @@ class BackendAudioPlayer: NSObject {
   private func setupEqualizerBands() {
     guard let equalizer else { return }
 
+    // Configure 10-band parametric EQ matching eqMac specifications
+    // Frequencies: 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 Hz
+    // Gain range: ±24dB (iOS AVAudioUnitEQ supports -96dB to +24dB)
     for (index, frequency) in EqualizerSetting.frequencies.enumerated() {
       guard index < equalizer.bands.count else { break }
 
       let band = equalizer.bands[index]
       band.frequency = frequency
+      // Bandwidth (Q factor) of 1.0 octave - standard for graphic equalizers
+      // This provides smooth overlap between adjacent bands
       band.bandwidth = 1.0
       band.filterType = .parametric
       band.gain = 0.0
       band.bypass = false
     }
+    
+    // Enable global bypass control
+    equalizer.globalGain = 0.0
+    
+    os_log(
+      .debug,
+      "EQ bands configured: %@",
+      EqualizerSetting.frequencies.map { String(format: "%.0fHz", $0) }.joined(separator: ", ")
+    )
   }
 
   private func applyEqualizerSetting(eqSetting: EqualizerSetting) {
     guard let equalizer else { return }
 
-    // EQ band gains
+    // Apply EQ band gains (±24dB range matching eqMac)
+    // iOS AVAudioUnitEQ supports gain range of -96dB to +24dB
     for (index, gain) in eqSetting.gains.enumerated() {
       guard index < equalizer.bands.count else { break }
 
       let band = equalizer.bands[index]
+      
+      // Clamp gain to iOS supported range (-96 to +24 dB)
+      // eqMac uses ±24dB, which is fully supported
+      let clampedGain = max(-96.0, min(24.0, gain))
 
       band.filterType = .parametric
       band.bandwidth = 1.0
-      band.gain = gain
+      band.gain = clampedGain
       band.bypass = false
     }
 
     equalizerVolumeCompensation = isEqualizerEnabled ? eqSetting.compensatedVolume : 1.0
 
-    os_log(.debug, "   EQ '%s'", eqSetting.description)
+    os_log(.debug, "EQ Applied: '%{public}s'", eqSetting.description)
     os_log(
       .debug,
-      "   EQ Gains: [%@] dB",
+      "EQ Gains: [%{public}@] dB",
       eqSetting.gains.map { String(format: "%.1f", $0) }.joined(separator: ", ")
     )
-    os_log(.debug, "   EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
-    os_log(.debug, "   EQ linear Volume Compensation: %.2f", eqSetting.compensatedVolume)
-    os_log(.debug, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
+    os_log(.debug, "EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
+    os_log(.debug, "EQ Volume Compensation: %.2f (linear)", equalizerVolumeCompensation)
   }
 
   // MARK: - ReplayGain Implementation

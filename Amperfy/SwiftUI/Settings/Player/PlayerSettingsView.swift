@@ -71,6 +71,21 @@ struct PlayerSettingsView: View {
   var body: some View {
     ZStack {
       SettingsList {
+        #if targetEnvironment(macCatalyst) || os(macOS)
+        // Discord Rich Presence Settings (macOS direct distribution only - not available in sandboxed App Store builds)
+        if DiscordRichPresenceManager.isAvailable {
+          SettingsSection(
+            content: {
+              SettingsCheckBoxRow(
+                title: "Discord Rich Presence",
+                isOn: $settings.isDiscordRichPresenceEnabled
+              )
+            },
+            footer: "Show currently playing track on Discord, similar to Spotify. Requires Discord app to be running."
+          )
+        }
+        #endif
+
         // ReplayGain Settings
         SettingsSection(
           content: {

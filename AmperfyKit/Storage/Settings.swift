@@ -195,6 +195,12 @@ public struct UserSettings: Sendable, Codable {
     set { _isReplayGainEnabled = newValue }
   }
 
+  private var _isDiscordRichPresenceEnabled: Bool = false
+  public var isDiscordRichPresenceEnabled: Bool {
+    get { _isDiscordRichPresenceEnabled }
+    set { _isDiscordRichPresenceEnabled = newValue }
+  }
+
   private var _playerVolume: Float = 1.0
   public var playerVolume: Float {
     get {

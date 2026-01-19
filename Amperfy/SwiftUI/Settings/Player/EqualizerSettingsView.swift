@@ -47,6 +47,9 @@ struct EqualizerSettingsView: View {
 
   @State
   var isShowDeleteAlert = false
+  
+  @State
+  private var selectedPreset: EqualizerPreset = .flat
 
   var body: some View {
     ZStack {
@@ -76,7 +79,7 @@ struct EqualizerSettingsView: View {
               }
             }
           }
-        })
+        }, footer: "10-band equalizer with ±24dB range, matching official eqMac specifications.", header: "Equalizer")
 
         SettingsSection(content: {
           SettingsRow(title: "Equalizer") {
@@ -107,6 +110,49 @@ struct EqualizerSettingsView: View {
               TextField("Equalizer Name", text: $eqSettingName)
                 .multilineTextAlignment(.trailing)
             }
+            
+            // eqMac style presets
+            SettingsRow(title: "eqMac Preset") {
+              Menu("Select") {
+                ForEach(EqualizerPreset.allCases, id: \.self) { preset in
+                  Button(preset.description) {
+                    selectedPreset = preset
+                    eqSettingGains = preset.gains.compactMap { CGFloat($0) }
+                    if eqSettingName == "My new Equalizer" || eqSettingName.isEmpty {
+                      eqSettingName = preset.description
+                    }
+                  }
+                }
+              }
+            }
+            
+            // AutoEQ headphone correction presets
+            SettingsRow(title: "AutoEQ Preset") {
+              Menu("Select Headphone") {
+                // Over-Ear section
+                Menu("Over-Ear Headphones") {
+                  ForEach(AutoEQPreset.presets(for: .overEar), id: \.self) { preset in
+                    Button(preset.description) {
+                      eqSettingGains = preset.gains.compactMap { CGFloat($0) }
+                      if eqSettingName == "My new Equalizer" || eqSettingName.isEmpty {
+                        eqSettingName = "AutoEQ: \(preset.description)"
+                      }
+                    }
+                  }
+                }
+                // In-Ear section
+                Menu("In-Ear / TWS") {
+                  ForEach(AutoEQPreset.presets(for: .inEar), id: \.self) { preset in
+                    Button(preset.description) {
+                      eqSettingGains = preset.gains.compactMap { CGFloat($0) }
+                      if eqSettingName == "My new Equalizer" || eqSettingName.isEmpty {
+                        eqSettingName = "AutoEQ: \(preset.description)"
+                      }
+                    }
+                  }
+                }
+              }
+            }
 
             EqualizerView(
               sliderLabels: $sliderLabel,
@@ -114,6 +160,11 @@ struct EqualizerSettingsView: View {
               sliderTintColor: Color(settings.themePreference.asColor),
               gradientColors: [Color(settings.themePreference.asColor), .clear]
             )
+            
+            // Reset button
+            SettingsButtonRow(title: "Reset to Flat") {
+              eqSettingGains = EqualizerPreset.flat.gains.compactMap { CGFloat($0) }
+            }
 
             SettingsButtonRow(title: "Save") {
               guard var eqSettingToEdit else { return }
@@ -156,7 +207,7 @@ struct EqualizerSettingsView: View {
             }
           }
 
-        }, header: "Equalizer Editor")
+        }, footer: "Choose from 22 eqMac presets or 12 AutoEQ headphone corrections (based on oratory1990 measurements). AutoEQ presets scientifically correct your headphones to match the Harman target curve.", header: "Equalizer Editor")
       }
     }
     .navigationTitle("Equalizer")

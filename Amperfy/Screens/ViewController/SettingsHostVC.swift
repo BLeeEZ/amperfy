@@ -195,6 +195,15 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.player.updateReplayGainEnabled(isEnabled: newValue)
     }))
 
+    // Discord Rich Presence (only available in non-sandboxed macOS builds)
+    if DiscordRichPresenceManager.isAvailable {
+      settings.isDiscordRichPresenceEnabled = appDelegate.storage.settings.user.isDiscordRichPresenceEnabled
+      changesAgent.append(settings.$isDiscordRichPresenceEnabled.sink(receiveValue: { newValue in
+        self.appDelegate.storage.settings.user.isDiscordRichPresenceEnabled = newValue
+        AmperKit.shared.discordPresence?.setEnabled(newValue)
+      }))
+    }
+
     settings.isEqualizerEnabled = appDelegate.storage.settings.user.isEqualizerEnabled
     changesAgent.append(settings.$isEqualizerEnabled.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.isEqualizerEnabled = newValue

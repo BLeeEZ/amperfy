@@ -441,6 +441,7 @@
 		50C9D6DB284FAB88007F18D0 /* AudioSessionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501171332756A73000B7C08D /* AudioSessionHandler.swift */; };
 		50C9D6DC284FAB88007F18D0 /* RemoteCommandCenterHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501171312756778300B7C08D /* RemoteCommandCenterHandler.swift */; };
 		50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */; };
+		DISCORD0001284FAB88007F18D0 /* DiscordRichPresence.swift in Sources */ = {isa = PBXBuildFile; fileRef = DISCORD0002284FAB88007F18D0 /* DiscordRichPresence.swift */; };
 		50C9D6DE284FAB88007F18D0 /* PlayQueueHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */; };
 		50C9D6E3284FAB96007F18D0 /* UIImageAssetsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */; };
 		50C9D6E6284FABCB007F18D0 /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6E5284FABCB007F18D0 /* AudioPlayer.swift */; };
@@ -822,6 +823,7 @@
 		508FDE3521F1E130005A0724 /* NewPlaylistTableHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPlaylistTableHeader.swift; sourceTree = "<group>"; };
 		508FDE3721F1E14F005A0724 /* NewPlaylistTableHeader.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewPlaylistTableHeader.xib; sourceTree = "<group>"; };
 		508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendAudioPlayer.swift; sourceTree = "<group>"; };
+		DISCORD0002284FAB88007F18D0 /* DiscordRichPresence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscordRichPresence.swift; sourceTree = "<group>"; };
 		508FDE4B21F58AFC005A0724 /* AppStoryboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoryboard.swift; sourceTree = "<group>"; };
 		508FDE4F21F64ED6005A0724 /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
 		509001B52716C7F600A8056D /* AppDelegateAlertExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateAlertExtensions.swift; sourceTree = "<group>"; };
@@ -909,6 +911,7 @@
 		50AC4E5728D9D12D0091FF33 /* ObservableSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObservableSettings.swift; sourceTree = "<group>"; };
 		50ACAF1127B144040039913C /* SwipeActionSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeActionSettings.swift; sourceTree = "<group>"; };
 		50ACAF1327B277B50039913C /* Amperfy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Amperfy.entitlements; sourceTree = "<group>"; };
+		DISCORDENT001B277B50039913C /* Amperfy-macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Amperfy-macOS.entitlements"; sourceTree = "<group>"; };
 		50AD70DA2D5FBAFB00E369BF /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperView.swift; sourceTree = "<group>"; };
 		50AE79AD2C1E23920085CBB3 /* SsOpenSubsonicExtensionsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsOpenSubsonicExtensionsParserDelegate.swift; sourceTree = "<group>"; };
@@ -1461,6 +1464,7 @@
 				508385F321C5965E00C4BB32 /* Info.plist */,
 				5078AFB32B44AE260038FD17 /* AppIntentVocabulary.plist */,
 				50ACAF1327B277B50039913C /* Amperfy.entitlements */,
+				DISCORDENT001B277B50039913C /* Amperfy-macOS.entitlements */,
 				641708582C13BF5100BA2619 /* Haptics.swift */,
 			);
 			path = Amperfy;
@@ -2130,6 +2134,7 @@
 				5011712F27565B2A00B7C08D /* PlayerFacade.swift */,
 				50C9D6E5284FABCB007F18D0 /* AudioPlayer.swift */,
 				508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */,
+				DISCORD0002284FAB88007F18D0 /* DiscordRichPresence.swift */,
 				501171292743F25300B7C08D /* PlayerUtil.swift */,
 				5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */,
 				501171312756778300B7C08D /* RemoteCommandCenterHandler.swift */,
@@ -2794,6 +2799,7 @@
 				50C9D669284FAA0B007F18D0 /* AmpacheXmlParser.swift in Sources */,
 				50C9D6A3284FAA77007F18D0 /* MigrationPolicyV4toV5.swift in Sources */,
 				50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */,
+				DISCORD0001284FAB88007F18D0 /* DiscordRichPresence.swift in Sources */,
 				50C9D693284FAA6C007F18D0 /* DirectoryMO+CoreDataProperties.swift in Sources */,
 				50C9D6ED284FADB8007F18D0 /* PlayerDisplayStyleType.swift in Sources */,
 				50C9D6B4284FAA87007F18D0 /* AbstractPlayable.swift in Sources */,
@@ -3034,9 +3040,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Amperfy/Amperfy-macOS.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9P94DA795J;
 				INFOPLIST_FILE = Amperfy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3046,6 +3054,8 @@
 				MARKETING_VERSION = 2.1.0;
 				"MARKETING_VERSION[sdk=macosx*]" = 2.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = "Aarav-Chourishi";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = aaravchourishi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -3073,9 +3083,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Amperfy/Amperfy-macOS.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9P94DA795J;
 				INFOPLIST_FILE = Amperfy/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3085,6 +3097,8 @@
 				MARKETING_VERSION = 2.1.0;
 				"MARKETING_VERSION[sdk=macosx*]" = 2.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.familie-zimba.amperfy-music";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = "Aarav-Chourishi";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = aaravchourishi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -3116,6 +3130,8 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9P94DA795J;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 9P94DA795J;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
@@ -3167,6 +3183,8 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9P94DA795J;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 9P94DA795J;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";

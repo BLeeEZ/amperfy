@@ -116,6 +116,12 @@ public class AmperKit {
   private var playerNowPlayingInfoCenterHandler: NowPlayingInfoCenterHandler?
   private var playerRemoteCommandCenterHandler: RemoteCommandCenterHandler?
   private var playerNotificationAdapter: PlayerNotificationAdapter?
+  private var discordRichPresenceManager: DiscordRichPresenceManager?
+  
+  /// Access to Discord Rich Presence manager for enabling/disabling
+  public var discordPresence: DiscordRichPresenceManager? {
+    discordRichPresenceManager
+  }
 
   @MainActor
   private func createPlayer() -> PlayerFacade {
@@ -208,6 +214,15 @@ public class AmperKit {
     curPlayer.addNotifier(notifier: playerRemoteCommandCenterHandler!)
     playerNotificationAdapter = PlayerNotificationAdapter(notificationHandler: notificationHandler)
     curPlayer.addNotifier(notifier: playerNotificationAdapter!)
+
+    // Discord Rich Presence integration
+    discordRichPresenceManager = DiscordRichPresenceManager(
+      musicPlayer: curPlayer,
+      backendAudioPlayer: backendAudioPlayer,
+      storage: storage
+    )
+    curPlayer.addNotifier(notifier: discordRichPresenceManager!)
+    discordRichPresenceManager?.setEnabled(storage.settings.user.isDiscordRichPresenceEnabled)
 
     return facadeImpl
   }

@@ -113,57 +113,68 @@ extension EqualizerView {
   }
 
   func addScale(sliderWidth: CGFloat) -> some View {
+    // For ±24dB range (eqMac official spec), we show labels at +24, +12, 0, -12, -24
+    // Number of steps from 0 to max (24/6 = 4 steps of 6dB each)
     VStack {
-      ForEach((-EqualizerSetting.rangeFromZero / 2) ... -1, id: \.self) { i in
-        Text("\(i * -2) dB")
+      // Positive dB values (top)
+      ForEach([4, 3, 2, 1], id: \.self) { i in
+        Text("+\(i * 6)")
           .fontWeight(.thin)
           .lineLimit(1)
-          .minimumScaleFactor(0.8)
-          .font(.system(size: 14))
+          .minimumScaleFactor(0.6)
+          .font(.system(size: 11))
+          .foregroundColor(.secondary)
           .frame(maxHeight: .infinity)
       }
 
+      // 0 dB center line
       Text("0 dB")
-        .fontWeight(.bold)
+        .fontWeight(.semibold)
         .lineLimit(1)
-        .minimumScaleFactor(0.8)
-        .font(.system(size: 14))
+        .minimumScaleFactor(0.6)
+        .font(.system(size: 11))
         .frame(maxHeight: .infinity)
 
-      ForEach(1 ... (EqualizerSetting.rangeFromZero / 2), id: \.self) { i in
-        Text("\(i * -2) dB")
+      // Negative dB values (bottom)
+      ForEach([1, 2, 3, 4], id: \.self) { i in
+        Text("-\(i * 6)")
           .fontWeight(.thin)
           .lineLimit(1)
-          .minimumScaleFactor(0.8)
-          .font(.system(size: 14))
+          .minimumScaleFactor(0.6)
+          .font(.system(size: 11))
+          .foregroundColor(.secondary)
           .frame(maxHeight: .infinity)
       }
     }
   }
 
   func addScaleLines(sliderWidth: CGFloat) -> some View {
+    // Match the scale steps for ±24dB range (eqMac official spec)
     VStack {
-      ForEach((-EqualizerSetting.rangeFromZero / 2) ... -1, id: \.self) { i in
+      // Lines for positive dB section
+      ForEach([4, 3, 2, 1], id: \.self) { _ in
         VStack {
           Rectangle()
-            .fill(Color.quaternaryLabel)
-            .frame(height: 1.5)
+            .fill(Color.quaternaryLabel.opacity(0.4))
+            .frame(height: 1)
             .edgesIgnoringSafeArea(.horizontal)
         }.frame(maxHeight: .infinity)
       }
 
+      // Center line at 0 dB (more prominent)
       VStack {
         Rectangle()
           .fill(Color.secondaryLabel)
-          .frame(height: 1.5)
+          .frame(height: 2)
           .edgesIgnoringSafeArea(.horizontal)
       }.frame(maxHeight: .infinity)
 
-      ForEach(1 ... (EqualizerSetting.rangeFromZero / 2), id: \.self) { i in
+      // Lines for negative dB section
+      ForEach([1, 2, 3, 4], id: \.self) { _ in
         VStack {
           Rectangle()
-            .fill(Color.quaternaryLabel)
-            .frame(height: 1.5)
+            .fill(Color.quaternaryLabel.opacity(0.4))
+            .frame(height: 1)
             .edgesIgnoringSafeArea(.horizontal)
         }.frame(maxHeight: .infinity)
       }
