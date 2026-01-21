@@ -369,8 +369,18 @@ class PlayerUIHandler: NSObject {
     playTypeIcon: UIImageView,
     liveLabel: UILabel
   ) {
+    if timeSlider.trackConfiguration == nil {
+      timeSlider.trackConfiguration = UISlider.TrackConfiguration(
+        allowsTickValuesOnly: false,
+        ticks: []
+      )
+    } else {
+      timeSlider.trackConfiguration?.allowsTickValuesOnly = false
+    }
+
     timeSlider.preferredBehavioralStyle = .pad
     timeSlider.sliderStyle = .thumbless
+
     if let currentlyPlaying = player.currentlyPlaying {
       let supportTimeInteraction = !currentlyPlaying.isRadio
       timeSlider.isEnabled = supportTimeInteraction && (style != .miniPlayeriOS)
