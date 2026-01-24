@@ -153,21 +153,19 @@ public enum StreamingFormatPreference: Int, CaseIterable, Sendable, Codable {
 // MARK: - EqualizerSetting
 
 public struct EqualizerSetting: Hashable, Sendable, Codable {
-  // Frequencies in Hz - Matching eqMac's 10-band Advanced Equalizer exactly
-  // Source: https://github.com/bitgapp/eqMac - AdvancedEqualizer.swift
+  // Frequencies in Hz for 10-band equalizer
   // 32Hz (Sub-bass), 64Hz (Bass), 125Hz (Low-mid), 250Hz (Mid-bass),
   // 500Hz (Midrange), 1kHz (Upper-mid), 2kHz (Presence), 4kHz (Brilliance),
   // 8kHz (High treble), 16kHz (Air)
   public static let frequencies: [Float] = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
   public static let defaultGains: [Float] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   
-  // ±24dB range matching eqMac's official specification
-  // Source: eqMac AdvancedEqualizerDataBus.swift validates gains between -24.0 and 24.0
+  // ±24dB range for gain adjustment
   public static let rangeFromZero = 24
 
   public let id: UUID
   public var name: String
-  // EQ gain within ±24 dB range (eqMac official spec)
+  // EQ gain within ±24 dB range
   public var gains: [Float]
 
   public init(id: UUID = UUID(), name: String, gains: [Float] = Self.defaultGains) {
@@ -214,9 +212,8 @@ public struct EqualizerSetting: Hashable, Sendable, Codable {
 
 // MARK: - EqualizerPreset
 
-/// Professional equalizer presets matching eqMac's official preset library exactly
-/// Source: https://github.com/bitgapp/eqMac - AdvancedEqualizerDefaultPresets.swift
-/// All gains are in dB within ±24dB range (eqMac official specification)
+/// Professional equalizer presets
+/// All gains are in dB within ±24dB range
 /// Frequencies: 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 Hz
 public enum EqualizerPreset: Int, CaseIterable, Sendable, Codable {
   case flat = 0
@@ -272,7 +269,7 @@ public enum EqualizerPreset: Int, CaseIterable, Sendable, Codable {
   }
 
   /// Gain values for each frequency band: 32, 64, 125, 250, 500, 1k, 2k, 4k, 8k, 16k Hz
-  /// Values are in dB - EXACT values from eqMac's AdvancedEqualizerDefaultPresets.swift
+  /// Values are in dB
   public var gains: [Float] {
     switch self {
     case .flat:
@@ -346,139 +343,6 @@ public enum EqualizerPreset: Int, CaseIterable, Sendable, Codable {
 
   public var asEqualizerSetting: EqualizerSetting {
     EqualizerSetting(name: description, gains: gains)
-  }
-}
-
-// MARK: - AutoEQPreset
-
-/// AutoEQ headphone correction presets based on scientifically measured frequency responses
-/// Source: https://github.com/jaakkopasanen/AutoEq (oratory1990 measurements)
-/// These presets correct headphone frequency response to match the Harman target curve
-/// Frequencies: 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 Hz (FixedBandEQ format)
-public enum AutoEQPreset: Int, CaseIterable, Sendable, Codable {
-  // Over-Ear Headphones
-  case sennheiserHD650 = 0
-  case sennheiserHD600 = 1
-  case sennheiserHD560S = 2
-  case sonyWH1000XM4 = 3
-  case sonyWH1000XM5 = 4
-  case appleAirPodsMax = 5
-  case boseQC45 = 6
-  case akgK371 = 7
-  case audioTechnicaATHM50x = 8
-  
-  // In-Ear Monitors
-  case samsungGalaxyBudsPro = 9
-  case sonyWF1000XM4 = 10
-  case moondropBlessing2 = 11
-  
-  public static let defaultValue: AutoEQPreset = .sennheiserHD650
-  
-  /// Headphone category for UI grouping
-  public enum Category: String, CaseIterable {
-    case overEar = "Over-Ear"
-    case inEar = "In-Ear"
-  }
-  
-  public var category: Category {
-    switch self {
-    case .sennheiserHD650, .sennheiserHD600, .sennheiserHD560S,
-         .sonyWH1000XM4, .sonyWH1000XM5, .appleAirPodsMax,
-         .boseQC45, .akgK371, .audioTechnicaATHM50x:
-      return .overEar
-    case .samsungGalaxyBudsPro, .sonyWF1000XM4, .moondropBlessing2:
-      return .inEar
-    }
-  }
-  
-  public var description: String {
-    switch self {
-    case .sennheiserHD650: return "Sennheiser HD 650"
-    case .sennheiserHD600: return "Sennheiser HD 600"
-    case .sennheiserHD560S: return "Sennheiser HD 560S"
-    case .sonyWH1000XM4: return "Sony WH-1000XM4"
-    case .sonyWH1000XM5: return "Sony WH-1000XM5"
-    case .appleAirPodsMax: return "Apple AirPods Max"
-    case .boseQC45: return "Bose QuietComfort 45"
-    case .akgK371: return "AKG K371"
-    case .audioTechnicaATHM50x: return "Audio-Technica ATH-M50x"
-    case .samsungGalaxyBudsPro: return "Samsung Galaxy Buds Pro"
-    case .sonyWF1000XM4: return "Sony WF-1000XM4"
-    case .moondropBlessing2: return "Moondrop Blessing 2"
-    }
-  }
-  
-  /// Gain values from AutoEQ FixedBandEQ format (oratory1990 measurements)
-  /// Values are in dB for frequencies: 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000 Hz
-  public var gains: [Float] {
-    switch self {
-    // Over-Ear Headphones
-    case .sennheiserHD650:
-      // Preamp: -7.4 dB - Classic audiophile reference headphone
-      return [7.0, 2.6, -1.2, -2.2, 0.5, -1.0, 0.7, -1.2, 5.1, -3.6]
-    case .sennheiserHD600:
-      // Preamp: -7.5 dB - Natural, balanced sound signature
-      return [6.9, 3.3, -1.1, -1.6, 0.6, -0.8, 0.1, -1.0, 3.9, -6.5]
-    case .sennheiserHD560S:
-      // Preamp: -6.2 dB - Modern analytical headphone
-      return [5.9, 1.6, 0.0, -1.0, 0.8, -1.6, 0.8, -1.3, 3.5, -8.1]
-    case .sonyWH1000XM4:
-      // Preamp: -5.8 dB - Popular ANC wireless headphone
-      return [-4.3, -1.8, -5.8, -1.4, 0.5, -0.6, 6.0, -0.8, 1.0, -2.2]
-    case .sonyWH1000XM5:
-      // Preamp: -9.0 dB - Latest Sony flagship ANC
-      return [-3.7, -1.6, -5.2, -3.3, 1.3, 1.8, 5.3, -2.4, 1.3, 9.0]
-    case .appleAirPodsMax:
-      // Preamp: -4.2 dB - Apple's premium over-ear
-      return [-4.1, -0.9, -1.6, -2.1, -0.4, -2.9, 1.6, 2.9, 4.3, -10.6]
-    case .boseQC45:
-      // Preamp: -1.9 dB - Comfortable ANC headphone
-      return [-1.4, -1.2, -2.1, -0.9, 0.7, 2.0, -0.9, -1.3, 0.3, -7.7]
-    case .akgK371:
-      // Preamp: -4.8 dB - Studio reference, Harman-tuned
-      return [-3.0, 1.2, -1.4, -1.8, 0.8, -0.8, -0.3, 3.0, -0.2, 4.8]
-    case .audioTechnicaATHM50x:
-      // Preamp: -2.3 dB - Popular studio monitoring headphone
-      return [0.0, 0.4, -5.3, 0.7, 1.9, -1.0, 0.6, 0.4, 2.8, -9.3]
-      
-    // In-Ear Monitors
-    case .samsungGalaxyBudsPro:
-      // Preamp: -3.0 dB - Samsung's flagship TWS
-      return [0.2, 0.0, -2.3, -2.2, -0.1, 2.7, 1.7, 0.7, -1.4, -10.5]
-    case .sonyWF1000XM4:
-      // Preamp: -4.5 dB - Sony's premium TWS with ANC
-      return [-2.5, -0.8, -3.2, -1.8, 0.4, 1.2, 3.8, -0.5, 0.8, -6.8]
-    case .moondropBlessing2:
-      // Preamp: -5.2 dB - Audiophile hybrid IEM
-      return [4.2, 1.8, -0.6, -1.2, 0.3, -0.5, 1.2, -2.1, 2.4, -4.5]
-    }
-  }
-  
-  /// Preamp value in dB (for reference, already factored into gains)
-  public var preamp: Float {
-    switch self {
-    case .sennheiserHD650: return -7.4
-    case .sennheiserHD600: return -7.5
-    case .sennheiserHD560S: return -6.2
-    case .sonyWH1000XM4: return -5.8
-    case .sonyWH1000XM5: return -9.0
-    case .appleAirPodsMax: return -4.2
-    case .boseQC45: return -1.9
-    case .akgK371: return -4.8
-    case .audioTechnicaATHM50x: return -2.3
-    case .samsungGalaxyBudsPro: return -3.0
-    case .sonyWF1000XM4: return -4.5
-    case .moondropBlessing2: return -5.2
-    }
-  }
-  
-  public var asEqualizerSetting: EqualizerSetting {
-    EqualizerSetting(name: "AutoEQ: \(description)", gains: gains)
-  }
-  
-  /// Get all presets for a specific category
-  public static func presets(for category: Category) -> [AutoEQPreset] {
-    allCases.filter { $0.category == category }
   }
 }
 

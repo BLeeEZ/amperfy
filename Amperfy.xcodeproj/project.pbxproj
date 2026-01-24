@@ -36,6 +36,8 @@
 		501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D4E26820B3F0055A51B /* PodcastDetailVC.swift */; };
 		501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501DBE9E2632D2CF00B31128 /* GenreDetailVC.swift */; };
 		502041982E2A37F2003CE29A /* EqualizerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */; };
+		502041992E2A37F3003CE29A /* AutoEQSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419A2E2A37F3003CE29A /* AutoEQSearchView.swift */; };
+		5020419B2E2A37F4003CE29A /* AutoEQService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419C2E2A37F4003CE29B /* AutoEQService.swift */; };
 		502041A12E2A3CDB003CE29A /* SliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502041A02E2A3CDB003CE29A /* SliderView.swift */; };
 		502041A22E2A3CDB003CE29A /* EquilizerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419F2E2A3CDB003CE29A /* EquilizerView.swift */; };
 		502041A32E2A3CDB003CE29A /* EQPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5020419E2E2A3CDB003CE29A /* EQPath.swift */; };
@@ -670,6 +672,8 @@
 		5020402F2202341500ED48A3 /* PlaylistParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistParserDelegate.swift; sourceTree = "<group>"; };
 		502040332203865400ED48A3 /* PlaylistSongsParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistSongsParserDelegate.swift; sourceTree = "<group>"; };
 		502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualizerSettingsView.swift; sourceTree = "<group>"; };
+		5020419A2E2A37F3003CE29A /* AutoEQSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoEQSearchView.swift; sourceTree = "<group>"; };
+		5020419C2E2A37F4003CE29B /* AutoEQService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoEQService.swift; sourceTree = "<group>"; };
 		5020419D2E2A3CDB003CE29A /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		5020419E2E2A3CDB003CE29A /* EQPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQPath.swift; sourceTree = "<group>"; };
 		5020419F2E2A3CDB003CE29A /* EquilizerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EquilizerView.swift; sourceTree = "<group>"; };
@@ -1278,6 +1282,7 @@
 				5020419C2E2A3C77003CE29A /* iOS-SpotifyEquilizerView */,
 				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
 				502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */,
+				5020419A2E2A37F3003CE29A /* AutoEQSearchView.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -1291,6 +1296,14 @@
 				502041A02E2A3CDB003CE29A /* SliderView.swift */,
 			);
 			path = "iOS-SpotifyEquilizerView";
+			sourceTree = "<group>";
+		};
+		5020419D2E2A37F4003CE29B /* AutoEQ */ = {
+			isa = PBXGroup;
+			children = (
+				5020419C2E2A37F4003CE29B /* AutoEQService.swift */,
+			);
+			path = AutoEQ;
 			sourceTree = "<group>";
 		};
 		503E04472B98F42F0091D31E /* Collection */ = {
@@ -1485,6 +1498,7 @@
 				509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */,
 				50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */,
 				504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */,
+				5020419D2E2A37F4003CE29B /* AutoEQ */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -2516,6 +2530,7 @@
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
 				502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */,
 				502041982E2A37F2003CE29A /* EqualizerSettingsView.swift in Sources */,
+				502041992E2A37F3003CE29A /* AutoEQSearchView.swift in Sources */,
 				50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */,
 				501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */,
 				504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */,
@@ -2720,6 +2735,7 @@
 				50C9D69E284FAA6C007F18D0 /* AbstractLibraryEntityMO+CoreDataProperties.swift in Sources */,
 				50C3B9AE2EED882D00F5CAB7 /* SettingEnumerations.swift in Sources */,
 				504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */,
+				5020419B2E2A37F4003CE29A /* AutoEQService.swift in Sources */,
 				505CA1FC2B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift in Sources */,
 				50ED756628CBC5D200E5D347 /* LibrarySyncerProxy.swift in Sources */,
 				50C9D642284FA9C7007F18D0 /* GenericXmlParser.swift in Sources */,
@@ -3039,6 +3055,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
+				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Amperfy/Amperfy-macOS.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -3082,6 +3099,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
+				CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION = YES;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Amperfy/Amperfy-macOS.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";

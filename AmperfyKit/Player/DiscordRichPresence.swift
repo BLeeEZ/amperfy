@@ -27,6 +27,7 @@ import os.log
 /// Represents a Discord Rich Presence activity payload
 /// Designed to match Spotify's Discord integration style - sleek, professional, and minimal
 public struct DiscordRichPresenceActivity: Codable, Sendable {
+  public var name: String?  // Custom name to display (overrides app name)
   public var type: Int?  // 0 = Playing, 2 = Listening, 3 = Watching
   public var state: String?
   public var details: String?
@@ -87,6 +88,7 @@ public struct DiscordRichPresenceActivity: Codable, Sendable {
   }
   
   public init(
+    name: String? = nil,
     type: Int? = nil,
     state: String? = nil,
     details: String? = nil,
@@ -95,6 +97,7 @@ public struct DiscordRichPresenceActivity: Codable, Sendable {
     party: Party? = nil,
     buttons: [Button]? = nil
   ) {
+    self.name = name
     self.type = type
     self.state = state
     self.details = details
@@ -373,6 +376,11 @@ private final class DiscordIPC: @unchecked Sendable {
     if let activity = activity {
       var activityDict: [String: Any] = [:]
       
+      // Custom name to override app name (shows as "Listening to [name]")
+      if let name = activity.name {
+        activityDict["name"] = name
+      }
+      
       // Activity type: 0 = Playing, 2 = Listening, 3 = Watching
       if let type = activity.type {
         activityDict["type"] = type
@@ -455,6 +463,9 @@ private final class DiscordIPC: @unchecked Sendable {
     if let activity = activity {
       var activityDict: [String: Any] = [:]
       
+      if let name = activity.name {
+        activityDict["name"] = name
+      }
       if let type = activity.type {
         activityDict["type"] = type
       }
@@ -719,18 +730,41 @@ public class DiscordRichPresenceManager {
     let startTimestamp = Int64(Date().timeIntervalSince1970 - elapsedTime)
     let endTimestamp = duration > 0 ? startTimestamp + Int64(duration) : nil
     
-    // Build details - Song title only (first line)
+    // Build the display strings for Discord Rich Presence
+    // 
+    // Layout:
+    // - Compact view: "Listening to Song Name - Artist" (via name field)
+    // - Profile/Expanded view:
+    //   - Details (bold): Song Name
+    //   - State (line 2): by Artist
+    //   - State (line 3): on Album
+    
+    // Activity name - shows as "Listening to [name]" in compact view
+    var activityName: String
+    if !artistName.isEmpty {
+      activityName = "\(songTitle) - \(artistName)"
+    } else {
+      activityName = songTitle
+    }
+    activityName = String(activityName.prefix(128))
+    
+    // Details - bold line in profile (song title)
     let details = String(songTitle.prefix(128))
     
-    // Build state string - "by Artist" (second line)
+    // State - shows artist and album in profile
     var stateString: String? = nil
-    if !artistName.isEmpty {
-      stateString = "by \(String(artistName.prefix(128)))"
+    if !artistName.isEmpty && albumName != nil {
+      stateString = "by \(artistName) on \(albumName!)"
+    } else if !artistName.isEmpty {
+      stateString = "by \(artistName)"
+    } else if let album = albumName {
+      stateString = "on \(album)"
     }
     
     // Create activity
-    // Type 2 = Listening (shows music icon instead of game controller)
+    // Type 2 = Listening (shows music note icon)
     var activity = DiscordRichPresenceActivity()
+    activity.name = activityName  // Shows as "Listening to [Song - Artist]"
     activity.type = 2  // Listening
     activity.details = details
     activity.state = stateString
@@ -754,7 +788,7 @@ public class DiscordRichPresenceManager {
     // Name them: "amperfy_logo", "playing", "paused"
     activity.assets = DiscordRichPresenceActivity.Assets(
       largeImage: "amperfy_logo",
-      largeText: albumName ?? "Amperfy",
+      largeText: albumName ?? songTitle,
       smallImage: backend.isPlaying ? "playing" : "paused",
       smallText: backend.isPlaying ? "Playing" : "Paused"
     )
