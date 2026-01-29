@@ -195,6 +195,24 @@ public struct UserSettings: Sendable, Codable {
     set { _isReplayGainEnabled = newValue }
   }
 
+  private var _parametricEqualizerSettings: [ParametricEqualizerSetting] = []
+  public var parametricEqualizerSettings: [ParametricEqualizerSetting] {
+    get { _parametricEqualizerSettings }
+    set { _parametricEqualizerSettings = newValue }
+  }
+
+  private var _activeParametricEqualizerSetting: ParametricEqualizerSetting = .off
+  public var activeParametricEqualizerSetting: ParametricEqualizerSetting {
+    get { _activeParametricEqualizerSetting }
+    set { _activeParametricEqualizerSetting = newValue }
+  }
+
+  private var _equalizerMigrationCompleted: Bool = false
+  public var equalizerMigrationCompleted: Bool {
+    get { _equalizerMigrationCompleted }
+    set { _equalizerMigrationCompleted = newValue }
+  }
+
   private var _playerVolume: Float = 1.0
   public var playerVolume: Float {
     get {

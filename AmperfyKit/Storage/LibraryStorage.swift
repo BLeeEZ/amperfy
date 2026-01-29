@@ -825,7 +825,7 @@ public class LibraryStorage: PlayableFileCachable {
     let downloadMOs = try? context.fetch(fetchRequest)
     return downloadMOs?.compactMap { Download(managedObject: $0) } ?? [Download]()
   }
-  
+
   func getDownloadsDict(
     account: Account,
     ids: Set<String>

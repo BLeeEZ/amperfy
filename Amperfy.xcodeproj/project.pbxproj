@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000010000000000000007 /* BandControlPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000010000000000000001 /* BandControlPanel.swift */; };
+		A10000010000000000000008 /* EQToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000010000000000000002 /* EQToolbar.swift */; };
+		A10000010000000000000009 /* FrequencyResponseCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000010000000000000003 /* FrequencyResponseCurve.swift */; };
+		A1000001000000000000000A /* ParametricEQView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000010000000000000004 /* ParametricEQView.swift */; };
+		A1000001000000000000000B /* ParametricEQViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000010000000000000005 /* ParametricEQViewModel.swift */; };
+		A1000001000000000000000C /* ParametricEQTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000010000000000000006 /* ParametricEQTest.swift */; };
 		43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */; };
 		5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */; };
 		5005938928E2D4EF008C8DF6 /* CommonCollectionSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5005938828E2D4EF008C8DF6 /* CommonCollectionSectionHeader.xib */; };
@@ -586,6 +592,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A10000010000000000000001 /* BandControlPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BandControlPanel.swift; sourceTree = "<group>"; };
+		A10000010000000000000002 /* EQToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EQToolbar.swift; sourceTree = "<group>"; };
+		A10000010000000000000003 /* FrequencyResponseCurve.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyResponseCurve.swift; sourceTree = "<group>"; };
+		A10000010000000000000004 /* ParametricEQView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametricEQView.swift; sourceTree = "<group>"; };
+		A10000010000000000000005 /* ParametricEQViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametricEQViewModel.swift; sourceTree = "<group>"; };
+		A10000010000000000000006 /* ParametricEQTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParametricEQTest.swift; sourceTree = "<group>"; };
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5002565625E69DC700674CE1 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserPreCreatedArtistsTest.swift; sourceTree = "<group>"; };
@@ -1272,11 +1284,24 @@
 		502041962E2A37D6003CE29A /* Player */ = {
 			isa = PBXGroup;
 			children = (
+				A1000001000000000000000D /* ParametricEQ */,
 				5020419C2E2A3C77003CE29A /* iOS-SpotifyEquilizerView */,
 				50791E8628D3B7BF006CE6E5 /* PlayerSettingsView.swift */,
 				502041972E2A37F2003CE29A /* EqualizerSettingsView.swift */,
 			);
 			path = Player;
+			sourceTree = "<group>";
+		};
+		A1000001000000000000000D /* ParametricEQ */ = {
+			isa = PBXGroup;
+			children = (
+				A10000010000000000000001 /* BandControlPanel.swift */,
+				A10000010000000000000002 /* EQToolbar.swift */,
+				A10000010000000000000003 /* FrequencyResponseCurve.swift */,
+				A10000010000000000000004 /* ParametricEQView.swift */,
+				A10000010000000000000005 /* ParametricEQViewModel.swift */,
+			);
+			path = ParametricEQ;
 			sourceTree = "<group>";
 		};
 		5020419C2E2A3C77003CE29A /* iOS-SpotifyEquilizerView */ = {
@@ -1567,6 +1592,7 @@
 			children = (
 				5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */,
 				5011712D27453D1300B7C08D /* PlayQueueHandlerTest.swift */,
+				A10000010000000000000006 /* ParametricEQTest.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -2511,6 +2537,11 @@
 				50DF1E5628DDE3FA00F3EA00 /* AlbumCollectionCell.swift in Sources */,
 				502B98ED2D03A02D000FE187 /* PlaylistEditVC.swift in Sources */,
 				502041982E2A37F2003CE29A /* EqualizerSettingsView.swift in Sources */,
+				A10000010000000000000007 /* BandControlPanel.swift in Sources */,
+				A10000010000000000000008 /* EQToolbar.swift in Sources */,
+				A10000010000000000000009 /* FrequencyResponseCurve.swift in Sources */,
+				A1000001000000000000000A /* ParametricEQView.swift in Sources */,
+				A1000001000000000000000B /* ParametricEQViewModel.swift in Sources */,
 				50E77DB928D21A9300BDF882 /* SettingsHostVC.swift in Sources */,
 				501DBE9F2632D2D000B31128 /* GenreDetailVC.swift in Sources */,
 				504B441928D6F0920033982C /* LicenseSettingsView.swift in Sources */,
@@ -2842,6 +2873,7 @@
 				50BE5D6E2850F4FB00156FC6 /* SsPlaylistsParserTest.swift in Sources */,
 				50BE5D862850F50F00156FC6 /* PlaylistSongsParserTest.swift in Sources */,
 				50BE5D532850F4E700156FC6 /* MusicPlayerTest.swift in Sources */,
+				A1000001000000000000000C /* ParametricEQTest.swift in Sources */,
 				50BE5D732850F4FB00156FC6 /* SsPodcastParserTest.swift in Sources */,
 				50BE5D722850F4FB00156FC6 /* SsSongExample1ParserTest.swift in Sources */,
 				50BE5D912850F50F00156FC6 /* GenreParserTest.swift in Sources */,

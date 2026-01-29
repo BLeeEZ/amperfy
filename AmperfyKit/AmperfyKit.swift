@@ -119,6 +119,9 @@ public class AmperKit {
 
   @MainActor
   private func createPlayer() -> PlayerFacade {
+    // Migrate legacy EQ presets to parametric EQ (one-time)
+    migrateEqualizerSettingsIfNeeded()
+
     playerAudioSessionHandler = AudioSessionHandler()
     let backendAudioPlayer = BackendAudioPlayer(
       createAudioStreamingPlayerCB: { AudioStreamingPlayer() },
@@ -160,6 +163,11 @@ public class AmperKit {
     backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.user.isEqualizerEnabled)
     backendAudioPlayer
       .updateEqualizerSetting(eqSetting: storage.settings.user.activeEqualizerSetting)
+    backendAudioPlayer
+      .updateParametricEqualizerSetting(
+        setting: storage.settings.user
+          .activeParametricEqualizerSetting
+      )
     backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.user.isReplayGainEnabled)
     backendAudioPlayer.volume = storage.settings.user.playerVolume
 
@@ -225,4 +233,37 @@ public class AmperKit {
   public lazy var localNotificationManager = {
     LocalNotificationManager(userStatistics: userStatistics, storage: storage)
   }()
+
+  // MARK: - Equalizer Migration
+
+  private func migrateEqualizerSettingsIfNeeded() {
+    // Check if migration has already been completed
+    guard !storage.settings.user.equalizerMigrationCompleted else { return }
+
+    // Migrate all legacy EQ presets to parametric format
+    let legacySettings = storage.settings.user.equalizerSettings
+    let migratedSettings = legacySettings.map { legacySetting in
+      ParametricEqualizerSetting.migrate(from: legacySetting)
+    }
+
+    // Save migrated presets (only if there are legacy presets to migrate)
+    if !migratedSettings.isEmpty {
+      storage.settings.user.parametricEqualizerSettings = migratedSettings
+    }
+
+    // Migrate the active preset if it's not "Off"
+    let activeEQ = storage.settings.user.activeEqualizerSetting
+    if activeEQ.id != EqualizerSetting.off.id {
+      let migratedActive = ParametricEqualizerSetting.migrate(from: activeEQ)
+      // Find the matching preset in the migrated list (by name) or use the converted one
+      if let matchingPreset = migratedSettings.first(where: { $0.name == migratedActive.name }) {
+        storage.settings.user.activeParametricEqualizerSetting = matchingPreset
+      } else {
+        storage.settings.user.activeParametricEqualizerSetting = migratedActive
+      }
+    }
+
+    // Mark migration as completed
+    storage.settings.user.equalizerMigrationCompleted = true
+  }
 }

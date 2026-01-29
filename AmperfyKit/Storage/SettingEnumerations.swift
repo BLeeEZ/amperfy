@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import AVFoundation
 import CoreData
 import Foundation
 import SwiftUI
@@ -402,5 +403,182 @@ extension UIUserInterfaceStyle: @retroactive Encodable, @retroactive Decodable {
   public func encode(to encoder: Encoder) throws {
     var container = encoder.singleValueContainer()
     try container.encode(rawValue)
+  }
+}
+
+// MARK: - Float+Clamped
+
+extension Float {
+  public func clamped(to range: ClosedRange<Float>) -> Float {
+    min(max(self, range.lowerBound), range.upperBound)
+  }
+}
+
+// MARK: - ParametricBandFilterType
+
+public enum ParametricBandFilterType: Int, CaseIterable, Sendable, Codable {
+  case bell = 0
+  case lowShelf = 1
+  case highShelf = 2
+
+  public var description: String {
+    switch self {
+    case .bell: return "Bell"
+    case .lowShelf: return "Low Shelf"
+    case .highShelf: return "High Shelf"
+    }
+  }
+
+  public var avAudioUnitEQFilterType: AVAudioUnitEQFilterType {
+    switch self {
+    case .bell: return .parametric
+    case .lowShelf: return .lowShelf
+    case .highShelf: return .highShelf
+    }
+  }
+}
+
+// MARK: - ParametricBand
+
+public struct ParametricBand: Hashable, Sendable, Codable, Identifiable {
+  public static let frequencyRange: ClosedRange<Float> = 20 ... 20000
+  public static let gainRange: ClosedRange<Float> = -12 ... 12
+  public static let qRange: ClosedRange<Float> = 0.1 ... 10.0
+  public static let defaultFrequencies: [Float] = [
+    32,
+    64,
+    125,
+    250,
+    500,
+    1000,
+    2000,
+    4000,
+    8000,
+    16000,
+  ]
+
+  public let id: UUID
+  public var frequency: Float
+  public var gain: Float
+  public var q: Float
+  public var filterType: ParametricBandFilterType
+  public var bypass: Bool
+
+  public init(
+    id: UUID = UUID(),
+    frequency: Float = 1000,
+    gain: Float = 0,
+    q: Float = 1.0,
+    filterType: ParametricBandFilterType = .bell,
+    bypass: Bool = false
+  ) {
+    self.id = id
+    self.frequency = frequency.clamped(to: Self.frequencyRange)
+    self.gain = gain.clamped(to: Self.gainRange)
+    self.q = q.clamped(to: Self.qRange)
+    self.filterType = filterType
+    self.bypass = bypass
+  }
+
+  public var bandwidth: Float {
+    // Convert Q to bandwidth: bandwidth = 2 * asinh(1/(2*Q)) / ln(2)
+    let ln2 = Float(0.693147180559945)
+    return 2 * asinh(1 / (2 * q)) / ln2
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  public static func == (lhs: ParametricBand, rhs: ParametricBand) -> Bool {
+    lhs.id == rhs.id
+  }
+}
+
+// MARK: - ParametricEqualizerSetting
+
+public struct ParametricEqualizerSetting: Hashable, Sendable, Codable, Identifiable {
+  public static let maxBands = 10
+
+  public let id: UUID
+  public var name: String
+  public var bands: [ParametricBand]
+  public var globalBypass: Bool
+
+  public init(
+    id: UUID = UUID(),
+    name: String,
+    bands: [ParametricBand] = [],
+    globalBypass: Bool = false
+  ) {
+    self.id = id
+    self.name = name
+    self.bands = Array(bands.prefix(Self.maxBands))
+    self.globalBypass = globalBypass
+  }
+
+  public var description: String {
+    name
+  }
+
+  public static let off: ParametricEqualizerSetting = .init(name: "Off", bands: [])
+
+  // Gain compensation to prevent clipping
+  public var gainCompensation: Float {
+    let activeGains = bands.filter { !$0.bypass }.map { $0.gain }
+    let positiveGains = activeGains.filter { $0 > 0 }
+    let avgBoost = positiveGains.isEmpty ? 0 : positiveGains
+      .reduce(0, +) / Float(positiveGains.count)
+    // Conservative compensation: half the average boost, max -12dB
+    return -min(avgBoost / 2.0, 12.0)
+  }
+
+  public var compensatedVolume: Float {
+    // Convert dB compensation to linear scale
+    let volume = pow(10.0, gainCompensation / 20.0)
+    // Ensure safe range (0.1 to 2.0)
+    return max(0.1, min(2.0, volume))
+  }
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(id)
+  }
+
+  public static func == (lhs: ParametricEqualizerSetting, rhs: ParametricEqualizerSetting) -> Bool {
+    lhs.id == rhs.id
+  }
+
+  // Migrate from legacy graphic EQ preset
+  public static func migrate(from legacy: EqualizerSetting) -> ParametricEqualizerSetting {
+    let defaultFrequencies = ParametricBand.defaultFrequencies
+    var bands: [ParametricBand] = []
+
+    for (index, gain) in legacy.gains.enumerated() {
+      guard index < defaultFrequencies.count else { break }
+
+      let filterType: ParametricBandFilterType
+      if index == 0 {
+        filterType = .lowShelf
+      } else if index == legacy.gains.count - 1 {
+        filterType = .highShelf
+      } else {
+        filterType = .bell
+      }
+
+      let band = ParametricBand(
+        frequency: defaultFrequencies[index],
+        gain: gain,
+        q: 1.0,
+        filterType: filterType,
+        bypass: false
+      )
+      bands.append(band)
+    }
+
+    return ParametricEqualizerSetting(
+      name: legacy.name,
+      bands: bands,
+      globalBypass: false
+    )
   }
 }

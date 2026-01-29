@@ -229,6 +229,7 @@ public protocol PlayerFacade {
 
   func updateEqualizerEnabled(isEnabled: Bool)
   func updateEqualizerSetting(eqSetting: EqualizerSetting)
+  func updateParametricEqualizerSetting(setting: ParametricEqualizerSetting)
   func updateReplayGainEnabled(isEnabled: Bool)
 }
 
@@ -507,6 +508,10 @@ class PlayerFacadeImpl: PlayerFacade {
 
   public func updateEqualizerSetting(eqSetting: EqualizerSetting) {
     backendAudioPlayer.updateEqualizerSetting(eqSetting: eqSetting)
+  }
+
+  public func updateParametricEqualizerSetting(setting: ParametricEqualizerSetting) {
+    backendAudioPlayer.updateParametricEqualizerSetting(setting: setting)
   }
 
   public func updateReplayGainEnabled(isEnabled: Bool) {

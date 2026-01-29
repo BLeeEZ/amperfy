@@ -116,6 +116,8 @@ class BackendAudioPlayer: NSObject {
   private var equalizerVolumeCompensation: Float = 1.0
   private var isEqualizerEnabled: Bool = true
   private var currentEqualizerSetting: EqualizerSetting = .off
+  private var currentParametricEqualizerSetting: ParametricEqualizerSetting = .off
+  private var isUsingParametricEQ: Bool = true // Default to parametric EQ
 
   public var isOfflineMode: Bool = false
   public var isAutoCachePlayedItems: Bool = true
@@ -659,6 +661,7 @@ class BackendAudioPlayer: NSObject {
   func updateEqualizerSetting(eqSetting: EqualizerSetting) {
     let oldSetting = currentEqualizerSetting
     currentEqualizerSetting = eqSetting
+    isUsingParametricEQ = false
     os_log(
       .debug,
       "Equalizer changed from %s to %s",
@@ -668,11 +671,29 @@ class BackendAudioPlayer: NSObject {
     applyEqualizerToActiveContent()
   }
 
+  func updateParametricEqualizerSetting(setting: ParametricEqualizerSetting) {
+    let oldSetting = currentParametricEqualizerSetting
+    currentParametricEqualizerSetting = setting
+    isUsingParametricEQ = true
+    os_log(
+      .debug,
+      "Parametric Equalizer changed from %s to %s",
+      oldSetting.description,
+      setting.description
+    )
+    applyEqualizerToActiveContent()
+  }
+
   private func applyEqualizerToActiveContent() {
     if isEqualizerEnabled {
-      applyEqualizerSetting(eqSetting: currentEqualizerSetting)
+      if isUsingParametricEQ {
+        applyParametricEqualizerSetting(setting: currentParametricEqualizerSetting)
+      } else {
+        applyEqualizerSetting(eqSetting: currentEqualizerSetting)
+      }
     } else {
-      applyEqualizerSetting(eqSetting: .off)
+      // Apply flat EQ when disabled
+      applyParametricEqualizerSetting(setting: .off)
     }
     applyReplayGain()
   }
@@ -718,6 +739,48 @@ class BackendAudioPlayer: NSObject {
     os_log(.debug, "   EQ Gain Compensation: %.1f dB", eqSetting.gainCompensation)
     os_log(.debug, "   EQ linear Volume Compensation: %.2f", eqSetting.compensatedVolume)
     os_log(.debug, "   Active EQ linear Volume Compensation: %.2f", equalizerVolumeCompensation)
+  }
+
+  private func applyParametricEqualizerSetting(setting: ParametricEqualizerSetting) {
+    guard let equalizer else { return }
+
+    // First, bypass all bands
+    for band in equalizer.bands {
+      band.bypass = true
+      band.gain = 0.0
+    }
+
+    // Apply active bands from setting (respecting global bypass)
+    let shouldBypassAll = setting.globalBypass || !isEqualizerEnabled
+
+    for (index, parametricBand) in setting.bands.enumerated() {
+      guard index < equalizer.bands.count else { break }
+
+      let band = equalizer.bands[index]
+
+      band.frequency = parametricBand.frequency
+      band.gain = parametricBand.gain
+      band.bandwidth = parametricBand.bandwidth
+      band.filterType = parametricBand.filterType.avAudioUnitEQFilterType
+      band.bypass = shouldBypassAll || parametricBand.bypass
+    }
+
+    equalizerVolumeCompensation = isEqualizerEnabled && !setting.globalBypass
+      ? setting.compensatedVolume : 1.0
+
+    os_log(.debug, "   Parametric EQ '%s'", setting.description)
+    os_log(.debug, "   Active bands: %d", setting.bands.filter { !$0.bypass }.count)
+    os_log(.debug, "   Global bypass: %s", setting.globalBypass.description)
+    os_log(
+      .debug,
+      "   Parametric EQ Gain Compensation: %.1f dB",
+      setting.gainCompensation
+    )
+    os_log(
+      .debug,
+      "   Active EQ linear Volume Compensation: %.2f",
+      equalizerVolumeCompensation
+    )
   }
 
   // MARK: - ReplayGain Implementation

@@ -212,6 +212,19 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.equalizerSettings = newValue
     }))
 
+    settings.activeParametricEqualizerSetting = appDelegate.storage.settings.user
+      .activeParametricEqualizerSetting
+    changesAgent.append(settings.$activeParametricEqualizerSetting.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.activeParametricEqualizerSetting = newValue
+      self.appDelegate.player.updateParametricEqualizerSetting(setting: newValue)
+    }))
+
+    settings.parametricEqualizerSettings = appDelegate.storage.settings.user
+      .parametricEqualizerSettings
+    changesAgent.append(settings.$parametricEqualizerSettings.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.parametricEqualizerSettings = newValue
+    }))
+
     changesAgent.append(settings.$swipeActionSettings.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.swipeActionSettings = newValue
     }))

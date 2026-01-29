@@ -28,139 +28,310 @@ struct EqualizerSettingsView: View {
   @EnvironmentObject
   private var settings: Settings
 
-  @State
-  private var eqSettingToEdit: EqualizerSetting?
-  @State
-  private var eqSettingNameSaved: String = ""
-  @State
-  private var eqSettingName: String = ""
-  @State
-  var eqSettingGains: [CGFloat] = EqualizerSetting.frequencies.map { _ in 0.0 }
-  @State
-  var sliderLabel: [String] = EqualizerSetting.frequencies.map {
-    if $0 < 1000 {
-      return "\(Int($0))"
-    } else {
-      return "\(Int($0 / 1000))k"
-    }
-  }
+  @StateObject
+  private var viewModel = ParametricEQViewModel()
 
   @State
-  var isShowDeleteAlert = false
+  private var selectedPresetId: UUID?
+  @State
+  private var isShowingNewPresetDialog = false
+  @State
+  private var newPresetName = ""
+  @State
+  private var isShowingDeleteAlert = false
+  @State
+  private var presetToDelete: ParametricEqualizerSetting?
+  @State
+  private var isShowingRenameDialog = false
+  @State
+  private var renameText = ""
 
   var body: some View {
-    ZStack {
-      SettingsList {
-        SettingsSection(content: {
-          SettingsCheckBoxRow(
-            title: "Enable Equalizer",
-            isOn: Binding(
-              get: { settings.isEqualizerEnabled },
-              set: { isEnabled in
-                settings.isEqualizerEnabled = isEnabled
-              }
-            )
-          )
+    ScrollView {
+      VStack(spacing: 20) {
+        // Enable/Disable Toggle
+        enableSection
 
-          if settings.isEqualizerEnabled {
-            SettingsRow(title: "Active Equalizer") {
-              Menu(settings.activeEqualizerSetting.description) {
-                Button(EqualizerSetting.off.description) {
-                  settings.activeEqualizerSetting = EqualizerSetting.off
-                }
-                ForEach(settings.equalizerSettings, id: \.self) { eqSetting in
-                  Button(eqSetting.description) {
-                    settings.activeEqualizerSetting = eqSetting
-                  }
-                }
-              }
-            }
+        if settings.isEqualizerEnabled {
+          // Preset selector
+          presetSection
+
+          // Parametric EQ Editor
+          if selectedPresetId != nil {
+            editorSection
           }
-        })
-
-        SettingsSection(content: {
-          SettingsRow(title: "Equalizer") {
-            Menu((eqSettingToEdit != nil) ? eqSettingNameSaved : "Select") {
-              ForEach(settings.equalizerSettings, id: \.self) { eqSetting in
-                Button(eqSetting.description) {
-                  eqSettingToEdit = eqSetting
-                  eqSettingName = eqSetting.name
-                  eqSettingNameSaved = eqSetting.name
-                  eqSettingGains = eqSetting.gains.compactMap { CGFloat($0) }
-                }
-              }
-              Button("Create new Equalizer") {
-                let newEQ = EqualizerSetting(name: "My new Equalizer")
-                var curEqSetting = settings.equalizerSettings
-                curEqSetting.append(newEQ)
-                settings.equalizerSettings = curEqSetting
-                eqSettingToEdit = newEQ
-                eqSettingName = newEQ.name
-                eqSettingNameSaved = newEQ.name
-                eqSettingGains = newEQ.gains.compactMap { CGFloat($0) }
-              }
-            }
-          }
-
-          if eqSettingToEdit != nil {
-            SettingsRow(title: "Name") {
-              TextField("Equalizer Name", text: $eqSettingName)
-                .multilineTextAlignment(.trailing)
-            }
-
-            EqualizerView(
-              sliderLabels: $sliderLabel,
-              sliderValues: $eqSettingGains,
-              sliderTintColor: Color(settings.themePreference.asColor),
-              gradientColors: [Color(settings.themePreference.asColor), .clear]
-            )
-
-            SettingsButtonRow(title: "Save") {
-              guard var eqSettingToEdit else { return }
-              var curEqSetting = settings.equalizerSettings
-              guard let index = curEqSetting.firstIndex(of: eqSettingToEdit) else { return }
-              eqSettingToEdit.name = eqSettingName
-              eqSettingNameSaved = eqSettingName
-              eqSettingToEdit.gains = eqSettingGains.compactMap { Float($0) }
-              self.eqSettingToEdit = eqSettingToEdit
-              curEqSetting[index] = eqSettingToEdit
-              settings.equalizerSettings = curEqSetting
-
-              if settings.activeEqualizerSetting == eqSettingToEdit {
-                settings.activeEqualizerSetting = eqSettingToEdit
-              }
-            }
-            SettingsButtonRow(title: "Delete", actionType: .destructive) {
-              isShowDeleteAlert = true
-            }.alert(isPresented: $isShowDeleteAlert) {
-              Alert(
-                title: Text("Delete Equalizer"),
-                message: Text(
-                  "Are you sure to delete this equalizer?"
-                ),
-                primaryButton: .destructive(Text("Delete")) {
-                  guard let eqSettingToEdit else { return }
-                  var curEqSetting = settings.equalizerSettings
-                  guard let index = curEqSetting.firstIndex(of: eqSettingToEdit) else { return }
-                  curEqSetting.remove(at: index)
-                  settings.equalizerSettings = curEqSetting
-
-                  if settings.activeEqualizerSetting == eqSettingToEdit {
-                    settings.activeEqualizerSetting = .off
-                  }
-
-                  self.eqSettingToEdit = nil
-                },
-                secondaryButton: .cancel()
-              )
-            }
-          }
-
-        }, header: "Equalizer Editor")
+        }
       }
+      .padding()
     }
     .navigationTitle("Equalizer")
     .navigationBarTitleDisplayMode(.inline)
+    .onAppear {
+      loadActivePreset()
+    }
+    .alert("New Preset", isPresented: $isShowingNewPresetDialog) {
+      TextField("Preset Name", text: $newPresetName)
+      Button("Cancel", role: .cancel) {
+        newPresetName = ""
+      }
+      Button("Create") {
+        createNewPreset()
+      }
+    } message: {
+      Text("Enter a name for the new equalizer preset")
+    }
+    .alert("Delete Preset", isPresented: $isShowingDeleteAlert) {
+      Button("Cancel", role: .cancel) {}
+      Button("Delete", role: .destructive) {
+        if let preset = presetToDelete {
+          deletePreset(preset)
+        }
+      }
+    } message: {
+      Text("Are you sure you want to delete this preset?")
+    }
+    .alert("Rename Preset", isPresented: $isShowingRenameDialog) {
+      TextField("Preset Name", text: $renameText)
+      Button("Cancel", role: .cancel) {
+        renameText = ""
+      }
+      Button("Rename") {
+        renameCurrentPreset()
+      }
+    } message: {
+      Text("Enter a new name for the preset")
+    }
+  }
+
+  // MARK: - Enable Section
+
+  private var enableSection: some View {
+    SettingsSection(content: {
+      SettingsCheckBoxRow(
+        title: "Enable Equalizer",
+        isOn: Binding(
+          get: { settings.isEqualizerEnabled },
+          set: { isEnabled in
+            settings.isEqualizerEnabled = isEnabled
+          }
+        )
+      )
+    })
+  }
+
+  // MARK: - Preset Section
+
+  private var presetSection: some View {
+    SettingsSection(content: {
+      // Active Preset Picker
+      SettingsRow(title: "Active Preset") {
+        Menu(settings.activeParametricEqualizerSetting.description) {
+          Button(ParametricEqualizerSetting.off.description) {
+            settings.activeParametricEqualizerSetting = .off
+            selectedPresetId = nil
+            viewModel.load(from: .off)
+          }
+
+          ForEach(settings.parametricEqualizerSettings, id: \.id) { preset in
+            Button(preset.description) {
+              settings.activeParametricEqualizerSetting = preset
+              selectedPresetId = preset.id
+              viewModel.load(from: preset)
+            }
+          }
+        }
+      }
+
+      // Preset Management
+      HStack {
+        // Edit existing preset
+        if !settings.parametricEqualizerSettings.isEmpty {
+          Menu("Edit Preset") {
+            ForEach(settings.parametricEqualizerSettings, id: \.id) { preset in
+              Button(preset.name) {
+                selectedPresetId = preset.id
+                viewModel.load(from: preset)
+              }
+            }
+          }
+          .buttonStyle(.bordered)
+        }
+
+        Spacer()
+
+        // New preset button
+        Button {
+          newPresetName = "New Preset"
+          isShowingNewPresetDialog = true
+        } label: {
+          Label("New", systemImage: "plus")
+        }
+        .buttonStyle(.bordered)
+      }
+      .padding(.vertical, 4)
+    }, header: "Presets")
+  }
+
+  // MARK: - Editor Section
+
+  private var editorSection: some View {
+    VStack(spacing: 16) {
+      // Preset name and actions
+      if let presetId = selectedPresetId,
+         let preset = findPreset(id: presetId) {
+        HStack {
+          Text(preset.name)
+            .font(.headline)
+
+          Spacer()
+
+          Menu {
+            Button {
+              renameText = preset.name
+              isShowingRenameDialog = true
+            } label: {
+              Label("Rename", systemImage: "pencil")
+            }
+
+            Button {
+              viewModel.createDefaultBands()
+              saveCurrentPreset()
+            } label: {
+              Label("Reset to Default Bands", systemImage: "arrow.counterclockwise")
+            }
+
+            Divider()
+
+            Button(role: .destructive) {
+              presetToDelete = preset
+              isShowingDeleteAlert = true
+            } label: {
+              Label("Delete Preset", systemImage: "trash")
+            }
+          } label: {
+            Image(systemName: "ellipsis.circle")
+          }
+        }
+        .padding(.horizontal)
+      }
+
+      // Parametric EQ View
+      ParametricEQView(
+        viewModel: viewModel,
+        accentColor: Color(settings.themePreference.asColor),
+        onSettingChanged: { _ in
+          saveCurrentPreset()
+        }
+      )
+
+      // Save indicator
+      if selectedPresetId != nil {
+        Text("Changes are saved automatically")
+          .font(.caption)
+          .foregroundColor(.secondary)
+      }
+    }
+    .padding(.vertical)
+    .background(Color(.systemBackground))
+    .cornerRadius(12)
+  }
+
+  // MARK: - Actions
+
+  private func loadActivePreset() {
+    let active = settings.activeParametricEqualizerSetting
+    if active.id != ParametricEqualizerSetting.off.id {
+      selectedPresetId = active.id
+      viewModel.load(from: active)
+    } else if let first = settings.parametricEqualizerSettings.first {
+      // Load first preset for editing but don't activate
+      selectedPresetId = first.id
+      viewModel.load(from: first)
+    }
+  }
+
+  private func createNewPreset() {
+    var newPreset = ParametricEqualizerSetting(name: newPresetName)
+
+    // Create default bands
+    newPreset = ParametricEqualizerSetting(
+      id: newPreset.id,
+      name: newPresetName,
+      bands: ParametricBand.defaultFrequencies.enumerated().map { index, freq in
+        let filterType: ParametricBandFilterType
+        if index == 0 {
+          filterType = .lowShelf
+        } else if index == ParametricBand.defaultFrequencies.count - 1 {
+          filterType = .highShelf
+        } else {
+          filterType = .bell
+        }
+        return ParametricBand(frequency: freq, gain: 0, q: 1.0, filterType: filterType)
+      },
+      globalBypass: false
+    )
+
+    var presets = settings.parametricEqualizerSettings
+    presets.append(newPreset)
+    settings.parametricEqualizerSettings = presets
+
+    // Activate and edit the new preset
+    settings.activeParametricEqualizerSetting = newPreset
+    selectedPresetId = newPreset.id
+    viewModel.load(from: newPreset)
+
+    newPresetName = ""
+  }
+
+  private func saveCurrentPreset() {
+    guard let presetId = selectedPresetId else { return }
+
+    let updatedSetting = viewModel.toSetting(withId: presetId)
+
+    // Update in the presets list
+    var presets = settings.parametricEqualizerSettings
+    if let index = presets.firstIndex(where: { $0.id == presetId }) {
+      presets[index] = updatedSetting
+      settings.parametricEqualizerSettings = presets
+    }
+
+    // Update active preset if it's the one being edited
+    if settings.activeParametricEqualizerSetting.id == presetId {
+      settings.activeParametricEqualizerSetting = updatedSetting
+    }
+  }
+
+  private func deletePreset(_ preset: ParametricEqualizerSetting) {
+    var presets = settings.parametricEqualizerSettings
+    presets.removeAll { $0.id == preset.id }
+    settings.parametricEqualizerSettings = presets
+
+    // Reset active if it was deleted
+    if settings.activeParametricEqualizerSetting.id == preset.id {
+      settings.activeParametricEqualizerSetting = .off
+    }
+
+    // Clear selection
+    if selectedPresetId == preset.id {
+      selectedPresetId = presets.first?.id
+      if let first = presets.first {
+        viewModel.load(from: first)
+      }
+    }
+
+    presetToDelete = nil
+  }
+
+  private func renameCurrentPreset() {
+    guard let presetId = selectedPresetId else { return }
+
+    viewModel.name = renameText
+    saveCurrentPreset()
+    renameText = ""
+  }
+
+  private func findPreset(id: UUID) -> ParametricEqualizerSetting? {
+    settings.parametricEqualizerSettings.first { $0.id == id }
   }
 }
 

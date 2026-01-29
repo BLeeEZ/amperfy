@@ -89,13 +89,17 @@ final class DownloadRequestManager: Sendable {
       return asyncRequests
     }
   }
-  
-  nonisolated private func addLowPrio(objects: [(DownloadElementInfo, Downloadable)], library: LibraryStorage) -> [(DownloadElementInfo, Downloadable, Download)] {
+
+  nonisolated private func addLowPrio(
+    objects: [(DownloadElementInfo, Downloadable)],
+    library: LibraryStorage
+  )
+    -> [(DownloadElementInfo, Downloadable, Download)] {
     var hasCoreDataChanges = false
     let account = library.getAccount(managedObjectId: accountObjectId)
-    let ids = Set(objects.compactMap{ $0.1.uniqueID })
+    let ids = Set(objects.compactMap { $0.1.uniqueID })
     let existingDownloadsDict = library.getDownloadsDict(account: account, ids: ids)
-    
+
     var downloadMapping = [(DownloadElementInfo, Downloadable, Download)]()
     for (info, object) in objects {
       if let existingDownload = existingDownloadsDict[object.uniqueID] {
@@ -113,7 +117,7 @@ final class DownloadRequestManager: Sendable {
         downloadMapping.append((info, object, newDownload))
       }
     }
-    
+
     if hasCoreDataChanges {
       library.saveContext()
     }
