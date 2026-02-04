@@ -56,8 +56,9 @@ class CurrentlyPlayingTableCell: BasicTableCell {
       titleLabel: titleLabel,
       artistLabel: artistLabel
     )
-    rootView?.refreshFavoriteButton(button: favoriteButton)
-    rootView?.refreshOptionButton(button: optionsButton, rootView: rootView)
+    // Hide buttons - favorite is now in rating view, options is in player controls
+    favoriteButton.isHidden = true
+    optionsButton.isHidden = true
   }
 
   func refreshArtwork() {

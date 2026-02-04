@@ -15,6 +15,17 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5:30" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="totalTime-label-id" userLabel="Total time">
+                    <rect key="frame" x="300" y="2" width="59" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="18" id="totalTime-height"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <nil key="highlightedColor"/>
+                    <variation key="widthClass=regular">
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                    </variation>
+                </label>
                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" continuous="NO" translatesAutoresizingMaskIntoConstraints="NO" id="42q-l9-IXM" userLabel="Progress">
                     <rect key="frame" x="16" y="20" width="343" height="30"/>
                     <color key="tintColor" systemColor="labelColor"/>
@@ -245,6 +256,8 @@
             <constraints>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="trailing" secondItem="iN0-l3-epB" secondAttribute="trailingMargin" id="3yB-kd-VKC"/>
                 <constraint firstItem="42q-l9-IXM" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" id="4ed-LA-PXc"/>
+                <constraint firstAttribute="trailingMargin" secondItem="totalTime-label-id" secondAttribute="trailing" id="totalTime-trailing"/>
+                <constraint firstItem="totalTime-label-id" firstAttribute="bottom" secondItem="42q-l9-IXM" secondAttribute="top" constant="7" id="totalTime-bottom"/>
                 <constraint firstItem="lCe-bR-yIr" firstAttribute="centerX" secondItem="42q-l9-IXM" secondAttribute="centerX" id="5j4-wU-MHY"/>
                 <constraint firstItem="fic-HG-erH" firstAttribute="leading" secondItem="1aU-Ga-twf" secondAttribute="trailing" constant="4" id="6q3-Lu-SIP"/>
                 <constraint firstItem="SoI-ny-Hw0" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="8yb-bt-h2J"/>
@@ -278,6 +291,7 @@
                 <outlet property="playerModeButton" destination="7xb-YR-9X6" id="yNk-04-nkT"/>
                 <outlet property="previousButton" destination="Jhy-pc-jwZ" id="3vl-Xj-JHn"/>
                 <outlet property="remainingTimeLabel" destination="t1c-hF-UMw" id="hPl-lK-efe"/>
+                <outlet property="totalTimeLabel" destination="totalTime-label-id" id="totalTime-outlet"/>
                 <outlet property="skipBackwardButton" destination="PZj-JS-NGq" id="q0L-Ve-YvK"/>
                 <outlet property="skipForwardButton" destination="QO0-Ep-X2s" id="idR-HQ-cSv"/>
                 <outlet property="timeSlider" destination="42q-l9-IXM" id="Uit-8D-ekQ"/>

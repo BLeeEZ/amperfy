@@ -67,6 +67,16 @@ struct PlayerSettingsView: View {
   private func updateCacheFormat(_ format: CacheTranscodingFormatPreference) {
     settings.cacheTranscodingFormatPreference = format
   }
+  
+  private func preampDisplayString(_ value: Int) -> String {
+    if value == 0 {
+      return "0 dB"
+    } else if value > 0 {
+      return "+\(value) dB"
+    } else {
+      return "\(value) dB"
+    }
+  }
 
   var body: some View {
     ZStack {
@@ -83,31 +93,36 @@ struct PlayerSettingsView: View {
                 }
               )
             )
+            if settings.isReplayGainEnabled {
+              SettingsRow(title: "Preamp") {
+                Menu(preampDisplayString(settings.replayGainPreamp)) {
+                  ForEach((-8...8).reversed(), id: \.self) { value in
+                    Button(preampDisplayString(value)) {
+                      settings.replayGainPreamp = value
+                    }
+                  }
+                }
+              }
+            }
           },
           footer: "Automatically normalize track volume based on replay gain information for consistent loudness."
         )
 
-        // General Settings
-        SettingsSection {
+        // Auto Cache Settings
+        SettingsSection(content: {
           SettingsCheckBoxRow(
             title: "Auto cache played Songs",
             isOn: $settings.isPlayerAutoCachePlayedItems
           )
-        }
-
-        SettingsSection(
-          content: {
-            SettingsCheckBoxRow(
-              title: "Song Playback Resume",
-              isOn: $settings.isPlayerSongPlaybackResumeEnabled
-            )
-          },
-          footer: "Keeps track of song progress so playback continues from the previously saved position."
-        )
-
-        SettingsSection(content: {
-          SettingsCheckBoxRow(title: "Manual Playback", isOn: $settings.isPlaybackStartOnlyOnPlay)
-        }, footer: "Enable to start playback only when the Play button is pressed.")
+          SettingsCheckBoxRow(
+            title: "Newest Songs",
+            isOn: $settings.isAutoCacheLatestSongs
+          )
+          SettingsCheckBoxRow(
+            title: "Newest Podcast Episodes",
+            isOn: $settings.isAutoCacheLatestPodcastEpisodes
+          )
+        }, header: "Auto Cache")
 
         // Streaming Format Settings
         SettingsSection(

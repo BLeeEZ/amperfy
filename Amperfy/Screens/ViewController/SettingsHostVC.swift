@@ -118,6 +118,11 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isShowArtistDuration = newValue
     }))
 
+    settings.isShowRating = appDelegate.storage.settings.user.isShowRating
+    changesAgent.append(settings.$isShowRating.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.isShowRating = newValue
+    }))
+
     settings.isPlayerShuffleButtonEnabled = appDelegate.storage.settings.user
       .isPlayerShuffleButtonEnabled
     changesAgent.append(settings.$isPlayerShuffleButtonEnabled.sink(receiveValue: { newValue in
@@ -193,6 +198,12 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$isReplayGainEnabled.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.isReplayGainEnabled = newValue
       self.appDelegate.player.updateReplayGainEnabled(isEnabled: newValue)
+    }))
+    
+    settings.replayGainPreamp = appDelegate.storage.settings.user.replayGainPreamp
+    changesAgent.append(settings.$replayGainPreamp.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.replayGainPreamp = newValue
+      self.appDelegate.player.updateReplayGainPreamp(preamp: newValue)
     }))
 
     settings.isEqualizerEnabled = appDelegate.storage.settings.user.isEqualizerEnabled

@@ -336,10 +336,13 @@ extension UIColor {
   }
 
   public static var labelColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.label
-    } else {
-      return UIColor.black
+    UIColor { traitCollection in
+      if traitCollection.userInterfaceStyle == .dark {
+        // 90% white in dark mode
+        return UIColor(white: 0.9, alpha: 1.0)
+      } else {
+        return UIColor.label
+      }
     }
   }
 
@@ -356,18 +359,24 @@ extension UIColor {
   }
 
   public static var secondaryLabelColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.secondaryLabel
-    } else {
-      return UIColor.systemGray
+    UIColor { traitCollection in
+      if traitCollection.userInterfaceStyle == .dark {
+        // 70% white in dark mode
+        return UIColor(white: 0.7, alpha: 1.0)
+      } else {
+        return UIColor.secondaryLabel
+      }
     }
   }
 
   public static var backgroundColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.systemBackground
-    } else {
-      return UIColor.white
+    UIColor { traitCollection in
+      if traitCollection.userInterfaceStyle == .dark {
+        // 90% black (10% white) in dark mode
+        return UIColor(white: 0.1, alpha: 1.0)
+      } else {
+        return UIColor.systemBackground
+      }
     }
   }
 }

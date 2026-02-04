@@ -6,16 +6,52 @@
     {
       "layers" : [
         {
-          "blend-mode" : "normal",
-          "fill" : "automatic",
-          "glass" : true,
-          "hidden" : false,
-          "image-name" : "Logo.png",
-          "name" : "Logo",
+          "fill-specializations" : [
+            {
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.00000,0.17281,0.96783,1.00000",
+                  "display-p3:0.00000,0.00663,0.65619,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.5,
+                    "y" : 0
+                  },
+                  "stop" : {
+                    "x" : 0.5,
+                    "y" : 0.7
+                  }
+                }
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : {
+                "linear-gradient" : [
+                  "display-p3:0.56059,0.76179,0.96783,1.00000",
+                  "display-p3:0.26558,0.46209,0.65619,1.00000"
+                ],
+                "orientation" : {
+                  "start" : {
+                    "x" : 0.5,
+                    "y" : 0
+                  },
+                  "stop" : {
+                    "x" : 0.5,
+                    "y" : 0.7
+                  }
+                }
+              }
+            }
+          ],
+          "glass" : false,
+          "image-name" : "icon.png",
+          "name" : "icon",
           "position" : {
-            "scale" : 1,
+            "scale" : 0.7,
             "translation-in-points" : [
-              35,
+              -38.09375,
               0
             ]
           }

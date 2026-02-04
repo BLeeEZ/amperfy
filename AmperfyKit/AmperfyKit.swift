@@ -161,6 +161,7 @@ public class AmperKit {
     backendAudioPlayer
       .updateEqualizerSetting(eqSetting: storage.settings.user.activeEqualizerSetting)
     backendAudioPlayer.updateReplayGainEnabled(isEnabled: storage.settings.user.isReplayGainEnabled)
+    backendAudioPlayer.updateReplayGainPreamp(preamp: storage.settings.user.replayGainPreamp)
     backendAudioPlayer.volume = storage.settings.user.playerVolume
 
     playerDownloadPreparationHandler = PlayerDownloadPreparationHandler(

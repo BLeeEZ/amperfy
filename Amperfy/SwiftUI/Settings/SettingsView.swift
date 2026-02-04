@@ -22,6 +22,10 @@
 import AmperfyKit
 import SwiftUI
 
+// MARK: - Musify Version
+
+public let musifyVersion = "1.0.0"
+
 // MARK: - SettingsView
 
 struct SettingsView: View {
@@ -55,8 +59,15 @@ struct SettingsView: View {
   var body: some View {
     let list =
       SettingsList {
+        Section(footer: Text("Musify is based on the Amperfy project. Thanks to everyone at Amperfy!")) {
+          EmptyView()
+        }
+        
         SettingsSection {
-          SettingsRow(title: "Version") {
+          SettingsRow(title: "Musify Version") {
+            SecondaryText(musifyVersion)
+          }
+          SettingsRow(title: "Based on Amperfy Version") {
             SecondaryText(AppDelegate.version)
           }
           SettingsRow(title: "Build Number") {

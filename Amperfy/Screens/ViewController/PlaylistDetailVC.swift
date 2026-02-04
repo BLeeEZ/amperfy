@@ -202,6 +202,10 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
         playContext: playContext
       ))
     }
+    removeFromPlaylistAtIndexPathCallback = { [weak self] indexPath in
+      guard let self = self else { return }
+      self.removeFromPlaylist(at: indexPath, playlist: self.playlist)
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -281,9 +285,40 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
     -> UITableViewCell {
     let cell: PlayableTableCell = dequeueCell(for: tableView, at: indexPath)
     if let song = playlistItem.playable.asSong {
-      cell.display(playable: song, playContextCb: convertCellViewToPlayContext, rootView: self)
+      let playlistRef = self.playlist
+      let removeCallback: () -> Void = { [weak self] in
+        guard let self = self else { return }
+        self.removeFromPlaylist(at: indexPath, playlist: playlistRef)
+      }
+      cell.display(
+        playable: song,
+        playContextCb: convertCellViewToPlayContext,
+        rootView: self,
+        removeFromPlaylistCb: removeCallback
+      )
     }
     return cell
+  }
+  
+  private func removeFromPlaylist(at indexPath: IndexPath, playlist: Playlist) {
+    playlist.remove(at: indexPath.row)
+    appDelegate.storage.main.saveContext()
+    
+    // Refresh the table view
+    singleFetchedResultsController?.fetch()
+    
+    guard appDelegate.storage.settings.user.isOnlineMode,
+          let account = playlist.account else { return }
+    Task { @MainActor in
+      do {
+        try await appDelegate.getMeta(account.info).librarySyncer.syncUpload(
+          playlistToDeleteSong: playlist,
+          index: indexPath.row
+        )
+      } catch {
+        appDelegate.eventLogger.report(topic: "Playlist Upload Entry Remove", error: error)
+      }
+    }
   }
 
   override func updateSearchResults(for searchController: UISearchController) {

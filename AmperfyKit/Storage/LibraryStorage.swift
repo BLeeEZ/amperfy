@@ -686,7 +686,7 @@ public class LibraryStorage: PlayableFileCachable {
     }
     deleteCacheFinalStep(playable: playable)
   }
-
+  
   private func deleteCacheFinalStep(playable: AbstractPlayable) {
     playable.contentTypeTranscoded = nil
     playable.relFilePath = nil

@@ -100,6 +100,6 @@ class DirectoryTableCell: BasicTableCell {
       iconImage.isHidden = false
     }
     accessoryType = .disclosureIndicator
-    backgroundColor = .systemBackground
+    backgroundColor = .customDarkBackground
   }
 }

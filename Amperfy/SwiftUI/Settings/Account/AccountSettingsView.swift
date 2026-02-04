@@ -31,39 +31,8 @@ struct AccountSettingsView: View {
   var isPwUpdateDialogVisible = false
   @State
   var isShowLogoutAlert = false
-  @State
-  var isShowResyncLibraryAlert = false
   @EnvironmentObject
   var settings: Settings
-
-  func setThemePreference(preference: ThemePreference) {
-    settings.themePreference = preference
-    appDelegate.setAppTheme(color: preference.asColor)
-    appDelegate.applyAppThemeToAlreadyLoadedViews()
-  }
-
-  private func resyncLibrary(accountInfo: AccountInfo) {
-    appDelegate.closeAllButActiveMainTabs()
-    if appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
-      appDelegate.stopForInit()
-    }
-
-    let meta = appDelegate.getMeta(accountInfo)
-    meta.stopManager()
-    appDelegate.resetMeta(accountInfo)
-
-    // reset quick actions
-    appDelegate.quickActionsManager.configureQuickActions()
-    appDelegate.configureMainMenu()
-
-    appDelegate.storage.settings.user.isOfflineMode = false
-    let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
-    appDelegate.player.logout(account: account)
-    let syncVC = AppStoryboard.Main.segueToSync(account: account)
-    syncVC.modalPresentationStyle = .formSheet
-    AppDelegate.mainSceneDelegate?.window?.rootViewController?.dismiss(animated: false)
-    AppDelegate.mainSceneDelegate?.window?.rootViewController?.present(syncVC, animated: true)
-  }
 
   private func logout(accountInfo: AccountInfo) {
     appDelegate.closeAllButActiveMainTabs()
@@ -136,51 +105,8 @@ struct AccountSettingsView: View {
             }
           }
 
-          SettingsSection {
-            SettingsRow(title: "Theme Color") {
-              Menu(settings.themePreference.description) {
-                Button(ThemePreference.blue.description) {
-                  setThemePreference(preference: .blue)
-                }
-                Button(ThemePreference.green.description) {
-                  setThemePreference(preference: .green)
-                }
-                Button(ThemePreference.red.description) {
-                  setThemePreference(preference: .red)
-                }
-                Button(ThemePreference.yellow.description) {
-                  setThemePreference(preference: .yellow)
-                }
-                Button(ThemePreference.orange.description) {
-                  setThemePreference(preference: .orange)
-                }
-                Button(ThemePreference.purple.description) {
-                  setThemePreference(preference: .purple)
-                }
-              }
-            }
-          }
-
-          SettingsSection(content: {
-            SettingsCheckBoxRow(
-              title: "Newest Songs",
-              isOn: $settings.isAutoCacheLatestSongs
-            )
-            SettingsCheckBoxRow(
-              title: "Newest Podcast Episodes",
-              isOn: $settings.isAutoCacheLatestPodcastEpisodes
-            )
-          }, header: "Auto Cache")
-
-          SettingsSection(
-            content: {
-              SettingsCheckBoxRow(
-                title: "Scrobble streamed Songs",
-                isOn: $settings.isScrobbleStreamedItems
-              )
-            },
-            footer: "Enable to scrobble all streamed songs, even if the server already marks them as played."
-          )
+          // Scrobbling is always enabled - server will increment playcount
+          // when songs are played for more than 50% (or 4 min)
 
           SettingsSection {
             SettingsRow(title: "Backend API", splitPercentage: splitPercentage) {
@@ -218,20 +144,6 @@ struct AccountSettingsView: View {
           SettingsSection {
             SettingsButtonRow(title: "Update Password") {
               withPopupAnimation { isPwUpdateDialogVisible = true }
-            }
-            SettingsButtonRow(title: "Resync Library") {
-              isShowResyncLibraryAlert = true
-            }.alert(isPresented: $isShowResyncLibraryAlert) {
-              Alert(
-                title: Text("Resync Library"),
-                message: Text(
-                  "This will reset your local library and start syncing again from the server. Your downloaded files will remain on this device.\n\nDo you want to resync your library?"
-                ),
-                primaryButton: .destructive(Text("Resync")) {
-                  resyncLibrary(accountInfo: activeAccountInfo)
-                },
-                secondaryButton: .cancel()
-              )
             }
           }
 

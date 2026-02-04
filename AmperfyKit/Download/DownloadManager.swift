@@ -98,6 +98,10 @@ actor DownloadManager: NSObject, DownloadManageable {
   private var backgroundFetchCompletionHandler: CompleteHandlerBlock?
   private var isFailWithPopupError: Bool = true
   private var preDownloadIsValidCheck: PreDownloadIsValidCB?
+  
+  // In-memory set to prevent duplicate download requests for the same ID
+  // This catches simultaneous calls before Core Data records are created
+  @MainActor private static var pendingDownloadIDs: Set<String> = []
   private var isCacheSizeLimited: Bool
   @MainActor
   private var _urlSessionIdentifier: String?
@@ -191,8 +195,19 @@ actor DownloadManager: NSObject, DownloadManageable {
     guard !object.isCached,
           let downloadInfo = object.threadSafeInfo
     else { return }
+    
+    // Prevent duplicate download requests for the same ID
+    let uniqueID = object.uniqueID
+    guard !Self.pendingDownloadIDs.contains(uniqueID) else { return }
+    Self.pendingDownloadIDs.insert(uniqueID)
 
     Task.detached {
+      defer {
+        Task { @MainActor in
+          Self.pendingDownloadIDs.remove(uniqueID)
+        }
+      }
+      
       let isStorageExceeded = await self.storageExceedsCacheLimit()
       guard await !self.isCacheSizeLimited || !isStorageExceeded
       else { return }
@@ -211,16 +226,27 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   @MainActor
   func download(objects: [Downloadable]) {
-    let downloadObjects = objects.filter { !$0.isCached }
-      .compactMap { $0.threadSafeInfo }
-    guard !downloadObjects.isEmpty else { return }
+    // Filter out already cached and already pending downloads
+    let filteredObjects = objects.filter { !$0.isCached && !Self.pendingDownloadIDs.contains($0.uniqueID) }
+    let downloadInfos = filteredObjects.compactMap { $0.threadSafeInfo }
+    guard !downloadInfos.isEmpty else { return }
+    
+    // Mark all as pending using the original object IDs
+    let uniqueIDs = filteredObjects.map { $0.uniqueID }
+    uniqueIDs.forEach { Self.pendingDownloadIDs.insert($0) }
 
     Task.detached {
+      defer {
+        Task { @MainActor in
+          uniqueIDs.forEach { Self.pendingDownloadIDs.remove($0) }
+        }
+      }
+      
       let isStorageExceeded = await self.storageExceedsCacheLimit()
       guard await !self.isCacheSizeLimited || !isStorageExceeded
       else { return }
 
-      var validDls = downloadObjects
+      var validDls = downloadInfos
       if let isValidCheck = await self.preDownloadIsValidCheck {
         validDls = await isValidCheck(validDls)
       }

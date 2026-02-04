@@ -33,6 +33,12 @@ struct DisplaySettingsView: View {
     appDelegate.setAppAppearanceMode(style: style)
   }
 
+  func setThemePreference(preference: ThemePreference) {
+    settings.themePreference = preference
+    appDelegate.setAppTheme(color: preference.asColor)
+    appDelegate.applyAppThemeToAlreadyLoadedViews()
+  }
+
   var body: some View {
     ZStack {
       SettingsList {
@@ -50,6 +56,28 @@ struct DisplaySettingsView: View {
               }
               Button("Dark") {
                 setAppearanceMode(style: .dark)
+              }
+            }
+          }
+          SettingsRow(title: "Theme Color") {
+            Menu(settings.themePreference.description) {
+              Button(ThemePreference.blue.description) {
+                setThemePreference(preference: .blue)
+              }
+              Button(ThemePreference.green.description) {
+                setThemePreference(preference: .green)
+              }
+              Button(ThemePreference.red.description) {
+                setThemePreference(preference: .red)
+              }
+              Button(ThemePreference.yellow.description) {
+                setThemePreference(preference: .yellow)
+              }
+              Button(ThemePreference.orange.description) {
+                setThemePreference(preference: .orange)
+              }
+              Button(ThemePreference.purple.description) {
+                setThemePreference(preference: .purple)
               }
             }
           }
@@ -76,21 +104,7 @@ struct DisplaySettingsView: View {
           "Add skip forward and skip backward buttons to the music player, along with the previous/next buttons."
         )
 
-        if let activeAccountInfo = settings.activeAccountInfo,
-           let credentials = appDelegate.storage.settings.accounts.getSetting(activeAccountInfo)
-           .read.loginCredentials,
-           credentials.backendApi.asServerApiType != .ampache {
-          SettingsSection(
-            content: {
-              SettingsCheckBoxRow(
-                title: "Lyrics Smooth Scrolling",
-                isOn: $settings.isLyricsSmoothScrolling
-              )
-            },
-            footer:
-            "Lyrics are smoothly scrolled to next line. Deactivating will result in jumping from line to line."
-          )
-        }
+        // Lyrics Smooth Scrolling is always enabled
 
         SettingsSection(
           content: {
@@ -129,6 +143,14 @@ struct DisplaySettingsView: View {
 
         SettingsSection(
           content: {
+            SettingsCheckBoxRow(title: "Show Star Rating", isOn: $settings.isShowRating)
+          },
+          footer:
+          "Display star rating in song cells and the currently playing view."
+        )
+
+        SettingsSection(
+          content: {
             SettingsCheckBoxRow(
               title: "Disable Player Shuffle Button",
               isOn: Binding<Bool>(
@@ -145,7 +167,7 @@ struct DisplaySettingsView: View {
         )
       }
     }
-    .navigationTitle("Display")
+    .navigationTitle("Display & Interaction")
     .navigationBarTitleDisplayMode(.inline)
   }
 }

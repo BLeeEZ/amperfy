@@ -216,14 +216,14 @@ class PlayerUIHandler: NSObject {
     shuffleButton.isSelected = player.isShuffle
   }
 
-  func refreshDisplayPlaylistButton(displayPlaylistButton: UIButton) {
+  func refreshDisplayPlaylistButton(displayPlaylistButton: UIButton, themeColor: UIColor? = nil) {
     let isSelected = appDelegate.storage.settings.user.playerDisplayStyle == .compact
 
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:
-      displayPlaylistButton.tintColor = isSelected ? .tintColor : .label
+      displayPlaylistButton.tintColor = isSelected ? .tintColor : .customDarkLabel
     case .popupPlayer:
-      var config = UIButton.Configuration.player(isSelected: isSelected)
+      var config = UIButton.Configuration.player(isSelected: isSelected, themeColor: themeColor)
       config.image = .playlistDisplayStyle
       displayPlaylistButton.isSelected = isSelected
       displayPlaylistButton.configuration = config
@@ -235,7 +235,7 @@ class PlayerUIHandler: NSObject {
 
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:
-      displayLyricsButton.tintColor = isSelected ? .tintColor : .label
+      displayLyricsButton.tintColor = isSelected ? .tintColor : .customDarkLabel
     case .popupPlayer:
       break
     }
@@ -246,7 +246,7 @@ class PlayerUIHandler: NSObject {
     menuCreateCB: @escaping () -> [UIMenuElement]
   ) {
     optionsButton?.showsMenuAsPrimaryAction = true
-    optionsButton?.menu = UIMenu.lazyMenu(title: "Player Options") {
+    optionsButton?.menu = UIMenu.lazyMenu(title: "") {
       menuCreateCB()
     }
   }
@@ -261,7 +261,16 @@ class PlayerUIHandler: NSObject {
   ) {
     refreshArtwork(artworkImage: artworkImage)
     if let playableInfo = player.currentlyPlaying {
-      titleLabel.text = playableInfo.title
+      // Display track number in front of title for songs if there are multiple songs
+      // from the same album in the queue
+      let shouldShowTrackNumber = playableInfo.isSong && 
+                                   playableInfo.track > 0 && 
+                                   hasMultipleSongsFromSameAlbumInQueue(playableInfo)
+      if shouldShowTrackNumber {
+        titleLabel.text = "\(playableInfo.track). \(playableInfo.title)"
+      } else {
+        titleLabel.text = playableInfo.title
+      }
       albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
       albumButton?.isEnabled = playableInfo.isSong
       albumContainerView?.isHidden = !playableInfo.isSong
@@ -278,6 +287,39 @@ class PlayerUIHandler: NSObject {
       albumContainerView?.isHidden = true
       artistLabel.text = ""
     }
+  }
+  
+  private func hasMultipleSongsFromSameAlbumInQueue(_ currentPlayable: AbstractPlayable) -> Bool {
+    guard let currentAlbum = currentPlayable.asSong?.album else { return false }
+    
+    // Count songs from the same album in all queues (including current song = 1)
+    var sameAlbumCount = 1
+    
+    // Check previous queue
+    for playable in player.getAllPrevQueueItems() {
+      if let song = playable.asSong, song.album == currentAlbum {
+        sameAlbumCount += 1
+        if sameAlbumCount > 1 { return true }
+      }
+    }
+    
+    // Check next queue
+    for playable in player.getAllNextQueueItems() {
+      if let song = playable.asSong, song.album == currentAlbum {
+        sameAlbumCount += 1
+        if sameAlbumCount > 1 { return true }
+      }
+    }
+    
+    // Check user queue
+    for playable in player.getAllUserQueueItems() {
+      if let song = playable.asSong, song.album == currentAlbum {
+        sameAlbumCount += 1
+        if sameAlbumCount > 1 { return true }
+      }
+    }
+    
+    return false
   }
 
   func refreshArtwork(artworkImage: LibraryEntityImage) {
@@ -338,11 +380,21 @@ class PlayerUIHandler: NSObject {
   }
 
   private var remainingTime: Int? {
-    let duration = player.duration
-    if player.currentlyPlaying != nil, duration.isNormal, !duration.isZero {
-      return Int(player.elapsedTime - ceil(player.duration))
+    guard let currentlyPlaying = player.currentlyPlaying else { return nil }
+    let playerDuration = player.duration
+    let songDuration = currentlyPlaying.duration
+    
+    // Use player duration if available, otherwise fall back to song metadata duration
+    let effectiveDuration: Double
+    if playerDuration.isNormal, !playerDuration.isZero {
+      effectiveDuration = playerDuration
+    } else if songDuration > 0 {
+      effectiveDuration = Double(songDuration)
+    } else {
+      return nil
     }
-    return nil
+    
+    return Int(player.elapsedTime - ceil(effectiveDuration))
   }
 
   func timeSliderChanged(timeSlider: UISlider) {
@@ -356,8 +408,11 @@ class PlayerUIHandler: NSObject {
   ) {
     let elapsedClockTime = ClockTime(timeInSeconds: Int(timeSlider.value))
     elapsedTimeLabel.text = elapsedClockTime.asShortString()
+    
+    // Use slider's maxValue which already has the effective duration
+    let effectiveDuration = Double(timeSlider.maximumValue)
     let remainingTime =
-      ClockTime(timeInSeconds: Int(Double(timeSlider.value) - ceil(player.duration)))
+      ClockTime(timeInSeconds: Int(Double(timeSlider.value) - ceil(effectiveDuration)))
     remainingTimeLabel.text = remainingTime.asShortString()
   }
 
@@ -365,6 +420,7 @@ class PlayerUIHandler: NSObject {
     timeSlider: UISlider,
     elapsedTimeLabel: UILabel,
     remainingTimeLabel: UILabel,
+    totalTimeLabel: UILabel?,
     audioInfoLabel: UILabel,
     playTypeIcon: UIImageView,
     liveLabel: UILabel
@@ -375,7 +431,33 @@ class PlayerUIHandler: NSObject {
       let supportTimeInteraction = !currentlyPlaying.isRadio
       timeSlider.isEnabled = supportTimeInteraction && (style != .miniPlayeriOS)
       timeSlider.minimumValue = 0.0
-      timeSlider.maximumValue = Float(player.duration)
+      
+      // Use player duration if available, otherwise fall back to song metadata duration
+      // This ensures the slider is visible even before streaming content loads
+      let playerDuration = player.duration
+      let songDuration = currentlyPlaying.duration
+      let effectiveDuration: Float
+      if playerDuration.isNormal, !playerDuration.isZero {
+        effectiveDuration = Float(playerDuration)
+      } else if songDuration > 0 {
+        effectiveDuration = Float(songDuration)
+      } else {
+        effectiveDuration = 1.0  // Fallback to prevent zero range
+      }
+      timeSlider.maximumValue = effectiveDuration
+      
+      // Update total time label
+      if supportTimeInteraction {
+        let duration = Int(ceil(effectiveDuration))
+        if duration > 0 {
+          totalTimeLabel?.text = ClockTime(timeInSeconds: duration).asShortString()
+          totalTimeLabel?.isHidden = false
+        } else {
+          totalTimeLabel?.text = ""
+          totalTimeLabel?.isHidden = true
+        }
+      }
+      
       if !timeSlider.isTracking, supportTimeInteraction {
         let elapsedClockTime = ClockTime(timeInSeconds: Int(player.elapsedTime))
         elapsedTimeLabel.text = elapsedClockTime.asShortString()
@@ -391,6 +473,7 @@ class PlayerUIHandler: NSObject {
         audioInfoLabel.isHidden = true
         playTypeIcon.isHidden = true
         liveLabel.isHidden = false
+        totalTimeLabel?.isHidden = true
         timeSlider.minimumValue = 0.0
         timeSlider.maximumValue = 1.0
         timeSlider.value = 0.0
@@ -429,6 +512,7 @@ class PlayerUIHandler: NSObject {
       audioInfoLabel.isHidden = true
       playTypeIcon.isHidden = true
       liveLabel.isHidden = true
+      totalTimeLabel?.isHidden = true
       timeSlider.layer.mask = nil
       elapsedTimeLabel.text = "--:--"
       remainingTimeLabel.text = "--:--"
@@ -479,12 +563,25 @@ class PlayerUIHandler: NSObject {
       return contentFormatText
     }
 
+    // Check if song is cached on disk
+    let isStillCached = currentlyPlaying.isCached
+    
     if playType == .cache {
-      playTypeIcon.image = UIImage.cache
+      // Playing from cache - get bitrate and format from song metadata
       displayBitrateInKbps = currentlyPlaying.bitrate / 1000
       formatText = getFormat(contentType: currentlyPlaying.fileContentType)
+      
+      if isStillCached {
+        // Downloaded - show cache icon
+        playTypeIcon.image = UIImage.cache
+        playTypeIcon.tintColor = .labelColor
+      } else {
+        // Cache was deleted - show antenna icon
+        playTypeIcon.image = UIImage.antenna
+        playTypeIcon.tintColor = .labelColor
+      }
     } else {
-      playTypeIcon.image = UIImage.antenna
+      // Streaming
       let streamingBitrate = player.activeStreamingBitrate
       if let streamingBitrate {
         if streamingBitrate == .noLimit ||
@@ -508,11 +605,33 @@ class PlayerUIHandler: NSObject {
       } else {
         formatText = ""
       }
+      
+      // Check if song was downloaded while streaming
+      if isStillCached {
+        // Downloaded while streaming - show cache icon
+        playTypeIcon.image = UIImage.cache
+        playTypeIcon.tintColor = .labelColor
+      } else {
+        // Streaming - show antenna icon
+        playTypeIcon.image = UIImage.antenna
+        playTypeIcon.tintColor = .labelColor
+      }
     }
 
-    audioInfoLabel
-      .text = (displayBitrateInKbps > 0) ? "\(formatText) \(displayBitrateInKbps) kbps" :
-      "\(formatText)"
-    playTypeIcon.tintColor = .labelColor
+    // Build the audio info text
+    var audioInfoText = (displayBitrateInKbps > 0) ? "\(formatText) \(displayBitrateInKbps) kbps" : "\(formatText)"
+    
+    // Add ReplayGain dB value if RG is enabled and song has RG data
+    let isReplayGainEnabled = appDelegate.storage.settings.user.isReplayGainEnabled
+    let replayGainValue = currentlyPlaying.replayGainTrackGain
+    if isReplayGainEnabled && replayGainValue != 0 {
+      // Include preamp in the displayed value
+      let preamp = Float(appDelegate.storage.settings.user.replayGainPreamp)
+      let totalGain = replayGainValue + preamp
+      let sign = totalGain >= 0 ? "+" : ""
+      audioInfoText += String(format: ", %@%.1f dB", sign, totalGain)
+    }
+    
+    audioInfoLabel.text = audioInfoText
   }
 }

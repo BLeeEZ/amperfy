@@ -49,6 +49,105 @@ extension MarqueeLabel {
 
 extension UIColor {
   static let hardLabelColor = UIColor(named: "hardLabelColor")
+
+  // MARK: - Custom Dark Mode Colors (90% values instead of 100%)
+
+  /// Background color: 90% black in dark mode (10% white), standard systemBackground in light mode
+  static let customDarkBackground: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // 90% black = 10% white
+      return UIColor(white: 0.05, alpha: 1.0)
+    } else {
+      return UIColor.systemBackground
+    }
+  }
+
+  /// Secondary background color for dark mode
+  static let customDarkSecondaryBackground: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // Slightly lighter than primary background
+      return UIColor(white: 0.1, alpha: 1.0)
+    } else {
+      return UIColor.secondarySystemBackground
+    }
+  }
+
+  /// Tertiary background color for dark mode
+  static let customDarkTertiaryBackground: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // Slightly lighter than secondary background
+      return UIColor(white: 0.15, alpha: 1.0)
+    } else {
+      return UIColor.tertiarySystemBackground
+    }
+  }
+
+  /// Label color: 90% white in dark mode, standard label in light mode
+  static let customDarkLabel: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // 90% white
+      return UIColor(white: 0.9, alpha: 1.0)
+    } else {
+      return UIColor.label
+    }
+  }
+
+  /// Secondary label color for dark mode
+  static let customDarkSecondaryLabel: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // 70% white for secondary text
+      return UIColor(white: 0.7, alpha: 1.0)
+    } else {
+      return UIColor.secondaryLabel
+    }
+  }
+
+  /// Tertiary label color for dark mode
+  static let customDarkTertiaryLabel: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // 50% white for tertiary text
+      return UIColor(white: 0.5, alpha: 1.0)
+    } else {
+      return UIColor.tertiaryLabel
+    }
+  }
+
+  /// Quaternary label color for dark mode
+  static let customDarkQuaternaryLabel: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      // 40% white for quaternary text
+      return UIColor(white: 0.4, alpha: 1.0)
+    } else {
+      return UIColor.quaternaryLabel
+    }
+  }
+
+  /// Grouped background color for dark mode
+  static let customDarkGroupedBackground: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      return UIColor(white: 0.1, alpha: 1.0)
+    } else {
+      return UIColor.systemGroupedBackground
+    }
+  }
+
+  /// Secondary grouped background color for dark mode
+  static let customDarkSecondaryGroupedBackground: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      return UIColor(white: 0.15, alpha: 1.0)
+    } else {
+      return UIColor.secondarySystemGroupedBackground
+    }
+  }
+
+  /// Tertiary grouped background color for dark mode
+  static let customDarkTertiaryGroupedBackground: UIColor = UIColor { traitCollection in
+    if traitCollection.userInterfaceStyle == .dark {
+      return UIColor(white: 0.2, alpha: 1.0)
+    } else {
+      return UIColor.tertiarySystemGroupedBackground
+    }
+  }
 }
 
 extension Color {
@@ -61,18 +160,18 @@ extension Color {
   static let darkText = Color(UIColor.darkText)
   static let placeholderText = Color(UIColor.placeholderText)
 
-  // MARK: - Label Colors
+  // MARK: - Label Colors (using custom dark mode colors)
 
-  static let label = Color(UIColor.label)
-  static let secondaryLabel = Color(UIColor.secondaryLabel)
-  static let tertiaryLabel = Color(UIColor.tertiaryLabel)
-  static let quaternaryLabel = Color(UIColor.quaternaryLabel)
+  static let label = Color(UIColor.customDarkLabel)
+  static let secondaryLabel = Color(UIColor.customDarkSecondaryLabel)
+  static let tertiaryLabel = Color(UIColor.customDarkTertiaryLabel)
+  static let quaternaryLabel = Color(UIColor.customDarkQuaternaryLabel)
 
-  // MARK: - Background Colors
+  // MARK: - Background Colors (using custom dark mode colors)
 
-  static let systemBackground = Color(UIColor.systemBackground)
-  static let secondarySystemBackground = Color(UIColor.secondarySystemBackground)
-  static let tertiarySystemBackground = Color(UIColor.tertiarySystemBackground)
+  static let systemBackground = Color(UIColor.customDarkBackground)
+  static let secondarySystemBackground = Color(UIColor.customDarkSecondaryBackground)
+  static let tertiarySystemBackground = Color(UIColor.customDarkTertiaryBackground)
 
   // MARK: - Fill Colors
 
@@ -81,11 +180,11 @@ extension Color {
   static let tertiarySystemFill = Color(UIColor.tertiarySystemFill)
   static let quaternarySystemFill = Color(UIColor.quaternarySystemFill)
 
-  // MARK: - Grouped Background Colors
+  // MARK: - Grouped Background Colors (using custom dark mode colors)
 
-  static let systemGroupedBackground = Color(UIColor.systemGroupedBackground)
-  static let secondarySystemGroupedBackground = Color(UIColor.secondarySystemGroupedBackground)
-  static let tertiarySystemGroupedBackground = Color(UIColor.tertiarySystemGroupedBackground)
+  static let systemGroupedBackground = Color(UIColor.customDarkGroupedBackground)
+  static let secondarySystemGroupedBackground = Color(UIColor.customDarkSecondaryGroupedBackground)
+  static let tertiarySystemGroupedBackground = Color(UIColor.customDarkTertiaryGroupedBackground)
 
   // MARK: - Gray Colors
 
@@ -128,21 +227,22 @@ extension View {
 }
 
 extension UIColor {
-  static let slideOverBackgroundColor: UIColor = .systemBackground.withAlphaComponent(0.5)
+  static let slideOverBackgroundColor: UIColor = .customDarkBackground.withAlphaComponent(0.5)
   static let hoveredBackgroundColor: UIColor = .systemGray2.withAlphaComponent(0.2)
 }
 
 extension UIButton.Configuration {
-  static func player(isSelected: Bool) -> UIButton.Configuration {
+  static func player(isSelected: Bool, themeColor: UIColor? = nil) -> UIButton.Configuration {
     var config = UIButton.Configuration.tinted()
+    let foregroundColor = themeColor ?? .customDarkLabel
     if isSelected {
-      config.background.strokeColor = .label
+      config.background.strokeColor = foregroundColor
       config.background.strokeWidth = 1.0
       config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
     }
     config.buttonSize = .small
-    config.baseForegroundColor = !isSelected ? .label : .systemBackground
-    config.baseBackgroundColor = !isSelected ? .clear : .label
+    config.baseForegroundColor = !isSelected ? foregroundColor : .customDarkBackground
+    config.baseBackgroundColor = !isSelected ? .clear : foregroundColor
     config.cornerStyle = .medium
     return config
   }
@@ -151,6 +251,14 @@ extension UIButton.Configuration {
     var config = UIButton.Configuration.gray()
     config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .medium)
     config.buttonSize = .small
+    // Use black background in dark mode, keep default grey in light mode
+    config.background.backgroundColor = UIColor { traitCollection in
+      if traitCollection.userInterfaceStyle == .dark {
+        return .black
+      } else {
+        return .secondarySystemFill
+      }
+    }
     return config
   }
 }

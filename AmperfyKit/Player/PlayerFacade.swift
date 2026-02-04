@@ -212,7 +212,7 @@ public protocol PlayerFacade {
   func play()
   func play(context: PlayContext)
   func playShuffled(context: PlayContext)
-  func play(playerIndex: PlayerIndex)
+  func play(playerIndex: PlayerIndex, autoStartPlayback: Bool?)
   func pause()
   func togglePlayPause()
   func stop()
@@ -230,6 +230,7 @@ public protocol PlayerFacade {
   func updateEqualizerEnabled(isEnabled: Bool)
   func updateEqualizerSetting(eqSetting: EqualizerSetting)
   func updateReplayGainEnabled(isEnabled: Bool)
+  func updateReplayGainPreamp(preamp: Int)
 }
 
 extension PlayerFacade {
@@ -512,6 +513,10 @@ class PlayerFacadeImpl: PlayerFacade {
   public func updateReplayGainEnabled(isEnabled: Bool) {
     backendAudioPlayer.updateReplayGainEnabled(isEnabled: isEnabled)
   }
+  
+  public func updateReplayGainPreamp(preamp: Int) {
+    backendAudioPlayer.updateReplayGainPreamp(preamp: preamp)
+  }
 
   func logout(account: Account) {
     if queueHandler.logout(account: account) {
@@ -625,8 +630,8 @@ class PlayerFacadeImpl: PlayerFacade {
     musicPlayer.notifyPlaylistUpdated()
   }
 
-  func play(playerIndex: PlayerIndex) {
-    musicPlayer.play(playerIndex: playerIndex)
+  func play(playerIndex: PlayerIndex, autoStartPlayback: Bool? = nil) {
+    musicPlayer.play(playerIndex: playerIndex, autoStartPlayback: autoStartPlayback)
   }
 
   func pause() {

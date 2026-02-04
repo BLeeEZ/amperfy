@@ -87,6 +87,9 @@ class SsPlayableParserDelegate: SsXmlLibWithArtworkParser {
         playableBuffer?.disk = disk
       }
       playableBuffer?.rating = Int(attributeDict["userRating"] ?? "0") ?? 0
+      if let attributePlayCount = attributeDict["playCount"], let playCount = Int(attributePlayCount) {
+        playableBuffer?.playCount = playCount
+      }
       if let starredDate = attributeDict["starred"] {
         playableBuffer?.isFavorite = true
         let dateFormatter = ISO8601DateFormatter()

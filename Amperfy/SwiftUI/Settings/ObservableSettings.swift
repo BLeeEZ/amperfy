@@ -34,6 +34,8 @@ final class Settings: ObservableObject {
   @Published
   var isShowArtistDuration = false
   @Published
+  var isShowRating = true
+  @Published
   var isPlayerShuffleButtonEnabled = true
   @Published
   var screenLockPreventionPreference: ScreenLockPreventionPreference = .defaultValue
@@ -59,7 +61,7 @@ final class Settings: ObservableObject {
   @Published
   var isPlaybackStartOnlyOnPlay = false
   @Published
-  var isPlayerSongPlaybackResumeEnabled = false
+  var isPlayerSongPlaybackResumeEnabled = true
   @Published
   var isShowMusicPlayerSkipButtons = false
   @Published
@@ -87,4 +89,7 @@ final class Settings: ObservableObject {
 
   @Published
   var isReplayGainEnabled = true
+  
+  @Published
+  var replayGainPreamp: Int = 0
 }

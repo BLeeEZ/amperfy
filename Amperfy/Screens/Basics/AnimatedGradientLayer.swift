@@ -123,7 +123,8 @@ class PopupAnimatedGradientLayer {
     if inStyle == .dark {
       return [
         coloredCornerColor.getWithLightness(of: lightnessDarkMode).cgColor,
-        UIColor.black.cgColor,
+        // 90% black (10% white) for custom dark mode
+        UIColor(white: 0.1, alpha: 1.0).cgColor,
       ]
     } else {
       return [

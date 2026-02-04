@@ -32,6 +32,10 @@ public class NowPlayingInfoCenterHandler {
   private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
   private let getArtworkDownloaderCB: GetArtworkDownloadManagerCallback
   private var accountNotificationHandler: AccountNotificationHandler?
+  
+  // Throttle Now Playing updates to reduce overhead
+  private var lastNowPlayingUpdate: Date = .distantPast
+  private let nowPlayingUpdateInterval: TimeInterval = 5.0
 
   init(
     musicPlayer: AudioPlayer,
@@ -162,6 +166,11 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   }
 
   public func didElapsedTimeChange() {
+    // Throttle Now Playing info updates to reduce overhead
+    let now = Date()
+    guard now.timeIntervalSince(lastNowPlayingUpdate) >= nowPlayingUpdateInterval else { return }
+    lastNowPlayingUpdate = now
+    
     if let curPlayable = musicPlayer.currentlyPlaying {
       updateNowPlayingInfo(playable: curPlayable)
     }

@@ -37,7 +37,7 @@ struct AddSwipeActionView: View {
   var addCB: (_ swipePosition: SwipePosition, _ elementToAdd: SwipeActionType) -> ()
 
   func reload() {
-    actionNotInUse = settings.swipeActionSettings.notUsed
+    actionNotInUse = settings.swipeActionSettings.notUsed.filter { $0.isVisibleInSettings }
   }
 
   var body: some View {

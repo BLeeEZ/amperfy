@@ -181,7 +181,7 @@
         </fetchIndex>
     </entity>
     <entity name="Player" representedClassName="PlayerMO" syncable="YES">
-        <attribute name="autoCachePlayedItemSetting" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES" elementID="autoCachePlayedSongSetting"/>
+        <attribute name="autoCachePlayedItemSetting" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" elementID="autoCachePlayedSongSetting"/>
         <attribute name="isUserQueuePlaying" attributeType="Boolean" defaultValueString="0" usesScalarValueType="YES" elementID="isWaitingQueuePlaying"/>
         <attribute name="musicIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" elementID="currentSongIndex"/>
         <attribute name="musicPlaybackRate" optional="YES" attributeType="Double" defaultValueString="1" usesScalarValueType="YES"/>

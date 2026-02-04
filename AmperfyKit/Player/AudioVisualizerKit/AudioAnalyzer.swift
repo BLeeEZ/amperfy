@@ -7,6 +7,7 @@ import SwiftUI
 @MainActor
 protocol AudioAnalyzerProtocol: AnyObject {
   func install(on audioNode: AVAudioNode)
+  func removeTap()
   func playing(sampleRate: Float)
   func play()
   func stop()
@@ -22,6 +23,10 @@ public final class AudioAnalyzer: ObservableObject, AudioAnalyzerProtocol {
   public var rms: Float = .zero
 
   private let fftSize: Int
+  
+  // Reference to the audio node for tap removal
+  nonisolated(unsafe) private weak var _installedNode: AVAudioNode?
+  private let _installedNodeLock = NSLock()
 
   nonisolated(unsafe) private var _isActive = false
   private let _isActiveLock = NSLock()
@@ -74,12 +79,25 @@ public final class AudioAnalyzer: ObservableObject, AudioAnalyzerProtocol {
   }
 
   public func install(on audioNode: AVAudioNode) {
+    // Store reference for later tap removal
+    _installedNodeLock.withLock {
+      _installedNode = audioNode
+    }
+    
     audioNode.installTap(
       onBus: .zero,
       bufferSize: AVAudioFrameCount(fftSize),
       format: nil,
       block: calculate
     )
+  }
+  
+  /// Removes the audio tap from the installed node
+  public func removeTap() {
+    _installedNodeLock.withLock {
+      _installedNode?.removeTap(onBus: .zero)
+      _installedNode = nil
+    }
   }
 
   public func playing(sampleRate: Float) {

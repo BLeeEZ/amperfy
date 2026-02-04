@@ -209,6 +209,8 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     super.viewDidLoad()
     // ensures that the collection view stops placing items under the sidebar
     collectionView.contentInsetAdjustmentBehavior = .always
+    view.backgroundColor = .customDarkBackground
+    collectionView.backgroundColor = .customDarkBackground
 
     appDelegate.userStatistics.visited(.albums)
 

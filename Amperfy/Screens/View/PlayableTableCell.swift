@@ -80,12 +80,16 @@ class PlayableTableCell: BasicTableCell {
   @IBOutlet
   weak var playOverNumberButton: UIButton!
 
+  private var ratingStackView: UIStackView?
+  private var ratingStarViews: [UIImageView] = []
+
   static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
   private static let touchAnimation = 0.4
 
   private var style = PlayableTableCellStyle.none
   private var playerIndexCb: GetPlayerIndexFromTableCellCallback?
   private var playContextCb: GetPlayContextFromTableCellCallback?
+  private var removeFromPlaylistCb: (() -> Void)?
   private var playable: AbstractPlayable?
   private var download: Download?
   private var rootView: UIViewController?
@@ -141,8 +145,56 @@ class PlayableTableCell: BasicTableCell {
       playOverArtworkButton.layer.cornerRadius = CornerRadius.small.asCGFloat
       selectionStyle = .none
       downloadProgress.isHidden = true
+      setupRatingStars()
       resetForReuse()
     }
+  }
+
+  private func setupRatingStars() {
+    let stackView = UIStackView()
+    stackView.axis = .horizontal
+    stackView.spacing = -2  // Negative spacing to put stars closer together
+    stackView.alignment = .center
+    stackView.distribution = .fill
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+
+    // Create 5 star image views
+    for _ in 0 ..< 5 {
+      let starView = UIImageView()
+      starView.contentMode = .scaleAspectFit
+      starView.translatesAutoresizingMaskIntoConstraints = false
+      starView.image = .starEmpty
+      starView.tintColor = UIColor(red: 0.882, green: 0.686, blue: 0.255, alpha: 1.0)  // #e1af41
+      let starSize: CGFloat = 10
+      NSLayoutConstraint.activate([
+        starView.widthAnchor.constraint(equalToConstant: starSize),
+        starView.heightAnchor.constraint(equalToConstant: starSize),
+      ])
+      ratingStarViews.append(starView)
+      stackView.addArrangedSubview(starView)
+    }
+
+    contentView.addSubview(stackView)
+
+    NSLayoutConstraint.activate([
+      stackView.trailingAnchor.constraint(equalTo: optionsButton.trailingAnchor, constant: -4),
+      stackView.topAnchor.constraint(equalTo: optionsButton.bottomAnchor, constant: -8),
+    ])
+
+    ratingStackView = stackView
+  }
+
+  private func updateRatingDisplay(rating: Int) {
+    // Show the LAST N stars (right-aligned) instead of first N
+    // This keeps stars right-justified regardless of rating
+    let startIndex = 5 - rating
+    for (index, starView) in ratingStarViews.enumerated() {
+      starView.isHidden = index < startIndex
+      starView.image = .starFill
+    }
+
+    // Only show rating if song has a rating > 0
+    ratingStackView?.isHidden = (rating == 0)
   }
 
   func resetForReuse() {
@@ -150,6 +202,11 @@ class PlayableTableCell: BasicTableCell {
     deleteButton.isHidden = true
     playOverArtworkButton.isHidden = true
     playOverNumberButton.isHidden = true
+    ratingStackView?.isHidden = true
+    // Reset all stars for next use
+    for starView in ratingStarViews {
+      starView.isHidden = false
+    }
   }
 
   override func prepareForReuse() {
@@ -190,7 +247,8 @@ class PlayableTableCell: BasicTableCell {
     playerIndexCb: GetPlayerIndexFromTableCellCallback? = nil,
     isDislayAlbumTrackNumberStyle: Bool = false,
     download: Download? = nil,
-    isMarked: Bool = false
+    isMarked: Bool = false,
+    removeFromPlaylistCb: (() -> Void)? = nil
   ) {
     if playIndicator?.rootViewTypeName != rootView.typeName {
       playIndicator = PlayIndicator(rootViewTypeName: rootView.typeName)
@@ -200,6 +258,7 @@ class PlayableTableCell: BasicTableCell {
     self.displayMode = displayMode
     self.playContextCb = playContextCb
     self.playerIndexCb = playerIndexCb
+    self.removeFromPlaylistCb = removeFromPlaylistCb
     self.rootView = rootView
     self.isDislayAlbumTrackNumberStyle = isDislayAlbumTrackNumberStyle
     self.download = download
@@ -213,7 +272,7 @@ class PlayableTableCell: BasicTableCell {
     #else
       singleTapGestureRecognizer.isEnabled = (displayMode == .normal)
     #endif
-    backgroundColor = .systemBackground
+    backgroundColor = .customDarkBackground
     refresh()
   }
 
@@ -320,6 +379,13 @@ class PlayableTableCell: BasicTableCell {
 
     refreshSubtitleColor()
     refreshCacheAndDuration()
+
+    // Update rating display for songs (only if setting is enabled)
+    if appDelegate.storage.settings.user.isShowRating, let song = playable.asSong {
+      updateRatingDisplay(rating: song.rating)
+    } else {
+      ratingStackView?.isHidden = true
+    }
   }
 
   private func configureTrackNumberLabel() {
@@ -345,20 +411,31 @@ class PlayableTableCell: BasicTableCell {
     let isDisplayOptionButton = (playContextCb != nil) && (playerIndexCb == nil)
     let durationTrailing = isDisplayOptionButton ?
       ((traitCollection.horizontalSizeClass == .regular) ? 30 : 30.0) : 0.0
+    
+    // Calculate extra space needed for rating stars when duration is hidden
+    // Stars are positioned at optionsButton.trailingAnchor - 4, extending left
+    // Each star is 10pt with -2pt spacing: width = rating * 8 + 2
+    // We only need extra space beyond what optionsButton area (30pt) already provides
+    let songRating = playable.asSong?.rating ?? 0
+    let isRatingVisible = appDelegate.storage.settings.user.isShowRating && songRating > 0
+    let starWidth = CGFloat(songRating * 8 + 2)  // Actual star width for this rating
+    let ratingExtraSpace: CGFloat = isRatingVisible ? max(0, starWidth - 26) + 6 : 0.0  // Add padding between artist name and stars
 
     optionsButton.isHidden = !isDisplayOptionButton
     if isDisplayOptionButton {
       optionsButton.showsMenuAsPrimaryAction = true
-      optionsButton.imageView?.tintColor = .label
+      optionsButton.imageView?.tintColor = .customDarkLabel
       if let rootView = rootView {
         let playContext = playContextCb != nil ? { self.playContextCb?(self) } : nil
         let playIndex = playerIndexCb != nil ? { self.playerIndexCb?(self) } : nil
+        let removeFromPlaylist = removeFromPlaylistCb
         optionsButton.menu = UIMenu.lazyMenu {
           EntityPreviewActionBuilder(
             container: playable,
             on: rootView,
             playContextCb: playContext,
-            playerIndexCb: playIndex
+            playerIndexCb: playIndex,
+            removeFromPlaylistCb: removeFromPlaylist
           ).createMenuActions()
         }
       }
@@ -382,6 +459,10 @@ class PlayableTableCell: BasicTableCell {
         lableTrailing += 4 + cacheIconWidth
       } else if isDurationVisible {
         lableTrailing += 8 + durationWidth
+      }
+      // Add extra space for rating stars when duration is not visible
+      if !isDurationVisible, isRatingVisible {
+        lableTrailing += ratingExtraSpace
       }
       labelTrailingCellConstraint.constant = lableTrailing
     }
@@ -411,13 +492,19 @@ class PlayableTableCell: BasicTableCell {
   func playThisSong() {
     guard let playable = playable else { return }
     if let playerIndex = playerIndexCb?(self) {
-      appDelegate.player.play(playerIndex: playerIndex)
-    } else if let context = playContextCb?(self),
+      appDelegate.player.play(playerIndex: playerIndex, autoStartPlayback: true)
+    } else if playContextCb != nil,
               playable.isCached || appDelegate.storage.settings.user.isOnlineMode {
       animateActivation()
       hideSearchBarKeyboardInRootView()
       Haptics.success.vibrate(isHapticsEnabled: appDelegate.storage.settings.user.isHapticsEnabled)
-      appDelegate.player.play(context: context)
+      // Insert the song at the front of the queue and play it immediately
+      appDelegate.player.insertContextQueue(playables: [playable])
+      // Play the song we just inserted (at index 0 of the next queue) with forced autostart
+      appDelegate.player.play(
+        playerIndex: PlayerIndex(queueType: .next, index: 0),
+        autoStartPlayback: true
+      )
     }
   }
 
@@ -509,7 +596,7 @@ class PlayableTableCell: BasicTableCell {
         configurePlayIndicator(playable: playable)
         deleteButton.isHidden = true
         refreshSubtitleColor()
-        optionsButton.imageView?.tintColor = .label
+        optionsButton.imageView?.tintColor = .customDarkLabel
         backgroundColor = .clear
       }
     }

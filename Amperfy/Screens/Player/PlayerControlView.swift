@@ -60,6 +60,8 @@ class PlayerControlView: UIView {
   @IBOutlet
   weak var remainingTimeLabel: UILabel!
   @IBOutlet
+  weak var totalTimeLabel: UILabel!
+  @IBOutlet
   weak var liveLabel: UILabel!
   @IBOutlet
   weak var audioInfoLabel: UILabel!
@@ -96,20 +98,33 @@ class PlayerControlView: UIView {
     #endif
   }
 
+  private var infoButton: UIButton!
+  private var themeColor: UIColor = .customDarkLabel
+  
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
     rootView = toWorkOnRootView
 
     playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
 
-    playButton.imageView?.tintColor = .label
-    previousButton.tintColor = .label
-    nextButton.tintColor = .label
-    skipBackwardButton.tintColor = .label
-    skipForwardButton.tintColor = .label
-    airplayButton.tintColor = .label
-    playerModeButton.tintColor = .label
-    volumeButton.tintColor = .label
-    optionsButton.imageView?.tintColor = .label
+    // Get theme color from account settings
+    themeColor = appDelegate.storage.settings.accounts.activeSetting.read.themePreference.asColor
+
+    playButton.imageView?.tintColor = .customDarkLabel
+    previousButton.tintColor = .customDarkLabel
+    nextButton.tintColor = .customDarkLabel
+    skipBackwardButton.tintColor = .customDarkLabel
+    skipForwardButton.tintColor = .customDarkLabel
+    playerModeButton.tintColor = .customDarkLabel
+    
+    // Use theme color for the 4 bottom-right buttons
+    airplayButton.tintColor = themeColor
+    displayPlaylistButton.tintColor = themeColor
+    optionsButton.tintColor = themeColor
+    
+    // Hide volume button and replace with info button
+    volumeButton.isHidden = true
+    setupInfoButton(themeColor: themeColor)
+    
     refreshPlayer()
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,
@@ -123,12 +138,56 @@ class PlayerControlView: UIView {
           timeSlider: self.timeSlider,
           elapsedTimeLabel: self.elapsedTimeLabel,
           remainingTimeLabel: self.remainingTimeLabel,
+          totalTimeLabel: self.totalTimeLabel,
           audioInfoLabel: self.audioInfoLabel,
           playTypeIcon: self.playTypeIcon,
           liveLabel: self.liveLabel
         )
       }
     )
+  }
+  
+  private func setupInfoButton(themeColor: UIColor) {
+    infoButton = UIButton(type: .system)
+    infoButton.translatesAutoresizingMaskIntoConstraints = false
+    
+    let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
+    let infoImage = UIImage(systemName: "info.circle", withConfiguration: config)
+    infoButton.setImage(infoImage, for: .normal)
+    infoButton.tintColor = themeColor
+    infoButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2)
+    
+    infoButton.addTarget(self, action: #selector(infoButtonPressed), for: .touchUpInside)
+    
+    // Insert info button at the same position as volume button in the stack view
+    if let volumeIndex = optionsStackView.arrangedSubviews.firstIndex(of: volumeButton) {
+      optionsStackView.insertArrangedSubview(infoButton, at: volumeIndex)
+    }
+    
+    NSLayoutConstraint.activate([
+      infoButton.widthAnchor.constraint(equalToConstant: 28),
+      infoButton.heightAnchor.constraint(equalToConstant: 28),
+    ])
+  }
+  
+  @objc
+  private func infoButtonPressed() {
+    guard let playable = player.currentlyPlaying else { return }
+    let metadataVC = SongMetadataVC()
+    metadataVC.playable = playable
+    
+    metadataVC.modalPresentationStyle = .popover
+    metadataVC.preferredContentSize = CGSize(width: 320, height: 480)
+    
+    if let popover = metadataVC.popoverPresentationController {
+      popover.sourceView = infoButton
+      popover.sourceRect = infoButton.bounds
+      popover.permittedArrowDirections = .down
+      popover.delegate = metadataVC
+      popover.backgroundColor = .clear
+    }
+    
+    rootView?.present(metadataVC, animated: true)
   }
 
   @IBAction
@@ -227,7 +286,7 @@ class PlayerControlView: UIView {
   @IBAction
   func displayPlaylistPressed() {
     rootView?.switchDisplayStyleOptionPersistent()
-    playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton)
+    playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton, themeColor: themeColor)
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,
       menuCreateCB: createPlayerOptionsMenu
@@ -259,12 +318,13 @@ class PlayerControlView: UIView {
       timeSlider: timeSlider,
       elapsedTimeLabel: elapsedTimeLabel,
       remainingTimeLabel: remainingTimeLabel,
+      totalTimeLabel: totalTimeLabel,
       audioInfoLabel: audioInfoLabel,
       playTypeIcon: playTypeIcon,
       liveLabel: liveLabel
     )
     playerHandler?.refreshPrevNextButtons(previousButton: previousButton, nextButton: nextButton)
-    playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton)
+    playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton, themeColor: themeColor)
     refreshPlayerModeChangeButton()
   }
 
@@ -311,127 +371,138 @@ class PlayerControlView: UIView {
 
   func createPlayerOptionsMenu() -> [UIMenuElement] {
     var menuActions = [UIMenuElement]()
-    if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player
-      .userQueueCount > 0 || player.nextQueueCount > 0 {
-      let clearPlayer = UIAction(title: "Clear Player", image: .clear, handler: { _ in
-        self.player.clearQueues()
-      })
-      menuActions.append(clearPlayer)
-    }
-    if player.userQueueCount > 0 {
-      let clearUserQueue = UIAction(title: "Clear User Queue", image: .playlistX, handler: { _ in
-        self.rootView?.clearUserQueue()
-      })
-      menuActions.append(clearUserQueue)
-    }
-
-    menuActions.append(appDelegate.createSleepTimerMenu(refreshCB: nil))
-    menuActions.append(createPlaybackRateMenu())
-
-    if rootView?.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false {
-      if !appDelegate.storage.settings.user.isPlayerLyricsDisplayed ||
-        appDelegate.storage.settings.user.playerDisplayStyle != .large {
-        let showLyricsAction = UIAction(title: "Show Lyrics", image: .lyrics, handler: { _ in
-          if !self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
-            self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
-            self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
-            self.rootView?.largeCurrentlyPlayingView?.display(element: .lyrics)
-          }
-          if self.appDelegate.storage.settings.user.playerDisplayStyle != .large {
-            self.displayPlaylistPressed()
-          }
-        })
-        menuActions.append(showLyricsAction)
-      } else {
-        let hideLyricsAction = UIAction(title: "Hide Lyrics", image: .lyrics, handler: { _ in
-          self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
-          self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
-        })
-        menuActions.append(hideLyricsAction)
-      }
-    }
-
-    if !appDelegate.storage.settings.user.isPlayerVisualizerDisplayed ||
-      appDelegate.storage.settings.user.playerDisplayStyle != .large {
-      let showVisualizerAction = UIAction(
-        title: "Show Audio Visualizer",
-        image: .audioVisualizer,
-        handler: { _ in
-          if !self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed {
-            self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = true
-            self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
-            self.rootView?.largeCurrentlyPlayingView?.display(element: .visualizer)
-          }
-          if self.appDelegate.storage.settings.user.playerDisplayStyle != .large {
-            self.displayPlaylistPressed()
-          }
-        }
-      )
-      menuActions.append(showVisualizerAction)
-    } else {
-      let hideVisualizerAction = UIAction(
-        title: "Hide Audio Visualizer",
-        image: .audioVisualizer,
-        handler: { _ in
-          self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
-          self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
-        }
-      )
-      menuActions.append(hideVisualizerAction)
-
-      // Add visualizer type selector submenu
-      menuActions.append(createVisualizerTypeMenu())
-    }
-
-    switch player.playerMode {
-    case .music:
-      if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player.nextQueueCount > 0,
-         appDelegate.storage.settings.user.isOnlineMode {
-        let addContextToPlaylist = UIAction(
-          title: "Add Context Queue to Playlist",
-          image: .playlistPlus,
-          handler: { _ in
-            var itemsToAdd = self.player.getAllPrevQueueItems().filterSongs()
-            if let currentlyPlaying = self.player.currentlyPlaying,
-               let currentSong = currentlyPlaying.asSong {
-              itemsToAdd.append(currentSong)
-            }
-            itemsToAdd.append(contentsOf: self.player.getAllNextQueueItems().filterSongs())
-            // allow add to playlist only if all songs belong to the same account
-            guard let firstItemAccount = itemsToAdd.first?.account,
-                  itemsToAdd.count == itemsToAdd.filter({ $0.account == firstItemAccount }).count
-            else { return }
-            let selectPlaylistVC = AppStoryboard.Main
-              .segueToPlaylistSelector(account: firstItemAccount, itemsToAdd: itemsToAdd)
-            let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-            self.rootView?.present(selectPlaylistNav, animated: true, completion: nil)
-          }
+    
+    // Build in REVERSE order since iOS displays menus upside down
+    
+    // Section 4 (last visually): Clear Queue, Delete Cache
+    var queueActions = [UIMenuElement]()
+    
+    // Delete Cache (will appear second)
+    if let currentlyPlaying = player.currentlyPlaying,
+       currentlyPlaying.isCached, let account = currentlyPlaying.account {
+      let deleteCacheAction = UIAction(title: "Delete Cache", image: .trash, attributes: .destructive, handler: { _ in
+        let alert = UIAlertController(
+          title: nil,
+          message: "Are you sure to delete the cached file of \"\(currentlyPlaying.displayString)\" from this device?",
+          preferredStyle: .actionSheet
         )
-        menuActions.append(addContextToPlaylist)
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+          self.appDelegate.getMeta(account.info).playableDownloadManager
+            .removeFinishedDownload(for: [currentlyPlaying])
+          self.appDelegate.storage.main.library.deleteCache(of: [currentlyPlaying])
+          self.appDelegate.storage.main.saveContext()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        self.rootView?.present(alert, animated: true)
+      })
+      queueActions.append(deleteCacheAction)
+    }
+    
+    // Clear Queue (will appear first)
+    let totalQueueCount = player.prevQueueCount + (player.currentlyPlaying != nil ? 1 : 0) + player.userQueueCount + player.nextQueueCount
+    if totalQueueCount > 0 {
+      let clearQueue = UIAction(title: "Clear Queue", image: .clear, handler: { _ in
+        let itemText = totalQueueCount == 1 ? "item" : "items"
+        let alert = UIAlertController(
+          title: nil,
+          message: "Should the current queue with \(totalQueueCount) \(itemText) really be cleared?",
+          preferredStyle: .actionSheet
+        )
+        alert.addAction(UIAlertAction(title: "Clear Queue", style: .destructive, handler: { _ in
+          self.player.clearQueues()
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        self.rootView?.present(alert, animated: true)
+      })
+      queueActions.append(clearQueue)
+    }
+    
+    if !queueActions.isEmpty {
+      menuActions.append(UIMenu(options: .displayInline, children: queueActions))
+    }
+    
+    // Section 3: Sleep Timer, Playback Rate
+    var timerActions = [UIMenuElement]()
+    timerActions.append(createPlaybackRateMenu())
+    timerActions.append(appDelegate.createSleepTimerMenu(refreshCB: nil))
+    menuActions.append(UIMenu(options: .displayInline, children: timerActions))
+    
+    // Section 2: Show Artist, Show Album
+    var navigationActions = [UIMenuElement]()
+    
+    if let currentlyPlaying = player.currentlyPlaying {
+      // Show Album (will appear second)
+      if let song = currentlyPlaying.asSong, let album = song.album, let account = song.account {
+        let showAlbumAction = UIAction(title: "Show Album", image: .album, handler: { _ in
+          let albumDetailVC = AppStoryboard.Main.segueToAlbumDetail(
+            account: account,
+            album: album,
+            songToScrollTo: song
+          )
+          self.rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
+        })
+        navigationActions.append(showAlbumAction)
       }
-    case .podcast: break
+      
+      // Show Artist (will appear first)
+      if let song = currentlyPlaying.asSong, let artist = song.artist, let account = song.account {
+        let showArtistAction = UIAction(title: "Show Artist", image: .artist, handler: { _ in
+          let artistDetailVC = AppStoryboard.Main.segueToArtistDetail(
+            account: account,
+            artist: artist
+          )
+          self.rootView?.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
+        })
+        navigationActions.append(showArtistAction)
+      }
     }
-
-    switch appDelegate.storage.settings.user.playerDisplayStyle {
-    case .compact:
-      let scrollToCurrentlyPlaying = UIAction(
-        title: "Scroll to currently playing",
-        image: .squareArrow,
-        handler: { _ in
-          self.rootView?.scrollToCurrentlyPlayingRow()
+    
+    if !navigationActions.isEmpty {
+      menuActions.append(UIMenu(options: .displayInline, children: navigationActions))
+    }
+    
+    // Section 1 (first visually): Add to Playlist, Add Queue to Playlist
+    var playlistActions = [UIMenuElement]()
+    
+    // Add Queue to Playlist (will appear second)
+    if player.playerMode == .music,
+       player.currentlyPlaying != nil || player.prevQueueCount > 0 || player.nextQueueCount > 0,
+       appDelegate.storage.settings.user.isOnlineMode {
+      let addQueueToPlaylist = UIAction(title: "Add Queue to Playlist", image: .playlistPlus, handler: { _ in
+        var itemsToAdd = self.player.getAllPrevQueueItems().filterSongs()
+        if let currentlyPlaying = self.player.currentlyPlaying,
+           let currentSong = currentlyPlaying.asSong {
+          itemsToAdd.append(currentSong)
         }
-      )
-      menuActions.append(scrollToCurrentlyPlaying)
-    case .large: break
+        itemsToAdd.append(contentsOf: self.player.getAllNextQueueItems().filterSongs())
+        guard let firstItemAccount = itemsToAdd.first?.account,
+              itemsToAdd.count == itemsToAdd.filter({ $0.account == firstItemAccount }).count
+        else { return }
+        let selectPlaylistVC = AppStoryboard.Main
+          .segueToPlaylistSelector(account: firstItemAccount, itemsToAdd: itemsToAdd)
+        let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+        self.rootView?.present(selectPlaylistNav, animated: true, completion: nil)
+      })
+      playlistActions.append(addQueueToPlaylist)
+    }
+    
+    // Add to Playlist (will appear first)
+    if let currentlyPlaying = player.currentlyPlaying,
+       currentlyPlaying.isSong, appDelegate.storage.settings.user.isOnlineMode,
+       let account = currentlyPlaying.account {
+      let addToPlaylistAction = UIAction(title: "Add to Playlist", image: .playlistPlus, handler: { _ in
+        let selectPlaylistVC = AppStoryboard.Main
+          .segueToPlaylistSelector(account: account, itemsToAdd: [currentlyPlaying].filterSongs())
+        let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
+        self.rootView?.present(selectPlaylistNav, animated: true)
+      })
+      playlistActions.append(addToPlaylistAction)
+    }
+    
+    if !playlistActions.isEmpty {
+      menuActions.append(UIMenu(options: .displayInline, children: playlistActions))
     }
 
-    let playerInfo = UIAction(title: "Player Info", image: .info, handler: { _ in
-      guard let rootView = self.rootView else { return }
-      let detailVC = PlainDetailsVC()
-      detailVC.display(player: self.player, on: rootView)
-      rootView.present(detailVC, animated: true)
-    })
-    menuActions.append(playerInfo)
     return menuActions
   }
 
@@ -474,6 +545,7 @@ extension PlayerControlView: MusicPlayable {
       timeSlider: timeSlider,
       elapsedTimeLabel: elapsedTimeLabel,
       remainingTimeLabel: remainingTimeLabel,
+      totalTimeLabel: totalTimeLabel,
       audioInfoLabel: audioInfoLabel,
       playTypeIcon: playTypeIcon,
       liveLabel: liveLabel

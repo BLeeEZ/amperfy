@@ -162,6 +162,18 @@ class LibraryElementDetailTableHeaderView: UIView {
     )
     playShuffledButton.layer.cornerRadius = 10.0
     playShuffledButton.isHidden = configuration.isShuffleHidden
+    
+    // Set dynamic background color: 100% black in dark mode, default grey in light mode
+    let buttonBackgroundColor = UIColor { traitCollection in
+      if traitCollection.userInterfaceStyle == .dark {
+        return UIColor.black
+      } else {
+        return UIColor.secondarySystemFill
+      }
+    }
+    playAllButton.backgroundColor = buttonBackgroundColor
+    playShuffledButton.backgroundColor = buttonBackgroundColor
+    
     activate()
     registerForTraitChanges(
       [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],

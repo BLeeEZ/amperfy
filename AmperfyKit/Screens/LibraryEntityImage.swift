@@ -51,7 +51,12 @@ extension LibraryEntityImage {
 
 @MainActor
 public class LibraryEntityImage: RoundedImage {
-  static private let cache: NSCache<NSString, UIImage> = NSCache()
+  static private let cache: NSCache<NSString, UIImage> = {
+    let cache = NSCache<NSString, UIImage>()
+    cache.countLimit = 50  // Keep at most 50 images in memory
+    cache.totalCostLimit = 50 * 1024 * 1024  // ~50 MB max
+    return cache
+  }()
 
   private let appDelegate: AmperKit
 
@@ -108,6 +113,8 @@ public class LibraryEntityImage: RoundedImage {
   }
 
   public func display(entity: AbstractLibraryEntity) {
+    // Skip refresh if displaying the same entity (prevents placeholder flash)
+    guard self.entity != entity else { return }
     self.entity = entity
     backupArtworkType = entity.getDefaultArtworkType()
     refresh()
@@ -183,7 +190,9 @@ public class LibraryEntityImage: RoundedImage {
     guard !Task.isCancelled else { return }
     Task { @MainActor [weak self] in
       guard let self, let readyImage else { return }
-      Self.cache.setObject(readyImage, forKey: imagePath as NSString)
+      // Calculate approximate memory cost (width * height * 4 bytes per pixel)
+      let cost = Int(readyImage.size.width * readyImage.size.height * readyImage.scale * readyImage.scale * 4)
+      Self.cache.setObject(readyImage, forKey: imagePath as NSString, cost: cost)
       refresh()
     }
   }

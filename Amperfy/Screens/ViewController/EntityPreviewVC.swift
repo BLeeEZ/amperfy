@@ -69,18 +69,23 @@ class EntityPreviewActionBuilder {
   private var isGoToSiteUrl = false
   private var isShowPodcastDetails = false
   private var isShowSongDetails = false
+  private var isShowCopyId = true
+
+  private var removeFromPlaylistCb: (() -> Void)?
 
   init(
     container: PlayableContainable,
     on rootView: UIViewController,
     playContextCb: GetPlayContextCallback? = nil,
-    playerIndexCb: GetPlayerIndexCallback? = nil
+    playerIndexCb: GetPlayerIndexCallback? = nil,
+    removeFromPlaylistCb: (() -> Void)? = nil
   ) {
     self.appDelegate = (UIApplication.shared.delegate as! AppDelegate)
     self.entityContainer = container
     self.rootView = rootView
     self.playContextCb = playContextCb
     self.playerIndexCb = playerIndexCb
+    self.removeFromPlaylistCb = removeFromPlaylistCb
   }
 
   public func createMenu() -> UIMenu {
@@ -144,6 +149,9 @@ class EntityPreviewActionBuilder {
     if !ratingFavActions.isEmpty {
       menuActions.append(UIMenu(options: .displayInline, children: ratingFavActions))
     }
+    if let removeFromPlaylistCb = removeFromPlaylistCb {
+      elementHandlingActions.append(createRemoveFromPlaylistAction(callback: removeFromPlaylistCb))
+    }
     if isAddToPlaylist {
       elementHandlingActions.append(createAddToPlaylistAction())
     }
@@ -162,7 +170,7 @@ class EntityPreviewActionBuilder {
     if !elementHandlingActions.isEmpty {
       menuActions.append(UIMenu(options: .displayInline, children: elementHandlingActions))
     }
-    if appDelegate.storage.settings.user.isShowDetailedInfo {
+    if isShowCopyId, appDelegate.storage.settings.user.isShowDetailedInfo {
       menuActions.append(createCopyIdToClipboardAction())
     }
 
@@ -234,16 +242,8 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(song: Song) {
-    isPlay = !(
-      (playContextCb == nil) ||
-        (!song.isCached && appDelegate.storage.settings.user.isOfflineMode)
-    )
-    isShuffle = !(
-      (playContextCb == nil) ||
-        playerIndexCb != nil ||
-        (!song.isCached && appDelegate.storage.settings.user.isOfflineMode)
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
+    isPlay = false
+    isShuffle = false
     isMusicQueue = !(
       (playContextCb == nil) ||
         playerIndexCb != nil ||
@@ -256,7 +256,8 @@ class EntityPreviewActionBuilder {
     isDeleteOnServer = false
     isGoToSiteUrl = false
     isShowPodcastDetails = false
-    isShowSongDetails = true
+    isShowSongDetails = false
+    isShowCopyId = false
   }
 
   private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -417,7 +418,7 @@ class EntityPreviewActionBuilder {
     UIAction(title: "Play", image: .play) { action in
       guard !self.entityPlayables.isEmpty else { return }
       if let playerIndex = self.playerIndexCb?() {
-        self.appDelegate.player.play(playerIndex: playerIndex)
+        self.appDelegate.player.play(playerIndex: playerIndex, autoStartPlayback: nil)
       } else if let context = self.playContextCb?() {
         self.appDelegate.player.play(context: context)
       } else {
@@ -444,22 +445,14 @@ class EntityPreviewActionBuilder {
   }
 
   private func createMusicQueueAction() -> UIMenuElement {
-    UIMenu(title: "Music Queue", image: .listBullet, children: [
-      UIAction(title: "Insert Context Queue", image: .contextQueueInsert) { action in
+    UIMenu(options: .displayInline, children: [
+      UIAction(title: "Play Next", image: .contextQueueInsert) { action in
         guard !self.entityPlayables.isEmpty else { return }
         self.appDelegate.player.insertContextQueue(playables: self.entityPlayables)
       },
-      UIAction(title: "Append Context Queue", image: .contextQueueAppend) { action in
+      UIAction(title: "Add to Queue", image: .contextQueueAppend) { action in
         guard !self.entityPlayables.isEmpty else { return }
         self.appDelegate.player.appendContextQueue(playables: self.entityPlayables)
-      },
-      UIAction(title: "Insert User Queue", image: .userQueueInsert) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.insertUserQueue(playables: self.entityPlayables)
-      },
-      UIAction(title: "Append User Queue", image: .userQueueAppend) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.appendUserQueue(playables: self.entityPlayables)
       },
     ])
   }
@@ -584,6 +577,12 @@ class EntityPreviewActionBuilder {
       } catch {
         self.appDelegate.eventLogger.report(topic: "Artist Rating Sync", error: error)
       }}
+    }
+  }
+
+  private func createRemoveFromPlaylistAction(callback: @escaping () -> Void) -> UIAction {
+    UIAction(title: "Remove from Playlist", image: .trash, attributes: .destructive) { action in
+      callback()
     }
   }
 

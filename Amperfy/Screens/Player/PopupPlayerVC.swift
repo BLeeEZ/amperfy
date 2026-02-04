@@ -41,6 +41,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
   private let safetyMarginOnBottom = 20.0
   internal var artworkGradientColors = [UIColor]()
+  
+  // Track song ID to ensure gradient is only calculated once per song
+  var lastGradientSongID: String?
 
   lazy var tableViewKeyCommandsController = TableViewKeyCommandsController(
     tableView: tableView,
@@ -55,6 +58,10 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   var controlView: PlayerControlView?
   var largeCurrentlyPlayingView: LargeCurrentlyPlayingPlayerView?
   var accountNotificationHandler: AccountNotificationHandler?
+  
+  /// Tracks whether the player has been "primed" this session to work around
+  /// a bug where the first play after app restart doesn't produce audio
+  private static var hasPlayerBeenPrimedThisSession = false
 
   var currentlyPlayingTableCell: CurrentlyPlayingTableCell?
   var contextPrevQueueSectionHeader: ContextQueuePrevSectionHeader?
@@ -81,7 +88,12 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     player.addNotifier(notifier: self)
     playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
 
-    backgroundImage.setBackgroundBlur(style: .prominent)
+    // Use lower blur alpha on iPad to ensure gradient colors are visible
+    if UIDevice.current.userInterfaceIdiom == .pad {
+      backgroundImage.setBackgroundBlur(style: .prominent, alpha: 0.9)
+    } else {
+      backgroundImage.setBackgroundBlur(style: .prominent)
+    }
 
     controlPlaceholderHeightConstraint.constant = PlayerControlView
       .frameHeight + safetyMarginOnBottom
@@ -107,8 +119,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
       createdLargeCurrentlyPlayingView.prepare(toWorkOnRootView: self)
       largePlayerPlaceholderView.addSubview(createdLargeCurrentlyPlayingView)
     }
-
-    closeButtonPlaceholderView.isHidden = true
 
     setupTableView()
     fetchSongInfoAndUpdateViews()
@@ -190,6 +200,54 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     scrollToCurrentlyPlayingRow()
     controlView?.refreshView()
     refresh()
+    
+    // Workaround: Prime the player if this is a resume scenario after app restart
+    // This must happen before setting artwork scale, and scale is set after priming completes
+    primePlayerIfNeeded()
+  }
+  
+  /// Workaround for a bug where the first play after app restart doesn't produce audio.
+  /// If we detect a song with saved progress and the player hasn't been used yet,
+  /// we simulate a quick play-pause cycle to "prime" the audio system.
+  private func primePlayerIfNeeded() {
+    // Only do this once per app session
+    guard !Self.hasPlayerBeenPrimedThisSession else {
+      // No priming needed, just set initial artwork scale
+      largeCurrentlyPlayingView?.setInitialArtworkScale()
+      return
+    }
+    
+    // Check if there's a song with saved progress (meaning it was playing before app closed)
+    guard let currentPlayable = player.currentlyPlaying,
+          currentPlayable.playProgress > 0,
+          !player.isPlaying else {
+      // No priming needed, just set initial artwork scale
+      largeCurrentlyPlayingView?.setInitialArtworkScale()
+      return
+    }
+    
+    // Mark as primed so we don't do this again
+    Self.hasPlayerBeenPrimedThisSession = true
+    
+    // Disable artwork scale animation during priming
+    largeCurrentlyPlayingView?.isArtworkScaleAnimationEnabled = false
+    
+    // Mute audio during priming to prevent audible blip
+    let savedVolume = player.volume
+    player.volume = 0
+    
+    // Simulate play -> wait 200ms -> pause to prime the audio system
+    player.play()
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+      guard let self else { return }
+      self.player.pause()
+      // Restore volume after pausing
+      self.player.volume = savedVolume
+      self.controlView?.refreshView()
+      // Re-enable artwork scale animation and set initial scale
+      self.largeCurrentlyPlayingView?.isArtworkScaleAnimationEnabled = true
+      self.largeCurrentlyPlayingView?.setInitialArtworkScale()
+    }
   }
 
   override func viewWillDisappear(_ animated: Bool) {
@@ -202,17 +260,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   }
 
   func fetchSongInfoAndUpdateViews() {
-    guard appDelegate.storage.settings.user.isOnlineMode,
-          let song = player.currentlyPlaying?.asSong,
-          let account = song.account
-    else { return }
-
-    Task { @MainActor in do {
-      try await self.appDelegate.getMeta(account.info).librarySyncer.sync(song: song)
-      self.refreshCurrentlyPlayingInfoView()
-    } catch {
-      self.appDelegate.eventLogger.report(topic: "Song Info", error: error)
-    }}
+    // Song sync is now handled centrally by ScrobbleSyncer when song starts
+    // This just refreshes the UI
+    refreshCurrentlyPlayingInfoView()
   }
 
   func reloadData() {
@@ -363,6 +413,7 @@ extension PopupPlayerVC: MusicPlayable {
   func didStartPlaying() {
     reloadData()
     refresh()
+    largeCurrentlyPlayingView?.onPlayerPlay()
   }
 
   func didStopPlaying() {
@@ -375,7 +426,9 @@ extension PopupPlayerVC: MusicPlayable {
     refresh()
   }
 
-  func didPause() {}
+  func didPause() {
+    largeCurrentlyPlayingView?.onPlayerPause()
+  }
   func didElapsedTimeChange() {}
 
   func didLyricsTimeChange(time: CMTime) {

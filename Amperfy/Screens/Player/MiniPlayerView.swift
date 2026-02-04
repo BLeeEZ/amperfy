@@ -29,6 +29,7 @@ import UIKit
 class MiniPlayerView: UIView {
   private var player: PlayerFacade
   private var playerHandler: PlayerUIHandler?
+  private var accountNotificationHandler: AccountNotificationHandler?
 
   private var hoverOverlayView: UIView?
 
@@ -40,13 +41,15 @@ class MiniPlayerView: UIView {
 
   fileprivate lazy var artworkOverlay: UIView = {
     let view = UIView()
-    view.backgroundColor = .black.withAlphaComponent(0.4)
+    // 90% black for dark mode overlay
+    view.backgroundColor = UIColor(white: 0.1, alpha: 0.4)
     view.isHidden = true
 
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.contentMode = .scaleAspectFit
-    imageView.tintColor = .white
+    // 90% white for dark mode
+    imageView.tintColor = UIColor(white: 0.9, alpha: 1.0)
     imageView.image = .miniPlayer.withRenderingMode(.alwaysTemplate)
 
     view.addSubview(imageView)
@@ -94,7 +97,7 @@ class MiniPlayerView: UIView {
     label.textAlignment = .center
     label.backgroundColor = .clear
     label.numberOfLines = 1
-    label.textColor = .label
+    label.textColor = .customDarkLabel
     return label
   }()
 
@@ -193,7 +196,7 @@ class MiniPlayerView: UIView {
         .withRenderingMode(.alwaysTemplate),
       for: .normal
     )
-    button.imageView?.tintColor = .label
+    button.imageView?.tintColor = .customDarkLabel
     button.showsMenuAsPrimaryAction = true
     return button
   }()
@@ -562,6 +565,23 @@ class MiniPlayerView: UIView {
     #endif
 
     player.addNotifier(notifier: self)
+    
+    // Register for download finished notifications to update play type icon
+    // Use AccountNotificationHandler to register for all accounts
+    let accountNotificationHandler = AccountNotificationHandler(
+      storage: appDelegate.storage,
+      notificationHandler: appDelegate.notificationHandler
+    )
+    accountNotificationHandler.registerCallbackForAllAccounts { [weak self] accountInfo in
+      guard let self else { return }
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(downloadFinishedSuccessful(notification:)),
+        name: .downloadFinishedSuccess,
+        object: appDelegate.getMeta(accountInfo).playableDownloadManager
+      )
+    }
+    self.accountNotificationHandler = accountNotificationHandler
 
     registerForTraitChanges(
       [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
@@ -576,6 +596,18 @@ class MiniPlayerView: UIView {
     ) in
       self.refreshForTabAccessoryTraitChange()
       self.tabAccessoryTraitChangeCB?()
+    }
+  }
+  
+  @objc
+  private func downloadFinishedSuccessful(notification: Notification) {
+    guard let downloadNotification = DownloadNotification.fromNotification(notification),
+          let curPlayable = player.currentlyPlaying
+    else { return }
+    if curPlayable.uniqueID == downloadNotification.id {
+      Task { @MainActor in
+        refreshPlayer()
+      }
     }
   }
 
@@ -845,8 +877,9 @@ class MiniPlayerView: UIView {
 
   func refreshPlayer() {
     if traitCollection.userInterfaceStyle == .dark {
-      titleLabel.textColor = .white
-      subtitleLabel.textColor = .lightGray
+      // 90% white for dark mode text
+      titleLabel.textColor = UIColor(white: 0.9, alpha: 1.0)
+      subtitleLabel.textColor = UIColor(white: 0.7, alpha: 1.0)
     } else {
       titleLabel.textColor = .black
       subtitleLabel.textColor = .darkGray
@@ -869,6 +902,7 @@ class MiniPlayerView: UIView {
       timeSlider: timeSlider,
       elapsedTimeLabel: elapsedTimeLabel,
       remainingTimeLabel: remainingTimeLabel,
+      totalTimeLabel: nil,
       audioInfoLabel: audioInfoLabel,
       playTypeIcon: playTypeIcon,
       liveLabel: liveLabel
@@ -952,6 +986,7 @@ extension MiniPlayerView: MusicPlayable {
       timeSlider: timeSlider,
       elapsedTimeLabel: elapsedTimeLabel,
       remainingTimeLabel: remainingTimeLabel,
+      totalTimeLabel: nil,
       audioInfoLabel: audioInfoLabel,
       playTypeIcon: playTypeIcon,
       liveLabel: liveLabel

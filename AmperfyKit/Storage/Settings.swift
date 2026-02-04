@@ -100,6 +100,12 @@ public struct UserSettings: Sendable, Codable {
     set { _isShowArtistDuration = newValue }
   }
 
+  private var _isShowRating: Bool = true
+  public var isShowRating: Bool {
+    get { _isShowRating }
+    set { _isShowRating = newValue }
+  }
+
   private var _isPlayerShuffleButtonEnabled: Bool = true
   public var isPlayerShuffleButtonEnabled: Bool {
     get { _isPlayerShuffleButtonEnabled }
@@ -114,7 +120,7 @@ public struct UserSettings: Sendable, Codable {
 
   private var _isLyricsSmoothScrolling: Bool = true
   public var isLyricsSmoothScrolling: Bool {
-    get { _isLyricsSmoothScrolling }
+    get { true } // Always enabled
     set { _isLyricsSmoothScrolling = newValue }
   }
 
@@ -159,7 +165,7 @@ public struct UserSettings: Sendable, Codable {
     set { _isPlaybackStartOnlyOnPlay = newValue }
   }
 
-  private var _isPlayerSongPlaybackResumeEnabled: Bool = false
+  private var _isPlayerSongPlaybackResumeEnabled: Bool = true
   public var isPlayerSongPlaybackResumeEnabled: Bool {
     get { _isPlayerSongPlaybackResumeEnabled }
     set { _isPlayerSongPlaybackResumeEnabled = newValue }
@@ -193,6 +199,12 @@ public struct UserSettings: Sendable, Codable {
   public var isReplayGainEnabled: Bool {
     get { _isReplayGainEnabled }
     set { _isReplayGainEnabled = newValue }
+  }
+
+  private var _replayGainPreamp: Int = 0
+  public var replayGainPreamp: Int {
+    get { _replayGainPreamp }
+    set { _replayGainPreamp = max(-8, min(8, newValue)) }
   }
 
   private var _playerVolume: Float = 1.0

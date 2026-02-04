@@ -53,8 +53,8 @@ struct SwipeSettingsView: View {
   var addPositionType = SwipePosition.leading
 
   func reload() {
-    leading = settings.swipeActionSettings.leading
-    trailing = settings.swipeActionSettings.trailing
+    leading = settings.swipeActionSettings.leading.filter { $0.isVisibleInSettings }
+    trailing = settings.swipeActionSettings.trailing.filter { $0.isVisibleInSettings }
   }
 
   func add(swipePosition: SwipePosition, elementToAdd: SwipeActionType) {

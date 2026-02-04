@@ -196,7 +196,7 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
     )
     listItem.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
-      appDelegate.player.play(playerIndex: playerIndex)
+      appDelegate.player.play(playerIndex: playerIndex, autoStartPlayback: nil)
       Task { @MainActor in
         guard let _ = try? await interfaceController?.popTemplate(animated: true) else { return }
         completion()

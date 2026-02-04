@@ -237,8 +237,19 @@ class TabBarVC: UITabBarController {
   }
 
   public func push(vc: UIViewController) {
-    guard let libraryGroup else { return }
-    libraryGroup.managingNavigationController?.pushViewController(vc, animated: true)
+    guard let libraryGroup,
+          let navController = libraryGroup.managingNavigationController
+    else { return }
+    
+    // Ensure the navigation controller has a root view controller before pushing
+    // This prevents the pushed VC from becoming the root (which would have no back button)
+    if navController.viewControllers.isEmpty {
+      let libraryVC = AppStoryboard.Main.segueToLibrary(account: account)
+      navController.setViewControllers([libraryVC, vc], animated: false)
+    } else {
+      navController.pushViewController(vc, animated: true)
+    }
+    
     selectedTab = libraryGroup
   }
 }

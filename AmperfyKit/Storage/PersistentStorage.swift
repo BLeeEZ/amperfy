@@ -257,7 +257,8 @@ public class CoreDataPersistentManager: CoreDataManagable {
 extension NSPersistentContainer {
   static fileprivate func configureContext(_ contextToConfigure: NSManagedObjectContext) {
     contextToConfigure.automaticallyMergesChangesFromParent = true
-    contextToConfigure.retainsRegisteredObjects = true
+    // Note: retainsRegisteredObjects defaults to false, which allows Core Data
+    // to release unused objects and prevent memory accumulation over time
     contextToConfigure
       .mergePolicy = NSMergePolicy(merge: .mergeByPropertyObjectTrumpMergePolicyType)
   }

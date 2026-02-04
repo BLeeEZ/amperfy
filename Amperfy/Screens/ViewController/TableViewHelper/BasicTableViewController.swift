@@ -74,7 +74,9 @@ struct SwipeDisplaySettings {
         return false
       }
       if actionType == .insertPodcastQueue ||
-        actionType == .appendPodcastQueue {
+        actionType == .appendPodcastQueue ||
+        actionType == .insertUserQueue ||
+        actionType == .appendUserQueue {
         return false
       }
     case .podcast:
@@ -113,6 +115,7 @@ class BasicTableViewController: KeyCommandTableViewController {
   var swipeDisplaySettings = SwipeDisplaySettings()
   var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
   var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
+  var removeFromPlaylistAtIndexPathCallback: ((IndexPath) -> Void)?
   var swipeCallback: SwipeActionCallback?
   var isEditLockedDueToActiveSwipe = false
   var isSingleCellEditingModeActive = false
@@ -284,10 +287,15 @@ class BasicTableViewController: KeyCommandTableViewController {
       if let playContextAtIndexPathCP = self.playContextAtIndexPathCallback {
         playIndexCB = { playContextAtIndexPathCP(indexPath) }
       }
+      var removeFromPlaylistCB: (() -> Void)?
+      if let removeFromPlaylistAtIndexPathCP = self.removeFromPlaylistAtIndexPathCallback {
+        removeFromPlaylistCB = { removeFromPlaylistAtIndexPathCP(indexPath) }
+      }
       return EntityPreviewActionBuilder(
         container: containable,
         on: self,
-        playContextCb: playIndexCB
+        playContextCb: playIndexCB,
+        removeFromPlaylistCb: removeFromPlaylistCB
       ).createMenu()
     }
   }

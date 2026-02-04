@@ -33,7 +33,7 @@ extension UITextField {
     clipsToBounds = true
     layer.cornerRadius = 5
     layer.borderWidth = CGFloat(0.5)
-    layer.borderColor = UIColor.label.cgColor
+    layer.borderColor = UIColor.customDarkLabel.cgColor
 
     borderStyle = .roundedRect
     font = .systemFont(ofSize: LoginVC.fontSize)
@@ -41,7 +41,7 @@ extension UITextField {
     let imageView = UIImageView(frame: CGRect(x: 5, y: 0, width: 25, height: 25))
     imageView.contentMode = .scaleAspectFit
     imageView.image = image.withRenderingMode(.alwaysTemplate)
-    imageView.tintColor = .label
+    imageView.tintColor = .customDarkLabel
 
     let leftContainerView = UIView(frame: CGRect(x: 0, y: 0, width: 35, height: 25))
     leftContainerView.addSubview(imageView)
@@ -75,7 +75,7 @@ class LoginVC: UIViewController {
 
   fileprivate lazy var amperfyLabel: UILabel = {
     let label = UILabel()
-    label.text = "Amperfy"
+    label.text = "Musify"
     label.font = .systemFont(ofSize: 50, weight: .bold)
     label.textColor = .tintColor
     label.tintColor = appDelegate.storage.settings.accounts.getSetting(nil).read.themePreference
@@ -471,7 +471,7 @@ class LoginVC: UIViewController {
       }),
     ])
 
-    view.backgroundColor = .systemBackground
+    view.backgroundColor = .customDarkBackground
 
     amperfyLabel.translatesAutoresizingMaskIntoConstraints = false
     iconView.translatesAutoresizingMaskIntoConstraints = false

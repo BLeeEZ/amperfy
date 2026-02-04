@@ -47,6 +47,8 @@ class ContextQueueNextSectionHeader: UIView {
   weak var shuffleButton: UIButton!
   @IBOutlet
   weak var repeatButton: UIButton!
+  
+  private var clearQueueButton: UIButton!
 
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
@@ -54,6 +56,31 @@ class ContextQueueNextSectionHeader: UIView {
     self.player = appDelegate.player
     player.addNotifier(notifier: self)
     self.playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
+  }
+  
+  override func awakeFromNib() {
+    super.awakeFromNib()
+    setupClearQueueButton()
+  }
+  
+  private func setupClearQueueButton() {
+    clearQueueButton = UIButton(type: .system)
+    clearQueueButton.translatesAutoresizingMaskIntoConstraints = false
+    
+    let config = UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
+    clearQueueButton.setImage(UIImage(systemName: "trash", withConfiguration: config), for: .normal)
+    clearQueueButton.tintColor = .label
+    
+    clearQueueButton.addTarget(self, action: #selector(pressedClearQueue), for: .touchUpInside)
+    
+    addSubview(clearQueueButton)
+    
+    NSLayoutConstraint.activate([
+      clearQueueButton.widthAnchor.constraint(equalToConstant: 28),
+      clearQueueButton.heightAnchor.constraint(equalToConstant: 28),
+      clearQueueButton.centerYAnchor.constraint(equalTo: shuffleButton.centerYAnchor),
+      clearQueueButton.trailingAnchor.constraint(equalTo: shuffleButton.leadingAnchor, constant: -16),
+    ])
   }
 
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
@@ -74,9 +101,11 @@ class ContextQueueNextSectionHeader: UIView {
     case .music:
       repeatButton.isHidden = false
       shuffleButton.isHidden = false
+      clearQueueButton?.isHidden = false
     case .podcast:
       repeatButton.isHidden = true
       shuffleButton.isHidden = true
+      clearQueueButton?.isHidden = true
     }
   }
 
@@ -91,6 +120,24 @@ class ContextQueueNextSectionHeader: UIView {
   func pressedRepeat(_ sender: Any) {
     playerHandler?.repeatButtonPushed()
     playerHandler?.refreshRepeatButton(repeatButton: repeatButton)
+  }
+  
+  @objc
+  func pressedClearQueue(_ sender: Any) {
+    let alert = UIAlertController(
+      title: "Clear Queue",
+      message: "Are you sure you want to clear the entire queue?",
+      preferredStyle: .alert
+    )
+    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    alert.addAction(UIAlertAction(title: "Clear", style: .destructive) { [weak self] _ in
+      self?.player.clearQueues()
+      self?.rootView?.reloadData()
+    })
+    
+    if let viewController = rootView ?? window?.rootViewController {
+      viewController.present(alert, animated: true)
+    }
   }
 }
 

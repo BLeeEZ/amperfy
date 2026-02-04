@@ -45,9 +45,9 @@ public enum SwipeActionType: Int, CaseIterable, Sendable, Codable {
     case .appendUserQueue:
       return "Append User Queue"
     case .insertContextQueue:
-      return "Insert Context Queue"
+      return "Play Next"
     case .appendContextQueue:
-      return "Append Context Queue"
+      return "Add to Queue"
     case .download:
       return "Download"
     case .removeFromCache:
@@ -74,9 +74,9 @@ public enum SwipeActionType: Int, CaseIterable, Sendable, Codable {
     case .appendUserQueue:
       return "Append to User Queue"
     case .insertContextQueue:
-      return "Insert in Context Queue"
+      return "Play Next"
     case .appendContextQueue:
-      return "Append to Context Queue"
+      return "Add to Queue"
     case .download:
       return "Download"
     case .removeFromCache:
@@ -93,6 +93,16 @@ public enum SwipeActionType: Int, CaseIterable, Sendable, Codable {
       return "Append to Podcast Queue"
     case .favorite:
       return "Mark as Favorite"
+    }
+  }
+  
+  /// Whether this action should be shown in settings
+  public var isVisibleInSettings: Bool {
+    switch self {
+    case .insertUserQueue, .appendUserQueue:
+      return false
+    default:
+      return true
     }
   }
 

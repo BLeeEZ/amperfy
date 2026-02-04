@@ -157,8 +157,19 @@ class SplitVC: UISplitViewController {
   }
 
   public func push(vc: UIViewController) {
-    let secondaryVC = viewController(for: .secondary) as? UINavigationController
-    secondaryVC?.pushViewController(vc, animated: false)
+    guard let navController = viewController(for: .secondary) as? UINavigationController else {
+      // No navigation controller exists - create one with the VC as root embedded in navigation
+      setViewController(embeddInNavigation(vc: vc), for: .secondary)
+      return
+    }
+    
+    // Ensure the navigation controller has a root view controller before pushing
+    if navController.viewControllers.isEmpty {
+      let homeVC = TabNavigatorItem.home.getController(account: account)
+      navController.setViewControllers([homeVC, vc], animated: false)
+    } else {
+      navController.pushViewController(vc, animated: false)
+    }
   }
 }
 
