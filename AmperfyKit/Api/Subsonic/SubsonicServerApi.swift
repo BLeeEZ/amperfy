@@ -865,7 +865,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
         id: id
       )
       if let date = date {
-        urlComp.addQueryItem(name: "time", value: Int(date.timeIntervalSince1970))
+        urlComp.addQueryItem(name: "time", value: Int(date.timeIntervalSince1970*1000))
       }
       urlComp.addQueryItem(name: "submission", value: submission.description)
       return try self.createUrl(from: urlComp)
