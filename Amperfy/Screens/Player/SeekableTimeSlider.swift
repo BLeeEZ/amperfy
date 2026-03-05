@@ -28,37 +28,34 @@ class SeekableTimeSlider: UISlider {
     return expandedBounds.contains(point)
   }
 
-  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     guard let touch = touches.first, isPointerSeekAllowed(touch) else {
-      super.touchesMoved(touches, with: event)
+      super.touchesBegan(touches, with: event)
       return
     }
-    super.touchesMoved(touches, with: event)
     let location = touch.location(in: self)
     if let value = valueFromLocation(location) {
       self.value = value
       sendActions(for: .valueChanged)
     }
+    super.touchesBegan(touches, with: event)
+  }
+
+  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    guard let touch = touches.first, isPointerSeekAllowed(touch) else {
+      super.touchesMoved(touches, with: event)
+      return
+    }
+    // For pointer/mouse: suppress drag seeking and UISlider's continuous drag behavior.
+    _ = touch
   }
 
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-    guard let touch = touches.first else {
+    guard let touch = touches.first, isPointerSeekAllowed(touch) else {
       super.touchesEnded(touches, with: event)
       return
     }
-    guard isPointerSeekAllowed(touch) else {
-      super.touchesEnded(touches, with: event)
-      return
-    }
-    let location = touch.location(in: self)
-    let previousLocation = touch.previousLocation(in: self)
-    let dragDistance = hypot(location.x - previousLocation.x, location.y - previousLocation.y)
-    let isClick = dragDistance < 10
-
-    if isClick, let value = valueFromLocation(location) {
-      self.value = value
-      sendActions(for: .valueChanged)
-    }
+    _ = touch
     super.touchesEnded(touches, with: event)
   }
 
@@ -70,9 +67,9 @@ class SeekableTimeSlider: UISlider {
 
   private func isPointerSeekAllowed(_ touch: UITouch) -> Bool {
     #if targetEnvironment(macCatalyst)
-    return true
+      return true
     #else
-    return touch.type == .indirectPointer
+      return touch.type == .indirectPointer
     #endif
   }
 }
