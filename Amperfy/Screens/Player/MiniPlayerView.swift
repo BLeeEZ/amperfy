@@ -973,6 +973,17 @@ extension MiniPlayerView: MusicPlayable {
     )
   }
 
+  func didNowPlayingInfoChange() {
+    playerHandler?.refreshCurrentlyPlayingInfo(
+      artworkImage: artworkImage,
+      titleLabel: titleLabel,
+      artistLabel: subtitleLabel,
+      albumLabel: nil,
+      albumButton: nil,
+      albumContainerView: nil
+    )
+  }
+
   func didShuffleChange() {
     playerHandler?.refreshShuffleButton(shuffleButton: shuffleButton)
   }

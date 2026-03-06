@@ -386,6 +386,10 @@ extension PopupPlayerVC: MusicPlayable {
     refreshCurrentlyPlayingArtworks()
   }
 
+  func didNowPlayingInfoChange() {
+    refreshCurrentlyPlayingInfoView()
+  }
+
   func didShuffleChange() {}
   func didRepeatChange() {}
   func didPlaybackRateChange() {}

@@ -37,6 +37,7 @@ protocol BackendAudioPlayerNotifiable {
   func didItemFinishedPlaying()
   func notifyItemPreparationFinished()
   func notifyErrorOccurred(error: Error)
+  func didReadStreamMetadata(_ metadata: [String: String])
 }
 
 // MARK: - AudioStreamingPlayer
@@ -839,5 +840,9 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
   nonisolated func audioPlayerDidReadMetadata(
     player: AudioStreaming.AudioPlayer,
     metadata: [String: String]
-  ) {}
+  ) {
+    Task { @MainActor in
+      self.responder?.didReadStreamMetadata(metadata)
+    }
+  }
 }

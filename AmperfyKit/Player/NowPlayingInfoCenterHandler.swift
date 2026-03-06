@@ -73,6 +73,7 @@ public class NowPlayingInfoCenterHandler {
 
   private func updateNowPlayingInfo(playable: AbstractPlayable) {
     let albumTitle = playable.asSong?.album?.name ?? ""
+    let nowPlaying = displayNowPlayingInfo(for: playable)
 
     var artworkImage = UIImage()
     if let accountInfo = playable.account?.info {
@@ -94,9 +95,9 @@ public class NowPlayingInfoCenterHandler {
       MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,
 
       MPMediaItemPropertyIsCloudItem: !playable.isCached,
-      MPMediaItemPropertyTitle: playable.title,
+      MPMediaItemPropertyTitle: nowPlaying.title,
       MPMediaItemPropertyAlbumTitle: albumTitle,
-      MPMediaItemPropertyArtist: playable.creatorName,
+      MPMediaItemPropertyArtist: nowPlaying.artist,
 
       MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
       MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
@@ -116,6 +117,15 @@ public class NowPlayingInfoCenterHandler {
         }
       ),
     ]
+  }
+
+  private func displayNowPlayingInfo(for playable: AbstractPlayable) -> RadioNowPlayingInfo {
+    if playable.isRadio,
+       let radioInfo = musicPlayer.currentRadioNowPlaying,
+       !radioInfo.isEmpty {
+      return radioInfo
+    }
+    return RadioNowPlayingInfo(title: playable.title, artist: playable.creatorName)
   }
 
   @objc
@@ -170,6 +180,12 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   public func didPlaylistChange() {}
 
   public func didArtworkChange() {}
+
+  public func didNowPlayingInfoChange() {
+    if let curPlayable = musicPlayer.currentlyPlaying {
+      updateNowPlayingInfo(playable: curPlayable)
+    }
+  }
 
   public func didShuffleChange() {}
 

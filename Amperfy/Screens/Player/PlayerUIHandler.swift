@@ -261,11 +261,26 @@ class PlayerUIHandler: NSObject {
   ) {
     refreshArtwork(artworkImage: artworkImage)
     if let playableInfo = player.currentlyPlaying {
-      titleLabel.text = playableInfo.title
-      albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
-      albumButton?.isEnabled = playableInfo.isSong
-      albumContainerView?.isHidden = !playableInfo.isSong
-      artistLabel.text = playableInfo.creatorName
+      if playableInfo.isRadio {
+        // For radios, show stream metadata if available, otherwise show station name
+        if let radioInfo = player.currentRadioNowPlaying, !radioInfo.isEmpty {
+          titleLabel.text = radioInfo.title
+          artistLabel.text = radioInfo.artist
+        } else {
+          titleLabel.text = playableInfo.title
+          artistLabel.text = ""
+        }
+        // Show station name in album label
+        albumLabel?.text = playableInfo.title
+        albumButton?.isEnabled = false
+        albumContainerView?.isHidden = false
+      } else {
+        titleLabel.text = playableInfo.title
+        albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
+        albumButton?.isEnabled = playableInfo.isSong
+        albumContainerView?.isHidden = !playableInfo.isSong
+        artistLabel.text = playableInfo.creatorName
+      }
     } else {
       switch player.playerMode {
       case .music:

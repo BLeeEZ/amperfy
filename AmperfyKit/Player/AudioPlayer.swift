@@ -61,6 +61,8 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   private let settings: AmperfySettings
   private let userStatistics: UserStatistics
   private var notifierList: [WeakMusicPlayable] = []
+  public private(set) var currentRadioNowPlaying: RadioNowPlayingInfo?
+  private var lastRadioStreamTitle: String?
 
   init(
     coreData: PlayerStatusPersistent,
@@ -119,6 +121,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
 
   // BackendAudioPlayerNotifiable
   func notifyItemPreparationFinished() {
+    handleRadioStartIfNeeded()
     notifyItemStartedPlayingFromBeginning()
     notifyItemStartedPlaying()
   }
@@ -279,6 +282,12 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     notifyLyricsTimeChanged(time: time)
   }
 
+  // BackendAudioPlayerNotifiable
+  func didReadStreamMetadata(_ metadata: [String: String]) {
+    guard let radio = currentlyPlaying?.asRadio else { return }
+    updateRadioNowPlaying(from: metadata, radio: radio)
+  }
+
   private func savePlayInformation(of playable: AbstractPlayable) {
     let playDuration = backendAudioPlayer.duration
     let playProgress = backendAudioPlayer.elapsedTime
@@ -368,6 +377,13 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
   }
 
+  func notifyNowPlayingInfoChanged() {
+    notifierList = notifierList.filter { $0.value != nil }
+    for notifier in notifierList {
+      notifier.value?.didNowPlayingInfoChange()
+    }
+  }
+
   func notifyShuffleUpdated() {
     notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
@@ -387,5 +403,51 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     for notifier in notifierList {
       notifier.value?.didPlaybackRateChange()
     }
+  }
+
+  private func handleRadioStartIfNeeded() {
+    guard let radio = currentlyPlaying?.asRadio else {
+      if currentRadioNowPlaying != nil {
+        currentRadioNowPlaying = nil
+        lastRadioStreamTitle = nil
+        notifyNowPlayingInfoChanged()
+      }
+      return
+    }
+
+    currentRadioNowPlaying = nil
+    lastRadioStreamTitle = nil
+    notifyNowPlayingInfoChanged()
+  }
+
+  private func updateRadioNowPlaying(from metadata: [String: String], radio: Radio) {
+    guard let currentRadio = currentlyPlaying?.asRadio,
+          currentRadio.managedObject == radio.managedObject else { return }
+    let streamTitleKey = metadata.keys.first { $0.lowercased() == "streamtitle" }
+    guard let streamTitleKey,
+          let rawStreamTitle = metadata[streamTitleKey]
+    else { return }
+    let streamTitle = rawStreamTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !streamTitle.isEmpty else { return }
+    guard streamTitle != lastRadioStreamTitle else { return }
+
+    let parsedInfo = parseStreamTitle(streamTitle)
+    guard let parsedInfo, !parsedInfo.isEmpty else { return }
+
+    lastRadioStreamTitle = streamTitle
+    currentRadioNowPlaying = parsedInfo
+    notifyNowPlayingInfoChanged()
+  }
+
+  private func parseStreamTitle(_ streamTitle: String) -> RadioNowPlayingInfo? {
+    let cleaned = streamTitle.trimmingCharacters(in: CharacterSet(charactersIn: "\"'"))
+    let parts = cleaned.components(separatedBy: " - ")
+    if parts.count >= 2 {
+      let artist = parts.first?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+      let title = parts.dropFirst().joined(separator: " - ")
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+      return RadioNowPlayingInfo(title: title, artist: artist)
+    }
+    return RadioNowPlayingInfo(title: cleaned, artist: "")
   }
 }
