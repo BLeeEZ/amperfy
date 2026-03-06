@@ -31,6 +31,10 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
   private var lineSpacing: CGFloat = 16
   private var hasLastLyricsLineAlreadyDisplayedOnce = false
   private var scrollAnimation = true
+  private var suppressAutoScrollUntil: Date?
+  private let autoScrollSuppressionInterval: TimeInterval = 5.0
+
+  public var onLyricSelected: ((LyricsLine) -> Void)?
 
   override init(frame: CGRect, style: UITableView.Style) {
     super.init(frame: frame, style: style)
@@ -50,6 +54,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
 
     dataSource = self
     delegate = self
+    allowsSelection = true
 
     backgroundColor = .clear
   }
@@ -128,7 +133,38 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
     shouldHighlightRowAt indexPath: IndexPath
   )
     -> Bool {
-    false
+    guard lyrics?.synced == true,
+          let model = lyricModels.object(at: indexPath.row),
+          model.lyric?.start != nil
+    else { return false }
+    return true
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard lyrics?.synced == true,
+          let model = lyricModels.object(at: indexPath.row),
+          let lyric = model.lyric,
+          lyric.start != nil
+    else { return }
+    suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
+    onLyricSelected?(lyric)
+  }
+
+  public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
+  }
+
+  public func scrollViewDidEndDragging(
+    _ scrollView: UIScrollView,
+    willDecelerate decelerate: Bool
+  ) {
+    if !decelerate {
+      suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
+    }
+  }
+
+  public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
   }
 
   private func reloadViewModels() {
@@ -164,14 +200,21 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
           lyrics.synced // if the lyrics are not synced -> only display
     else { return }
 
+    let isAutoScrollAllowed: Bool = {
+      guard let suppressUntil = suppressAutoScrollUntil else { return true }
+      return Date() >= suppressUntil
+    }()
+
     guard let indexOfNextLine = lyrics.line.firstIndex(where: { $0.startTime >= time }) else {
       if !hasLastLyricsLineAlreadyDisplayedOnce {
-        scrollToRow(
-          at: IndexPath(row: lyricModels.count - 1, section: 0),
-          at: .middle,
-          animated: scrollAnimation
-        )
-        hasLastLyricsLineAlreadyDisplayedOnce = true
+        if isAutoScrollAllowed {
+          scrollToRow(
+            at: IndexPath(row: lyricModels.count - 1, section: 0),
+            at: .middle,
+            animated: scrollAnimation
+          )
+          hasLastLyricsLineAlreadyDisplayedOnce = true
+        }
       }
       if let lastIndex = lastIndex,
          let lastIndexModel = lyricModels.object(at: lastIndex) {
@@ -202,10 +245,12 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         reconfigureRows(at: [IndexPath(row: prevIndex, section: 0)])
       }
     }
-    scrollToRow(
-      at: IndexPath(row: indexOfCurrentLine, section: 0),
-      at: .middle,
-      animated: scrollAnimation
-    )
+    if isAutoScrollAllowed {
+      scrollToRow(
+        at: IndexPath(row: indexOfCurrentLine, section: 0),
+        at: .middle,
+        animated: scrollAnimation
+      )
+    }
   }
 }

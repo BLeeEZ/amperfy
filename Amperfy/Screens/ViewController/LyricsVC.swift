@@ -53,6 +53,10 @@ class LyricsVC: UIViewController {
       lyricsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
     ])
 
+    lyricsView.onLyricSelected = { [weak self] lyric in
+      self?.player.seek(toSecond: lyric.startTime.seconds)
+    }
+
     self.lyricsView = lyricsView
 
     player.addNotifier(notifier: self)
