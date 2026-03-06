@@ -34,7 +34,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
   private var suppressAutoScrollUntil: Date?
   private let autoScrollSuppressionInterval: TimeInterval = 5.0
 
-  public var onLyricSelected: ((LyricsLine) -> Void)?
+  public var onLyricSelected: ((LyricsLine) -> ())?
 
   override init(frame: CGRect, style: UITableView.Style) {
     super.init(frame: frame, style: style)
