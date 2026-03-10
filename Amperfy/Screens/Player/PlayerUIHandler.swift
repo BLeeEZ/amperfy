@@ -144,6 +144,10 @@ class PlayerUIHandler: NSObject {
     case .music:
       previouseImg = UIImage.backwardFill
       nextImg = UIImage.forwardFill
+
+      let isRadio = player.currentlyPlaying?.isRadio ?? false
+      previousButton.isEnabled = !isRadio
+      nextButton.isEnabled = !isRadio
     case .podcast:
       previouseImg = UIImage.goBackward15
       nextImg = UIImage.goForward30

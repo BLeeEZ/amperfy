@@ -235,8 +235,8 @@ public class RemoteCommandCenterHandler {
       remoteCommandCenter.pauseCommand.isEnabled = false
       remoteCommandCenter.togglePlayPauseCommand.isEnabled = false
       remoteCommandCenter.stopCommand.isEnabled = true
-      remoteCommandCenter.previousTrackCommand.isEnabled = true
-      remoteCommandCenter.nextTrackCommand.isEnabled = true
+      remoteCommandCenter.previousTrackCommand.isEnabled = false
+      remoteCommandCenter.nextTrackCommand.isEnabled = false
       remoteCommandCenter.skipBackwardCommand.isEnabled = false
       remoteCommandCenter.skipForwardCommand.isEnabled = false
       remoteCommandCenter.changeShuffleModeCommand.isEnabled = true
