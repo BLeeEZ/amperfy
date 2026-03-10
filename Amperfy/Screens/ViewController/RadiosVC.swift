@@ -184,11 +184,8 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   }
 
   func convertIndexPathToPlayContext(radioIndexPath: IndexPath) -> PlayContext? {
-    guard let radios = fetchedResultsController.getContextRadios()
-    else { return nil }
     let selectedRadio = fetchedResultsController.getWrappedEntity(at: radioIndexPath)
-    guard let playContextIndex = radios.firstIndex(of: selectedRadio) else { return nil }
-    return PlayContext(name: sceneTitle ?? "", index: playContextIndex, playables: radios)
+    return PlayContext(name: sceneTitle ?? "", index: 0, playables: [selectedRadio])
   }
 
   func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
