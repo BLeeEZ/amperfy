@@ -174,4 +174,34 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.artwork?.id, "71381")
     XCTAssertEqual(song.artwork, song1Artwork)
   }
+
+  func testSimilarSongs2WrapperParsing() {
+    let similarSongsData = getTestFileData(name: "similarSongs2_example_1")
+
+    let idParserDelegate = SsIDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+    let idParser = XMLParser(data: similarSongsData)
+    idParser.delegate = idParserDelegate
+    idParser.parse()
+    XCTAssertNil(idParserDelegate.error)
+
+    let prefetch = library.getElements(account: account, prefetchIDs: idParserDelegate.prefetchIDs)
+    let parserDelegate = SsSongParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      prefetch: prefetch,
+      account: account,
+      library: library,
+      parseNotifier: nil
+    )
+    let parser = XMLParser(data: similarSongsData)
+    parser.delegate = parserDelegate
+    parser.parse()
+    XCTAssertNil(parserDelegate.error)
+
+    let songs = library.getSongs(for: account).sorted(by: { $0.id < $1.id })
+    XCTAssertEqual(songs.count, 2)
+    XCTAssertEqual(songs[0].id, "71458")
+    XCTAssertEqual(songs[0].title, "It's A Long Way To The Top")
+    XCTAssertEqual(songs[1].id, "71463")
+    XCTAssertEqual(songs[1].title, "The Jack")
+  }
 }

@@ -929,6 +929,18 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     }
   }
 
+  public func requestSimilarSongs(id: String, count: Int = 50) async throws -> APIDataResponse {
+    try await request { version in
+      var urlComp = try self.createAuthApiUrlComponent(
+        version: version,
+        forAction: "getSimilarSongs2",
+        id: id
+      )
+      urlComp.addQueryItem(name: "count", value: count)
+      return try self.createUrl(from: urlComp)
+    }
+  }
+
   private func createUrl(from urlComp: URLComponents) throws -> URL {
     if let url = urlComp.url {
       return url

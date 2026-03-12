@@ -1008,6 +1008,13 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   }
 
   @MainActor
+  func requestSimilarSongs(song: Song, count: Int) async throws -> [Song] {
+    // Ampache does not support similar songs API
+    // Return empty array
+    []
+  }
+
+  @MainActor
   func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) async throws {
     guard isSyncAllowed else { return }
     let response = try await ampacheXmlServerApi.requestPodcastEpisodeDelete(id: podcastEpisode.id)

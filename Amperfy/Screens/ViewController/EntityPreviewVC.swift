@@ -69,6 +69,7 @@ class EntityPreviewActionBuilder {
   private var isGoToSiteUrl = false
   private var isShowPodcastDetails = false
   private var isShowSongDetails = false
+  private var isInstantMix = false
 
   init(
     container: PlayableContainable,
@@ -102,6 +103,9 @@ class EntityPreviewActionBuilder {
     }
     if isShuffle {
       playActions.append(createPlayShuffledAction())
+    }
+    if isInstantMix {
+      playActions.append(createInstantMixAction())
     }
     if !playActions.isEmpty {
       menuActions.append(UIMenu(options: .displayInline, children: playActions))
@@ -257,6 +261,9 @@ class EntityPreviewActionBuilder {
     isGoToSiteUrl = false
     isShowPodcastDetails = false
     isShowSongDetails = true
+    isInstantMix =
+      appDelegate.storage.settings.user.isOnlineMode &&
+      song.account?.apiType == .subsonic
   }
 
   private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -440,6 +447,63 @@ class EntityPreviewActionBuilder {
           playables: self.entityPlayables
         ))
       }
+    }
+  }
+
+  private func createInstantMixAction() -> UIAction {
+    UIAction(title: "Instant Mix", image: .shuffle) { [weak self] action in
+      guard let self = self,
+            let song = (entityContainer as? AbstractPlayable)?.asSong
+      else { return }
+
+      Task { @MainActor in
+        await self.createAndPlayInstantMix(for: song)
+      }
+    }
+  }
+
+  private func createAndPlayInstantMix(for song: Song) async {
+    do {
+      // Get the library syncer for the song's account
+      guard let account = song.account else {
+        appDelegate.eventLogger.error(
+          topic: "Instant Mix",
+          statusCode: .commonError,
+          message: "Song has no account",
+          displayPopup: true
+        )
+        return
+      }
+
+      let librarySyncer = appDelegate.getMeta(account.info).librarySyncer
+
+      // Fetch similar songs from backend
+      let similarSongs = try await librarySyncer.requestSimilarSongs(song: song, count: 99)
+
+      if similarSongs.isEmpty {
+        appDelegate.eventLogger.info(
+          topic: "Instant Mix",
+          message: "No similar songs found",
+          displayPopup: true
+        )
+        return
+      }
+
+      // Create playlist: seed song + similar songs
+      var allSongs = [song] + similarSongs
+
+      // Create play context and start playing
+      let context = PlayContext(name: "Instant Mix: \(song.title)", playables: allSongs)
+      appDelegate.player.play(context: context)
+
+      appDelegate.eventLogger.info(
+        topic: "Instant Mix",
+        message: "Playing instant mix with \(allSongs.count) songs",
+        displayPopup: true
+      )
+
+    } catch {
+      appDelegate.eventLogger.report(topic: "Instant Mix", error: error)
     }
   }
 
