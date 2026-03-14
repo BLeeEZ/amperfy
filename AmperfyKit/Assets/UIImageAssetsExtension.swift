@@ -225,6 +225,7 @@ public struct AmperfyImage: Sendable {
   public static let settings = Self("gear")
   public static let shuffle = Self("shuffle")
   public static let shuffleMenu = Self("shuffle")
+  public static let instantMix = Self("point.3.filled.connected.trianglepath.dotted")
   public static let skipBackward10 = Self("gobackward.10")
   public static let skipBackward15 = Self("gobackward.15")
   public static let skipBackwardMenu = Self("gobackward")
@@ -365,6 +366,7 @@ extension UIImage {
   public static let serverUrl = UIImage.create(systemName: AmperfyImage.serverUrl.systemName)
   public static let settings = UIImage.create(systemName: AmperfyImage.settings.systemName)
   public static let shuffle = UIImage.create(systemName: AmperfyImage.shuffle.systemName)
+  public static let instantMix = UIImage.create(systemName: AmperfyImage.instantMix.systemName)
   public static let shuffleMenu = UIImage.create(systemName: AmperfyImage.shuffleMenu.systemName)
   public static let skipBackward10 = UIImage
     .create(systemName: AmperfyImage.skipBackward10.systemName)

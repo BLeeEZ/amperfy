@@ -261,9 +261,7 @@ class EntityPreviewActionBuilder {
     isGoToSiteUrl = false
     isShowPodcastDetails = false
     isShowSongDetails = true
-    isInstantMix =
-      appDelegate.storage.settings.user.isOnlineMode &&
-      song.account?.apiType == .subsonic
+    isInstantMix = appDelegate.storage.settings.user.isOnlineMode
   }
 
   private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -451,7 +449,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func createInstantMixAction() -> UIAction {
-    UIAction(title: "Instant Mix", image: .shuffle) { [weak self] action in
+    UIAction(title: "Instant Mix", image: .instantMix) { [weak self] action in
       guard let self = self,
             let song = (entityContainer as? AbstractPlayable)?.asSong
       else { return }

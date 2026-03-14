@@ -721,6 +721,17 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     }
   }
 
+  public func requestSimilarSongs(id: String, count: Int = 50) async throws -> APIDataResponse {
+    try await request { auth in
+      var urlComp = try self.createAuthApiUrlComponent(auth: auth)
+      urlComp.addQueryItem(name: "action", value: "get_similar")
+      urlComp.addQueryItem(name: "type", value: "song")
+      urlComp.addQueryItem(name: "filter", value: id)
+      urlComp.addQueryItem(name: "limit", value: count)
+      return try self.createUrl(from: urlComp)
+    }
+  }
+
   private func createUrl(from urlComp: URLComponents) throws -> URL {
     if let url = urlComp.url {
       return url
