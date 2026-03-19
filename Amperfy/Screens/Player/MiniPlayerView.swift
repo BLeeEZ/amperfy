@@ -111,8 +111,8 @@ class MiniPlayerView: UIView {
     return label
   }()
 
-  fileprivate lazy var timeSlider: UISlider = {
-    let slider = UISlider(frame: .zero)
+  fileprivate lazy var timeSlider: SeekableTimeSlider = {
+    let slider = SeekableTimeSlider(frame: .zero)
     slider.preferredBehavioralStyle = .pad
     return slider
   }()
