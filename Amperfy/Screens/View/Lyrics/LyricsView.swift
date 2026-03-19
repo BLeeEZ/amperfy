@@ -33,11 +33,16 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
   private var scrollAnimation = true
   private var isFirstScroll = true
   private var isUnsyncedLyrics = false
-  
+
   // Interlude overlay
   private var interludeOverlay: InterludeOverlayView?
   private var isShowingInterlude = false
   private static let interludeGapThreshold: TimeInterval = 3.0
+
+  private var suppressAutoScrollUntil: Date?
+  private let autoScrollSuppressionInterval: TimeInterval = 5.0
+
+  public var onLyricSelected: ((LyricsLine) -> ())?
 
   override init(frame: CGRect, style: UITableView.Style) {
     super.init(frame: frame, style: style)
@@ -57,6 +62,7 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
 
     dataSource = self
     delegate = self
+    allowsSelection = true
 
     backgroundColor = .clear
     
@@ -192,7 +198,38 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
     shouldHighlightRowAt indexPath: IndexPath
   )
     -> Bool {
-    false
+    guard lyrics?.synced == true,
+          let model = lyricModels.object(at: indexPath.row),
+          model.lyric?.start != nil
+    else { return false }
+    return true
+  }
+
+  public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard lyrics?.synced == true,
+          let model = lyricModels.object(at: indexPath.row),
+          let lyric = model.lyric,
+          lyric.start != nil
+    else { return }
+    suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
+    onLyricSelected?(lyric)
+  }
+
+  public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+    suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
+  }
+
+  public func scrollViewDidEndDragging(
+    _ scrollView: UIScrollView,
+    willDecelerate decelerate: Bool
+  ) {
+    if !decelerate {
+      suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
+    }
+  }
+
+  public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+    suppressAutoScrollUntil = Date().addingTimeInterval(autoScrollSuppressionInterval)
   }
 
   private func reloadViewModels() {
@@ -234,23 +271,28 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
     if isFirstScroll {
       isFirstScroll = false
     }
-    
+
+    let isAutoScrollAllowed: Bool = {
+      guard let suppressUntil = suppressAutoScrollUntil else { return true }
+      return Date() >= suppressUntil
+    }()
+
     let currentTimeSeconds = CMTimeGetSeconds(time)
-    
+
     // Check for intro (before first lyric) - only place we show interlude
     let firstLineStart = CMTimeGetSeconds(lyrics.line[0].startTime)
-    
+
     // Timing for interlude fade out - start fading 0.8 seconds before first lyric
     let fadeOutStartTime = firstLineStart - 0.8
-    
+
     if currentTimeSeconds < firstLineStart {
       // Show interlude during intro if:
       // 1. There's enough time before first lyric (>= 3 seconds)
       // 2. We're at least 0.5 seconds into the song
       // 3. We haven't started fading out yet
-      if firstLineStart >= Self.interludeGapThreshold && 
-         currentTimeSeconds >= 0.5 && 
-         currentTimeSeconds < fadeOutStartTime {
+      if firstLineStart >= Self.interludeGapThreshold &&
+        currentTimeSeconds >= 0.5 &&
+        currentTimeSeconds < fadeOutStartTime {
         showInterlude()
       } else if currentTimeSeconds >= fadeOutStartTime {
         // Start fading out before lyrics begin
@@ -276,12 +318,14 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
       let lastLineIndex = lyricModels.count - 1
       
       if !hasLastLyricsLineAlreadyDisplayedOnce {
-        scrollToRow(
-          at: IndexPath(row: lastLineIndex, section: 0),
-          at: .middle,
-          animated: shouldAnimate
-        )
-        hasLastLyricsLineAlreadyDisplayedOnce = true
+        if isAutoScrollAllowed {
+          scrollToRow(
+            at: IndexPath(row: lastLineIndex, section: 0),
+            at: .middle,
+            animated: shouldAnimate
+          )
+          hasLastLyricsLineAlreadyDisplayedOnce = true
+        }
       }
       
       // Deactivate previous line if different from last line
@@ -323,11 +367,13 @@ class LyricsView: UITableView, UITableViewDataSource, UITableViewDelegate {
         reloadRows(at: [IndexPath(row: prevIndex, section: 0)], with: .none)
       }
     }
-    scrollToRow(
-      at: IndexPath(row: indexOfCurrentLine, section: 0),
-      at: .middle,
-      animated: shouldAnimate
-    )
+    if isAutoScrollAllowed {
+      scrollToRow(
+        at: IndexPath(row: indexOfCurrentLine, section: 0),
+        at: .middle,
+        animated: shouldAnimate
+      )
+    }
   }
   
   private func showInterlude() {

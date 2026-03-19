@@ -141,7 +141,7 @@ class SwiftUIContentView: UIView {
 
 // MARK: - LargeCurrentlyPlayingPlayerView
 
-class LargeCurrentlyPlayingPlayerView: UIView {
+class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
   static let rowHeight: CGFloat = 94.0
   static private let margin = UIEdgeInsets(
     top: 0,
@@ -212,7 +212,12 @@ class LargeCurrentlyPlayingPlayerView: UIView {
 
     lyricsView = LyricsView()
     lyricsView!.frame = upperContainerView.bounds
+    lyricsView!.onLyricSelected = { [weak self] lyric in
+      self?.appDelegate.player.seek(toSecond: lyric.startTime.seconds)
+    }
     let lyricsTap = UITapGestureRecognizer(target: self, action: #selector(handleLyricsTap(_:)))
+    lyricsTap.cancelsTouchesInView = false
+    lyricsTap.delegate = self
     lyricsView!.addGestureRecognizer(lyricsTap)
     upperContainerView.addSubview(lyricsView!)
 
@@ -350,6 +355,15 @@ class LargeCurrentlyPlayingPlayerView: UIView {
       display(element: .artwork)
       refreshRating()
     }
+  }
+
+  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch)
+    -> Bool {
+    guard let lyricsView = lyricsView,
+          gestureRecognizer is UITapGestureRecognizer
+    else { return true }
+    let location = touch.location(in: lyricsView)
+    return lyricsView.indexPathForRow(at: location) == nil
   }
 
   private func addSwipeGesturesToArtwork() {
