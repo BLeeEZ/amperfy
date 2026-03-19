@@ -170,6 +170,7 @@ public protocol PlayerFacade {
   var currentlyPlaying: AbstractPlayable? { get }
   var currentMusicItem: AbstractPlayable? { get }
   var currentPodcastItem: AbstractPlayable? { get }
+  var currentRadioNowPlaying: RadioNowPlayingInfo? { get }
   var contextName: String { get }
   var elapsedTime: Double { get }
   var duration: Double { get }
@@ -403,6 +404,10 @@ class PlayerFacadeImpl: PlayerFacade {
 
   var currentPodcastItem: AbstractPlayable? {
     musicPlayer.currentPodcastItem
+  }
+
+  var currentRadioNowPlaying: RadioNowPlayingInfo? {
+    musicPlayer.currentRadioNowPlaying
   }
 
   var contextName: String {

@@ -35,6 +35,7 @@ public protocol MusicPlayable: AnyObject {
   func didLyricsTimeChange(time: CMTime) // high refresh count
   func didPlaylistChange()
   func didArtworkChange()
+  func didNowPlayingInfoChange()
   func didShuffleChange()
   func didRepeatChange()
   func didPlaybackRateChange()
@@ -42,6 +43,7 @@ public protocol MusicPlayable: AnyObject {
 
 extension MusicPlayable {
   public func didLyricsTimeChange(time: CMTime) {} // make it an optional method
+  public func didNowPlayingInfoChange() {}
 }
 
 extension MusicPlayable {
@@ -49,6 +51,22 @@ extension MusicPlayable {
   func didRepeatChange() {}
   func didPlaybackRateChange() {}
   func errorOccurred(error: Error) {}
+}
+
+// MARK: - RadioNowPlayingInfo
+
+public struct RadioNowPlayingInfo: Equatable, Sendable {
+  public let title: String
+  public let artist: String
+
+  public init(title: String, artist: String) {
+    self.title = title
+    self.artist = artist
+  }
+
+  public var isEmpty: Bool {
+    title.isEmpty && artist.isEmpty
+  }
 }
 
 // MARK: - RepeatMode

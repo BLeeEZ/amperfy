@@ -261,20 +261,35 @@ class PlayerUIHandler: NSObject {
   ) {
     refreshArtwork(artworkImage: artworkImage)
     if let playableInfo = player.currentlyPlaying {
-      // Display track number in front of title for songs if there are multiple songs
-      // from the same album in the queue
-      let shouldShowTrackNumber = playableInfo.isSong && 
-                                   playableInfo.track > 0 && 
-                                   hasMultipleSongsFromSameAlbumInQueue(playableInfo)
-      if shouldShowTrackNumber {
-        titleLabel.text = "\(playableInfo.track). \(playableInfo.title)"
+      if playableInfo.isRadio {
+        // For radios, show stream metadata if available, otherwise show station name
+        if let radioInfo = player.currentRadioNowPlaying, !radioInfo.isEmpty {
+          titleLabel.text = radioInfo.title
+          artistLabel.text = radioInfo.artist
+        } else {
+          titleLabel.text = playableInfo.title
+          artistLabel.text = ""
+        }
+        // Show station name in album label
+        albumLabel?.text = playableInfo.title
+        albumButton?.isEnabled = false
+        albumContainerView?.isHidden = false
       } else {
-        titleLabel.text = playableInfo.title
+        // Display track number in front of title for songs if there are multiple songs
+        // from the same album in the queue
+        let shouldShowTrackNumber = playableInfo.isSong &&
+          playableInfo.track > 0 &&
+          hasMultipleSongsFromSameAlbumInQueue(playableInfo)
+        if shouldShowTrackNumber {
+          titleLabel.text = "\(playableInfo.track). \(playableInfo.title)"
+        } else {
+          titleLabel.text = playableInfo.title
+        }
+        albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
+        albumButton?.isEnabled = playableInfo.isSong
+        albumContainerView?.isHidden = !playableInfo.isSong
+        artistLabel.text = playableInfo.creatorName
       }
-      albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
-      albumButton?.isEnabled = playableInfo.isSong
-      albumContainerView?.isHidden = !playableInfo.isSong
-      artistLabel.text = playableInfo.creatorName
     } else {
       switch player.playerMode {
       case .music:
