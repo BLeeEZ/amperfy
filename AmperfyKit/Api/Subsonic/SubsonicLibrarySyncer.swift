@@ -905,6 +905,40 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   }
 
   @MainActor
+  func requestSimilarSongs(song: Song, count: Int) async throws -> [Song] {
+    guard isSyncAllowed else { return [] }
+    let response = try await subsonicServerApi.requestSimilarSongs(id: song.id, count: count)
+
+    let similarSongObjectIds: [NSManagedObjectID] = try await storage.async.performAndGet {
+      asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: response,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
+
+      let parserDelegate = SsSongParserDelegate(
+        performanceMonitor: self.performanceMonitor,
+        prefetch: prefetch,
+        account: accountAsync,
+        library: asyncCompanion.library
+      )
+      try self.parse(response: response, delegate: parserDelegate)
+      return parserDelegate.parsedSongs.compactMap { $0.managedObject.objectID }
+    }
+
+    return try similarSongObjectIds.map {
+      Song(managedObject: try storage.main.context.existingObject(with: $0) as! SongMO)
+    }
+  }
+
+  @MainActor
   func requestPodcastEpisodeDelete(podcastEpisode: PodcastEpisode) async throws {
     guard isSyncAllowed else { return }
     let response = try await subsonicServerApi.requestPodcastEpisodeDelete(id: podcastEpisode.id)

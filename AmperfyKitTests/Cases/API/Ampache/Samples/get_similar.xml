@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+<total_count>5</total_count>
+<song id="41039">
+	<title><![CDATA[Somebody Told Me]]></title>
+	<name><![CDATA[Somebody Told Me]]></name>
+		<artist id="2277"><![CDATA[The Killers]]></artist>
+		<album id="50260"><![CDATA[Hot Fuss]]></album>
+</song>
+<song id="41037">
+	<title><![CDATA[Smile Like You Mean It]]></title>
+	<name><![CDATA[Smile Like You Mean It]]></name>
+		<artist id="2277"><![CDATA[The Killers]]></artist>
+		<album id="50260"><![CDATA[Hot Fuss]]></album>
+</song>
+<song id="169876">
+	<title><![CDATA[Sex on Fire]]></title>
+	<name><![CDATA[Sex on Fire]]></name>
+		<artist id="5774"><![CDATA[Kings of Leon]]></artist>
+		<album id="56356"><![CDATA[Only by the Night]]></album>
+</song>
+<song id="169866">
+	<title><![CDATA[Use Somebody]]></title>
+	<name><![CDATA[Use Somebody]]></name>
+		<artist id="5774"><![CDATA[Kings of Leon]]></artist>
+		<album id="56356"><![CDATA[Only by the Night]]></album>
+</song>
+<song id="777754">
+	<title><![CDATA[Fluorescent Adolescent]]></title>
+	<name><![CDATA[Fluorescent Adolescent]]></name>
+		<artist id="10468"><![CDATA[Arctic Monkeys]]></artist>
+		<album id="84543"><![CDATA[Favourite Worst Nightmare]]></album>
+</song>
+</root>
