@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24057"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -22,7 +22,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="375" height="536"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BiX-ge-9XM" userLabel="Artwork Button">
-                                    <rect key="frame" x="37.5" y="118" width="300" height="300"/>
+                                    <rect key="frame" x="7.5" y="88" width="360" height="360"/>
                                     <state key="normal" title="Button"/>
                                     <buttonConfiguration key="configuration" style="plain"/>
                                     <connections>
@@ -30,10 +30,10 @@
                                     </connections>
                                 </button>
                                 <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4sr-YU-gYi" customClass="LibraryEntityImage" customModule="AmperfyKit">
-                                    <rect key="frame" x="37.5" y="118" width="300" height="300"/>
+                                    <rect key="frame" x="7.5" y="88" width="360" height="360"/>
                                     <constraints>
                                         <constraint firstAttribute="width" secondItem="4sr-YU-gYi" secondAttribute="height" multiplier="1:1" id="0Rb-po-1Ij"/>
-                                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="300" id="t8J-Id-9KE"/>
+                                        <constraint firstAttribute="width" relation="lessThanOrEqual" constant="360" id="t8J-Id-9KE"/>
                                     </constraints>
                                 </imageView>
                             </subviews>
@@ -226,7 +226,7 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.2196078431372549" blue="0.23529411764705882" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
