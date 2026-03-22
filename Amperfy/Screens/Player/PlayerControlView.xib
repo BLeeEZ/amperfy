@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24504"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -177,6 +177,7 @@
                         <button opaque="NO" clipsSubviews="YES" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="6Pl-OT-ev0" userLabel="Volume Button">
                             <rect key="frame" x="204" y="0.0" width="28" height="28"/>
                             <constraints>
+                                <constraint firstAttribute="width" secondItem="6Pl-OT-ev0" secondAttribute="height" multiplier="1:1" id="17H-kZ-Fa5"/>
                                 <constraint firstAttribute="width" constant="28" id="Pf6-ox-Kmc"/>
                                 <constraint firstAttribute="width" secondItem="6Pl-OT-ev0" secondAttribute="height" multiplier="1:1" id="rZT-aA-wsC"/>
                             </constraints>
@@ -185,7 +186,7 @@
                             <inset key="contentEdgeInsets" minX="2" minY="2" maxX="2" maxY="2"/>
                             <state key="normal">
                                 <color key="titleColor" systemColor="labelColor"/>
-                                <imageReference key="image" image="volume.3.fill" catalog="system" symbolScale="medium"/>
+                                <imageReference key="image" image="speaker.wave.3.fill" catalog="system" symbolScale="medium"/>
                             </state>
                             <connections>
                                 <action selector="volumeButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="hyp-0o-Z8e"/>
@@ -205,7 +206,6 @@
                         </button>
                     </subviews>
                     <constraints>
-                        <constraint firstItem="6Pl-OT-ev0" firstAttribute="width" secondItem="6Pl-OT-ev0" secondAttribute="height" multiplier="1:1" id="17H-kZ-Fa5"/>
                         <constraint firstAttribute="width" constant="300" id="dMH-9W-9do"/>
                     </constraints>
                 </stackView>
@@ -304,7 +304,7 @@
         <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="play.fill" catalog="system" width="120" height="128"/>
         <image name="podcast" width="10" height="11"/>
-        <image name="volume.3.fill" catalog="system" width="128" height="84"/>
+        <image name="speaker.wave.3.fill" catalog="system" width="128" height="84"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
