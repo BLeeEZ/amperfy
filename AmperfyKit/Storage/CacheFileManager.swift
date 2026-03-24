@@ -36,8 +36,6 @@ public class MimeFileConverter {
 
   static let iOSIncompatibleMimeTypes = [
     "audio/x-ms-wma",
-    "audio/ogg",
-    "application/ogg",
     mimeTypeUnknown,
   ]
 
