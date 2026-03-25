@@ -88,5 +88,10 @@ final class Settings: ObservableObject {
   var equalizerSettings: [EqualizerSetting] = []
 
   @Published
+  var activeParametricEqualizerSetting: ParametricEqualizerSetting = .off
+  @Published
+  var parametricEqualizerSettings: [ParametricEqualizerSetting] = []
+
+  @Published
   var isReplayGainEnabled = true
 }
