@@ -1677,7 +1677,6 @@ public class LibraryStorage: PlayableFileCachable {
       getFetchPredicate(forAccount: account),
       SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
       NSPredicate(format: "%K == nil", #keyPath(SongMO.relFilePath)),
-      NSPredicate(format: "%K == nil", #keyPath(SongMO.download)),
     ])
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
