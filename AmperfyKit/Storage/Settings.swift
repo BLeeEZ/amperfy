@@ -207,6 +207,12 @@ public struct UserSettings: Sendable, Codable {
     set { _replayGainPreamp = max(-8, min(8, newValue)) }
   }
 
+  private var _isMiniPlayerAlwaysOnTop: Bool = false
+  public var isMiniPlayerAlwaysOnTop: Bool {
+    get { _isMiniPlayerAlwaysOnTop }
+    set { _isMiniPlayerAlwaysOnTop = newValue }
+  }
+
   private var _playerVolume: Float = 1.0
   public var playerVolume: Float {
     get {

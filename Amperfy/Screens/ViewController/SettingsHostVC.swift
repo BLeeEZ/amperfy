@@ -237,6 +237,15 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isHapticsEnabled = newValue
     }))
 
+    settings.isMiniPlayerAlwaysOnTop = appDelegate.storage.settings.user.isMiniPlayerAlwaysOnTop
+    changesAgent.append(settings.$isMiniPlayerAlwaysOnTop.sink(receiveValue: { newValue in
+      let hasValueChanged = self.appDelegate.storage.settings.user
+        .isMiniPlayerAlwaysOnTop != newValue
+      guard hasValueChanged else { return }
+      self.appDelegate.storage.settings.user.isMiniPlayerAlwaysOnTop = newValue
+      self.appDelegate.updateMiniPlayerAlwaysOnTop()
+    }))
+
     settings.appearanceMode = appDelegate.storage.settings.user.appearanceMode
     changesAgent.append(settings.$appearanceMode.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.appearanceMode = newValue

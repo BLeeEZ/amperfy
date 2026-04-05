@@ -377,6 +377,15 @@ extension AppDelegate {
       }
   }
 
+  func updateMiniPlayerAlwaysOnTop() {
+    #if targetEnvironment(macCatalyst)
+      MacWindowHelper.setAlwaysOnTop(
+        storage.settings.user.isMiniPlayerAlwaysOnTop,
+        sceneTitle: MiniPlayerSceneDelegate.sceneTitle
+      )
+    #endif
+  }
+
   func createSleepTimerMenu(refreshCB: VoidFunctionCallback?) -> UIMenuElement {
     if let timer = sleepTimer {
       let actionTitle = "Turn Off (Pause at: \(timer.fireDate.asShortHrMinString))"

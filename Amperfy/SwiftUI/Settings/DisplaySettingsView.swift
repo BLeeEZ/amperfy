@@ -93,6 +93,19 @@ struct DisplaySettingsView: View {
           )
         #endif
 
+        #if targetEnvironment(macCatalyst)
+          SettingsSection(
+            content: {
+              SettingsCheckBoxRow(
+                title: "Mini Player Always on Top",
+                isOn: $settings.isMiniPlayerAlwaysOnTop
+              )
+            },
+            footer:
+            "Keep the mini player window floating above all other windows."
+          )
+        #endif
+
         SettingsSection(
           content: {
             SettingsCheckBoxRow(

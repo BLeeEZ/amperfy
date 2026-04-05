@@ -89,7 +89,10 @@ final class Settings: ObservableObject {
 
   @Published
   var isReplayGainEnabled = true
-  
+
   @Published
   var replayGainPreamp: Int = 0
+
+  @Published
+  var isMiniPlayerAlwaysOnTop = false
 }

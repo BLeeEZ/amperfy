@@ -25,6 +25,8 @@ import SwiftUI
 import UIKit
 
 class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
+  static let sceneTitle = "Amperfy Mini Player"
+
   public lazy var log = {
     AmperKit.shared.log
   }()
@@ -47,6 +49,10 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     window = UIWindow(windowScene: windowScene)
     window?.backgroundColor = .secondarySystemBackground
+
+    #if targetEnvironment(macCatalyst)
+      windowScene.title = Self.sceneTitle
+    #endif
 
     window?.rootViewController = PopupPlayerVC()
     window?.makeKeyAndVisible()
@@ -100,6 +106,12 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     os_log("MiniPlayer: sceneDidBecomeActive", log: self.log, type: .info)
     appDelegate.rebuildMainMenu()
+    #if targetEnvironment(macCatalyst)
+      MacWindowHelper.setAlwaysOnTop(
+        appDelegate.storage.settings.user.isMiniPlayerAlwaysOnTop,
+        sceneTitle: Self.sceneTitle
+      )
+    #endif
   }
 
   func sceneWillResignActive(_ scene: UIScene) {
