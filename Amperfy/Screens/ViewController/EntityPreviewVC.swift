@@ -70,6 +70,7 @@ class EntityPreviewActionBuilder {
   private var isShowPodcastDetails = false
   private var isShowSongDetails = false
   private var isInstantMix = false
+  private var isShareSong = false
 
   init(
     container: PlayableContainable,
@@ -159,6 +160,9 @@ class EntityPreviewActionBuilder {
     }
     if isDeleteOnServer {
       elementHandlingActions.append(createDeleteOnServerAction())
+    }
+    if isShareSong, let playable = entityContainer as? AbstractPlayable {
+      elementHandlingActions.append(createShareAction(playable: playable))
     }
     if isGoToSiteUrl, let url = (entityContainer as? AbstractPlayable)?.asRadio?.siteURL {
       elementHandlingActions.append(createGoToSiteUrl(url: url))
@@ -262,6 +266,7 @@ class EntityPreviewActionBuilder {
     isShowPodcastDetails = false
     isShowSongDetails = true
     isInstantMix = appDelegate.storage.settings.user.isOnlineMode
+    isShareSong = true
   }
 
   private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -793,6 +798,20 @@ class EntityPreviewActionBuilder {
         // do nothing
       }))
       self.rootView.present(alert, animated: true, completion: nil)
+    }
+  }
+
+  private func createShareAction(playable: AbstractPlayable) -> UIAction {
+    UIAction(
+      title: "Share",
+      image: UIImage(systemName: "square.and.arrow.up")
+    ) { _ in
+      ShareSongAction.share(
+        song: playable,
+        from: self.rootView.view,
+        presenter: self.rootView,
+        appDelegate: self.appDelegate
+      )
     }
   }
 
