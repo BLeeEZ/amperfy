@@ -99,8 +99,9 @@ class PlayerControlView: UIView {
   }
 
   private var infoButton: UIButton!
+  private var lyricsButton: UIButton!
   private var themeColor: UIColor = .customDarkLabel
-  
+
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
     rootView = toWorkOnRootView
 
@@ -124,7 +125,8 @@ class PlayerControlView: UIView {
     // Hide volume button and replace with info button
     volumeButton.isHidden = true
     setupInfoButton(themeColor: themeColor)
-    
+    setupLyricsButton(themeColor: themeColor)
+
     refreshPlayer()
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,
@@ -187,6 +189,49 @@ class PlayerControlView: UIView {
     }
     
     rootView?.present(metadataVC, animated: true)
+  }
+
+  private func setupLyricsButton(themeColor: UIColor) {
+    var buttonConfig = UIButton.Configuration.plain()
+    let symbolConfig = UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
+    buttonConfig.image = UIImage(systemName: "quote.bubble", withConfiguration: symbolConfig)
+    buttonConfig.baseForegroundColor = themeColor
+    buttonConfig.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
+
+    lyricsButton = UIButton(configuration: buttonConfig)
+    lyricsButton.translatesAutoresizingMaskIntoConstraints = false
+    lyricsButton.addTarget(self, action: #selector(lyricsButtonPressed), for: .touchUpInside)
+
+    // Insert lyrics button between info button and options button (just before "...")
+    if let optionsIndex = optionsStackView.arrangedSubviews.firstIndex(of: optionsButton) {
+      optionsStackView.insertArrangedSubview(lyricsButton, at: optionsIndex)
+    }
+
+    NSLayoutConstraint.activate([
+      lyricsButton.widthAnchor.constraint(equalToConstant: 28),
+      lyricsButton.heightAnchor.constraint(equalToConstant: 28),
+    ])
+
+    refreshLyricsButton()
+  }
+
+  @objc
+  private func lyricsButtonPressed() {
+    rootView?.largeCurrentlyPlayingView?.toggleLyricsDisplay()
+    refreshLyricsButton()
+  }
+
+  func refreshLyricsButton() {
+    guard let lyricsButton = lyricsButton else { return }
+    let isAllowed = rootView?.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false
+    lyricsButton.isHidden = !isAllowed
+
+    let isShowingLyrics = appDelegate.storage.settings.user.isPlayerLyricsDisplayed
+    let symbolConfig = UIImage.SymbolConfiguration(pointSize: 17, weight: .regular)
+    let imageName = isShowingLyrics ? "quote.bubble.fill" : "quote.bubble"
+    var config = lyricsButton.configuration ?? UIButton.Configuration.plain()
+    config.image = UIImage(systemName: imageName, withConfiguration: symbolConfig)
+    lyricsButton.configuration = config
   }
 
   @IBAction
@@ -325,6 +370,7 @@ class PlayerControlView: UIView {
     playerHandler?.refreshPrevNextButtons(previousButton: previousButton, nextButton: nextButton)
     playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton, themeColor: themeColor)
     refreshPlayerModeChangeButton()
+    refreshLyricsButton()
   }
 
   func createPlaybackRateMenu() -> UIMenuElement {

@@ -61,7 +61,10 @@ class LyricsVC: UIViewController {
     ])
 
     lyricsView.onLyricSelected = { [weak self] lyric in
-      self?.player.seek(toSecond: lyric.startTime.seconds)
+      // Seek slightly past the tapped lyric's start time so the player's
+      // playhead-driven highlight resolves to the tapped line rather than
+      // briefly snapping to the previous line.
+      self?.player.seek(toSecond: lyric.startTime.seconds + 0.2)
     }
 
     self.lyricsView = lyricsView

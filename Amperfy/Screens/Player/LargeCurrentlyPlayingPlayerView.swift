@@ -213,7 +213,10 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
     lyricsView = LyricsView()
     lyricsView!.frame = upperContainerView.bounds
     lyricsView!.onLyricSelected = { [weak self] lyric in
-      self?.appDelegate.player.seek(toSecond: lyric.startTime.seconds)
+      // Seek slightly past the tapped lyric's start time so the player's
+      // playhead-driven highlight resolves to the tapped line rather than
+      // briefly snapping to the previous line.
+      self?.appDelegate.player.seek(toSecond: lyric.startTime.seconds + 0.2)
     }
     let lyricsTap = UITapGestureRecognizer(target: self, action: #selector(handleLyricsTap(_:)))
     lyricsTap.cancelsTouchesInView = false
@@ -354,6 +357,7 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
       appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
       display(element: .artwork)
       refreshRating()
+      rootView?.controlView?.refreshLyricsButton()
     }
   }
 
@@ -402,6 +406,25 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
   private func handleArtworkTap(_ gesture: UITapGestureRecognizer) {
     // Toggle lyrics when artwork is tapped
     if isLyricsButtonAllowedToDisplay && displayElement != .lyrics {
+      appDelegate.storage.settings.user.isPlayerLyricsDisplayed = true
+      appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
+      display(element: .lyrics)
+      ratingView?.isHidden = true
+      infoButton?.isHidden = true
+      rootView?.controlView?.refreshLyricsButton()
+    }
+  }
+
+  /// Toggles between displaying lyrics and the artwork.
+  /// Called by the lyrics button in PlayerControlView so the user can hide/show
+  /// lyrics without tapping the lyrics view (which now seeks instead of hiding).
+  func toggleLyricsDisplay() {
+    guard isLyricsButtonAllowedToDisplay else { return }
+    if displayElement == .lyrics {
+      appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
+      display(element: .artwork)
+      refreshRating()
+    } else {
       appDelegate.storage.settings.user.isPlayerLyricsDisplayed = true
       appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
       display(element: .lyrics)
