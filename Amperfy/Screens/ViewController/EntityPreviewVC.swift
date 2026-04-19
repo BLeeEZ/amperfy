@@ -266,7 +266,7 @@ class EntityPreviewActionBuilder {
     isShowPodcastDetails = false
     isShowSongDetails = true
     isInstantMix = appDelegate.storage.settings.user.isOnlineMode
-    isShareSong = true
+    isShareSong = song.isCached || appDelegate.storage.settings.user.isOnlineMode
   }
 
   private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -806,11 +806,22 @@ class EntityPreviewActionBuilder {
       title: "Share",
       image: UIImage(systemName: "square.and.arrow.up")
     ) { _ in
+      // Used if the song is not cached, otherwise never called
+      let downloadManagerProvider: () -> DownloadManageable? = { [weak self] in
+        guard let self = self,
+              let accountInfo = playable.account?.info
+        else { return nil }
+        return appDelegate
+          .getMeta(accountInfo)
+          .playableDownloadManager
+      }
+
+      // Note: This is strongly coupled, I could protocolize and inject. But this is simplest and the project doesn't seem to do DI/tests for this target.
       ShareSongAction.share(
         song: playable,
         from: self.rootView.view,
         presenter: self.rootView,
-        appDelegate: self.appDelegate
+        downloadManagerProvider: downloadManagerProvider
       )
     }
   }

@@ -2,7 +2,7 @@
 //  ShareSongAction.swift
 //  Amperfy
 //
-//  Created by the Amperfy spike (Feature E — Share).
+//  Created by the Olivier Butler 18.04.2026.
 //  Copyright (c) 2026 Olivier Butler. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
@@ -19,19 +19,19 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-import AmperfyKit
 import UIKit
 
 /// Presents the iOS share sheet for a single song. If the song is not yet
 /// cached locally, triggers a download first and shows a progress alert.
-/// See BACKLOG.md §PR 6.
+///
+/// No shared state between functions, one prepares the song, one cleans a URL, one presents the sharing activity VC.
 @MainActor
-enum ShareSongAction {
-  static func share(
+public enum ShareSongAction {
+  public static func share(
     song: AbstractPlayable,
     from sourceView: UIView,
     presenter: UIViewController,
-    appDelegate: AppDelegate
+    downloadManagerProvider: () -> DownloadManageable?
   ) {
     // Already cached — present immediately.
     if let fileURL = cachedFileURL(for: song) {
@@ -43,9 +43,9 @@ enum ShareSongAction {
       )
       return
     }
-
-    // Not cached — trigger download, poll for completion.
-    guard let accountInfo = song.account?.info else { return }
+    guard let downloadManager = downloadManagerProvider() else {
+      return
+    }
 
     let progressAlert = UIAlertController(
       title: "Downloading\u{2026}",
@@ -58,8 +58,7 @@ enum ShareSongAction {
     })
     presenter.present(progressAlert, animated: true)
 
-    appDelegate.getMeta(accountInfo).playableDownloadManager
-      .download(object: song)
+    downloadManager.download(object: song)
 
     // Poll for the file to appear on disk (download manager is fire-and-forget).
     Task { @MainActor in
@@ -78,11 +77,11 @@ enum ShareSongAction {
           return
         }
       }
-      // Timed out.
+      // Timed out, show error
       progressAlert.dismiss(animated: true) {
         let errorAlert = UIAlertController(
           title: "Download failed",
-          message: "Couldn't download this song. Please try again.",
+          message: "The download took too long. Please try again.",
           preferredStyle: .alert
         )
         errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -99,19 +98,27 @@ enum ShareSongAction {
     return absoluteURL
   }
 
+  static func shareTextItem(title: String, artistName: String?) -> String {
+    let resolvedArtist = artistName ?? "Unknown artist"
+    return "\(title) \u{2014} \(resolvedArtist)"
+  }
+
+  static func sanitizedFileName(title: String, artistName: String?) -> String {
+    let resolvedArtist = artistName ?? "Unknown artist"
+    return "\(title) - \(resolvedArtist)"
+      .replacingOccurrences(of: "/", with: "-")
+      .replacingOccurrences(of: ":", with: "-")
+  }
+
   private static func presentActivityController(
     for song: AbstractPlayable,
     fileURL: URL,
     sourceView: UIView,
     presenter: UIViewController
   ) {
-    let artistName = song.asSong?.artist?.name ?? "Unknown artist"
-    let textItem = "\(song.title) \u{2014} \(artistName)"
-
-    // Rename to "Song Title - Artist.ext" for a friendly filename in the share sheet
-    let safeFileName = "\(song.title) - \(artistName)"
-      .replacingOccurrences(of: "/", with: "-")
-      .replacingOccurrences(of: ":", with: "-")
+    let artistName = song.asSong?.artist?.name
+    let textItem = shareTextItem(title: song.title, artistName: artistName)
+    let safeFileName = sanitizedFileName(title: song.title, artistName: artistName)
     let tempURL = FileManager.default.temporaryDirectory
       .appendingPathComponent(safeFileName)
       .appendingPathExtension(fileURL.pathExtension)
