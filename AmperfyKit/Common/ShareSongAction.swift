@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import LinkPresentation
 import UIKit
 
 /// Presents the iOS share sheet for a single song. If the song is not yet
@@ -126,8 +127,14 @@ public enum ShareSongAction {
     try? FileManager.default.copyItem(at: fileURL, to: tempURL)
     let shareURL = FileManager.default.fileExists(atPath: tempURL.path) ? tempURL : fileURL
 
+    let artwork = artworkImage(for: song)
+    let fileItemSource = SongShareItemSource(
+      fileURL: shareURL,
+      title: textItem,
+      artwork: artwork
+    )
     let activityVC = UIActivityViewController(
-      activityItems: [shareURL, textItem],
+      activityItems: [fileItemSource, textItem],
       applicationActivities: nil
     )
     activityVC.popoverPresentationController?.sourceView = sourceView
@@ -138,5 +145,58 @@ public enum ShareSongAction {
       }
     }
     presenter.present(activityVC, animated: true)
+  }
+
+  static func artworkImage(for song: AbstractPlayable) -> UIImage {
+    let settings = AmperKit.shared.storage.settings
+    let accountSettings = song.account.map { settings.accounts.getSetting($0.info) }
+      ?? settings.accounts.activeSetting
+    return LibraryEntityImage.getImageToDisplayImmediately(
+      libraryEntity: song,
+      themePreference: accountSettings.read.themePreference,
+      artworkDisplayPreference: accountSettings.read.artworkDisplayPreference,
+      useCache: false
+    )
+  }
+}
+
+private final class SongShareItemSource: NSObject, UIActivityItemSource {
+  let fileURL: URL
+  let title: String
+  let artwork: UIImage
+
+  init(fileURL: URL, title: String, artwork: UIImage) {
+    self.fileURL = fileURL
+    self.title = title
+    self.artwork = artwork
+  }
+
+  func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController)
+    -> Any {
+    fileURL
+  }
+
+  func activityViewController(
+    _ activityViewController: UIActivityViewController,
+    itemForActivityType activityType: UIActivity.ActivityType?
+  ) -> Any? {
+    fileURL
+  }
+
+  func activityViewController(
+    _ activityViewController: UIActivityViewController,
+    subjectForActivityType activityType: UIActivity.ActivityType?
+  ) -> String {
+    title
+  }
+
+  func activityViewControllerLinkMetadata(_ activityViewController: UIActivityViewController)
+    -> LPLinkMetadata? {
+    let metadata = LPLinkMetadata()
+    metadata.title = title
+    metadata.originalURL = fileURL
+    metadata.iconProvider = NSItemProvider(object: artwork)
+    metadata.imageProvider = NSItemProvider(object: artwork)
+    return metadata
   }
 }
