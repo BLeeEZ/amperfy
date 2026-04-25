@@ -21,47 +21,48 @@
 import UIKit
 
 class SeekableTimeSlider: UISlider {
-  static let hitAreaExpansion: CGFloat = 12
+  static let verticalHitAreaExpansion: CGFloat = 20
+  static let horizontalHitAreaExpansion: CGFloat = 8
 
   override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
-    let expandedBounds = bounds.insetBy(dx: 0, dy: -Self.hitAreaExpansion)
+    let expandedBounds = bounds.inset(
+      by: UIEdgeInsets(
+        top: -Self.verticalHitAreaExpansion,
+        left: -Self.horizontalHitAreaExpansion,
+        bottom: -Self.verticalHitAreaExpansion,
+        right: -Self.horizontalHitAreaExpansion
+      )
+    )
     return expandedBounds.contains(point)
   }
 
-  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    guard let touch = touches.first, isPointerSeekAllowed(touch) else {
-      super.touchesBegan(touches, with: event)
-      return
+  override func beginTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    guard isPointerSeekAllowed(touch) else {
+      return super.beginTracking(touch, with: event)
     }
-    let location = touch.location(in: self)
-    if let value = valueFromLocation(location) {
-      self.value = value
-      sendActions(for: .valueChanged)
-    }
-    super.touchesBegan(touches, with: event)
+    updateValue(for: touch.location(in: self))
+    return false
   }
 
-  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    guard let touch = touches.first, isPointerSeekAllowed(touch) else {
-      super.touchesMoved(touches, with: event)
-      return
+  override func continueTracking(_ touch: UITouch, with event: UIEvent?) -> Bool {
+    guard isPointerSeekAllowed(touch) else {
+      return super.continueTracking(touch, with: event)
     }
     // For pointer/mouse: suppress drag seeking and UISlider's continuous drag behavior.
-    _ = touch
+    return false
   }
 
-  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-    guard let touch = touches.first, isPointerSeekAllowed(touch) else {
-      super.touchesEnded(touches, with: event)
-      return
-    }
-    _ = touch
-    super.touchesEnded(touches, with: event)
+  private func updateValue(for location: CGPoint) {
+    guard let value = valueFromLocation(location) else { return }
+    self.value = value
+    sendActions(for: .valueChanged)
   }
 
   private func valueFromLocation(_ location: CGPoint) -> Float? {
-    guard bounds.width > 0 else { return nil }
-    let fraction = max(0, min(1, location.x / bounds.width))
+    let trackRect = trackRect(forBounds: bounds)
+    guard trackRect.width > 0 else { return nil }
+    let clampedX = min(max(location.x, trackRect.minX), trackRect.maxX)
+    let fraction = (clampedX - trackRect.minX) / trackRect.width
     return minimumValue + Float(fraction) * (maximumValue - minimumValue)
   }
 
