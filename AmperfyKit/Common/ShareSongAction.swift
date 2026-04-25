@@ -22,6 +22,8 @@
 import LinkPresentation
 import UIKit
 
+// MARK: - ShareSongAction
+
 /// Presents the iOS share sheet for a single song. If the song is not yet
 /// cached locally, triggers a download first and shows a progress alert.
 ///
@@ -48,9 +50,12 @@ public enum ShareSongAction {
       return
     }
 
+    let artistName = song.asSong?.artist?.name
+    let message = shareTextItem(title: song.title, artistName: artistName)
+
     let progressAlert = UIAlertController(
-      title: "Downloading\u{2026}",
-      message: song.title,
+      title: "Downloading\(CommonString.ellipsis)",
+      message: message,
       preferredStyle: .alert
     )
     var cancelled = false
@@ -100,13 +105,13 @@ public enum ShareSongAction {
   }
 
   static func shareTextItem(title: String, artistName: String?) -> String {
-    let resolvedArtist = artistName ?? "Unknown artist"
-    return "\(title) \u{2014} \(resolvedArtist)"
+    let resolvedArtist = artistName ?? "Unknown Artist"
+    return "\(resolvedArtist) - \(title)"
   }
 
   static func sanitizedFileName(title: String, artistName: String?) -> String {
-    let resolvedArtist = artistName ?? "Unknown artist"
-    return "\(title) - \(resolvedArtist)"
+    let resolvedArtist = artistName ?? "Unknown Artist"
+    return "\(resolvedArtist) - \(title)"
       .replacingOccurrences(of: "/", with: "-")
       .replacingOccurrences(of: ":", with: "-")
   }
@@ -160,6 +165,8 @@ public enum ShareSongAction {
   }
 }
 
+// MARK: - SongShareItemSource
+
 private final class SongShareItemSource: NSObject, UIActivityItemSource {
   let fileURL: URL
   let title: String
@@ -179,14 +186,16 @@ private final class SongShareItemSource: NSObject, UIActivityItemSource {
   func activityViewController(
     _ activityViewController: UIActivityViewController,
     itemForActivityType activityType: UIActivity.ActivityType?
-  ) -> Any? {
+  )
+    -> Any? {
     fileURL
   }
 
   func activityViewController(
     _ activityViewController: UIActivityViewController,
     subjectForActivityType activityType: UIActivity.ActivityType?
-  ) -> String {
+  )
+    -> String {
     title
   }
 

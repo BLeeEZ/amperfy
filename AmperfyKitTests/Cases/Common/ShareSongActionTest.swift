@@ -42,28 +42,28 @@ class ShareSongActionTest: XCTestCase {
   func testShareTextItemJoinsTitleAndArtistWithEmDash() {
     XCTAssertEqual(
       ShareSongAction.shareTextItem(title: "Song", artistName: "Artist"),
-      "Song \u{2014} Artist"
+      "Artist - Song"
     )
   }
 
   func testShareTextItemFallsBackWhenArtistNil() {
     XCTAssertEqual(
       ShareSongAction.shareTextItem(title: "Song", artistName: nil),
-      "Song \u{2014} Unknown artist"
+      "Unknown Artist - Song"
     )
   }
 
   func testSanitizedFileNameReplacesSlashAndColon() {
     XCTAssertEqual(
       ShareSongAction.sanitizedFileName(title: "A/B:C", artistName: "D/E:F"),
-      "A-B-C - D-E-F"
+      "D-E-F - A-B-C"
     )
   }
 
   func testSanitizedFileNameFallsBackWhenArtistNil() {
     XCTAssertEqual(
       ShareSongAction.sanitizedFileName(title: "Song", artistName: nil),
-      "Song - Unknown artist"
+      "Unknown Artist - Song"
     )
   }
 
