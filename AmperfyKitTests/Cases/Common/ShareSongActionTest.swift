@@ -39,31 +39,16 @@ class ShareSongActionTest: XCTestCase {
 
   // MARK: - Pure helpers
 
-  func testShareTextItemJoinsTitleAndArtistWithEmDash() {
-    XCTAssertEqual(
-      ShareSongAction.shareTextItem(title: "Song", artistName: "Artist"),
-      "Artist - Song"
-    )
-  }
-
-  func testShareTextItemFallsBackWhenArtistNil() {
-    XCTAssertEqual(
-      ShareSongAction.shareTextItem(title: "Song", artistName: nil),
-      "Unknown Artist - Song"
-    )
-  }
-
   func testSanitizedFileNameReplacesSlashAndColon() {
+    guard let cachedSong = library.getSong(for: account, id: "36") else {
+      XCTFail("Seeded cached song \"36\" not found")
+      return
+    }
+    cachedSong.title = "A/B:C"
+    cachedSong.artist?.name = "D/E:F"
     XCTAssertEqual(
-      ShareSongAction.sanitizedFileName(title: "A/B:C", artistName: "D/E:F"),
+      ShareSongAction.sanitizedFileName(playable: cachedSong),
       "D-E-F - A-B-C"
-    )
-  }
-
-  func testSanitizedFileNameFallsBackWhenArtistNil() {
-    XCTAssertEqual(
-      ShareSongAction.sanitizedFileName(title: "Song", artistName: nil),
-      "Unknown Artist - Song"
     )
   }
 
@@ -75,7 +60,7 @@ class ShareSongActionTest: XCTestCase {
       return
     }
     ShareSongAction.share(
-      song: cachedSong,
+      playable: cachedSong,
       from: UIView(),
       presenter: UIViewController(),
       downloadManagerProvider: { self.songDownloader }
@@ -89,7 +74,7 @@ class ShareSongActionTest: XCTestCase {
       return
     }
     ShareSongAction.share(
-      song: uncachedSong,
+      playable: uncachedSong,
       from: UIView(),
       presenter: UIViewController(),
       downloadManagerProvider: { self.songDownloader }
@@ -105,7 +90,7 @@ class ShareSongActionTest: XCTestCase {
     }
     var providerInvocations = 0
     ShareSongAction.share(
-      song: uncachedSong,
+      playable: uncachedSong,
       from: UIView(),
       presenter: UIViewController(),
       downloadManagerProvider: {

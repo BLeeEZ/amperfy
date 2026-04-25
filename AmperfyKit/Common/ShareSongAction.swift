@@ -31,15 +31,15 @@ import UIKit
 @MainActor
 public enum ShareSongAction {
   public static func share(
-    song: AbstractPlayable,
+    playable: AbstractPlayable,
     from sourceView: UIView,
     presenter: UIViewController,
     downloadManagerProvider: () -> DownloadManageable?
   ) {
     // Already cached — present immediately.
-    if let fileURL = cachedFileURL(for: song) {
+    if let fileURL = cachedFileURL(for: playable) {
       presentActivityController(
-        for: song,
+        for: playable,
         fileURL: fileURL,
         sourceView: sourceView,
         presenter: presenter
@@ -50,12 +50,9 @@ public enum ShareSongAction {
       return
     }
 
-    let artistName = song.asSong?.artist?.name
-    let message = shareTextItem(title: song.title, artistName: artistName)
-
     let progressAlert = UIAlertController(
       title: "Downloading\(CommonString.ellipsis)",
-      message: message,
+      message: playable.displayString,
       preferredStyle: .alert
     )
     var cancelled = false
@@ -64,17 +61,17 @@ public enum ShareSongAction {
     })
     presenter.present(progressAlert, animated: true)
 
-    downloadManager.download(object: song)
+    downloadManager.download(object: playable)
 
     // Poll for the file to appear on disk (download manager is fire-and-forget).
     Task { @MainActor in
       for _ in 0 ..< 120 { // up to ~60 seconds at 0.5s intervals
         try? await Task.sleep(for: .milliseconds(500))
         if cancelled { return }
-        if let fileURL = cachedFileURL(for: song) {
+        if let fileURL = cachedFileURL(for: playable) {
           progressAlert.dismiss(animated: true) {
             presentActivityController(
-              for: song,
+              for: playable,
               fileURL: fileURL,
               sourceView: sourceView,
               presenter: presenter
@@ -96,35 +93,28 @@ public enum ShareSongAction {
     }
   }
 
-  private static func cachedFileURL(for song: AbstractPlayable) -> URL? {
-    guard let relPath = song.relFilePath,
+  private static func cachedFileURL(for playable: AbstractPlayable) -> URL? {
+    guard let relPath = playable.relFilePath,
           let absoluteURL = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relPath),
           FileManager.default.fileExists(atPath: absoluteURL.path)
     else { return nil }
     return absoluteURL
   }
 
-  static func shareTextItem(title: String, artistName: String?) -> String {
-    let resolvedArtist = artistName ?? "Unknown Artist"
-    return "\(resolvedArtist) - \(title)"
-  }
-
-  static func sanitizedFileName(title: String, artistName: String?) -> String {
-    let resolvedArtist = artistName ?? "Unknown Artist"
-    return "\(resolvedArtist) - \(title)"
+  static func sanitizedFileName(playable: AbstractPlayable) -> String {
+    playable.displayString
       .replacingOccurrences(of: "/", with: "-")
       .replacingOccurrences(of: ":", with: "-")
   }
 
   private static func presentActivityController(
-    for song: AbstractPlayable,
+    for playable: AbstractPlayable,
     fileURL: URL,
     sourceView: UIView,
     presenter: UIViewController
   ) {
-    let artistName = song.asSong?.artist?.name
-    let textItem = shareTextItem(title: song.title, artistName: artistName)
-    let safeFileName = sanitizedFileName(title: song.title, artistName: artistName)
+    let textItem = playable.displayString
+    let safeFileName = sanitizedFileName(playable: playable)
     let tempURL = FileManager.default.temporaryDirectory
       .appendingPathComponent(safeFileName)
       .appendingPathExtension(fileURL.pathExtension)
@@ -132,7 +122,7 @@ public enum ShareSongAction {
     try? FileManager.default.copyItem(at: fileURL, to: tempURL)
     let shareURL = FileManager.default.fileExists(atPath: tempURL.path) ? tempURL : fileURL
 
-    let artwork = artworkImage(for: song)
+    let artwork = artworkImage(for: playable)
     let fileItemSource = SongShareItemSource(
       fileURL: shareURL,
       title: textItem,
@@ -152,12 +142,12 @@ public enum ShareSongAction {
     presenter.present(activityVC, animated: true)
   }
 
-  static func artworkImage(for song: AbstractPlayable) -> UIImage {
+  static func artworkImage(for playable: AbstractPlayable) -> UIImage {
     let settings = AmperKit.shared.storage.settings
-    let accountSettings = song.account.map { settings.accounts.getSetting($0.info) }
+    let accountSettings = playable.account.map { settings.accounts.getSetting($0.info) }
       ?? settings.accounts.activeSetting
     return LibraryEntityImage.getImageToDisplayImmediately(
-      libraryEntity: song,
+      libraryEntity: playable,
       themePreference: accountSettings.read.themePreference,
       artworkDisplayPreference: accountSettings.read.artworkDisplayPreference,
       useCache: false

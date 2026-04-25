@@ -70,7 +70,7 @@ class EntityPreviewActionBuilder {
   private var isShowPodcastDetails = false
   private var isShowSongDetails = false
   private var isInstantMix = false
-  private var isShareSong = false
+  private var isShareable = false
 
   init(
     container: PlayableContainable,
@@ -161,7 +161,7 @@ class EntityPreviewActionBuilder {
     if isDeleteOnServer {
       elementHandlingActions.append(createDeleteOnServerAction())
     }
-    if isShareSong, let playable = entityContainer as? AbstractPlayable {
+    if isShareable, let playable = entityContainer as? AbstractPlayable {
       elementHandlingActions.append(createShareAction(playable: playable))
     }
     if isGoToSiteUrl, let url = (entityContainer as? AbstractPlayable)?.asRadio?.siteURL {
@@ -266,7 +266,7 @@ class EntityPreviewActionBuilder {
     isShowPodcastDetails = false
     isShowSongDetails = true
     isInstantMix = appDelegate.storage.settings.user.isOnlineMode
-    isShareSong = song.isCached || appDelegate.storage.settings.user.isOnlineMode
+    isShareable = song.isCached || appDelegate.storage.settings.user.isOnlineMode
   }
 
   private func configureFor(podcastEpisode: PodcastEpisode) {
@@ -291,6 +291,7 @@ class EntityPreviewActionBuilder {
     isGoToSiteUrl = false
     isShowPodcastDetails = true
     isShowSongDetails = false
+    isShareable = podcastEpisode.isCached || appDelegate.storage.settings.user.isOnlineMode
   }
 
   private func configureFor(radio: Radio) {
@@ -818,7 +819,7 @@ class EntityPreviewActionBuilder {
 
       // Note: This is strongly coupled, I could protocolize and inject. But this is simplest and the project doesn't seem to do DI/tests for this target.
       ShareSongAction.share(
-        song: playable,
+        playable: playable,
         from: self.rootView.view,
         presenter: self.rootView,
         downloadManagerProvider: downloadManagerProvider
