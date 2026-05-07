@@ -72,6 +72,9 @@ struct AccountSettingsView: View {
     }
 
     let meta = appDelegate.getMeta(accountInfo)
+
+    CaptivePortalSession.shared.logout()
+
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
 

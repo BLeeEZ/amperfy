@@ -84,6 +84,14 @@ final class PlayableDownloadDelegate: DownloadManagerDelegate {
       url: fileURL,
       maxFileSize: Self.maxFileSizeOfErrorResponse
     ) else { return nil }
+    if CaptivePortalDetector.isHTMLContent(data: data) {
+      return ResponseError(
+        type: .api,
+        message: "Network session expired. Please open the app to re-authenticate.",
+        cleansedURL: downloadURL?.asCleansedURL(cleanser: backendApi),
+        data: data
+      )
+    }
     return backendApi.checkForErrorResponse(response: APIDataResponse(
       data: data,
       url: downloadURL

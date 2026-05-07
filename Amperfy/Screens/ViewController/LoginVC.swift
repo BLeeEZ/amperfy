@@ -399,10 +399,25 @@ class LoginVC: UIViewController {
     Task { @MainActor in
       do {
         let meta = self.appDelegate.getMeta(accountInfo)
-        let authenticatedApiType = try await meta.backendApi.login(
-          apiType: selectedApiType,
-          credentials: credentials
-        )
+        let authenticatedApiType: BackenApiType
+        do {
+          authenticatedApiType = try await meta.backendApi.login(
+            apiType: selectedApiType,
+            credentials: credentials
+          )
+        } catch let error as CaptivePortalError where error == .captivePortalDetected {
+          guard let serverURL = URL(string: credentials.activeBackendServerUrl) else {
+            self.showErrorMsg(message: "Invalid server URL")
+            self.appDelegate.resetMeta(accountInfo)
+            return
+          }
+          try await CaptivePortalSession.shared.authenticate(serverURL: serverURL)
+          authenticatedApiType = try await meta.backendApi.login(
+            apiType: selectedApiType,
+            credentials: credentials
+          )
+        }
+
         credentials.backendApi = authenticatedApiType
         accountInfo = Account.createInfo(credentials: credentials)
         meta.backendApi.selectedApi = authenticatedApiType
@@ -430,8 +445,12 @@ class LoginVC: UIViewController {
           mainScene
             .replaceMainRootViewController(vc: syncVC)
         }
+      } catch let error as CaptivePortalError where error == .userCancelled {
+        self.appDelegate.resetMeta(accountInfo)
       } catch {
         if error is AuthenticationError {
+          self.showErrorMsg(message: error.localizedDescription)
+        } else if error is CaptivePortalError {
           self.showErrorMsg(message: error.localizedDescription)
         } else {
           self.showErrorMsg(message: "Not able to login!")
