@@ -740,7 +740,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     }
   }
 
-  private func request(url: URL) async throws -> APIDataResponse {
+  private func performAFRequest(url: URL) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
       AF.request(url, method: .get).validate().responseData { response in
 
@@ -754,6 +754,26 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
         }
         fatalError("should not get here")
       }
+    }
+  }
+
+  private func request(url: URL) async throws -> APIDataResponse {
+    do {
+      return try await performAFRequest(url: url)
+    } catch {
+      if let account,
+         let serverURLString = credentials.wrappedValue?.activeBackendServerUrl,
+         let serverURL = URL(string: serverURLString),
+         ClientCertificateManager.shared.hasIdentity(
+           tag: ClientCertificateManager.accountTag(for: account.ident)
+         ) {
+        try await ClientCertificateSession.shared.reauthenticateIfNeeded(
+          accountTag: ClientCertificateManager.accountTag(for: account.ident),
+          serverURL: serverURL
+        )
+        return try await performAFRequest(url: url)
+      }
+      throw error
     }
   }
 

@@ -639,14 +639,31 @@ class BackendAudioPlayer: NSObject {
       return
     }
 
+    let headers = Self.cookieHeaders(for: asset.url)
+
     switch queueType {
     case .play:
       currentPreparedUrl = asset.url.absoluteString
-      player?.play(url: asset.url)
+      if headers.isEmpty {
+        player?.play(url: asset.url)
+      } else {
+        player?.play(url: asset.url, headers: headers)
+      }
     case .queue:
       nextPreloadedUrl = asset.url.absoluteString
-      player?.queue(url: asset.url)
+      if headers.isEmpty {
+        player?.queue(url: asset.url)
+      } else {
+        player?.queue(url: asset.url, headers: headers)
+      }
     }
+  }
+
+  private static func cookieHeaders(for url: URL) -> [String: String] {
+    guard let cookies = HTTPCookieStorage.shared.cookies(for: url), !cookies.isEmpty else {
+      return [:]
+    }
+    return HTTPCookie.requestHeaderFields(with: cookies)
   }
 
   // MARK: - EQ Implementation
