@@ -140,9 +140,15 @@ extension CarPlaySceneDelegate {
             // ignore online fetch in CarPlay
           }
         }
-        self.appDelegate.player.play(context: PlayContext(containable: selectedPlayable))
-        displayNowPlaying {
+        if let album = selectedPlayable as? Album {
+          let albumTemplate = createAlbumSongListTemplate(for: album, onlyCached: isOfflineMode)
+          let _ = try? await interfaceController?.pushTemplate(albumTemplate, animated: true)
           completion()
+        } else {
+          self.appDelegate.player.play(context: PlayContext(containable: selectedPlayable))
+          displayNowPlaying {
+            completion()
+          }
         }
       }
     }

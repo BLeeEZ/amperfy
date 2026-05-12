@@ -275,28 +275,32 @@ extension CarPlaySceneDelegate {
     ]
     section.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
-      var songItems = [CPListItem]()
-      songItems.append(createPlayShuffledListItem(playContext: PlayContext(
-        containable: album,
-        playables: album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-      )))
-      let albumSongs = album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-        .prefix(LibraryStorage.carPlayMaxElements)
-      for (index, song) in albumSongs.enumerated() {
-        let listItem = createDetailTemplate(
-          for: song,
-          playContext: PlayContext(containable: album, index: index, playables: Array(albumSongs)),
-          isTrackDisplayed: true
-        )
-        songItems.append(listItem)
-      }
-      let albumTemplate = CPListTemplate(title: album.name, sections: [
-        CPListSection(items: songItems),
-      ])
+      let albumTemplate = createAlbumSongListTemplate(for: album, onlyCached: onlyCached)
       interfaceController?.pushTemplate(albumTemplate, animated: true, completion: nil)
       completion()
     }
     return section
+  }
+
+  func createAlbumSongListTemplate(for album: Album, onlyCached: Bool) -> CPListTemplate {
+    var songItems = [CPListItem]()
+    songItems.append(createPlayShuffledListItem(playContext: PlayContext(
+      containable: album,
+      playables: album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+    )))
+    let albumSongs = album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+      .prefix(LibraryStorage.carPlayMaxElements)
+    for (index, song) in albumSongs.enumerated() {
+      let listItem = createDetailTemplate(
+        for: song,
+        playContext: PlayContext(containable: album, index: index, playables: Array(albumSongs)),
+        isTrackDisplayed: true
+      )
+      songItems.append(listItem)
+    }
+    return CPListTemplate(title: album.name, sections: [
+      CPListSection(items: songItems),
+    ])
   }
 
   func createPlaylistsSections() -> [CPListSection] {

@@ -98,6 +98,8 @@ extension CarPlaySceneDelegate {
     )
     CPNowPlayingTemplate.shared.updateNowPlayingButtons(buttons)
     CPNowPlayingTemplate.shared.isUpNextButtonEnabled = true
+    let currentlyPlayingAlbum = (appDelegate.player.currentlyPlaying as? Song)?.album
+    CPNowPlayingTemplate.shared.isAlbumArtistButtonEnabled = currentlyPlayingAlbum != nil
   }
 
   func displayNowPlaying(immediately: Bool = false, completion: @escaping (() -> ())) {
@@ -123,6 +125,16 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
   nonisolated func nowPlayingTemplateUpNextButtonTapped(_ nowPlayingTemplate: CPNowPlayingTemplate) {
     MainActor.assumeIsolated {
       self.interfaceController?.pushTemplate(playerQueueSection, animated: true, completion: nil)
+    }
+  }
+
+  nonisolated func nowPlayingTemplateAlbumArtistButtonTapped(
+    _ nowPlayingTemplate: CPNowPlayingTemplate
+  ) {
+    MainActor.assumeIsolated {
+      guard let album = (appDelegate.player.currentlyPlaying as? Song)?.album else { return }
+      let albumTemplate = createAlbumSongListTemplate(for: album, onlyCached: isOfflineMode)
+      interfaceController?.pushTemplate(albumTemplate, animated: true, completion: nil)
     }
   }
 
