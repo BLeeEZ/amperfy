@@ -109,6 +109,16 @@ struct PlayerSettingsView: View {
           SettingsCheckBoxRow(title: "Manual Playback", isOn: $settings.isPlaybackStartOnlyOnPlay)
         }, footer: "Enable to start playback only when the Play button is pressed.")
 
+        SettingsSection(
+          content: {
+            SettingsCheckBoxRow(
+              title: "Instant Mix After End",
+              isOn: $settings.isAutoMixAfterEnd
+            )
+          },
+          footer: "When the queue ends, automatically continue playback using Instant Mix to find similar songs."
+        )
+
         // Streaming Format Settings
         SettingsSection(
           content: {

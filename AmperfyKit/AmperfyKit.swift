@@ -157,6 +157,13 @@ public class AmperKit {
     playerAudioSessionHandler!.eventLogger = eventLogger
     playerAudioSessionHandler!.configureObserverForAudioSessionInterruption()
     backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
+    curPlayer.autoInstantMixCB = { [weak self] song in
+      guard let self, let accountInfo = song.account?.info else { return [] }
+      return try await self.getMeta(accountInfo).librarySyncer.requestSimilarSongs(
+        song: song,
+        count: 99
+      )
+    }
     backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.user.isEqualizerEnabled)
     backendAudioPlayer
       .updateEqualizerSetting(eqSetting: storage.settings.user.activeEqualizerSetting)

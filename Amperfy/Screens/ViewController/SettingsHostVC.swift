@@ -192,6 +192,11 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isPlayerSongPlaybackResumeEnabled = newValue
     }))
 
+    settings.isAutoMixAfterEnd = appDelegate.storage.settings.user.isAutoMixAfterEnd
+    changesAgent.append(settings.$isAutoMixAfterEnd.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.isAutoMixAfterEnd = newValue
+    }))
+
     settings.swipeActionSettings = appDelegate.storage.settings.user.swipeActionSettings
 
     settings.isReplayGainEnabled = appDelegate.storage.settings.user.isReplayGainEnabled

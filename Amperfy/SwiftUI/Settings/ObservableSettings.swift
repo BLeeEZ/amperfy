@@ -92,4 +92,7 @@ final class Settings: ObservableObject {
 
   @Published
   var isMiniPlayerAlwaysOnTop = false
+
+  @Published
+  var isAutoMixAfterEnd = false
 }
