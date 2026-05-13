@@ -218,11 +218,11 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
         guard let self else { return }
         do {
           let similarSongs = try await cb(song)
-          guard !similarSongs.isEmpty else { self.stop(); return }
-          self.queueHandler.appendContextQueue(playables: similarSongs)
-          self.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+          guard !similarSongs.isEmpty else { stop(); return }
+          queueHandler.appendContextQueue(playables: similarSongs)
+          play(playerIndex: PlayerIndex(queueType: .next, index: 0))
         } catch {
-          self.stop()
+          stop()
         }
       }
     } else {
