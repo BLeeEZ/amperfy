@@ -160,6 +160,7 @@ public class MetaManager {
     )
     dlManager.initialize(
       urlSession: urlSession,
+      isCheckForCachedNeeded: true,
       validationCB: nil
     )
 
@@ -239,6 +240,7 @@ public class MetaManager {
     )
     dlManager.initialize(
       urlSession: urlSession,
+      isCheckForCachedNeeded: false,
       validationCB: validationCB
     )
 

@@ -137,7 +137,7 @@ public class Artwork: NSObject {
 
 extension Artwork: Downloadable {
   public var objectID: NSManagedObjectID { managedObject.objectID }
-  public var isCached: Bool { false }
+  public var isCached: Bool { relFilePath != nil }
   public var displayString: String {
     "Artwork account: \(account?.shortLogIdent ?? "-"), id: \(id), type: \(type)"
   }

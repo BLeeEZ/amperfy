@@ -102,6 +102,8 @@ actor DownloadManager: NSObject, DownloadManageable {
   // In-memory set to prevent duplicate download requests for the same ID
   // This catches simultaneous calls before Core Data records are created
   @MainActor private static var pendingDownloadIDs: Set<String> = []
+  @MainActor
+  private var isCheckForCachedNeeded: Bool = true
   private var isCacheSizeLimited: Bool
   @MainActor
   private var _urlSessionIdentifier: String?
@@ -139,6 +141,7 @@ actor DownloadManager: NSObject, DownloadManageable {
   @MainActor
   public func initialize(
     urlSession: URLSession,
+    isCheckForCachedNeeded: Bool,
     validationCB: PreDownloadIsValidCB?
   ) {
     taskQueue.maxConcurrentOperationCount = getDownloadDelegateCB().parallelDownloadsCount
@@ -156,7 +159,7 @@ actor DownloadManager: NSObject, DownloadManageable {
       object: nil
     )
     Task {
-      await _initialize(urlSession: urlSession, validationCB: validationCB)
+      await _initialize(urlSession: urlSession, isCheckForCachedNeeded: isCheckForCachedNeeded, validationCB: validationCB)
     }
   }
 
@@ -165,11 +168,12 @@ actor DownloadManager: NSObject, DownloadManageable {
     _urlSessionIdentifier
   }
 
-  private func _initialize(urlSession: URLSession, validationCB: PreDownloadIsValidCB?) {
+  private func _initialize(urlSession: URLSession, isCheckForCachedNeeded: Bool, validationCB: PreDownloadIsValidCB?) {
     self.urlSession = urlSession
     let ident = self.urlSession?.configuration.identifier
     preDownloadIsValidCheck = validationCB
     Task { @MainActor in
+      self.isCheckForCachedNeeded = isCheckForCachedNeeded
       _urlSessionIdentifier = ident
     }
   }
@@ -192,7 +196,7 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   @MainActor
   func download(object: Downloadable) {
-    guard !object.isCached,
+    guard !isCheckForCachedNeeded || !object.isCached,
           let downloadInfo = object.threadSafeInfo
     else { return }
     
@@ -227,7 +231,8 @@ actor DownloadManager: NSObject, DownloadManageable {
   @MainActor
   func download(objects: [Downloadable]) {
     // Filter out already cached and already pending downloads
-    let filteredObjects = objects.filter { !$0.isCached && !Self.pendingDownloadIDs.contains($0.uniqueID) }
+    let filteredObjects = objects
+      .filter { (!isCheckForCachedNeeded || !$0.isCached) && !Self.pendingDownloadIDs.contains($0.uniqueID) }
     let downloadInfos = filteredObjects.compactMap { $0.threadSafeInfo }
     guard !downloadInfos.isEmpty else { return }
     
