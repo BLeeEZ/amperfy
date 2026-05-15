@@ -690,6 +690,9 @@ public class LibraryStorage: PlayableFileCachable {
   private func deleteCacheFinalStep(playable: AbstractPlayable) {
     playable.contentTypeTranscoded = nil
     playable.relFilePath = nil
+    if let download = playable.playableManagedObject.download {
+      context.delete(download)
+    }
     playable.deleteCache()
   }
 
@@ -1674,7 +1677,6 @@ public class LibraryStorage: PlayableFileCachable {
       getFetchPredicate(forAccount: account),
       SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
       NSPredicate(format: "%K == nil", #keyPath(SongMO.relFilePath)),
-      NSPredicate(format: "%K == nil", #keyPath(SongMO.download)),
     ])
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
