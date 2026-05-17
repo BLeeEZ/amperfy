@@ -72,6 +72,8 @@ public enum AuthenticationError: LocalizedError {
   case invalidUrl
   case requestStatusError(message: String)
   case downloadError(message: String)
+  case clientCertificateRequired
+  case certificateExpired
 
   public var errorDescription: String? {
     var ret = ""
@@ -84,6 +86,12 @@ public enum AuthenticationError: LocalizedError {
       ret = "Requesting server URL finished with status response error code '\(message)'!"
     case let .downloadError(message: message):
       ret = message
+    case .clientCertificateRequired:
+      ret =
+        "This server requires a client certificate (mTLS). Import one using the Certificate option."
+    case .certificateExpired:
+      ret =
+        "The client certificate has expired. Please import a new certificate."
     }
     return ret
   }
@@ -317,17 +325,37 @@ public final class BackendProxy: Sendable {
       throw AuthenticationError.invalidUrl
     }
 
+    if let credential = ClientCertificateManager.shared.getCredential(
+      tag: ClientCertificateManager.loginTag
+    ) {
+      if let certInfo = ClientCertificateManager.shared.getCertificateInfo(
+        tag: ClientCertificateManager.loginTag
+      ), certInfo.isExpired {
+        throw AuthenticationError.certificateExpired
+      }
+      try await ClientCertificateSession.shared.performHandshake(
+        serverURL: activeBackendServerUrl, credential: credential
+      )
+      os_log("mTLS authentication succeeded.", log: self.log, type: .info)
+    }
+
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(), Error>) in
       let sessionConfig = URLSessionConfiguration.default
       let session = URLSession(configuration: sessionConfig)
       let request = URLRequest(url: activeBackendServerUrl)
       let task = session.downloadTask(with: request) { tempLocalUrl, response, error in
         if let error = error {
-          continuation
-            .resume(
-              throwing: AuthenticationError
-                .downloadError(message: error.localizedDescription)
-            )
+          let nsError = error as NSError
+          if nsError.domain == NSURLErrorDomain,
+             nsError.code == NSURLErrorClientCertificateRequired {
+            continuation.resume(throwing: AuthenticationError.clientCertificateRequired)
+          } else {
+            continuation
+              .resume(
+                throwing: AuthenticationError
+                  .downloadError(message: error.localizedDescription)
+              )
+          }
         } else {
           if let statusCode = (response as? HTTPURLResponse)?.statusCode {
             if statusCode >= 400,
