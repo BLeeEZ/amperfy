@@ -25,8 +25,10 @@ import SwiftUI
 // MARK: - SongTagsFilterView
 
 struct SongTagsFilterView: View {
-  @ObservedObject var store: TagVisibilityStore
-  @Environment(\.dismiss) private var dismiss
+  @ObservedObject
+  var store: TagVisibilityStore
+  @Environment(\.dismiss)
+  private var dismiss
 
   var body: some View {
     List {

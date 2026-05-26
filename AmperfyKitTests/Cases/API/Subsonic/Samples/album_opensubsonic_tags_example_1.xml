@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Fixture for SsSongOpenSubsonicTagsParserTest.
+  Three songs:
+    ost1 – all new OpenSubsonic simple attributes + all new child element types.
+    ost2 – contributor with subRole + two contributors sharing the same role (grouping test).
+    ost3 – minimal song, no new fields (state-reset / no-bleedover verification).
+-->
+
+<subsonic-response xmlns="http://subsonic.org/restapi"
+                   status="ok" version="1.16.1" type="navidrome" openSubsonic="true">
+
+    <album id="ost-album" name="OpenSubsonic Tags Album" songCount="3"
+           created="2024-01-01T00:00:00Z" duration="600"
+           artist="Test Artist" artistId="ost-artist">
+
+        <!-- ost1: every new field present -->
+        <song id="ost1"
+              parent="ost-album"
+              title="Full Tag Song"
+              album="OpenSubsonic Tags Album"
+              albumId="ost-album"
+              artist="Test Artist"
+              artistId="ost-artist"
+              displayArtist="Should Be Overridden By Artists Children"
+              isDir="false"
+              created="2024-01-01T00:00:00Z"
+              duration="240"
+              bitRate="320"
+              size="9600000"
+              contentType="audio/flac"
+              type="music"
+              bpm="120"
+              comment="Test comment"
+              sortName="Full Tag Sort"
+              musicBrainzId="550e8400-e29b-41d4-a716-446655440000"
+              displayAlbumArtist="Album Artist Display"
+              displayComposer="John Smith"
+              explicitStatus="explicit"
+              channelCount="2"
+              samplingRate="44100"
+              bitDepth="24">
+            <!-- multi-artist: should override displayArtist attr -->
+            <artists id="ost-artist-a1" name="Artist One"/>
+            <artists id="ost-artist-a2" name="Artist Two"/>
+            <!-- album artists -->
+            <albumArtists id="ost-artist-a1" name="Album Artist One"/>
+            <!-- multi-genre -->
+            <genres name="Rock"/>
+            <genres name="Metal"/>
+            <!-- contributors: two distinct roles -->
+            <contributors role="composer">
+                <artist id="ost-contrib-c1" name="John Smith"/>
+            </contributors>
+            <contributors role="lyricist">
+                <artist id="ost-contrib-c2" name="Jane Doe"/>
+            </contributors>
+            <!-- text-content child elements -->
+            <isrc>USRC17607839</isrc>
+            <moods>Happy</moods>
+            <moods>Energetic</moods>
+            <groupings>Group A</groupings>
+        </song>
+
+        <!-- ost2: contributor subRole + same-role grouping -->
+        <song id="ost2"
+              parent="ost-album"
+              title="SubRole Grouping Song"
+              album="OpenSubsonic Tags Album"
+              albumId="ost-album"
+              artist="Test Artist"
+              artistId="ost-artist"
+              isDir="false"
+              created="2024-01-01T00:00:00Z"
+              duration="180"
+              bitRate="320"
+              size="7200000"
+              contentType="audio/flac"
+              type="music">
+            <!-- two contributors, same role + same subRole: should be grouped -->
+            <contributors role="composer" subRole="orchestral">
+                <artist id="ost-contrib-c3" name="Composer A"/>
+            </contributors>
+            <contributors role="composer" subRole="orchestral">
+                <artist id="ost-contrib-c4" name="Composer B"/>
+            </contributors>
+        </song>
+
+        <!-- ost3: no new fields at all (verifies no bleedover from ost1/ost2) -->
+        <song id="ost3"
+              parent="ost-album"
+              title="Minimal Song"
+              album="OpenSubsonic Tags Album"
+              albumId="ost-album"
+              artist="Simple Artist"
+              artistId="ost-artist"
+              isDir="false"
+              created="2024-01-01T00:00:00Z"
+              duration="120"
+              bitRate="128"
+              size="1920000"
+              contentType="audio/mpeg"
+              type="music"/>
+
+    </album>
+
+</subsonic-response>

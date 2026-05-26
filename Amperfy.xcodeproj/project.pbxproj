@@ -174,6 +174,7 @@
 		50AE79B62C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79B52C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift */; };
 		50AE79B82C1F68090085CBB3 /* SsLyricsBySongId2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79B72C1F68080085CBB3 /* SsLyricsBySongId2ParserTest.swift */; };
 		50AE79BA2C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50AE79B92C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml */; };
+		BB0A0002BB0A00020085CBB3 /* album_opensubsonic_tags_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = BB0A0001BB0A00010085CBB3 /* album_opensubsonic_tags_example_1.xml */; };
 		50AE79BC2C1F6ADF0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79BB2C1F6ADE0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift */; };
 		50AE79C22C20709C0085CBB3 /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79C12C20709C0085CBB3 /* LyricsView.swift */; };
 		50AE79C32C2070F40085CBB3 /* LyricTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79BF2C206EF10085CBB3 /* LyricTableCell.swift */; };
@@ -239,6 +240,7 @@
 		50BE5D752850F4FB00156FC6 /* SsPlaylistSongsParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB92CF2666BC2000DCE45C /* SsPlaylistSongsParserTest.swift */; };
 		50BE5D762850F4FB00156FC6 /* SsArtistParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */; };
 		50BE5D772850F4FB00156FC6 /* SsSongExample2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB92E126675B7000DCE45C /* SsSongExample2ParserTest.swift */; };
+		BB0A0004BB0A00040085CBB3 /* SsSongOpenSubsonicTagsParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0A0003BB0A00030085CBB3 /* SsSongOpenSubsonicTagsParserTest.swift */; };
 		50BE5D782850F4FB00156FC6 /* SsAlbumMissingArtistsIdParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED2B9427BB938500331BF7 /* SsAlbumMissingArtistsIdParserTest.swift */; };
 		50BE5D792850F4FB00156FC6 /* SsDirectoriesExample2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB92E3266760C100DCE45C /* SsDirectoriesExample2ParserTest.swift */; };
 		50BE5D7A2850F50700156FC6 /* podcasts.xml in Resources */ = {isa = PBXBuildFile; fileRef = 501A7D1F26808A9D0055A51B /* podcasts.xml */; };
@@ -899,6 +901,7 @@
 		50AB92C326661F2600DCE45C /* SsAlbumParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserTest.swift; sourceTree = "<group>"; };
 		50AB92C526661F5800DCE45C /* artist_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = artist_example_1.xml; sourceTree = "<group>"; };
 		50AB92C726662DAC00DCE45C /* album_example_2.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = album_example_2.xml; sourceTree = "<group>"; };
+		BB0A0001BB0A00010085CBB3 /* album_opensubsonic_tags_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_opensubsonic_tags_example_1.xml; sourceTree = "<group>"; };
 		50AB92C92666BAC300DCE45C /* SsPlaylistsParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPlaylistsParserTest.swift; sourceTree = "<group>"; };
 		50AB92CB2666BAED00DCE45C /* playlists_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = playlists_example_1.xml; sourceTree = "<group>"; };
 		50AB92CD2666BC0B00DCE45C /* playlist_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = playlist_example_1.xml; sourceTree = "<group>"; };
@@ -912,6 +915,7 @@
 		50AB92DD2666C54500DCE45C /* SsIndexesParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsIndexesParserTest.swift; sourceTree = "<group>"; };
 		50AB92DF2667564800DCE45C /* AbstractSsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbstractSsTest.swift; sourceTree = "<group>"; };
 		50AB92E126675B7000DCE45C /* SsSongExample2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSongExample2ParserTest.swift; sourceTree = "<group>"; };
+		BB0A0003BB0A00030085CBB3 /* SsSongOpenSubsonicTagsParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsSongOpenSubsonicTagsParserTest.swift; sourceTree = "<group>"; };
 		50AB92E3266760C100DCE45C /* SsDirectoriesExample2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsDirectoriesExample2ParserTest.swift; sourceTree = "<group>"; };
 		50AB92E52667615400DCE45C /* AbstractAmpacheTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbstractAmpacheTest.swift; sourceTree = "<group>"; };
 		50AC4E5128D909720091FF33 /* EventLogSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventLogSettingsView.swift; sourceTree = "<group>"; };
@@ -2024,6 +2028,7 @@
 				50ED2B9427BB938500331BF7 /* SsAlbumMissingArtistsIdParserTest.swift */,
 				50AB92C12666127100DCE45C /* SsSongExample1ParserTest.swift */,
 				50AB92E126675B7000DCE45C /* SsSongExample2ParserTest.swift */,
+				BB0A0003BB0A00030085CBB3 /* SsSongOpenSubsonicTagsParserTest.swift */,
 				50AB92C92666BAC300DCE45C /* SsPlaylistsParserTest.swift */,
 				50AB92CF2666BC2000DCE45C /* SsPlaylistSongsParserTest.swift */,
 				50AB92D72666C2D900DCE45C /* SsMusicFolderParserTest.swift */,
@@ -2051,6 +2056,7 @@
 				5067E371278C1DC900807A78 /* album_multidisc_example_1.xml */,
 				50AB92BF2666126300DCE45C /* album_example_1.xml */,
 				50AB92C726662DAC00DCE45C /* album_example_2.xml */,
+				BB0A0001BB0A00010085CBB3 /* album_opensubsonic_tags_example_1.xml */,
 				50ED2B9227BB932700331BF7 /* album_missing_artistId.xml */,
 				50AB92CB2666BAED00DCE45C /* playlists_example_1.xml */,
 				50AB92CD2666BC0B00DCE45C /* playlist_example_1.xml */,
@@ -2389,6 +2395,7 @@
 			files = (
 				50BE5D632850F4F600156FC6 /* album_example_2.xml in Resources */,
 				50AE79BA2C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml in Resources */,
+				BB0A0002BB0A00020085CBB3 /* album_opensubsonic_tags_example_1.xml in Resources */,
 				50BE5D7D2850F50700156FC6 /* catalogs.xml in Resources */,
 				50BE5D7C2850F50700156FC6 /* podcast_episodes.xml in Resources */,
 				50AE79B42C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml in Resources */,
@@ -2905,6 +2912,7 @@
 				50BE5D4A2850F4C900156FC6 /* SongTest.swift in Sources */,
 				50CEC6492D1F41A400D0E696 /* RadiosExampleParserTest.swift in Sources */,
 				50BE5D772850F4FB00156FC6 /* SsSongExample2ParserTest.swift in Sources */,
+				BB0A0004BB0A00040085CBB3 /* SsSongOpenSubsonicTagsParserTest.swift in Sources */,
 				50BE5D762850F4FB00156FC6 /* SsArtistParserTest.swift in Sources */,
 				50BE5D682850F4FB00156FC6 /* SsPodcastEpisodesParserTest.swift in Sources */,
 				50BE5D692850F4FB00156FC6 /* SsXmlParserTest.swift in Sources */,

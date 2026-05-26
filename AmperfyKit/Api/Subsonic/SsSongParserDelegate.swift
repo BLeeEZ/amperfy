@@ -209,22 +209,19 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
     // Each OpenSubsonic song artist is its own <artists id="..." name="..."/> element
     // (the element name is plural). Collect while inside a song.
     if elementName == "artists", songBuffer != nil, let name = attributeDict["name"],
-      !name.isEmpty
-    {
+       !name.isEmpty {
       collectedArtistNames.append(name)
     }
 
     // Album artists: <albumArtists id="..." name="..."/>
     if elementName == "albumArtists", songBuffer != nil, let name = attributeDict["name"],
-      !name.isEmpty
-    {
+       !name.isEmpty {
       collectedAlbumArtistNames.append(name)
     }
 
     // Multi-genre: <genres name="..."/>
     if elementName == "genres", songBuffer != nil, let name = attributeDict["name"],
-      !name.isEmpty
-    {
+       !name.isEmpty {
       collectedGenreNames.append(name)
     }
 
@@ -236,17 +233,15 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
     }
     // Inner <artist> element inside a <contributors> block
     if elementName == "artist", isInsideContributor, let name = attributeDict["name"],
-      !name.isEmpty
-    {
+       !name.isEmpty {
       collectedContributors.append(
         (role: currentContributorRole, subRole: currentContributorSubRole, name: name)
       )
     }
 
     // Text-content child elements: <isrc>, <moods>, <groupings>
-    if (elementName == "isrc" || elementName == "moods" || elementName == "groupings"),
-      songBuffer != nil
-    {
+    if elementName == "isrc" || elementName == "moods" || elementName == "groupings",
+       songBuffer != nil {
       currentTextElementName = elementName
       currentTextBuffer = ""
     }
@@ -292,8 +287,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
     }
 
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
-      "episode", songBuffer != nil
-    {
+      "episode", songBuffer != nil {
       // Multi-artist display string
       if !collectedArtistNames.isEmpty {
         songBuffer?.artistsString = collectedArtistNames.joined(separator: ", ")

@@ -26,37 +26,37 @@ import SwiftUI
 // MARK: - SongTagKey
 
 enum SongTagKey: String, CaseIterable {
-  case title = "title"
-  case artists = "artists"
-  case albumArtists = "albumArtists"
-  case album = "album"
-  case genre = "genre"
-  case genres = "genres"
-  case trackNumber = "trackNumber"
-  case discNumber = "discNumber"
-  case year = "year"
-  case duration = "duration"
-  case bpm = "bpm"
-  case bitrate = "bitrate"
-  case bitDepth = "bitDepth"
-  case samplingRate = "samplingRate"
-  case channelCount = "channelCount"
-  case contentType = "contentType"
-  case fileSize = "fileSize"
-  case dateAdded = "dateAdded"
-  case rating = "rating"
-  case favorite = "favorite"
-  case explicitStatus = "explicitStatus"
-  case comment = "comment"
-  case sortName = "sortName"
-  case musicBrainzId = "musicBrainzId"
-  case isrc = "isrc"
-  case moods = "moods"
-  case groupings = "groupings"
-  case contributors = "contributors"
-  case displayComposer = "displayComposer"
-  case replayGainTrack = "replayGainTrack"
-  case replayGainAlbum = "replayGainAlbum"
+  case title
+  case artists
+  case albumArtists
+  case album
+  case genre
+  case genres
+  case trackNumber
+  case discNumber
+  case year
+  case duration
+  case bpm
+  case bitrate
+  case bitDepth
+  case samplingRate
+  case channelCount
+  case contentType
+  case fileSize
+  case dateAdded
+  case rating
+  case favorite
+  case explicitStatus
+  case comment
+  case sortName
+  case musicBrainzId
+  case isrc
+  case moods
+  case groupings
+  case contributors
+  case displayComposer
+  case replayGainTrack
+  case replayGainAlbum
 
   var displayName: String {
     switch self {
@@ -195,13 +195,14 @@ enum SongTagKey: String, CaseIterable {
 class TagVisibilityStore: ObservableObject {
   static let udKey = "songTagVisibility"
 
-  @Published var hiddenKeys: Set<String>
+  @Published
+  var hiddenKeys: Set<String>
 
   init() {
     if let saved = UserDefaults.standard.stringArray(forKey: Self.udKey) {
-      hiddenKeys = Set(saved)
+      self.hiddenKeys = Set(saved)
     } else {
-      hiddenKeys = []
+      self.hiddenKeys = []
     }
   }
 
@@ -228,8 +229,10 @@ class TagVisibilityStore: ObservableObject {
 
 struct SongTagsView: View {
   let song: Song
-  @StateObject private var store = TagVisibilityStore()
-  @State private var showFilter = false
+  @StateObject
+  private var store = TagVisibilityStore()
+  @State
+  private var showFilter = false
 
   var body: some View {
     List {
