@@ -106,8 +106,94 @@ public class Song: AbstractPlayable, Identifyable {
     }
   }
 
+  public var artistsString: String? {
+    get { managedObject.artistsString }
+    set { managedObject.artistsString = newValue }
+  }
+
+  public var albumArtistsString: String? {
+    get { managedObject.albumArtistsString }
+    set { managedObject.albumArtistsString = newValue }
+  }
+
+  public var bpm: Int16 {
+    get { managedObject.bpm }
+    set { managedObject.bpm = newValue }
+  }
+
+  public var bitDepth: Int16 {
+    get { managedObject.bitDepth }
+    set { managedObject.bitDepth = newValue }
+  }
+
+  public var channelCount: Int16 {
+    get { managedObject.channelCount }
+    set { managedObject.channelCount = newValue }
+  }
+
+  public var samplingRate: Int32 {
+    get { managedObject.samplingRate }
+    set { managedObject.samplingRate = newValue }
+  }
+
+  public var comment: String? {
+    get { managedObject.comment }
+    set { managedObject.comment = newValue }
+  }
+
+  public var sortName: String? {
+    get { managedObject.sortName }
+    set { managedObject.sortName = newValue }
+  }
+
+  public var musicBrainzId: String? {
+    get { managedObject.musicBrainzId }
+    set { managedObject.musicBrainzId = newValue }
+  }
+
+  public var isrcList: String? {
+    get { managedObject.isrcList }
+    set { managedObject.isrcList = newValue }
+  }
+
+  public var genresList: String? {
+    get { managedObject.genresList }
+    set { managedObject.genresList = newValue }
+  }
+
+  public var moodsList: String? {
+    get { managedObject.moodsList }
+    set { managedObject.moodsList = newValue }
+  }
+
+  public var groupingsList: String? {
+    get { managedObject.groupingsList }
+    set { managedObject.groupingsList = newValue }
+  }
+
+  public var displayAlbumArtist: String? {
+    get { managedObject.displayAlbumArtist }
+    set { managedObject.displayAlbumArtist = newValue }
+  }
+
+  public var contributorsString: String? {
+    get { managedObject.contributorsString }
+    set { managedObject.contributorsString = newValue }
+  }
+
+  public var displayComposer: String? {
+    get { managedObject.displayComposer }
+    set { managedObject.displayComposer = newValue }
+  }
+
+  public var explicitStatus: String? {
+    get { managedObject.explicitStatus }
+    set { managedObject.explicitStatus = newValue }
+  }
+
   override public var creatorName: String {
-    artist?.name ?? "Unknown Artist"
+    if let s = managedObject.artistsString, !s.isEmpty { return s }
+    return artist?.name ?? "Unknown Artist"
   }
 
   public var detailInfo: String {

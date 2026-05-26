@@ -22,6 +22,7 @@
 import AmperfyKit
 import Foundation
 import MarqueeLabel
+import SwiftUI
 import UIKit
 
 typealias GetPlayContextCallback = () -> PlayContext?
@@ -69,6 +70,7 @@ class EntityPreviewActionBuilder {
   private var isGoToSiteUrl = false
   private var isShowPodcastDetails = false
   private var isShowSongDetails = false
+  private var isShowSongTags = false
   private var isInstantMix = false
   private var isShareable = false
 
@@ -127,6 +129,10 @@ class EntityPreviewActionBuilder {
        let song = (entityContainer as? AbstractPlayable)?.asSong,
        let lyricsShowAction = createShowLyricsAction(song: song) {
       gotoActions.append(lyricsShowAction)
+    }
+    if isShowSongTags,
+       let song = (entityContainer as? AbstractPlayable)?.asSong {
+      gotoActions.append(createShowSongTagsAction(song: song))
     }
     if isShowPodcastDetails,
        let podcastEpisode = (entityContainer as? AbstractPlayable)?.asPodcastEpisode {
@@ -265,6 +271,7 @@ class EntityPreviewActionBuilder {
     isGoToSiteUrl = false
     isShowPodcastDetails = false
     isShowSongDetails = true
+    isShowSongTags = SongTagKey.allCases.contains { $0.value(for: song) != nil }
     isInstantMix = appDelegate.storage.settings.user.isOnlineMode
     isShareable = song.isCached || appDelegate.storage.settings.user.isOnlineMode
   }
@@ -859,6 +866,26 @@ class EntityPreviewActionBuilder {
     if let descriptionVC = descriptionVC {
       rootView.present(descriptionVC, animated: true)
     }
+  }
+
+  private func createShowSongTagsAction(song: Song) -> UIAction {
+    UIAction(title: "View Tags", image: UIImage(systemName: "tag")) { [weak self] _ in
+      self?.showSongTags(song: song)
+    }
+  }
+
+  private func showSongTags(song: Song) {
+    // Bail out silently if the managed object has been invalidated between menu
+    // construction and the user tapping the action — prevents an empty/broken sheet.
+    guard song.managedObject.managedObjectContext != nil else { return }
+    let tagsView = SongTagsView(song: song)
+    let hostingVC = UIHostingController(rootView: tagsView)
+    let navVC = UINavigationController(rootViewController: hostingVC)
+    if let sheet = navVC.sheetPresentationController {
+      sheet.detents = [.large()]
+      sheet.prefersGrabberVisible = true
+    }
+    rootView.present(navVC, animated: true)
   }
 
   private func createShowLyricsAction(song: Song) -> UIAction? {

@@ -30,6 +30,23 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
   var guessedArtist: Artist?
   var guessedAlbum: Album?
   var guessedGenre: Genre?
+  // Accumulates individual artist names from OpenSubsonic <artists> child elements.
+  var collectedArtistNames = [String]()
+  // Accumulates album artist names from OpenSubsonic <albumArtists> child elements.
+  var collectedAlbumArtistNames = [String]()
+  // Accumulates genre names from OpenSubsonic <genres name="..."/> child elements.
+  var collectedGenreNames = [String]()
+  // Accumulates contributors from OpenSubsonic <contributors role="..."><artist .../></contributors>.
+  var collectedContributors = [(role: String, subRole: String, name: String)]()
+  var currentContributorRole = ""
+  var currentContributorSubRole = ""
+  var isInsideContributor = false
+  // For text-content child elements (isrc, moods, groupings).
+  var currentTextElementName = ""
+  var currentTextBuffer = ""
+  var collectedISRCs = [String]()
+  var collectedMoods = [String]()
+  var collectedGroupings = [String]()
 
   override func parser(
     _ parser: XMLParser,
@@ -95,6 +112,57 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         }
       }
 
+      // Store the fallback display string now; overwritten at element close if
+      // OpenSubsonic child <artist> elements are present.
+      if let displayArtist = attributeDict["displayArtist"], !displayArtist.isEmpty {
+        songBuffer?.artistsString = displayArtist
+      } else if let artistDisplayString = attributeDict["artist"] {
+        songBuffer?.artistsString = artistDisplayString
+      }
+      collectedArtistNames = []
+      collectedAlbumArtistNames = []
+      collectedGenreNames = []
+      collectedContributors = []
+      collectedISRCs = []
+      collectedMoods = []
+      collectedGroupings = []
+      isInsideContributor = false
+      currentTextElementName = ""
+      currentTextBuffer = ""
+
+      // OpenSubsonic simple-attribute fields
+      if let bpmStr = attributeDict["bpm"], let bpmVal = Int16(bpmStr) {
+        songBuffer?.bpm = bpmVal
+      }
+      if let commentStr = attributeDict["comment"] {
+        songBuffer?.comment = commentStr.isEmpty ? nil : commentStr
+      }
+      if let sortNameStr = attributeDict["sortName"] {
+        songBuffer?.sortName = sortNameStr.isEmpty ? nil : sortNameStr
+      }
+      if let mbidStr = attributeDict["musicBrainzId"] {
+        songBuffer?.musicBrainzId = mbidStr.isEmpty ? nil : mbidStr
+      }
+      if let displayAlbumArtistStr = attributeDict["displayAlbumArtist"] {
+        songBuffer?.displayAlbumArtist =
+          displayAlbumArtistStr.isEmpty ? nil : displayAlbumArtistStr
+      }
+      if let displayComposerStr = attributeDict["displayComposer"] {
+        songBuffer?.displayComposer = displayComposerStr.isEmpty ? nil : displayComposerStr
+      }
+      if let explicitStatusStr = attributeDict["explicitStatus"] {
+        songBuffer?.explicitStatus = explicitStatusStr.isEmpty ? nil : explicitStatusStr
+      }
+      if let channelStr = attributeDict["channelCount"], let channelVal = Int16(channelStr) {
+        songBuffer?.channelCount = channelVal
+      }
+      if let srStr = attributeDict["samplingRate"], let srVal = Int32(srStr) {
+        songBuffer?.samplingRate = srVal
+      }
+      if let bdStr = attributeDict["bitDepth"], let bdVal = Int16(bdStr) {
+        songBuffer?.bitDepth = bdVal
+      }
+
       if let albumId = attributeDict["albumId"] {
         if let guessedAlbum, guessedAlbum.id == albumId {
           songBuffer?.album = guessedAlbum
@@ -138,6 +206,51 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       }
     }
 
+    // Each OpenSubsonic song artist is its own <artists id="..." name="..."/> element
+    // (the element name is plural). Collect while inside a song.
+    if elementName == "artists", songBuffer != nil, let name = attributeDict["name"],
+      !name.isEmpty
+    {
+      collectedArtistNames.append(name)
+    }
+
+    // Album artists: <albumArtists id="..." name="..."/>
+    if elementName == "albumArtists", songBuffer != nil, let name = attributeDict["name"],
+      !name.isEmpty
+    {
+      collectedAlbumArtistNames.append(name)
+    }
+
+    // Multi-genre: <genres name="..."/>
+    if elementName == "genres", songBuffer != nil, let name = attributeDict["name"],
+      !name.isEmpty
+    {
+      collectedGenreNames.append(name)
+    }
+
+    // Contributors: <contributors role="..." subRole="..."><artist id="..." name="..."/></contributors>
+    if elementName == "contributors", songBuffer != nil {
+      currentContributorRole = attributeDict["role"] ?? ""
+      currentContributorSubRole = attributeDict["subRole"] ?? ""
+      isInsideContributor = true
+    }
+    // Inner <artist> element inside a <contributors> block
+    if elementName == "artist", isInsideContributor, let name = attributeDict["name"],
+      !name.isEmpty
+    {
+      collectedContributors.append(
+        (role: currentContributorRole, subRole: currentContributorSubRole, name: name)
+      )
+    }
+
+    // Text-content child elements: <isrc>, <moods>, <groupings>
+    if (elementName == "isrc" || elementName == "moods" || elementName == "groupings"),
+      songBuffer != nil
+    {
+      currentTextElementName = elementName
+      currentTextBuffer = ""
+    }
+
     super.parser(
       parser,
       didStartElement: elementName,
@@ -147,14 +260,98 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
     )
   }
 
+  override func parser(_ parser: XMLParser, foundCharacters string: String) {
+    guard !currentTextElementName.isEmpty, songBuffer != nil else { return }
+    currentTextBuffer += string
+  }
+
   override func parser(
     _ parser: XMLParser,
     didEndElement elementName: String,
     namespaceURI: String?,
     qualifiedName qName: String?
   ) {
+    // Finalise text-content child elements
+    if elementName == currentTextElementName, !currentTextElementName.isEmpty {
+      let trimmed = currentTextBuffer.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmed.isEmpty {
+        switch currentTextElementName {
+        case "isrc": collectedISRCs.append(trimmed)
+        case "moods": collectedMoods.append(trimmed)
+        case "groupings": collectedGroupings.append(trimmed)
+        default: break
+        }
+      }
+      currentTextElementName = ""
+      currentTextBuffer = ""
+    }
+
+    // Contributors block ends
+    if elementName == "contributors" {
+      isInsideContributor = false
+    }
+
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
-      "episode", songBuffer != nil {
+      "episode", songBuffer != nil
+    {
+      // Multi-artist display string
+      if !collectedArtistNames.isEmpty {
+        songBuffer?.artistsString = collectedArtistNames.joined(separator: ", ")
+      }
+
+      // Album artists
+      if !collectedAlbumArtistNames.isEmpty {
+        songBuffer?.albumArtistsString = collectedAlbumArtistNames.joined(separator: ", ")
+      }
+
+      // Multi-genre list
+      if !collectedGenreNames.isEmpty {
+        songBuffer?.genresList = collectedGenreNames.joined(separator: ", ")
+      }
+
+      // ISRC list
+      if !collectedISRCs.isEmpty {
+        songBuffer?.isrcList = collectedISRCs.joined(separator: ", ")
+      }
+
+      // Moods list
+      if !collectedMoods.isEmpty {
+        songBuffer?.moodsList = collectedMoods.joined(separator: ", ")
+      }
+
+      // Groupings list
+      if !collectedGroupings.isEmpty {
+        songBuffer?.groupingsList = collectedGroupings.joined(separator: ", ")
+      }
+
+      // Contributors: group by role, format as "Role: Name1, Name2"
+      if !collectedContributors.isEmpty {
+        var roleGroups = [String: [String]]()
+        var roleOrder = [String]()
+        for contributor in collectedContributors {
+          let roleLabel = contributor.subRole.isEmpty
+            ? contributor.role.capitalized
+            : "\(contributor.role.capitalized) (\(contributor.subRole))"
+          if roleGroups[roleLabel] == nil {
+            roleGroups[roleLabel] = []
+            roleOrder.append(roleLabel)
+          }
+          roleGroups[roleLabel]?.append(contributor.name)
+        }
+        let lines = roleOrder.compactMap { role -> String? in
+          guard let names = roleGroups[role], !names.isEmpty else { return nil }
+          return "\(role): \(names.joined(separator: ", "))"
+        }
+        songBuffer?.contributorsString = lines.joined(separator: "\n")
+      }
+
+      collectedArtistNames = []
+      collectedAlbumArtistNames = []
+      collectedGenreNames = []
+      collectedContributors = []
+      collectedISRCs = []
+      collectedMoods = []
+      collectedGroupings = []
       parsedCount += 1
       resetPlayableBuffer()
       if let song = songBuffer {

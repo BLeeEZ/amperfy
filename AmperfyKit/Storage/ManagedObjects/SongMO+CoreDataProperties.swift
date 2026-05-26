@@ -31,7 +31,41 @@ extension SongMO {
   @NSManaged
   public var lyricsRelFilePath: String?
   @NSManaged
+  public var artistsString: String?
+  @NSManaged
+  public var albumArtistsString: String?
+  @NSManaged
   public var addedDate: Date?
+  @NSManaged
+  public var bpm: Int16
+  @NSManaged
+  public var bitDepth: Int16
+  @NSManaged
+  public var channelCount: Int16
+  @NSManaged
+  public var samplingRate: Int32
+  @NSManaged
+  public var comment: String?
+  @NSManaged
+  public var sortName: String?
+  @NSManaged
+  public var musicBrainzId: String?
+  @NSManaged
+  public var isrcList: String?
+  @NSManaged
+  public var genresList: String?
+  @NSManaged
+  public var moodsList: String?
+  @NSManaged
+  public var groupingsList: String?
+  @NSManaged
+  public var displayAlbumArtist: String?
+  @NSManaged
+  public var contributorsString: String?
+  @NSManaged
+  public var displayComposer: String?
+  @NSManaged
+  public var explicitStatus: String?
   @NSManaged
   public var album: AlbumMO?
   @NSManaged
