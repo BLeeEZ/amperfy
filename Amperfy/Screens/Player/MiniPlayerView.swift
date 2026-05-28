@@ -646,7 +646,7 @@ class MiniPlayerView: UIView {
     playerHandler = PlayerUIHandler(player: player, style: .miniPlayeriOS)
     let miniPlayerGotTouchedView = UIView()
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(miniPlayerGotTouched))
-    addGestureRecognizer(tapGesture)
+    miniPlayerGotTouchedView.addGestureRecognizer(tapGesture)
 
     miniPlayerGotTouchedView.translatesAutoresizingMaskIntoConstraints = false
     artworkImage.translatesAutoresizingMaskIntoConstraints = false
@@ -654,6 +654,7 @@ class MiniPlayerView: UIView {
     subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
     timeSlider.translatesAutoresizingMaskIntoConstraints = false
     liveLabel.translatesAutoresizingMaskIntoConstraints = false
+    previousButton.translatesAutoresizingMaskIntoConstraints = false
     playButton.translatesAutoresizingMaskIntoConstraints = false
     nextButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -663,6 +664,7 @@ class MiniPlayerView: UIView {
     addSubview(subtitleLabel)
     addSubview(timeSlider)
     addSubview(liveLabel)
+    addSubview(previousButton)
     addSubview(playButton)
     addSubview(nextButton)
 
@@ -671,7 +673,7 @@ class MiniPlayerView: UIView {
       miniPlayerGotTouchedView.heightAnchor.constraint(equalTo: heightAnchor),
       miniPlayerGotTouchedView.bottomAnchor.constraint(equalTo: bottomAnchor),
       miniPlayerGotTouchedView.trailingAnchor.constraint(
-        equalTo: playButton.leadingAnchor,
+        equalTo: previousButton.leadingAnchor,
         constant: -8
       ),
 
@@ -693,12 +695,17 @@ class MiniPlayerView: UIView {
       titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
       titleLabel.bottomAnchor.constraint(equalTo: playButton.centerYAnchor),
       titleLabel.leadingAnchor.constraint(equalTo: artworkImage.trailingAnchor, constant: 8),
-      titleLabel.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -8),
+      titleLabel.trailingAnchor.constraint(equalTo: previousButton.leadingAnchor, constant: -8),
 
       subtitleLabel.topAnchor.constraint(equalTo: playButton.centerYAnchor, constant: 0),
       subtitleLabel.bottomAnchor.constraint(equalTo: timeSlider.topAnchor, constant: -8),
       subtitleLabel.leadingAnchor.constraint(equalTo: artworkImage.trailingAnchor, constant: 8),
-      subtitleLabel.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -8),
+      subtitleLabel.trailingAnchor.constraint(equalTo: previousButton.leadingAnchor, constant: -8),
+
+      previousButton.centerYAnchor.constraint(equalTo: artworkImage.centerYAnchor, constant: 0),
+      previousButton.widthAnchor.constraint(equalToConstant: 30),
+      previousButton.heightAnchor.constraint(equalTo: previousButton.widthAnchor),
+      previousButton.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -5),
 
       playButton.centerYAnchor.constraint(equalTo: artworkImage.centerYAnchor, constant: 0),
       playButton.widthAnchor.constraint(equalToConstant: 30),
