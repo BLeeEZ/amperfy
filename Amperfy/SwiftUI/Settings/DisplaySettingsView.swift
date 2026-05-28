@@ -151,7 +151,7 @@ struct DisplaySettingsView: View {
         SettingsSection(
           content: {
             SettingsCheckBoxRow(
-              title: "Disable Player Shuffle Button",
+              title: "Hide Player Shuffle Button",
               isOn: Binding<Bool>(
                 get: { !settings.isPlayerShuffleButtonEnabled },
                 set: {
@@ -162,7 +162,7 @@ struct DisplaySettingsView: View {
             )
           },
           footer:
-          "The player shuffle button is displayed but non-interactive."
+          "The player shuffle button is hidden everywhere it appears."
         )
       }
     }
