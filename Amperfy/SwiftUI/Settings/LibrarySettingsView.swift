@@ -62,6 +62,10 @@ struct LibrarySettingsView: View {
   var isShowDeleteCacheAlert = false
   @State
   var isShowDownloadSongsAlert = false
+  @State
+  var isShowSyncAllPlaylistsAlert = false
+  @State
+  var isSyncAllPlaylistsRunning = false
 
   let byteValues = (
     stride(from: 0, through: 20, by: 1).map { $0.description } +
@@ -137,6 +141,49 @@ struct LibrarySettingsView: View {
     } catch {
       // do nothing
     }}
+  }
+
+  private func syncAllPlaylistTracks(accountInfo: AccountInfo) {
+    guard !isSyncAllPlaylistsRunning else { return }
+    isSyncAllPlaylistsRunning = true
+
+    Task { @MainActor in
+      defer {
+        isSyncAllPlaylistsRunning = false
+        updateValues()
+      }
+
+      do {
+        let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
+        let accountObjectId = account.managedObject.objectID
+        let meta = appDelegate.getMeta(account.info)
+        try await meta.librarySyncer.syncDownPlaylistsWithoutSongs()
+        let playlistIds = try await appDelegate.storage.async.performAndGet { asyncCompanion in
+          let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
+          let playlists = asyncCompanion.library.getPlaylists(for: accountAsync)
+          return playlists.compactMap { $0.managedObject.objectID }
+        }
+        for playlistId in playlistIds {
+          let playlistMainMO = appDelegate.storage.main.context
+            .object(with: playlistId) as! PlaylistMO
+          let playlistMain = Playlist(
+            library: appDelegate.storage.main.library,
+            managedObject: playlistMainMO
+          )
+          try await playlistMain.fetch(
+            storage: appDelegate.storage,
+            librarySyncer: meta.librarySyncer,
+            playableDownloadManager: meta.playableDownloadManager
+          )
+        }
+        appDelegate.eventLogger.info(
+          topic: "Sync All Playlists",
+          message: "All playlist tracks have been synced."
+        )
+      } catch {
+        appDelegate.eventLogger.report(topic: "Sync All Playlists", error: error)
+      }
+    }
   }
 
   var body: some View {
@@ -220,6 +267,27 @@ struct LibrarySettingsView: View {
           #endif
 
           if let activeAccountInfo = settings.activeAccountInfo {
+            SettingsButtonRow(
+              title: isSyncAllPlaylistsRunning
+                ? "Retrieving all playlist tracks..."
+                : "Retrieve all playlist tracks"
+            ) {
+              isShowSyncAllPlaylistsAlert = true
+            }
+            .disabled(isSyncAllPlaylistsRunning || settings.isOfflineMode)
+            .alert(isPresented: $isShowSyncAllPlaylistsAlert) {
+              Alert(
+                title: Text("Retrieve all playlist tracks"),
+                message: Text(
+                  "This will sync every playlist and fetch its track list from the server. Continue?"
+                ),
+                primaryButton: .default(Text("OK")) {
+                  syncAllPlaylistTracks(accountInfo: activeAccountInfo)
+                },
+                secondaryButton: .cancel()
+              )
+            }
+
             SettingsButtonRow(title: "Download all songs in library") {
               isShowDownloadSongsAlert = true
             }
