@@ -323,7 +323,7 @@ class PlayableTableCell: BasicTableCell {
   func refresh() {
     guard let playable = playable else { return }
     titleLabel.text = playable.title
-    artistLabel.text = playable.creatorName
+    artistLabel.text = playable.asSong?.creatorNameWithComposer ?? playable.creatorName
 
     configureStyle(
       playable: playable,

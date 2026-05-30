@@ -140,6 +140,8 @@ class SongParserDelegate: PlayableParserDelegate {
         songBuffer?.genre = genre
         genreIdToCreate = nil
       }
+    case "composer":
+      songBuffer?.composer = buffer
     case "song":
       parsedCount += 1
       parseNotifier?.notifyParsedObject(ofType: .song)
