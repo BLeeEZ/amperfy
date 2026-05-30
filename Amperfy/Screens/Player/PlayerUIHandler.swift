@@ -212,7 +212,10 @@ class PlayerUIHandler: NSObject {
       config.image = .shuffle
       shuffleButton.configuration = config
     }
-    shuffleButton.isEnabled = appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
+    let isShuffleButtonVisible = player.playerMode == .music &&
+      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
+    shuffleButton.isHidden = !isShuffleButtonVisible
+    shuffleButton.isEnabled = isShuffleButtonVisible
     shuffleButton.isSelected = player.isShuffle
   }
 
