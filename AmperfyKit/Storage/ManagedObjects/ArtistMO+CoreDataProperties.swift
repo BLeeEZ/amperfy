@@ -41,9 +41,13 @@ extension ArtistMO {
   @NSManaged
   public var name: String?
   @NSManaged
+  public var albumArtistSongs: NSOrderedSet?
+  @NSManaged
   public var albums: NSOrderedSet?
   @NSManaged
   public var genre: GenreMO?
+  @NSManaged
+  public var multiArtistSongs: NSOrderedSet?
   @NSManaged
   public var songs: NSOrderedSet?
 
@@ -138,4 +142,44 @@ extension ArtistMO {
   @objc(removeSongs:)
   @NSManaged
   public func removeFromSongs(_ values: NSOrderedSet)
+}
+
+// MARK: Generated accessors for multiArtistSongs
+
+extension ArtistMO {
+  @objc(addMultiArtistSongsObject:)
+  @NSManaged
+  public func addToMultiArtistSongs(_ value: SongMO)
+
+  @objc(removeMultiArtistSongsObject:)
+  @NSManaged
+  public func removeFromMultiArtistSongs(_ value: SongMO)
+
+  @objc(addMultiArtistSongs:)
+  @NSManaged
+  public func addToMultiArtistSongs(_ values: NSOrderedSet)
+
+  @objc(removeMultiArtistSongs:)
+  @NSManaged
+  public func removeFromMultiArtistSongs(_ values: NSOrderedSet)
+}
+
+// MARK: Generated accessors for albumArtistSongs
+
+extension ArtistMO {
+  @objc(addAlbumArtistSongsObject:)
+  @NSManaged
+  public func addToAlbumArtistSongs(_ value: SongMO)
+
+  @objc(removeAlbumArtistSongsObject:)
+  @NSManaged
+  public func removeFromAlbumArtistSongs(_ value: SongMO)
+
+  @objc(addAlbumArtistSongs:)
+  @NSManaged
+  public func addToAlbumArtistSongs(_ values: NSOrderedSet)
+
+  @objc(removeAlbumArtistSongs:)
+  @NSManaged
+  public func removeFromAlbumArtistSongs(_ values: NSOrderedSet)
 }

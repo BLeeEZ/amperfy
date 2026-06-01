@@ -31,11 +31,11 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
   var guessedAlbum: Album?
   var guessedGenre: Genre?
   // Accumulates individual artist names from OpenSubsonic <artists> child elements.
-  var collectedArtistNames = [String]()
-  // Accumulates album artist names from OpenSubsonic <albumArtists> child elements.
-  var collectedAlbumArtistNames = [String]()
-  // Accumulates genre names from OpenSubsonic <genres name="..."/> child elements.
-  var collectedGenreNames = [String]()
+  var collectedMultiArtists = [Artist]()
+  // Accumulates album artist entities from OpenSubsonic <albumArtists> child elements.
+  var collectedAlbumArtists = [Artist]()
+  // Accumulates genre entities from OpenSubsonic <genres name="..."/> child elements.
+  var collectedMultiGenres = [Genre]()
   // Accumulates contributors from OpenSubsonic <contributors role="..."><artist .../></contributors>.
   var collectedContributors = [(role: String, subRole: String, name: String)]()
   var currentContributorRole = ""
@@ -112,16 +112,9 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         }
       }
 
-      // Store the fallback display string now; overwritten at element close if
-      // OpenSubsonic child <artist> elements are present.
-      if let displayArtist = attributeDict["displayArtist"], !displayArtist.isEmpty {
-        songBuffer?.artistsString = displayArtist
-      } else if let artistDisplayString = attributeDict["artist"] {
-        songBuffer?.artistsString = artistDisplayString
-      }
-      collectedArtistNames = []
-      collectedAlbumArtistNames = []
-      collectedGenreNames = []
+      collectedMultiArtists = []
+      collectedAlbumArtists = []
+      collectedMultiGenres = []
       collectedContributors = []
       collectedISRCs = []
       collectedMoods = []
@@ -131,7 +124,7 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       currentTextBuffer = ""
 
       // OpenSubsonic simple-attribute fields
-      if let bpmStr = attributeDict["bpm"], let bpmVal = Int16(bpmStr) {
+      if let bpmStr = attributeDict["bpm"], let bpmVal = Int(bpmStr) {
         songBuffer?.bpm = bpmVal
       }
       if let commentStr = attributeDict["comment"] {
@@ -153,13 +146,13 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       if let explicitStatusStr = attributeDict["explicitStatus"] {
         songBuffer?.explicitStatus = explicitStatusStr.isEmpty ? nil : explicitStatusStr
       }
-      if let channelStr = attributeDict["channelCount"], let channelVal = Int16(channelStr) {
+      if let channelStr = attributeDict["channelCount"], let channelVal = Int(channelStr) {
         songBuffer?.channelCount = channelVal
       }
-      if let srStr = attributeDict["samplingRate"], let srVal = Int32(srStr) {
+      if let srStr = attributeDict["samplingRate"], let srVal = Int(srStr) {
         songBuffer?.samplingRate = srVal
       }
-      if let bdStr = attributeDict["bitDepth"], let bdVal = Int16(bdStr) {
+      if let bdStr = attributeDict["bitDepth"], let bdVal = Int(bdStr) {
         songBuffer?.bitDepth = bdVal
       }
 
@@ -206,23 +199,51 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       }
     }
 
-    // Each OpenSubsonic song artist is its own <artists id="..." name="..."/> element
-    // (the element name is plural). Collect while inside a song.
-    if elementName == "artists", songBuffer != nil, let name = attributeDict["name"],
-       !name.isEmpty {
-      collectedArtistNames.append(name)
+    // Each OpenSubsonic song artist is its own <artists id="..." name="..."/> element.
+    // Look up or create the Artist entity and collect it.
+    if elementName == "artists", songBuffer != nil {
+      if let artistId = attributeDict["id"] {
+        if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+          collectedMultiArtists.append(prefetchedArtist)
+        } else if let artistName = attributeDict["name"] {
+          let artist = library.createArtist(account: account)
+          prefetch.prefetchedArtistDict[artistId] = artist
+          artist.id = artistId
+          artist.name = artistName
+          os_log("Multi-artist <%s> id %s created", log: log, type: .error, artistName, artistId)
+          collectedMultiArtists.append(artist)
+        }
+      }
     }
 
     // Album artists: <albumArtists id="..." name="..."/>
-    if elementName == "albumArtists", songBuffer != nil, let name = attributeDict["name"],
-       !name.isEmpty {
-      collectedAlbumArtistNames.append(name)
+    if elementName == "albumArtists", songBuffer != nil {
+      if let artistId = attributeDict["id"] {
+        if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+          collectedAlbumArtists.append(prefetchedArtist)
+        } else if let artistName = attributeDict["name"] {
+          let artist = library.createArtist(account: account)
+          prefetch.prefetchedArtistDict[artistId] = artist
+          artist.id = artistId
+          artist.name = artistName
+          os_log("Album artist <%s> id %s created", log: log, type: .error, artistName, artistId)
+          collectedAlbumArtists.append(artist)
+        }
+      }
     }
 
-    // Multi-genre: <genres name="..."/>
+    // Multi-genre: <genres name="..."/> (no ID in OpenSubsonic, keyed by name)
     if elementName == "genres", songBuffer != nil, let name = attributeDict["name"],
        !name.isEmpty {
-      collectedGenreNames.append(name)
+      if let prefetchedGenre = prefetch.prefetchedGenreDict[name] {
+        collectedMultiGenres.append(prefetchedGenre)
+      } else {
+        let genre = library.createGenre(account: account)
+        prefetch.prefetchedGenreDict[name] = genre
+        genre.name = name
+        os_log("Multi-genre <%s> created", log: log, type: .error, name)
+        collectedMultiGenres.append(genre)
+      }
     }
 
     // Contributors: <contributors role="..." subRole="..."><artist id="..." name="..."/></contributors>
@@ -288,19 +309,19 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
 
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
       "episode", songBuffer != nil {
-      // Multi-artist display string
-      if !collectedArtistNames.isEmpty {
-        songBuffer?.artistsString = collectedArtistNames.joined(separator: ", ")
+      // Multi-artist entities
+      if !collectedMultiArtists.isEmpty {
+        songBuffer?.multiArtists = collectedMultiArtists
       }
 
-      // Album artists
-      if !collectedAlbumArtistNames.isEmpty {
-        songBuffer?.albumArtistsString = collectedAlbumArtistNames.joined(separator: ", ")
+      // Album artist entities
+      if !collectedAlbumArtists.isEmpty {
+        songBuffer?.albumArtists = collectedAlbumArtists
       }
 
-      // Multi-genre list
-      if !collectedGenreNames.isEmpty {
-        songBuffer?.genresList = collectedGenreNames.joined(separator: ", ")
+      // Multi-genre entities
+      if !collectedMultiGenres.isEmpty {
+        songBuffer?.multiGenres = collectedMultiGenres
       }
 
       // ISRC list
@@ -339,9 +360,9 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         songBuffer?.contributorsString = lines.joined(separator: "\n")
       }
 
-      collectedArtistNames = []
-      collectedAlbumArtistNames = []
-      collectedGenreNames = []
+      collectedMultiArtists = []
+      collectedAlbumArtists = []
+      collectedMultiGenres = []
       collectedContributors = []
       collectedISRCs = []
       collectedMoods = []

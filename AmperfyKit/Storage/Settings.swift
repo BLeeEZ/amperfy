@@ -310,6 +310,12 @@ public struct UserSettings: Sendable, Codable {
     }
     set { _albumsGridSizeSetting = newValue }
   }
+
+  private var _hiddenSongTagKeys: [String] = []
+  public var hiddenSongTagKeys: [String] {
+    get { _hiddenSongTagKeys }
+    set { _hiddenSongTagKeys = newValue }
+  }
 }
 
 // MARK: - AccountSetting

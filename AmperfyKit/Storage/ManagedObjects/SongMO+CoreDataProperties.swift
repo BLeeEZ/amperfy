@@ -31,10 +31,6 @@ extension SongMO {
   @NSManaged
   public var lyricsRelFilePath: String?
   @NSManaged
-  public var artistsString: String?
-  @NSManaged
-  public var albumArtistsString: String?
-  @NSManaged
   public var addedDate: Date?
   @NSManaged
   public var bpm: Int16
@@ -53,8 +49,6 @@ extension SongMO {
   @NSManaged
   public var isrcList: String?
   @NSManaged
-  public var genresList: String?
-  @NSManaged
   public var moodsList: String?
   @NSManaged
   public var groupingsList: String?
@@ -69,7 +63,13 @@ extension SongMO {
   @NSManaged
   public var album: AlbumMO?
   @NSManaged
+  public var albumArtists: NSOrderedSet?
+  @NSManaged
   public var artist: ArtistMO?
+  @NSManaged
+  public var multiArtists: NSOrderedSet?
+  @NSManaged
+  public var multiGenres: NSOrderedSet?
   @NSManaged
   public var directory: DirectoryMO?
   @NSManaged
@@ -84,4 +84,64 @@ extension SongMO {
     #keyPath(SongMO.artwork),
     #keyPath(SongMO.embeddedArtwork),
   ]
+}
+
+// MARK: Generated accessors for multiArtists
+
+extension SongMO {
+  @objc(addMultiArtistsObject:)
+  @NSManaged
+  public func addToMultiArtists(_ value: ArtistMO)
+
+  @objc(removeMultiArtistsObject:)
+  @NSManaged
+  public func removeFromMultiArtists(_ value: ArtistMO)
+
+  @objc(addMultiArtists:)
+  @NSManaged
+  public func addToMultiArtists(_ values: NSOrderedSet)
+
+  @objc(removeMultiArtists:)
+  @NSManaged
+  public func removeFromMultiArtists(_ values: NSOrderedSet)
+}
+
+// MARK: Generated accessors for albumArtists
+
+extension SongMO {
+  @objc(addAlbumArtistsObject:)
+  @NSManaged
+  public func addToAlbumArtists(_ value: ArtistMO)
+
+  @objc(removeAlbumArtistsObject:)
+  @NSManaged
+  public func removeFromAlbumArtists(_ value: ArtistMO)
+
+  @objc(addAlbumArtists:)
+  @NSManaged
+  public func addToAlbumArtists(_ values: NSOrderedSet)
+
+  @objc(removeAlbumArtists:)
+  @NSManaged
+  public func removeFromAlbumArtists(_ values: NSOrderedSet)
+}
+
+// MARK: Generated accessors for multiGenres
+
+extension SongMO {
+  @objc(addMultiGenresObject:)
+  @NSManaged
+  public func addToMultiGenres(_ value: GenreMO)
+
+  @objc(removeMultiGenresObject:)
+  @NSManaged
+  public func removeFromMultiGenres(_ value: GenreMO)
+
+  @objc(addMultiGenres:)
+  @NSManaged
+  public func addToMultiGenres(_ values: NSOrderedSet)
+
+  @objc(removeMultiGenres:)
+  @NSManaged
+  public func removeFromMultiGenres(_ values: NSOrderedSet)
 }

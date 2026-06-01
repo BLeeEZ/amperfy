@@ -41,6 +41,8 @@ extension GenreMO {
   @NSManaged
   public var artists: NSOrderedSet?
   @NSManaged
+  public var multiGenreSongs: NSOrderedSet?
+  @NSManaged
   public var songs: NSOrderedSet?
 
   static let relationshipKeyPathsForPrefetching = [
@@ -178,4 +180,24 @@ extension GenreMO {
   @objc(removeSongs:)
   @NSManaged
   public func removeFromSongs(_ values: NSOrderedSet)
+}
+
+// MARK: Generated accessors for multiGenreSongs
+
+extension GenreMO {
+  @objc(addMultiGenreSongsObject:)
+  @NSManaged
+  public func addToMultiGenreSongs(_ value: SongMO)
+
+  @objc(removeMultiGenreSongsObject:)
+  @NSManaged
+  public func removeFromMultiGenreSongs(_ value: SongMO)
+
+  @objc(addMultiGenreSongs:)
+  @NSManaged
+  public func addToMultiGenreSongs(_ values: NSOrderedSet)
+
+  @objc(removeMultiGenreSongs:)
+  @NSManaged
+  public func removeFromMultiGenreSongs(_ values: NSOrderedSet)
 }

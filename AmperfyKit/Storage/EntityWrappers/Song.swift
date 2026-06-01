@@ -107,33 +107,59 @@ public class Song: AbstractPlayable, Identifyable {
   }
 
   public var artistsString: String? {
-    get { managedObject.artistsString }
-    set { managedObject.artistsString = newValue }
+    if multiArtists.isEmpty { return artist?.name }
+    return multiArtists.map { $0.name }.joined(separator: ", ")
   }
 
   public var albumArtistsString: String? {
-    get { managedObject.albumArtistsString }
-    set { managedObject.albumArtistsString = newValue }
+    albumArtists.isEmpty ? nil : albumArtists.map { $0.name }.joined(separator: ", ")
   }
 
-  public var bpm: Int16 {
-    get { managedObject.bpm }
-    set { managedObject.bpm = newValue }
+  public var multiArtists: [Artist] {
+    get {
+      (managedObject.multiArtists?.array as? [ArtistMO])?.map { Artist(managedObject: $0) } ?? []
+    }
+    set {
+      managedObject.multiArtists = NSOrderedSet(array: newValue.map { $0.managedObject })
+    }
   }
 
-  public var bitDepth: Int16 {
-    get { managedObject.bitDepth }
-    set { managedObject.bitDepth = newValue }
+  public var albumArtists: [Artist] {
+    get {
+      (managedObject.albumArtists?.array as? [ArtistMO])?.map { Artist(managedObject: $0) } ?? []
+    }
+    set {
+      managedObject.albumArtists = NSOrderedSet(array: newValue.map { $0.managedObject })
+    }
   }
 
-  public var channelCount: Int16 {
-    get { managedObject.channelCount }
-    set { managedObject.channelCount = newValue }
+  public var multiGenres: [Genre] {
+    get {
+      (managedObject.multiGenres?.array as? [GenreMO])?.map { Genre(managedObject: $0) } ?? []
+    }
+    set {
+      managedObject.multiGenres = NSOrderedSet(array: newValue.map { $0.managedObject })
+    }
   }
 
-  public var samplingRate: Int32 {
-    get { managedObject.samplingRate }
-    set { managedObject.samplingRate = newValue }
+  public var bpm: Int {
+    get { Int(managedObject.bpm) }
+    set { managedObject.bpm = Int16(newValue) }
+  }
+
+  public var bitDepth: Int {
+    get { Int(managedObject.bitDepth) }
+    set { managedObject.bitDepth = Int16(newValue) }
+  }
+
+  public var channelCount: Int {
+    get { Int(managedObject.channelCount) }
+    set { managedObject.channelCount = Int16(newValue) }
+  }
+
+  public var samplingRate: Int {
+    get { Int(managedObject.samplingRate) }
+    set { managedObject.samplingRate = Int32(newValue) }
   }
 
   public var comment: String? {
@@ -157,8 +183,7 @@ public class Song: AbstractPlayable, Identifyable {
   }
 
   public var genresList: String? {
-    get { managedObject.genresList }
-    set { managedObject.genresList = newValue }
+    multiGenres.isEmpty ? nil : multiGenres.map { $0.name }.joined(separator: ", ")
   }
 
   public var moodsList: String? {
@@ -192,7 +217,7 @@ public class Song: AbstractPlayable, Identifyable {
   }
 
   override public var creatorName: String {
-    if let s = managedObject.artistsString, !s.isEmpty { return s }
+    if let s = artistsString, !s.isEmpty { return s }
     return artist?.name ?? "Unknown Artist"
   }
 

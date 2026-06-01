@@ -87,6 +87,16 @@ class SsIDsParserDelegate: SsNotifiableXmlParser {
       prefetchIDs.localArtistNames.insert(artistName)
     }
 
+    // OpenSubsonic multi-artist: <artists id="..."> child elements inside a song
+    if elementName == "artists", let artistId = attributeDict["id"] {
+      prefetchIDs.artistIDs.insert(artistId)
+    }
+
+    // OpenSubsonic multi-albumArtist: <albumArtists id="..."> child elements inside a song
+    if elementName == "albumArtists", let artistId = attributeDict["id"] {
+      prefetchIDs.artistIDs.insert(artistId)
+    }
+
     if let albumId = attributeDict["albumId"] {
       prefetchIDs.albumIDs.insert(albumId)
     }
@@ -98,6 +108,11 @@ class SsIDsParserDelegate: SsNotifiableXmlParser {
 
     if elementName != "episode", let genreName = attributeDict["genre"] {
       // ignore podcast episode genre
+      prefetchIDs.genreNames.insert(genreName)
+    }
+
+    // OpenSubsonic multi-genre: <genres name="..."/> child elements inside a song
+    if elementName == "genres", let genreName = attributeDict["name"] {
       prefetchIDs.genreNames.insert(genreName)
     }
   }

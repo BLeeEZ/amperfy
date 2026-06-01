@@ -30,6 +30,8 @@ class SongParserDelegate: PlayableParserDelegate {
   var artistIdToCreate: String?
   var albumIdToCreate: String?
   var genreIdToCreate: String?
+  var albumArtistIdToCreate: String?
+  var collectedMultiGenres = [Genre]()
 
   var guessedArtist: Artist?
   var guessedAlbum: Album?
@@ -71,6 +73,8 @@ class SongParserDelegate: PlayableParserDelegate {
         guessedGenre = nil
       }
       playableBuffer = songBuffer
+      collectedMultiGenres = []
+      albumArtistIdToCreate = nil
     case "artist":
       guard let song = songBuffer, let artistId = attributeDict["id"] else { return }
       if let guessedArtist, guessedArtist.id == artistId {
@@ -79,6 +83,14 @@ class SongParserDelegate: PlayableParserDelegate {
         song.artist = prefetchedArtist
       } else {
         artistIdToCreate = artistId
+      }
+    case "albumartist":
+      guard songBuffer != nil, let artistId = attributeDict["id"] else { return }
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        collectedMultiGenres.isEmpty ? () : ()
+        songBuffer?.albumArtists = [prefetchedArtist]
+      } else {
+        albumArtistIdToCreate = artistId
       }
     case "album":
       guard let song = songBuffer, let albumId = attributeDict["id"] else { return }
@@ -91,10 +103,13 @@ class SongParserDelegate: PlayableParserDelegate {
       }
     case "genre":
       guard let song = songBuffer, let genreId = attributeDict["id"] else { return }
+      // Ampache can have multiple <genre> elements. First one sets song.genre; all go to multiGenres.
       if let guessedGenre = guessedGenre, guessedGenre.id == genreId {
-        song.genre = guessedGenre
+        if song.genre == nil { song.genre = guessedGenre }
+        collectedMultiGenres.append(guessedGenre)
       } else if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
-        song.genre = prefetchedGenre
+        if song.genre == nil { song.genre = prefetchedGenre }
+        collectedMultiGenres.append(prefetchedGenre)
       } else {
         genreIdToCreate = genreId
       }
@@ -120,6 +135,18 @@ class SongParserDelegate: PlayableParserDelegate {
         songBuffer?.artist = artist
         artistIdToCreate = nil
       }
+    case "albumartist":
+      if let artistId = albumArtistIdToCreate {
+        os_log(
+          "AlbumArtist <%s> with id %s has been created", log: log, type: .error, buffer, artistId
+        )
+        let artist = library.createArtist(account: account)
+        prefetch.prefetchedArtistDict[artistId] = artist
+        artist.id = artistId
+        artist.name = buffer
+        songBuffer?.albumArtists = [artist]
+        albumArtistIdToCreate = nil
+      }
     case "album":
       if let albumId = albumIdToCreate {
         os_log("Album <%s> with id %s has been created", log: log, type: .error, buffer, albumId)
@@ -137,10 +164,24 @@ class SongParserDelegate: PlayableParserDelegate {
         prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer
-        songBuffer?.genre = genre
+        if songBuffer?.genre == nil { songBuffer?.genre = genre }
+        collectedMultiGenres.append(genre)
         genreIdToCreate = nil
       }
+    case "rate":
+      if let val = Int(buffer) { songBuffer?.samplingRate = val }
+    case "channels":
+      if let val = Int(buffer) { songBuffer?.channelCount = val }
+    case "composer":
+      if !buffer.isEmpty { songBuffer?.displayComposer = buffer }
+    case "comment":
+      if !buffer.isEmpty { songBuffer?.comment = buffer }
+    case "mbid":
+      if !buffer.isEmpty { songBuffer?.musicBrainzId = buffer }
     case "song":
+      if !collectedMultiGenres.isEmpty {
+        songBuffer?.multiGenres = collectedMultiGenres
+      }
       parsedCount += 1
       parseNotifier?.notifyParsedObject(ofType: .song)
       songBuffer?.rating = rating

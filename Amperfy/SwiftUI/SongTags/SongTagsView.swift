@@ -193,17 +193,13 @@ enum SongTagKey: String, CaseIterable {
 // MARK: - TagVisibilityStore
 
 class TagVisibilityStore: ObservableObject {
-  static let udKey = "songTagVisibility"
-
   @Published
   var hiddenKeys: Set<String>
 
   init() {
-    if let saved = UserDefaults.standard.stringArray(forKey: Self.udKey) {
-      self.hiddenKeys = Set(saved)
-    } else {
-      self.hiddenKeys = []
-    }
+    self.hiddenKeys = Set(
+      (UIApplication.shared.delegate as! AppDelegate).storage.settings.user.hiddenSongTagKeys
+    )
   }
 
   func setVisible(_ key: SongTagKey, visible: Bool) {
@@ -221,7 +217,10 @@ class TagVisibilityStore: ObservableObject {
   }
 
   private func persist() {
-    UserDefaults.standard.set(Array(hiddenKeys), forKey: Self.udKey)
+    let appDelegate = UIApplication.shared.delegate as! AppDelegate
+    var userSettings = appDelegate.storage.settings.user
+    userSettings.hiddenSongTagKeys = Array(hiddenKeys)
+    appDelegate.storage.settings.user = userSettings
   }
 }
 

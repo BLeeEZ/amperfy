@@ -963,7 +963,13 @@ public class LibraryStorage: PlayableFileCachable {
   }
 
   func getFetchPredicate(forArtist artist: Artist) -> NSPredicate {
-    NSPredicate(format: "artist == %@", artist.managedObject.objectID)
+    NSCompoundPredicate(orPredicateWithSubpredicates: [
+      NSPredicate(format: "artist == %@", artist.managedObject.objectID),
+      NSPredicate(
+        format: "SUBQUERY(multiArtists, $ma, $ma == %@).@count > 0",
+        artist.managedObject.objectID
+      ),
+    ])
   }
 
   func getFetchPredicate(forAlbum album: Album) -> NSPredicate {

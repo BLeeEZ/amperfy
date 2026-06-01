@@ -61,6 +61,8 @@ enum CoreDataMigrationVersion: String, CaseIterable {
   case v49 =
     "Amperfy v49" // Remove PlayableFile and Artwork data (they were already deprecated); Account: add apiType
   case v50 = "Amperfy v50" // Store joined artist display string for multi-artist songs
+  case v51 =
+    "Amperfy v51" // Replace string-denormalized artists/albumArtists/genres with Core Data relationships
 
   // MARK: - Current
 
@@ -175,6 +177,8 @@ enum CoreDataMigrationVersion: String, CaseIterable {
     case .v49:
       return .v50
     case .v50:
+      return .v51
+    case .v51:
       return nil
     }
   }
