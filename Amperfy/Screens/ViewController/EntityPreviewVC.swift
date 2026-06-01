@@ -349,11 +349,8 @@ class EntityPreviewActionBuilder {
   }
 
   private func configureFor(podcast: Podcast) {
-    isPlay = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
+    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
+      .hasCachedItems
     isShuffle = false
     isMusicQueue = false
     isShowAlbum = false

@@ -100,7 +100,8 @@ extension CarPlaySceneDelegate {
       guard let entity = fetchedController.getWrappedEntity(at: index) else { break }
       playables.append(entity)
     }
-    if !playables.isEmpty {
+    if !playables.isEmpty,
+       appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
       items.append(createPlayShuffledListItem(playContext: PlayContext(
         name: "Favorite Songs",
         playables: playables
@@ -126,10 +127,12 @@ extension CarPlaySceneDelegate {
     guard let playables = fetchedController.getContextSongs(onlyCachedSongs: isOfflineMode)
     else { return items }
 
-    items.append(createPlayShuffledListItem(playContext: PlayContext(
-      containable: playlist,
-      playables: playlist.playables.filterCached(dependigOn: isOfflineMode)
-    )))
+    if appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
+      items.append(createPlayShuffledListItem(playContext: PlayContext(
+        containable: playlist,
+        playables: playlist.playables.filterCached(dependigOn: isOfflineMode)
+      )))
+    }
     let displayedSongs = playables.prefix(CPListTemplate.maximumSectionCount - 2)
     for (index, song) in displayedSongs.enumerated() {
       let listItem = createDetailTemplate(
@@ -190,10 +193,12 @@ extension CarPlaySceneDelegate {
     section.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       var albumItems = [CPListItem]()
-      albumItems.append(createPlayShuffledListItem(playContext: PlayContext(
-        containable: artist,
-        playables: artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-      )))
+      if appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
+        albumItems.append(createPlayShuffledListItem(playContext: PlayContext(
+          containable: artist,
+          playables: artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+        )))
+      }
       albumItems.append(createDetailAllSongsTemplate(for: artist, onlyCached: onlyCached))
       let artistAlbums = appDelegate.storage.main.library.getAlbums(
         for: activeAccount,
@@ -230,10 +235,12 @@ extension CarPlaySceneDelegate {
     section.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       var songItems = [CPListItem]()
-      songItems.append(createPlayShuffledListItem(playContext: PlayContext(
-        containable: artist,
-        playables: artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-      )))
+      if appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
+        songItems.append(createPlayShuffledListItem(playContext: PlayContext(
+          containable: artist,
+          playables: artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+        )))
+      }
       let artistSongs = artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
         .sortByTitle().prefix(LibraryStorage.carPlayMaxElements)
       for (index, song) in artistSongs.enumerated() {
@@ -284,10 +291,12 @@ extension CarPlaySceneDelegate {
 
   func createAlbumSongListTemplate(for album: Album, onlyCached: Bool) -> CPListTemplate {
     var songItems = [CPListItem]()
-    songItems.append(createPlayShuffledListItem(playContext: PlayContext(
-      containable: album,
-      playables: album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-    )))
+    if appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
+      songItems.append(createPlayShuffledListItem(playContext: PlayContext(
+        containable: album,
+        playables: album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+      )))
+    }
     let albumSongs = album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
       .prefix(LibraryStorage.carPlayMaxElements)
     for (index, song) in albumSongs.enumerated() {
