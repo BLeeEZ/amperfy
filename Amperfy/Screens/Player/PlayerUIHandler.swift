@@ -201,6 +201,8 @@ class PlayerUIHandler: NSObject {
   }
 
   func refreshShuffleButton(shuffleButton: UIButton) {
+    let isShuffleButtonEnabled = appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
+    shuffleButton.isHidden = !isShuffleButtonEnabled
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:
       shuffleButton.configuration?.image = .shuffle
@@ -212,7 +214,7 @@ class PlayerUIHandler: NSObject {
       config.image = .shuffle
       shuffleButton.configuration = config
     }
-    shuffleButton.isEnabled = appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
+    shuffleButton.isEnabled = isShuffleButtonEnabled
     shuffleButton.isSelected = player.isShuffle
   }
 

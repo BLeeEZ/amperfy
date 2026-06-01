@@ -41,7 +41,8 @@ extension CarPlaySceneDelegate {
         appDelegate.player.setRepeatMode(appDelegate.player.repeatMode.nextMode)
       })
     )
-    if appDelegate.player.playerMode == .music {
+    if appDelegate.player.playerMode == .music,
+       appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled {
       buttons.append(
         CPNowPlayingShuffleButton(handler: { [weak self] button in
           guard let self = self else { return }

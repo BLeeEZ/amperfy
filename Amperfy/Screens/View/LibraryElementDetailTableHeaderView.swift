@@ -161,7 +161,8 @@ class LibraryElementDetailTableHeaderView: UIView {
       for: .normal
     )
     playShuffledButton.layer.cornerRadius = 10.0
-    playShuffledButton.isHidden = configuration.isShuffleHidden
+    playShuffledButton.isHidden = configuration.isShuffleHidden || !appDelegate
+      .storage.settings.user.isPlayerShuffleButtonEnabled
     activate()
     registerForTraitChanges(
       [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
@@ -174,6 +175,8 @@ class LibraryElementDetailTableHeaderView: UIView {
   func activate() {
     playAllButton.isEnabled = true
     playShuffledButton.isEnabled = !(config?.isShuffleOnContextNeccessary ?? true) || appDelegate
+      .storage.settings.user.isPlayerShuffleButtonEnabled
+    playShuffledButton.isHidden = (config?.isShuffleHidden ?? false) || !appDelegate
       .storage.settings.user.isPlayerShuffleButtonEnabled
   }
 

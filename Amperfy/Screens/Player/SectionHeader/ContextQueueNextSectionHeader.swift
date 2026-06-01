@@ -73,7 +73,7 @@ class ContextQueueNextSectionHeader: UIView {
     switch player.playerMode {
     case .music:
       repeatButton.isHidden = false
-      shuffleButton.isHidden = false
+      shuffleButton.isHidden = !appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     case .podcast:
       repeatButton.isHidden = true
       shuffleButton.isHidden = true
