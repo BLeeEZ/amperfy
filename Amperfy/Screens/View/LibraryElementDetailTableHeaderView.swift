@@ -54,13 +54,6 @@ class LibraryElementDetailTableHeaderView: UIView {
   static let margin = UIView.defaultMarginMiddleElement
 
   private var config: PlayShuffleInfoConfiguration?
-  private var shouldHideShuffleButton: Bool {
-    guard let config else { return true }
-    let isPlayerShuffleButtonEnabled = appDelegate.storage.settings.user
-      .isPlayerShuffleButtonEnabled
-    return config
-      .isShuffleHidden || (config.isShuffleOnContextNeccessary && !isPlayerShuffleButtonEnabled)
-  }
 
   required init?(coder aDecoder: NSCoder) {
     super.init(coder: aDecoder)
@@ -126,7 +119,6 @@ class LibraryElementDetailTableHeaderView: UIView {
     infoContainerView.isHidden = config
       .isInfoAlwaysHidden || (traitCollection.horizontalSizeClass == .compact)
     infoLabel.text = config.infoCB?() ?? ""
-    playShuffledButton.isHidden = shouldHideShuffleButton
   }
 
   @IBAction
@@ -169,7 +161,7 @@ class LibraryElementDetailTableHeaderView: UIView {
       for: .normal
     )
     playShuffledButton.layer.cornerRadius = 10.0
-    playShuffledButton.isHidden = shouldHideShuffleButton
+    playShuffledButton.isHidden = configuration.isShuffleHidden
     activate()
     registerForTraitChanges(
       [UITraitUserInterfaceStyle.self, UITraitHorizontalSizeClass.self],
@@ -180,14 +172,9 @@ class LibraryElementDetailTableHeaderView: UIView {
   }
 
   func activate() {
-    let isPlayerShuffleButtonEnabled = appDelegate.storage.settings.user
-      .isPlayerShuffleButtonEnabled
-    let isShuffleOnContextNeccessary = config?.isShuffleOnContextNeccessary ?? true
-
     playAllButton.isEnabled = true
-    playShuffledButton.isHidden = shouldHideShuffleButton
-    playShuffledButton.isEnabled = !shouldHideShuffleButton &&
-      (!isShuffleOnContextNeccessary || isPlayerShuffleButtonEnabled)
+    playShuffledButton.isEnabled = !(config?.isShuffleOnContextNeccessary ?? true) || appDelegate
+      .storage.settings.user.isPlayerShuffleButtonEnabled
   }
 
   func deactivate() {
