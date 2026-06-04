@@ -609,7 +609,8 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
 
   private func updateBottomSafeAreaForFixedControls() {
     let miniPlayerSafeAreaExtension = AppDelegate.mainWindowHostVC?.getSafeAreaExtension() ?? 0
-    fixedPlayerControlsBottomConstraint?.constant = -miniPlayerSafeAreaExtension
+    let systemBottomSafeArea = max(0, view.safeAreaInsets.bottom - additionalSafeAreaInsets.bottom)
+    fixedPlayerControlsBottomConstraint?.constant = -(systemBottomSafeArea + miniPlayerSafeAreaExtension)
     fixedPlayerControlsView?.refreshDisplayState()
     let controlsHeight = fixedPlayerControlsView?.shouldDisplay == true
       ? PlaylistPlaybackControlsView.frameHeight
