@@ -45,7 +45,7 @@
             <artists id="ost-artist-a1" name="Artist One"/>
             <artists id="ost-artist-a2" name="Artist Two"/>
             <!-- album artists -->
-            <albumArtists id="ost-artist-a1" name="Album Artist One"/>
+            <albumArtists id="ost-artist-aa1" name="Album Artist One"/>
             <!-- multi-genre -->
             <genres name="Rock"/>
             <genres name="Metal"/>
@@ -94,7 +94,7 @@
               album="OpenSubsonic Tags Album"
               albumId="ost-album"
               artist="Simple Artist"
-              artistId="ost-artist"
+              artistId="ost-artist-simple"
               isDir="false"
               created="2024-01-01T00:00:00Z"
               duration="120"

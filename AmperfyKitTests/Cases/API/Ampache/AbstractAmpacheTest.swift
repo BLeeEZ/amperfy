@@ -72,7 +72,11 @@ class AbstractAmpacheTest: XCTestCase {
     idParserDelegate = IDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
   }
 
-  override func tearDown() {}
+  override func tearDown() {
+    xmlData = nil
+    parserDelegate = nil
+    super.tearDown()
+  }
 
   var prefetchIdTester: PrefetchIdTester {
     PrefetchIdTester(library: library, prefetchIDs: idParserDelegate.prefetchIDs)

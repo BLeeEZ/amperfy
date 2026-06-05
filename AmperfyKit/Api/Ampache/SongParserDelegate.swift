@@ -103,12 +103,12 @@ class SongParserDelegate: PlayableParserDelegate {
       }
     case "genre":
       guard let song = songBuffer, let genreId = attributeDict["id"] else { return }
-      // Ampache can have multiple <genre> elements. First one sets song.genre; all go to multiGenres.
+      // Ampache can have multiple <genre> elements. Last one sets song.genre; all go to multiGenres.
       if let guessedGenre = guessedGenre, guessedGenre.id == genreId {
-        if song.genre == nil { song.genre = guessedGenre }
+        song.genre = guessedGenre
         collectedMultiGenres.append(guessedGenre)
       } else if let prefetchedGenre = prefetch.prefetchedGenreDict[genreId] {
-        if song.genre == nil { song.genre = prefetchedGenre }
+        song.genre = prefetchedGenre
         collectedMultiGenres.append(prefetchedGenre)
       } else {
         genreIdToCreate = genreId
@@ -164,7 +164,7 @@ class SongParserDelegate: PlayableParserDelegate {
         prefetch.prefetchedGenreDict[genreId] = genre
         genre.id = genreId
         genre.name = buffer
-        if songBuffer?.genre == nil { songBuffer?.genre = genre }
+        songBuffer?.genre = genre
         collectedMultiGenres.append(genre)
         genreIdToCreate = nil
       }

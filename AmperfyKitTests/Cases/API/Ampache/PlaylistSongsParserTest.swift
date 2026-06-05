@@ -130,7 +130,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
     prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 3,
       genreIdCount: 4,
-      artistCount: 4,
+      artistCount: 5,
       albumCount: 2,
       songCount: 4,
       songLibraryCount: 4 + createdSongCount
