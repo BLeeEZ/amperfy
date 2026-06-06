@@ -122,11 +122,6 @@ public class Song: AbstractPlayable, Identifyable {
     artist?.name ?? "Unknown Artist"
   }
 
-  public var creatorNameWithComposer: String {
-    guard let composer = composer else { return creatorName }
-    return "\(creatorName) \(CommonString.oneMiddleDot) \(composer)"
-  }
-
   public var detailInfo: String {
     var info = displayString
     info += " ("

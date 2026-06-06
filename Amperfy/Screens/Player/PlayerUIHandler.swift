@@ -279,7 +279,7 @@ class PlayerUIHandler: NSObject {
         albumLabel?.text = playableInfo.asSong?.album?.name ?? ""
         albumButton?.isEnabled = playableInfo.isSong
         albumContainerView?.isHidden = !playableInfo.isSong
-        artistLabel.text = playableInfo.asSong?.creatorNameWithComposer ?? playableInfo.creatorName
+        artistLabel.text = playableInfo.creatorName
       }
     } else {
       switch player.playerMode {

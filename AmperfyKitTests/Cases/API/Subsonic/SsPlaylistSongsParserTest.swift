@@ -131,6 +131,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.id, "657")
     XCTAssertEqual(song.title, "Making Me Nervous")
     XCTAssertEqual(song.rating, 2)
+    XCTAssertEqual(song.composer, "Brad Turcotte")
     XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.id, "45")
@@ -160,6 +161,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.id, "748")
     XCTAssertEqual(song.title, "Stories from Emona II")
     XCTAssertEqual(song.rating, 0)
+    XCTAssertNil(song.composer)
     XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.id, "51") // Artist not pre created
@@ -189,6 +191,7 @@ class SsPlaylistSongsParserTest: AbstractSsParserTest {
     XCTAssertEqual(song.id, "805")
     XCTAssertEqual(song.title, "Bajo siete lunas (intro)")
     XCTAssertEqual(song.rating, 1)
+    XCTAssertNil(song.composer)
     XCTAssertEqual(song.artist?.account?.serverHash, TestAccountInfo.test1ServerHash)
     XCTAssertEqual(song.artist?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artist?.id, "54")

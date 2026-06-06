@@ -9,7 +9,7 @@
                artist="Brad Sucks" isDir="false" coverArt="655" created="2008-04-10T07:10:32" duration="159"
                bitRate="202" track="1" year="2003" size="4060113" suffix="mp3" contentType="audio/mpeg" isVideo="false"
                path="Brad Sucks/I Don&apos;t Know What I&apos;m Doing/01 - Making Me Nervous.mp3" albumId="58"
-               artistId="45" type="music" userRating="2"/>
+               artistId="45" composer="Brad Turcotte" type="music" userRating="2"/>
         <entry id="823" parent="784" title="Piano escena" album="BSO  Sebastian" artist="PeerGynt Lobogris"
                isDir="false" coverArt="784" created="2009-01-14T22:26:29" duration="129" bitRate="170" track="8"
                year="2008" genre="Blues" size="2799954" suffix="mp3" contentType="audio/mpeg" isVideo="false"
