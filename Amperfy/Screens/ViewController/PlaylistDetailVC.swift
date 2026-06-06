@@ -85,13 +85,14 @@ class PlaylistDetailDiffableDataSource: BasicUITableViewDiffableDataSource {
 
 // MARK: - PlaylistPlaybackControlsView
 
+@MainActor
 private final class PlaylistPlaybackControlsView: UIView {
   static let frameHeight: CGFloat = 112
 
   var visibilityChangedCB: VoidFunctionCallback?
 
-  private let player = appDelegate.player
-  private let playerHandler = PlayerUIHandler(player: appDelegate.player, style: .popupPlayer)
+  private let player: PlayerFacade
+  private let playerHandler: PlayerUIHandler
   private let previousButton = UIButton(type: .system)
   private let playButton = UIButton(type: .system)
   private let nextButton = UIButton(type: .system)
@@ -109,6 +110,9 @@ private final class PlaylistPlaybackControlsView: UIView {
   }
 
   override init(frame: CGRect) {
+    let player = (UIApplication.shared.delegate as! AppDelegate).player
+    self.player = player
+    self.playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
     super.init(frame: frame)
     setup()
     player.addNotifier(notifier: self)
