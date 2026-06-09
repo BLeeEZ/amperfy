@@ -214,6 +214,7 @@ public protocol PlayerFacade {
   func play(context: PlayContext)
   func playShuffled(context: PlayContext)
   func play(playerIndex: PlayerIndex)
+  func playCurrentItem()
   func pause()
   func togglePlayPause()
   func stop()
@@ -304,6 +305,7 @@ class PlayerFacadeImpl: PlayerFacade {
   private let backendAudioPlayer: BackendAudioPlayer
   private let musicPlayer: AudioPlayer
   private let userStatistics: UserStatistics
+  private let savedQueueManager: SavedQueueManager
 
   init(
     playerStatus: PlayerStatusPersistent,
@@ -311,13 +313,15 @@ class PlayerFacadeImpl: PlayerFacade {
     musicPlayer: AudioPlayer,
     library: LibraryStorage,
     backendAudioPlayer: BackendAudioPlayer,
-    userStatistics: UserStatistics
+    userStatistics: UserStatistics,
+    savedQueueManager: SavedQueueManager
   ) {
     self.playerStatus = playerStatus
     self.queueHandler = queueHandler
     self.backendAudioPlayer = backendAudioPlayer
     self.musicPlayer = musicPlayer
     self.userStatistics = userStatistics
+    self.savedQueueManager = savedQueueManager
   }
 
   var prevQueueCount: Int {
@@ -522,6 +526,7 @@ class PlayerFacadeImpl: PlayerFacade {
     if queueHandler.logout(account: account) {
       stop()
     }
+    savedQueueManager.deleteAll(for: account)
   }
 
   func seek(toSecond: Double) {
@@ -602,6 +607,10 @@ class PlayerFacadeImpl: PlayerFacade {
 
   func play() {
     musicPlayer.play()
+  }
+
+  func playCurrentItem() {
+    musicPlayer.playCurrentItem()
   }
 
   func play(context: PlayContext) {

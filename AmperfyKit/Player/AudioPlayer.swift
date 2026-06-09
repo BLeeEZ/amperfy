@@ -55,6 +55,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
 
   var isShouldPauseAfterFinishedPlaying = false
   var autoMixCB: (@MainActor (Song) async throws -> [Song])?
+  var savedQueueManager: SavedQueueManager?
 
   private var playerStatus: PlayerStatusPersistent
   private var queueHandler: PlayQueueHandler
@@ -157,10 +158,19 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     }
   }
 
+  // Force the backend to load the queue's current item, replacing any
+  // previously buffered track. Used by Saved Queues restore, where the queue
+  // state changed but the backend still holds the prior track.
+  func playCurrentItem() {
+    guard let currentPlayable = currentlyPlaying else { return }
+    insertIntoPlayer(playable: currentPlayable)
+  }
+
   public func play(context: PlayContext) {
     guard let activePlayable = context.getActivePlayable() else { return }
     let topUserQueueItem = queueHandler.getUserQueueItem(at: 0)
     let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
+    savedQueueManager?.snapshotIfNeeded(reason: .contextReplace)
     queueHandler.clearActiveQueue()
     queueHandler.appendActiveQueue(playables: context.playables)
     if context.type == .music {

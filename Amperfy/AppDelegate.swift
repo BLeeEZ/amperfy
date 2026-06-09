@@ -79,6 +79,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   public var libraryUpdater: LibraryUpdater { AmperKit.shared.libraryUpdater }
 
+  public var savedQueues: SavedQueueManager { AmperKit.shared.savedQueues }
+
   public lazy var userStatistics = {
     AmperKit.shared.userStatistics
   }()

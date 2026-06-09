@@ -95,4 +95,7 @@ final class Settings: ObservableObject {
 
   @Published
   var isAutoMixAfterEnd = false
+
+  @Published
+  var savedQueuesLimit: Int = 20
 }

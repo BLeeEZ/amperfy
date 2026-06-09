@@ -110,6 +110,9 @@ public class AmperKit {
     createPlayer()
   }()
 
+  @MainActor
+  public private(set) var savedQueues: SavedQueueManager!
+
   // internal player helper classes that interact only via player callbacks
   private var playerDownloadPreparationHandler: PlayerDownloadPreparationHandler?
   private var playerAudioSessionHandler: AudioSessionHandler?
@@ -153,6 +156,15 @@ public class AmperKit {
       settings: storage.settings,
       userStatistics: userStatistics
     )
+    let savedQueueManager = SavedQueueManager(
+      library: storage.main.library,
+      queueHandler: queueHandler,
+      playerData: playerData,
+      settings: storage.settings,
+      eventLogger: eventLogger
+    )
+    curPlayer.savedQueueManager = savedQueueManager
+    savedQueues = savedQueueManager
     playerAudioSessionHandler!.musicPlayer = curPlayer
     playerAudioSessionHandler!.eventLogger = eventLogger
     playerAudioSessionHandler!.configureObserverForAudioSessionInterruption()
@@ -185,7 +197,8 @@ public class AmperKit {
       musicPlayer: curPlayer,
       library: storage.main.library,
       backendAudioPlayer: backendAudioPlayer,
-      userStatistics: userStatistics
+      userStatistics: userStatistics,
+      savedQueueManager: savedQueueManager
     )
     facadeImpl.isOfflineMode = storage.settings.user.isOfflineMode
 

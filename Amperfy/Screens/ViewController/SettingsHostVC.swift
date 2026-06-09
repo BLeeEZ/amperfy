@@ -197,6 +197,16 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isAutoMixAfterEnd = newValue
     }))
 
+    settings.savedQueuesLimit = appDelegate.storage.settings.user.savedQueuesLimit
+    changesAgent.append(settings.$savedQueuesLimit.sink(receiveValue: { [weak self] newValue in
+      guard let self else { return }
+      appDelegate.storage.settings.user.savedQueuesLimit = newValue
+      if let info = appDelegate.storage.settings.accounts.active {
+        let account = appDelegate.storage.main.library.getAccount(info: info)
+        appDelegate.savedQueues.enforceLimit(for: account)
+      }
+    }))
+
     settings.swipeActionSettings = appDelegate.storage.settings.user.swipeActionSettings
 
     settings.isReplayGainEnabled = appDelegate.storage.settings.user.isReplayGainEnabled

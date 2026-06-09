@@ -367,13 +367,21 @@ class MusicPlayerTest: XCTestCase {
       settings: storage.settings,
       userStatistics: userStatistics
     )
+    let savedQueueManager = SavedQueueManager(
+      library: library,
+      queueHandler: testQueueHandler,
+      playerData: playerData,
+      settings: storage.settings,
+      eventLogger: eventLogger
+    )
     testPlayer = PlayerFacadeImpl(
       playerStatus: playerData,
       queueHandler: testQueueHandler,
       musicPlayer: testMusicPlayer,
       library: library,
       backendAudioPlayer: backendPlayer,
-      userStatistics: userStatistics
+      userStatistics: userStatistics,
+      savedQueueManager: savedQueueManager
     )
     testPlayer.addNotifier(notifier: mockMusicPlayable)
 

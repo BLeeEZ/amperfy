@@ -69,6 +69,8 @@ extension LibraryDisplayType {
       )
     case .radios:
       return AppStoryboard.Main.segueToRadios(account: account)
+    case .savedQueues:
+      return AppStoryboard.Main.segueToSavedQueues(account: account)
     }
   }
 }

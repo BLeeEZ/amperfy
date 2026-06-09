@@ -122,6 +122,21 @@ struct PlayerSettingsView: View {
           footer: "When the queue ends, automatically continue playback using Instant Mix to find similar songs."
         )
 
+        SettingsSection(
+          content: {
+            SettingsRow(title: "Saved Queues Limit") {
+              Menu(settings.savedQueuesLimit.description) {
+                ForEach([10, 20, 50, 100], id: \.self) { limit in
+                  Button(limit.description) {
+                    settings.savedQueuesLimit = limit
+                  }
+                }
+              }
+            }
+          },
+          footer: "Maximum number of saved queues to keep. Oldest queues are removed first when the limit is exceeded."
+        )
+
         // Streaming Format Settings
         SettingsSection(
           content: {
