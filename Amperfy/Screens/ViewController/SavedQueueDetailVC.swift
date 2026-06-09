@@ -71,7 +71,7 @@ class SavedQueueDetailVC: BasicTableViewController {
 
     containableAtIndexPathCallback = { [weak self] indexPath in
       guard let self, indexPath.row < self.resolvedSongs.count else { return nil }
-      return self.resolvedSongs[indexPath.row]
+      return resolvedSongs[indexPath.row]
     }
     playContextAtIndexPathCallback = { [weak self] indexPath in
       self?.makePlayContext(startingAt: indexPath.row)
@@ -81,8 +81,8 @@ class SavedQueueDetailVC: BasicTableViewController {
         completionHandler(nil)
         return
       }
-      let song = self.resolvedSongs[indexPath.row]
-      let playContext = self.makePlayContext(startingAt: indexPath.row)
+      let song = resolvedSongs[indexPath.row]
+      let playContext = makePlayContext(startingAt: indexPath.row)
       completionHandler(SwipeActionContext(containable: song, playContext: playContext))
     }
   }
@@ -131,8 +131,8 @@ class SavedQueueDetailVC: BasicTableViewController {
       attributes: .destructive
     ) { [weak self] _ in
       guard let self else { return }
-      self.appDelegate.savedQueues.delete(self.savedQueue)
-      self.navigationController?.popViewController(animated: true)
+      appDelegate.savedQueues.delete(savedQueue)
+      navigationController?.popViewController(animated: true)
     }
     return UIMenu(children: [saveAsPlaylist, delete])
   }

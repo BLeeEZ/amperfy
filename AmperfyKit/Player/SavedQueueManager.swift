@@ -73,13 +73,21 @@ public class SavedQueueManager {
     let currentIndex = playerData.currentIndex
     let contextName = queueHandler.contextName
 
-    // Dedupe against the most recent snapshot. Names use a wall-clock
-    // timestamp so a strict equality check on `name` would never dedupe;
-    // compare by contextName + songs + index instead.
-    if let recent = mostRecentQueue(for: account),
-       recent.contextSongIds == contextIds,
-       recent.currentIndex == currentIndex,
-       contextName.isEmpty || recent.name.hasPrefix(contextName) {
+    // Match on song-id arrays. Toggling between two saved queues should
+    // refresh the existing rows in place, not produce a new duplicate every
+    // round trip.
+    if let existing = library.getSavedQueues(for: account).first(where: { saved in
+      saved.contextSongIds == contextIds && saved.userQueueSongIds == userIds
+    }) {
+      existing.currentIndex = currentIndex
+      existing.isShuffle = playerData.isShuffle
+      existing.repeatMode = playerData.repeatMode
+      existing.isUserQueuePlaying = playerData.isUserQueuePlaying
+      // Bump the timestamp so the refreshed queue bubbles to the top of the
+      // list — useful signal that it was the most recently active queue.
+      existing.managedObject.createdAt = Date()
+      library.saveContext()
+      postListChanged()
       return
     }
 
