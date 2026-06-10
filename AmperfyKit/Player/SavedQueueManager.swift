@@ -66,7 +66,11 @@ public class SavedQueueManager {
     guard let accountInfo = settings.accounts.active else { return }
     let account = library.getAccount(info: accountInfo)
 
-    let contextIds = playerData.contextQueue.playables.map { $0.id }
+    // Capture the queue as it plays: with shuffle active the shuffled queue
+    // is what the user hears and what currentIndex refers to. The plain
+    // context order can't reproduce that and would resume in a different
+    // order.
+    let contextIds = playerData.activeMusicQueue.playables.map { $0.id }
     let userIds = playerData.userQueuePlaylist.playables.map { $0.id }
     guard !(contextIds.isEmpty && userIds.isEmpty) else { return }
 

@@ -749,6 +749,23 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
   }
 
+  func testPlayContext_LeavingShuffledQueue_SnapshotsPlayingOrder() {
+    storage.settings.accounts.switchActiveAccount(account.info)
+    fillPlayerWithSomeSongs()
+    playerData.setShuffle(true)
+    let playingOrder = playerData.activeQueue.playables.map { $0.id }
+    guard let nextSong = library.getSong(
+      for: getAccountForSong(atIndex: 6),
+      id: cdHelper.seeder.songs[6].id
+    ) else { XCTFail(); return }
+    testPlayer.play(context: PlayContext(name: "Other", playables: [nextSong]))
+
+    let queues = library.getSavedQueues(for: account)
+    XCTAssertEqual(queues.count, 1)
+    XCTAssertEqual(queues[0].contextSongIds, playingOrder)
+    XCTAssertTrue(queues[0].isShuffle)
+  }
+
   func testPlaySongInPlaylistAt_EmptyPlaylist() {
     testPlayer.play(playerIndex: PlayerIndex(queueType: .prev, index: 0))
     XCTAssertFalse(testPlayer.isPlaying)

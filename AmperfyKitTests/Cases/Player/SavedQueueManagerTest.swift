@@ -87,6 +87,30 @@ class SavedQueueManagerTest: XCTestCase {
     XCTAssertEqual(saved.name, "Album A Queue")
   }
 
+  func testSnapshot_ShuffleActive_SavesPlayingOrderAndIndex() {
+    let songs = appendSongs(count: 5)
+    playerData.setCurrentIndex(0)
+    playerData.setShuffle(true)
+    // Arrange the shuffled queue deterministically (reverse of the plain
+    // order) so the playing order provably differs from the context order.
+    let playingOrder: [String] = songs.reversed().map { $0.id }
+    let active = playerData.activeQueue
+    for (destIndex, id) in playingOrder.enumerated() {
+      let curIndex = active.playables.firstIndex { $0.id == id }!
+      active.movePlaylistItem(fromIndex: curIndex, to: destIndex)
+    }
+    playerData.setCurrentIndex(2)
+    queueHandler.setContextName("All songs")
+    manager.snapshotIfNeeded(reason: .contextReplace)
+
+    let queues = library.getSavedQueues(for: account)
+    XCTAssertEqual(queues.count, 1)
+    let saved = queues[0]
+    XCTAssertEqual(saved.contextSongIds, playingOrder)
+    XCTAssertEqual(saved.currentIndex, 2)
+    XCTAssertTrue(saved.isShuffle)
+  }
+
   func testRestore_BasicRoundTrip() async {
     let songs = appendSongs(count: 3)
     playerData.setCurrentIndex(1)

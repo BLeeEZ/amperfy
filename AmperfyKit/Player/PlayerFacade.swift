@@ -615,6 +615,12 @@ class PlayerFacadeImpl: PlayerFacade {
 
   func play(context: PlayContext) {
     setPlayerModeForContextPlay(context.type)
+    // Snapshot before the shuffle reset below: switching shuffle off remaps
+    // the current index and abandons the shuffled (playing) order, so a later
+    // snapshot could no longer capture the queue as the user heard it.
+    if context.getActivePlayable() != nil {
+      savedQueueManager.snapshotIfNeeded(reason: .contextReplace)
+    }
     if playerMode == .music, playerStatus.isShuffle {
       playerStatus.setShuffle(false)
       musicPlayer.notifyShuffleUpdated()
@@ -631,6 +637,8 @@ class PlayerFacadeImpl: PlayerFacade {
   func playShuffled(context: PlayContext) {
     setPlayerModeForContextPlay(context.type)
     guard !context.playables.isEmpty else { return }
+    // Snapshot before the shuffle reset, see play(context:).
+    savedQueueManager.snapshotIfNeeded(reason: .contextReplace)
     if playerStatus.isShuffle { playerStatus.setShuffle(false) }
     let shuffleContext = context.getWithShuffledIndex()
     musicPlayer.play(context: shuffleContext)
