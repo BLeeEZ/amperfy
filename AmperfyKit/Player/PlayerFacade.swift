@@ -583,6 +583,9 @@ class PlayerFacadeImpl: PlayerFacade {
   }
 
   func clearContextQueue() {
+    // Snapshot before stop(): stopping resets currentIndex and clears the
+    // user queue, so a later snapshot could no longer capture the position.
+    savedQueueManager.snapshotIfNeeded(reason: .playerClear)
     if !queueHandler.isUserQueuePlaying {
       if queueHandler.userQueueCount == 0 {
         musicPlayer.stop()
@@ -594,6 +597,9 @@ class PlayerFacadeImpl: PlayerFacade {
   }
 
   func clearQueues() {
+    // Snapshot before stop(): stopping resets currentIndex and clears the
+    // user queue, so a later snapshot could no longer capture the position.
+    savedQueueManager.snapshotIfNeeded(reason: .playerClear)
     musicPlayer.stop()
     queueHandler.clearActiveQueue()
     switch playerStatus.playerMode {

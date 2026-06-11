@@ -27,6 +27,7 @@ import Foundation
 public enum SavedQueueSnapshotReason {
   case contextReplace
   case restoreOverwrite
+  case playerClear
 }
 
 // MARK: - SavedQueueRestoreError
