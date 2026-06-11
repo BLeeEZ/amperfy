@@ -329,6 +329,8 @@ final class HomeVC: UICollectionViewController {
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
+    } else if let song = playableContainer as? Song {
+      appDelegate.player.play(context: PlayContext(containable: song))
     } else if let podcastEpisode = playableContainer as? PodcastEpisode,
               let podcast = podcastEpisode.podcast {
       navigationController?.pushViewController(
