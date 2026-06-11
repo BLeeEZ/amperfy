@@ -33,6 +33,7 @@ public enum SavedQueueSnapshotReason {
 
 public enum SavedQueueRestoreError: Error {
   case allSongsUnavailable
+  case noActiveAccount
 }
 
 // MARK: - SavedQueueManager
@@ -87,9 +88,7 @@ public class SavedQueueManager {
       existing.isShuffle = playerData.isShuffle
       existing.repeatMode = playerData.repeatMode
       existing.isUserQueuePlaying = playerData.isUserQueuePlaying
-      // Bump the timestamp so the refreshed queue bubbles to the top of the
-      // list — useful signal that it was the most recently active queue.
-      existing.managedObject.createdAt = Date()
+      existing.lastUsedAt = Date()
       library.saveContext()
       postListChanged()
       return
@@ -117,15 +116,24 @@ public class SavedQueueManager {
     var survivors = [SavedQueue]()
     for queue in queues {
       let allIds = Set(queue.contextSongIds + queue.userQueueSongIds)
-      let resolved = library.getSongs(for: account, ids: allIds)
-      if resolved.isEmpty {
-        library.deleteSavedQueue(queue)
-      } else {
+      if library.isAnySongAvailable(for: account, ids: allIds) {
         survivors.append(queue)
+      } else {
+        library.deleteSavedQueue(queue)
       }
     }
     if survivors.count != queues.count { library.saveContext() }
     return survivors
+  }
+
+  // MARK: - Rename
+
+  public func rename(_ savedQueue: SavedQueue, to name: String) {
+    let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !trimmed.isEmpty else { return }
+    savedQueue.name = trimmed
+    library.saveContext()
+    postListChanged()
   }
 
   // MARK: - Delete
@@ -157,17 +165,16 @@ public class SavedQueueManager {
 
   // MARK: - Restore
 
-  public func restore(_ savedQueue: SavedQueue) async {
+  @discardableResult
+  public func restore(_ savedQueue: SavedQueue) async -> Bool {
     guard let accountInfo = settings.accounts.active else {
       eventLogger.report(
         topic: "Restore Queue",
-        error: SavedQueueRestoreError.allSongsUnavailable
+        error: SavedQueueRestoreError.noActiveAccount
       )
-      return
+      return false
     }
     let account = library.getAccount(info: accountInfo)
-
-    snapshotIfNeeded(reason: .restoreOverwrite)
 
     let contextIds = savedQueue.contextSongIds
     let userIds = savedQueue.userQueueSongIds
@@ -184,20 +191,37 @@ public class SavedQueueManager {
         topic: "Restore Queue",
         error: SavedQueueRestoreError.allSongsUnavailable
       )
-      return
+      return false
     }
 
+    // Saved queues are always music queues; switch over before snapshotting
+    // so a music queue lingering behind an active podcast session is still
+    // captured before being replaced.
+    playerData.setPlayerMode(.music)
+    snapshotIfNeeded(reason: .restoreOverwrite)
+
     // Adjust currentIndex by counting surviving items up to the saved index.
-    let savedIndex = max(0, savedQueue.currentIndex)
+    // An index of -1 is valid: it marks a user queue item playing before the
+    // first context item.
+    let savedIndex = savedQueue.currentIndex
     var adjustedIndex = 0
-    for i in 0 ..< min(savedIndex, contextIds.count) {
+    for i in 0 ..< min(max(0, savedIndex), contextIds.count) {
       if songById[contextIds[i]] != nil { adjustedIndex += 1 }
     }
     if adjustedIndex >= resolvedContext.count {
       adjustedIndex = max(0, resolvedContext.count - 1)
     }
 
-    queueHandler.removeAllItems()
+    // Clear only the music queues; the podcast queue must survive a restore.
+    playerData.clearUserQueue()
+    playerData.setUserQueuePlaying(false)
+    queueHandler.clearContextQueue()
+    // Apply the flags while the queues are empty: setShuffle(true) on a
+    // filled queue would generate a fresh random permutation, but
+    // contextSongIds already hold the order that was playing.
+    playerData.setShuffle(savedQueue.isShuffle)
+    playerData.setRepeatMode(savedQueue.repeatMode)
+
     queueHandler.appendContextQueue(playables: resolvedContext.map { $0 as AbstractPlayable })
     queueHandler.setContextName(savedQueue.name)
     queueHandler.setCurrentIndex(adjustedIndex)
@@ -205,8 +229,12 @@ public class SavedQueueManager {
     if !resolvedUser.isEmpty {
       queueHandler.appendUserQueue(playables: resolvedUser.map { $0 as AbstractPlayable })
       playerData.setUserQueuePlaying(savedQueue.isUserQueuePlaying)
+      if savedQueue.isUserQueuePlaying, savedIndex < 0 {
+        queueHandler.setCurrentIndex(-1)
+      }
     }
 
+    savedQueue.lastUsedAt = Date()
     library.saveContext()
     postListChanged()
 
@@ -219,6 +247,7 @@ public class SavedQueueManager {
         message: "Restored \(totalResolved) of \(totalSaved) songs (\(dropped) no longer available)."
       )
     }
+    return true
   }
 
   // MARK: - Save as Playlist
@@ -269,10 +298,6 @@ public class SavedQueueManager {
   }
 
   // MARK: - Helpers
-
-  private func mostRecentQueue(for account: Account) -> SavedQueue? {
-    library.getSavedQueues(for: account).first
-  }
 
   private func postListChanged() {
     NotificationCenter.default.post(

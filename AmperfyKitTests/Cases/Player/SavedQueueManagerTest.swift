@@ -128,6 +128,82 @@ class SavedQueueManagerTest: XCTestCase {
     XCTAssertEqual(playerData.contextQueue.playables[0].id, songs[0].id)
   }
 
+  func testRestore_ShuffledQueue_RestoresPlayingOrderShuffleAndIndex() async {
+    let songs = appendSongs(count: 5)
+    playerData.setCurrentIndex(0)
+    playerData.setShuffle(true)
+    // Same deterministic reorder as the snapshot test: playing order is the
+    // reverse of the plain context order.
+    let playingOrder: [String] = songs.reversed().map { $0.id }
+    let active = playerData.activeQueue
+    for (destIndex, id) in playingOrder.enumerated() {
+      let curIndex = active.playables.firstIndex { $0.id == id }!
+      active.movePlaylistItem(fromIndex: curIndex, to: destIndex)
+    }
+    playerData.setCurrentIndex(2)
+    manager.snapshotIfNeeded(reason: .contextReplace)
+
+    playerData.setShuffle(false)
+    playerData.removeAllItems()
+
+    let queues = library.getSavedQueues(for: account)
+    let restored = await manager.restore(queues[0])
+
+    XCTAssertTrue(restored)
+    XCTAssertTrue(playerData.isShuffle)
+    XCTAssertEqual(playerData.activeQueue.playables.map { $0.id }, playingOrder)
+    XCTAssertEqual(playerData.currentIndex, 2)
+    XCTAssertEqual(playerData.currentItem?.id, playingOrder[2])
+  }
+
+  func testRestore_AppliesRepeatMode() async {
+    _ = appendSongs(count: 3)
+    playerData.setRepeatMode(.all)
+    manager.snapshotIfNeeded(reason: .contextReplace)
+
+    playerData.setRepeatMode(.off)
+    playerData.removeAllItems()
+
+    let queues = library.getSavedQueues(for: account)
+    await manager.restore(queues[0])
+    XCTAssertEqual(playerData.repeatMode, .all)
+  }
+
+  func testRestore_PodcastQueueSurvives() async {
+    let songs = appendSongs(count: 3)
+    manager.snapshotIfNeeded(reason: .contextReplace)
+    playerData.clearContextQueue()
+
+    playerData.appendPodcastQueue(playables: [songs[0]])
+    XCTAssertEqual(playerData.podcastQueue.playables.count, 1)
+
+    let queues = library.getSavedQueues(for: account)
+    await manager.restore(queues[0])
+
+    XCTAssertEqual(playerData.playerMode, .music)
+    XCTAssertEqual(playerData.contextQueue.playables.count, 3)
+    XCTAssertEqual(playerData.podcastQueue.playables.count, 1)
+  }
+
+  func testRestore_UserQueuePlayingBeforeContext_KeepsPosition() async {
+    let songs = appendSongs(count: 3)
+    let userSong = library.getSong(for: account, id: cdHelper.seeder.songs[4].id)!
+    playerData.appendUserQueue(playables: [userSong])
+    playerData.setUserQueuePlaying(true)
+    playerData.setCurrentIndex(-1)
+    manager.snapshotIfNeeded(reason: .contextReplace)
+
+    playerData.removeAllItems()
+
+    let queues = library.getSavedQueues(for: account)
+    await manager.restore(queues[0])
+
+    XCTAssertTrue(playerData.isUserQueuePlaying)
+    XCTAssertEqual(playerData.currentIndex, -1)
+    XCTAssertEqual(playerData.currentItem?.id, userSong.id)
+    XCTAssertEqual(playerData.contextQueue.playables.map { $0.id }, songs.map { $0.id })
+  }
+
   func testRestore_AllSongsMissing_NoMutation() async {
     let saved = library.createSavedQueue(account: account)
     saved.contextSongIds = ["nonexistent-id-1", "nonexistent-id-2"]
@@ -172,13 +248,41 @@ class SavedQueueManagerTest: XCTestCase {
       let saved = library.createSavedQueue(account: account)
       saved.name = "queue-\(i)"
       saved.contextSongIds = [cdHelper.seeder.songs[0].id]
-      saved.managedObject.createdAt = Date(timeIntervalSinceReferenceDate: Double(i))
+      saved.lastUsedAt = Date(timeIntervalSinceReferenceDate: Double(i))
       library.saveContext()
     }
     manager.enforceLimit(for: account)
     let remaining = library.getSavedQueues(for: account)
     XCTAssertEqual(remaining.count, 3)
-    // Most-recent (createdAt = 4) survives, oldest (0, 1) evicted.
+    // Most-recently used (lastUsedAt = 4) survives, least-recently used
+    // (0, 1) evicted.
     XCTAssertEqual(remaining.map { $0.name }.sorted(), ["queue-2", "queue-3", "queue-4"])
+  }
+
+  func testRename_TrimsAndNotifies() {
+    let saved = library.createSavedQueue(account: account)
+    saved.name = "Old Name"
+    saved.contextSongIds = [cdHelper.seeder.songs[0].id]
+    library.saveContext()
+
+    manager.rename(saved, to: "  New Name  ")
+    XCTAssertEqual(saved.name, "New Name")
+
+    manager.rename(saved, to: "   ")
+    XCTAssertEqual(saved.name, "New Name")
+  }
+
+  func testList_PrunesQueuesWithOnlyMissingSongs() {
+    let alive = library.createSavedQueue(account: account)
+    alive.name = "alive"
+    alive.contextSongIds = [cdHelper.seeder.songs[0].id, "gone-id"]
+    let dead = library.createSavedQueue(account: account)
+    dead.name = "dead"
+    dead.contextSongIds = ["gone-id-1", "gone-id-2"]
+    library.saveContext()
+
+    let listed = manager.list(forAccount: account)
+    XCTAssertEqual(listed.map { $0.name }, ["alive"])
+    XCTAssertEqual(library.getSavedQueues(for: account).count, 1)
   }
 }

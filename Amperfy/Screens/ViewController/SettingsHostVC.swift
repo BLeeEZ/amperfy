@@ -201,8 +201,7 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$savedQueuesLimit.sink(receiveValue: { [weak self] newValue in
       guard let self else { return }
       appDelegate.storage.settings.user.savedQueuesLimit = newValue
-      if let info = appDelegate.storage.settings.accounts.active {
-        let account = appDelegate.storage.main.library.getAccount(info: info)
+      for account in appDelegate.storage.main.library.getAllAccounts() {
         appDelegate.savedQueues.enforceLimit(for: account)
       }
     }))

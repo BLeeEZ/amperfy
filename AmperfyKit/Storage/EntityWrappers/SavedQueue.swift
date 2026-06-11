@@ -33,17 +33,14 @@ public class SavedQueue {
     self.managedObject = managedObject
   }
 
-  public var id: UUID {
-    managedObject.id ?? UUID()
-  }
-
   public var name: String {
     get { managedObject.name ?? "" }
     set { managedObject.name = newValue }
   }
 
-  public var createdAt: Date {
-    managedObject.createdAt ?? Date.distantPast
+  public var lastUsedAt: Date {
+    get { managedObject.lastUsedAt ?? Date.distantPast }
+    set { managedObject.lastUsedAt = newValue }
   }
 
   public var playerMode: PlayerMode {

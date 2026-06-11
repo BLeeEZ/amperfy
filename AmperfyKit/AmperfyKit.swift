@@ -163,7 +163,6 @@ public class AmperKit {
       settings: storage.settings,
       eventLogger: eventLogger
     )
-    curPlayer.savedQueueManager = savedQueueManager
     savedQueues = savedQueueManager
     playerAudioSessionHandler!.musicPlayer = curPlayer
     playerAudioSessionHandler!.eventLogger = eventLogger

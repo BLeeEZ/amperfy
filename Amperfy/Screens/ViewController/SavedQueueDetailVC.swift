@@ -54,6 +54,13 @@ class SavedQueueDetailVC: BasicTableViewController {
     optionsButton.menu = makeMenu()
     navigationItem.rightBarButtonItem = optionsButton
 
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(savedQueueListChanged),
+      name: .savedQueueListChanged,
+      object: nil
+    )
+
     resolveSongs()
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
@@ -62,7 +69,9 @@ class SavedQueueDetailVC: BasicTableViewController {
       },
       playContextCb: { [weak self] in self?.makePlayContext() },
       player: appDelegate.player,
-      isInfoAlwaysHidden: false
+      isInfoAlwaysHidden: false,
+      customPlayName: "Resume",
+      customPlayCB: { [weak self] in self?.resumeQueue() }
     )
     detailHeaderView = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,
@@ -98,6 +107,18 @@ class SavedQueueDetailVC: BasicTableViewController {
     detailHeaderView?.refresh()
   }
 
+  @objc
+  private func savedQueueListChanged() {
+    guard savedQueue.managedObject.managedObjectContext != nil,
+          !savedQueue.managedObject.isDeleted else {
+      navigationController?.popViewController(animated: true)
+      return
+    }
+    setNavBarTitle(title: savedQueue.name)
+    resolveSongs()
+    detailHeaderView?.refresh()
+  }
+
   private func resolveSongs() {
     let allIds = Set(savedQueue.contextSongIds + savedQueue.userQueueSongIds)
     let fetched = appDelegate.storage.main.library.getSongs(for: account, ids: allIds)
@@ -105,6 +126,16 @@ class SavedQueueDetailVC: BasicTableViewController {
     resolvedSongs = (savedQueue.contextSongIds + savedQueue.userQueueSongIds)
       .compactMap { byId[$0] }
     tableView.reloadData()
+  }
+
+  // Resume the queue as it was left: separate user queue, shuffle and repeat
+  // state, current song. Tapping an individual row instead plays the saved
+  // list as a fresh context starting at that song.
+  private func resumeQueue() {
+    Task { @MainActor in
+      guard await appDelegate.savedQueues.restore(savedQueue) else { return }
+      appDelegate.player.playCurrentItem()
+    }
   }
 
   private func makePlayContext(startingAt index: Int? = nil) -> PlayContext {
@@ -119,6 +150,12 @@ class SavedQueueDetailVC: BasicTableViewController {
   }
 
   private func makeMenu() -> UIMenu {
+    let rename = UIAction(
+      title: "Rename",
+      image: UIImage(systemName: "pencil")
+    ) { [weak self] _ in
+      self?.promptRename()
+    }
     let saveAsPlaylist = UIAction(
       title: "Save as Playlist",
       image: UIImage(systemName: "square.and.arrow.down")
@@ -134,7 +171,19 @@ class SavedQueueDetailVC: BasicTableViewController {
       appDelegate.savedQueues.delete(savedQueue)
       navigationController?.popViewController(animated: true)
     }
-    return UIMenu(children: [saveAsPlaylist, delete])
+    return UIMenu(children: [rename, saveAsPlaylist, delete])
+  }
+
+  private func promptRename() {
+    let alert = UIAlertController(title: "Rename Queue", message: nil, preferredStyle: .alert)
+    alert.addTextField { tf in tf.text = self.savedQueue.name }
+    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    alert.addAction(UIAlertAction(title: "Rename", style: .default) { _ in
+      guard let name = alert.textFields?.first?.text else { return }
+      self.appDelegate.savedQueues.rename(self.savedQueue, to: name)
+      // Title and header refresh via the .savedQueueListChanged notification.
+    })
+    present(alert, animated: true)
   }
 
   private func promptSaveAsPlaylist() {

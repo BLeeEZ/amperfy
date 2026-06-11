@@ -256,7 +256,7 @@
     </entity>
     <entity name="SavedQueue" representedClassName="SavedQueueMO" syncable="YES">
         <attribute name="contextSongIds" optional="YES" attributeType="Binary"/>
-        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO" indexed="YES"/>
+        <attribute name="lastUsedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" indexed="YES"/>
         <attribute name="currentIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" indexed="YES"/>
         <attribute name="isShuffle" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>

@@ -636,7 +636,7 @@ public class LibraryStorage: PlayableFileCachable {
   func createSavedQueue(account: Account) -> SavedQueue {
     let mo = SavedQueueMO(context: context)
     mo.id = UUID()
-    mo.createdAt = Date()
+    mo.lastUsedAt = Date()
     mo.toAccount = account.managedObject
     return SavedQueue(managedObject: mo)
   }
@@ -648,10 +648,26 @@ public class LibraryStorage: PlayableFileCachable {
       #keyPath(SavedQueueMO.toAccount), account.managedObject
     )
     fetchRequest.sortDescriptors = [
-      NSSortDescriptor(key: #keyPath(SavedQueueMO.createdAt), ascending: false),
+      NSSortDescriptor(key: #keyPath(SavedQueueMO.lastUsedAt), ascending: false),
     ]
     let mos = (try? context.fetch(fetchRequest)) ?? []
     return mos.map { SavedQueue(managedObject: $0) }
+  }
+
+  public func isAnySongAvailable(for account: Account, ids: Set<String>) -> Bool {
+    guard !ids.isEmpty else { return false }
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(
+        format: "%K IN %@",
+        #keyPath(SongMO.id),
+        ids
+      ),
+    ])
+    fetchRequest.fetchLimit = 1
+    let count = (try? context.count(for: fetchRequest)) ?? 0
+    return count > 0
   }
 
   public func deleteSavedQueue(_ savedQueue: SavedQueue) {

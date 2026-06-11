@@ -33,7 +33,7 @@ extension SavedQueueMO {
   @NSManaged
   public var name: String?
   @NSManaged
-  public var createdAt: Date?
+  public var lastUsedAt: Date?
   @NSManaged
   public var playerMode: Int16
   @NSManaged
