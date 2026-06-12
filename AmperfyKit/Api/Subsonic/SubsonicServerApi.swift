@@ -957,24 +957,34 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   }
 
   private func request(url: URL) async throws -> APIDataResponse {
+    let (data, httpResponse) = try await performAFRequest(url: url)
+
+    if CaptivePortalDetector.isCaptivePortalResponse(
+      requestURL: url, response: httpResponse, data: data
+    ) {
+      guard let serverURLString = credentials.wrappedValue?.activeBackendServerUrl,
+            let serverURL = URL(string: serverURLString)
+      else { throw CaptivePortalError.authenticationFailed }
+      try await CaptivePortalSession.shared.authenticate(serverURL: serverURL)
+      let (retryData, retryResponse) = try await performAFRequest(url: url)
+      if CaptivePortalDetector.isCaptivePortalResponse(
+        requestURL: url, response: retryResponse, data: retryData
+      ) {
+        throw CaptivePortalError.authenticationFailed
+      }
+      return try processAFResponse(url: url, data: retryData, httpResponse: retryResponse)
+    }
+
+    return try processAFResponse(url: url, data: data, httpResponse: httpResponse)
+  }
+
+  private func performAFRequest(url: URL) async throws -> (Data, HTTPURLResponse?) {
     try await withUnsafeThrowingContinuation { continuation in
-      let afRequest = AF.request(url, method: .get)
-      afRequest.validate().responseData { response in
-        if response.response?.statusCode == 404 {
-          let cleanedURL = self.cleanse(url: response.request?.url)
-          os_log("API 404: Not Found: %s", log: self.log, type: .info, cleanedURL.description)
-          let notFoundError = ResponseError(
-            type: .api,
-            statusCode: SubsonicError.requestedDataNotFound.rawValue,
-            message: "404: Not Found",
-            cleansedURL: cleanedURL,
-            data: response.data
-          )
-          continuation.resume(throwing: notFoundError)
-          return
-        }
+      AF.request(url, method: .get).responseData { response in
         if let data = response.data {
-          continuation.resume(returning: APIDataResponse(data: data, url: url))
+          continuation.resume(
+            returning: (data, response.response)
+          )
           return
         }
         if let err = response.error {
@@ -984,5 +994,32 @@ final class SubsonicServerApi: URLCleanser, Sendable {
         fatalError("should not get here")
       }
     }
+  }
+
+  private func processAFResponse(
+    url: URL, data: Data, httpResponse: HTTPURLResponse?
+  ) throws
+    -> APIDataResponse {
+    if httpResponse?.statusCode == 404 {
+      let cleanedURL = cleanse(url: url)
+      os_log("API 404: Not Found: %s", log: self.log, type: .info, cleanedURL.description)
+      throw ResponseError(
+        type: .api,
+        statusCode: SubsonicError.requestedDataNotFound.rawValue,
+        message: "404: Not Found",
+        cleansedURL: cleanedURL,
+        data: data
+      )
+    }
+    if let statusCode = httpResponse?.statusCode, statusCode >= 400 {
+      throw ResponseError(
+        type: .api,
+        statusCode: statusCode,
+        message: "HTTP Error: \(statusCode)",
+        cleansedURL: cleanse(url: url),
+        data: data
+      )
+    }
+    return APIDataResponse(data: data, url: url)
   }
 }

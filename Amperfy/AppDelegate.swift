@@ -87,6 +87,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     AmperKit.shared.localNotificationManager
   }()
 
+  private let captivePortalAuthenticator = CaptivePortalAuthenticator()
+
   public func getMeta(_ accountInfo: AccountInfo) -> MetaManager {
     AmperKit.shared.getMeta(accountInfo)
   }
@@ -262,6 +264,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     } else {
       os_log("application launch", log: self.log, type: .info)
     }
+
+    CaptivePortalSession.shared.authHandler = captivePortalAuthenticator
 
     storage.applyMultiAccountSettingsUpdateIfNeeded()
     libraryUpdater.performAccountCleanUpIfNeccessaryInBackground()

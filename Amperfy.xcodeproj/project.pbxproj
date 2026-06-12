@@ -204,8 +204,9 @@
 		50BE5D522850F4D700156FC6 /* HelperTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B798B323B8664700551E62 /* HelperTest.swift */; };
 		50BE5D532850F4E700156FC6 /* MusicPlayerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */; };
 		50BE5D542850F4E700156FC6 /* SubsonicVersionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */; };
+		B5C7DE010000000000000001 /* CaptivePortalDetectorTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7DE010000000000000002 /* CaptivePortalDetectorTest.swift */; };
+		B5C7DE010000000000000003 /* CaptivePortalSessionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C7DE010000000000000004 /* CaptivePortalSessionTest.swift */; };
 		50BE5D552850F4E700156FC6 /* UtilitiesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5090963726496A9500DD9826 /* UtilitiesTest.swift */; };
-		B5A5CE010000000000000001 /* ShareSongActionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CE010000000000000002 /* ShareSongActionTest.swift */; };
 		50BE5D562850F4E700156FC6 /* PlayQueueHandlerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5011712D27453D1300B7C08D /* PlayQueueHandlerTest.swift */; };
 		50BE5D572850F4F600156FC6 /* album_missing_artistId.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50ED2B9227BB932700331BF7 /* album_missing_artistId.xml */; };
 		50BE5D582850F4F600156FC6 /* artist_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50AB92C526661F5800DCE45C /* artist_example_1.xml */; };
@@ -312,6 +313,9 @@
 		50C9D644284FA9C7007F18D0 /* BackendProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B2B302249607B00D14EF4 /* BackendProxy.swift */; };
 		50C9D645284FA9C7007F18D0 /* BackendApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87A22397B8400546F5A /* BackendApi.swift */; };
 		50C9D646284FA9C7007F18D0 /* LoginCredentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */; };
+		7146AB03077769531B516A68 /* CaptivePortalDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61D4B85223AB23B952FE958 /* CaptivePortalDetector.swift */; };
+		A5F13F6A02387E878E94F964 /* CaptivePortalSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE16295A61BFA531345994AE /* CaptivePortalSession.swift */; };
+		6036AB4E5C3D8AA06B7D3AC5 /* CaptivePortalAuthenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857989FA4AA8B31088A135BF /* CaptivePortalAuthenticator.swift */; };
 		50C9D647284FAA02007F18D0 /* SsMusicFolderParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DEEDFF265D46CB0073FF20 /* SsMusicFolderParserDelegate.swift */; };
 		50C9D648284FAA02007F18D0 /* SsPingParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F884223A1E4600546F5A /* SsPingParserDelegate.swift */; };
 		50C9D649284FAA02007F18D0 /* SubsonicVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964A925E8E20E00E3210F /* SubsonicVersion.swift */; };
@@ -530,10 +534,11 @@
 		632F51262C83A8400032860D /* LyricsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 632F51252C83A8400032860D /* LyricsVC.swift */; };
 		6333C8E12C6FDB5200CCA50A /* SecondaryText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */; };
 		637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */; };
-		C0A1B0032EEE000000000003 /* MacWindowHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1B0022EEE000000000002 /* MacWindowHelper.swift */; };
 		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
+		B5A5CE010000000000000001 /* ShareSongActionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CE010000000000000002 /* ShareSongActionTest.swift */; };
+		C0A1B0032EEE000000000003 /* MacWindowHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1B0022EEE000000000002 /* MacWindowHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -840,7 +845,6 @@
 		509001C027182A1300A8056D /* CatalogParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogParserTest.swift; sourceTree = "<group>"; };
 		509001C227182A4700A8056D /* CatalogParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogParserDelegate.swift; sourceTree = "<group>"; };
 		5090963726496A9500DD9826 /* UtilitiesTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UtilitiesTest.swift; sourceTree = "<group>"; };
-		B5A5CE010000000000000002 /* ShareSongActionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongActionTest.swift; sourceTree = "<group>"; };
 		509357512E3BF47800CD4075 /* MiniPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
 		509362EC28E041FF005C2AAC /* Amperfy v28.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v28.xcdatamodel"; sourceTree = "<group>"; };
 		50947E0227DA011F00C368D7 /* ScrobbleEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrobbleEntry.swift; sourceTree = "<group>"; };
@@ -956,6 +960,9 @@
 		50BA92EC21CBF45D00E5901D /* AlbumParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlbumParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92ED21CBF45D00E5901D /* ArtistParserDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArtistParserDelegate.swift; sourceTree = "<group>"; };
 		50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginCredentials.swift; sourceTree = "<group>"; };
+		F61D4B85223AB23B952FE958 /* CaptivePortalDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptivePortalDetector.swift; sourceTree = "<group>"; };
+		AE16295A61BFA531345994AE /* CaptivePortalSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptivePortalSession.swift; sourceTree = "<group>"; };
+		857989FA4AA8B31088A135BF /* CaptivePortalAuthenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptivePortalAuthenticator.swift; sourceTree = "<group>"; };
 		50BA92F721CC318D00E5901D /* PlayableTableCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableTableCell.swift; sourceTree = "<group>"; };
 		50BA92F921CC37F800E5901D /* SongsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsVC.swift; sourceTree = "<group>"; };
 		50BA92FD21CED4AF00E5901D /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
@@ -1103,6 +1110,8 @@
 		50E936DA2F100C7800C1C504 /* RatingAppEnum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RatingAppEnum.swift; sourceTree = "<group>"; };
 		50E964A925E8E20E00E3210F /* SubsonicVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersion.swift; sourceTree = "<group>"; };
 		50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicVersionTest.swift; sourceTree = "<group>"; };
+		B5C7DE010000000000000002 /* CaptivePortalDetectorTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptivePortalDetectorTest.swift; sourceTree = "<group>"; };
+		B5C7DE010000000000000004 /* CaptivePortalSessionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptivePortalSessionTest.swift; sourceTree = "<group>"; };
 		50ED030C2E2788200092E6DC /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/CoreAudio.framework; sourceTree = DEVELOPER_DIR; };
 		50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventNotificationHandler.swift; sourceTree = "<group>"; };
 		50ED2B9227BB932700331BF7 /* album_missing_artistId.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = album_missing_artistId.xml; sourceTree = "<group>"; };
@@ -1148,12 +1157,13 @@
 		632F51252C83A8400032860D /* LyricsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsVC.swift; sourceTree = "<group>"; };
 		6333C8E02C6FDB5200CCA50A /* SecondaryText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryText.swift; sourceTree = "<group>"; };
 		637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerSceneDelegate.swift; sourceTree = "<group>"; };
-		C0A1B0022EEE000000000002 /* MacWindowHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWindowHelper.swift; sourceTree = "<group>"; };
 		638920EF2C8C8E9000932EE8 /* SettingsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsList.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v39.xcdatamodel"; sourceTree = "<group>"; };
 		64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v46.xcdatamodel"; sourceTree = "<group>"; };
+		B5A5CE010000000000000002 /* ShareSongActionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongActionTest.swift; sourceTree = "<group>"; };
+		C0A1B0022EEE000000000002 /* MacWindowHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWindowHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1463,6 +1473,7 @@
 			isa = PBXGroup;
 			children = (
 				508385E721C5965B00C4BB32 /* AppDelegate.swift */,
+				857989FA4AA8B31088A135BF /* CaptivePortalAuthenticator.swift */,
 				5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */,
 				63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */,
 				637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */,
@@ -1490,6 +1501,8 @@
 			children = (
 				5086F87A22397B8400546F5A /* BackendApi.swift */,
 				500B2B302249607B00D14EF4 /* BackendProxy.swift */,
+				F61D4B85223AB23B952FE958 /* CaptivePortalDetector.swift */,
+				AE16295A61BFA531345994AE /* CaptivePortalSession.swift */,
 				50CDF201264BB1C000F83EF6 /* EventLogger.swift */,
 				5077F954222C58A10099CA91 /* GenericXmlParser.swift */,
 				50BA92EE21CBF45D00E5901D /* LoginCredentials.swift */,
@@ -2142,6 +2155,8 @@
 				50DB11A8266536190033BFFA /* Subsonic */,
 				50DB1180266501EC0033BFFA /* Ampache */,
 				50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */,
+				B5C7DE010000000000000002 /* CaptivePortalDetectorTest.swift */,
+				B5C7DE010000000000000004 /* CaptivePortalSessionTest.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -2551,6 +2566,7 @@
 				50C171522D10777400C0C53A /* PlaylistAddPlaylistsVC.swift in Sources */,
 				500B7D4921EDD6250083ED6F /* ViewCreator.swift in Sources */,
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
+				6036AB4E5C3D8AA06B7D3AC5 /* CaptivePortalAuthenticator.swift in Sources */,
 				507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */,
 				50B137022EFC85D700738475 /* AccountAppEntity.swift in Sources */,
 				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
@@ -2815,6 +2831,8 @@
 				50C9D6A5284FAA7F007F18D0 /* CoreDataMigrationStep.swift in Sources */,
 				50C9D6B9284FAA87007F18D0 /* Artist.swift in Sources */,
 				50C9D644284FA9C7007F18D0 /* BackendProxy.swift in Sources */,
+				7146AB03077769531B516A68 /* CaptivePortalDetector.swift in Sources */,
+				A5F13F6A02387E878E94F964 /* CaptivePortalSession.swift in Sources */,
 				50C9D69A284FAA6C007F18D0 /* AbstractLibraryEntityMO+CoreDataClass.swift in Sources */,
 				50C9D678284FAA6C007F18D0 /* SongMO+CoreDataProperties.swift in Sources */,
 				50C9D687284FAA6C007F18D0 /* AlbumMO+CoreDataProperties.swift in Sources */,
@@ -2850,6 +2868,8 @@
 				50BE5D522850F4D700156FC6 /* HelperTest.swift in Sources */,
 				50BE5D6B2850F4FB00156FC6 /* SsGenreParserTest.swift in Sources */,
 				50BE5D542850F4E700156FC6 /* SubsonicVersionTest.swift in Sources */,
+				B5C7DE010000000000000001 /* CaptivePortalDetectorTest.swift in Sources */,
+				B5C7DE010000000000000003 /* CaptivePortalSessionTest.swift in Sources */,
 				50BE5D742850F4FB00156FC6 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */,
 				50BE5D872850F50F00156FC6 /* AbstractAmpacheTest.swift in Sources */,
 				50BE5D4F2850F4C900156FC6 /* AlbumTest.swift in Sources */,

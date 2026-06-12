@@ -321,26 +321,43 @@ public final class BackendProxy: Sendable {
       let sessionConfig = URLSessionConfiguration.default
       let session = URLSession(configuration: sessionConfig)
       let request = URLRequest(url: activeBackendServerUrl)
-      let task = session.downloadTask(with: request) { tempLocalUrl, response, error in
+      let task = session.dataTask(with: request) { data, response, error in
         if let error = error {
           continuation
             .resume(
               throwing: AuthenticationError
                 .downloadError(message: error.localizedDescription)
             )
-        } else {
-          if let statusCode = (response as? HTTPURLResponse)?.statusCode {
-            if statusCode >= 400,
-               // ignore 401 Unauthorized (RFC 7235) status code
-               // -> Can occur if root website requires http basic authentication,
-               //    but the REST API endpoints are reachable without http basic authentication
-               statusCode != 401 {
-              continuation
-                .resume(throwing: AuthenticationError.requestStatusError(message: "\(statusCode)"))
-            } else {
-              continuation.resume()
-            }
+          return
+        }
+
+        let httpResponse = response as? HTTPURLResponse
+
+        // For the root URL reachability check, only detect captive portal
+        // via domain redirect (the server redirected us to a different host).
+        // Content-Type checks are not appropriate here because the server's
+        // root page legitimately returns HTML.
+        if CaptivePortalDetector.isDomainRedirect(
+          requestURL: activeBackendServerUrl,
+          response: httpResponse
+        ) {
+          continuation.resume(throwing: CaptivePortalError.captivePortalDetected)
+          return
+        }
+
+        if let statusCode = httpResponse?.statusCode {
+          if statusCode >= 400,
+             // ignore 401 Unauthorized (RFC 7235) status code
+             // -> Can occur if root website requires http basic authentication,
+             //    but the REST API endpoints are reachable without http basic authentication
+             statusCode != 401 {
+            continuation
+              .resume(throwing: AuthenticationError.requestStatusError(message: "\(statusCode)"))
+          } else {
+            continuation.resume()
           }
+        } else {
+          continuation.resume()
         }
       }
       task.resume()
