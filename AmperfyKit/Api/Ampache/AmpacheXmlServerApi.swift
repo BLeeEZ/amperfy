@@ -160,6 +160,18 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     return urlComp
   }
 
+  public var customHTTPHeaders: [String: String] {
+    credentials.wrappedValue?.customHTTPHeaders ?? [:]
+  }
+
+  /// Builds the Alamofire headers for a request. During login the credentials are not yet stored in
+  /// `credentials`, so the ones provided to the login call are used as a fallback.
+  private func httpHeaders(_ providedCredentials: LoginCredentials? = nil) -> HTTPHeaders? {
+    let headers = providedCredentials?.customHTTPHeaders ?? customHTTPHeaders
+    guard !headers.isEmpty else { return nil }
+    return HTTPHeaders(headers)
+  }
+
   func provideCredentials(credentials: LoginCredentials) {
     authHandshake.wrappedValue = nil
     self.credentials.wrappedValue = credentials
@@ -185,7 +197,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private func requestAuth(credentials: LoginCredentials) async throws
     -> AuthentificationHandshake {
     let url = try await createAuthURL(credentials: credentials)
-    let response = try await request(url: url)
+    let response = try await request(url: url, headers: httpHeaders(credentials))
     return try await parseAuthResult(response: response)
   }
 
@@ -740,9 +752,9 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     }
   }
 
-  private func request(url: URL) async throws -> APIDataResponse {
+  private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
-      AF.request(url, method: .get).validate().responseData { response in
+      AF.request(url, method: .get, headers: headers).validate().responseData { response in
 
         if let data = response.data {
           continuation.resume(returning: APIDataResponse(data: data, url: url))
@@ -870,6 +882,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     -> APIDataResponse {
     let auth = try await reauthenticate()
     let url = try urlCreation(auth)
-    return try await request(url: url)
+    return try await request(url: url, headers: httpHeaders())
   }
 }

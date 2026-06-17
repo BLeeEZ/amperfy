@@ -27,6 +27,7 @@ import Foundation
 struct DownloadTaskInfo: Sendable {
   let request: DownloadRequest
   let url: URL
+  var httpHeaders: [String: String] = [:]
   var hasStarted = false
 }
 

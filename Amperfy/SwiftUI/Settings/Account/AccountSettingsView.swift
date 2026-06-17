@@ -65,6 +65,25 @@ struct AccountSettingsView: View {
     AppDelegate.mainSceneDelegate?.window?.rootViewController?.present(syncVC, animated: true)
   }
 
+  private func customHTTPHeaders(accountInfo: AccountInfo) -> [String: String] {
+    appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+      .loginCredentials?.customHTTPHeaders ?? [:]
+  }
+
+  private func saveCustomHTTPHeaders(_ headers: [String: String], accountInfo: AccountInfo) {
+    appDelegate.storage.settings.accounts
+      .updateSetting(accountInfo) { accountSettings in
+        accountSettings.loginCredentials?.customHTTPHeaders = headers
+      }
+    // Re-provide the credentials so requests of the running session pick up the new headers
+    // without requiring a restart.
+    if let updatedCredentials = appDelegate.storage.settings.accounts
+      .getSetting(accountInfo).read.loginCredentials {
+      appDelegate.getMeta(accountInfo).backendApi
+        .provideCredentials(credentials: updatedCredentials)
+    }
+  }
+
   private func logout(accountInfo: AccountInfo) {
     appDelegate.closeAllButActiveMainTabs()
     if appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
@@ -212,6 +231,13 @@ struct AccountSettingsView: View {
           SettingsSection {
             NavigationLink(destination: ServerURLsSettingsView()) {
               Text("Manage Server URLs")
+            }
+            NavigationLink(destination: CustomHTTPHeadersView(
+              headers: customHTTPHeaders(accountInfo: activeAccountInfo)
+            ) { updated in
+              saveCustomHTTPHeaders(updated, accountInfo: activeAccountInfo)
+            }) {
+              Text("Custom HTTP Headers")
             }
           }
 

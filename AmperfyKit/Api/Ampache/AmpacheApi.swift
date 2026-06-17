@@ -45,6 +45,10 @@ final class AmpacheApi: BackendApi {
 
   public var serverApiVersion: String { ampacheXmlServerApi.serverApiVersion.wrappedValue ?? "-" }
 
+  public var customHTTPHeaders: [String: String] {
+    ampacheXmlServerApi.customHTTPHeaders
+  }
+
   func provideCredentials(credentials: LoginCredentials) {
     ampacheXmlServerApi.provideCredentials(credentials: credentials)
   }

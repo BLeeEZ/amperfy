@@ -44,6 +44,10 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     2
   }
 
+  var customHTTPHeaders: [String: String] {
+    ampacheXmlServerApi.customHTTPHeaders
+  }
+
   @MainActor
   func prepareDownload(
     downloadInfo: DownloadElementInfo,

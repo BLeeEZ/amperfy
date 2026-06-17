@@ -49,6 +49,10 @@ final class PlayableDownloadDelegate: DownloadManagerDelegate {
     4
   }
 
+  var customHTTPHeaders: [String: String] {
+    backendApi.customHTTPHeaders
+  }
+
   @MainActor
   func prepareDownload(
     downloadInfo: DownloadElementInfo,

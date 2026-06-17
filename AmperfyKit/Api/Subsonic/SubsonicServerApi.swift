@@ -251,6 +251,18 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     return urlComp
   }
 
+  public var customHTTPHeaders: [String: String] {
+    credentials.wrappedValue?.customHTTPHeaders ?? [:]
+  }
+
+  /// Builds the Alamofire headers for a request. During login the credentials are not yet stored in
+  /// `credentials`, so the ones provided to the login call are used as a fallback.
+  private func httpHeaders(_ providedCredentials: LoginCredentials? = nil) -> HTTPHeaders? {
+    let headers = providedCredentials?.customHTTPHeaders ?? customHTTPHeaders
+    guard !headers.isEmpty else { return nil }
+    return HTTPHeaders(headers)
+  }
+
   public func provideCredentials(credentials: LoginCredentials) {
     self.credentials.wrappedValue = credentials
   }
@@ -290,7 +302,10 @@ final class SubsonicServerApi: URLCleanser, Sendable {
       forAction: "ping",
       credentials: credentials
     )
-    let response = try await request(url: try createUrl(from: urlComp))
+    let response = try await request(
+      url: try createUrl(from: urlComp),
+      headers: httpHeaders(credentials)
+    )
 
     let parserDelegate = SsPingParserDelegate(performanceMonitor: performanceMonitor)
     let parser = XMLParser(data: response.data)
@@ -389,7 +404,7 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     }
 
     let url = try createUrl(from: urlComp)
-    let response = try await request(url: url)
+    let response = try await request(url: url, headers: httpHeaders(providedCredentials))
 
     let delegate = SsPingParserDelegate(performanceMonitor: performanceMonitor)
     let parser = XMLParser(data: response.data)
@@ -953,12 +968,12 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     -> APIDataResponse {
     let version = try await determineApiVersionToUse()
     let url = try urlCreation(version)
-    return try await request(url: url)
+    return try await request(url: url, headers: httpHeaders())
   }
 
-  private func request(url: URL) async throws -> APIDataResponse {
+  private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
-      let afRequest = AF.request(url, method: .get)
+      let afRequest = AF.request(url, method: .get, headers: headers)
       afRequest.validate().responseData { response in
         if response.response?.statusCode == 404 {
           let cleanedURL = self.cleanse(url: response.request?.url)

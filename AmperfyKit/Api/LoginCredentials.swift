@@ -29,6 +29,7 @@ public struct LoginCredentials: Sendable, Codable {
     case backendApi
     case activeBackendServerUrl
     case alternativeServerURLs
+    case customHTTPHeaders
   }
 
   public var serverUrl: String
@@ -38,6 +39,10 @@ public struct LoginCredentials: Sendable, Codable {
   public var backendApi: BackenApiType
   public var activeBackendServerUrl: String
   public var alternativeServerURLs: [String]
+  /// Custom HTTP headers sent with every request to the server. Used e.g. to provide a
+  /// Cloudflare Access service token (CF-Access-Client-Id / CF-Access-Client-Secret) so that
+  /// the connection bypasses an interactive Zero Trust policy.
+  public var customHTTPHeaders: [String: String]
 
   public init() {
     self.serverUrl = ""
@@ -47,6 +52,7 @@ public struct LoginCredentials: Sendable, Codable {
     self.backendApi = .notDetected
     self.activeBackendServerUrl = ""
     self.alternativeServerURLs = []
+    self.customHTTPHeaders = [:]
   }
 
   public var displayServerUrl: String {
@@ -74,6 +80,7 @@ public struct LoginCredentials: Sendable, Codable {
     self.backendApi = .notDetected
     self.activeBackendServerUrl = serverUrl
     self.alternativeServerURLs = []
+    self.customHTTPHeaders = [:]
   }
 
   public init(serverUrl: String, username: String, password: String, backendApi: BackenApiType) {
@@ -96,6 +103,10 @@ public struct LoginCredentials: Sendable, Codable {
       [String].self,
       forKey: .alternativeServerURLs
     ) ?? []
+    self.customHTTPHeaders = try container.decodeIfPresent(
+      [String: String].self,
+      forKey: .customHTTPHeaders
+    ) ?? [:]
     self.passwordHash = StringHasher.sha256(dataString: password)
   }
 
@@ -107,6 +118,7 @@ public struct LoginCredentials: Sendable, Codable {
     try container.encode(backendApi, forKey: .backendApi)
     try container.encode(activeBackendServerUrl, forKey: .activeBackendServerUrl)
     try container.encode(alternativeServerURLs, forKey: .alternativeServerURLs)
+    try container.encode(customHTTPHeaders, forKey: .customHTTPHeaders)
   }
 
   public mutating func changePasswordAndHash(password newPassword: String) {

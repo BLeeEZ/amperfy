@@ -20,6 +20,7 @@
 //
 
 import AmperfyKit
+import SwiftUI
 import UIKit
 
 extension String {
@@ -57,6 +58,10 @@ extension UITextField {
 
 class LoginVC: UIViewController {
   var selectedApiType: BackenApiType = .notDetected
+  /// Custom HTTP headers (e.g. a Cloudflare Access service token) sent with every request to the
+  /// server. Collected via the embedded `CustomHTTPHeadersView` and applied to the credentials on
+  /// login.
+  var customHeaders: [String: String] = [:]
 
   #if targetEnvironment(macCatalyst)
     static let fontSize: CGFloat = 14
@@ -178,6 +183,26 @@ class LoginVC: UIViewController {
     return button
   }()
 
+  fileprivate lazy var customHeadersButton: UIButton = {
+    var config = UIButton.Configuration.glass()
+    let button = UIButton(configuration: config)
+    button.setTitle("Custom HTTP Headers", for: .normal)
+    button.accessibilityLabel = "Custom HTTP Headers"
+    button.addTarget(self, action: #selector(Self.customHeadersPressed), for: .touchUpInside)
+    button.preferredBehavioralStyle = .pad
+    return button
+  }()
+
+  @IBAction
+  func customHeadersPressed() {
+    let editor = CustomHTTPHeadersView(headers: customHeaders) { [weak self] updated in
+      self?.customHeaders = updated
+    }
+    let hostingController = UIHostingController(rootView: NavigationView { editor })
+    hostingController.modalPresentationStyle = .formSheet
+    present(hostingController, animated: true)
+  }
+
   // Close button shown when presented as a sheet/modal
   fileprivate lazy var closeButton: UIButton = {
     var config = UIButton.Configuration.prominentGlass()
@@ -213,6 +238,7 @@ class LoginVC: UIViewController {
     self.passwordTF.translatesAutoresizingMaskIntoConstraints = false
     apiLabel.translatesAutoresizingMaskIntoConstraints = false
     self.apiSelectorButton.translatesAutoresizingMaskIntoConstraints = false
+    self.customHeadersButton.translatesAutoresizingMaskIntoConstraints = false
 
     let view = UIView()
     view.addSubview(serverUrlTF)
@@ -220,6 +246,7 @@ class LoginVC: UIViewController {
     view.addSubview(passwordTF)
     view.addSubview(apiLabel)
     view.addSubview(apiSelectorButton)
+    view.addSubview(customHeadersButton)
 
     let padding: CGFloat = 0
     let elementHeight: CGFloat = 40
@@ -288,8 +315,22 @@ class LoginVC: UIViewController {
       ),
       apiSelectorButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
+      customHeadersButton.safeAreaLayoutGuide.topAnchor.constraint(
+        equalTo: apiSelectorButton.bottomAnchor,
+        constant: spaceInBetween
+      ),
+      customHeadersButton.safeAreaLayoutGuide.leadingAnchor.constraint(
+        equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+        constant: padding
+      ),
+      customHeadersButton.safeAreaLayoutGuide.trailingAnchor.constraint(
+        equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+        constant: -padding
+      ),
+      customHeadersButton.heightAnchor.constraint(equalToConstant: elementHeight),
+
       view.heightAnchor
-        .constraint(equalToConstant: (4 * elementHeight) + (3 * spaceInBetween) + (2 * padding)),
+        .constraint(equalToConstant: (5 * elementHeight) + (4 * spaceInBetween) + (2 * padding)),
     ])
 
     return view
@@ -388,6 +429,9 @@ class LoginVC: UIViewController {
     }
 
     var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
+    // Apply custom headers before login so the reachability check and authentication request
+    // already carry e.g. a Cloudflare Access service token.
+    credentials.customHTTPHeaders = customHeaders
     var accountInfo = Account.createInfo(credentials: credentials)
 
     guard !appDelegate.storage.settings.accounts.allAccounts.contains(where: { $0 == accountInfo })
@@ -584,6 +628,7 @@ class LoginVC: UIViewController {
       .loginCredentials {
       serverUrlTF.text = credentials.serverUrl
       usernameTF.text = credentials.username
+      customHeaders = credentials.customHTTPHeaders
     }
   }
 

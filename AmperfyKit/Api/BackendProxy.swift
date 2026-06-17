@@ -320,7 +320,12 @@ public final class BackendProxy: Sendable {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(), Error>) in
       let sessionConfig = URLSessionConfiguration.default
       let session = URLSession(configuration: sessionConfig)
-      let request = URLRequest(url: activeBackendServerUrl)
+      var request = URLRequest(url: activeBackendServerUrl)
+      // Forward custom headers (e.g. Cloudflare Access service token) so that the very first
+      // reachability check is not blocked by a Zero Trust policy.
+      for (field, value) in credentials.customHTTPHeaders {
+        request.setValue(value, forHTTPHeaderField: field)
+      }
       let task = session.downloadTask(with: request) { tempLocalUrl, response, error in
         if let error = error {
           continuation
@@ -355,6 +360,8 @@ extension BackendProxy: BackendApi {
   public var clientApiVersion: String { activeApi.clientApiVersion }
 
   public var serverApiVersion: String { activeApi.serverApiVersion }
+
+  public var customHTTPHeaders: [String: String] { activeApi.customHTTPHeaders }
 
   public func provideCredentials(credentials: LoginCredentials) {
     activeApi.provideCredentials(credentials: credentials)

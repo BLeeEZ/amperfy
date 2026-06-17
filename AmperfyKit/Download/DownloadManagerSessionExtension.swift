@@ -26,7 +26,18 @@ import os.log
 extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
   func fetch(downloadTaskInfo: DownloadTaskInfo) {
     guard let urlSession else { return }
-    let task = urlSession.downloadTask(with: downloadTaskInfo.url)
+    let task: URLSessionDownloadTask
+    if downloadTaskInfo.httpHeaders.isEmpty {
+      task = urlSession.downloadTask(with: downloadTaskInfo.url)
+    } else {
+      // Forward custom headers (e.g. Cloudflare Access service token) so that downloads are not
+      // blocked by a Zero Trust policy.
+      var request = URLRequest(url: downloadTaskInfo.url)
+      for (field, value) in downloadTaskInfo.httpHeaders {
+        request.setValue(value, forHTTPHeaderField: field)
+      }
+      task = urlSession.downloadTask(with: request)
+    }
     tasks[task] = downloadTaskInfo
     task.resume()
   }
