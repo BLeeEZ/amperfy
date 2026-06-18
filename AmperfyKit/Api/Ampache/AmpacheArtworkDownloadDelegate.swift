@@ -44,8 +44,8 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
     2
   }
 
-  var customHTTPHeaders: [String: String] {
-    ampacheXmlServerApi.customHTTPHeaders
+  var httpHeaders: [String: String] {
+    ampacheXmlServerApi.httpHeaders
   }
 
   @MainActor

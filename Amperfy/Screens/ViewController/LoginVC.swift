@@ -58,9 +58,6 @@ extension UITextField {
 
 class LoginVC: UIViewController {
   var selectedApiType: BackenApiType = .notDetected
-  /// Custom HTTP headers (e.g. a Cloudflare Access service token) sent with every request to the
-  /// server. Collected via the embedded `CustomHTTPHeadersView` and applied to the credentials on
-  /// login.
   var customHeaders: [String: String] = [:]
 
   #if targetEnvironment(macCatalyst)
@@ -431,7 +428,7 @@ class LoginVC: UIViewController {
     var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
     // Apply custom headers before login so the reachability check and authentication request
     // already carry e.g. a Cloudflare Access service token.
-    credentials.customHTTPHeaders = customHeaders
+    credentials.httpHeaders = customHeaders
     var accountInfo = Account.createInfo(credentials: credentials)
 
     guard !appDelegate.storage.settings.accounts.allAccounts.contains(where: { $0 == accountInfo })
@@ -628,7 +625,7 @@ class LoginVC: UIViewController {
       .loginCredentials {
       serverUrlTF.text = credentials.serverUrl
       usernameTF.text = credentials.username
-      customHeaders = credentials.customHTTPHeaders
+      customHeaders = credentials.httpHeaders
     }
   }
 

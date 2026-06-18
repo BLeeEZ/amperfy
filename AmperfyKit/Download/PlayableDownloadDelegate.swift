@@ -49,8 +49,8 @@ final class PlayableDownloadDelegate: DownloadManagerDelegate {
     4
   }
 
-  var customHTTPHeaders: [String: String] {
-    backendApi.customHTTPHeaders
+  var httpHeaders: [String: String] {
+    backendApi.httpHeaders
   }
 
   @MainActor

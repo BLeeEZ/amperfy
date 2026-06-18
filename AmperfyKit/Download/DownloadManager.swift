@@ -398,7 +398,7 @@ actor DownloadManager: NSObject, DownloadManageable {
         downloadInfo: downloadRequest.info,
         storage: storage
       )
-      let httpHeaders = await getDownloadDelegateCB().customHTTPHeaders
+      let httpHeaders = await getDownloadDelegateCB().httpHeaders
       let downloadTaskInfo = DownloadTaskInfo(
         request: downloadRequest,
         url: url,

@@ -45,8 +45,8 @@ final class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
     2
   }
 
-  var customHTTPHeaders: [String: String] {
-    subsonicServerApi.customHTTPHeaders
+  var httpHeaders: [String: String] {
+    subsonicServerApi.httpHeaders
   }
 
   @MainActor

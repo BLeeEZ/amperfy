@@ -323,7 +323,7 @@ public final class BackendProxy: Sendable {
       var request = URLRequest(url: activeBackendServerUrl)
       // Forward custom headers (e.g. Cloudflare Access service token) so that the very first
       // reachability check is not blocked by a Zero Trust policy.
-      for (field, value) in credentials.customHTTPHeaders {
+      for (field, value) in credentials.httpHeaders {
         request.setValue(value, forHTTPHeaderField: field)
       }
       let task = session.downloadTask(with: request) { tempLocalUrl, response, error in
@@ -361,7 +361,7 @@ extension BackendProxy: BackendApi {
 
   public var serverApiVersion: String { activeApi.serverApiVersion }
 
-  public var customHTTPHeaders: [String: String] { activeApi.customHTTPHeaders }
+  public var httpHeaders: [String: String] { activeApi.httpHeaders }
 
   public func provideCredentials(credentials: LoginCredentials) {
     activeApi.provideCredentials(credentials: credentials)

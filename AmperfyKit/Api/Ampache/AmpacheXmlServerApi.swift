@@ -160,14 +160,14 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     return urlComp
   }
 
-  public var customHTTPHeaders: [String: String] {
-    credentials.wrappedValue?.customHTTPHeaders ?? [:]
+  public var httpHeaders: [String: String] {
+    credentials.wrappedValue?.httpHeaders ?? [:]
   }
 
   /// Builds the Alamofire headers for a request. During login the credentials are not yet stored in
   /// `credentials`, so the ones provided to the login call are used as a fallback.
-  private func httpHeaders(_ providedCredentials: LoginCredentials? = nil) -> HTTPHeaders? {
-    let headers = providedCredentials?.customHTTPHeaders ?? customHTTPHeaders
+  private func buildHTTPHeaders(_ providedCredentials: LoginCredentials? = nil) -> HTTPHeaders? {
+    let headers = providedCredentials?.httpHeaders ?? httpHeaders
     guard !headers.isEmpty else { return nil }
     return HTTPHeaders(headers)
   }
@@ -197,7 +197,7 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
   private func requestAuth(credentials: LoginCredentials) async throws
     -> AuthentificationHandshake {
     let url = try await createAuthURL(credentials: credentials)
-    let response = try await request(url: url, headers: httpHeaders(credentials))
+    let response = try await request(url: url, headers: buildHTTPHeaders(credentials))
     return try await parseAuthResult(response: response)
   }
 
@@ -882,6 +882,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     -> APIDataResponse {
     let auth = try await reauthenticate()
     let url = try urlCreation(auth)
-    return try await request(url: url, headers: httpHeaders())
+    return try await request(url: url, headers: buildHTTPHeaders())
   }
 }

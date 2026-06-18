@@ -192,7 +192,7 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
 final class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
   var requestPredicate: NSPredicate { NSPredicate(value: true) }
   let parallelDownloadsCount = 2
-  let customHTTPHeaders: [String: String] = [:]
+  let httpHeaders: [String: String] = [:]
   func prepareDownload(
     downloadInfo: AmperfyKit.DownloadElementInfo,
     storage: AmperfyKit.AsyncCoreDataAccessWrapper
@@ -220,7 +220,7 @@ final class MOCK_DownloadManagerDelegate: DownloadManagerDelegate {
 final class MOCK_BackendApi: BackendApi {
   let clientApiVersion: String = ""
   let serverApiVersion: String = ""
-  let customHTTPHeaders: [String: String] = [:]
+  let httpHeaders: [String: String] = [:]
   func provideCredentials(credentials: LoginCredentials) {}
   func isAuthenticationValid(credentials: LoginCredentials) async throws {
     throw BackendError.notSupported

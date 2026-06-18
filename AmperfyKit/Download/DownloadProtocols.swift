@@ -60,9 +60,7 @@ public protocol DownloadManageable {
 public protocol DownloadManagerDelegate: Sendable {
   var requestPredicate: NSPredicate { get }
   var parallelDownloadsCount: Int { get }
-  /// Custom HTTP headers (e.g. a Cloudflare Access service token) that must be sent with every
-  /// download request. Empty when none are configured.
-  var customHTTPHeaders: [String: String] { get }
+  var httpHeaders: [String: String] { get }
   func prepareDownload(
     downloadInfo: DownloadElementInfo,
     storage: AsyncCoreDataAccessWrapper
