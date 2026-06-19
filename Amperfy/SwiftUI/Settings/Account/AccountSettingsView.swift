@@ -75,8 +75,6 @@ struct AccountSettingsView: View {
       .updateSetting(accountInfo) { accountSettings in
         accountSettings.loginCredentials?.httpHeaders = headers
       }
-    // Re-provide the credentials so requests of the running session pick up the new headers
-    // without requiring a restart.
     if let updatedCredentials = appDelegate.storage.settings.accounts
       .getSetting(accountInfo).read.loginCredentials {
       appDelegate.getMeta(accountInfo).backendApi

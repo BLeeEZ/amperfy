@@ -164,8 +164,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     credentials.wrappedValue?.httpHeaders ?? [:]
   }
 
-  /// Builds the Alamofire headers for a request. During login the credentials are not yet stored in
-  /// `credentials`, so the ones provided to the login call are used as a fallback.
   private func buildHTTPHeaders(_ providedCredentials: LoginCredentials? = nil) -> HTTPHeaders? {
     let headers = providedCredentials?.httpHeaders ?? httpHeaders
     guard !headers.isEmpty else { return nil }

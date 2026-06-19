@@ -550,8 +550,6 @@ class BackendAudioPlayer: NSObject {
   ) async throws {
     let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
     let streamingTranscodingFormat = streamingTranscodings.getActive(networkMonitor: networkMonitor)
-    // Custom headers (e.g. Cloudflare Access service token) for the backend server stream. Radio
-    // streams point to arbitrary external URLs, so they keep the empty default.
     var httpHeaders: [String: String] = [:]
     @MainActor
     func provideUrl() async throws -> URL {

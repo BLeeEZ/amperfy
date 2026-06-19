@@ -58,7 +58,7 @@ extension UITextField {
 
 class LoginVC: UIViewController {
   var selectedApiType: BackenApiType = .notDetected
-  var customHeaders: [String: String] = [:]
+  var httpHeaders: [String: String] = [:]
 
   #if targetEnvironment(macCatalyst)
     static let fontSize: CGFloat = 14
@@ -192,8 +192,8 @@ class LoginVC: UIViewController {
 
   @IBAction
   func customHeadersPressed() {
-    let editor = CustomHTTPHeadersView(headers: customHeaders) { [weak self] updated in
-      self?.customHeaders = updated
+    let editor = CustomHTTPHeadersView(headers: httpHeaders) { [weak self] updated in
+      self?.httpHeaders = updated
     }
     let hostingController = UIHostingController(rootView: NavigationView { editor })
     hostingController.modalPresentationStyle = .formSheet
@@ -426,9 +426,7 @@ class LoginVC: UIViewController {
     }
 
     var credentials = LoginCredentials(serverUrl: serverUrl, username: username, password: password)
-    // Apply custom headers before login so the reachability check and authentication request
-    // already carry e.g. a Cloudflare Access service token.
-    credentials.httpHeaders = customHeaders
+    credentials.httpHeaders = httpHeaders
     var accountInfo = Account.createInfo(credentials: credentials)
 
     guard !appDelegate.storage.settings.accounts.allAccounts.contains(where: { $0 == accountInfo })
@@ -625,7 +623,7 @@ class LoginVC: UIViewController {
       .loginCredentials {
       serverUrlTF.text = credentials.serverUrl
       usernameTF.text = credentials.username
-      customHeaders = credentials.httpHeaders
+      httpHeaders = credentials.httpHeaders
     }
   }
 

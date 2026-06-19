@@ -321,8 +321,6 @@ public final class BackendProxy: Sendable {
       let sessionConfig = URLSessionConfiguration.default
       let session = URLSession(configuration: sessionConfig)
       var request = URLRequest(url: activeBackendServerUrl)
-      // Forward custom headers (e.g. Cloudflare Access service token) so that the very first
-      // reachability check is not blocked by a Zero Trust policy.
       for (field, value) in credentials.httpHeaders {
         request.setValue(value, forHTTPHeaderField: field)
       }

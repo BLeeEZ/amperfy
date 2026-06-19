@@ -23,8 +23,6 @@ import SwiftUI
 
 // MARK: - HTTPHeaderEntry
 
-/// A single editable HTTP header row. Identity is kept stable across edits so SwiftUI does not
-/// recreate the text fields while typing.
 struct HTTPHeaderEntry: Identifiable, Equatable {
   let id = UUID()
   var key: String
@@ -33,12 +31,6 @@ struct HTTPHeaderEntry: Identifiable, Equatable {
 
 // MARK: - CustomHTTPHeadersView
 
-/// Generic editor for custom HTTP headers that are sent with every request to the server.
-///
-/// Typical use case: provide a Cloudflare Access service token
-/// (`CF-Access-Client-Id` / `CF-Access-Client-Secret`) so the connection bypasses an interactive
-/// Zero Trust policy (e.g. an email OTP). The editor is reused both in the login screen (before an
-/// account exists) and in the account settings (to edit an existing account).
 struct CustomHTTPHeadersView: View {
   private static let cloudflareHeaderKeys = ["CF-Access-Client-Id", "CF-Access-Client-Secret"]
 
@@ -46,10 +38,6 @@ struct CustomHTTPHeadersView: View {
   private var entries: [HTTPHeaderEntry]
   private let onChange: ([String: String]) -> ()
 
-  /// - Parameters:
-  ///   - headers: the headers to pre-populate the editor with.
-  ///   - onChange: called with the resulting `[field: value]` dictionary on every edit. Rows with
-  ///     an empty field name are discarded.
   init(headers: [String: String], onChange: @escaping ([String: String]) -> ()) {
     _entries = State(
       initialValue: headers
