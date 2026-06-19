@@ -180,18 +180,18 @@ class LoginVC: UIViewController {
     return button
   }()
 
-  fileprivate lazy var customHeadersButton: UIButton = {
+  fileprivate lazy var httpHeadersButton: UIButton = {
     var config = UIButton.Configuration.glass()
     let button = UIButton(configuration: config)
     button.setTitle("Custom HTTP Headers", for: .normal)
     button.accessibilityLabel = "Custom HTTP Headers"
-    button.addTarget(self, action: #selector(Self.customHeadersPressed), for: .touchUpInside)
+    button.addTarget(self, action: #selector(Self.httpHeadersPressed), for: .touchUpInside)
     button.preferredBehavioralStyle = .pad
     return button
   }()
 
   @IBAction
-  func customHeadersPressed() {
+  func httpHeadersPressed() {
     let editor = CustomHTTPHeadersView(headers: httpHeaders) { [weak self] updated in
       self?.httpHeaders = updated
     }
@@ -235,7 +235,7 @@ class LoginVC: UIViewController {
     self.passwordTF.translatesAutoresizingMaskIntoConstraints = false
     apiLabel.translatesAutoresizingMaskIntoConstraints = false
     self.apiSelectorButton.translatesAutoresizingMaskIntoConstraints = false
-    self.customHeadersButton.translatesAutoresizingMaskIntoConstraints = false
+    self.httpHeadersButton.translatesAutoresizingMaskIntoConstraints = false
 
     let view = UIView()
     view.addSubview(serverUrlTF)
@@ -243,7 +243,7 @@ class LoginVC: UIViewController {
     view.addSubview(passwordTF)
     view.addSubview(apiLabel)
     view.addSubview(apiSelectorButton)
-    view.addSubview(customHeadersButton)
+    view.addSubview(httpHeadersButton)
 
     let padding: CGFloat = 0
     let elementHeight: CGFloat = 40
@@ -312,19 +312,19 @@ class LoginVC: UIViewController {
       ),
       apiSelectorButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
-      customHeadersButton.safeAreaLayoutGuide.topAnchor.constraint(
+      httpHeadersButton.safeAreaLayoutGuide.topAnchor.constraint(
         equalTo: apiSelectorButton.bottomAnchor,
         constant: spaceInBetween
       ),
-      customHeadersButton.safeAreaLayoutGuide.leadingAnchor.constraint(
+      httpHeadersButton.safeAreaLayoutGuide.leadingAnchor.constraint(
         equalTo: view.safeAreaLayoutGuide.leadingAnchor,
         constant: padding
       ),
-      customHeadersButton.safeAreaLayoutGuide.trailingAnchor.constraint(
+      httpHeadersButton.safeAreaLayoutGuide.trailingAnchor.constraint(
         equalTo: view.safeAreaLayoutGuide.trailingAnchor,
         constant: -padding
       ),
-      customHeadersButton.heightAnchor.constraint(equalToConstant: elementHeight),
+      httpHeadersButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
       view.heightAnchor
         .constraint(equalToConstant: (5 * elementHeight) + (4 * spaceInBetween) + (2 * padding)),
