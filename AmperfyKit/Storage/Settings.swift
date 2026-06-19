@@ -242,6 +242,12 @@ public struct UserSettings: Sendable, Codable {
     set { _playlistsSortSetting = newValue }
   }
 
+  private var _savedQueuesLimit: Int = 20
+  public var savedQueuesLimit: Int {
+    get { _savedQueuesLimit }
+    set { _savedQueuesLimit = newValue }
+  }
+
   private var _artistsSortSetting: ArtistElementSortType = .defaultValue
   public var artistsSortSetting: ArtistElementSortType {
     get { _artistsSortSetting }

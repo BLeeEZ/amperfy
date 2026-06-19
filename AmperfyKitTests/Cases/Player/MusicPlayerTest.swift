@@ -369,13 +369,21 @@ class MusicPlayerTest: XCTestCase {
       settings: storage.settings,
       userStatistics: userStatistics
     )
+    let savedQueueManager = SavedQueueManager(
+      library: library,
+      queueHandler: testQueueHandler,
+      playerData: playerData,
+      settings: storage.settings,
+      eventLogger: eventLogger
+    )
     testPlayer = PlayerFacadeImpl(
       playerStatus: playerData,
       queueHandler: testQueueHandler,
       musicPlayer: testMusicPlayer,
       library: library,
       backendAudioPlayer: backendPlayer,
-      userStatistics: userStatistics
+      userStatistics: userStatistics,
+      savedQueueManager: savedQueueManager
     )
     testPlayer.addNotifier(notifier: mockMusicPlayable)
 
@@ -741,6 +749,78 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.getAllUserQueueItems(), [AbstractPlayable]())
     XCTAssertEqual(testPlayer.getAllNextQueueItems(), [AbstractPlayable]())
     XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
+  }
+
+  func testPlayContext_LeavingShuffledQueue_SnapshotsPlayingOrder() {
+    storage.settings.accounts.switchActiveAccount(account.info)
+    fillPlayerWithSomeSongs()
+    playerData.setShuffle(true)
+    let playingOrder = playerData.activeQueue.playables.map { $0.id }
+    guard let nextSong = library.getSong(
+      for: getAccountForSong(atIndex: 6),
+      id: cdHelper.seeder.songs[6].id
+    ) else { XCTFail(); return }
+    testPlayer.play(context: PlayContext(name: "Other", playables: [nextSong]))
+
+    let queues = library.getSavedQueues(for: account)
+    XCTAssertEqual(queues.count, 1)
+    XCTAssertEqual(queues[0].contextSongIds, playingOrder)
+    XCTAssertTrue(queues[0].isShuffle)
+  }
+
+  func testClearPlayer_SnapshotsQueueWithPosition() {
+    storage.settings.accounts.switchActiveAccount(account.info)
+    fillPlayerWithSomeSongs()
+    playerData.setCurrentIndex(2)
+    let queueIds = playerData.activeQueue.playables.map { $0.id }
+    testPlayer.clearQueues()
+
+    let queues = library.getSavedQueues(for: account)
+    XCTAssertEqual(queues.count, 1)
+    XCTAssertEqual(queues[0].contextSongIds, queueIds)
+    XCTAssertEqual(queues[0].currentIndex, 2)
+    XCTAssertEqual(playerData.contextQueue.playables.count, 0)
+  }
+
+  func testClearPlayer_SnapshotsUserQueue() {
+    storage.settings.accounts.switchActiveAccount(account.info)
+    fillPlayerWithSomeSongsAndWaitingQueue()
+    playerData.setCurrentIndex(1)
+    let contextIds = playerData.activeQueue.playables.map { $0.id }
+    let userIds = playerData.userQueuePlaylist.playables.map { $0.id }
+    XCTAssertFalse(userIds.isEmpty)
+    testPlayer.clearQueues()
+
+    let queues = library.getSavedQueues(for: account)
+    XCTAssertEqual(queues.count, 1)
+    XCTAssertEqual(queues[0].contextSongIds, contextIds)
+    XCTAssertEqual(queues[0].userQueueSongIds, userIds)
+    XCTAssertEqual(queues[0].currentIndex, 1)
+  }
+
+  func testClearContextQueue_SnapshotsQueueWithPosition() {
+    storage.settings.accounts.switchActiveAccount(account.info)
+    fillPlayerWithSomeSongs()
+    playerData.setCurrentIndex(2)
+    let queueIds = playerData.activeQueue.playables.map { $0.id }
+    testPlayer.clearContextQueue()
+
+    let queues = library.getSavedQueues(for: account)
+    XCTAssertEqual(queues.count, 1)
+    XCTAssertEqual(queues[0].contextSongIds, queueIds)
+    XCTAssertEqual(queues[0].currentIndex, 2)
+    XCTAssertEqual(playerData.contextQueue.playables.count, 0)
+  }
+
+  func testClearPlayer_PodcastMode_NoMusicSnapshot() {
+    storage.settings.accounts.switchActiveAccount(account.info)
+    fillPlayerWithSomeSongs()
+    playerData.setPlayerMode(.podcast)
+    testPlayer.clearQueues()
+
+    XCTAssertEqual(library.getSavedQueues(for: account).count, 0)
+    // The music queue must survive clearing the podcast player.
+    XCTAssertEqual(playerData.contextQueue.playables.count, fillCount)
   }
 
   func testPlaySongInPlaylistAt_EmptyPlaylist() {

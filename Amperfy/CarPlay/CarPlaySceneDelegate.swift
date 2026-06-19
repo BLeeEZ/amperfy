@@ -86,6 +86,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         name: .offlineModeChanged,
         object: nil
       )
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(refreshSavedQueues),
+        name: .savedQueueListChanged,
+        object: nil
+      )
       accountNotificationHandler = AccountNotificationHandler(
         storage: appDelegate.storage,
         notificationHandler: appDelegate.notificationHandler
@@ -174,6 +180,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       self.interfaceController = nil
       appDelegate.notificationHandler.remove(self, name: .fetchControllerSortChanged, object: nil)
       appDelegate.notificationHandler.remove(self, name: .offlineModeChanged, object: nil)
+      appDelegate.notificationHandler.remove(self, name: .savedQueueListChanged, object: nil)
       accountNotificationHandler?.performOnAllRegisteredAccounts { [weak self] accountInfo in
         guard let self else { return }
         let meta = appDelegate.getMeta(accountInfo)
@@ -389,6 +396,16 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     let template = CPListTemplate(title: "Radios", sections: [
       CPListSection(items: [CPListTemplateItem]()),
     ])
+    return template
+  }()
+
+  lazy var savedQueuesSection = {
+    let template = CPListTemplate(title: "Saved Queues", sections: [
+      CPListSection(items: [CPListTemplateItem]()),
+    ])
+    template.emptyViewTitleVariants = ["No Saved Queues"]
+    template.emptyViewSubtitleVariants =
+      ["Queues are saved automatically when you start a new one."]
     return template
   }()
 
@@ -1151,6 +1168,9 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         if radiosFetchController == nil { createRadiosFetchController() }
         radioSection
           .updateSections(createRadioSections(from: radiosFetchController))
+      } else if aTemplate == savedQueuesSection {
+        os_log("CarPlay: templateWillAppear savedQueuesSection", log: self.log, type: .info)
+        savedQueuesSection.updateSections(createSavedQueuesSections())
       } else if aTemplate == artistsFavoriteSection {
         os_log("CarPlay: templateWillAppear artistsFavoriteSection", log: self.log, type: .info)
         if artistsFavoritesFetchController == nil { createArtistsFavoritesFetchController() }

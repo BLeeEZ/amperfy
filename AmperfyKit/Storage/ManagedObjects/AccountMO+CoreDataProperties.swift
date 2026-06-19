@@ -62,6 +62,8 @@ extension AccountMO {
   public var scrobbleEntries: NSSet?
   @NSManaged
   public var searchHistories: NSSet?
+  @NSManaged
+  public var savedQueues: NSSet?
 }
 
 // MARK: Generated accessors for artworks
@@ -262,6 +264,26 @@ extension AccountMO {
   @objc(removeSearchHistories:)
   @NSManaged
   public func removeFromSearchHistories(_ values: NSSet)
+}
+
+// MARK: Generated accessors for savedQueues
+
+extension AccountMO {
+  @objc(addSavedQueuesObject:)
+  @NSManaged
+  public func addToSavedQueues(_ value: SavedQueueMO)
+
+  @objc(removeSavedQueuesObject:)
+  @NSManaged
+  public func removeFromSavedQueues(_ value: SavedQueueMO)
+
+  @objc(addSavedQueues:)
+  @NSManaged
+  public func addToSavedQueues(_ values: NSSet)
+
+  @objc(removeSavedQueues:)
+  @NSManaged
+  public func removeFromSavedQueues(_ values: NSSet)
 }
 
 // MARK: - AccountMO + Identifiable

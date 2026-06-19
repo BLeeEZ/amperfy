@@ -633,6 +633,57 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(scrobbleEntry.managedObject)
   }
 
+  func createSavedQueue(account: Account) -> SavedQueue {
+    let mo = SavedQueueMO(context: context)
+    mo.id = UUID()
+    mo.lastUsedAt = Date()
+    mo.toAccount = account.managedObject
+    return SavedQueue(managedObject: mo)
+  }
+
+  public func getSavedQueues(for account: Account) -> [SavedQueue] {
+    let fetchRequest: NSFetchRequest<SavedQueueMO> = SavedQueueMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K == %@",
+      #keyPath(SavedQueueMO.toAccount), account.managedObject
+    )
+    fetchRequest.sortDescriptors = [
+      NSSortDescriptor(key: #keyPath(SavedQueueMO.lastUsedAt), ascending: false),
+    ]
+    let mos = (try? context.fetch(fetchRequest)) ?? []
+    return mos.map { SavedQueue(managedObject: $0) }
+  }
+
+  public func isAnySongAvailable(for account: Account, ids: Set<String>) -> Bool {
+    guard !ids.isEmpty else { return false }
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(
+        format: "%K IN %@",
+        #keyPath(SongMO.id),
+        ids
+      ),
+    ])
+    fetchRequest.fetchLimit = 1
+    let count = (try? context.count(for: fetchRequest)) ?? 0
+    return count > 0
+  }
+
+  public func deleteSavedQueue(_ savedQueue: SavedQueue) {
+    context.delete(savedQueue.managedObject)
+  }
+
+  public func deleteAllSavedQueues(for account: Account) {
+    let fetchRequest: NSFetchRequest<SavedQueueMO> = SavedQueueMO.fetchRequest()
+    fetchRequest.predicate = NSPredicate(
+      format: "%K == %@",
+      #keyPath(SavedQueueMO.toAccount), account.managedObject
+    )
+    let mos = (try? context.fetch(fetchRequest)) ?? []
+    for mo in mos { context.delete(mo) }
+  }
+
   func createMusicFolder(account: Account) -> MusicFolder {
     let musicFolderMO = MusicFolderMO(context: context)
     let musicFolder = MusicFolder(managedObject: musicFolderMO)
@@ -1694,6 +1745,21 @@ public class LibraryStorage: PlayableFileCachable {
     fetchRequest.fetchLimit = 1
     let songs = try? context.fetch(fetchRequest)
     return songs?.lazy.compactMap { Song(managedObject: $0) }.first
+  }
+
+  public func getSongs(for account: Account, ids: Set<String>) -> [Song] {
+    guard !ids.isEmpty else { return [] }
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(
+        format: "%K IN %@",
+        #keyPath(SongMO.id),
+        ids
+      ),
+    ])
+    let mos = (try? context.fetch(fetchRequest)) ?? []
+    return mos.map { Song(managedObject: $0) }
   }
 
   // MARK: Radios

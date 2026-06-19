@@ -32,6 +32,9 @@ struct PlayShuffleInfoConfiguration {
   var player: PlayerFacade
   let isInfoAlwaysHidden: Bool
   var customPlayName: String?
+  /// Overrides the play button action when set; the shuffle button keeps
+  /// using playContextCb.
+  var customPlayCB: (() -> ())?
   var isShuffleHidden = false
   var isShuffleOnContextNeccessary: Bool = true
   var shuffleContextCb: GetPlayContextCallback?
@@ -134,6 +137,10 @@ class LibraryElementDetailTableHeaderView: UIView {
   }
 
   private func play(isShuffled: Bool) {
+    if !isShuffled, let customPlayCB = config?.customPlayCB {
+      customPlayCB()
+      return
+    }
     guard let playContext = config?.playContextCb?(), let player = config?.player else { return }
     isShuffled ? player.playShuffled(context: playContext) : player.play(context: playContext)
   }
