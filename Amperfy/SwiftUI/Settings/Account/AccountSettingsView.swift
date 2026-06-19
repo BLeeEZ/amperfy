@@ -70,7 +70,7 @@ struct AccountSettingsView: View {
       .loginCredentials?.httpHeaders ?? [:]
   }
 
-  private func saveCustomHTTPHeaders(_ headers: [String: String], accountInfo: AccountInfo) {
+  private func saveHTTPHeaders(_ headers: [String: String], accountInfo: AccountInfo) {
     appDelegate.storage.settings.accounts
       .updateSetting(accountInfo) { accountSettings in
         accountSettings.loginCredentials?.httpHeaders = headers
@@ -233,7 +233,7 @@ struct AccountSettingsView: View {
             NavigationLink(destination: CustomHTTPHeadersView(
               headers: httpHeaders(accountInfo: activeAccountInfo)
             ) { updated in
-              saveCustomHTTPHeaders(updated, accountInfo: activeAccountInfo)
+              saveHTTPHeaders(updated, accountInfo: activeAccountInfo)
             }) {
               Text("Custom HTTP Headers")
             }
