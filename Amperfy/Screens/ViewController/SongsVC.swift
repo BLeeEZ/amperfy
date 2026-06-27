@@ -331,8 +331,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       detailHeaderView?.refresh()
       updateContentUnavailable()
     }
-    // Typing: debounce the expensive contains[cd] fetch. Cleared text: restore
-    // the full list immediately (and drop any pending search).
     if searchText.isEmpty {
       searchDebouncer.runImmediately(performSearch)
     } else {

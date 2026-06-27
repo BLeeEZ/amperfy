@@ -81,6 +81,7 @@
 		505CA1FC2B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1F82B87387600AA81CD /* SearchHistoryItemMO+CoreDataProperties.swift */; };
 		505CA1FE2B8739AE00AA81CD /* SearchHistoryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA1FD2B8739AE00AA81CD /* SearchHistoryItem.swift */; };
 		505CA2082B88E8F400AA81CD /* BasicTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50120A2426281C1900B037B1 /* BasicTableViewController.swift */; };
+		27EB1C38402CA80F8B0B537D /* SearchDebouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7049C69DC0AAE33A2158D8F5 /* SearchDebouncer.swift */; };
 		505CA2092B88E8F400AA81CD /* BasicCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005938E28E2EDDB008C8DF6 /* BasicCollectionViewController.swift */; };
 		505CA20A2B88E94800AA81CD /* MultiSourceTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA2032B88E69500AA81CD /* MultiSourceTableViewController.swift */; };
 		505CA20C2B88E9D300AA81CD /* FetchUpdateHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 505CA2002B88DF3B00AA81CD /* FetchUpdateHandler.swift */; };
@@ -645,6 +646,7 @@
 		501171352756A8E100B7C08D /* NowPlayingInfoCenterHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingInfoCenterHandler.swift; sourceTree = "<group>"; };
 		50120A2026280C9200B037B1 /* FetchedResultsControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchedResultsControllers.swift; sourceTree = "<group>"; };
 		50120A2426281C1900B037B1 /* BasicTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicTableViewController.swift; sourceTree = "<group>"; };
+		7049C69DC0AAE33A2158D8F5 /* SearchDebouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchDebouncer.swift; sourceTree = "<group>"; };
 		501267B6264C058500E13F08 /* SsXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsXmlParser.swift; sourceTree = "<group>"; };
 		501267B8264C187600E13F08 /* AmpacheXmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpacheXmlParser.swift; sourceTree = "<group>"; };
 		5013DC8B2B49997F00EC191E /* Amperfy v30.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v30.xcdatamodel"; sourceTree = "<group>"; };
@@ -1382,6 +1384,7 @@
 			children = (
 				50E1D3972B8A82BA0001A572 /* KeyCommandTableViewController.swift */,
 				50120A2426281C1900B037B1 /* BasicTableViewController.swift */,
+				7049C69DC0AAE33A2158D8F5 /* SearchDebouncer.swift */,
 				50DE29F02B90855100ABA78E /* KeyCommandCollectionViewController.swift */,
 				5005938E28E2EDDB008C8DF6 /* BasicCollectionViewController.swift */,
 				505CA20D2B88EB9900AA81CD /* BasicFetchedResultsTableViewController.swift */,
@@ -2614,6 +2617,7 @@
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
 				50AC4E5628D99A410091FF33 /* ButtonStyles.swift in Sources */,
 				505CA2082B88E8F400AA81CD /* BasicTableViewController.swift in Sources */,
+				27EB1C38402CA80F8B0B537D /* SearchDebouncer.swift in Sources */,
 				507414A12F004C07007AEC5D /* NextPreviousTrackIntent.swift in Sources */,
 				50B166AC2ED4E68400F7A1D6 /* HomeVC.swift in Sources */,
 				50C16C1C21E7051700F086F0 /* AlbumDetailVC.swift in Sources */,

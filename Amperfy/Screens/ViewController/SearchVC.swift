@@ -502,8 +502,6 @@ class SearchVC: BasicTableViewController {
   private let searchDebouncer = SearchDebouncer()
 
   override func updateSearchResults(for searchController: UISearchController) {
-    // Cleared text: show search history immediately. Typing: debounce so we don't
-    // fire network searches + a background fetch + fuzzy match on every keystroke.
     let searchText = searchController.searchBar.text ?? ""
     if searchText.isEmpty {
       searchDebouncer.runImmediately { [weak self] in self?.performSearch(for: searchController) }

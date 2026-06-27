@@ -335,8 +335,6 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
-    // The collection refresh now runs inside common's debounced search (via reloadListViewCB),
-    // so it no longer fires on every keystroke.
     common.updateSearchResults(for: searchController)
   }
 
