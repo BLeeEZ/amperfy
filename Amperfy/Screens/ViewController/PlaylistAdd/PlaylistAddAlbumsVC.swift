@@ -160,7 +160,8 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
+    // The list refresh now runs inside common's debounced search (via reloadListViewCB),
+    // so it no longer fires on every keystroke.
     common.updateSearchResults(for: self.searchController)
-    tableView.reloadData()
   }
 }

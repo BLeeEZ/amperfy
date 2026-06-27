@@ -293,38 +293,51 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     return convertIndexPathToPlayContext(songIndexPath: indexPath)
   }
 
+  private let searchDebouncer = SearchDebouncer()
+
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
-      Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.account.info).librarySyncer
-          .searchSongs(searchText: searchText)
-      } catch {
-        self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
-      }}
-      fetchedResultsController.search(
-        searchText: searchText,
-        onlyCachedSongs: false,
-        displayFilter: displayFilter
-      )
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
-      fetchedResultsController.search(
-        searchText: searchText,
-        onlyCachedSongs: true,
-        displayFilter: displayFilter
-      )
-    } else if displayFilter != .all {
-      fetchedResultsController.search(
-        searchText: searchText,
-        onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1,
-        displayFilter: displayFilter
-      )
-    } else {
-      fetchedResultsController.showAllResults()
+    let scopeIndex = searchController.searchBar.selectedScopeButtonIndex
+    let performSearch: @MainActor () -> () = { [weak self] in
+      guard let self else { return }
+      if !searchText.isEmpty, scopeIndex == 0 {
+        Task { @MainActor in do {
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
+            .searchSongs(searchText: searchText)
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)
+        }}
+        fetchedResultsController.search(
+          searchText: searchText,
+          onlyCachedSongs: false,
+          displayFilter: displayFilter
+        )
+      } else if scopeIndex == 1 {
+        fetchedResultsController.search(
+          searchText: searchText,
+          onlyCachedSongs: true,
+          displayFilter: displayFilter
+        )
+      } else if displayFilter != .all {
+        fetchedResultsController.search(
+          searchText: searchText,
+          onlyCachedSongs: scopeIndex == 1,
+          displayFilter: displayFilter
+        )
+      } else {
+        fetchedResultsController.showAllResults()
+      }
+      tableView.reloadData()
+      detailHeaderView?.refresh()
+      updateContentUnavailable()
     }
-    tableView.reloadData()
-    detailHeaderView?.refresh()
-    updateContentUnavailable()
+    // Typing: debounce the expensive contains[cd] fetch. Cleared text: restore
+    // the full list immediately (and drop any pending search).
+    if searchText.isEmpty {
+      searchDebouncer.runImmediately(performSearch)
+    } else {
+      searchDebouncer.schedule(performSearch)
+    }
   }
 
   private func saveSortPreference(preference: SongElementSortType) {

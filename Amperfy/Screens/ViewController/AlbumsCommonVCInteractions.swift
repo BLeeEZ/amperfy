@@ -531,22 +531,36 @@ class AlbumsCommonVCInteractions {
     )
   }
 
+  private let searchDebouncer = SearchDebouncer()
+
   func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
-      Task { @MainActor in do {
-        try await self.appDelegate.getMeta(self.account.info).librarySyncer
-          .searchAlbums(searchText: searchText)
-      } catch {
-        self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
-      }}
+    let scopeIndex = searchController.searchBar.selectedScopeButtonIndex
+    let performSearch: @MainActor () -> () = { [weak self] in
+      guard let self else { return }
+      if !searchText.isEmpty, scopeIndex == 0 {
+        Task { @MainActor in do {
+          try await self.appDelegate.getMeta(self.account.info).librarySyncer
+            .searchAlbums(searchText: searchText)
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
+        }}
+      }
+      fetchedResultsController.search(
+        searchText: searchText,
+        onlyCached: scopeIndex == 1,
+        displayFilter: displayFilter
+      )
+      reloadListViewCB?()
+      updateContentUnavailable()
     }
-    fetchedResultsController.search(
-      searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
-      displayFilter: displayFilter
-    )
-    updateContentUnavailable()
+    // Typing: debounce the expensive contains[cd] fetch. Cleared text: restore
+    // the full list immediately (and drop any pending search).
+    if searchText.isEmpty {
+      searchDebouncer.runImmediately(performSearch)
+    } else {
+      searchDebouncer.schedule(performSearch)
+    }
   }
 
   func createPlayShuffleInfoConfig() -> PlayShuffleInfoConfiguration {

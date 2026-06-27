@@ -173,6 +173,8 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     }
     common.reloadListViewCB = {
       self.tableView.reloadData()
+      self.detailHeader?.refresh()
+      self.updateHeaderViewVisibility()
     }
     common.updateSearchResultsCB = {
       self.updateSearchResults(for: self.searchController)
@@ -305,9 +307,8 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
+    // The list refresh now runs inside common's debounced search (via reloadListViewCB),
+    // so it no longer fires (and faults the A-Z section index) on every keystroke.
     common.updateSearchResults(for: self.searchController)
-    tableView.reloadData()
-    detailHeader?.refresh()
-    updateHeaderViewVisibility()
   }
 }

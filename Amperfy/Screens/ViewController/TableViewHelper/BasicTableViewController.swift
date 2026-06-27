@@ -460,3 +460,42 @@ extension BasicTableViewController: UISearchBarDelegate {
 // MARK: UISearchControllerDelegate
 
 extension BasicTableViewController: UISearchControllerDelegate {}
+
+// MARK: - SearchDebouncer
+
+/// Coalesces rapidly-fired search-as-you-type requests so that only the last one
+/// in a burst actually runs, after a short quiet period. Scheduling a new request
+/// cancels the previously pending one, so no orphaned work items pile up. Use
+/// `runImmediately(_:)` for the cleared-text case so the full list reappears
+/// without waiting for the debounce delay.
+@MainActor
+final class SearchDebouncer {
+  private var pendingWorkItem: DispatchWorkItem?
+  private let delay: TimeInterval
+
+  init(delay: TimeInterval = 0.2) {
+    self.delay = delay
+  }
+
+  /// Runs `action` after `delay`, cancelling any pending (not-yet-fired) action.
+  func schedule(_ action: @escaping @MainActor () -> ()) {
+    pendingWorkItem?.cancel()
+    let workItem = DispatchWorkItem {
+      MainActor.assumeIsolated { action() }
+    }
+    pendingWorkItem = workItem
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem)
+  }
+
+  /// Cancels any pending action and runs `action` right away.
+  func runImmediately(_ action: @MainActor () -> ()) {
+    cancel()
+    action()
+  }
+
+  /// Cancels any pending action without running it.
+  func cancel() {
+    pendingWorkItem?.cancel()
+    pendingWorkItem = nil
+  }
+}

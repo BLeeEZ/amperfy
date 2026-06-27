@@ -499,7 +499,20 @@ class SearchVC: BasicTableViewController {
     var songsIDs = [NSManagedObjectID]()
   }
 
+  private let searchDebouncer = SearchDebouncer()
+
   override func updateSearchResults(for searchController: UISearchController) {
+    // Cleared text: show search history immediately. Typing: debounce so we don't
+    // fire network searches + a background fetch + fuzzy match on every keystroke.
+    let searchText = searchController.searchBar.text ?? ""
+    if searchText.isEmpty {
+      searchDebouncer.runImmediately { [weak self] in self?.performSearch(for: searchController) }
+    } else {
+      searchDebouncer.schedule { [weak self] in self?.performSearch(for: searchController) }
+    }
+  }
+
+  private func performSearch(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text, let accountObjectId else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {
