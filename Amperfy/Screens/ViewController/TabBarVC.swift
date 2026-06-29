@@ -132,7 +132,7 @@ class TabBarVC: UITabBarController {
     let accessory = UITabAccessory(contentView: miniPlayer!.glassContainer)
     bottomAccessory = accessory
 
-    heightConstraint = miniPlayer!.glassContainer.heightAnchor.constraint(equalToConstant: 48.0)
+    heightConstraint = miniPlayer!.glassContainer.heightAnchor.constraint(equalToConstant: 72.0)
     heightConstraint?.isActive = true
     compactWidthConstraint = miniPlayer!.glassContainer.widthAnchor
       .constraint(equalTo: miniPlayer!.glassContainer.superview!.widthAnchor)
@@ -187,14 +187,14 @@ class TabBarVC: UITabBarController {
         .constraint(equalToConstant: playerWidth)
       regularWidthConstraint?.isActive = true
       centerConstraint?.isActive = true
-      heightConstraint?.constant = 60.0
+      heightConstraint?.constant = 72.0
     } else if isInline {
-      heightConstraint?.constant = 48.0
+      heightConstraint?.constant = 72.0
       centerConstraint?.isActive = false
       regularWidthConstraint?.isActive = false
       compactWidthConstraint?.isActive = true
     } else {
-      heightConstraint?.constant = 48.0
+      heightConstraint?.constant = 72.0
       centerConstraint?.isActive = false
       regularWidthConstraint?.isActive = false
       compactWidthConstraint?.isActive = true

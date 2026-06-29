@@ -368,9 +368,96 @@ class MiniPlayerView: UIView {
     return button
   }()
 
+  fileprivate lazy var volumeDownButton: UIButton = {
+    var config = UIButton.Configuration.plain()
+    config.image = .volumeMin
+      .withConfiguration(
+        UIImage
+          .SymbolConfiguration(pointSize: PlayerUIHandler.bigButtonImagePointSize)
+      )
+    let button = UIButton(configuration: config)
+    button.tintColor = .secondaryLabel
+    button.addTarget(self, action: #selector(Self.volumeDownButtonPushed), for: .touchUpInside)
+    button.accessibilityLabel = "Decrease volume"
+    return button
+  }()
+
+  fileprivate lazy var volumeUpButton: UIButton = {
+    var config = UIButton.Configuration.plain()
+    config.image = .volumeMax
+      .withConfiguration(
+        UIImage
+          .SymbolConfiguration(pointSize: PlayerUIHandler.bigButtonImagePointSize)
+      )
+    let button = UIButton(configuration: config)
+    button.tintColor = .secondaryLabel
+    button.addTarget(self, action: #selector(Self.volumeUpButtonPushed), for: .touchUpInside)
+    button.accessibilityLabel = "Increase volume"
+    return button
+  }()
+
+  fileprivate lazy var volumeSlider: UISlider = {
+    let slider = UISlider(frame: .zero)
+    slider.preferredBehavioralStyle = .pad
+    slider.minimumValue = 1
+    slider.maximumValue = 100
+    slider.addTarget(self, action: #selector(Self.volumeSliderChanged(_:)), for: .valueChanged)
+    slider.accessibilityLabel = "Volume"
+    return slider
+  }()
+
+  fileprivate lazy var volumeValueLabel: UILabel = {
+    let label = UILabel(frame: .zero)
+    label.font = .monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)
+    label.textAlignment = .right
+    label.textColor = .secondaryLabel
+    return label
+  }()
+
+  public lazy var volumeControlsView: UIStackView = {
+    volumeDownButton.translatesAutoresizingMaskIntoConstraints = false
+    volumeUpButton.translatesAutoresizingMaskIntoConstraints = false
+    volumeSlider.translatesAutoresizingMaskIntoConstraints = false
+    volumeValueLabel.translatesAutoresizingMaskIntoConstraints = false
+
+    NSLayoutConstraint.activate([
+      volumeDownButton.widthAnchor.constraint(equalToConstant: 24),
+      volumeDownButton.heightAnchor.constraint(equalTo: volumeDownButton.widthAnchor),
+      volumeUpButton.widthAnchor.constraint(equalToConstant: 24),
+      volumeUpButton.heightAnchor.constraint(equalTo: volumeUpButton.widthAnchor),
+      volumeValueLabel.widthAnchor.constraint(equalToConstant: 34),
+    ])
+
+    let stack = UIStackView(arrangedSubviews: [
+      volumeDownButton,
+      volumeSlider,
+      volumeValueLabel,
+      volumeUpButton,
+    ])
+    stack.axis = .horizontal
+    stack.alignment = .center
+    stack.spacing = 6
+    return stack
+  }()
+
   @IBAction
   func volumeButtonPushed(_ sender: UIButton) {
     showVolumeSliderMenu()
+  }
+
+  @IBAction
+  func volumeDownButtonPushed(_ sender: UIButton) {
+    adjustVolume(by: -5)
+  }
+
+  @IBAction
+  func volumeUpButtonPushed(_ sender: UIButton) {
+    adjustVolume(by: 5)
+  }
+
+  @IBAction
+  func volumeSliderChanged(_ sender: UISlider) {
+    setPlayerVolume(percent: sender.value)
   }
 
   public lazy var infoView: UIView = {
@@ -646,7 +733,7 @@ class MiniPlayerView: UIView {
     playerHandler = PlayerUIHandler(player: player, style: .miniPlayeriOS)
     let miniPlayerGotTouchedView = UIView()
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(miniPlayerGotTouched))
-    addGestureRecognizer(tapGesture)
+    miniPlayerGotTouchedView.addGestureRecognizer(tapGesture)
 
     miniPlayerGotTouchedView.translatesAutoresizingMaskIntoConstraints = false
     artworkImage.translatesAutoresizingMaskIntoConstraints = false
@@ -654,6 +741,8 @@ class MiniPlayerView: UIView {
     subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
     timeSlider.translatesAutoresizingMaskIntoConstraints = false
     liveLabel.translatesAutoresizingMaskIntoConstraints = false
+    volumeControlsView.translatesAutoresizingMaskIntoConstraints = false
+    previousButton.translatesAutoresizingMaskIntoConstraints = false
     playButton.translatesAutoresizingMaskIntoConstraints = false
     nextButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -663,6 +752,8 @@ class MiniPlayerView: UIView {
     addSubview(subtitleLabel)
     addSubview(timeSlider)
     addSubview(liveLabel)
+    addSubview(volumeControlsView)
+    addSubview(previousButton)
     addSubview(playButton)
     addSubview(nextButton)
 
@@ -671,7 +762,7 @@ class MiniPlayerView: UIView {
       miniPlayerGotTouchedView.heightAnchor.constraint(equalTo: heightAnchor),
       miniPlayerGotTouchedView.bottomAnchor.constraint(equalTo: bottomAnchor),
       miniPlayerGotTouchedView.trailingAnchor.constraint(
-        equalTo: playButton.leadingAnchor,
+        equalTo: previousButton.leadingAnchor,
         constant: -8
       ),
 
@@ -686,19 +777,32 @@ class MiniPlayerView: UIView {
       liveLabel.heightAnchor.constraint(equalTo: liveLabel.widthAnchor),
 
       artworkImage.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-      artworkImage.bottomAnchor.constraint(equalTo: timeSlider.topAnchor, constant: -8),
+      artworkImage.bottomAnchor.constraint(equalTo: volumeControlsView.topAnchor, constant: -4),
       artworkImage.widthAnchor.constraint(equalTo: artworkImage.heightAnchor),
       artworkImage.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
 
       titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
       titleLabel.bottomAnchor.constraint(equalTo: playButton.centerYAnchor),
       titleLabel.leadingAnchor.constraint(equalTo: artworkImage.trailingAnchor, constant: 8),
-      titleLabel.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -8),
+      titleLabel.trailingAnchor.constraint(equalTo: previousButton.leadingAnchor, constant: -8),
 
       subtitleLabel.topAnchor.constraint(equalTo: playButton.centerYAnchor, constant: 0),
-      subtitleLabel.bottomAnchor.constraint(equalTo: timeSlider.topAnchor, constant: -8),
+      subtitleLabel.bottomAnchor.constraint(equalTo: volumeControlsView.topAnchor, constant: -4),
       subtitleLabel.leadingAnchor.constraint(equalTo: artworkImage.trailingAnchor, constant: 8),
-      subtitleLabel.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -8),
+      subtitleLabel.trailingAnchor.constraint(equalTo: previousButton.leadingAnchor, constant: -8),
+
+      volumeControlsView.leadingAnchor.constraint(
+        equalTo: artworkImage.trailingAnchor,
+        constant: 8
+      ),
+      volumeControlsView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+      volumeControlsView.bottomAnchor.constraint(equalTo: timeSlider.topAnchor, constant: -4),
+      volumeControlsView.heightAnchor.constraint(equalToConstant: 24),
+
+      previousButton.centerYAnchor.constraint(equalTo: artworkImage.centerYAnchor, constant: 0),
+      previousButton.widthAnchor.constraint(equalToConstant: 30),
+      previousButton.heightAnchor.constraint(equalTo: previousButton.widthAnchor),
+      previousButton.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -5),
 
       playButton.centerYAnchor.constraint(equalTo: artworkImage.centerYAnchor, constant: 0),
       playButton.widthAnchor.constraint(equalToConstant: 30),
@@ -875,6 +979,7 @@ class MiniPlayerView: UIView {
     )
     refreshMoreButton()
     refreshTrailingButtons()
+    refreshVolumeControls()
   }
 
   required init?(coder: NSCoder) {
@@ -927,6 +1032,30 @@ class MiniPlayerView: UIView {
         completion: nil
       )
     }
+  }
+
+  private func adjustVolume(by percentDelta: Float) {
+    setPlayerVolume(percent: currentVolumePercent + percentDelta)
+  }
+
+  private var currentVolumePercent: Float {
+    min(max(appDelegate.player.volume * 100, 1), 100)
+  }
+
+  private func setPlayerVolume(percent: Float) {
+    let clampedPercent = min(max(percent, 1), 100)
+    appDelegate.player.volume = clampedPercent / 100.0
+    refreshVolumeControls()
+  }
+
+  private func refreshVolumeControls() {
+    let level = Int(currentVolumePercent.rounded())
+    if !volumeSlider.isTracking {
+      volumeSlider.value = Float(level)
+    }
+    volumeValueLabel.text = "\(level)"
+    volumeDownButton.isEnabled = level > 1
+    volumeUpButton.isEnabled = level < 100
   }
 }
 
