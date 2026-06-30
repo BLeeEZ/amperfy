@@ -170,6 +170,11 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
   fileprivate var common: AlbumsCommonVCInteractions
 
   private var previousSize: CGSize = .zero
+  private var cachedItemSize: CGSize?
+
+  func invalidateItemSizeCache() {
+    cachedItemSize = nil
+  }
 
   public var displayFilter: DisplayCategoryFilter {
     set { common.displayFilter = newValue }
@@ -281,6 +286,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    invalidateItemSizeCache()
     extendSafeAreaToAccountForMiniPlayer()
     common.updateRightBarButtonItems()
     common.updateFromRemote()
@@ -346,8 +352,15 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     let currentSize = view.bounds.size
     if currentSize != previousSize {
       previousSize = currentSize
+      cachedItemSize = nil
       collectionView.collectionViewLayout.invalidateLayout()
     }
+  }
+
+  override func viewSafeAreaInsetsDidChange() {
+    super.viewSafeAreaInsetsDidChange()
+    cachedItemSize = nil
+    collectionView.collectionViewLayout.invalidateLayout()
   }
 }
 
@@ -363,22 +376,28 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
     sizeForItemAt indexPath: IndexPath
   )
     -> CGSize {
+    if let cachedItemSize {
+      return cachedItemSize
+    }
     let inset = self.collectionView(
       collectionView,
       layout: collectionViewLayout,
       insetForSectionAt: indexPath.section
     )
 
+    let gridSize = appDelegate.storage.settings.user.albumsGridSizeSetting
     let marginsAndInsets = inset.left + inset.right + collectionView.safeAreaInsets
       .left + collectionView.safeAreaInsets.right + Self
       .minimumInteritemSpacing *
-      CGFloat(appDelegate.storage.settings.user.albumsGridSizeSetting - 1)
+      CGFloat(gridSize - 1)
     let itemWidth =
       (
         (collectionView.bounds.size.width - marginsAndInsets) /
-          CGFloat(appDelegate.storage.settings.user.albumsGridSizeSetting)
+          CGFloat(gridSize)
       ).rounded(.down)
-    return CGSize(width: itemWidth, height: itemWidth + 45)
+    let itemSize = CGSize(width: itemWidth, height: itemWidth + 45)
+    cachedItemSize = itemSize
+    return itemSize
   }
 
   func collectionView(

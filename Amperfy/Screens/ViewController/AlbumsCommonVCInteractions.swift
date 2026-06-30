@@ -391,6 +391,7 @@ class AlbumsCommonVCInteractions {
       if newIntValue != self.appDelegate.storage.settings.user.albumsGridSizeSetting {
         self.appDelegate.storage.settings.user.albumsGridSizeSetting = newIntValue
         if let collectionVC = rootVC as? AlbumsCollectionVC {
+          collectionVC.invalidateItemSizeCache()
           collectionVC.collectionView.reloadData()
         }
       }
