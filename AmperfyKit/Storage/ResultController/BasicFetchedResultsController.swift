@@ -465,6 +465,9 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
   where ResultType: NSFetchRequestResult {
   let account: Account
   var keepAllResultsUpdated = true
+  private var didFetchAll = false
+  private var didFetchSearch = false
+  private var lastSearchPredicateFormat: String?
   private let allFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
   private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
   private var sectionIndexType: SectionIndexType
@@ -522,6 +525,14 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
 
   override public func search(predicate: NSPredicate?) {
     isSearchActive = true
+    let predicateFormat = predicate?.predicateFormat
+    if didFetchSearch,
+       lastSearchPredicateFormat == predicateFormat,
+       searchFetchResulsController.fetchedObjects != nil {
+      return
+    }
+    didFetchSearch = true
+    lastSearchPredicateFormat = predicateFormat
     searchFetchResulsController.fetchRequest.predicate = predicate
     searchFetchResulsController.fetch()
   }
@@ -531,7 +542,17 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
   }
 
   override public func fetch() {
+    let wasSearchActive = isSearchActive
     isSearchActive = false
+    didFetchSearch = false
+    lastSearchPredicateFormat = nil
+    if !wasSearchActive,
+       didFetchAll,
+       keepAllResultsUpdated,
+       allFetchResulsController.fetchedObjects != nil {
+      return
+    }
+    didFetchAll = true
     allFetchResulsController.fetch()
   }
 
@@ -541,6 +562,8 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
 
   override public func clearResults() {
     isSearchActive = true
+    didFetchSearch = false
+    lastSearchPredicateFormat = nil
     searchFetchResulsController.clearResults()
   }
 
@@ -559,6 +582,8 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
 
   public func hideResults() {
     isSearchActive = true
+    didFetchSearch = false
+    lastSearchPredicateFormat = nil
     searchFetchResulsController.fetchRequest.predicate = NSPredicate(format: "id == nil")
     searchFetchResulsController.fetch()
   }
