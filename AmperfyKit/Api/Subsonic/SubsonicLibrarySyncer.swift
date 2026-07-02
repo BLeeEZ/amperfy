@@ -27,6 +27,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private let subsonicServerApi: SubsonicServerApi
 
   private static let maxItemCountToPollAtOnce: Int = 500
+  private static let maxParallelSyncRequests: Int = 4
+  private static let albumCheckpointSaveInterval: Int = 5
 
   init(
     subsonicServerApi: SubsonicServerApi,
@@ -48,7 +50,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func syncInitial(statusNotifyier: SyncCallbacks?) async throws {
-    try await super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
+    let resumeAlbumBatches = storage.settings.accounts.getSetting(accountInfo).read
+      .initialSyncCompletedAlbumBatches
+    if resumeAlbumBatches == nil {
+      try await super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
+    }
 
     statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: 0)
     let genreResponse = try await subsonicServerApi.requestGenres()
@@ -119,14 +125,30 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         Int(ceil(Double(albumCount) / Double(Self.maxItemCountToPollAtOnce)))
       )
     }
-    statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: pollCountArtist)
-    try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-      for index in Array(0 ... pollCountArtist) {
-        taskGroup.addTask { @MainActor @Sendable in
-          let albumsResponse = try await self.subsonicServerApi.requestAlbums(
-            offset: index * Self.maxItemCountToPollAtOnce,
-            count: Self.maxItemCountToPollAtOnce
-          )
+    var completedAlbumBatches = resumeAlbumBatches ?? Set<Int>()
+    if storage.settings.accounts.getSetting(accountInfo).read
+      .initialSyncAlbumPollCount != pollCountArtist {
+      completedAlbumBatches = Set<Int>()
+    }
+    let remainingAlbumBatches = Array(0 ... pollCountArtist)
+      .filter { !completedAlbumBatches.contains($0) }
+    statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: remainingAlbumBatches.count)
+
+    var albumBatchIterator = remainingAlbumBatches.makeIterator()
+    var albumBatchesSinceCheckpoint = 0
+    do {
+      try await withThrowingTaskGroup(of: (Int, APIDataResponse).self) { taskGroup in
+        for _ in 0 ..< Self.maxParallelSyncRequests {
+          guard let batchIndex = albumBatchIterator.next() else { break }
+          taskGroup.addTask { @MainActor @Sendable in
+            let response = try await self.subsonicServerApi.requestAlbums(
+              offset: batchIndex * Self.maxItemCountToPollAtOnce,
+              count: Self.maxItemCountToPollAtOnce
+            )
+            return (batchIndex, response)
+          }
+        }
+        while let (batchIndex, albumsResponse) = try await taskGroup.next() {
           try await self.storage.async.perform { asyncCompanion in
             let accountAsync = Account(
               managedObject: asyncCompanion.context
@@ -147,17 +169,43 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
               library: asyncCompanion.library,
               parseNotifier: statusNotifyier
             )
-            parserDelegate.prefetch = prefetch
             try self.parse(
               response: albumsResponse,
               delegate: parserDelegate,
               isThrowingErrorsAllowed: false
             )
           }
+          completedAlbumBatches.insert(batchIndex)
           statusNotifyier?.notifyParsedObject(ofType: .album)
+
+          albumBatchesSinceCheckpoint += 1
+          if albumBatchesSinceCheckpoint >= Self.albumCheckpointSaveInterval {
+            albumBatchesSinceCheckpoint = 0
+            let checkpoint = completedAlbumBatches
+            self.storage.settings.accounts.updateSetting(self.accountInfo) {
+              $0.initialSyncCompletedAlbumBatches = checkpoint
+              $0.initialSyncAlbumPollCount = pollCountArtist
+            }
+          }
+
+          if let nextBatchIndex = albumBatchIterator.next() {
+            taskGroup.addTask { @MainActor @Sendable in
+              let response = try await self.subsonicServerApi.requestAlbums(
+                offset: nextBatchIndex * Self.maxItemCountToPollAtOnce,
+                count: Self.maxItemCountToPollAtOnce
+              )
+              return (nextBatchIndex, response)
+            }
+          }
         }
       }
-      try await taskGroup.waitForAll()
+    } catch {
+      let checkpoint = completedAlbumBatches
+      storage.settings.accounts.updateSetting(accountInfo) {
+        $0.initialSyncCompletedAlbumBatches = checkpoint
+        $0.initialSyncAlbumPollCount = pollCountArtist
+      }
+      throw error
     }
 
     try await storage.async.perform { asyncCompanion in
@@ -212,7 +260,13 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
 
     let isSupported = try await subsonicServerApi.requestServerPodcastSupport()
-    guard isSupported else { return }
+    guard isSupported else {
+      storage.settings.accounts.updateSetting(accountInfo) {
+        $0.initialSyncCompletedAlbumBatches = nil
+        $0.initialSyncAlbumPollCount = nil
+      }
+      return
+    }
     statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
     let podcastsResponse = try await subsonicServerApi.requestPodcasts()
     try await storage.async.perform { asyncCompanion in
@@ -242,6 +296,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         isThrowingErrorsAllowed: false
       )
       parserDelegate.performPostParseOperations()
+    }
+    storage.settings.accounts.updateSetting(accountInfo) {
+      $0.initialSyncCompletedAlbumBatches = nil
+      $0.initialSyncAlbumPollCount = nil
     }
   }
 
