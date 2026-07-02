@@ -65,6 +65,14 @@ extension LibrarySyncerProxy: LibrarySyncer {
   }
 
   @MainActor
+  func syncSongsInBackground(
+    targets: [AlbumSyncTarget],
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async {
+    await activeSyncer.syncSongsInBackground(targets: targets, isCancelled: isCancelled)
+  }
+
+  @MainActor
   func sync(song: Song) async throws {
     try await activeSyncer.sync(song: song)
   }
