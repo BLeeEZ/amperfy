@@ -109,6 +109,7 @@ class BasicTableViewController: KeyCommandTableViewController {
   ]
 
   let searchController = UISearchController(searchResultsController: nil)
+  private let searchResultsUpdaterProxy = DebouncedSearchResultsUpdater()
 
   var swipeDisplaySettings = SwipeDisplaySettings()
   var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
@@ -214,7 +215,8 @@ class BasicTableViewController: KeyCommandTableViewController {
     placeholder: String?,
     scopeButtonTitles: [String]? = nil
   ) {
-    searchController.searchResultsUpdater = self
+    searchResultsUpdaterProxy.target = self
+    searchController.searchResultsUpdater = searchResultsUpdaterProxy
     searchController.searchBar.autocapitalizationType = .none
     #if !targetEnvironment(macCatalyst)
       // On mac catalyist scopeButtonTitle together with fullscreen will trigger the following exception:

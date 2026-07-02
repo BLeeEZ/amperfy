@@ -499,18 +499,7 @@ class SearchVC: BasicTableViewController {
     var songsIDs = [NSManagedObjectID]()
   }
 
-  private let searchDebouncer = SearchDebouncer()
-
   override func updateSearchResults(for searchController: UISearchController) {
-    let searchText = searchController.searchBar.text ?? ""
-    if searchText.isEmpty {
-      searchDebouncer.runImmediately { [weak self] in self?.performSearch(for: searchController) }
-    } else {
-      searchDebouncer.schedule { [weak self] in self?.performSearch(for: searchController) }
-    }
-  }
-
-  private func performSearch(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text, let accountObjectId else { return }
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
       Task { @MainActor in do {

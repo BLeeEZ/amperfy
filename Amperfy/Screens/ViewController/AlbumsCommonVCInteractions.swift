@@ -531,34 +531,22 @@ class AlbumsCommonVCInteractions {
     )
   }
 
-  private let searchDebouncer = SearchDebouncer()
-
   func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
-    let scopeIndex = searchController.searchBar.selectedScopeButtonIndex
-    let performSearch: @MainActor () -> () = { [weak self] in
-      guard let self else { return }
-      if !searchText.isEmpty, scopeIndex == 0 {
-        Task { @MainActor in do {
-          try await self.appDelegate.getMeta(self.account.info).librarySyncer
-            .searchAlbums(searchText: searchText)
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
-        }}
-      }
-      fetchedResultsController.search(
-        searchText: searchText,
-        onlyCached: scopeIndex == 1,
-        displayFilter: displayFilter
-      )
-      reloadListViewCB?()
-      updateContentUnavailable()
+    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+      Task { @MainActor in do {
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
+          .searchAlbums(searchText: searchText)
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Albums Search", error: error)
+      }}
     }
-    if searchText.isEmpty {
-      searchDebouncer.runImmediately(performSearch)
-    } else {
-      searchDebouncer.schedule(performSearch)
-    }
+    fetchedResultsController.search(
+      searchText: searchText,
+      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
+      displayFilter: displayFilter
+    )
+    updateContentUnavailable()
   }
 
   func createPlayShuffleInfoConfig() -> PlayShuffleInfoConfiguration {

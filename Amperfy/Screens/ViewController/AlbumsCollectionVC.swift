@@ -336,6 +336,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
 
   override func updateSearchResults(for searchController: UISearchController) {
     common.updateSearchResults(for: searchController)
+    collectionView.reloadData()
   }
 
   override func viewDidLayoutSubviews() {

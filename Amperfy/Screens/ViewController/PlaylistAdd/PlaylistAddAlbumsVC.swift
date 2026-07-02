@@ -161,5 +161,6 @@ class PlaylistAddAlbumsVC: SingleSnapshotFetchedResultsTableViewController<Album
 
   override func updateSearchResults(for searchController: UISearchController) {
     common.updateSearchResults(for: self.searchController)
+    tableView.reloadData()
   }
 }

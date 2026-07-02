@@ -27,6 +27,7 @@ import UIKit
 
 class BasicCollectionViewController: UICollectionViewController {
   let searchController = UISearchController(searchResultsController: nil)
+  private let searchResultsUpdaterProxy = DebouncedSearchResultsUpdater()
 
   var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
   var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
@@ -56,7 +57,8 @@ class BasicCollectionViewController: UICollectionViewController {
     placeholder: String?,
     scopeButtonTitles: [String]? = nil
   ) {
-    searchController.searchResultsUpdater = self
+    searchResultsUpdaterProxy.target = self
+    searchController.searchResultsUpdater = searchResultsUpdaterProxy
     searchController.searchBar.autocapitalizationType = .none
     #if !targetEnvironment(macCatalyst)
       // On mac catalyist scopeButtonTitle together with fullscreen will trigger the following exception:

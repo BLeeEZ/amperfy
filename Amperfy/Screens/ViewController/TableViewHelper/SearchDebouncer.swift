@@ -20,6 +20,30 @@
 //
 
 import Foundation
+import UIKit
+
+// MARK: - DebouncedSearchResultsUpdater
+
+@MainActor
+final class DebouncedSearchResultsUpdater: NSObject, UISearchResultsUpdating {
+  weak var target: UISearchResultsUpdating?
+  private let debouncer = SearchDebouncer()
+
+  func updateSearchResults(for searchController: UISearchController) {
+    let searchText = searchController.searchBar.text ?? ""
+    if searchText.isEmpty {
+      debouncer.runImmediately {
+        target?.updateSearchResults(for: searchController)
+      }
+    } else {
+      debouncer.schedule { [weak self] in
+        self?.target?.updateSearchResults(for: searchController)
+      }
+    }
+  }
+}
+
+// MARK: - SearchDebouncer
 
 @MainActor
 final class SearchDebouncer {

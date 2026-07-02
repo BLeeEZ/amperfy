@@ -182,32 +182,21 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
     navigationController?.pushViewController(nextVC, animated: true)
   }
 
-  private let searchDebouncer = SearchDebouncer()
-
   override func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
-    let scopeIndex = searchController.searchBar.selectedScopeButtonIndex
-    let performSearch: @MainActor () -> () = { [weak self] in
-      guard let self else { return }
-      fetchedResultsController.search(
-        searchText: searchText,
-        onlyCached: scopeIndex == 1,
-        displayFilter: displayFilter
-      )
-      tableView.reloadData()
-      if !searchText.isEmpty, scopeIndex == 0 {
-        Task { @MainActor in do {
-          try await self.appDelegate.getMeta(self.account.info).librarySyncer
-            .searchArtists(searchText: searchText)
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
-        }}
-      }
-    }
-    if searchText.isEmpty {
-      searchDebouncer.runImmediately(performSearch)
-    } else {
-      searchDebouncer.schedule(performSearch)
+    fetchedResultsController.search(
+      searchText: searchText,
+      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
+      displayFilter: displayFilter
+    )
+    tableView.reloadData()
+    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+      Task { @MainActor in do {
+        try await self.appDelegate.getMeta(account.info).librarySyncer
+          .searchArtists(searchText: searchText)
+      } catch {
+        self.appDelegate.eventLogger.report(topic: "Artists Search", error: error)
+      }}
     }
   }
 }
