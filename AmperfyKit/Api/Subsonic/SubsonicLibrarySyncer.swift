@@ -29,6 +29,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private static let maxItemCountToPollAtOnce: Int = 500
   private static let maxParallelSyncRequests: Int = 4
   private static let albumCheckpointSaveInterval: Int = 5
+  private static let songSyncBatchSize: Int = 16
 
   init(
     subsonicServerApi: SubsonicServerApi,
@@ -426,67 +427,86 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     do {
       try await storage.async.perform { asyncCompanion in
-        let accountAsync = Account(
-          managedObject: asyncCompanion.context
-            .object(with: self.accountObjectId) as! AccountMO
+        try self.writeAlbumSongs(
+          asyncCompanion: asyncCompanion,
+          albumObjectId: albumObjectId,
+          response: albumResponse
         )
-        let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
-        try self.parse(
-          response: albumResponse,
-          delegate: idParserDelegate,
-          isThrowingErrorsAllowed: false
-        )
-        let prefetch = asyncCompanion.library.getElements(
-          account: accountAsync,
-          prefetchIDs: idParserDelegate.prefetchIDs
-        )
-
-        let parserDelegate = SsAlbumParserDelegate(
-          performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
-          library: asyncCompanion.library
-        )
-        try self.parse(response: albumResponse, delegate: parserDelegate)
       }
     } catch {
       try await handleNotAvailableAlbum(error: error)
     }
+  }
 
-    guard album.remoteStatus == .available else { return }
-    try await storage.async.perform { asyncCompanion in
-      let albumAsync = Album(
-        managedObject: asyncCompanion.context
-          .object(with: albumObjectId) as! AlbumMO
-      )
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
-      let oldSongs = Set(albumAsync.songs)
-
-      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
-      try self.parse(
-        response: albumResponse,
-        delegate: idParserDelegate,
-        isThrowingErrorsAllowed: false
-      )
-      let prefetch = asyncCompanion.library.getElements(
-        account: accountAsync,
-        prefetchIDs: idParserDelegate.prefetchIDs
-      )
-      let parserDelegate = SsSongParserDelegate(
-        performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
-        library: asyncCompanion.library
-      )
-      try self.parse(response: albumResponse, delegate: parserDelegate)
-      let removedSongs = oldSongs.subtracting(parserDelegate.parsedSongs)
-      removedSongs.lazy.compactMap { $0.asSong }.forEach {
-        os_log("Song <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
-        $0.remoteStatus = .deleted
-        albumAsync.managedObject.removeFromSongs($0.managedObject)
+  @MainActor
+  func syncSongsInBackground(
+    targets: [AlbumSyncTarget],
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async {
+    guard isSyncAllowed else { return }
+    await syncAlbumSongsBatched(
+      targets: targets,
+      batchSize: Self.songSyncBatchSize,
+      maxParallelFetches: Self.maxParallelSyncRequests,
+      isCancelled: isCancelled,
+      fetch: { albumId in
+        try await self.subsonicServerApi.requestAlbum(id: albumId)
+      },
+      write: { asyncCompanion, albumObjectId, response in
+        try self.writeAlbumSongs(
+          asyncCompanion: asyncCompanion,
+          albumObjectId: albumObjectId,
+          response: response
+        )
+      },
+      classifyNotAvailable: { error in
+        guard let responseError = error as? ResponseError,
+              let subsonicError = responseError.asSubsonicError else { return false }
+        return !subsonicError.isRemoteAvailable
       }
-      albumAsync.isCached = parserDelegate.isCollectionCached
-      albumAsync.isSongsMetaDataSynced = true
+    )
+  }
+
+  nonisolated private func writeAlbumSongs(
+    asyncCompanion: CoreDataCompanion,
+    albumObjectId: NSManagedObjectID,
+    response: APIDataResponse
+  ) throws {
+    let accountAsync = Account(
+      managedObject: asyncCompanion.context.object(with: accountObjectId) as! AccountMO
+    )
+    let albumAsync = Album(
+      managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO
+    )
+    let oldSongs = Set(albumAsync.songs)
+
+    let idParserDelegate = SsIDsParserDelegate(performanceMonitor: performanceMonitor)
+    try parse(response: response, delegate: idParserDelegate, isThrowingErrorsAllowed: false)
+    let prefetch = asyncCompanion.library.getElements(
+      account: accountAsync,
+      prefetchIDs: idParserDelegate.prefetchIDs
+    )
+
+    let albumParserDelegate = SsAlbumParserDelegate(
+      performanceMonitor: performanceMonitor, prefetch: prefetch, account: accountAsync,
+      library: asyncCompanion.library
+    )
+    try parse(response: response, delegate: albumParserDelegate)
+
+    let songParserDelegate = SsSongParserDelegate(
+      performanceMonitor: performanceMonitor, prefetch: prefetch, account: accountAsync,
+      library: asyncCompanion.library
+    )
+    try parse(response: response, delegate: songParserDelegate)
+
+    let removedSongs = oldSongs.subtracting(songParserDelegate.parsedSongs)
+    removedSongs.lazy.compactMap { $0.asSong }.forEach {
+      os_log("Song <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
+      $0.remoteStatus = .deleted
+      albumAsync.managedObject.removeFromSongs($0.managedObject)
     }
+    albumAsync.isCached = songParserDelegate.isCollectionCached
+    albumAsync.isSongsMetaDataSynced = true
   }
 
   @MainActor

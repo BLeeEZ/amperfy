@@ -257,7 +257,6 @@ public class MetaManager {
     )
     return BackgroundLibrarySyncer(
       storage: storage.async,
-      mainStorage: storage.main,
       settings: storage.settings,
       networkMonitor: networkMonitor,
       librarySyncer: librarySyncer,
@@ -281,7 +280,7 @@ public class MetaManager {
     os_log("Start background manager after sync", log: self.log, type: .info)
     playableDownloadManager.start()
     artworkDownloadManager.start()
-    backgroundLibrarySyncer.start()
+    startBackgroundLibrarySyncerIfNoResumePending()
     let scrobbler = createScrobbleSyncer(player: player)
     player.addNotifier(notifier: scrobbler)
   }
@@ -291,10 +290,18 @@ public class MetaManager {
     duplicateEntitiesResolver.start()
     artworkDownloadManager.start()
     playableDownloadManager.start()
-    backgroundLibrarySyncer.start()
+    startBackgroundLibrarySyncerIfNoResumePending()
     let scrobbler = createScrobbleSyncer(player: player)
     player.addNotifier(notifier: scrobbler)
     scrobbler.start()
+  }
+
+  private func startBackgroundLibrarySyncerIfNoResumePending() {
+    let accountSetting = storage.settings.accounts.getSetting(account.info).read
+    let isInitialSyncResumable = accountSetting.initialSyncCompletionStatus == .aborted
+      && accountSetting.initialSyncCompletedAlbumBatches != nil
+    guard !isInitialSyncResumable else { return }
+    backgroundLibrarySyncer.start()
   }
 
   public func stopManager() {

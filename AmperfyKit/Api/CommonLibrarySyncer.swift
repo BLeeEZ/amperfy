@@ -23,6 +23,8 @@ import CoreData
 import Foundation
 import os.log
 
+// MARK: - CommonLibrarySyncer
+
 @MainActor
 class CommonLibrarySyncer {
   let account: Account
@@ -139,4 +141,82 @@ class CommonLibrarySyncer {
       }
     }
   }
+
+  @MainActor
+  func syncAlbumSongsBatched<Payload: Sendable>(
+    targets: [AlbumSyncTarget],
+    batchSize: Int,
+    maxParallelFetches: Int,
+    isCancelled: @escaping @Sendable () -> Bool,
+    fetch: @escaping @MainActor @Sendable (String) async throws -> Payload,
+    write: @escaping @Sendable (CoreDataCompanion, NSManagedObjectID, Payload) throws -> (),
+    classifyNotAvailable: @escaping @Sendable (Error) -> Bool
+  ) async {
+    var index = 0
+    while index < targets.count {
+      guard !isCancelled() else { return }
+      let batch = Array(targets[index ..< min(index + batchSize, targets.count)])
+      index += batchSize
+
+      var results = [(NSManagedObjectID, AlbumSongsFetchResult<Payload>)]()
+      var iterator = batch.makeIterator()
+      await withTaskGroup(of: (NSManagedObjectID, AlbumSongsFetchResult<Payload>).self) { group in
+        for _ in 0 ..< maxParallelFetches {
+          guard let target = iterator.next() else { break }
+          group.addTask { @MainActor @Sendable in
+            do {
+              return (target.objectID, .fetched(try await fetch(target.id)))
+            } catch {
+              return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
+            }
+          }
+        }
+        while let result = await group.next() {
+          results.append(result)
+          guard let target = iterator.next() else { continue }
+          group.addTask { @MainActor @Sendable in
+            do {
+              return (target.objectID, .fetched(try await fetch(target.id)))
+            } catch {
+              return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
+            }
+          }
+        }
+      }
+
+      let batchResults = results
+      guard !isCancelled() else { return }
+      try? await storage.async.perform { asyncCompanion in
+        for (objectID, result) in batchResults {
+          guard let albumMO = try? asyncCompanion.context.existingObject(with: objectID) as? AlbumMO
+          else { continue }
+          let albumAsync = Album(managedObject: albumMO)
+          switch result {
+          case let .fetched(payload):
+            do {
+              try write(asyncCompanion, objectID, payload)
+            } catch {
+              if classifyNotAvailable(error) {
+                albumAsync.markAsRemoteDeleted()
+              } else {
+                albumAsync.isSongsMetaDataSynced = true
+              }
+            }
+          case .notAvailable:
+            albumAsync.markAsRemoteDeleted()
+          case .failed:
+            albumAsync.isSongsMetaDataSynced = true
+          }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - AlbumSongsFetchResult
+
+enum AlbumSongsFetchResult<Payload: Sendable>: Sendable {
+  case fetched(Payload)
+  case notAvailable
+  case failed
 }
