@@ -334,6 +334,18 @@ public struct AccountSetting: Sendable, Codable {
     set { _homeSections = newValue }
   }
 
+  private var _initialSyncCompletedAlbumBatches: Set<Int>? = nil
+  public var initialSyncCompletedAlbumBatches: Set<Int>? {
+    get { _initialSyncCompletedAlbumBatches }
+    set { _initialSyncCompletedAlbumBatches = newValue }
+  }
+
+  private var _initialSyncAlbumPollCount: Int? = nil
+  public var initialSyncAlbumPollCount: Int? {
+    get { _initialSyncAlbumPollCount }
+    set { _initialSyncAlbumPollCount = newValue }
+  }
+
   private var _initialSyncCompletionStatus: SyncCompletionStatus = .defaultValue
   public var initialSyncCompletionStatus: SyncCompletionStatus {
     get { _initialSyncCompletionStatus }

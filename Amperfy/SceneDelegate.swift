@@ -109,7 +109,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     #endif
     if let activeAccountInfo = AmperKit.shared.storage.settings.accounts.active {
       let account = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
-      if !AmperKit.shared.storage.settings.app.isLibrarySynced {
+      let accountSetting = AmperKit.shared.storage.settings.accounts.getSetting(activeAccountInfo)
+        .read
+      let isInitialSyncResumable = accountSetting.initialSyncCompletionStatus == .aborted
+        && accountSetting.initialSyncCompletedAlbumBatches != nil
+      if !AmperKit.shared.storage.settings.app.isLibrarySynced || isInitialSyncResumable {
         initialViewController = AppStoryboard.Main.segueToSync(account: account)
       } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
         initialViewController = AppStoryboard.Main.segueToUpdate()

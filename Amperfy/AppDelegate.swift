@@ -281,7 +281,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         .asColor
     )
 
-    guard AmperKit.shared.storage.settings.app.isLibrarySynced else {
+    let accountSetting = storage.settings.accounts.getSetting(activeAccountInfo).read
+    let isInitialSyncResumable = accountSetting.initialSyncCompletionStatus == .aborted
+      && accountSetting.initialSyncCompletedAlbumBatches != nil
+    guard AmperKit.shared.storage.settings.app.isLibrarySynced, !isInitialSyncResumable else {
       return true
     }
 

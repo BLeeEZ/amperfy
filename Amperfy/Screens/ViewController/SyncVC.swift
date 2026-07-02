@@ -58,7 +58,21 @@ class SyncVC: UIViewController {
       if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
         self.appDelegate.storage.settings.app.isLibrarySynced = false
       }
-      self.appDelegate.storage.main.library.cleanStorageOfObsoleteAccountEntries(account: account)
+      let accountSettings = self.appDelegate.storage.settings.accounts.getSetting(account.info)
+        .read
+      let isResumingSync = accountSettings.initialSyncCompletionStatus == .aborted
+        && accountSettings.initialSyncCompletedAlbumBatches != nil
+      if !isResumingSync {
+        self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
+          accountSettings.initialSyncCompletedAlbumBatches = nil
+          accountSettings.initialSyncAlbumPollCount = nil
+        }
+        self.appDelegate.storage.main.library
+          .cleanStorageOfObsoleteAccountEntries(account: account)
+      }
+      self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
+        accountSettings.initialSyncCompletionStatus = .aborted
+      }
 
       do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
@@ -66,6 +80,7 @@ class SyncVC: UIViewController {
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .completed
         }
+        self.finishSync()
       } catch {
         guard !self.syncFinished else { return }
         self.appDelegate.eventLogger.report(
@@ -76,8 +91,8 @@ class SyncVC: UIViewController {
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .aborted
         }
+        self.finishSync()
       }
-      self.finishSync()
     }
   }
 
@@ -127,6 +142,8 @@ class SyncVC: UIViewController {
       self.appDelegate.storage.settings.accounts
         .updateSetting(self.account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .skipped
+          accountSettings.initialSyncCompletedAlbumBatches = nil
+          accountSettings.initialSyncAlbumPollCount = nil
         }
       self.finishSync()
     })
