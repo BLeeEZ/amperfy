@@ -2328,7 +2328,7 @@ public class LibraryStorage: PlayableFileCachable {
     let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
       getFetchPredicate(forAccount: account),
       SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-      SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+      SongMO.getTitleAndArtistSearchPredicate(searchText: searchText),
       getFetchPredicate(onlyCachedSongs: onlyCached),
       getFetchPredicate(songsDisplayFilter: displayFilter),
     ])

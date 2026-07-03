@@ -33,16 +33,18 @@ public struct MatchResult {
 public class FuzzySearcher {
   public static func findBestMatch(
     in items: [PlayableContainable],
-    search: String
+    search: String,
+    isTokenized: Bool = false,
+    searchableText: (PlayableContainable) -> String = { $0.name }
   )
     -> [PlayableContainable] {
-    let fuse = Fuse()
+    let fuse = Fuse(tokenize: isTokenized)
     // Improve performance by creating the pattern once
     let pattern = fuse.createPattern(from: search)
 
     var matches = [MatchResult]()
     items.forEach {
-      let result = fuse.search(pattern, in: $0.name)
+      let result = fuse.search(pattern, in: searchableText($0))
       if let result = result {
         matches.append(MatchResult(item: $0, score: result.score))
       }

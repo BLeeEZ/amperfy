@@ -566,10 +566,15 @@ class SearchVC: BasicTableViewController {
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Playlist }
               .compactMap { $0.managedObject.objectID }
-            result.songsIDs = FuzzySearcher.findBestMatch(in: songs, search: searchText)
-              .prefix(upToAsArray: Self.categoryItemLimit)
-              .compactMap { $0 as? Song }
-              .compactMap { $0.managedObject.objectID }
+            result.songsIDs = FuzzySearcher.findBestMatch(
+              in: songs,
+              search: searchText,
+              isTokenized: true,
+              searchableText: { "\($0.name) \(($0 as? Song)?.creatorName ?? "")" }
+            )
+            .prefix(upToAsArray: Self.categoryItemLimit)
+            .compactMap { $0 as? Song }
+            .compactMap { $0.managedObject.objectID }
             return result
           }
 
@@ -637,10 +642,15 @@ class SearchVC: BasicTableViewController {
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Playlist }
               .compactMap { $0.managedObject.objectID }
-            result.songsIDs = FuzzySearcher.findBestMatch(in: songs, search: searchText)
-              .prefix(upToAsArray: Self.categoryItemLimit)
-              .compactMap { $0 as? Song }
-              .compactMap { $0.managedObject.objectID }
+            result.songsIDs = FuzzySearcher.findBestMatch(
+              in: songs,
+              search: searchText,
+              isTokenized: true,
+              searchableText: { "\($0.name) \(($0 as? Song)?.creatorName ?? "")" }
+            )
+            .prefix(upToAsArray: Self.categoryItemLimit)
+            .compactMap { $0 as? Song }
+            .compactMap { $0.managedObject.objectID }
             return result
           }
 
