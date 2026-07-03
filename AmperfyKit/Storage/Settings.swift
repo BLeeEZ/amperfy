@@ -340,16 +340,20 @@ public struct AccountSetting: Sendable, Codable {
     set { _initialSyncCompletedAlbumBatches = newValue }
   }
 
-  private var _initialSyncAlbumPollCount: Int? = nil
-  public var initialSyncAlbumPollCount: Int? {
-    get { _initialSyncAlbumPollCount }
-    set { _initialSyncAlbumPollCount = newValue }
+  private var _initialSyncAlbumCount: Int? = nil
+  public var initialSyncAlbumCount: Int? {
+    get { _initialSyncAlbumCount }
+    set { _initialSyncAlbumCount = newValue }
   }
 
   private var _initialSyncCompletionStatus: SyncCompletionStatus = .defaultValue
   public var initialSyncCompletionStatus: SyncCompletionStatus {
     get { _initialSyncCompletionStatus }
     set { _initialSyncCompletionStatus = newValue }
+  }
+
+  public var isInitialSyncResumable: Bool {
+    initialSyncCompletionStatus == .aborted && initialSyncCompletedAlbumBatches != nil
   }
 
   private var _isAutoDownloadLatestPodcastEpisodesActive: Bool = false

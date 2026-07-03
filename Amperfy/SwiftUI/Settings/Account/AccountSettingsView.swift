@@ -59,7 +59,7 @@ struct AccountSettingsView: View {
     appDelegate.storage.settings.user.isOfflineMode = false
     appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
       accountSettings.initialSyncCompletedAlbumBatches = nil
-      accountSettings.initialSyncAlbumPollCount = nil
+      accountSettings.initialSyncAlbumCount = nil
     }
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)

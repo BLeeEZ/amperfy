@@ -161,6 +161,8 @@ public protocol LibrarySyncer: Sendable {
     isCancelled: @escaping @Sendable () -> Bool
   ) async
   @MainActor
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool
+  @MainActor
   func sync(song: Song) async throws
   @MainActor
   func sync(podcast: Podcast) async throws

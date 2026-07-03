@@ -73,6 +73,11 @@ extension LibrarySyncerProxy: LibrarySyncer {
   }
 
   @MainActor
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool {
+    try await activeSyncer.syncAllSongs(isCancelled: isCancelled)
+  }
+
+  @MainActor
   func sync(song: Song) async throws {
     try await activeSyncer.sync(song: song)
   }

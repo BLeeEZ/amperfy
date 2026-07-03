@@ -27,9 +27,6 @@ import UIKit
 class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private let ampacheXmlServerApi: AmpacheXmlServerApi
 
-  private static let maxParallelSyncRequests: Int = 4
-  private static let songSyncBatchSize: Int = 16
-
   private struct AlbumSyncPayload: Sendable {
     let albumInfo: APIDataResponse
     let albumSongs: APIDataResponse
@@ -438,6 +435,11 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         return !ampacheError.isRemoteAvailable
       }
     )
+  }
+
+  @MainActor
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool {
+    false
   }
 
   nonisolated private func writeAlbumSongs(

@@ -93,6 +93,15 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
         }
       }
 
+      let hasAlbumsToSync = !(await self.nextUnsyncedAlbumTargets()).isEmpty
+      if hasAlbumsToSync, self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
+         self.networkMonitor.isConnectedToNetwork {
+        _ = try? await self.librarySyncer.syncAllSongs {
+          !self.isRunning.wrappedValue || !self.settings.user.isOnlineMode
+            || !self.networkMonitor.isConnectedToNetwork
+        }
+      }
+
       while self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
             self.networkMonitor.isConnectedToNetwork {
         let targets = await self.nextUnsyncedAlbumTargets()

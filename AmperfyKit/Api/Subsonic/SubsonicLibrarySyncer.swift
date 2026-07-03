@@ -27,9 +27,9 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private let subsonicServerApi: SubsonicServerApi
 
   private static let maxItemCountToPollAtOnce: Int = 500
-  private static let maxParallelSyncRequests: Int = 4
   private static let albumCheckpointSaveInterval: Int = 5
-  private static let songSyncBatchSize: Int = 16
+  private static let bulkSongProbeCount: Int = 20
+  private static let maxBulkSongPages: Int = 10000
 
   init(
     subsonicServerApi: SubsonicServerApi,
@@ -117,18 +117,19 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
 
     var pollCountArtist = 0
+    var remoteAlbumCount = 0
     storage.main.perform { companion in
       let accountAsync = companion.library.getAccount(managedObjectId: self.accountObjectId)
       let artists = companion.library.getArtists(for: accountAsync).filter { !$0.id.isEmpty }
-      let albumCount = artists.reduce(0) { $0 + $1.remoteAlbumCount }
+      remoteAlbumCount = artists.reduce(0) { $0 + $1.remoteAlbumCount }
       pollCountArtist = max(
         1,
-        Int(ceil(Double(albumCount) / Double(Self.maxItemCountToPollAtOnce)))
+        Int(ceil(Double(remoteAlbumCount) / Double(Self.maxItemCountToPollAtOnce)))
       )
     }
     var completedAlbumBatches = resumeAlbumBatches ?? Set<Int>()
     if storage.settings.accounts.getSetting(accountInfo).read
-      .initialSyncAlbumPollCount != pollCountArtist {
+      .initialSyncAlbumCount != remoteAlbumCount {
       completedAlbumBatches = Set<Int>()
     }
     let remainingAlbumBatches = Array(0 ... pollCountArtist)
@@ -150,6 +151,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           }
         }
         while let (batchIndex, albumsResponse) = try await taskGroup.next() {
+          try Task.checkCancellation()
           try await self.storage.async.perform { asyncCompanion in
             let accountAsync = Account(
               managedObject: asyncCompanion.context
@@ -185,7 +187,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             let checkpoint = completedAlbumBatches
             self.storage.settings.accounts.updateSetting(self.accountInfo) {
               $0.initialSyncCompletedAlbumBatches = checkpoint
-              $0.initialSyncAlbumPollCount = pollCountArtist
+              $0.initialSyncAlbumCount = remoteAlbumCount
             }
           }
 
@@ -204,7 +206,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       let checkpoint = completedAlbumBatches
       storage.settings.accounts.updateSetting(accountInfo) {
         $0.initialSyncCompletedAlbumBatches = checkpoint
-        $0.initialSyncAlbumPollCount = pollCountArtist
+        $0.initialSyncAlbumCount = remoteAlbumCount
       }
       throw error
     }
@@ -264,7 +266,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSupported else {
       storage.settings.accounts.updateSetting(accountInfo) {
         $0.initialSyncCompletedAlbumBatches = nil
-        $0.initialSyncAlbumPollCount = nil
+        $0.initialSyncAlbumCount = nil
       }
       return
     }
@@ -300,7 +302,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
     storage.settings.accounts.updateSetting(accountInfo) {
       $0.initialSyncCompletedAlbumBatches = nil
-      $0.initialSyncAlbumPollCount = nil
+      $0.initialSyncAlbumCount = nil
     }
   }
 
@@ -1369,6 +1371,97 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
+    }
+  }
+
+  @MainActor
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool {
+    guard isSyncAllowed,
+          storage.settings.accounts.getSetting(accountInfo).read
+          .initialSyncCompletionStatus != .aborted
+    else { return false }
+    os_log("Sync all songs via bulk search3", log: log, type: .info)
+
+    let probeResponse = try await subsonicServerApi.requestAllSongs(
+      songOffset: 0,
+      count: Self.bulkSongProbeCount
+    )
+    let probeParserDelegate = SsIDsParserDelegate(performanceMonitor: performanceMonitor)
+    try parse(
+      response: probeResponse,
+      delegate: probeParserDelegate,
+      isThrowingErrorsAllowed: false
+    )
+    guard !probeParserDelegate.prefetchIDs.songIDs.isEmpty else { return false }
+
+    var songOffset = 0
+    var pageIndex = 0
+    var pendingAlbumIDs = Set<String>()
+    var markedAlbumCount = 0
+
+    while pageIndex < Self.maxBulkSongPages {
+      guard !isCancelled() else { return false }
+      let songResponse = try await subsonicServerApi.requestAllSongs(
+        songOffset: songOffset,
+        count: Self.maxItemCountToPollAtOnce
+      )
+      let page = try await storage.async.performAndGet { asyncCompanion in
+        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+        let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+        try self.parse(
+          response: songResponse,
+          delegate: idParserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+        let prefetch = asyncCompanion.library.getElements(
+          account: accountAsync,
+          prefetchIDs: idParserDelegate.prefetchIDs
+        )
+        let parserDelegate = SsSongParserDelegate(
+          performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
+          library: asyncCompanion.library
+        )
+        try self.parse(response: songResponse, delegate: parserDelegate)
+        return (
+          songCount: parserDelegate.parsedSongs.count,
+          albumIDs: parserDelegate.parsedSongs.compactMap { $0.album?.id }
+        )
+      }
+      guard !isCancelled() else { return false }
+      guard page.songCount > 0 else { break }
+      let pageAlbumIDs = Set(page.albumIDs)
+      let confirmedAlbumIDs = pendingAlbumIDs.subtracting(pageAlbumIDs)
+      try await markAlbumSongsSynced(albumIDs: confirmedAlbumIDs)
+      markedAlbumCount += confirmedAlbumIDs.count
+      pendingAlbumIDs = pageAlbumIDs
+      songOffset += page.songCount
+      pageIndex += 1
+    }
+
+    guard pageIndex < Self.maxBulkSongPages, !isCancelled() else { return false }
+
+    try await markAlbumSongsSynced(albumIDs: pendingAlbumIDs)
+    markedAlbumCount += pendingAlbumIDs.count
+    os_log("Bulk song sync marked %i albums", log: log, type: .info, markedAlbumCount)
+    return true
+  }
+
+  @MainActor
+  private func markAlbumSongsSynced(albumIDs: Set<String>) async throws {
+    guard !albumIDs.isEmpty else { return }
+    try await storage.async.perform { asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      var albumPrefetchIDs = LibraryStorage.PrefetchIdContainer()
+      albumPrefetchIDs.albumIDs = albumIDs
+      let albumPrefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: albumPrefetchIDs
+      )
+      for album in albumPrefetch.prefetchedAlbumDict.values {
+        let songs = album.songs
+        album.isCached = !songs.isEmpty && songs.allSatisfy { $0.isCached }
+        album.isSongsMetaDataSynced = true
+      }
     }
   }
 
