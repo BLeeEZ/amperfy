@@ -222,11 +222,14 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     }
   }
 
+  private let searchTaskRunner = SearchTaskRunner()
+
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
+    searchTaskRunner.cancelAll()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
-      Task { @MainActor in do {
-        try await self.appDelegate.getMeta(account.info).librarySyncer
+      searchTaskRunner.runRemoteSearch(searchText: searchText) { do {
+        try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchSongs(searchText: searchText)
       } catch {
         self.appDelegate.eventLogger.report(topic: "Songs Search", error: error)

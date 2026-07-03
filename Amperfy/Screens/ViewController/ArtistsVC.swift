@@ -376,8 +376,11 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     )
   }
 
+  private let searchTaskRunner = SearchTaskRunner()
+
   override func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
+    searchTaskRunner.cancelAll()
     fetchedResultsController.search(
       searchText: searchText,
       onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
@@ -385,7 +388,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     )
     tableView.reloadData()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
-      Task { @MainActor in do {
+      searchTaskRunner.runRemoteSearch(searchText: searchText) { do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)
       } catch {

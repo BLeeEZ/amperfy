@@ -42,10 +42,11 @@ public struct DetailInfoType {
 
   public init(type: DetailType, settings: AmperfySettings) {
     self.type = type
-    self.isShowDetailedInfo = settings.user.isShowDetailedInfo
-    self.isShowAlbumDuration = settings.user.isShowAlbumDuration
-    self.isShowArtistDuration = settings.user.isShowArtistDuration
-    self.artistFilterSetting = settings.user.artistsFilterSetting
+    let userSettings = settings.user
+    self.isShowDetailedInfo = userSettings.isShowDetailedInfo
+    self.isShowAlbumDuration = userSettings.isShowAlbumDuration
+    self.isShowArtistDuration = userSettings.isShowArtistDuration
+    self.artistFilterSetting = userSettings.artistsFilterSetting
   }
 }
 

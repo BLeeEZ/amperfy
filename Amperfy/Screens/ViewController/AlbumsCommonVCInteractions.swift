@@ -532,10 +532,13 @@ class AlbumsCommonVCInteractions {
     )
   }
 
+  private let searchTaskRunner = SearchTaskRunner()
+
   func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
+    searchTaskRunner.cancelAll()
     if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
-      Task { @MainActor in do {
+      searchTaskRunner.runRemoteSearch(searchText: searchText) { do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchAlbums(searchText: searchText)
       } catch {
