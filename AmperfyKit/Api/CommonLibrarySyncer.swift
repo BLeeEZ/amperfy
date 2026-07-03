@@ -153,15 +153,37 @@ class CommonLibrarySyncer {
     classifyNotAvailable: @escaping @Sendable (Error) -> Bool
   ) async {
     var index = 0
+    var lastParallelFetches = maxParallelFetches
     while index < targets.count {
       guard !isCancelled() else { return }
+      if ProcessInfo.processInfo.thermalState == .critical {
+        os_log("Album songs sync paused: critical thermal state", log: log, type: .info)
+        while ProcessInfo.processInfo.thermalState == .critical {
+          try? await Task.sleep(nanoseconds: 10_000_000_000)
+          guard !isCancelled() else { return }
+        }
+      }
+      let isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+      let isThermalThrottled = ProcessInfo.processInfo.thermalState == .serious
+      let parallelFetches = isLowPower ? 1 : (isThermalThrottled ? 2 : maxParallelFetches)
+      if parallelFetches != lastParallelFetches {
+        os_log(
+          "Album songs sync parallel fetches: %i (thermal throttled: %s, low power: %s)",
+          log: log,
+          type: .info,
+          parallelFetches,
+          isThermalThrottled ? "yes" : "no",
+          isLowPower ? "yes" : "no"
+        )
+        lastParallelFetches = parallelFetches
+      }
       let batch = Array(targets[index ..< min(index + batchSize, targets.count)])
       index += batchSize
 
       var results = [(NSManagedObjectID, AlbumSongsFetchResult<Payload>)]()
       var iterator = batch.makeIterator()
       await withTaskGroup(of: (NSManagedObjectID, AlbumSongsFetchResult<Payload>).self) { group in
-        for _ in 0 ..< maxParallelFetches {
+        for _ in 0 ..< parallelFetches {
           guard let target = iterator.next() else { break }
           group.addTask { @MainActor @Sendable in
             do {
