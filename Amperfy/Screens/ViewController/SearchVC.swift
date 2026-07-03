@@ -69,7 +69,7 @@ class SearchDiffableDataSource: BasicUITableViewDiffableDataSource {
 class SearchVC: BasicTableViewController {
   override var sceneTitle: String { "Search" }
 
-  nonisolated private static let categoryItemLimit = 10
+  nonisolated private static let categoryItemLimit = 20
 
   private var diffableDataSource: SearchDiffableDataSource?
   private let searchTaskRunner = SearchTaskRunner()
@@ -554,15 +554,18 @@ class SearchVC: BasicTableViewController {
             )
 
             var result = SearchResultObjectContainer()
-            result.artistsIDs = FuzzySearcher.findBestMatch(in: artists, search: searchText)
+            result.artistsIDs = FuzzySearcher
+              .findBestMatch(in: artists, search: searchText, isTokenized: true)
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Artist }
               .compactMap { $0.managedObject.objectID }
-            result.albumsIDs = FuzzySearcher.findBestMatch(in: albums, search: searchText)
+            result.albumsIDs = FuzzySearcher
+              .findBestMatch(in: albums, search: searchText, isTokenized: true)
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Album }
               .compactMap { $0.managedObject.objectID }
-            result.playlistsIDs = FuzzySearcher.findBestMatch(in: playlists, search: searchText)
+            result.playlistsIDs = FuzzySearcher
+              .findBestMatch(in: playlists, search: searchText, isTokenized: true)
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Playlist }
               .compactMap { $0.managedObject.objectID }
@@ -630,15 +633,18 @@ class SearchVC: BasicTableViewController {
             )
 
             var result = SearchResultObjectContainer()
-            result.artistsIDs = FuzzySearcher.findBestMatch(in: artists, search: searchText)
+            result.artistsIDs = FuzzySearcher
+              .findBestMatch(in: artists, search: searchText, isTokenized: true)
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Artist }
               .compactMap { $0.managedObject.objectID }
-            result.albumsIDs = FuzzySearcher.findBestMatch(in: albums, search: searchText)
+            result.albumsIDs = FuzzySearcher
+              .findBestMatch(in: albums, search: searchText, isTokenized: true)
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Album }
               .compactMap { $0.managedObject.objectID }
-            result.playlistsIDs = FuzzySearcher.findBestMatch(in: playlists, search: searchText)
+            result.playlistsIDs = FuzzySearcher
+              .findBestMatch(in: playlists, search: searchText, isTokenized: true)
               .prefix(upToAsArray: Self.categoryItemLimit)
               .compactMap { $0 as? Playlist }
               .compactMap { $0.managedObject.objectID }
