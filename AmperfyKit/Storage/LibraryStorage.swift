@@ -1438,6 +1438,22 @@ public class LibraryStorage: PlayableFileCachable {
     return albums ?? [Album]()
   }
 
+  public func getAlbumsCount(
+    for account: Account,
+    whichContainsSongsWithArtist artist: Artist
+  )
+    -> Int {
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        getFetchPredicate(forArtist: artist),
+        AlbumMO.getFetchPredicateForAlbumsWhoseSongsHave(artist: artist),
+      ]),
+    ])
+    return (try? context.count(for: fetchRequest)) ?? 0
+  }
+
   public func getAlbum(for account: Account, id: String, isDetailFaultResolution: Bool) -> Album? {
     let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -1630,6 +1646,23 @@ public class LibraryStorage: PlayableFileCachable {
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
     return songs ?? [Song]()
+  }
+
+  public func getSongsCount(
+    for account: Account,
+    whichContainsSongsWithArtist artist: Artist
+  )
+    -> Int {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        getFetchPredicate(forArtist: artist),
+        getFetchPredicate(forSongsOfArtistWithCommonAlbum: artist),
+      ]),
+    ])
+    return (try? context.count(for: fetchRequest)) ?? 0
   }
 
   public func getCachedSongs(for account: Account) -> [Song] {
@@ -2189,7 +2222,7 @@ public class LibraryStorage: PlayableFileCachable {
     displayFilter: ArtistCategoryFilter
   )
     -> [Artist] {
-    let fetchRequest = ArtistMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
     fetchRequest.predicate = getSearchArtistsPredicate(
       for: account,
       searchText: searchText,
@@ -2228,7 +2261,7 @@ public class LibraryStorage: PlayableFileCachable {
     displayFilter: DisplayCategoryFilter
   )
     -> [Album] {
-    let fetchRequest = AlbumMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
     fetchRequest.predicate = getSearchAlbumsPredicate(
       for: account,
       searchText: searchText,
@@ -2261,7 +2294,7 @@ public class LibraryStorage: PlayableFileCachable {
     playlistSearchCategory: PlaylistSearchCategory
   )
     -> [Playlist] {
-    let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
     fetchRequest.predicate = getSearchPlaylistsPredicate(
       for: account,
       searchText: searchText,
@@ -2309,7 +2342,7 @@ public class LibraryStorage: PlayableFileCachable {
     displayFilter: DisplayCategoryFilter
   )
     -> [Song] {
-    let fetchRequest = SongMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
     fetchRequest.predicate = getSearchSongsPredicate(
       for: account,
       searchText: searchText,
