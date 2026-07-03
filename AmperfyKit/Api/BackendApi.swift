@@ -132,6 +132,18 @@ public struct LyricsLine {
   }
 }
 
+// MARK: - AlbumSyncTarget
+
+public struct AlbumSyncTarget: Sendable {
+  public let objectID: NSManagedObjectID
+  public let id: String
+
+  public init(objectID: NSManagedObjectID, id: String) {
+    self.objectID = objectID
+    self.id = id
+  }
+}
+
 // MARK: - LibrarySyncer
 
 public protocol LibrarySyncer: Sendable {
@@ -143,6 +155,13 @@ public protocol LibrarySyncer: Sendable {
   func sync(artist: Artist) async throws
   @MainActor
   func sync(album: Album) async throws
+  @MainActor
+  func syncSongsInBackground(
+    targets: [AlbumSyncTarget],
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async
+  @MainActor
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool
   @MainActor
   func sync(song: Song) async throws
   @MainActor

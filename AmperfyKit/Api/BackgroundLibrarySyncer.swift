@@ -22,29 +22,10 @@
 import Foundation
 import os.log
 
-// MARK: - BackgroundSyncOperation
-
-public class BackgroundSyncOperation: AsyncOperation, @unchecked Sendable {
-  private let completeBlock: VoidAsyncClosure
-
-  public init(completeBlock: @escaping VoidAsyncClosure) {
-    self.completeBlock = completeBlock
-  }
-
-  override public func main() {
-    Task {
-      await self.completeBlock()
-      finish()
-    }
-  }
-}
-
 // MARK: - BackgroundLibrarySyncer
 
 public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sendable {
   private let storage: AsyncCoreDataAccessWrapper
-  @MainActor
-  private let mainStorage: CoreDataCompanion
   private let settings: AmperfySettings
   private let networkMonitor: NetworkMonitorFacade
   private let librarySyncer: LibrarySyncer
@@ -54,16 +35,16 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   private let autoDownloadLibrarySyncer: AutoDownloadLibrarySyncer
   private let eventLogger: EventLogger
 
+  private static let albumSyncPageSize: Int = 500
+
   private let log = OSLog(subsystem: "Amperfy", category: "BackgroundLibrarySyncer")
   private let isRunning = Atomic<Bool>(wrappedValue: false)
   private let isCurrentlyActive = Atomic<Bool>(wrappedValue: false)
   private let backgroundTask = Atomic<Task<(), Never>?>(wrappedValue: nil)
-  private let taskQueue: OperationQueue
 
   @MainActor
   init(
     storage: AsyncCoreDataAccessWrapper,
-    mainStorage: CoreDataCompanion,
     settings: AmperfySettings,
     networkMonitor: NetworkMonitorFacade,
     librarySyncer: LibrarySyncer,
@@ -72,15 +53,12 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     eventLogger: EventLogger
   ) {
     self.storage = storage
-    self.mainStorage = mainStorage
     self.settings = settings
     self.networkMonitor = networkMonitor
     self.librarySyncer = librarySyncer
     self.playableDownloadManager = playableDownloadManager
     self.autoDownloadLibrarySyncer = autoDownloadLibrarySyncer
     self.eventLogger = eventLogger
-    self.taskQueue = OperationQueue()
-    taskQueue.maxConcurrentOperationCount = 1
   }
 
   var isActive: Bool { isCurrentlyActive.wrappedValue }
@@ -95,8 +73,6 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
 
   public func stop() {
     isRunning.wrappedValue = false
-    taskQueue.cancelAllOperations()
-    addOperationsEndMessage()
   }
 
   private func syncAlbumSongsInBackground() {
@@ -117,39 +93,36 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
         }
       }
 
-      try? await storage.perform { asyncCompanion in
-        let albumsToSync = asyncCompanion.library.getAlbumWithoutSyncedSongs()
-
-        for albumToSync in albumsToSync {
-          let albumObjectID = albumToSync.managedObject.objectID
-          let asyncOperation = BackgroundSyncOperation {
-            guard !Task.isCancelled, self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
-                  self.networkMonitor.isConnectedToNetwork else { return }
-            let albumMO = self.mainStorage.context.object(with: albumObjectID) as! AlbumMO
-            let album = Album(managedObject: albumMO)
-            do {
-              try await self.librarySyncer.sync(album: album)
-            } catch {
-              self.eventLogger.report(
-                topic: "Album Background Sync",
-                error: error,
-                displayPopup: false
-              )
-              album.isSongsMetaDataSynced = true
-            }
-          }
-          self.taskQueue.addOperation(asyncOperation)
+      let hasAlbumsToSync = !(await self.nextUnsyncedAlbumTargets()).isEmpty
+      if hasAlbumsToSync, self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
+         self.networkMonitor.isConnectedToNetwork {
+        _ = try? await self.librarySyncer.syncAllSongs {
+          !self.isRunning.wrappedValue || !self.settings.user.isOnlineMode
+            || !self.networkMonitor.isConnectedToNetwork
         }
       }
 
-      addOperationsEndMessage()
+      while self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
+            self.networkMonitor.isConnectedToNetwork {
+        let targets = await self.nextUnsyncedAlbumTargets()
+        guard !targets.isEmpty else { break }
+        await self.librarySyncer.syncSongsInBackground(targets: targets) {
+          !self.isRunning.wrappedValue || !self.settings.user.isOnlineMode
+            || !self.networkMonitor.isConnectedToNetwork
+        }
+      }
+
+      self.isRunning.wrappedValue = false
+      self.isCurrentlyActive.wrappedValue = false
+      os_log("stopped", log: self.log, type: .info)
     }
   }
 
-  func addOperationsEndMessage() {
-    taskQueue.addBarrierBlock {
-      self.isRunning.wrappedValue = false
-      os_log("stopped", log: self.log, type: .info)
-    }
+  @MainActor
+  private func nextUnsyncedAlbumTargets() async -> [AlbumSyncTarget] {
+    (try? await storage.performAndGet { asyncCompanion in
+      asyncCompanion.library.getAlbumWithoutSyncedSongs(fetchLimit: Self.albumSyncPageSize)
+        .map { AlbumSyncTarget(objectID: $0.managedObject.objectID, id: $0.id) }
+    }) ?? []
   }
 }
