@@ -32,6 +32,7 @@ class SyncVC: UIViewController {
   var libObjectsToParseCount: Int = 1
   var syncFinished = false
   var account: Account!
+  private var syncTask: Task<(), Never>?
 
   @IBOutlet
   weak var progressBar: UIProgressView!
@@ -53,19 +54,17 @@ class SyncVC: UIViewController {
   }
 
   override func viewDidAppear(_ animated: Bool) {
-    Task { @MainActor in
+    syncTask = Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
       if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
         self.appDelegate.storage.settings.app.isLibrarySynced = false
       }
-      let accountSettings = self.appDelegate.storage.settings.accounts.getSetting(account.info)
-        .read
-      let isResumingSync = accountSettings.initialSyncCompletionStatus == .aborted
-        && accountSettings.initialSyncCompletedAlbumBatches != nil
+      let isResumingSync = self.appDelegate.storage.settings.accounts.getSetting(account.info)
+        .read.isInitialSyncResumable
       if !isResumingSync {
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletedAlbumBatches = nil
-          accountSettings.initialSyncAlbumPollCount = nil
+          accountSettings.initialSyncAlbumCount = nil
         }
         self.appDelegate.storage.main.library
           .cleanStorageOfObsoleteAccountEntries(account: account)
@@ -139,11 +138,12 @@ class SyncVC: UIViewController {
       preferredStyle: .alert
     )
     let skip = UIAlertAction(title: "Skip", style: .destructive, handler: { action in
+      self.syncTask?.cancel()
       self.appDelegate.storage.settings.accounts
         .updateSetting(self.account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .skipped
           accountSettings.initialSyncCompletedAlbumBatches = nil
-          accountSettings.initialSyncAlbumPollCount = nil
+          accountSettings.initialSyncAlbumCount = nil
         }
       self.finishSync()
     })

@@ -297,10 +297,8 @@ public class MetaManager {
   }
 
   private func startBackgroundLibrarySyncerIfNoResumePending() {
-    let accountSetting = storage.settings.accounts.getSetting(account.info).read
-    let isInitialSyncResumable = accountSetting.initialSyncCompletionStatus == .aborted
-      && accountSetting.initialSyncCompletedAlbumBatches != nil
-    guard !isInitialSyncResumable else { return }
+    guard !storage.settings.accounts.getSetting(account.info).read.isInitialSyncResumable
+    else { return }
     backgroundLibrarySyncer.start()
   }
 

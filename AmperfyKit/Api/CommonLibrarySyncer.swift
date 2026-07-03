@@ -63,6 +63,9 @@ enum AlbumSyncCoalescer {
 
 @MainActor
 class CommonLibrarySyncer {
+  static let maxParallelSyncRequests: Int = 4
+  static let songSyncBatchSize: Int = 16
+
   let account: Account
   let accountObjectId: NSManagedObjectID
   let networkMonitor: NetworkMonitorFacade
@@ -190,18 +193,22 @@ class CommonLibrarySyncer {
   ) async {
     var index = 0
     var lastParallelFetches = maxParallelFetches
+    var criticalThermalWaits = 0
     while index < targets.count {
       guard !isCancelled() else { return }
-      if ProcessInfo.processInfo.thermalState == .critical {
+      if ProcessInfo.processInfo.thermalState == .critical, criticalThermalWaits < 6 {
         os_log("Album songs sync paused: critical thermal state", log: log, type: .info)
-        while ProcessInfo.processInfo.thermalState == .critical {
+        while ProcessInfo.processInfo.thermalState == .critical, criticalThermalWaits < 6 {
+          criticalThermalWaits += 1
           try? await Task.sleep(nanoseconds: 10_000_000_000)
           guard !isCancelled() else { return }
         }
       }
+      let thermalState = ProcessInfo.processInfo.thermalState
       let isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
-      let isThermalThrottled = ProcessInfo.processInfo.thermalState == .serious
-      let parallelFetches = isLowPower ? 1 : (isThermalThrottled ? 2 : maxParallelFetches)
+      let isThermalThrottled = thermalState == .serious || thermalState == .critical
+      let parallelFetches = isLowPower || thermalState == .critical
+        ? 1 : (isThermalThrottled ? 2 : maxParallelFetches)
       if parallelFetches != lastParallelFetches {
         os_log(
           "Album songs sync parallel fetches: %i (thermal throttled: %s, low power: %s)",
@@ -225,6 +232,11 @@ class CommonLibrarySyncer {
             do {
               return (target.objectID, .fetched(try await fetch(target.id)))
             } catch {
+              self.eventLogger.report(
+                topic: "Album Background Sync",
+                error: error,
+                displayPopup: false
+              )
               return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
             }
           }
@@ -236,6 +248,11 @@ class CommonLibrarySyncer {
             do {
               return (target.objectID, .fetched(try await fetch(target.id)))
             } catch {
+              self.eventLogger.report(
+                topic: "Album Background Sync",
+                error: error,
+                displayPopup: false
+              )
               return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
             }
           }
