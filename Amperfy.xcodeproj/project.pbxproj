@@ -27,6 +27,7 @@
 		500B97CD2B7BC680005554BF /* EntityPreviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500B97CC2B7BC67F005554BF /* EntityPreviewVC.swift */; };
 		500B97D02B7C9555005554BF /* EntityPreviewVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 500B97CF2B7C9546005554BF /* EntityPreviewVC.xib */; };
 		500DA64B2F087221005578C7 /* CarPlayHomeTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500DA64A2F087221005578C7 /* CarPlayHomeTabExtension.swift */; };
+		50C4F1A12F5A2A1000B0D9C1 /* CarPlaySavedQueuesExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C4F1A02F5A2A1000B0D9C1 /* CarPlaySavedQueuesExtension.swift */; };
 		500DA64D2F087307005578C7 /* CarPlayLibraryTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500DA64C2F087307005578C7 /* CarPlayLibraryTabExtension.swift */; };
 		500DA64F2F0873DB005578C7 /* CarPlayCachedTabExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500DA64E2F0873DB005578C7 /* CarPlayCachedTabExtension.swift */; };
 		500DA6512F08750A005578C7 /* CarPlayCommonListExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500DA6502F08750A005578C7 /* CarPlayCommonListExtension.swift */; };
@@ -640,6 +641,7 @@
 		500BB45521CAA73700D367CF /* PersistentStorage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersistentStorage.swift; sourceTree = "<group>"; };
 		500BB49621CAAA2700D367CF /* Amperfy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Amperfy.xcdatamodel; sourceTree = "<group>"; };
 		500DA64A2F087221005578C7 /* CarPlayHomeTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayHomeTabExtension.swift; sourceTree = "<group>"; };
+		50C4F1A02F5A2A1000B0D9C1 /* CarPlaySavedQueuesExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlaySavedQueuesExtension.swift; sourceTree = "<group>"; };
 		500DA64C2F087307005578C7 /* CarPlayLibraryTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayLibraryTabExtension.swift; sourceTree = "<group>"; };
 		500DA64E2F0873DB005578C7 /* CarPlayCachedTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayCachedTabExtension.swift; sourceTree = "<group>"; };
 		500DA6502F08750A005578C7 /* CarPlayCommonListExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayCommonListExtension.swift; sourceTree = "<group>"; };
@@ -1562,6 +1564,7 @@
 				500DA64A2F087221005578C7 /* CarPlayHomeTabExtension.swift */,
 				500DA64C2F087307005578C7 /* CarPlayLibraryTabExtension.swift */,
 				500DA64E2F0873DB005578C7 /* CarPlayCachedTabExtension.swift */,
+				50C4F1A02F5A2A1000B0D9C1 /* CarPlaySavedQueuesExtension.swift */,
 			);
 			path = CarPlay;
 			sourceTree = "<group>";
@@ -2627,6 +2630,7 @@
 				505362D12C23682500846C53 /* AlbumsCollectionVC.swift in Sources */,
 				50C16C1821E704CE00F086F0 /* AlbumsVC.swift in Sources */,
 				500DA64B2F087221005578C7 /* CarPlayHomeTabExtension.swift in Sources */,
+				50C4F1A12F5A2A1000B0D9C1 /* CarPlaySavedQueuesExtension.swift in Sources */,
 				508AA57D2B6A3E1D00BE8117 /* CarPlayFetchControllerExtension.swift in Sources */,
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
