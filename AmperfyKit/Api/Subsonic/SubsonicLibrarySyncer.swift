@@ -1398,9 +1398,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     var pageIndex = 0
     var pendingAlbumIDs = Set<String>()
     var markedAlbumCount = 0
+    var criticalThermalWaits = 0
 
     while pageIndex < Self.maxBulkSongPages {
       guard !isCancelled() else { return false }
+      let thermalWait = await waitWhileThermalStateCritical(
+        previousWaitCount: criticalThermalWaits,
+        isCancelled: isCancelled
+      )
+      criticalThermalWaits = thermalWait.waitCount
+      guard !thermalWait.isCancelled else { return false }
       let songResponse = try await subsonicServerApi.requestAllSongs(
         songOffset: songOffset,
         count: Self.maxItemCountToPollAtOnce

@@ -146,6 +146,25 @@ class CommonLibrarySyncer {
   }
 
   @MainActor
+  func waitWhileThermalStateCritical(
+    previousWaitCount: Int,
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async
+    -> (isCancelled: Bool, waitCount: Int) {
+    var waitCount = previousWaitCount
+    guard ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 else {
+      return (false, waitCount)
+    }
+    os_log("Album songs sync paused: critical thermal state", log: log, type: .info)
+    while ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 {
+      waitCount += 1
+      try? await Task.sleep(nanoseconds: 10_000_000_000)
+      guard !isCancelled() else { return (true, waitCount) }
+    }
+    return (false, waitCount)
+  }
+
+  @MainActor
   func syncAlbumSongsBatched<Payload: Sendable>(
     targets: [AlbumSyncTarget],
     batchSize: Int,
@@ -160,14 +179,12 @@ class CommonLibrarySyncer {
     var criticalThermalWaits = 0
     while index < targets.count {
       guard !isCancelled() else { return }
-      if ProcessInfo.processInfo.thermalState == .critical, criticalThermalWaits < 6 {
-        os_log("Album songs sync paused: critical thermal state", log: log, type: .info)
-        while ProcessInfo.processInfo.thermalState == .critical, criticalThermalWaits < 6 {
-          criticalThermalWaits += 1
-          try? await Task.sleep(nanoseconds: 10_000_000_000)
-          guard !isCancelled() else { return }
-        }
-      }
+      let thermalWait = await waitWhileThermalStateCritical(
+        previousWaitCount: criticalThermalWaits,
+        isCancelled: isCancelled
+      )
+      criticalThermalWaits = thermalWait.waitCount
+      guard !thermalWait.isCancelled else { return }
       let thermalState = ProcessInfo.processInfo.thermalState
       let isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
       let isThermalThrottled = thermalState == .serious || thermalState == .critical
