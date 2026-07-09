@@ -82,6 +82,20 @@ class CoreDataMigrationTest: XCTestCase {
     let savedQueues = try context
       .fetch(NSFetchRequest<NSManagedObject>(entityName: "SavedQueue"))
     XCTAssertEqual(savedQueues.count, 0)
+
+    let savedQueue = NSEntityDescription.entity(forEntityName: "SavedQueue", in: context)
+    XCTAssertNotNil(savedQueue)
+    XCTAssertNil(savedQueue?.attributesByName["contextSongIds"])
+    XCTAssertNil(savedQueue?.attributesByName["userQueueSongIds"])
+    XCTAssertNil(savedQueue?.attributesByName["playerMode"])
+    XCTAssertNil(savedQueue?.attributesByName["songCount"])
+    XCTAssertNil(savedQueue?.relationshipsByName["toAccount"])
+    XCTAssertNotNil(savedQueue?.relationshipsByName["contextPlaylist"])
+    XCTAssertNotNil(savedQueue?.relationshipsByName["userQueuePlaylist"])
+    XCTAssertEqual(
+      savedQueue?.relationshipsByName["contextPlaylist"]?.destinationEntity?.name,
+      "Playlist"
+    )
     try coordinator.remove(store)
   }
 

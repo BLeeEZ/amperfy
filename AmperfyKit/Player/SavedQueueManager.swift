@@ -30,11 +30,12 @@ public enum SavedQueueSnapshotReason {
   case playerClear
 }
 
-// MARK: - SavedQueueRestoreError
+// MARK: - SavedQueueError
 
-public enum SavedQueueRestoreError: Error {
+public enum SavedQueueError: Error {
   case allSongsUnavailable
   case noActiveAccount
+  case noSongsForActiveAccount
 }
 
 // MARK: - SavedQueueManager
@@ -65,25 +66,22 @@ public class SavedQueueManager {
 
   public func snapshotIfNeeded(reason: SavedQueueSnapshotReason) {
     guard playerData.playerMode == .music else { return }
-    guard let accountInfo = settings.accounts.active else { return }
-    let account = library.getAccount(info: accountInfo)
 
     // Capture the queue as it plays: with shuffle active the shuffled queue
     // is what the user hears and what currentIndex refers to. The plain
     // context order can't reproduce that and would resume in a different
     // order.
-    let contextIds = playerData.activeMusicQueue.playables.map { $0.id }
-    let userIds = playerData.userQueuePlaylist.playables.map { $0.id }
-    guard !(contextIds.isEmpty && userIds.isEmpty) else { return }
+    let contextPlayables = playerData.activeMusicQueue.playables
+    let userPlayables = playerData.userQueuePlaylist.playables
+    guard !(contextPlayables.isEmpty && userPlayables.isEmpty) else { return }
 
     let currentIndex = playerData.currentIndex
     let contextName = queueHandler.contextName
 
-    // Match on song-id arrays. Toggling between two saved queues should
-    // refresh the existing rows in place, not produce a new duplicate every
-    // round trip.
-    if let existing = library.getSavedQueues(for: account).first(where: { saved in
-      saved.contextSongIds == contextIds && saved.userQueueSongIds == userIds
+    // Match on content. Toggling between two saved queues should refresh the
+    // existing rows in place, not produce a new duplicate every round trip.
+    if let existing = library.getSavedQueues().first(where: { saved in
+      hasSameContent(saved, context: contextPlayables, user: userPlayables)
     }) {
       existing.currentIndex = currentIndex
       existing.isShuffle = playerData.isShuffle
@@ -95,35 +93,53 @@ public class SavedQueueManager {
       return
     }
 
-    let saved = library.createSavedQueue(account: account)
+    let saved = library.createSavedQueue()
     saved.name = makeName(contextName: contextName, at: Date())
-    saved.contextSongIds = contextIds
-    saved.userQueueSongIds = userIds
+    saved.contextPlaylist.append(playables: contextPlayables)
+    saved.userQueuePlaylist.append(playables: userPlayables)
     saved.currentIndex = currentIndex
     saved.isShuffle = playerData.isShuffle
     saved.repeatMode = playerData.repeatMode
     saved.isUserQueuePlaying = playerData.isUserQueuePlaying
-    saved.songCount = contextIds.count + userIds.count
+    saved.lastUsedAt = Date()
     library.saveContext()
 
-    enforceLimit(for: account)
+    enforceLimit()
     postListChanged()
+  }
+
+  private func hasSameContent(
+    _ saved: SavedQueue,
+    context: [AbstractPlayable],
+    user: [AbstractPlayable]
+  )
+    -> Bool {
+    saved.contextPlaylist.playables.map { $0.playableManagedObject.objectID }
+      == context.map { $0.playableManagedObject.objectID }
+      && saved.userQueuePlaylist.playables.map { $0.playableManagedObject.objectID }
+      == user.map { $0.playableManagedObject.objectID }
   }
 
   // MARK: - List
 
-  public func list(forAccount account: Account) -> [SavedQueue] {
-    let queues = library.getSavedQueues(for: account)
+  public func list() -> [SavedQueue] {
+    let queues = library.getSavedQueues()
+    // Deleted songs cascade out of the playlists; a queue whose songs are all
+    // gone has nothing left to restore and is dropped here. Check the actual
+    // items (playables.isEmpty), NOT the stored songCount: the logout purge
+    // runs as an NSBatchDeleteRequest that bypasses willSave, leaving the
+    // playlists' stored songCount stale (see Global Constraints).
     var survivors = [SavedQueue]()
+    var didDelete = false
     for queue in queues {
-      let allIds = Set(queue.contextSongIds + queue.userQueueSongIds)
-      if library.isAnySongAvailable(for: account, ids: allIds) {
-        survivors.append(queue)
-      } else {
+      if queue.playables.isEmpty {
         library.deleteSavedQueue(queue)
+        didDelete = true
+      } else {
+        survivors.append(queue)
       }
     }
-    if survivors.count != queues.count { library.saveContext() }
+    if didDelete { library.saveContext() }
     return survivors
   }
 
@@ -145,20 +161,21 @@ public class SavedQueueManager {
     postListChanged()
   }
 
-  public func deleteAll(for account: Account) {
-    library.deleteAllSavedQueues(for: account)
+  public func deleteEmptySavedQueues() {
+    let empty = library.getSavedQueues().filter { $0.playables.isEmpty }
+    guard !empty.isEmpty else { return }
+    for queue in empty { library.deleteSavedQueue(queue) }
     library.saveContext()
     postListChanged()
   }
 
   // MARK: - Eviction
 
-  public func enforceLimit(for account: Account) {
+  public func enforceLimit() {
     let limit = settings.user.savedQueuesLimit
-    let queues = library.getSavedQueues(for: account)
+    let queues = library.getSavedQueues()
     guard queues.count > limit else { return }
-    let toDrop = queues.dropFirst(limit)
-    for queue in toDrop {
+    for queue in queues.dropFirst(limit) {
       library.deleteSavedQueue(queue)
     }
     library.saveContext()
@@ -168,30 +185,11 @@ public class SavedQueueManager {
 
   @discardableResult
   public func restore(_ savedQueue: SavedQueue) async -> Bool {
-    guard let accountInfo = settings.accounts.active else {
-      eventLogger.report(
-        topic: "Restore Queue",
-        error: SavedQueueRestoreError.noActiveAccount
-      )
-      return false
-    }
-    let account = library.getAccount(info: accountInfo)
-
-    let contextIds = savedQueue.contextSongIds
-    let userIds = savedQueue.userQueueSongIds
-    let allIds = Set(contextIds + userIds)
-    let resolvedSongs = library.getSongs(for: account, ids: allIds)
-    let songById = Dictionary(
-      uniqueKeysWithValues: resolvedSongs.map { ($0.id, $0) }
-    )
-    let resolvedContext = contextIds.compactMap { songById[$0] }
-    let resolvedUser = userIds.compactMap { songById[$0] }
+    let resolvedContext = savedQueue.contextPlaylist.playables
+    let resolvedUser = savedQueue.userQueuePlaylist.playables
 
     if resolvedContext.isEmpty, resolvedUser.isEmpty {
-      eventLogger.report(
-        topic: "Restore Queue",
-        error: SavedQueueRestoreError.allSongsUnavailable
-      )
+      eventLogger.report(topic: "Restore Queue", error: SavedQueueError.allSongsUnavailable)
       return false
     }
 
@@ -201,36 +199,30 @@ public class SavedQueueManager {
     playerData.setPlayerMode(.music)
     snapshotIfNeeded(reason: .restoreOverwrite)
 
-    // Adjust currentIndex by counting surviving items up to the saved index.
-    // An index of -1 is valid: it marks a user queue item playing before the
-    // first context item.
-    let savedIndex = savedQueue.currentIndex
-    var adjustedIndex = 0
-    for i in 0 ..< min(max(0, savedIndex), contextIds.count) {
-      if songById[contextIds[i]] != nil { adjustedIndex += 1 }
-    }
-    if adjustedIndex >= resolvedContext.count {
-      adjustedIndex = max(0, resolvedContext.count - 1)
-    }
+    // Songs deleted from the library cascade out of the saved playlists, so
+    // the stored index can point past the end; clamp it. An index of -1 is
+    // valid: it marks a user queue item playing before the first context item.
+    var adjustedIndex = min(savedQueue.currentIndex, resolvedContext.count - 1)
+    adjustedIndex = max(0, adjustedIndex)
 
     // Clear only the music queues; the podcast queue must survive a restore.
     playerData.clearUserQueue()
     playerData.setUserQueuePlaying(false)
     queueHandler.clearContextQueue()
     // Apply the flags while the queues are empty: setShuffle(true) on a
-    // filled queue would generate a fresh random permutation, but
-    // contextSongIds already hold the order that was playing.
+    // filled queue would generate a fresh random permutation, but the saved
+    // context playlist already holds the order that was playing.
     playerData.setShuffle(savedQueue.isShuffle)
     playerData.setRepeatMode(savedQueue.repeatMode)
 
-    queueHandler.appendContextQueue(playables: resolvedContext.map { $0 as AbstractPlayable })
+    queueHandler.appendContextQueue(playables: resolvedContext)
     queueHandler.setContextName(savedQueue.name)
     queueHandler.setCurrentIndex(adjustedIndex)
 
     if !resolvedUser.isEmpty {
-      queueHandler.appendUserQueue(playables: resolvedUser.map { $0 as AbstractPlayable })
+      queueHandler.appendUserQueue(playables: resolvedUser)
       playerData.setUserQueuePlaying(savedQueue.isUserQueuePlaying)
-      if savedQueue.isUserQueuePlaying, savedIndex < 0 {
+      if savedQueue.isUserQueuePlaying, savedQueue.currentIndex < 0 {
         queueHandler.setCurrentIndex(-1)
       }
     }
@@ -238,16 +230,6 @@ public class SavedQueueManager {
     savedQueue.lastUsedAt = Date()
     library.saveContext()
     postListChanged()
-
-    let totalSaved = contextIds.count + userIds.count
-    let totalResolved = resolvedContext.count + resolvedUser.count
-    let dropped = totalSaved - totalResolved
-    if dropped > 0 {
-      eventLogger.info(
-        topic: "Restore Queue",
-        message: "Restored \(totalResolved) of \(totalSaved) songs (\(dropped) no longer available)."
-      )
-    }
     return true
   }
 
@@ -260,25 +242,37 @@ public class SavedQueueManager {
   ) async throws
     -> Playlist {
     guard let accountInfo = settings.accounts.active else {
-      throw SavedQueueRestoreError.allSongsUnavailable
+      throw SavedQueueError.noActiveAccount
     }
     let account = library.getAccount(info: accountInfo)
 
-    let allIds = Set(savedQueue.contextSongIds + savedQueue.userQueueSongIds)
-    let resolvedSongs = library.getSongs(for: account, ids: allIds)
-    let byId = Dictionary(uniqueKeysWithValues: resolvedSongs.map { ($0.id, $0) })
-    let ordered = (savedQueue.contextSongIds + savedQueue.userQueueSongIds)
-      .compactMap { byId[$0] }
+    // A server playlist belongs to one account; a saved queue may mix songs
+    // from several. Keep the active account's songs and tell the user how
+    // many were skipped.
+    let all = savedQueue.playables
+    let ordered = all.filter { $0.account == account }
+    guard !ordered.isEmpty else {
+      throw SavedQueueError.noSongsForActiveAccount
+    }
 
     let playlist = library.createPlaylist(account: account)
     playlist.name = name
-    playlist.append(playables: ordered.map { $0 as AbstractPlayable })
+    playlist.append(playables: ordered)
     library.saveContext()
+
+    let skipped = all.count - ordered.count
+    if skipped > 0 {
+      eventLogger.info(
+        topic: "Save as Playlist",
+        message: "\(skipped) songs belonging to other accounts were skipped."
+      )
+    }
 
     if let syncer = librarySyncer {
       try await syncer.syncUpload(playlistToUpdateName: playlist)
-      if !ordered.isEmpty {
-        try await syncer.syncUpload(playlistToAddSongs: playlist, songs: ordered)
+      let songs = ordered.compactMap { $0.asSong }
+      if !songs.isEmpty {
+        try await syncer.syncUpload(playlistToAddSongs: playlist, songs: songs)
       }
     }
     return playlist

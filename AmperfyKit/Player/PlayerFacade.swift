@@ -214,7 +214,8 @@ public protocol PlayerFacade {
   func play(context: PlayContext)
   func playShuffled(context: PlayContext)
   func play(playerIndex: PlayerIndex)
-  func playCurrentItem()
+  @discardableResult
+  func restore(savedQueue: SavedQueue) async -> Bool
   func pause()
   func togglePlayPause()
   func stop()
@@ -526,7 +527,9 @@ class PlayerFacadeImpl: PlayerFacade {
     if queueHandler.logout(account: account) {
       stop()
     }
-    savedQueueManager.deleteAll(for: account)
+    // Saved queues are account-agnostic and survive a logout. The departed
+    // account's songs are purged at the next launch by LibraryUpdater;
+    // queues emptied by that purge are pruned lazily by list().
   }
 
   func seek(toSecond: Double) {
@@ -615,8 +618,13 @@ class PlayerFacadeImpl: PlayerFacade {
     musicPlayer.play()
   }
 
-  func playCurrentItem() {
+  @discardableResult
+  func restore(savedQueue: SavedQueue) async -> Bool {
+    guard await savedQueueManager.restore(savedQueue) else { return false }
+    // The queue state changed underneath the backend, which still holds the
+    // prior track; force it to load the restored current item.
     musicPlayer.playCurrentItem()
+    return true
   }
 
   func play(context: PlayContext) {

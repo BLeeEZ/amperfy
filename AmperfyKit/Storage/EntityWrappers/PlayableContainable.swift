@@ -61,6 +61,7 @@ public enum PlayableContainerBaseType: Int, Codable {
   case podcast
   case directory
   case radio
+  case savedQueue
 
   public var displayString: String {
     switch self {
@@ -73,6 +74,7 @@ public enum PlayableContainerBaseType: Int, Codable {
     case .podcast: return "Podcast"
     case .directory: return "Directory"
     case .radio: return "Radio"
+    case .savedQueue: return "Saved Queue"
     }
   }
 
@@ -87,6 +89,7 @@ public enum PlayableContainerBaseType: Int, Codable {
     case .podcast: return .podcast
     case .directory: return .folder
     case .radio: return .radio
+    case .savedQueue: return .savedQueues
     }
   }
 }

@@ -59,6 +59,8 @@ public final class PlaylistMO: NSManagedObject {
       NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersShuffledContextPlaylist)),
       NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersUserQueuePlaylist)),
       NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.playersPodcastPlaylist)),
+      NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.savedQueueContextPlaylist)),
+      NSPredicate(format: "%K == nil", #keyPath(PlaylistMO.savedQueueUserQueuePlaylist)),
     ])
   }
 

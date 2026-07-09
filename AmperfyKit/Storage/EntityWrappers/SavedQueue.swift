@@ -28,8 +28,10 @@ public class SavedQueue {
   public static var typeName: String { String(describing: Self.self) }
 
   public let managedObject: SavedQueueMO
+  private let library: LibraryStorage
 
-  public init(managedObject: SavedQueueMO) {
+  public init(library: LibraryStorage, managedObject: SavedQueueMO) {
+    self.library = library
     self.managedObject = managedObject
   }
 
@@ -41,10 +43,6 @@ public class SavedQueue {
   public var lastUsedAt: Date {
     get { managedObject.lastUsedAt ?? Date.distantPast }
     set { managedObject.lastUsedAt = newValue }
-  }
-
-  public var playerMode: PlayerMode {
-    PlayerMode(rawValue: managedObject.playerMode) ?? .music
   }
 
   public var currentIndex: Int {
@@ -67,28 +65,16 @@ public class SavedQueue {
     set { managedObject.isUserQueuePlaying = newValue }
   }
 
+  public var contextPlaylist: Playlist {
+    Playlist(library: library, managedObject: managedObject.contextPlaylist!)
+  }
+
+  public var userQueuePlaylist: Playlist {
+    Playlist(library: library, managedObject: managedObject.userQueuePlaylist!)
+  }
+
   public var songCount: Int {
-    get { Int(managedObject.songCount) }
-    set { managedObject.songCount = Int32(newValue) }
-  }
-
-  public var contextSongIds: [String] {
-    get { Self.decodeIds(managedObject.contextSongIds) }
-    set { managedObject.contextSongIds = Self.encodeIds(newValue) }
-  }
-
-  public var userQueueSongIds: [String] {
-    get { Self.decodeIds(managedObject.userQueueSongIds) }
-    set { managedObject.userQueueSongIds = Self.encodeIds(newValue) }
-  }
-
-  private static func encodeIds(_ ids: [String]) -> Data {
-    (try? JSONEncoder().encode(ids)) ?? Data()
-  }
-
-  private static func decodeIds(_ data: Data?) -> [String] {
-    guard let data, !data.isEmpty else { return [] }
-    return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+    contextPlaylist.songCount + userQueuePlaylist.songCount
   }
 }
 
@@ -106,4 +92,61 @@ extension SavedQueue: Hashable {
   public func hash(into hasher: inout Hasher) {
     hasher.combine(managedObject)
   }
+}
+
+// MARK: PlayableContainable
+
+extension SavedQueue: PlayableContainable {
+  public var id: String { managedObject.id?.uuidString ?? "" }
+  public var subtitle: String? { nil }
+  public var subsubtitle: String? { nil }
+
+  public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
+    var infoContent = [String]()
+    if songCount == 1 {
+      infoContent.append("1 Song")
+    } else {
+      infoContent.append("\(songCount) Songs")
+    }
+    return infoContent
+  }
+
+  public var playables: [AbstractPlayable] {
+    contextPlaylist.playables + userQueuePlaylist.playables
+  }
+
+  public var playContextType: PlayerMode { .music }
+  public var account: Account? { nil }
+  public var isDownloadAvailable: Bool { true }
+
+  @MainActor
+  public func fetchFromServer(
+    storage: PersistentStorage,
+    librarySyncer: LibrarySyncer,
+    playableDownloadManager: DownloadManageable
+  ) async throws {
+    // Saved queues are a local-only container; there is nothing to sync.
+  }
+
+  @MainActor
+  public func remoteToggleFavorite(syncer: LibrarySyncer) async throws {
+    throw BackendError.notSupported
+  }
+
+  @MainActor
+  public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
+    if !contextPlaylist.playables.isEmpty {
+      return contextPlaylist.getArtworkCollection(theme: theme)
+    }
+    return userQueuePlaylist.getArtworkCollection(theme: theme)
+  }
+
+  public func playedViaContext() {
+    lastUsedAt = Date()
+  }
+
+  public var containerIdentifier: PlayableContainerIdentifier { PlayableContainerIdentifier(
+    type: .savedQueue,
+    objectID: managedObject.objectID.uriRepresentation().absoluteString
+  ) }
 }

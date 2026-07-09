@@ -63,6 +63,10 @@ extension PlaylistMO {
   @NSManaged
   public var playersUserQueuePlaylist: PlayerMO?
   @NSManaged
+  public var savedQueueContextPlaylist: SavedQueueMO?
+  @NSManaged
+  public var savedQueueUserQueuePlaylist: SavedQueueMO?
+  @NSManaged
   public var artworkItems: [PlaylistItemMO]
   @NSManaged
   public var searchHistory: SearchHistoryItemMO?

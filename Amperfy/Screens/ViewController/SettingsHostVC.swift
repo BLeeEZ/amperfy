@@ -201,9 +201,7 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$savedQueuesLimit.sink(receiveValue: { [weak self] newValue in
       guard let self else { return }
       appDelegate.storage.settings.user.savedQueuesLimit = newValue
-      for account in appDelegate.storage.main.library.getAllAccounts() {
-        appDelegate.savedQueues.enforceLimit(for: account)
-      }
+      appDelegate.savedQueues.enforceLimit()
     }))
 
     settings.swipeActionSettings = appDelegate.storage.settings.user.swipeActionSettings

@@ -70,7 +70,9 @@ extension LibraryDisplayType {
     case .radios:
       return AppStoryboard.Main.segueToRadios(account: account)
     case .savedQueues:
-      return AppStoryboard.Main.segueToSavedQueues(account: account)
+      // The library entry lives in each account's library UI, but saved
+      // queues are global: the list it opens is account-independent.
+      return AppStoryboard.Main.segueToSavedQueues()
     }
   }
 }

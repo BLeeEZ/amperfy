@@ -59,7 +59,6 @@
         <relationship name="playlistItems" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistItem" inverseName="account" inverseEntity="PlaylistItem"/>
         <relationship name="playlists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Playlist" inverseName="account" inverseEntity="Playlist"/>
         <relationship name="scrobbleEntries" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ScrobbleEntry" inverseName="account" inverseEntity="ScrobbleEntry"/>
-        <relationship name="savedQueues" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="SavedQueue" inverseName="toAccount" inverseEntity="SavedQueue"/>
         <relationship name="searchHistories" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SearchHistoryItem" inverseName="account" inverseEntity="SearchHistoryItem"/>
     </entity>
     <entity name="Album" representedClassName="AlbumMO" parentEntity="AbstractLibraryEntity" syncable="YES">
@@ -216,6 +215,8 @@
         <relationship name="playersPodcastPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="podcastPlaylist" inverseEntity="Player"/>
         <relationship name="playersShuffledContextPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="shuffledContextPlaylist" inverseEntity="Player" elementID="playersShuffledPlaylist"/>
         <relationship name="playersUserQueuePlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Player" inverseName="userQueuePlaylist" inverseEntity="Player" elementID="playersWaitingQueuePlaylist"/>
+        <relationship name="savedQueueContextPlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SavedQueue" inverseName="contextPlaylist" inverseEntity="SavedQueue"/>
+        <relationship name="savedQueueUserQueuePlaylist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SavedQueue" inverseName="userQueuePlaylist" inverseEntity="SavedQueue"/>
         <relationship name="searchHistory" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="SearchHistoryItem" inverseName="searchedPlaylist" inverseEntity="SearchHistoryItem"/>
         <fetchIndex name="byPlaylistIdIndex">
             <fetchIndexElement property="id" type="Binary" order="ascending"/>
@@ -255,18 +256,15 @@
         </fetchIndex>
     </entity>
     <entity name="SavedQueue" representedClassName="SavedQueueMO" syncable="YES">
-        <attribute name="contextSongIds" optional="YES" attributeType="Binary"/>
-        <attribute name="lastUsedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" indexed="YES"/>
         <attribute name="currentIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO" indexed="YES"/>
         <attribute name="isShuffle" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isUserQueuePlaying" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="lastUsedAt" optional="YES" attributeType="Date" usesScalarValueType="NO" indexed="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="playerMode" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="repeatMode" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="songCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="userQueueSongIds" optional="YES" attributeType="Binary"/>
-        <relationship name="toAccount" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Account" inverseName="savedQueues" inverseEntity="Account"/>
+        <relationship name="contextPlaylist" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Playlist" inverseName="savedQueueContextPlaylist" inverseEntity="Playlist"/>
+        <relationship name="userQueuePlaylist" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Playlist" inverseName="savedQueueUserQueuePlaylist" inverseEntity="Playlist"/>
     </entity>
     <entity name="ScrobbleEntry" representedClassName="ScrobbleEntryMO" syncable="YES">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>

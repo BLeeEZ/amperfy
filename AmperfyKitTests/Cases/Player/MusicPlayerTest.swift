@@ -750,7 +750,6 @@ class MusicPlayerTest: XCTestCase {
   }
 
   func testPlayContext_LeavingShuffledQueue_SnapshotsPlayingOrder() {
-    storage.settings.accounts.switchActiveAccount(account.info)
     fillPlayerWithSomeSongs()
     playerData.setShuffle(true)
     let playingOrder = playerData.activeQueue.playables.map { $0.id }
@@ -760,28 +759,26 @@ class MusicPlayerTest: XCTestCase {
     ) else { XCTFail(); return }
     testPlayer.play(context: PlayContext(name: "Other", playables: [nextSong]))
 
-    let queues = library.getSavedQueues(for: account)
+    let queues = library.getSavedQueues()
     XCTAssertEqual(queues.count, 1)
-    XCTAssertEqual(queues[0].contextSongIds, playingOrder)
+    XCTAssertEqual(queues[0].contextPlaylist.playables.map { $0.id }, playingOrder)
     XCTAssertTrue(queues[0].isShuffle)
   }
 
   func testClearPlayer_SnapshotsQueueWithPosition() {
-    storage.settings.accounts.switchActiveAccount(account.info)
     fillPlayerWithSomeSongs()
     playerData.setCurrentIndex(2)
     let queueIds = playerData.activeQueue.playables.map { $0.id }
     testPlayer.clearQueues()
 
-    let queues = library.getSavedQueues(for: account)
+    let queues = library.getSavedQueues()
     XCTAssertEqual(queues.count, 1)
-    XCTAssertEqual(queues[0].contextSongIds, queueIds)
+    XCTAssertEqual(queues[0].contextPlaylist.playables.map { $0.id }, queueIds)
     XCTAssertEqual(queues[0].currentIndex, 2)
     XCTAssertEqual(playerData.contextQueue.playables.count, 0)
   }
 
   func testClearPlayer_SnapshotsUserQueue() {
-    storage.settings.accounts.switchActiveAccount(account.info)
     fillPlayerWithSomeSongsAndWaitingQueue()
     playerData.setCurrentIndex(1)
     let contextIds = playerData.activeQueue.playables.map { $0.id }
@@ -789,36 +786,52 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertFalse(userIds.isEmpty)
     testPlayer.clearQueues()
 
-    let queues = library.getSavedQueues(for: account)
+    let queues = library.getSavedQueues()
     XCTAssertEqual(queues.count, 1)
-    XCTAssertEqual(queues[0].contextSongIds, contextIds)
-    XCTAssertEqual(queues[0].userQueueSongIds, userIds)
+    XCTAssertEqual(queues[0].contextPlaylist.playables.map { $0.id }, contextIds)
+    XCTAssertEqual(queues[0].userQueuePlaylist.playables.map { $0.id }, userIds)
     XCTAssertEqual(queues[0].currentIndex, 1)
   }
 
   func testClearContextQueue_SnapshotsQueueWithPosition() {
-    storage.settings.accounts.switchActiveAccount(account.info)
     fillPlayerWithSomeSongs()
     playerData.setCurrentIndex(2)
     let queueIds = playerData.activeQueue.playables.map { $0.id }
     testPlayer.clearContextQueue()
 
-    let queues = library.getSavedQueues(for: account)
+    let queues = library.getSavedQueues()
     XCTAssertEqual(queues.count, 1)
-    XCTAssertEqual(queues[0].contextSongIds, queueIds)
+    XCTAssertEqual(queues[0].contextPlaylist.playables.map { $0.id }, queueIds)
     XCTAssertEqual(queues[0].currentIndex, 2)
     XCTAssertEqual(playerData.contextQueue.playables.count, 0)
   }
 
   func testClearPlayer_PodcastMode_NoMusicSnapshot() {
-    storage.settings.accounts.switchActiveAccount(account.info)
     fillPlayerWithSomeSongs()
     playerData.setPlayerMode(.podcast)
     testPlayer.clearQueues()
 
-    XCTAssertEqual(library.getSavedQueues(for: account).count, 0)
+    XCTAssertEqual(library.getSavedQueues().count, 0)
     // The music queue must survive clearing the podcast player.
     XCTAssertEqual(playerData.contextQueue.playables.count, fillCount)
+  }
+
+  func testFacadeRestoreLoadsCurrentItemIntoBackend() async {
+    fillPlayerWithSomeSongs()
+    playerData.setCurrentIndex(1)
+    testPlayer.clearQueues()
+
+    let queues = library.getSavedQueues()
+    XCTAssertEqual(queues.count, 1)
+    let saved = queues[0]
+    let expectedCurrent = saved.contextPlaylist.playables[1]
+    markAsCached(playable: expectedCurrent)
+
+    let ok = await testPlayer.restore(savedQueue: saved)
+    XCTAssertTrue(ok)
+    XCTAssertEqual(testPlayer.currentlyPlaying?.id, expectedCurrent.id)
+    // The backend loaded the restored current item (cached => synchronous).
+    XCTAssertEqual(backendPlayer.playType, .cache)
   }
 
   func testPlaySongInPlaylistAt_EmptyPlaylist() {

@@ -25,13 +25,11 @@ import UIKit
 class SavedQueueDetailVC: BasicTableViewController {
   override var sceneTitle: String? { savedQueue.name }
 
-  private let account: Account
   private let savedQueue: SavedQueue
   private var resolvedSongs: [Song] = []
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
 
-  init(account: Account, savedQueue: SavedQueue) {
-    self.account = account
+  init(savedQueue: SavedQueue) {
     self.savedQueue = savedQueue
     super.init(style: .grouped)
   }
@@ -120,11 +118,9 @@ class SavedQueueDetailVC: BasicTableViewController {
   }
 
   private func resolveSongs() {
-    let allIds = Set(savedQueue.contextSongIds + savedQueue.userQueueSongIds)
-    let fetched = appDelegate.storage.main.library.getSongs(for: account, ids: allIds)
-    let byId = Dictionary(uniqueKeysWithValues: fetched.map { ($0.id, $0) })
-    resolvedSongs = (savedQueue.contextSongIds + savedQueue.userQueueSongIds)
-      .compactMap { byId[$0] }
+    // Saved queues are now backed by Core Data song objects directly
+    // (Task 1/2), so `playables` already holds the resolved songs in order.
+    resolvedSongs = savedQueue.playables.compactMap { $0 as? Song }
     tableView.reloadData()
   }
 
@@ -133,17 +129,17 @@ class SavedQueueDetailVC: BasicTableViewController {
   // list as a fresh context starting at that song.
   private func resumeQueue() {
     Task { @MainActor in
-      guard await appDelegate.savedQueues.restore(savedQueue) else { return }
-      appDelegate.player.playCurrentItem()
+      await appDelegate.player.restore(savedQueue: savedQueue)
     }
   }
 
   private func makePlayContext(startingAt index: Int? = nil) -> PlayContext {
     let savedIndex = max(0, Int(savedQueue.currentIndex))
     let startIndex = index ?? min(savedIndex, max(0, resolvedSongs.count - 1))
+    // The standard container path, mirroring PlaylistDetailVC: play() is the
+    // fresh start; the header's Resume action is the faithful continuation.
     return PlayContext(
-      name: savedQueue.name,
-      type: .music,
+      containable: savedQueue,
       index: startIndex,
       playables: resolvedSongs.map { $0 as AbstractPlayable }
     )
@@ -194,7 +190,10 @@ class SavedQueueDetailVC: BasicTableViewController {
       let name = alert.textFields?.first?.text ?? self.savedQueue.name
       Task { @MainActor in
         do {
-          let syncer = self.appDelegate.getMeta(self.account.info).librarySyncer
+          // saveAsPlaylist filters to the active account, so the upload goes
+          // through the active account's syncer.
+          let syncer = self.appDelegate.storage.settings.accounts.active
+            .map { self.appDelegate.getMeta($0).librarySyncer }
           _ = try await self.appDelegate.savedQueues.saveAsPlaylist(
             self.savedQueue,
             name: name,

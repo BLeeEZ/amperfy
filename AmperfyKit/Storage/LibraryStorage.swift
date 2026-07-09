@@ -633,55 +633,33 @@ public class LibraryStorage: PlayableFileCachable {
     context.delete(scrobbleEntry.managedObject)
   }
 
-  func createSavedQueue(account: Account) -> SavedQueue {
-    let mo = SavedQueueMO(context: context)
-    mo.id = UUID()
-    mo.lastUsedAt = Date()
-    mo.toAccount = account.managedObject
-    return SavedQueue(managedObject: mo)
+  public func createSavedQueue() -> SavedQueue {
+    let managedObject = SavedQueueMO(context: context)
+    managedObject.id = UUID()
+    managedObject.contextPlaylist = PlaylistMO(context: context)
+    managedObject.userQueuePlaylist = PlaylistMO(context: context)
+    return SavedQueue(library: self, managedObject: managedObject)
   }
 
-  public func getSavedQueues(for account: Account) -> [SavedQueue] {
-    let fetchRequest: NSFetchRequest<SavedQueueMO> = SavedQueueMO.fetchRequest()
-    fetchRequest.predicate = NSPredicate(
-      format: "%K == %@",
-      #keyPath(SavedQueueMO.toAccount), account.managedObject
-    )
+  public func getSavedQueues() -> [SavedQueue] {
+    let fetchRequest = SavedQueueMO.fetchRequest()
     fetchRequest.sortDescriptors = [
       NSSortDescriptor(key: #keyPath(SavedQueueMO.lastUsedAt), ascending: false),
     ]
-    let mos = (try? context.fetch(fetchRequest)) ?? []
-    return mos.map { SavedQueue(managedObject: $0) }
-  }
-
-  public func isAnySongAvailable(for account: Account, ids: Set<String>) -> Bool {
-    guard !ids.isEmpty else { return false }
-    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      NSPredicate(
-        format: "%K IN %@",
-        #keyPath(SongMO.id),
-        ids
-      ),
-    ])
-    fetchRequest.fetchLimit = 1
-    let count = (try? context.count(for: fetchRequest)) ?? 0
-    return count > 0
+    let found = try? context.fetch(fetchRequest)
+    return found?.compactMap { SavedQueue(library: self, managedObject: $0) } ?? []
   }
 
   public func deleteSavedQueue(_ savedQueue: SavedQueue) {
+    savedQueue.contextPlaylist.removeAllItems()
+    savedQueue.userQueuePlaylist.removeAllItems()
+    if let contextMO = savedQueue.managedObject.contextPlaylist {
+      context.delete(contextMO)
+    }
+    if let userMO = savedQueue.managedObject.userQueuePlaylist {
+      context.delete(userMO)
+    }
     context.delete(savedQueue.managedObject)
-  }
-
-  public func deleteAllSavedQueues(for account: Account) {
-    let fetchRequest: NSFetchRequest<SavedQueueMO> = SavedQueueMO.fetchRequest()
-    fetchRequest.predicate = NSPredicate(
-      format: "%K == %@",
-      #keyPath(SavedQueueMO.toAccount), account.managedObject
-    )
-    let mos = (try? context.fetch(fetchRequest)) ?? []
-    for mo in mos { context.delete(mo) }
   }
 
   func createMusicFolder(account: Account) -> MusicFolder {
@@ -928,6 +906,11 @@ public class LibraryStorage: PlayableFileCachable {
       return Directory(managedObject: context.object(with: managedObjectID) as! DirectoryMO)
     case .radio:
       return Radio(managedObject: context.object(with: managedObjectID) as! RadioMO)
+    case .savedQueue:
+      return SavedQueue(
+        library: self,
+        managedObject: context.object(with: managedObjectID) as! SavedQueueMO
+      )
     }
   }
 
@@ -1745,21 +1728,6 @@ public class LibraryStorage: PlayableFileCachable {
     fetchRequest.fetchLimit = 1
     let songs = try? context.fetch(fetchRequest)
     return songs?.lazy.compactMap { Song(managedObject: $0) }.first
-  }
-
-  public func getSongs(for account: Account, ids: Set<String>) -> [Song] {
-    guard !ids.isEmpty else { return [] }
-    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      NSPredicate(
-        format: "%K IN %@",
-        #keyPath(SongMO.id),
-        ids
-      ),
-    ])
-    let mos = (try? context.fetch(fetchRequest)) ?? []
-    return mos.map { Song(managedObject: $0) }
   }
 
   // MARK: Radios

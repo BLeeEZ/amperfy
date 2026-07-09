@@ -25,11 +25,9 @@ import UIKit
 class SavedQueuesVC: BasicTableViewController {
   override var sceneTitle: String? { "Saved Queues" }
 
-  private let account: Account
   private var savedQueues: [SavedQueue] = []
 
-  init(account: Account) {
-    self.account = account
+  init() {
     super.init(style: .plain)
   }
 
@@ -65,7 +63,7 @@ class SavedQueuesVC: BasicTableViewController {
 
   @objc
   private func reload() {
-    savedQueues = appDelegate.savedQueues.list(forAccount: account)
+    savedQueues = appDelegate.savedQueues.list()
     tableView.reloadData()
     updateContentUnavailable()
   }
@@ -85,13 +83,12 @@ class SavedQueuesVC: BasicTableViewController {
 
   private func resume(_ savedQueue: SavedQueue) {
     Task { @MainActor in
-      guard await appDelegate.savedQueues.restore(savedQueue) else { return }
-      appDelegate.player.playCurrentItem()
+      await appDelegate.player.restore(savedQueue: savedQueue)
     }
   }
 
   private func showDetail(for savedQueue: SavedQueue) {
-    let detailVC = SavedQueueDetailVC(account: account, savedQueue: savedQueue)
+    let detailVC = SavedQueueDetailVC(savedQueue: savedQueue)
     navigationController?.pushViewController(detailVC, animated: true)
   }
 

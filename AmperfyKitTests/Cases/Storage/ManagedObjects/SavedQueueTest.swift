@@ -27,45 +27,78 @@ class SavedQueueTest: XCTestCase {
   var cdHelper: CoreDataHelper!
   var library: LibraryStorage!
   var account: Account!
+  var songA: Song!
+  var songB: Song!
+  var songC: Song!
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
     library = cdHelper.createSeededStorage()
     account = library.getAccount(info: TestAccountInfo.create1())
+    songA = library.getSong(for: account, id: cdHelper.seeder.songs[0].id)!
+    songB = library.getSong(for: account, id: cdHelper.seeder.songs[1].id)!
+    songC = library.getSong(for: account, id: cdHelper.seeder.songs[2].id)!
   }
 
   override func tearDown() {}
 
-  func makeSavedQueue() -> SavedQueue {
-    library.createSavedQueue(account: account)
+  @MainActor
+  func testSavedQueuePlaylistsAreExcludedFromLibrary() throws {
+    let playlistCountBefore = library.getPlaylists(for: account).count
+    let saved = library.createSavedQueue()
+    saved.contextPlaylist.append(playables: [songA, songB].map { $0 as AbstractPlayable })
+    library.saveContext()
+    XCTAssertEqual(library.getPlaylists(for: account).count, playlistCountBefore)
   }
 
-  func testEmptyIdArraysDecodeAsEmpty() {
-    let sq = makeSavedQueue()
-    XCTAssertEqual(sq.contextSongIds, [])
-    XCTAssertEqual(sq.userQueueSongIds, [])
+  @MainActor
+  func testSongCountIsDerivedFromPlaylists() throws {
+    let saved = library.createSavedQueue()
+    saved.contextPlaylist.append(playables: [songA, songB].map { $0 as AbstractPlayable })
+    saved.userQueuePlaylist.append(playables: [songC].map { $0 as AbstractPlayable })
+    XCTAssertEqual(saved.songCount, 3)
   }
 
-  func testRoundTripContextSongIds() {
-    let sq = makeSavedQueue()
-    sq.contextSongIds = ["a", "b", "c"]
-    XCTAssertEqual(sq.contextSongIds, ["a", "b", "c"])
+  @MainActor
+  func testPlayablesConcatenatesContextThenUserQueue() throws {
+    let saved = library.createSavedQueue()
+    saved.contextPlaylist.append(playables: [songA].map { $0 as AbstractPlayable })
+    saved.userQueuePlaylist.append(playables: [songB].map { $0 as AbstractPlayable })
+    XCTAssertEqual(saved.playables.map { $0.id }, [songA.id, songB.id])
   }
 
-  func testRoundTripUserQueueSongIds() {
-    let sq = makeSavedQueue()
-    sq.userQueueSongIds = ["x", "y"]
-    XCTAssertEqual(sq.userQueueSongIds, ["x", "y"])
+  @MainActor
+  func testDeletingSongPrunesItFromSavedQueue() throws {
+    let saved = library.createSavedQueue()
+    saved.contextPlaylist.append(playables: [songA, songB].map { $0 as AbstractPlayable })
+    library.saveContext()
+    // No deleteSong API exists; delete the MO directly (see Global Constraints).
+    cdHelper.persistentContainer.viewContext.delete(songA.playableManagedObject)
+    library.saveContext()
+    XCTAssertEqual(saved.contextPlaylist.playables.map { $0.id }, [songB.id])
   }
 
-  func testPlayerModeDefaultsToMusic() {
-    let sq = makeSavedQueue()
-    XCTAssertEqual(sq.playerMode, .music)
+  @MainActor
+  func testContainerIdentifierRoundTrip() throws {
+    let saved = library.createSavedQueue()
+    saved.name = "Road Trip"
+    library.saveContext()
+    let resolved = library.getContainer(identifier: saved.containerIdentifier)
+    XCTAssertEqual(resolved?.name, "Road Trip")
+    XCTAssertTrue(resolved is SavedQueue)
   }
 
-  func testRepeatModeRoundTrip() {
-    let sq = makeSavedQueue()
-    sq.repeatMode = .all
-    XCTAssertEqual(sq.repeatMode, .all)
+  @MainActor
+  func testDeleteSavedQueueRemovesItsSystemPlaylists() throws {
+    let fetchAllPlaylists = PlaylistMO.fetchRequest()
+    let before = (try? cdHelper.persistentContainer.viewContext.count(for: fetchAllPlaylists)) ?? -1
+    let saved = library.createSavedQueue()
+    saved.contextPlaylist.append(playables: [songA].map { $0 as AbstractPlayable })
+    library.saveContext()
+    library.deleteSavedQueue(saved)
+    library.saveContext()
+    let after = (try? cdHelper.persistentContainer.viewContext.count(for: fetchAllPlaylists)) ?? -2
+    XCTAssertEqual(before, after)
+    XCTAssertTrue(library.getSavedQueues().isEmpty)
   }
 }

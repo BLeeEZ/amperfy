@@ -35,8 +35,6 @@ extension SavedQueueMO {
   @NSManaged
   public var lastUsedAt: Date?
   @NSManaged
-  public var playerMode: Int16
-  @NSManaged
   public var currentIndex: Int32
   @NSManaged
   public var isShuffle: Bool
@@ -45,13 +43,9 @@ extension SavedQueueMO {
   @NSManaged
   public var isUserQueuePlaying: Bool
   @NSManaged
-  public var songCount: Int32
+  public var contextPlaylist: PlaylistMO?
   @NSManaged
-  public var contextSongIds: Data?
-  @NSManaged
-  public var userQueueSongIds: Data?
-  @NSManaged
-  public var toAccount: AccountMO?
+  public var userQueuePlaylist: PlaylistMO?
 }
 
 // MARK: - SavedQueueMO + Identifiable

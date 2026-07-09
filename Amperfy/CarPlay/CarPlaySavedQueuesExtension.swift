@@ -25,8 +25,8 @@ import Foundation
 
 extension CarPlaySceneDelegate {
   func createSavedQueuesSections() -> [CPListSection] {
-    guard let activeAccount else { return [] }
-    let savedQueues = appDelegate.savedQueues.list(forAccount: activeAccount)
+    guard activeAccount != nil else { return [] }
+    let savedQueues = appDelegate.savedQueues.list()
     let formatter = RelativeDateTimeFormatter()
     var items = [CPListTemplateItem]()
     for savedQueue in savedQueues.prefix(CPListTemplate.maximumItemCount) {
@@ -45,11 +45,10 @@ extension CarPlaySceneDelegate {
       item.handler = { [weak self] _, completion in
         guard let self else { completion(); return }
         Task { @MainActor in
-          guard await appDelegate.savedQueues.restore(savedQueue) else {
+          guard await appDelegate.player.restore(savedQueue: savedQueue) else {
             completion()
             return
           }
-          appDelegate.player.playCurrentItem()
           displayNowPlaying {
             completion()
           }
