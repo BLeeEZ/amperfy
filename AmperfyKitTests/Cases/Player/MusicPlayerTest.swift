@@ -703,6 +703,23 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.contextName, "asdf")
   }
 
+  func testQueueReplacementPersistsContextNameWithOneSave() {
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testQueueHandler.replaceActiveQueue(playables: [songCached], contextName: "Replacement")
+
+    XCTAssertEqual(saveCount, 1)
+    XCTAssertEqual(testQueueHandler.contextName, "Replacement")
+  }
+
   func testContextName_changeContext() {
     testPlayer.play(context: PlayContext(name: "asdf", playables: [songCached]))
     XCTAssertEqual(testPlayer.contextName, "asdf")

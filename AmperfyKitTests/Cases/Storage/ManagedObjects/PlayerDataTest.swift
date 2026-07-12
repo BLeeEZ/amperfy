@@ -20,6 +20,7 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
 
 @MainActor
@@ -82,6 +83,148 @@ class PlayerDataTest: XCTestCase {
     fillPlayerWithSomeSongs()
     XCTAssertEqual(testPlayer.activeQueue.playables.count, fillCount)
     checkCorrectDefaultPlaylist()
+  }
+
+  func testReplaceActiveQueueSavesOnce() {
+    fillPlayerWithSomeSongs()
+    let songs = (0 ... 2).compactMap {
+      library.getSong(for: account, id: cdHelper.seeder.songs[$0].id)
+    }
+    XCTAssertEqual(songs.count, 3)
+
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testPlayer.replaceActiveQueue(playables: songs, contextName: "Replacement")
+
+    XCTAssertEqual(saveCount, 1)
+    XCTAssertEqual(testPlayer.contextName, "Replacement")
+    testPlayer.setShuffle(false)
+    XCTAssertEqual(testPlayer.activeQueue.playables.map(\.id), songs.map(\.id))
+    testPlayer.setShuffle(true)
+    XCTAssertEqual(Set(testPlayer.activeQueue.playables.map(\.id)), Set(songs.map(\.id)))
+    XCTAssertEqual(testPlayer.activeQueue.songCount, songs.count)
+  }
+
+  func testReplaceActiveQueueWithUserQueueSavesOnce() {
+    let songs = (0 ... 2).compactMap {
+      library.getSong(for: account, id: cdHelper.seeder.songs[$0].id)
+    }
+    XCTAssertEqual(songs.count, 3)
+    testPlayer.appendUserQueue(playables: [songs[0]])
+
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testPlayer.replaceActiveQueue(
+      playables: Array(songs.dropFirst()),
+      contextName: "User Queue Replacement"
+    )
+
+    XCTAssertEqual(saveCount, 1)
+    XCTAssertEqual(testPlayer.contextName, "User Queue Replacement")
+    XCTAssertTrue(testPlayer.isUserQueuePlaying)
+    XCTAssertEqual(testPlayer.currentIndex, -1)
+    XCTAssertEqual(testPlayer.contextQueue.playables.map(\.id), songs.dropFirst().map(\.id))
+    XCTAssertEqual(
+      Set(testPlayer.inactiveQueue.playables.map(\.id)),
+      Set(songs.dropFirst().map(\.id))
+    )
+  }
+
+  func testReplacePodcastQueueSavesOnce() {
+    let songs = (0 ... 2).compactMap {
+      library.getSong(for: account, id: cdHelper.seeder.songs[$0].id)
+    }
+    XCTAssertEqual(songs.count, 3)
+    testPlayer.setPlayerMode(.podcast)
+    testPlayer.appendActiveQueue(playables: [songs[0]])
+
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testPlayer.replaceActiveQueue(playables: Array(songs.dropFirst()), contextName: "Ignored")
+
+    XCTAssertEqual(saveCount, 1)
+    XCTAssertEqual(testPlayer.playerMode, .podcast)
+    XCTAssertEqual(testPlayer.currentIndex, 0)
+    XCTAssertEqual(testPlayer.podcastQueue.playables.map(\.id), songs.dropFirst().map(\.id))
+  }
+
+  func testPlaylistBatchAppendSavesByDefault() {
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[0].id)
+    else { XCTFail(); return }
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testNormalPlaylist.append(playables: [song])
+
+    XCTAssertEqual(saveCount, 1)
+  }
+
+  func testPlaylistRemoveAllItemsSavesByDefault() {
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[0].id)
+    else { XCTFail(); return }
+    testNormalPlaylist.append(playables: [song])
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testNormalPlaylist.removeAllItems()
+
+    XCTAssertEqual(saveCount, 1)
+    XCTAssertTrue(testNormalPlaylist.playables.isEmpty)
+  }
+
+  func testPlaylistNameSavesByDefault() {
+    var saveCount = 0
+    let observer = NotificationCenter.default.addObserver(
+      forName: .NSManagedObjectContextDidSave,
+      object: cdHelper.persistentContainer.viewContext,
+      queue: nil
+    ) { _ in
+      saveCount += 1
+    }
+    defer { NotificationCenter.default.removeObserver(observer) }
+
+    testNormalPlaylist.name = "Renamed"
+
+    XCTAssertEqual(saveCount, 1)
+    XCTAssertEqual(testNormalPlaylist.name, "Renamed")
   }
 
   func testCurrentSong() {
