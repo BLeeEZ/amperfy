@@ -161,11 +161,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     guard let activePlayable = context.getActivePlayable() else { return }
     let topUserQueueItem = queueHandler.getUserQueueItem(at: 0)
     let wasUserQueuePlaying = queueHandler.isUserQueuePlaying
-    queueHandler.clearActiveQueue()
-    queueHandler.appendActiveQueue(playables: context.playables)
-    if context.type == .music {
-      queueHandler.setContextName(context.name)
-    }
+    queueHandler.replaceActiveQueue(playables: context.playables, contextName: context.name)
 
     if queueHandler.isUserQueuePlaying {
       play(playerIndex: PlayerIndex(queueType: .next, index: context.index))

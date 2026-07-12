@@ -195,6 +195,10 @@ public class PlayQueueHandler {
     playerQueues.appendActiveQueue(playables: playables)
   }
 
+  func replaceActiveQueue(playables: [AbstractPlayable], contextName: String) {
+    playerQueues.replaceActiveQueue(playables: playables, contextName: contextName)
+  }
+
   func insertContextQueue(playables: [AbstractPlayable]) {
     playerQueues.setContextName("")
     playerQueues.insertContextQueue(playables: playables)

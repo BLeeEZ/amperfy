@@ -149,13 +149,21 @@ public class Playlist: Identifyable {
       managedObject.name ?? ""
     }
     set {
-      if managedObject.name != newValue {
-        managedObject.name = newValue
-        updateAlphabeticSectionInitial(section: newValue)
-        updateChangeDate()
+      if setNameWithoutSaving(newValue) {
         library.saveContext()
       }
     }
+  }
+
+  @discardableResult
+  func setNameWithoutSaving(_ newValue: String) -> Bool {
+    if managedObject.name != newValue {
+      managedObject.name = newValue
+      updateAlphabeticSectionInitial(section: newValue)
+      updateChangeDate()
+      return true
+    }
+    return false
   }
 
   func updateAlphabeticSectionInitial(section: String) {
@@ -250,13 +258,17 @@ public class Playlist: Identifyable {
   }
 
   public func append(playables playablesToAppend: [AbstractPlayable]) {
+    appendWithoutSaving(playables: playablesToAppend)
+    library.saveContext()
+  }
+
+  func appendWithoutSaving(playables playablesToAppend: [AbstractPlayable]) {
     for playable in playablesToAppend {
       createAndAppendPlaylistItem(for: playable)
     }
     updateChangeDate()
     updateDuration(byIncreasingDuration: playablesToAppend.reduce(0) { $0 + $1.duration })
     updateArtworkItems()
-    library.saveContext()
   }
 
   public func createAndAppendPlaylistItem(for playable: AbstractPlayable) {
@@ -448,12 +460,16 @@ public class Playlist: Identifyable {
   }
 
   public func removeAllItems() {
+    removeAllItemsWithoutSaving()
+    library.saveContext()
+  }
+
+  func removeAllItemsWithoutSaving() {
     managedObject.removeAllItems()
     updateChangeDate()
     updateArtworkItems()
     managedObject.duration = 0
     managedObject.remoteDuration = 0
-    library.saveContext()
   }
 
   public func shuffle() {
