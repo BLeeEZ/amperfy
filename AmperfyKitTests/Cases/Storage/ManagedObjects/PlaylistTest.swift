@@ -114,6 +114,60 @@ class PlaylistTest: XCTestCase {
     XCTAssertEqual(playlistFetched.account?.userHash, TestAccountInfo.test2UserHash)
   }
 
+  func testPinnedStateDefaultsToFalseAndIsSaved() {
+    XCTAssertFalse(defaultPlaylist.isPinned)
+
+    defaultPlaylist.isPinned = true
+
+    XCTAssertTrue(defaultPlaylist.isPinned)
+    guard let context = defaultPlaylist.managedObject.managedObjectContext
+    else { XCTFail(); return }
+    XCTAssertFalse(context.hasChanges)
+  }
+
+  func testPinnedStatePassesToDuplicatePlaylistOwner() {
+    let targetPlaylist = library.createPlaylist(account: account)
+    defaultPlaylist.isPinned = true
+
+    defaultPlaylist.managedObject.passOwnership(to: targetPlaylist.managedObject)
+
+    XCTAssertTrue(targetPlaylist.isPinned)
+  }
+
+  func testPinnedPlaylistFetchIsAccountScopedAlphabeticAndExcludesSystemPlaylists() {
+    defaultPlaylist.name = "Zulu"
+    defaultPlaylist.isPinned = true
+    playlistNoCached.name = "Alpha"
+    playlistNoCached.isPinned = true
+
+    let secondAccount = library.getAccount(info: TestAccountInfo.create2())
+    guard let secondAccountPlaylist = library.getPlaylist(
+      for: secondAccount,
+      id: cdHelper.seeder.playlists[4].id
+    ) else { XCTFail(); return }
+    secondAccountPlaylist.isPinned = true
+
+    let systemPlaylist = library.getPlayerData().activeQueue
+    systemPlaylist.account = account
+    systemPlaylist.name = "Queue"
+    systemPlaylist.isPinned = true
+
+    guard let context = defaultPlaylist.managedObject.managedObjectContext
+    else { XCTFail(); return }
+    let controller = PinnedPlaylistFetchedResultsController(
+      coreDataCompanion: CoreDataCompanion(context: context),
+      account: account
+    )
+    controller.fetch()
+
+    XCTAssertEqual(controller.fetchedObjects?.compactMap(\.name), ["Alpha", "Zulu"])
+
+    playlistNoCached.isPinned = false
+    controller.fetch()
+
+    XCTAssertEqual(controller.fetchedObjects?.compactMap(\.name), ["Zulu"])
+  }
+
   func testSongAppend() {
     let playlist = library.createPlaylist(account: account)
     XCTAssertEqual(playlist.items.count, 0)

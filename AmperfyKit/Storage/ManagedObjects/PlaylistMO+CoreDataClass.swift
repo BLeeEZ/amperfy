@@ -147,5 +147,7 @@ extension PlaylistMO: CoreDataIdentifyable {
     \PlaylistMO.name
   }
 
-  func passOwnership(to targetPlaylist: PlaylistMO) {}
+  func passOwnership(to targetPlaylist: PlaylistMO) {
+    targetPlaylist.isPinned = targetPlaylist.isPinned || isPinned
+  }
 }
