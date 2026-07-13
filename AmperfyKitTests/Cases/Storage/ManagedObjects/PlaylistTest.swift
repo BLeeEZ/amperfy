@@ -114,14 +114,19 @@ class PlaylistTest: XCTestCase {
     XCTAssertEqual(playlistFetched.account?.userHash, TestAccountInfo.test2UserHash)
   }
 
-  func testPinnedStateDefaultsToFalseAndIsSaved() {
+  func testPinnedStateCanBeToggledAndIsSaved() {
     XCTAssertFalse(defaultPlaylist.isPinned)
 
-    defaultPlaylist.isPinned = true
+    defaultPlaylist.isPinned.toggle()
 
     XCTAssertTrue(defaultPlaylist.isPinned)
     guard let context = defaultPlaylist.managedObject.managedObjectContext
     else { XCTFail(); return }
+    XCTAssertFalse(context.hasChanges)
+
+    defaultPlaylist.isPinned.toggle()
+
+    XCTAssertFalse(defaultPlaylist.isPinned)
     XCTAssertFalse(context.hasChanges)
   }
 
