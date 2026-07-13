@@ -20,6 +20,7 @@
 //
 
 import AmperfyKit
+import CoreData
 import UIKit
 
 // MARK: - LibraryNavigatorItem
@@ -31,6 +32,7 @@ final class LibraryNavigatorItem: Hashable, Sendable {
   @MainActor
   var isSelected = false
   let isInteractable: Bool
+  let playlistObjectID: NSManagedObjectID?
   let tab: TabNavigatorItem?
 
   init(
@@ -38,12 +40,14 @@ final class LibraryNavigatorItem: Hashable, Sendable {
     library: LibraryDisplayType? = nil,
     isSelected: Bool = false,
     isInteractable: Bool = true,
+    playlistObjectID: NSManagedObjectID? = nil,
     tab: TabNavigatorItem? = nil
   ) {
     self.title = title
     self.library = library
     self.isSelected = isSelected
     self.isInteractable = isInteractable
+    self.playlistObjectID = playlistObjectID
     self.tab = tab
   }
 
@@ -101,6 +105,7 @@ class LibraryNavigatorConfigurator: NSObject {
   private let account: Account
   private var data = [LibraryNavigatorItem]()
   private let offsetData: [LibraryNavigatorItem]
+  private var additionalData = [LibraryNavigatorItem]()
   private var collectionView: UICollectionView!
   private var dataSource: SideBarDiffableDataSource!
   private let layoutConfig: UICollectionLayoutListConfiguration
@@ -197,6 +202,7 @@ class LibraryNavigatorConfigurator: NSObject {
 
       collectionView.isEditing.toggle()
       var snapshot = dataSource.snapshot(for: 0)
+      snapshot.delete(additionalData)
       snapshot.append(libraryNotUsed)
       dataSource.apply(snapshot, to: 0, animatingDifferences: true)
     } else {
@@ -234,6 +240,7 @@ class LibraryNavigatorConfigurator: NSObject {
               .compactMap { $0.library }
           )
         }
+      snapshot.append(additionalData)
       dataSource.apply(snapshot, to: 0, animatingDifferences: true)
 
       // Restore selection after editing endet on macOS
@@ -261,8 +268,12 @@ class LibraryNavigatorConfigurator: NSObject {
       isSelected: true
     ) }
     #if targetEnvironment(macCatalyst) // ok
-      // update the preEditItem based on title
-      preEditItem = libraryInUse.first(where: { $0.title == preEditItem?.title })
+      let selectedItem = preEditItem
+      if let selectedLibrary = selectedItem?.library {
+        preEditItem = libraryInUse.first(where: { $0.library == selectedLibrary })
+      } else {
+        preEditItem = (offsetData + additionalData).first(where: { $0 == selectedItem })
+      }
     #endif
     libraryNotUsed = librarySettings.notUsed.map { LibraryNavigatorItem(
       title: $0.displayName,
@@ -271,6 +282,7 @@ class LibraryNavigatorConfigurator: NSObject {
 
     snapshot.append(offsetData)
     snapshot.append(libraryInUse)
+    snapshot.append(additionalData)
     dataSource.apply(snapshot, to: 0, animatingDifferences: true)
 
     // Restore selection after refresh endet on macOS
@@ -279,6 +291,18 @@ class LibraryNavigatorConfigurator: NSObject {
         collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
       }
     #endif
+  }
+
+  func updateAdditionalData(_ additionalData: [LibraryNavigatorItem]) {
+    let previousAdditionalData = self.additionalData
+    self.additionalData = additionalData
+
+    guard dataSource != nil, !collectionView.isEditing else { return }
+
+    var snapshot = dataSource.snapshot(for: 0)
+    snapshot.delete(previousAdditionalData.filter { snapshot.items.contains($0) })
+    snapshot.append(additionalData)
+    dataSource.apply(snapshot, to: 0, animatingDifferences: true)
   }
 
   private func createLayout() -> UICollectionViewLayout {
@@ -344,6 +368,16 @@ class LibraryNavigatorConfigurator: NSObject {
         content.text = tabItem.title
         content.image = tabItem.icon.withRenderingMode(.alwaysTemplate)
         cell.contentConfiguration = content
+      } else if item.playlistObjectID != nil {
+        #if targetEnvironment(macCatalyst) // ok
+          cell.accessories = []
+        #else
+          cell.accessories = [.disclosureIndicator()]
+        #endif
+        var content = cell.defaultContentConfiguration()
+        content.text = item.title
+        content.image = UIImage.playlist.withRenderingMode(.alwaysTemplate)
+        cell.contentConfiguration = content
       }
       cell.indentationLevel = 0
     }
@@ -406,6 +440,7 @@ class LibraryNavigatorConfigurator: NSObject {
       isSelected: true
     ) }
     data.append(contentsOf: libraryItems)
+    data.append(contentsOf: additionalData)
 
     var outlineSnapshot = NSDiffableDataSourceSectionSnapshot<LibraryNavigatorItem>()
     outlineSnapshot.append(data)
