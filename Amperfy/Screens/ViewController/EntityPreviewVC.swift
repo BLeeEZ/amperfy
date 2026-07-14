@@ -328,6 +328,8 @@ class EntityPreviewActionBuilder {
     isShowArtist = false
     #if targetEnvironment(macCatalyst)
       isPinToSidebar = true
+    #else
+      isPinToSidebar = rootView.traitCollection.userInterfaceIdiom == .pad
     #endif
     isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
