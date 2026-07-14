@@ -955,6 +955,26 @@ public class PlaylistFetchedResultsController: BasicFetchedResultsController<Pla
   }
 }
 
+// MARK: - PinnedPlaylistFetchedResultsController
+
+public class PinnedPlaylistFetchedResultsController: BasicFetchedResultsController<PlaylistMO> {
+  public init(coreDataCompanion: CoreDataCompanion, account: Account) {
+    let fetchRequest = PlaylistMO.alphabeticSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      coreDataCompanion.library.getFetchPredicate(forAccount: account),
+      PlaylistMO.excludeSystemPlaylistsFetchPredicate,
+      NSPredicate(format: "%K == YES", #keyPath(PlaylistMO.isPinned)),
+    ])
+    fetchRequest.relationshipKeyPathsForPrefetching = PlaylistMO.relationshipKeyPathsForPrefetching
+    fetchRequest.returnsObjectsAsFaults = false
+    super.init(
+      coreDataCompanion: coreDataCompanion,
+      fetchRequest: fetchRequest,
+      isGroupedInAlphabeticSections: false
+    )
+  }
+}
+
 // MARK: - PlaylistSelectorFetchedResultsController
 
 public class PlaylistSelectorFetchedResultsController: CachedFetchedResultsController<PlaylistMO> {

@@ -56,6 +56,7 @@ class EntityPreviewActionBuilder {
   private var isPodcastQueue = false
   private var isShowAlbum = false
   private var isShowArtist = false
+  private var isPinToSidebar = false
   private var isAddToPlaylist = false
   private var isDownloadPossible: Bool {
     !(
@@ -148,6 +149,9 @@ class EntityPreviewActionBuilder {
     }
     if !ratingFavActions.isEmpty {
       menuActions.append(UIMenu(options: .displayInline, children: ratingFavActions))
+    }
+    if isPinToSidebar, let playlist = entityContainer as? Playlist {
+      elementHandlingActions.append(createPinToSidebarAction(playlist: playlist))
     }
     if isAddToPlaylist {
       elementHandlingActions.append(createAddToPlaylistAction())
@@ -322,6 +326,11 @@ class EntityPreviewActionBuilder {
     isPodcastQueue = false
     isShowAlbum = false
     isShowArtist = false
+    #if targetEnvironment(macCatalyst)
+      isPinToSidebar = true
+    #else
+      isPinToSidebar = rootView.traitCollection.userInterfaceIdiom == .pad
+    #endif
     isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
     isDeleteOnServer = false
     isGoToSiteUrl = false
@@ -663,6 +672,15 @@ class EntityPreviewActionBuilder {
         .segueToPlaylistSelector(account: account, itemsToAdd: self.entityPlayables.filterSongs())
       let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
       self.rootView.present(selectPlaylistNav, animated: true)
+    }
+  }
+
+  private func createPinToSidebarAction(playlist: Playlist) -> UIAction {
+    UIAction(
+      title: playlist.isPinned ? "Unpin from Sidebar" : "Pin to Sidebar",
+      image: playlist.isPinned ? .pinSlash : .pin
+    ) { _ in
+      playlist.isPinned.toggle()
     }
   }
 

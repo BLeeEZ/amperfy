@@ -20,12 +20,16 @@
 //
 
 import AmperfyKit
+import CoreData
 import UIKit
 
 // MARK: - TabBarVC
 
 class TabBarVC: UITabBarController {
   private var libraryGroup: UITabGroup?
+  private var pinnedPlaylistsGroup: UITabGroup!
+  private var pinnedPlaylistTabs = [NSManagedObjectID: UITab]()
+  private var pinnedPlaylistsFetchedResultsController: PinnedPlaylistFetchedResultsController!
   private var searchTab: UISearchTab?
   private var homeTab: UITab?
   private let account: Account
@@ -101,6 +105,9 @@ class TabBarVC: UITabBarController {
       }
     libraryTabs.append(contentsOf: libraryTabsHidden)
 
+    configurePinnedPlaylists()
+    libraryTabs.append(pinnedPlaylistsGroup)
+
     libraryGroup = UITabGroup(
       title: "Library",
       image: .musicLibrary,
@@ -115,6 +122,7 @@ class TabBarVC: UITabBarController {
 
     delegate = self
     tabs = fixTabs
+    pinnedPlaylistsGroup.isHidden = pinnedPlaylistTabs.isEmpty
 
     NotificationCenter.default.addObserver(
       self,
@@ -152,6 +160,57 @@ class TabBarVC: UITabBarController {
     if appDelegate.storage.settings.user.isOfflineMode {
       appDelegate.eventLogger.info(topic: "Reminder", message: "Offline Mode is active.")
     }
+  }
+
+  private func configurePinnedPlaylists() {
+    pinnedPlaylistsFetchedResultsController = PinnedPlaylistFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main,
+      account: account
+    )
+    pinnedPlaylistsFetchedResultsController.fetch()
+
+    pinnedPlaylistsGroup = UITabGroup(
+      title: "Pinned",
+      image: nil,
+      identifier: "Tabs.Pinned",
+      children: [],
+      viewControllerProvider: nil
+    )
+    pinnedPlaylistsGroup.preferredPlacement = .sidebarOnly
+    pinnedPlaylistsGroup.sidebarAppearance = .rootSection
+    updatePinnedPlaylists()
+    pinnedPlaylistsFetchedResultsController.delegate = self
+  }
+
+  private func updatePinnedPlaylists() {
+    let previousTabs = pinnedPlaylistTabs
+    let playlists = pinnedPlaylistsFetchedResultsController.fetchedObjects?.map {
+      Playlist(library: appDelegate.storage.main.library, managedObject: $0)
+    } ?? []
+
+    pinnedPlaylistTabs = Dictionary(uniqueKeysWithValues: playlists.map { playlist in
+      let objectID = playlist.managedObject.objectID
+      let tab = previousTabs[objectID] ?? createPinnedPlaylistTab(playlist: playlist)
+      tab.title = playlist.name
+      return (objectID, tab)
+    })
+
+    let tabs = playlists.compactMap { pinnedPlaylistTabs[$0.managedObject.objectID] }
+    pinnedPlaylistsGroup.children = tabs
+    pinnedPlaylistsGroup.isHidden = tabs.isEmpty
+  }
+
+  private func createPinnedPlaylistTab(playlist: Playlist) -> UITab {
+    let objectID = playlist.managedObject.objectID
+    let tab = UITab(
+      title: playlist.name,
+      image: .playlist,
+      identifier: "Tabs.Pinned.\(objectID.uriRepresentation().absoluteString)"
+    ) { _ in
+      AppStoryboard.Main.segueToPlaylistDetail(account: self.account, playlist: playlist)
+    }
+    tab.preferredPlacement = .sidebarOnly
+    return tab
   }
 
   private func mainContent() -> UIView {
@@ -260,6 +319,19 @@ extension TabBarVC: UITabBarControllerDelegate {
         accountSettings.libraryDisplaySettings = LibraryDisplaySettings(inUse: visibleItems)
       }
     NotificationCenter.default.post(name: .LibraryItemsChanged, object: nil, userInfo: nil)
+  }
+}
+
+// MARK: NSFetchedResultsControllerDelegate
+
+extension TabBarVC: @preconcurrency NSFetchedResultsControllerDelegate {
+  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    MainActor.assumeIsolated {
+      guard controller == pinnedPlaylistsFetchedResultsController.fetchResultsController else {
+        return
+      }
+      updatePinnedPlaylists()
+    }
   }
 }
 
