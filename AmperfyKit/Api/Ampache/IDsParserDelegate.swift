@@ -50,7 +50,7 @@ class IDsParserDelegate: AmpacheNotifiableXmlParser {
       if let id = attributeDict["id"] {
         prefetchIDs.musicFolderIDs.insert(id)
       }
-    case "artist":
+    case "albumartist", "artist":
       if let id = attributeDict["id"] {
         prefetchIDs.artistIDs.insert(id)
       }

@@ -59,6 +59,10 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
     artist = library.createArtist(account: account)
     artist.id = "2"
     artist.name = "Synthetic"
+
+    artist = library.createArtist(account: account)
+    artist.id = "19"
+    artist.name = "Various Artists"
   }
 
   func createTestAlbums() {
@@ -130,7 +134,7 @@ class PlaylistSongsParserTest: AbstractAmpacheTest {
     prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 3,
       genreIdCount: 4,
-      artistCount: 4,
+      artistCount: 5,
       albumCount: 2,
       songCount: 4,
       songLibraryCount: 4 + createdSongCount

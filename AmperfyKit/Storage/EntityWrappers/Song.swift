@@ -106,8 +106,38 @@ public class Song: AbstractPlayable, Identifyable {
     }
   }
 
+  public var artistsString: String? {
+    guard let multiArtists = multiArtists, !multiArtists.isEmpty else { return artist?.name }
+    return multiArtists.map { $0.name }.joined(separator: ", ")
+  }
+
+  public var albumArtistsString: String? {
+    guard let albumArtists = albumArtists, !albumArtists.isEmpty else { return nil }
+    return albumArtists.map { $0.name }.joined(separator: ", ")
+  }
+
+  public var multiArtists: [Artist]? {
+    get {
+      guard let orderedSet = managedObject.multiArtists else { return nil }
+      return (orderedSet.array as? [ArtistMO])?.map { Artist(managedObject: $0) }
+    }
+    set {
+      managedObject.multiArtists = newValue.map { NSOrderedSet(array: $0.map { $0.managedObject }) }
+    }
+  }
+
+  public var albumArtists: [Artist]? {
+    get {
+      guard let orderedSet = managedObject.albumArtists else { return nil }
+      return (orderedSet.array as? [ArtistMO])?.map { Artist(managedObject: $0) }
+    }
+    set {
+      managedObject.albumArtists = newValue.map { NSOrderedSet(array: $0.map { $0.managedObject }) }
+    }
+  }
+
   override public var creatorName: String {
-    artist?.name ?? "Unknown Artist"
+    artistsString ?? artist?.name ?? "Unknown Artist"
   }
 
   public var detailInfo: String {
