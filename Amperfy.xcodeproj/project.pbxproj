@@ -203,6 +203,7 @@
 		50BE5D4D2850F4C900156FC6 /* ArtworkTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8F23BCDE1600EAAC3E /* ArtworkTest.swift */; };
 		50BE5D4E2850F4C900156FC6 /* PlayerDataTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E9123BD29BB00EAAC3E /* PlayerDataTest.swift */; };
 		50BE5D4F2850F4C900156FC6 /* AlbumTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */; };
+		7A1C0D5F2E00000100AAAA02 /* CachedDisplayFilterTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1C0D5E2E00000100AAAA01 /* CachedDisplayFilterTest.swift */; };
 		50BE5D522850F4D700156FC6 /* HelperTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B798B323B8664700551E62 /* HelperTest.swift */; };
 		50BE5D532850F4E700156FC6 /* MusicPlayerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */; };
 		50BE5D542850F4E700156FC6 /* SubsonicVersionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */; };
@@ -1116,6 +1117,7 @@
 		50F800202685B8DA0015844D /* Amperfy v10.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v10.xcdatamodel"; sourceTree = "<group>"; };
 		50F81E8523BAF25900EAAC3E /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		50F81E8723BB29CD00EAAC3E /* AlbumTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumTest.swift; sourceTree = "<group>"; };
+		7A1C0D5E2E00000100AAAA01 /* CachedDisplayFilterTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedDisplayFilterTest.swift; sourceTree = "<group>"; };
 		50F81E8923BB5FC500EAAC3E /* Artist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		50F81E8B23BB666100EAAC3E /* ArtistTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistTest.swift; sourceTree = "<group>"; };
 		50F81E8D23BC6FEA00EAAC3E /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
@@ -1601,6 +1603,7 @@
 			isa = PBXGroup;
 			children = (
 				5095F98F23CA94BC008B0805 /* ManagedObjects */,
+				7A1C0D5E2E00000100AAAA01 /* CachedDisplayFilterTest.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -2861,6 +2864,7 @@
 				50BE5D742850F4FB00156FC6 /* SsAlbumMultidiscExample1ParserTest.swift in Sources */,
 				50BE5D872850F50F00156FC6 /* AbstractAmpacheTest.swift in Sources */,
 				50BE5D4F2850F4C900156FC6 /* AlbumTest.swift in Sources */,
+				7A1C0D5F2E00000100AAAA02 /* CachedDisplayFilterTest.swift in Sources */,
 				50BE5D8E2850F50F00156FC6 /* PodcastEpisodesParserTest.swift in Sources */,
 				50CEC6432D1F38F800D0E696 /* SsRadioExampleParserTest.swift in Sources */,
 				50BE5D882850F50F00156FC6 /* SongParserTest.swift in Sources */,

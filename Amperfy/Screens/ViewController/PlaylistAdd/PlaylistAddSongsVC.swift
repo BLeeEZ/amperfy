@@ -28,6 +28,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     switch displayFilter {
     case .all, .newest, .recent: "Songs"
     case .favorites: "Favorite Songs"
+    case .cached: "Downloaded Songs"
     }
   }
 
@@ -101,6 +102,8 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
       break
     case .newest, .recent:
       break
+    case .cached:
+      break
     case .favorites:
       Task { @MainActor in
         do {
@@ -121,6 +124,9 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
       change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .newest, .recent:
       break
+    case .cached:
+      isIndexTitelsHidden = false
+      change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .favorites:
       isIndexTitelsHidden = false
       if account.apiType.asServerApiType != .ampache {

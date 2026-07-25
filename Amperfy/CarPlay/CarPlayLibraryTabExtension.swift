@@ -32,7 +32,7 @@ extension LibraryDisplayType {
          .podcasts,
          .radios, .recentAlbums:
       return true
-    case .directories, .downloads, .songs:
+    case .directories, .downloadedAlbums, .downloadedArtists, .downloads, .songs:
       return false
     case .playlists:
       return false // playlists have their own tab
@@ -114,7 +114,7 @@ extension CarPlaySceneDelegate {
         sectionToDisplay = albumsRecentSection
       case .radios:
         sectionToDisplay = radioSection
-      case .directories, .downloads, .playlists, .songs:
+      case .directories, .downloadedAlbums, .downloadedArtists, .downloads, .playlists, .songs:
         break // do nothing
       }
       guard let sectionToDisplay else { completion(); return }

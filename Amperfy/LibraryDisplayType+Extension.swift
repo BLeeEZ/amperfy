@@ -69,6 +69,14 @@ extension LibraryDisplayType {
       )
     case .radios:
       return AppStoryboard.Main.segueToRadios(account: account)
+    case .downloadedAlbums:
+      return AppStoryboard.Main.createAlbumsVC(
+        account: account,
+        style: settings.user.albumsStyleSetting,
+        category: .cached
+      )
+    case .downloadedArtists:
+      return AppStoryboard.Main.segueToDownloadedArtists(account: account)
     }
   }
 }

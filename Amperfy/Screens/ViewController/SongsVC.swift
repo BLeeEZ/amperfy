@@ -28,6 +28,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     switch displayFilter {
     case .all, .newest, .recent: "Songs"
     case .favorites: "Favorite Songs"
+    case .cached: "Downloaded Songs"
     }
   }
 
@@ -134,6 +135,10 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .newest, .recent:
       break
+    case .cached:
+      filterTitle = "Downloaded Songs"
+      isIndexTitelsHidden = false
+      change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .favorites:
       filterTitle = "Favorite Songs"
       isIndexTitelsHidden = false
@@ -204,6 +209,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     case .all:
       break
     case .newest, .recent:
+      break
+    case .cached:
       break
     case .favorites:
       Task { @MainActor in
@@ -470,6 +477,8 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         case .all:
           songs = self.appDelegate.storage.main.library.getSongs(for: self.account)
         case .newest, .recent:
+          break
+        case .cached:
           break
         case .favorites:
           songs = self.appDelegate.storage.main.library

@@ -95,6 +95,7 @@ class AlbumsCommonVCInteractions {
     case .newest: "Newest Albums"
     case .recent: "Recently Played Albums"
     case .favorites: "Favorite Albums"
+    case .cached: "Downloaded Albums"
     }
   }
 
@@ -167,6 +168,10 @@ class AlbumsCommonVCInteractions {
       change(sortType: .recent)
     case .favorites:
       filterTitle = "Favorite Albums"
+      isIndexTitelsHidden = false
+      change(sortType: appDelegate.storage.settings.user.albumsSortSetting)
+    case .cached:
+      filterTitle = "Downloaded Albums"
       isIndexTitelsHidden = false
       change(sortType: appDelegate.storage.settings.user.albumsSortSetting)
     }
@@ -255,6 +260,8 @@ class AlbumsCommonVCInteractions {
         }
         self.updateSearchResultsCB?()
       }
+    case .cached:
+      break
     }
   }
 
@@ -270,7 +277,7 @@ class AlbumsCommonVCInteractions {
     }
     actions.append(createStyleButtonMenu())
 
-    if appDelegate.storage.settings.user.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode, displayFilter != .cached {
       actions.append(createActionButtonMenu())
     }
 
@@ -470,6 +477,8 @@ class AlbumsCommonVCInteractions {
         case .recent:
           albums = self.appDelegate.storage.main.library
             .getRecentAlbums(for: self.account)
+        case .cached:
+          albums = []
         case .favorites:
           albums = self.appDelegate.storage.main.library
             .getFavoriteAlbums(for: self.account)

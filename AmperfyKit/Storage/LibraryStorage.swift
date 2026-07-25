@@ -1111,6 +1111,8 @@ public class LibraryStorage: PlayableFileCachable {
       return NSPredicate(value: true)
     case .favorites:
       return NSPredicate(format: "%K == TRUE", #keyPath(SongMO.isFavorite))
+    case .cached:
+      return getFetchPredicate(onlyCachedSongs: true)
     }
   }
 
@@ -1124,6 +1126,8 @@ public class LibraryStorage: PlayableFileCachable {
       return NSPredicate(format: "%K > 0", #keyPath(AlbumMO.recentIndex))
     case .favorites:
       return NSPredicate(format: "%K == TRUE", #keyPath(AlbumMO.isFavorite))
+    case .cached:
+      return getFetchPredicate(onlyCachedAlbums: true)
     }
   }
 
@@ -1135,6 +1139,8 @@ public class LibraryStorage: PlayableFileCachable {
       return NSPredicate(format: "%K.@count > 0", #keyPath(ArtistMO.albums))
     case .favorites:
       return NSPredicate(format: "%K == TRUE", #keyPath(ArtistMO.isFavorite))
+    case .cached:
+      return getFetchPredicate(onlyCachedArtists: true)
     }
   }
 
