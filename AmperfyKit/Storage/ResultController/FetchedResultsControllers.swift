@@ -153,6 +153,9 @@ public enum DisplayCategoryFilter: Codable {
   case newest
   case recent
   case favorites
+  /// Only elements with at least one downloaded song. Purely local state, so
+  /// unlike the other cases it never triggers a remote sync.
+  case cached
 }
 
 // MARK: - ArtistCategoryFilter
@@ -161,6 +164,8 @@ public enum ArtistCategoryFilter: Int, Sendable, Codable {
   case all = 0
   case favorites = 1
   case albumArtists = 2
+  /// Only artists with at least one downloaded song.
+  case cached = 3
 
   public static let defaultValue: ArtistCategoryFilter = .albumArtists
 }
@@ -600,7 +605,7 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
     self.displayFilter = displayFilter
     let fetchRequest = SongMO.alphabeticSortedFetchRequest
     switch self.displayFilter {
-    case .all, .favorites:
+    case .all, .cached, .favorites:
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
         coreDataCompanion.library.getFetchPredicate(forArtist: artist),
@@ -631,7 +636,7 @@ public class ArtistSongsItemsFetchedResultsController: BasicFetchedResultsContro
     if !searchText.isEmpty || onlyCachedSongs {
       var predicate = NSCompoundPredicate()
       switch displayFilter {
-      case .all, .favorites:
+      case .all, .cached, .favorites:
         predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
           SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
           coreDataCompanion.library.getFetchPredicate(forArtist: artist),

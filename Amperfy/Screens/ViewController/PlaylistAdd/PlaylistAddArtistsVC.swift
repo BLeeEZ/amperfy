@@ -29,6 +29,7 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
     switch displayFilter {
     case .albumArtists, .all: "Artists"
     case .favorites: "Favorite Artists"
+    case .cached: "Downloaded Artists"
     }
   }
 

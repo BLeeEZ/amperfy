@@ -113,6 +113,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     switch displayFilter {
     case .albumArtists, .all: "Artists"
     case .favorites: "Favorite Artists"
+    case .cached: "Downloaded Artists"
     }
   }
 
@@ -241,6 +242,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
       filterTitle = "Favorite Artists"
     case .albumArtists:
       filterTitle = "Album Artists"
+    case .cached:
+      filterTitle = "Downloaded Artists"
     }
     setNavBarTitle(title: filterTitle)
   }
@@ -266,7 +269,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   func change(filterType: ArtistCategoryFilter) {
     // favorite views can't change the display filter
-    guard displayFilter != .favorites else { return }
+    guard displayFilter != .favorites, displayFilter != .cached else { return }
     displayFilter = filterType
     appDelegate.storage.settings.user.artistsFilterSetting = filterType
     updateSearchResults(for: searchController)
@@ -289,10 +292,10 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   func updateRightBarButtonItems() {
     var actions = [UIMenu]()
     actions.append(createSortButtonMenu())
-    if displayFilter != .favorites {
+    if displayFilter != .favorites, displayFilter != .cached {
       actions.append(createFilterButtonMenu())
     }
-    if appDelegate.storage.settings.user.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode, displayFilter != .cached {
       actions.append(createActionButtonMenu())
     }
     optionsButton = UIBarButtonItem.createOptionsBarButton()
@@ -303,7 +306,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   func updateFromRemote() {
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     switch displayFilter {
-    case .albumArtists, .all:
+    case .albumArtists, .all, .cached:
       break
     case .favorites:
       Task { @MainActor in
@@ -481,6 +484,8 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
         case .favorites:
           artists = self.appDelegate.storage.main.library
             .getFavoriteArtists(for: self.account)
+        case .cached:
+          artists = []
         }
         let artistSongs = Array(artists.compactMap { $0.playables }.joined())
         if artistSongs.count > AppDelegate.maxPlayablesDownloadsToAddAtOnceWithoutWarning {

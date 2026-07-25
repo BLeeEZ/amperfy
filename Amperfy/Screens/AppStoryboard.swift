@@ -126,6 +126,12 @@ enum AppStoryboard: String {
     return artistsVC
   }
 
+  func segueToDownloadedArtists(account: Account)
+    -> UIViewController { let artistsVC = ArtistsVC(account: account)
+    artistsVC.displayFilter = .cached
+    return artistsVC
+  }
+
   func segueToMusicFolders(account: Account) -> UIViewController {
     MusicFoldersVC(account: account)
   }

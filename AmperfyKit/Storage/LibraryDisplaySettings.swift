@@ -43,6 +43,8 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
   case newestAlbums = 12
   case recentAlbums = 13
   case radios = 14
+  case downloadedAlbums = 15
+  case downloadedArtists = 16
 
   public static func createByDisplayName(name: String) -> LibraryDisplayType? {
     .allCases.first {
@@ -80,6 +82,10 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
       return "Recently Played Albums"
     case .radios:
       return "Radios"
+    case .downloadedAlbums:
+      return "Downloaded Albums"
+    case .downloadedArtists:
+      return "Downloaded Artists"
     }
   }
 
@@ -113,6 +119,10 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
       return UIImage.albumRecent
     case .radios:
       return UIImage.radio
+    case .downloadedAlbums:
+      return UIImage.download
+    case .downloadedArtists:
+      return UIImage.download
     }
   }
 }
@@ -149,7 +159,14 @@ public struct LibraryDisplaySettings: Sendable, Codable {
     }
 
     if mapped.count == 2 {
-      self.combined = mapped
+      // A library type added by a newer app version is in neither stored group,
+      // which would leave it unreachable from the library editor.
+      // Fold any such type into notUsed so it stays selectable.
+      let known = Set(mapped[0]).union(mapped[1])
+      let missing = LibraryDisplayType.allCases
+        .filter { !known.contains($0) }
+        .sorted { $0.rawValue < $1.rawValue }
+      self.combined = [mapped[0], mapped[1] + missing]
     } else if let first = mapped.first {
       // If only one group present, treat it as inUse and compute notUsed
       self = LibraryDisplaySettings(inUse: first)
