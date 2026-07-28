@@ -146,7 +146,8 @@ public class MetaManager {
       notificationHandler: notificationHandler,
       urlCleanser: backendApi,
       limitCacheSize: true,
-      isFailWithPopupError: true
+      isFailWithPopupError: true,
+      clientCertificateAccountIdent: account.ident
     )
 
     let configuration = URLSessionConfiguration
@@ -192,7 +193,8 @@ public class MetaManager {
       notificationHandler: notificationHandler,
       urlCleanser: backendApi,
       limitCacheSize: false,
-      isFailWithPopupError: false
+      isFailWithPopupError: false,
+      clientCertificateAccountIdent: account.ident
     )
 
     let validationCB: PreDownloadIsValidCB =

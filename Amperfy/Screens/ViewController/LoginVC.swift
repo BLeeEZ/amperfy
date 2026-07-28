@@ -180,24 +180,53 @@ class LoginVC: UIViewController {
     return button
   }()
 
-  fileprivate lazy var httpHeadersButton: UIButton = {
+  fileprivate lazy var advancedLabel: UILabel = {
+    let label = UILabel()
+    label.text = "Advanced:"
+    label.font = .systemFont(ofSize: Self.fontSize)
+    label.textColor = .hardLabelColor
+    return label
+  }()
+
+  fileprivate lazy var advancedButton: UIButton = {
     var config = UIButton.Configuration.glass()
     let button = UIButton(configuration: config)
-    button.setTitle("Custom HTTP Headers", for: .normal)
-    button.accessibilityLabel = "Custom HTTP Headers"
-    button.addTarget(self, action: #selector(Self.httpHeadersPressed), for: .touchUpInside)
+    button.setTitle("None", for: .normal)
+    button.accessibilityLabel = "Advanced network access options"
+    button.addTarget(self, action: #selector(Self.advancedPressed), for: .touchUpInside)
     button.preferredBehavioralStyle = .pad
     return button
   }()
 
   @IBAction
-  func httpHeadersPressed() {
-    let editor = CustomHTTPHeadersView(headers: httpHeaders) { [weak self] updated in
-      self?.httpHeaders = updated
-    }
-    let hostingController = UIHostingController(rootView: NavigationView { editor })
+  func advancedPressed() {
+    let root = AdvancedLoginOptionsView(
+      headers: httpHeaders,
+      onHeadersChange: { [weak self] updated in self?.httpHeaders = updated },
+      onDismiss: { [weak self] in self?.updateAdvancedSummary() }
+    )
+    .environmentObject(Settings())
+    let hostingController = UIHostingController(rootView: root)
     hostingController.modalPresentationStyle = .formSheet
     present(hostingController, animated: true)
+  }
+
+  static func advancedSummaryTitle(hasHeaders: Bool, hasCertificate: Bool) -> String {
+    switch (hasHeaders, hasCertificate) {
+    case (false, false): "None"
+    case (true, false): "Headers"
+    case (false, true): "Certificate"
+    case (true, true): "Headers + Certificate"
+    }
+  }
+
+  func updateAdvancedSummary() {
+    let hasCert = ClientCertificateManager.shared
+      .hasIdentity(tag: ClientCertificateManager.loginTag)
+    advancedButton.setTitle(
+      Self.advancedSummaryTitle(hasHeaders: !httpHeaders.isEmpty, hasCertificate: hasCert),
+      for: .normal
+    )
   }
 
   // Close button shown when presented as a sheet/modal
@@ -235,7 +264,8 @@ class LoginVC: UIViewController {
     self.passwordTF.translatesAutoresizingMaskIntoConstraints = false
     apiLabel.translatesAutoresizingMaskIntoConstraints = false
     self.apiSelectorButton.translatesAutoresizingMaskIntoConstraints = false
-    self.httpHeadersButton.translatesAutoresizingMaskIntoConstraints = false
+    self.advancedButton.translatesAutoresizingMaskIntoConstraints = false
+    advancedLabel.translatesAutoresizingMaskIntoConstraints = false
 
     let view = UIView()
     view.addSubview(serverUrlTF)
@@ -243,7 +273,8 @@ class LoginVC: UIViewController {
     view.addSubview(passwordTF)
     view.addSubview(apiLabel)
     view.addSubview(apiSelectorButton)
-    view.addSubview(httpHeadersButton)
+    view.addSubview(advancedLabel)
+    view.addSubview(advancedButton)
 
     let padding: CGFloat = 0
     let elementHeight: CGFloat = 40
@@ -312,19 +343,25 @@ class LoginVC: UIViewController {
       ),
       apiSelectorButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
-      httpHeadersButton.safeAreaLayoutGuide.topAnchor.constraint(
+      advancedLabel.safeAreaLayoutGuide.topAnchor.constraint(
         equalTo: apiSelectorButton.bottomAnchor,
         constant: spaceInBetween
       ),
-      httpHeadersButton.safeAreaLayoutGuide.leadingAnchor.constraint(
+      advancedLabel.safeAreaLayoutGuide.leadingAnchor.constraint(
         equalTo: view.safeAreaLayoutGuide.leadingAnchor,
         constant: padding
       ),
-      httpHeadersButton.safeAreaLayoutGuide.trailingAnchor.constraint(
+      advancedLabel.heightAnchor.constraint(equalToConstant: elementHeight),
+
+      advancedButton.safeAreaLayoutGuide.topAnchor.constraint(
+        equalTo: apiSelectorButton.bottomAnchor,
+        constant: spaceInBetween
+      ),
+      advancedButton.safeAreaLayoutGuide.trailingAnchor.constraint(
         equalTo: view.safeAreaLayoutGuide.trailingAnchor,
         constant: -padding
       ),
-      httpHeadersButton.heightAnchor.constraint(equalToConstant: elementHeight),
+      advancedButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
       view.heightAnchor
         .constraint(equalToConstant: (5 * elementHeight) + (4 * spaceInBetween) + (2 * padding)),
@@ -450,6 +487,13 @@ class LoginVC: UIViewController {
         self.appDelegate.storage.settings.accounts.login(credentials)
         meta.backendApi.provideCredentials(credentials: credentials)
 
+        if ClientCertificateManager.shared.hasIdentity(tag: ClientCertificateManager.loginTag) {
+          let accountTag = ClientCertificateManager.accountTag(for: accountInfo.ident)
+          try? ClientCertificateManager.shared.migrateIdentity(
+            from: ClientCertificateManager.loginTag, to: accountTag
+          )
+        }
+
         self.appDelegate.notificationHandler.post(name: .accountAdded, object: nil, userInfo: nil)
         self.appDelegate.notificationHandler.post(
           name: .accountActiveChanged,
@@ -470,8 +514,12 @@ class LoginVC: UIViewController {
             .replaceMainRootViewController(vc: syncVC)
         }
       } catch {
-        if error is AuthenticationError {
-          self.showErrorMsg(message: error.localizedDescription)
+        if let authError = error as? AuthenticationError {
+          self.showErrorMsg(message: authError.localizedDescription)
+        } else if let certError = error as? ClientCertificateError {
+          self.showErrorMsg(message: certError.localizedDescription)
+        } else if let certSessionError = error as? ClientCertificateSessionError {
+          self.showErrorMsg(message: certSessionError.localizedDescription)
         } else {
           self.showErrorMsg(message: "Not able to login!")
         }
@@ -509,6 +557,8 @@ class LoginVC: UIViewController {
         self.updateApiSelectorText()
       }),
     ])
+
+    updateAdvancedSummary()
 
     view.backgroundColor = .systemBackground
 
@@ -625,6 +675,7 @@ class LoginVC: UIViewController {
       usernameTF.text = credentials.username
       httpHeaders = credentials.httpHeaders
     }
+    updateAdvancedSummary()
   }
 
   override func viewWillAppear(_ animated: Bool) {

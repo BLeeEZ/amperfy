@@ -121,7 +121,11 @@ public class AmperKit {
   private func createPlayer() -> PlayerFacade {
     playerAudioSessionHandler = AudioSessionHandler()
     let backendAudioPlayer = BackendAudioPlayer(
-      createAudioStreamingPlayerCB: { AudioStreamingPlayer() },
+      createAudioStreamingPlayerCB: {
+        AudioStreamingPlayer(clientCertificateProvider: { _ in
+          ClientCertificateManager.shared.activeStreamingCredential()
+        })
+      },
       audioSessionHandler: playerAudioSessionHandler!,
       eventLogger: eventLogger,
       getBackendApiCB: { accountInfo in

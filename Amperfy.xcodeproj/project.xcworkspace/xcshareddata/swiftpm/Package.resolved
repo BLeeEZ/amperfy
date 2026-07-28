@@ -11,15 +11,6 @@
       }
     },
     {
-      "identity" : "audiostreaming",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/dimitris-c/AudioStreaming",
-      "state" : {
-        "revision" : "a729ee28fece29d80a749419d96df0693200f124",
-        "version" : "1.4.4"
-      }
-    },
-    {
       "identity" : "callbackurlkit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/phimage/CallbackURLKit",

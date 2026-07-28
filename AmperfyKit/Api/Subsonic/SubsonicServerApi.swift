@@ -969,9 +969,13 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     return try await request(url: url, headers: buildHTTPHeaders())
   }
 
-  private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
+  private func performAFRequest(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
-      let afRequest = AF.request(url, method: .get, headers: headers)
+      var afRequest = AF.request(url, method: .get, headers: headers)
+      if let credential = ClientCertificateManager.shared
+        .credentialForAccountOrLogin(accountIdent: account?.ident) {
+        afRequest = afRequest.authenticate(with: credential)
+      }
       afRequest.validate().responseData { response in
         if response.response?.statusCode == 404 {
           let cleanedURL = self.cleanse(url: response.request?.url)
@@ -996,6 +1000,26 @@ final class SubsonicServerApi: URLCleanser, Sendable {
         }
         fatalError("should not get here")
       }
+    }
+  }
+
+  private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
+    do {
+      return try await performAFRequest(url: url, headers: headers)
+    } catch {
+      if let account,
+         let serverURLString = credentials.wrappedValue?.activeBackendServerUrl,
+         let serverURL = URL(string: serverURLString),
+         ClientCertificateManager.shared.hasIdentity(
+           tag: ClientCertificateManager.accountTag(for: account.ident)
+         ) {
+        try await ClientCertificateSession.shared.reauthenticateIfNeeded(
+          accountTag: ClientCertificateManager.accountTag(for: account.ident),
+          serverURL: serverURL
+        )
+        return try await performAFRequest(url: url, headers: headers)
+      }
+      throw error
     }
   }
 }
