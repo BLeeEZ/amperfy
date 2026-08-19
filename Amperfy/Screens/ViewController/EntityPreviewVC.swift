@@ -27,6 +27,21 @@ import UIKit
 typealias GetPlayContextCallback = () -> PlayContext?
 typealias GetPlayerIndexCallback = () -> PlayerIndex?
 
+// MARK: - PlaylistOwning
+
+@MainActor
+protocol PlaylistOwning: AnyObject {
+  var playlist: Playlist { get }
+}
+
+// MARK: - PlaylistDetailVC + PlaylistOwning
+
+extension PlaylistDetailVC: PlaylistOwning {}
+
+// MARK: - PlaylistEditVC + PlaylistOwning
+
+extension PlaylistEditVC: PlaylistOwning {}
+
 // MARK: - EntityPreviewActionBuilder
 
 @MainActor
@@ -150,6 +165,11 @@ class EntityPreviewActionBuilder {
       menuActions.append(UIMenu(options: .displayInline, children: ratingFavActions))
     }
     if isAddToPlaylist {
+      if let account = entityContainer.account,
+         let recentPlaylist = appDelegate.recentPlaylist(for: account),
+         !isCurrentPlaylist(recentPlaylist) {
+        elementHandlingActions.append(createAddToRecentPlaylistAction(recentPlaylist))
+      }
       elementHandlingActions.append(createAddToPlaylistAction())
     }
     if isDownloadPossible {
@@ -664,6 +684,30 @@ class EntityPreviewActionBuilder {
       let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
       self.rootView.present(selectPlaylistNav, animated: true)
     }
+  }
+
+  private func createAddToRecentPlaylistAction(_ playlist: Playlist) -> UIAction {
+    UIAction(title: "Add to \"\(playlist.name)\"", image: .playlistPlus) { _ in
+      let songs = self.entityPlayables.filterSongs()
+      guard !songs.isEmpty else { return }
+      PlaylistSongAdder.resolveSongsToAdd(
+        songs,
+        to: playlist,
+        presenting: self.rootView
+      ) { songsToAdd in
+        PlaylistSongAdder.add(songsToAdd, to: playlist, appDelegate: self.appDelegate)
+      }
+    }
+  }
+
+  private func isCurrentPlaylist(_ playlist: Playlist) -> Bool {
+    let playlistObjectId = playlist.managedObject.objectID
+    if let entityPlaylist = entityContainer as? Playlist,
+       entityPlaylist.managedObject.objectID == playlistObjectId {
+      return true
+    }
+    guard let playlistOwner = rootView as? PlaylistOwning else { return false }
+    return playlistOwner.playlist.managedObject.objectID == playlistObjectId
   }
 
   private func createShowAlbumAction() -> UIAction {
