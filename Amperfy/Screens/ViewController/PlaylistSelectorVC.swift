@@ -30,6 +30,100 @@ enum AddToPlaylistSelectMode {
   case multi
 }
 
+// MARK: - PlaylistSongAdder
+
+@MainActor
+enum PlaylistSongAdder {
+  private static var pendingSongCounts = [NSManagedObjectID: [NSManagedObjectID: Int]]()
+
+  static func resolveSongsToAdd(
+    _ songs: [Song],
+    to playlist: Playlist,
+    presenting viewController: UIViewController,
+    completion: @escaping ([Song]) -> ()
+  ) {
+    let pendingSongs = pendingSongCounts[playlist.managedObject.objectID] ?? [:]
+    let songsNotContained = Array(playlist.notContaines(playables: songs))
+      .filterSongs()
+      .filter { pendingSongs[$0.managedObject.objectID] == nil }
+    guard songsNotContained.count != songs.count else {
+      completion(songs)
+      return
+    }
+
+    let alert = UIAlertController(
+      title: nil,
+      message: "Some Songs are already in this Playlist.",
+      preferredStyle: .alert
+    )
+    alert.addAction(UIAlertAction(title: "Add Duplicates", style: .default, handler: { _ in
+      completion(songs)
+    }))
+    alert.addAction(UIAlertAction(title: "Skip Duplicates", style: .default, handler: { _ in
+      completion(songsNotContained)
+    }))
+    alert.addAction(UIAlertAction(title: "Cancel", style: .default))
+    viewController.present(alert, animated: true)
+  }
+
+  static func add(
+    _ songs: [Song],
+    to playlist: Playlist,
+    appDelegate: AppDelegate
+  ) {
+    add([playlist: songs], appDelegate: appDelegate)
+  }
+
+  static func add(
+    _ selections: [Playlist: [Song]],
+    appDelegate: AppDelegate
+  ) {
+    guard selections.contains(where: { !$0.value.isEmpty }) else { return }
+    registerPendingSongs(in: selections)
+    Task { @MainActor in do {
+      defer { unregisterPendingSongs(in: selections) }
+      for (playlist, songs) in selections where !songs.isEmpty {
+        guard let account = playlist.account else { continue }
+        try await appDelegate.getMeta(account.info).librarySyncer.syncUpload(
+          playlistToAddSongs: playlist,
+          songs: songs
+        )
+        playlist.append(playables: songs)
+      }
+    } catch {
+      appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
+    }}
+  }
+
+  private static func registerPendingSongs(in selections: [Playlist: [Song]]) {
+    for (playlist, songs) in selections {
+      let playlistObjectId = playlist.managedObject.objectID
+      for song in songs {
+        let songObjectId = song.managedObject.objectID
+        pendingSongCounts[playlistObjectId, default: [:]][songObjectId, default: 0] += 1
+      }
+    }
+  }
+
+  private static func unregisterPendingSongs(in selections: [Playlist: [Song]]) {
+    for (playlist, songs) in selections {
+      let playlistObjectId = playlist.managedObject.objectID
+      for song in songs {
+        let songObjectId = song.managedObject.objectID
+        guard let count = pendingSongCounts[playlistObjectId]?[songObjectId] else { continue }
+        if count > 1 {
+          pendingSongCounts[playlistObjectId]?[songObjectId] = count - 1
+        } else {
+          pendingSongCounts[playlistObjectId]?.removeValue(forKey: songObjectId)
+        }
+      }
+      if pendingSongCounts[playlistObjectId]?.isEmpty == true {
+        pendingSongCounts.removeValue(forKey: playlistObjectId)
+      }
+    }
+  }
+}
+
 // MARK: - PlaylistsSelectorDiffableDataSource
 
 class PlaylistsSelectorDiffableDataSource: BasicUITableViewDiffableDataSource {
@@ -194,18 +288,12 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
     defer { selectedPlaylits.removeAll() }
     guard !selectedPlaylits.isEmpty else { return }
 
-    let localCopySelectedPlaylits = selectedPlaylits
-    Task { @MainActor in do {
-      for (playlist, songs) in localCopySelectedPlaylits {
-        try await self.appDelegate.getMeta(self.account.info).librarySyncer.syncUpload(
-          playlistToAddSongs: playlist,
-          songs: songs
-        )
-        playlist.append(playables: songs)
-      }
-    } catch {
-      self.appDelegate.eventLogger.report(topic: "Playlist Add Songs", error: error)
-    }}
+    if selectMode == .single,
+       let (playlist, songs) = selectedPlaylits.first,
+       !songs.isEmpty {
+      appDelegate.rememberRecentPlaylist(playlist)
+    }
+    PlaylistSongAdder.add(selectedPlaylits, appDelegate: appDelegate)
   }
 
   @IBAction
@@ -359,25 +447,12 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
       snap.reconfigureItems([playlist.managedObject.objectID])
       diffableDataSource.apply(snap)
     } else {
-      let itemsNotContained = playlist.notContaines(playables: itemsToAdd)
-      if itemsNotContained.count != itemsToAdd.count {
-        let alert = UIAlertController(
-          title: nil,
-          message: "Some Songs are already in this Playlist.",
-          preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Add Duplicates", style: .default, handler: { _ in
-          handleSuccessfullSelection(playables: self.itemsToAdd)
-        }))
-        alert.addAction(UIAlertAction(title: "Skip Duplicates", style: .default, handler: { _ in
-          handleSuccessfullSelection(playables: Array(itemsNotContained))
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: { _ in
-          // do nothing
-        }))
-        present(alert, animated: true, completion: nil)
-      } else {
-        handleSuccessfullSelection(playables: itemsToAdd)
+      PlaylistSongAdder.resolveSongsToAdd(
+        itemsToAdd,
+        to: playlist,
+        presenting: self
+      ) { songs in
+        handleSuccessfullSelection(playables: songs)
       }
     }
   }
