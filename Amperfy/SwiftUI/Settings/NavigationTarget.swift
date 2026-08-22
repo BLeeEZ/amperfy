@@ -26,6 +26,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
   case account
   case displayAndInteraction
   case library
+  case storage
   case player
   case equalizer
   case swipe
@@ -45,6 +46,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     case .displayAndInteraction: DisplaySettingsView()
     case .account: AccountSettingsView()
     case .library: LibrarySettingsView()
+    case .storage: StorageSettingsView()
     case .player: PlayerSettingsView()
     case .equalizer: EqualizerSettingsView()
     case .swipe: SwipeSettingsView()
@@ -64,6 +66,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     case .displayAndInteraction: "Display & Interaction"
     case .account: "Account"
     case .library: "Library"
+    case .storage: "Storage"
     case .swipe: "Swipe"
     case .artwork: "Artwork"
     case .support: "Support"
@@ -84,6 +87,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     case .displayAndInteraction: .display
     case .account: .userPerson
     case .library: .musicLibrary
+    case .storage: .internalDrive
     case .player: .playCircle
     case .equalizer: .equalizer
     case .swipe: .arrowRight
@@ -103,6 +107,7 @@ enum NavigationTarget: String, CaseIterable, @MainActor Identifiable {
     case .displayAndInteraction: "display"
     case .account: "person.fill"
     case .library: "music.note.house"
+    case .storage: "internaldrive.fill"
     case .player: "play.circle.fill"
     case .equalizer: "chart.bar.xaxis"
     case .swipe: "arrow.right.circle.fill"

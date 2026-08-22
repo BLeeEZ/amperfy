@@ -186,6 +186,38 @@ public class PersistentStorage {
   public var async: AsyncCoreDataAccessWrapper {
     AsyncCoreDataAccessWrapper(persistentContainer: coreDataManager.persistentContainer)
   }
+
+  @MainActor
+  public var databaseStoreURL: URL? {
+    coreDataManager.persistentContainer.persistentStoreDescriptions.first?.url
+  }
+
+  /// Size of the SQLite store including its -wal/-shm files and the hidden
+  /// external binary data support directory next to it.
+  public static func getDatabaseSizeInByte(storeURL: URL) -> Int64 {
+    let storeDirectory = storeURL.deletingLastPathComponent()
+    let storeFileName = storeURL.lastPathComponent
+    let supportDirectoryPrefix = "." + storeURL.deletingPathExtension()
+      .lastPathComponent + "_SUPPORT"
+    guard let contents = try? FileManager.default.contentsOfDirectory(
+      at: storeDirectory,
+      includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey]
+    ) else { return 0 }
+
+    var size = Int64(0)
+    for url in contents {
+      let name = url.lastPathComponent
+      guard name.hasPrefix(storeFileName) || name.hasPrefix(supportDirectoryPrefix)
+      else { continue }
+      let resourceValues = try? url.resourceValues(forKeys: [.isDirectoryKey])
+      if resourceValues?.isDirectory == true {
+        size += CacheFileManager.shared.directorySize(url: url)
+      } else if let fileSize = CacheFileManager.shared.getFileSize(url: url) {
+        size += fileSize
+      }
+    }
+    return size
+  }
 }
 
 // MARK: - CoreDataManagable

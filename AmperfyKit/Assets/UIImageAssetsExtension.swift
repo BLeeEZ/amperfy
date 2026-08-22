@@ -184,6 +184,7 @@ public struct AmperfyImage: Sendable {
   public static let heartSlash = Self("heart.slash")
   public static let home = Self("house.fill")
   public static let info = Self("info.circle")
+  public static let internalDrive = Self("internaldrive.fill")
   public static let isSelected = Self("checkmark.circle.fill")
   public static let leftRightPlay = Self("play.rectangle.on.rectangle")
   public static let listBullet = Self("list.bullet")
@@ -330,6 +331,8 @@ extension UIImage {
   public static let heartSlash = UIImage.create(systemName: AmperfyImage.heartSlash.systemName)
   public static let home = UIImage.create(systemName: AmperfyImage.home.systemName)
   public static let info = UIImage.create(systemName: AmperfyImage.info.systemName)
+  public static let internalDrive = UIImage
+    .create(systemName: AmperfyImage.internalDrive.systemName)
   public static let isSelected = UIImage.create(systemName: AmperfyImage.isSelected.systemName)
   public static let listBullet = UIImage.create(systemName: AmperfyImage.listBullet.systemName)
   public static let login = UIImage.create(systemName: AmperfyImage.login.systemName)

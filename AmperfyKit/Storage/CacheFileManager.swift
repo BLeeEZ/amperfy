@@ -307,6 +307,36 @@ final public class CacheFileManager: Sendable {
     return bytes
   }
 
+  public func getSongsCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    guard let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo) else { return 0 }
+    return directorySize(url: absSongsDir)
+  }
+
+  public func getEpisodesCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    guard let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo)
+    else { return 0 }
+    return directorySize(url: absEpisodesDir)
+  }
+
+  public func getArtworkCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    guard let absArtworksDir = getOrCreateAbsoluteArtworksDirectory(for: accountInfo)
+    else { return 0 }
+    return directorySize(url: absArtworksDir)
+  }
+
+  public func getEmbeddedArtworkCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    guard let absEmbeddedArtworksDir = getOrCreateAbsoluteEmbeddedArtworksDirectory(
+      for: accountInfo
+    ) else { return 0 }
+    return directorySize(url: absEmbeddedArtworksDir)
+  }
+
+  public func getLyricsCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    guard let absLyricsDir = getOrCreateAbsoluteLyricsDirectory(for: accountInfo)
+    else { return 0 }
+    return directorySize(url: absLyricsDir)
+  }
+
   private static let artworkFileExtension = "png"
   private static let lyricsFileExtension = "xml"
   private static let accountsDir = URL(string: "accounts")!
@@ -827,7 +857,7 @@ final public class CacheFileManager: Sendable {
     return contents ?? [URL]()
   }
 
-  private func directorySize(url: URL) -> Int64 {
+  public func directorySize(url: URL) -> Int64 {
     let contents: [URL]
     do {
       contents = try FileManager.default.contentsOfDirectory(

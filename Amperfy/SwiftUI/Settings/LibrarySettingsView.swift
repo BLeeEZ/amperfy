@@ -195,6 +195,11 @@ struct LibrarySettingsView: View {
           SettingsRow(title: "Complete Cache Size") {
             SecondaryText(completeCacheSize.description)
           }
+          NavigationLink {
+            StorageSettingsView()
+          } label: {
+            Text("Storage Overview")
+          }
 
           #if targetEnvironment(macCatalyst) // ok
             // We can not present the picker in wheel style on macOS. It is not supported.

@@ -1644,6 +1644,33 @@ public class LibraryStorage: PlayableFileCachable {
     return songs ?? [Song]()
   }
 
+  public struct CachedAlbumFilesInfo: Sendable {
+    public let albumId: String
+    public let albumName: String
+    public let artistName: String
+    public let songCount: Int
+    public let relFilePaths: [URL]
+  }
+
+  public func getCachedSongsFileInfosGroupedByAlbum(for account: Account)
+    -> [CachedAlbumFilesInfo] {
+    let cachedSongs = getCachedSongs(for: account)
+    let songsByAlbum = Dictionary(grouping: cachedSongs) {
+      $0.album?.managedObject.objectID
+    }
+    return songsByAlbum.map { albumObjectId, songs in
+      let relFilePaths = songs.compactMap { $0.relFilePath }
+      let album = songs.first?.album
+      return CachedAlbumFilesInfo(
+        albumId: albumObjectId?.uriRepresentation().absoluteString ?? "unknown-album",
+        albumName: album?.name ?? "Unknown Album",
+        artistName: album?.subtitle ?? "Unknown Artist",
+        songCount: relFilePaths.count,
+        relFilePaths: relFilePaths
+      )
+    }
+  }
+
   public func getRandomSongs(for account: Account, count: Int = 100, onlyCached: Bool) -> [Song] {
     let fetchRequest = SongMO.identifierSortedFetchRequest
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
