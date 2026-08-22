@@ -307,6 +307,15 @@ final public class CacheFileManager: Sendable {
     return bytes
   }
 
+  /// Size of this account's downloaded artwork on disk. Unlike `getPlayableCacheSize`, this is
+  /// not backed by a maintained running total -- it walks the artwork directory on every call --
+  /// so callers should compute it on demand rather than on a high-frequency timer.
+  public func getArtworkCacheSize(for accountInfo: AccountInfo) -> Int64 {
+    guard let absArtworksDir = getOrCreateAbsoluteArtworksDirectory(for: accountInfo)
+    else { return 0 }
+    return directorySize(url: absArtworksDir)
+  }
+
   private static let artworkFileExtension = "png"
   private static let lyricsFileExtension = "xml"
   private static let accountsDir = URL(string: "accounts")!
