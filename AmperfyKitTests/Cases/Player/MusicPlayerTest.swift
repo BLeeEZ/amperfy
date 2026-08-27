@@ -2824,4 +2824,31 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertTrue(testPlayer.isPlaying)
     XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
   }
+
+  @MainActor
+  private func startPlaybackAndSettle() async throws {
+    prepareWithAllSongsCached()
+    testPlayer.play()
+    // playback start hops through the main actor several times, so let it settle
+    // before injecting an error, otherwise the two interleave.
+    try await Task.sleep(nanoseconds: 500_000_000)
+  }
+
+  @MainActor
+  func testStreamError_capturesPlaybackPositionForRecovery() async throws {
+    try await startPlaybackAndSettle()
+    mockAudioStreamingPlayer.mockElapsedTime = 200.0
+
+    XCTAssertFalse(backendPlayer.isErrorOccurred)
+    XCTAssertEqual(backendPlayer.elapsedTimeBeforeErrorOccurred, 0.0)
+
+    backendPlayer.audioPlayerUnexpectedError(
+      player: AudioStreaming.AudioPlayer(),
+      error: .codecError
+    )
+    try await Task.sleep(nanoseconds: 300_000_000)
+
+    XCTAssertTrue(backendPlayer.isErrorOccurred)
+    XCTAssertEqual(backendPlayer.elapsedTimeBeforeErrorOccurred, 200.0)
+  }
 }
