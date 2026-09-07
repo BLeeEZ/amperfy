@@ -180,6 +180,34 @@ class LoginVC: UIViewController {
     return button
   }()
 
+  #if targetEnvironment(macCatalyst)
+    fileprivate lazy var cacheLocationButton: UIButton = {
+      var config = UIButton.Configuration.glass()
+      config.image = .folder
+      config.imagePadding = 8.0
+      let button = UIButton(configuration: config)
+      button.setTitle("Cache Location…", for: .normal)
+      button.accessibilityIdentifier = CacheLocationAccessibility.preLoginEntry
+      button.accessibilityLabel = "Cache Location"
+      button.accessibilityHint = "Opens the application-wide cache location settings"
+      button.addTarget(
+        self,
+        action: #selector(Self.cacheLocationPressed),
+        for: .touchUpInside
+      )
+      button.preferredBehavioralStyle = .pad
+      return button
+    }()
+
+    @IBAction
+    func cacheLocationPressed() {
+      let hostingController = UIHostingController(rootView: CacheLocationSheet())
+      hostingController.modalPresentationStyle = .formSheet
+      hostingController.preferredContentSize = CGSize(width: 620, height: 480)
+      present(hostingController, animated: true)
+    }
+  #endif
+
   fileprivate lazy var httpHeadersButton: UIButton = {
     var config = UIButton.Configuration.glass()
     let button = UIButton(configuration: config)
@@ -517,11 +545,17 @@ class LoginVC: UIViewController {
     formGlassContainer.translatesAutoresizingMaskIntoConstraints = false
     loginGlassContainer.translatesAutoresizingMaskIntoConstraints = false
     closeButton.translatesAutoresizingMaskIntoConstraints = false
+    #if targetEnvironment(macCatalyst)
+      cacheLocationButton.translatesAutoresizingMaskIntoConstraints = false
+    #endif
     view.addSubview(amperfyLabel)
     view.addSubview(iconView)
     view.addSubview(formGlassContainer)
     view.addSubview(loginGlassContainer)
     view.addSubview(closeButton)
+    #if targetEnvironment(macCatalyst)
+      view.addSubview(cacheLocationButton)
+    #endif
 
     formLeadingConstraing = formGlassContainer.leadingAnchor.constraint(
       equalTo: view.leadingAnchor,
@@ -575,6 +609,18 @@ class LoginVC: UIViewController {
         constant: -16
       ),
     ])
+
+    #if targetEnvironment(macCatalyst)
+      NSLayoutConstraint.activate([
+        cacheLocationButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+        cacheLocationButton.topAnchor.constraint(
+          equalTo: loginGlassContainer.bottomAnchor,
+          constant: 12
+        ),
+        cacheLocationButton.widthAnchor.constraint(greaterThanOrEqualToConstant: 180),
+        cacheLocationButton.heightAnchor.constraint(equalToConstant: 40),
+      ])
+    #endif
 
     // Show close button only when presented as a sheet/modal
     let isModal = presentingViewController != nil || navigationController?

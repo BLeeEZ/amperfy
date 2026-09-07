@@ -19,6 +19,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CryptoKit
+import Darwin
 import Foundation
 import UniformTypeIdentifiers
 
@@ -75,55 +77,114 @@ public class MimeFileConverter {
   }
 }
 
+// MARK: - PreparedCacheFileCommit
+
+public final class PreparedCacheFileCommit: @unchecked Sendable {
+  public let receipt: CacheFileCommitReceipt
+  public let recoverableFileURL: URL
+  public let destinationURL: URL
+
+  private let finishOperation: @Sendable () throws -> ()
+  private let cancelOperation: @Sendable () throws -> ()
+
+  init(
+    receipt: CacheFileCommitReceipt,
+    recoverableFileURL: URL,
+    destinationURL: URL,
+    finishOperation: @escaping @Sendable () throws -> (),
+    cancelOperation: @escaping @Sendable () throws -> ()
+  ) {
+    self.receipt = receipt
+    self.recoverableFileURL = recoverableFileURL
+    self.destinationURL = destinationURL
+    self.finishOperation = finishOperation
+    self.cancelOperation = cancelOperation
+  }
+
+  /// Removes recovery evidence only after the caller has committed Core Data successfully.
+  public func finishAfterCoreDataCommit() throws {
+    try finishOperation()
+  }
+
+  /// Explicitly cancels retry state. It succeeds only while the original root lease is current.
+  public func cancel() throws {
+    try cancelOperation()
+  }
+}
+
 // MARK: - CacheFileManager
 
 final public class CacheFileManager: Sendable {
-  public static let shared = CacheFileManager()
+  public static var shared: CacheFileManager { CacheRootRuntime.shared.fileManager }
 
-  // Get the URL to the app container's 'Library' directory.
-  private let amperfyLibraryDirectory: URL?
+  private let rootRegistry: CacheRootRegistry
+  private let backgroundStagingRoot: URL?
+  private let backgroundStagingPolicy: BackgroundStagingPolicy
+  private let atomicStore: DurableAtomicFileStore
+  // Get the currently active cache root. External roots can only become visible through the
+  // registry, which invalidates all leases from the previous generation.
+  private var amperfyLibraryDirectory: URL? {
+    try? rootRegistry.currentLease().rootURL
+  }
+
   // Complete playable directory size
   nonisolated(unsafe) private var _completePlayableCacheSize: Int64 = 0
   private let _completePlayableCacheSizeLock = NSLock()
   nonisolated public var completePlayableCacheSize: Int64 {
-    _completePlayableCacheSizeLock.withLock { _completePlayableCacheSize }
+    guard let lease = try? rootRegistry.currentLease() else { return 0 }
+    return (try? lease.performAtCommitBoundary {
+      _completePlayableCacheSizeLock.withLock { _completePlayableCacheSize }
+    }) ?? 0
   }
 
   // Account playable directory size
   nonisolated(unsafe) private var _accountPlayableCacheSize = [AccountInfo: Int64]()
   private let _accountPlayableCacheSizeLock = NSLock()
   nonisolated public func getPlayableCacheSize(for accountInfo: AccountInfo) -> Int64 {
-    var size = Int64(0)
-    _accountPlayableCacheSizeLock.withLock { size = _accountPlayableCacheSize[accountInfo] ?? 0 }
-    return size
+    guard let lease = try? rootRegistry.currentLease() else { return 0 }
+    return (try? lease.performAtCommitBoundary {
+      _accountPlayableCacheSizeLock.withLock { _accountPlayableCacheSize[accountInfo] ?? 0 }
+    }) ?? 0
   }
 
-  init() {
-    // the action to get Amperfy's library directory takes long -> save it in cache
-    if let bundleIdentifier = Bundle.main.bundleIdentifier,
-       // Get the URL to the app container's 'Library' directory.
-       var url = try? FileManager.default.url(
-         for: .libraryDirectory,
-         in: .userDomainMask,
-         appropriateFor: nil,
-         create: true
-       ) {
-      // Append the bundle identifier to the retrieved URL.
-      url.appendPathComponent(bundleIdentifier, isDirectory: true)
-      self.amperfyLibraryDirectory = url
-    } else {
-      self.amperfyLibraryDirectory = nil
-    }
+  init(
+    rootRegistry: CacheRootRegistry,
+    backgroundStagingRoot: URL? = nil,
+    backgroundStagingPolicy: BackgroundStagingPolicy = BackgroundStagingPolicy(),
+    atomicStore: DurableAtomicFileStore = DurableAtomicFileStore()
+  ) {
+    self.rootRegistry = rootRegistry
+    self.backgroundStagingRoot = backgroundStagingRoot
+    self.backgroundStagingPolicy = backgroundStagingPolicy
+    self.atomicStore = atomicStore
+  }
 
-    checkAmperfyDirectory()
+  public func currentRootLease() throws -> CacheRootLease {
+    try rootRegistry.currentLease()
+  }
+
+  /// Called only by the bootstrap authority after preference resolution and health checks.
+  func rootDidActivate(using lease: CacheRootLease) throws {
+    try lease.performAtCommitBoundary {
+      let root = try lease.secureContainedURL(CacheRelativePath(".bootstrap-root"))
+        .deletingLastPathComponent()
+      try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+      try markItemAsExcludedFromBackup(at: root)
+    }
     recalculatePlayableCacheSizes()
   }
 
+  func rootDidBlock() {
+    _accountPlayableCacheSizeLock.withLock { _accountPlayableCacheSize.removeAll() }
+    _completePlayableCacheSizeLock.withLock { _completePlayableCacheSize = 0 }
+  }
+
   public func recalculatePlayableCacheSizes() {
+    guard let lease = try? currentRootLease() else { return }
     var completeCacheSize = Int64(0)
-    let accounts = getAccounts()
+    let accounts = getAccounts(using: lease)
     for account in accounts {
-      let accountCache = calculatePlayableCacheSize(for: account)
+      let accountCache = calculatePlayableCacheSize(for: account, using: lease)
       _accountPlayableCacheSizeLock.withLock {
         _accountPlayableCacheSize[account] = accountCache
       }
@@ -131,13 +192,6 @@ final public class CacheFileManager: Sendable {
     }
     _completePlayableCacheSizeLock.withLock {
       _completePlayableCacheSize = completeCacheSize
-    }
-  }
-
-  func checkAmperfyDirectory() {
-    guard let amperfyLibraryDirectory else { return }
-    if createDirectoryIfNeeded(at: amperfyLibraryDirectory) {
-      try? markItemAsExcludedFromBackup(at: amperfyLibraryDirectory)
     }
   }
 
@@ -149,42 +203,237 @@ final public class CacheFileManager: Sendable {
     return tmpFileURL
   }
 
-  public func moveExcludedFromBackupItem(at: URL, to: URL, accountInfo: AccountInfo) throws {
-    let subDir = to.deletingLastPathComponent()
-    if createDirectoryIfNeeded(at: subDir) {
-      try? markItemAsExcludedFromBackup(at: subDir)
-    }
-    if FileManager.default.fileExists(atPath: to.path) {
-      try? removeItem(at: to, accountInfo: accountInfo)
-    }
-    try FileManager.default.moveItem(at: at, to: to)
-    try markItemAsExcludedFromBackup(at: to)
+  /// Stages a completed background download in the app container, writes a durable receipt, then
+  /// copies it into the leased cache root using a verified temporary file and atomic rename. The
+  /// recoverable app-container copy is retained until `finishAfterCoreDataCommit()` is called.
+  public func prepareRecoverableFileCommit(
+    sourceURL: URL,
+    destinationURL: URL,
+    accountInfo: AccountInfo,
+    using lease: CacheRootLease
+  ) throws
+    -> PreparedCacheFileCommit {
+    let stagingRoot = try resolvedBackgroundStagingRoot()
+    try FileManager.default.createDirectory(at: stagingRoot, withIntermediateDirectories: true)
+    try validateStagingCapacity(adding: getFileSize(url: sourceURL) ?? 0, at: stagingRoot)
 
-    updateCachedDirectorySize(itemUrl: to, isAdded: true, accountInfo: accountInfo)
+    let transactionID = UUID()
+    let transactionRoot = stagingRoot.appendingPathComponent(
+      transactionID.uuidString,
+      isDirectory: true
+    )
+    try FileManager.default.createDirectory(at: transactionRoot, withIntermediateDirectories: true)
+    let recoverableURL = transactionRoot.appendingPathComponent("payload", isDirectory: false)
+    let incomingURL = transactionRoot.appendingPathComponent("payload.incoming", isDirectory: false)
+    let receiptURL = transactionRoot.appendingPathComponent("receipt.json", isDirectory: false)
+
+    do {
+      try FileManager.default.copyItem(at: sourceURL, to: incomingURL)
+      try synchronizeFile(at: incomingURL)
+      let sourceDigest = try sha256AndSize(of: sourceURL)
+      let incomingDigest = try sha256AndSize(of: incomingURL)
+      guard incomingDigest == sourceDigest else { throw CacheRootError.inconsistentActivation }
+      guard Darwin.rename(incomingURL.path, recoverableURL.path) == 0 else {
+        throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+      }
+
+      let safeDestination = try ensureInsideRoot(destinationURL, lease: lease)
+      let rootPrefix = lease.rootURL.path.hasSuffix("/")
+        ? lease.rootURL.path
+        : lease.rootURL.path + "/"
+      let relativeDestination = try CacheRelativePath(
+        String(safeDestination.path.dropFirst(rootPrefix.count))
+      )
+      var receipt = CacheFileCommitReceipt(
+        transactionID: transactionID,
+        relativeDestinationPath: relativeDestination.string,
+        stagedFileName: recoverableURL.lastPathComponent,
+        byteCount: sourceDigest.size,
+        sha256: sourceDigest.sha256,
+        phase: .staged
+      )
+      try atomicStore.write(receipt, to: receiptURL)
+      try? FileManager.default.removeItem(at: sourceURL)
+
+      try lease.performAtCommitBoundary {
+        let finalDestination = try lease.secureContainedURL(relativeDestination)
+        let parent = finalDestination.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+        _ = try ensureInsideRoot(parent, lease: lease)
+        let partialURL = parent.appendingPathComponent(
+          ".\(finalDestination.lastPathComponent).\(transactionID.uuidString).partial"
+        )
+        try? FileManager.default.removeItem(at: partialURL)
+        try FileManager.default.copyItem(at: recoverableURL, to: partialURL)
+        try synchronizeFile(at: partialURL)
+        guard try sha256AndSize(of: partialURL) == sourceDigest else {
+          throw CacheRootError.inconsistentActivation
+        }
+        _ = try ensureInsideRoot(partialURL, lease: lease)
+        guard Darwin.rename(partialURL.path, finalDestination.path) == 0 else {
+          throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO)
+        }
+        try markItemAsExcludedFromBackup(at: finalDestination)
+        updateCachedDirectorySize(
+          itemUrl: finalDestination,
+          isAdded: true,
+          accountInfo: accountInfo,
+          using: lease
+        )
+      }
+
+      receipt.phase = .filesystemCommitted
+      try atomicStore.write(receipt, to: receiptURL)
+      return PreparedCacheFileCommit(
+        receipt: receipt,
+        recoverableFileURL: recoverableURL,
+        destinationURL: safeDestination,
+        finishOperation: {
+          try FileManager.default.removeItem(at: transactionRoot)
+        },
+        cancelOperation: { [weak self] in
+          guard let self else { throw CacheRootError.unavailable }
+          try lease.performAtCommitBoundary {
+            let destination = try lease.secureContainedURL(relativeDestination)
+            if FileManager.default.fileExists(atPath: destination.path) {
+              try self.removeItem(at: destination, accountInfo: accountInfo, using: lease)
+            }
+            try FileManager.default.removeItem(at: transactionRoot)
+          }
+        }
+      )
+    } catch {
+      try? FileManager.default.removeItem(at: incomingURL)
+      throw error
+    }
+  }
+
+  private func resolvedBackgroundStagingRoot() throws -> URL {
+    if let backgroundStagingRoot { return backgroundStagingRoot }
+    let applicationSupport = try FileManager.default.url(
+      for: .applicationSupportDirectory,
+      in: .userDomainMask,
+      appropriateFor: nil,
+      create: true
+    )
+    let bundle = Bundle.main.bundleIdentifier ?? "Amperfy"
+    return applicationSupport.appendingPathComponent(bundle, isDirectory: true)
+      .appendingPathComponent("Cache Commit Staging", isDirectory: true)
+  }
+
+  private func validateStagingCapacity(adding bytes: Int64, at stagingRoot: URL) throws {
+    var stagedBytes: Int64 = 0
+    var oldestDate = Date()
+    if let enumerator = FileManager.default.enumerator(
+      at: stagingRoot,
+      includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey, .isRegularFileKey]
+    ) {
+      while let url = enumerator.nextObject() as? URL {
+        let values = try url.resourceValues(forKeys: [
+          .fileSizeKey,
+          .contentModificationDateKey,
+          .isRegularFileKey,
+        ])
+        guard values.isRegularFile == true else { continue }
+        stagedBytes += Int64(values.fileSize ?? 0)
+        oldestDate = min(oldestDate, values.contentModificationDate ?? oldestDate)
+      }
+    }
+    let available = try stagingRoot.resourceValues(forKeys: [
+      .volumeAvailableCapacityForImportantUsageKey,
+    ]).volumeAvailableCapacityForImportantUsage ?? 0
+    guard backgroundStagingPolicy.permits(
+      stagedBytes: stagedBytes + bytes,
+      oldestItemAge: Date().timeIntervalSince(oldestDate),
+      containerAvailableCapacity: available
+    ) else { throw CacheRootError.stagingLimitExceeded }
+  }
+
+  private func sha256AndSize(of url: URL) throws -> (sha256: String, size: Int64) {
+    let handle = try FileHandle(forReadingFrom: url)
+    defer { try? handle.close() }
+    var hasher = SHA256()
+    var size: Int64 = 0
+    while true {
+      let data = try handle.read(upToCount: 1024 * 1024) ?? Data()
+      guard !data.isEmpty else { break }
+      hasher.update(data: data)
+      size += Int64(data.count)
+    }
+    return (hasher.finalize().map { String(format: "%02x", $0) }.joined(), size)
+  }
+
+  private func synchronizeFile(at url: URL) throws {
+    let handle = try FileHandle(forWritingTo: url)
+    defer { try? handle.close() }
+    try handle.synchronize()
+  }
+
+  public func moveExcludedFromBackupItem(at: URL, to: URL, accountInfo: AccountInfo) throws {
+    let lease = try currentRootLease()
+    try moveExcludedFromBackupItem(at: at, to: to, accountInfo: accountInfo, using: lease)
+  }
+
+  /// Moves a completed download only while `lease` is still the active root generation.
+  public func moveExcludedFromBackupItem(
+    at sourceURL: URL,
+    to destinationURL: URL,
+    accountInfo: AccountInfo,
+    using lease: CacheRootLease
+  ) throws {
+    try lease.performAtCommitBoundary {
+      let expectedDestination = try ensureInsideRoot(destinationURL, lease: lease)
+      let subdirectory = expectedDestination.deletingLastPathComponent()
+      try FileManager.default.createDirectory(
+        at: subdirectory,
+        withIntermediateDirectories: true
+      )
+      try markItemAsExcludedFromBackup(at: subdirectory)
+      if FileManager.default.fileExists(atPath: expectedDestination.path) {
+        try removeItem(at: expectedDestination, accountInfo: accountInfo, using: lease)
+      }
+      try FileManager.default.moveItem(at: sourceURL, to: expectedDestination)
+      try markItemAsExcludedFromBackup(at: expectedDestination)
+      updateCachedDirectorySize(
+        itemUrl: expectedDestination,
+        isAdded: true,
+        accountInfo: accountInfo,
+        using: lease
+      )
+    }
   }
 
   public func move(from: URL?, to: URL?) throws {
     guard let from, let to else { return }
-    if createDirectoryIfNeeded(at: to) {
-      try? markItemAsExcludedFromBackup(at: to)
+    let lease = try currentRootLease()
+    try lease.performAtCommitBoundary {
+      let safeFrom = try ensureInsideRoot(from, lease: lease)
+      let safeTo = try ensureInsideRoot(to, lease: lease)
+      try FileManager.default.createDirectory(at: safeTo, withIntermediateDirectories: true)
+      try markItemAsExcludedFromBackup(at: safeTo)
+      let items = try contentsOfDirectory(url: safeFrom, using: lease)
+      for file in items {
+        let destinationFileURL = safeTo.appendingPathComponent(file.lastPathComponent)
+        _ = try ensureInsideRoot(destinationFileURL, lease: lease)
+        try FileManager.default.moveItem(at: file, to: destinationFileURL)
+      }
+      try markItemAsExcludedFromBackup(at: safeTo)
     }
-    let items = contentsOfDirectory(url: from)
-    for file in items {
-      let destinationFileURL = to.appendingPathComponent(file.lastPathComponent)
-      try FileManager.default.moveItem(at: file, to: destinationFileURL)
-    }
-    try markItemAsExcludedFromBackup(at: to)
   }
 
   @discardableResult
   public func createDirectoryIfNeeded(at url: URL) -> Bool {
-    guard !FileManager.default.fileExists(atPath: url.path) else { return false }
-    try? FileManager.default.createDirectory(
-      at: url,
-      withIntermediateDirectories: true,
-      attributes: [:]
-    )
-    return true
+    guard let lease = try? currentRootLease() else { return false }
+    return (try? lease.performAtCommitBoundary {
+      let safeURL = try ensureInsideRoot(url, lease: lease)
+      guard !FileManager.default.fileExists(atPath: safeURL.path) else { return false }
+      try FileManager.default.createDirectory(
+        at: safeURL,
+        withIntermediateDirectories: true,
+        attributes: [:]
+      )
+      return true
+    }) ?? false
   }
 
   nonisolated private func resetPlayableCacheSize(for accountInfo: AccountInfo) {
@@ -237,13 +486,38 @@ final public class CacheFileManager: Sendable {
   }
 
   public func removeItem(at itemUrl: URL, accountInfo: AccountInfo) throws {
-    updateCachedDirectorySize(itemUrl: itemUrl, isAdded: false, accountInfo: accountInfo)
-    try FileManager.default.removeItem(at: itemUrl)
+    let lease = try currentRootLease()
+    try removeItem(at: itemUrl, accountInfo: accountInfo, using: lease)
   }
 
-  private func updateCachedDirectorySize(itemUrl: URL, isAdded: Bool, accountInfo: AccountInfo) {
-    guard let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo),
-          let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo),
+  private func removeItem(
+    at itemURL: URL,
+    accountInfo: AccountInfo,
+    using lease: CacheRootLease
+  ) throws {
+    try lease.performAtCommitBoundary {
+      let safeURL = try ensureInsideRoot(itemURL, lease: lease)
+      updateCachedDirectorySize(
+        itemUrl: safeURL,
+        isAdded: false,
+        accountInfo: accountInfo,
+        using: lease
+      )
+      try FileManager.default.removeItem(at: safeURL)
+    }
+  }
+
+  private func updateCachedDirectorySize(
+    itemUrl: URL,
+    isAdded: Bool,
+    accountInfo: AccountInfo,
+    using lease: CacheRootLease
+  ) {
+    guard let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo, using: lease),
+          let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(
+            for: accountInfo,
+            using: lease
+          ),
           let itemSize = getFileSize(url: itemUrl),
           isFileURLInsideDirectory(fileURL: itemUrl, directoryURL: absSongsDir) ||
           isFileURLInsideDirectory(fileURL: itemUrl, directoryURL: absEpisodesDir)
@@ -257,54 +531,78 @@ final public class CacheFileManager: Sendable {
   }
 
   private func getOrCreateSubDirectory(subDirectoryNames: [String]) -> URL? {
-    var url: URL? = amperfyLibraryDirectory
-    for subDirName in subDirectoryNames {
-      url = url?.appendingPathComponent(
-        subDirName,
-        isDirectory: true
-      )
-      guard let url else { continue }
-      if createDirectoryIfNeeded(at: url) {
-        try? markItemAsExcludedFromBackup(at: url)
+    guard let lease = try? currentRootLease() else { return nil }
+    return getOrCreateSubDirectory(subDirectoryNames: subDirectoryNames, using: lease)
+  }
+
+  private func getOrCreateSubDirectory(
+    subDirectoryNames: [String],
+    using lease: CacheRootLease
+  )
+    -> URL? {
+    guard let relativePath = try? CacheRelativePath(subDirectoryNames.joined(separator: "/"))
+    else { return nil }
+    return try? lease.performAtCommitBoundary {
+      let url = try lease.secureContainedURL(relativePath)
+      if !FileManager.default.fileExists(atPath: url.path) {
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        try markItemAsExcludedFromBackup(at: url)
       }
+      return try lease.secureContainedURL(relativePath)
     }
-    return url
   }
 
   public func deleteAccountCache(accountInfo: AccountInfo) {
-    if let absAccountDir = getOrCreateAbsoluteAccountDirectory(for: accountInfo) {
-      try? FileManager.default.removeItem(at: absAccountDir)
+    guard let lease = try? currentRootLease(),
+          let absAccountDir = getOrCreateAbsoluteAccountDirectory(for: accountInfo, using: lease)
+    else { return }
+    try? lease.performAtCommitBoundary {
+      try FileManager.default.removeItem(at: try ensureInsideRoot(absAccountDir, lease: lease))
     }
   }
 
   public func deletePlayableCache(accountInfo: AccountInfo) {
-    if let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo) {
-      try? FileManager.default.removeItem(at: absSongsDir)
+    guard let lease = try? currentRootLease() else { return }
+    try? lease.performAtCommitBoundary {
+      let directories = [
+        getOrCreateAbsoluteSongsDirectory(for: accountInfo, using: lease),
+        getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo, using: lease),
+        getOrCreateAbsoluteEmbeddedArtworksDirectory(for: accountInfo, using: lease),
+      ].compactMap { $0 }
+      for directory in directories {
+        try? FileManager.default.removeItem(at: try ensureInsideRoot(directory, lease: lease))
+      }
+      resetPlayableCacheSize(for: accountInfo)
     }
-    if let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo) {
-      try? FileManager.default.removeItem(at: absEpisodesDir)
-    }
-    if let absEmbeddedArtworksDir = getOrCreateAbsoluteEmbeddedArtworksDirectory(for: accountInfo) {
-      try? FileManager.default.removeItem(at: absEmbeddedArtworksDir)
-    }
-    resetPlayableCacheSize(for: accountInfo)
   }
 
   public func deleteRemoteArtworkCache(accountInfo: AccountInfo) {
-    if let absArtworksDir = getOrCreateAbsoluteArtworksDirectory(for: accountInfo) {
-      try? FileManager.default.removeItem(at: absArtworksDir)
+    guard let lease = try? currentRootLease(),
+          let absArtworksDir = getOrCreateAbsoluteArtworksDirectory(for: accountInfo, using: lease)
+    else { return }
+    try? lease.performAtCommitBoundary {
+      try FileManager.default.removeItem(at: try ensureInsideRoot(absArtworksDir, lease: lease))
     }
   }
 
-  private func calculatePlayableCacheSize(for accountInfo: AccountInfo) -> Int64 {
-    var bytes = Int64(0)
-    if let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo) {
-      bytes += directorySize(url: absSongsDir)
-    }
-    if let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: accountInfo) {
-      bytes += directorySize(url: absEpisodesDir)
-    }
-    return bytes
+  private func calculatePlayableCacheSize(
+    for accountInfo: AccountInfo,
+    using lease: CacheRootLease
+  )
+    -> Int64 {
+    (try? lease.performAtCommitBoundary {
+      var bytes = Int64(0)
+      if let absSongsDir = getOrCreateAbsoluteSongsDirectory(for: accountInfo, using: lease) {
+        bytes += try directorySize(url: absSongsDir, using: lease)
+      }
+      if let absEpisodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(
+        for: accountInfo,
+        using: lease
+      ) {
+        bytes += try directorySize(url: absEpisodesDir, using: lease)
+      }
+      return bytes
+    }) ?? 0
   }
 
   private static let artworkFileExtension = "png"
@@ -339,6 +637,17 @@ final public class CacheFileManager: Sendable {
     ))
   }
 
+  private func getOrCreateAbsoluteAccountDirectory(
+    for account: AccountInfo,
+    using lease: CacheRootLease
+  )
+    -> URL? {
+    getOrCreateSubDirectory(
+      subDirectoryNames: getRelAccountPaths(for: account, dirName: nil),
+      using: lease
+    )
+  }
+
   public func getRelPath(for account: AccountInfo) -> URL? {
     Self.accountsDir.appendingPathComponent(account.serverHash)
       .appendingPathComponent(account.userHash)
@@ -349,6 +658,17 @@ final public class CacheFileManager: Sendable {
       for: account,
       dirName: Self.songsDir.path
     ))
+  }
+
+  private func getOrCreateAbsoluteSongsDirectory(
+    for account: AccountInfo,
+    using lease: CacheRootLease
+  )
+    -> URL? {
+    getOrCreateSubDirectory(
+      subDirectoryNames: getRelAccountPaths(for: account, dirName: Self.songsDir.path),
+      using: lease
+    )
   }
 
   public func getRelSongsDirectory(for account: AccountInfo) -> URL? {
@@ -362,6 +682,17 @@ final public class CacheFileManager: Sendable {
     ))
   }
 
+  private func getOrCreateAbsolutePodcastEpisodesDirectory(
+    for account: AccountInfo,
+    using lease: CacheRootLease
+  )
+    -> URL? {
+    getOrCreateSubDirectory(
+      subDirectoryNames: getRelAccountPaths(for: account, dirName: Self.episodesDir.path),
+      using: lease
+    )
+  }
+
   public func getRelPodcastEpisodesDirectory(for account: AccountInfo) -> URL? {
     getRelPath(for: account)?.appendingPathComponent(Self.episodesDir.path)
   }
@@ -373,6 +704,17 @@ final public class CacheFileManager: Sendable {
     ))
   }
 
+  private func getOrCreateAbsoluteArtworksDirectory(
+    for account: AccountInfo,
+    using lease: CacheRootLease
+  )
+    -> URL? {
+    getOrCreateSubDirectory(
+      subDirectoryNames: getRelAccountPaths(for: account, dirName: Self.artworksDir.path),
+      using: lease
+    )
+  }
+
   public func getRelArtworkDirectory(for account: AccountInfo) -> URL? {
     getRelPath(for: account)?.appendingPathComponent(Self.artworksDir.path)
   }
@@ -382,6 +724,17 @@ final public class CacheFileManager: Sendable {
       for: account,
       dirName: Self.embeddedArtworksDir.path
     ))
+  }
+
+  private func getOrCreateAbsoluteEmbeddedArtworksDirectory(
+    for account: AccountInfo,
+    using lease: CacheRootLease
+  )
+    -> URL? {
+    getOrCreateSubDirectory(
+      subDirectoryNames: getRelAccountPaths(for: account, dirName: Self.embeddedArtworksDir.path),
+      using: lease
+    )
   }
 
   public func getRelEmbeddedArtworkDirectory(for account: AccountInfo) -> URL? {
@@ -400,11 +753,19 @@ final public class CacheFileManager: Sendable {
   }
 
   public func getAccounts() -> [AccountInfo] {
+    guard let lease = try? currentRootLease() else { return [] }
+    return getAccounts(using: lease)
+  }
+
+  private func getAccounts(using lease: CacheRootLease) -> [AccountInfo] {
     var URLs = [URL]()
     var accountInfo = [AccountInfo]()
     var serverHashes = [String]()
-    if let accountsDir = getOrCreateAbsoluteServerDirectory() {
-      URLs = contentsOfDirectory(url: accountsDir)
+    if let accountsDir = getOrCreateSubDirectory(
+      subDirectoryNames: [Self.accountsDir.path],
+      using: lease
+    ) {
+      URLs = (try? contentsOfDirectory(url: accountsDir, using: lease)) ?? []
     }
     // get all server hashes
     for url in URLs {
@@ -420,8 +781,11 @@ final public class CacheFileManager: Sendable {
       serverHashes.append(url.lastPathComponent)
     }
     for serverHash in serverHashes {
-      if let usersDir = getOrCreateAbsoluteUserDirectory(server: serverHash) {
-        URLs = contentsOfDirectory(url: usersDir)
+      if let usersDir = getOrCreateSubDirectory(
+        subDirectoryNames: [Self.accountsDir.path, serverHash],
+        using: lease
+      ) {
+        URLs = (try? contentsOfDirectory(url: usersDir, using: lease)) ?? []
       }
       // get all users hashes for the server hashes
       for url in URLs {
@@ -650,6 +1014,30 @@ final public class CacheFileManager: Sendable {
     let relFilePath: URL?
   }
 
+  public struct AccountCacheSnapshot: Sendable {
+    let artworks: [ArtworkCacheInfo]
+    let embeddedArtworks: [EmbeddedArtworkCacheInfo]
+    let lyrics: [LyricsCacheInfo]
+    let songs: [PlayableCacheInfo]
+    let episodes: [PlayableCacheInfo]
+  }
+
+  public func accountCacheSnapshot(
+    for account: AccountInfo,
+    using lease: CacheRootLease
+  ) throws
+    -> AccountCacheSnapshot {
+    try lease.performAtCommitBoundary {
+      AccountCacheSnapshot(
+        artworks: getCachedArtworks(for: account),
+        embeddedArtworks: getCachedEmbeddedArtworks(for: account),
+        lyrics: getCachedLyrics(for: account),
+        songs: getCachedSongs(for: account),
+        episodes: getCachedEpisodes(for: account)
+      )
+    }
+  }
+
   public func getCachedLyrics(for account: AccountInfo) -> [LyricsCacheInfo] {
     var cacheInfo = [LyricsCacheInfo]()
     if let lyricsDir = getOrCreateAbsoluteLyricsDirectory(for: account) {
@@ -788,27 +1176,112 @@ final public class CacheFileManager: Sendable {
   }
 
   public func getAbsoluteAmperfyPath(relFilePath: URL) -> URL? {
-    guard let amperfyDir = amperfyLibraryDirectory else { return nil }
-    return amperfyDir.appendingPathComponent(relFilePath.path)
+    guard let lease = try? currentRootLease() else { return nil }
+    return try? lease.resolve(relativePath: relFilePath)
+  }
+
+  public func getAbsoluteAmperfyPath(
+    relFilePath: URL,
+    using lease: CacheRootLease
+  ) throws
+    -> URL {
+    try lease.resolve(relativePath: relFilePath)
+  }
+
+  public func getAbsoluteAmperfyPath(
+    relativePath: CacheRelativePath,
+    using lease: CacheRootLease
+  ) throws
+    -> URL {
+    try lease.resolve(relativePath: relativePath)
+  }
+
+  public func withCacheFile<T>(
+    relativePath: URL,
+    operation: (URL) throws -> T
+  ) throws
+    -> T {
+    let lease = try currentRootLease()
+    return try lease.performAtCommitBoundary {
+      let absoluteURL = try lease.resolve(relativePath: relativePath)
+      guard FileManager.default.fileExists(atPath: absoluteURL.path) else {
+        throw CocoaError(.fileNoSuchFile)
+      }
+      return try operation(absoluteURL)
+    }
+  }
+
+  public func readCacheData(at absoluteURL: URL) throws -> Data {
+    let lease = try currentRootLease()
+    return try lease.performAtCommitBoundary {
+      let safeURL = try ensureInsideRoot(absoluteURL, lease: lease)
+      return try Data(contentsOf: safeURL)
+    }
+  }
+
+  public func copyCacheItem(at absoluteURL: URL, to destinationURL: URL) throws {
+    let lease = try currentRootLease()
+    try lease.performAtCommitBoundary {
+      let safeURL = try ensureInsideRoot(absoluteURL, lease: lease)
+      try FileManager.default.copyItem(at: safeURL, to: destinationURL)
+    }
   }
 
   public func fileExits(relFilePath: URL) -> Bool {
-    guard let absFilePath = amperfyLibraryDirectory?.appendingPathComponent(relFilePath.path)
-    else { return false }
-    return FileManager.default.fileExists(atPath: absFilePath.path)
+    guard let lease = try? currentRootLease() else { return false }
+    return (try? lease.performAtCommitBoundary {
+      let absolutePath = try lease.resolve(relativePath: relFilePath)
+      return FileManager.default.fileExists(atPath: absolutePath.path)
+    }) ?? false
   }
 
   public func writeDataExcludedFromBackup(data: Data, to: URL, accountInfo: AccountInfo?) throws {
-    let subDir = to.deletingLastPathComponent()
-    if createDirectoryIfNeeded(at: subDir) {
-      try? markItemAsExcludedFromBackup(at: subDir)
+    let lease = try currentRootLease()
+    try writeDataExcludedFromBackup(data: data, to: to, accountInfo: accountInfo, using: lease)
+  }
+
+  public func writeDataExcludedFromBackup(
+    data: Data,
+    to destinationURL: URL,
+    accountInfo: AccountInfo?,
+    using lease: CacheRootLease
+  ) throws {
+    try lease.performAtCommitBoundary {
+      let expectedDestination = try ensureInsideRoot(destinationURL, lease: lease)
+      let subdirectory = expectedDestination.deletingLastPathComponent()
+      try FileManager.default.createDirectory(
+        at: subdirectory,
+        withIntermediateDirectories: true
+      )
+      try markItemAsExcludedFromBackup(at: subdirectory)
+      try data.write(to: expectedDestination, options: [.atomic])
+      try markItemAsExcludedFromBackup(at: expectedDestination)
+      if let accountInfo {
+        updateCachedDirectorySize(
+          itemUrl: expectedDestination,
+          isAdded: true,
+          accountInfo: accountInfo,
+          using: lease
+        )
+      }
     }
-    try data.write(to: to, options: [.atomic])
-    try markItemAsExcludedFromBackup(at: to)
-    // account info is nil when written to Amperfy directory directly
-    if let accountInfo {
-      updateCachedDirectorySize(itemUrl: to, isAdded: true, accountInfo: accountInfo)
+  }
+
+  private func ensureInsideRoot(_ url: URL, lease: CacheRootLease) throws -> URL {
+    let standardizedURL = url.standardizedFileURL
+    let standardizedRoot = lease.rootURL.standardizedFileURL
+    if standardizedURL.path == standardizedRoot.path {
+      try lease.validateCurrent()
+      return standardizedRoot.resolvingSymlinksInPath()
     }
+    let rootPath = standardizedRoot.path.hasSuffix("/")
+      ? standardizedRoot.path
+      : standardizedRoot.path + "/"
+    guard standardizedURL.path.hasPrefix(rootPath) else {
+      throw CacheRootError.pathEscapesRoot
+    }
+    let relative = try CacheRelativePath(String(standardizedURL.path.dropFirst(rootPath.count)))
+    return try lease.secureContainedURL(relative)
   }
 
   private func markItemAsExcludedFromBackup(at: URL) throws {
@@ -820,42 +1293,58 @@ final public class CacheFileManager: Sendable {
   }
 
   private func contentsOfDirectory(url: URL) -> [URL] {
-    let contents = try? FileManager.default.contentsOfDirectory(
-      at: url,
-      includingPropertiesForKeys: [.isDirectoryKey]
-    )
-    return contents ?? [URL]()
+    guard let lease = try? currentRootLease() else { return [] }
+    return (try? contentsOfDirectory(url: url, using: lease)) ?? []
   }
 
-  private func directorySize(url: URL) -> Int64 {
-    let contents: [URL]
-    do {
-      contents = try FileManager.default.contentsOfDirectory(
-        at: url,
-        includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey]
+  private func contentsOfDirectory(url: URL, using lease: CacheRootLease) throws -> [URL] {
+    try lease.performAtCommitBoundary {
+      let safeURL = try ensureInsideRoot(url, lease: lease)
+      let contents = try FileManager.default.contentsOfDirectory(
+        at: safeURL,
+        includingPropertiesForKeys: [.isDirectoryKey, .isSymbolicLinkKey]
       )
-    } catch {
-      return 0
+      for item in contents {
+        _ = try ensureInsideRoot(item, lease: lease)
+      }
+      return contents
     }
+  }
+
+  private func directorySize(url: URL, using lease: CacheRootLease) throws -> Int64 {
+    let safeURL = try ensureInsideRoot(url, lease: lease)
+    let contents = try FileManager.default.contentsOfDirectory(
+      at: safeURL,
+      includingPropertiesForKeys: [.fileSizeKey, .isDirectoryKey, .isSymbolicLinkKey]
+    )
 
     var size: Int64 = 0
 
     for url in contents {
       let isDirectoryResourceValue: URLResourceValues
       do {
-        isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
+        _ = try ensureInsideRoot(url, lease: lease)
+        isDirectoryResourceValue = try url.resourceValues(forKeys: [
+          .isDirectoryKey,
+          .isSymbolicLinkKey,
+        ])
       } catch {
-        continue
+        throw error
+      }
+
+      guard isDirectoryResourceValue.isSymbolicLink != true else {
+        throw CacheRootError.pathEscapesRoot
       }
 
       if isDirectoryResourceValue.isDirectory == true {
-        size += directorySize(url: url)
+        size += try directorySize(url: url, using: lease)
       } else {
         if let fileSize = getFileSize(url: url) {
           size += fileSize
         }
       }
     }
+    try lease.validateCurrent()
     return size
   }
 

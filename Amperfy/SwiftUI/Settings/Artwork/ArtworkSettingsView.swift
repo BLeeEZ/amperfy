@@ -122,6 +122,7 @@ struct ArtworkSettingsView: View {
                   "This action will delete downloaded artworks. Artworks embedded in song/podcast episode files will be kept. Continue?"
                 ),
                 primaryButton: .destructive(Text("Delete")) {
+                  guard CacheRootRuntime.shared.isCacheAvailable else { return }
                   let account = appDelegate.storage.main.library
                     .getAccount(info: activeAccountInfo)
                   appDelegate.getMeta(activeAccountInfo).artworkDownloadManager.stop()

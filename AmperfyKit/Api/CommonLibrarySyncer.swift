@@ -57,19 +57,21 @@ class CommonLibrarySyncer {
 
   func createCachedItemRepresentationsInCoreData(statusNotifyier: SyncCallbacks?) async throws {
     let accountInfo = account.info
-    try await storage.async.perform { asyncCompanion in
-      let cachedArtworks = self.fileManager.getCachedArtworks(for: accountInfo)
-      let cachedEmbeddedArtworks = self.fileManager.getCachedEmbeddedArtworks(for: accountInfo)
-      let cachedLyrics = self.fileManager.getCachedLyrics(for: accountInfo)
-      let cachedSongs = self.fileManager.getCachedSongs(for: accountInfo)
-      let cachedEpisodes = self.fileManager.getCachedEpisodes(for: accountInfo)
+    let rootLease = try fileManager.currentRootLease()
+    let snapshot = try fileManager.accountCacheSnapshot(for: accountInfo, using: rootLease)
+    try await storage.async.performWithCommitValidation { asyncCompanion in
+      let cachedArtworks = snapshot.artworks
+      let cachedEmbeddedArtworks = snapshot.embeddedArtworks
+      let cachedLyrics = snapshot.lyrics
+      let cachedSongs = snapshot.songs
+      let cachedEpisodes = snapshot.episodes
 
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let totalCount = cachedArtworks.count + cachedEmbeddedArtworks.count + cachedLyrics
         .count + cachedSongs.count + cachedEpisodes.count
       guard totalCount > 0 else {
         // nothing to do
-        return
+        return ()
       }
       statusNotifyier?.notifySyncStarted(ofType: .cache, totalCount: totalCount)
       for cachedArtwork in cachedArtworks {
@@ -137,6 +139,9 @@ class CommonLibrarySyncer {
         }
         statusNotifyier?.notifyParsedObject(ofType: .cache)
       }
+      return ()
+    } validateBeforeSave: {
+      try rootLease.validateCurrent()
     }
   }
 }
