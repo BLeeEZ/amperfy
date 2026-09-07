@@ -25,6 +25,8 @@ import os.log
 
 // MARK: - PlayableFileCachable
 
+/// Legacy test seam retained while player tests are migrated. Production playback no longer uses
+/// this URL projection; `BackendAudioPlayer` holds its generation lease through insertion instead.
 protocol PlayableFileCachable {
   func getFileURL(forPlayable playable: AbstractPlayable) -> URL?
 }
@@ -2894,19 +2896,18 @@ public class LibraryStorage: PlayableFileCachable {
     return playlistDict
   }
 
+  /// Legacy test-only URL projection. Production reads must use `CacheFileManager.withCacheFile`.
   func getFileURL(forPlayable playable: AbstractPlayable) -> URL? {
-    var absFileURL: URL?
-    if let relFilePath = playable.relFilePath {
-      absFileURL = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
-    } else {
+    guard let relFilePath = playable.relFilePath else {
       os_log(
         "File URL was not able to retrieve for: %s",
         log: log,
         type: .error,
         playable.displayString
       )
+      return nil
     }
-    return absFileURL
+    return fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
   }
 
   public func cleanStorageOfObsoleteAccountEntries(account: Account) {

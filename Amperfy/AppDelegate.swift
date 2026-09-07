@@ -37,6 +37,9 @@ let defaultWindowActivityType = "amperfy.main"
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+  #if targetEnvironment(macCatalyst)
+    private var cacheAvailabilityTimer: Timer?
+  #endif
   static let name = "Amperfy"
   static var version: String {
     (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
@@ -185,6 +188,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   @MainActor
   private func performBackgroundFetchTask(bgTask: BGTask) async {
+    guard let rootLease = try? CacheFileManager.shared.currentRootLease() else {
+      bgTask.setTaskCompleted(success: false)
+      return
+    }
     os_log("Perform task: %s", log: self.log, type: .info, Self.refreshTaskId)
     var success = true
     for accountInfo in storage.settings.accounts.allAccounts {
@@ -199,6 +206,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           displayPopup: false
         )
       }
+    }
+    do {
+      try rootLease.validateCurrent()
+    } catch {
+      success = false
     }
     bgTask.setTaskCompleted(success: success)
     userStatistics.backgroundFetchPerformed(result: UIBackgroundFetchResult.newData)
@@ -255,6 +267,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   )
     -> Bool {
+    do {
+      try CacheRootRuntime.shared.bootstrap()
+    } catch {
+      // Metadata and streaming remain available. Cache consumers still reject access
+      // until the configured drive is verified; no internal fallback is created.
+    }
+
     if let options = launchOptions {
       os_log("application launch with options:", log: self.log, type: .info)
       options
@@ -263,8 +282,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       os_log("application launch", log: self.log, type: .info)
     }
 
+    #if targetEnvironment(macCatalyst)
+      cacheAvailabilityTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
+        Task.detached { CacheRootRuntime.shared.refreshAvailability() }
+      }
+    #endif
     storage.applyMultiAccountSettingsUpdateIfNeeded()
-    libraryUpdater.performAccountCleanUpIfNeccessaryInBackground()
+    if CacheRootRuntime.shared.isCacheAvailable {
+      libraryUpdater.performAccountCleanUpIfNeccessaryInBackground()
+    }
 
     configureDefaultNavigationBarStyle()
     configureBatteryMonitoring()
@@ -291,7 +317,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       type: .info,
       CacheFileManager.shared.getAmperfyPath() ?? "-"
     )
-    libraryUpdater.performSmallBlockingLibraryUpdatesIfNeeded()
+    if CacheRootRuntime.shared.isCacheAvailable {
+      libraryUpdater.performSmallBlockingLibraryUpdatesIfNeeded()
+    }
     // start manager only if no visual indicated updates are needed
     if !libraryUpdater.isVisualUpadateNeeded {
       startManagerForNormalOperation()

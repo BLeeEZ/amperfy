@@ -29,16 +29,21 @@ final class PlayableDownloadDelegate: DownloadManagerDelegate {
   private let backendApi: BackendApi
   private let artworkExtractor: EmbeddedArtworkExtractor
   private let networkMonitor: NetworkMonitorFacade
-  private let fileManager = CacheFileManager.shared
+  private let fileManager: CacheFileManager
+  private let afterFilesystemCommitBeforeCoreDataSave: @Sendable () throws -> ()
 
   init(
     backendApi: BackendApi,
     artworkExtractor: EmbeddedArtworkExtractor,
-    networkMonitor: NetworkMonitorFacade
+    networkMonitor: NetworkMonitorFacade,
+    fileManager: CacheFileManager = .shared,
+    afterFilesystemCommitBeforeCoreDataSave: @escaping @Sendable () throws -> () = {}
   ) {
     self.backendApi = backendApi
     self.artworkExtractor = artworkExtractor
     self.networkMonitor = networkMonitor
+    self.fileManager = fileManager
+    self.afterFilesystemCommitBeforeCoreDataSave = afterFilesystemCommitBeforeCoreDataSave
   }
 
   var requestPredicate: NSPredicate {
@@ -132,29 +137,35 @@ final class PlayableDownloadDelegate: DownloadManagerDelegate {
     fileMimeType: String?,
     storage: AsyncCoreDataAccessWrapper
   ) async throws {
-    try await storage.perform { asyncCompanion in
+    let rootLease = try fileManager.currentRootLease()
+    let preparedCommit = try await storage.performWithCommitValidation { asyncCompanion in
       let playableAsync = AbstractPlayable(
         managedObject: asyncCompanion.context
           .object(with: playableInfo.objectID) as! AbstractPlayableMO
       )
       playableAsync.contentTypeTranscoded = fileMimeType
       // transcoding info needs to available to generate a correct file extension
-      guard let relFilePath = CacheFileManager.shared.createRelPath(for: playableAsync),
-            let absFilePath = CacheFileManager.shared
-            .getAbsoluteAmperfyPath(relFilePath: relFilePath),
+      guard let relFilePath = self.fileManager.createRelPath(for: playableAsync),
             let accountInfo = playableAsync.account?.info
-      else { return }
-      do {
-        try CacheFileManager.shared.moveExcludedFromBackupItem(
-          at: fileURL,
-          to: absFilePath,
-          accountInfo: accountInfo
-        )
-        playableAsync.relFilePath = relFilePath
-      } catch {
-        playableAsync.relFilePath = nil
-      }
+      else { throw CacheRootError.unavailable }
+      let absFilePath = try self.fileManager.getAbsoluteAmperfyPath(
+        relFilePath: relFilePath,
+        using: rootLease
+      )
+      let transaction = try self.fileManager.prepareRecoverableFileCommit(
+        sourceURL: fileURL,
+        destinationURL: absFilePath,
+        accountInfo: accountInfo,
+        using: rootLease
+      )
+      try self.afterFilesystemCommitBeforeCoreDataSave()
+      try rootLease.validateCurrent()
+      playableAsync.relFilePath = relFilePath
+      return transaction
+    } validateBeforeSave: {
+      try rootLease.validateCurrent()
     }
+    try preparedCommit.finishAfterCoreDataCommit()
   }
 
   func failedDownload(downloadInfo: DownloadElementInfo, storage: AsyncCoreDataAccessWrapper) {}

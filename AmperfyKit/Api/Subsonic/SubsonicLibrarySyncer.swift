@@ -1297,11 +1297,14 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   @MainActor
   func parseLyrics(relFilePath: URL) async throws -> LyricsList {
     let parserDelegate = SsLyricsParserDelegate(performanceMonitor: performanceMonitor)
-    guard let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath) else {
-      throw ResponseError(type: .xml)
-    }
     do {
-      try parse(absFilePath: absFilePath, delegate: parserDelegate, isThrowingErrorsAllowed: false)
+      try fileManager.withCacheFile(relativePath: relFilePath) { absFilePath in
+        try parse(
+          absFilePath: absFilePath,
+          delegate: parserDelegate,
+          isThrowingErrorsAllowed: false
+        )
+      }
     } catch {
       throw ResponseError(type: .xml)
     }

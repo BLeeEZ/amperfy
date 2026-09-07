@@ -21,6 +21,7 @@
 
 import AmperfyKit
 import OSLog
+import SwiftUI
 import UIKit
 
 // MARK: - MainSceneHostingViewController
@@ -82,6 +83,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }()
 
   var window: UIWindow?
+  #if targetEnvironment(macCatalyst)
+    private var cacheBanner: UIView?
+    private var cacheBannerTimer: Timer?
+    private var contentTopInset: CGFloat = 0
+  #endif
 
   func scene(
     _ scene: UIScene,
@@ -128,8 +134,76 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func replaceMainRootViewController(vc: UIViewController) {
+    #if targetEnvironment(macCatalyst)
+      cacheBanner?.removeFromSuperview()
+      cacheBanner = nil
+      cacheBannerTimer?.invalidate()
+      contentTopInset = vc.additionalSafeAreaInsets.top
+    #endif
     window?.rootViewController = vc
+    #if targetEnvironment(macCatalyst)
+      updateCacheBanner()
+      cacheBannerTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { [weak self] _ in
+        Task { @MainActor in self?.updateCacheBanner() }
+      }
+    #endif
   }
+
+  #if targetEnvironment(macCatalyst)
+    private func updateCacheBanner() {
+      guard let window, let vc = window.rootViewController,
+            vc.viewIfLoaded?.window === window else { return }
+      guard case .blocked = CacheRootRuntime.shared.state else {
+        cacheBanner?.removeFromSuperview()
+        cacheBanner = nil
+        vc.additionalSafeAreaInsets.top = contentTopInset
+        return
+      }
+      if let cacheBanner {
+        window.bringSubviewToFront(cacheBanner)
+        return
+      }
+      let label = UILabel()
+      label.text = "Cache drive unavailable. Downloads are waiting."
+      label.font = .preferredFont(forTextStyle: .footnote)
+      label.textColor = .label
+      label.isAccessibilityElement = true
+      label.setContentCompressionResistancePriority(.required, for: .horizontal)
+      let button = UIButton(type: .system)
+      button.setTitle("Storage…", for: .normal)
+      button.addTarget(self, action: #selector(showCacheLocation), for: .touchUpInside)
+      let banner = UIView()
+      banner.backgroundColor = .secondarySystemBackground
+      banner.translatesAutoresizingMaskIntoConstraints = false
+      label.translatesAutoresizingMaskIntoConstraints = false
+      button.translatesAutoresizingMaskIntoConstraints = false
+      banner.addSubview(label)
+      banner.addSubview(button)
+      vc.additionalSafeAreaInsets.top = contentTopInset + 44
+      // UISplitViewController owns and lays out its direct subviews. Keep this
+      // scene-wide notice in the window, outside that managed hierarchy.
+      window.addSubview(banner)
+      NSLayoutConstraint.activate([
+        banner.topAnchor.constraint(equalTo: vc.view.safeAreaLayoutGuide.topAnchor, constant: -44),
+        banner.leadingAnchor.constraint(equalTo: window.leadingAnchor),
+        banner.trailingAnchor.constraint(equalTo: window.trailingAnchor),
+        banner.heightAnchor.constraint(equalToConstant: 44),
+        label.leadingAnchor.constraint(equalTo: banner.leadingAnchor, constant: 16),
+        label.centerYAnchor.constraint(equalTo: banner.centerYAnchor),
+        label.trailingAnchor.constraint(lessThanOrEqualTo: button.leadingAnchor, constant: -16),
+        button.trailingAnchor.constraint(equalTo: banner.trailingAnchor, constant: -16),
+        button.centerYAnchor.constraint(equalTo: banner.centerYAnchor),
+      ])
+      cacheBanner = banner
+    }
+
+    @objc
+    private func showCacheLocation() {
+      let sheet = UIHostingController(rootView: CacheLocationSheet())
+      sheet.modalPresentationStyle = .formSheet
+      window?.rootViewController?.present(sheet, animated: true)
+    }
+  #endif
 
   /** Called when the user activates your application by selecting a shortcut on the Home Screen,
        and the window scene is already connected.
@@ -161,6 +235,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Called when the scene has moved from an inactive state to an active state.
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     os_log("sceneDidBecomeActive", log: self.log, type: .info)
+    #if targetEnvironment(macCatalyst)
+      updateCacheBanner()
+    #endif
     guard appDelegate.isNormalInteraction else {
       return
     }

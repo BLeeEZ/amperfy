@@ -94,6 +94,7 @@ actor DownloadManager: NSObject, DownloadManageable {
   private let urlCleanser: URLCleanser
 
   private var isRunning = false
+  private var isPausedForCacheMove = false
   private var taskOperations = [DownloadRequest: DownloadOperation]()
   private var backgroundFetchCompletionHandler: CompleteHandlerBlock?
   private var isFailWithPopupError: Bool = true
@@ -152,6 +153,12 @@ actor DownloadManager: NSObject, DownloadManageable {
       self,
       selector: #selector(networkStatusChanged(notification:)),
       name: .networkStatusChanged,
+      object: nil
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(networkStatusChanged(notification:)),
+      name: CacheRootRuntime.didChangeNotification,
       object: nil
     )
     Task {
@@ -297,6 +304,26 @@ actor DownloadManager: NSObject, DownloadManageable {
     for task in urlSessionTasks {
       task.cancel()
     }
+  }
+
+  @MainActor
+  func pauseForCacheMove() async {
+    await setCacheMovePaused(true)
+  }
+
+  @MainActor
+  func resumeAfterCacheMove() async {
+    await setCacheMovePaused(false)
+  }
+
+  private func setCacheMovePaused(_ paused: Bool) async {
+    if !paused {
+      isPausedForCacheMove = false
+      await setupDownloadQueue()
+      return
+    }
+    isPausedForCacheMove = true
+    await _suspendDownloads()
   }
 
   nonisolated func suspendDownloads() {
@@ -533,7 +560,8 @@ actor DownloadManager: NSObject, DownloadManageable {
   }
 
   private var isAllowedToTriggerDownload: Bool {
-    isRunning &&
+    isRunning && !isPausedForCacheMove &&
+      CacheRootRuntime.shared.isCacheAvailable &&
       settings.user.isOnlineMode &&
       networkMonitor.isConnectedToNetwork &&
       (!isCacheSizeLimited || !storageExceedsCacheLimit())

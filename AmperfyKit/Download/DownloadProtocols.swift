@@ -53,6 +53,15 @@ public protocol DownloadManageable {
   func cancelDownloads()
   func start()
   func stop()
+  @MainActor
+  func pauseForCacheMove() async
+  @MainActor
+  func resumeAfterCacheMove() async
+}
+
+extension DownloadManageable {
+  public func pauseForCacheMove() async { stop() }
+  public func resumeAfterCacheMove() async { start() }
 }
 
 // MARK: - DownloadManagerDelegate

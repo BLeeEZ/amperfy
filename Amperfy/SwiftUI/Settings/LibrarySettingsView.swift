@@ -124,8 +124,7 @@ struct LibrarySettingsView: View {
       completeCacheSize = try await appDelegate.storage.async.performAndGet { asyncCompanion in
         let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
         let playableByteSize = fileManager.getPlayableCacheSize(for: accountAsync.info)
-        return (playableByteSize > 1_000_000) ? playableByteSize.asByteString : Int64(0)
-          .asByteString
+        return playableByteSize.asByteString
       }
 
       let curCacheSizeLimit = Int64(settings.cacheSizeLimit)
@@ -188,6 +187,16 @@ struct LibrarySettingsView: View {
             }
           }
 
+          #if targetEnvironment(macCatalyst)
+            NavigationLink(destination: CacheLocationSettingsView()) {
+              SettingsRow(title: "Cache Location") {
+                SecondaryText(
+                  CacheRootRuntime.shared
+                    .isCacheAvailable ? "Manage Storage" : "Drive Unavailable"
+                )
+              }
+            }
+          #endif
           SettingsRow(title: "Cached Songs") { SecondaryText(cachedSongCount.description) }
           SettingsRow(title: "Cached Podcast Episodes") {
             SecondaryText(cachedPodcastEpisodesCount.description)
@@ -253,6 +262,7 @@ struct LibrarySettingsView: View {
                   "Are you sure you want to delete this account’s downloaded songs and podcast episodes?"
                 ),
                 primaryButton: .destructive(Text("Delete")) {
+                  guard CacheRootRuntime.shared.isCacheAvailable else { return }
                   appDelegate.player.stop()
                   let account = appDelegate.storage.main.library
                     .getAccount(info: activeAccountInfo)

@@ -75,7 +75,6 @@ enum BackendAudioQueueType {
 @MainActor
 class BackendAudioPlayer: NSObject {
   private let getPlayableDownloaderCB: GetPlayableDownloadManagerCallback
-  private let cacheProxy: PlayableFileCachable
   private let getBackendApiCB: GetBackendApiCallback
   private let userStatistics: UserStatistics
   private let createAudioStreamingPlayerCB: CreateAudioStreamingPlayerCallback
@@ -210,7 +209,7 @@ class BackendAudioPlayer: NSObject {
     self.networkMonitor = networkMonitor
     self.eventLogger = eventLogger
     self.getPlayableDownloaderCB = getPlayableDownloaderCB
-    self.cacheProxy = cacheProxy
+    _ = cacheProxy // retained only for source-compatible player tests
     self.userStatistics = userStatistics
     self.audioAnalyzer = AudioAnalyzer()
 
@@ -257,7 +256,7 @@ class BackendAudioPlayer: NSObject {
         nextPreloadedPlayable = nextPlayablePreloadCB?()
         guard let nextPreloadedPlayable = nextPreloadedPlayable else { return }
         os_log(.default, "Preloading: %s", nextPreloadedPlayable.displayString)
-        if nextPreloadedPlayable.isCached {
+        if let path = nextPreloadedPlayable.relFilePath, fileManager.fileExits(relFilePath: path) {
           insertCachedPlayable(playable: nextPreloadedPlayable, queueType: .queue)
         } else if !isOfflineMode {
           Task { @MainActor in
@@ -528,19 +527,19 @@ class BackendAudioPlayer: NSObject {
     playable: AbstractPlayable,
     queueType: BackendAudioQueueType = .play
   ) {
-    guard let fileURL = cacheProxy.getFileURL(forPlayable: playable) else {
-      return
+    guard let relativePath = playable.relFilePath else { return }
+    try? fileManager.withCacheFile(relativePath: relativePath) { fileURL in
+      if queueType == .play {
+        playType = .cache
+        perloadedPlayType = nil
+        os_log(.default, "Play Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
+      } else {
+        perloadedPlayType = .cache
+        os_log(.default, "Insert Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
+      }
+      if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
+      insert(playable: playable, withUrl: fileURL, queueType: queueType)
     }
-    if queueType == .play {
-      playType = .cache
-      perloadedPlayType = nil
-      os_log(.default, "Play Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
-    } else {
-      perloadedPlayType = .cache
-      os_log(.default, "Insert Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
-    }
-    if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
-    insert(playable: playable, withUrl: fileURL, queueType: queueType)
   }
 
   @MainActor

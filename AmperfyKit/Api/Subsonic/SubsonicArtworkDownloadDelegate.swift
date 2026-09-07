@@ -101,27 +101,38 @@ final class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
       return artwork.remoteInfo
     }
     guard let artworkRemoteInfo else { return }
-    let relFilePath = handleCustomImage(fileURL: fileURL, artworkRemoteInfo: artworkRemoteInfo)
-    try? await storage.perform { asyncCompanion in
-      let artwork = Artwork(
-        managedObject: asyncCompanion.context
-          .object(with: downloadInfo.objectId) as! ArtworkMO
-      )
-      artwork.status = .CustomImage
-      artwork.relFilePath = relFilePath
-    }
-  }
-
-  func handleCustomImage(fileURL: URL, artworkRemoteInfo: ArtworkRemoteInfo) -> URL? {
     guard let account = subsonicServerApi.account,
-          let relFilePath = fileManager.createRelPath(for: artworkRemoteInfo, account: account),
-          let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
-    else { return nil }
+          let rootLease = try? fileManager.currentRootLease()
+    else { return }
     do {
-      try fileManager.moveExcludedFromBackupItem(at: fileURL, to: absFilePath, accountInfo: account)
-      return relFilePath
+      let preparedCommit = try await storage.performWithCommitValidation { asyncCompanion in
+        let artwork = Artwork(
+          managedObject: asyncCompanion.context
+            .object(with: downloadInfo.objectId) as! ArtworkMO
+        )
+        guard let relFilePath = self.fileManager.createRelPath(
+          for: artworkRemoteInfo,
+          account: account
+        ) else { throw CacheRootError.unavailable }
+        let absolutePath = try self.fileManager.getAbsoluteAmperfyPath(
+          relFilePath: relFilePath,
+          using: rootLease
+        )
+        let transaction = try self.fileManager.prepareRecoverableFileCommit(
+          sourceURL: fileURL,
+          destinationURL: absolutePath,
+          accountInfo: account,
+          using: rootLease
+        )
+        artwork.status = .CustomImage
+        artwork.relFilePath = relFilePath
+        return transaction
+      } validateBeforeSave: {
+        try rootLease.validateCurrent()
+      }
+      try preparedCommit.finishAfterCoreDataCommit()
     } catch {
-      return nil
+      return
     }
   }
 
