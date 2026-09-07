@@ -536,6 +536,9 @@
 		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
+		C90700000000000000000001 /* MainWindowFrameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90700000000000000000004; };
+		C90700000000000000000002 /* MainWindowFrameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90700000000000000000004; };
+		C90700000000000000000003 /* MainWindowFrameStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90700000000000000000005; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1158,6 +1161,8 @@
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v39.xcdatamodel"; sourceTree = "<group>"; };
 		64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v46.xcdatamodel"; sourceTree = "<group>"; };
+		C90700000000000000000004 /* MainWindowFrameStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Amperfy/MainWindowFrameStore.swift; sourceTree = SOURCE_ROOT; };
+		C90700000000000000000005 /* MainWindowFrameStoreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmperfyKitTests/Cases/Storage/MainWindowFrameStoreTest.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1470,6 +1475,7 @@
 			children = (
 				508385E721C5965B00C4BB32 /* AppDelegate.swift */,
 				5059A31B28A9ED680068E4D2 /* SceneDelegate.swift */,
+				C90700000000000000000004 /* MainWindowFrameStore.swift */,
 				63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */,
 				637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */,
 				C0A1B0022EEE000000000002 /* MacWindowHelper.swift */,
@@ -1592,6 +1598,7 @@
 			isa = PBXGroup;
 			children = (
 				5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */,
+				C90700000000000000000005 /* MainWindowFrameStoreTest.swift */,
 				5011712D27453D1300B7C08D /* PlayQueueHandlerTest.swift */,
 			);
 			path = Player;
@@ -2529,6 +2536,7 @@
 				50DE29EF2B90642E00ABA78E /* SelectionAccessory.swift in Sources */,
 				501A7D4F26820B3F0055A51B /* PodcastDetailVC.swift in Sources */,
 				5059A31C28A9ED680068E4D2 /* SceneDelegate.swift in Sources */,
+				C90700000000000000000001 /* MainWindowFrameStore.swift in Sources */,
 				50DE29F12B90855100ABA78E /* KeyCommandCollectionViewController.swift in Sources */,
 				50E1D39C2B8BED4C0001A572 /* SideBarVC.swift in Sources */,
 				505CA20E2B88EB9A00AA81CD /* BasicFetchedResultsTableViewController.swift in Sources */,
@@ -2881,6 +2889,8 @@
 				50BE5D6E2850F4FB00156FC6 /* SsPlaylistsParserTest.swift in Sources */,
 				50BE5D862850F50F00156FC6 /* PlaylistSongsParserTest.swift in Sources */,
 				50BE5D532850F4E700156FC6 /* MusicPlayerTest.swift in Sources */,
+				C90700000000000000000002 /* MainWindowFrameStore.swift in Sources */,
+				C90700000000000000000003 /* MainWindowFrameStoreTest.swift in Sources */,
 				50BE5D732850F4FB00156FC6 /* SsPodcastParserTest.swift in Sources */,
 				50BE5D722850F4FB00156FC6 /* SsSongExample1ParserTest.swift in Sources */,
 				50BE5D912850F50F00156FC6 /* GenreParserTest.swift in Sources */,
