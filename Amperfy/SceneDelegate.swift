@@ -83,6 +83,40 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   var window: UIWindow?
 
+  #if targetEnvironment(macCatalyst)
+    private let mainWindowFrameStore = MainWindowFrameStore()
+    private var hasRestoredMainWindowFrame = false
+
+    private func restoreMainWindowFrame(in scene: UIWindowScene) {
+      guard !hasRestoredMainWindowFrame, !scene.isFullScreen else { return }
+      hasRestoredMainWindowFrame = true
+      guard let frame = mainWindowFrameStore.restoredFrame(
+        defaultFrame: scene.effectiveGeometry.systemFrame,
+        displays: MainWindowFrameStore.connectedDisplayFrames()
+      ) else { return }
+      scene.requestGeometryUpdate(UIWindowScene.GeometryPreferences.Mac(systemFrame: frame)) {
+        error in
+        os_log("Could not restore main window frame: %@", type: .error, error.localizedDescription)
+      }
+    }
+
+    private func saveMainWindowFrame(in scene: UIWindowScene) {
+      guard hasRestoredMainWindowFrame else { return }
+      mainWindowFrameStore.save(
+        scene.effectiveGeometry.systemFrame,
+        isFullScreen: scene.isFullScreen,
+        isResizing: scene.effectiveGeometry.isInteractivelyResizing
+      )
+    }
+
+    func windowScene(
+      _ windowScene: UIWindowScene,
+      didUpdateEffectiveGeometry previousEffectiveGeometry: UIWindowScene.Geometry
+    ) {
+      saveMainWindowFrame(in: windowScene)
+    }
+  #endif
+
   func scene(
     _ scene: UIScene,
     willConnectTo session: UISceneSession,
@@ -161,6 +195,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Called when the scene has moved from an inactive state to an active state.
     // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
     os_log("sceneDidBecomeActive", log: self.log, type: .info)
+    #if targetEnvironment(macCatalyst)
+      if let windowScene = scene as? UIWindowScene {
+        restoreMainWindowFrame(in: windowScene)
+      }
+    #endif
     guard appDelegate.isNormalInteraction else {
       return
     }
@@ -172,6 +211,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Called when the scene will move from an active state to an inactive state.
     // This may occur due to temporary interruptions (ex. an incoming phone call).
     os_log("sceneWillResignActive", log: self.log, type: .info)
+    #if targetEnvironment(macCatalyst)
+      if let windowScene = scene as? UIWindowScene {
+        saveMainWindowFrame(in: windowScene)
+      }
+    #endif
     guard appDelegate.isNormalInteraction else {
       return
     }
