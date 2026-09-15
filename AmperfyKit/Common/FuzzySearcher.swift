@@ -38,11 +38,11 @@ public class FuzzySearcher {
     -> [PlayableContainable] {
     let fuse = Fuse()
     // Improve performance by creating the pattern once
-    let pattern = fuse.createPattern(from: search)
+    let pattern = fuse.createPattern(from: search.replacing(/[‘’'`]/, with: "'"))
 
     var matches = [MatchResult]()
     items.forEach {
-      let result = fuse.search(pattern, in: $0.name)
+      let result = fuse.search(pattern, in: $0.name.replacing(/[‘’'`]/, with: "'"))
       if let result = result {
         matches.append(MatchResult(item: $0, score: result.score))
       }
