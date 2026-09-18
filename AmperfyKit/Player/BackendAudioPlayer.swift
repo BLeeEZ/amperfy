@@ -560,6 +560,7 @@ class BackendAudioPlayer: NSObject {
           throw BackendError.invalidUrl
         }
         playType = .stream
+        ClientCertificateManager.shared.activeStreamingCertificateAccountIdent = nil
         return streamUrl
       } else {
         if queueType == .play {
@@ -579,6 +580,14 @@ class BackendAudioPlayer: NSObject {
         }
         let backendApi = getBackendApiCB(accountInfo)
         httpHeaders = backendApi.httpHeaders
+        ClientCertificateManager.shared.activeStreamingCertificateAccountIdent = accountInfo.ident
+        os_log(
+          .default,
+          "Streaming mTLS certificate for account %{public}@: %{public}@",
+          accountInfo.ident,
+          ClientCertificateManager.shared
+            .credentialForAccountOrLogin(accountIdent: accountInfo.ident) != nil ? "found" : "MISSING"
+        )
         return try await backendApi.generateUrl(
           forStreamingPlayable: playable.info,
           maxBitrate: streamingMaxBitrate,
@@ -645,22 +654,32 @@ class BackendAudioPlayer: NSObject {
       return
     }
 
+    var headers = Self.cookieHeaders(for: asset.url)
+    headers.merge(httpHeaders) { _, new in new }
+
     switch queueType {
     case .play:
       currentPreparedUrl = asset.url.absoluteString
-      if httpHeaders.isEmpty {
+      if headers.isEmpty {
         player?.play(url: asset.url)
       } else {
-        player?.play(url: asset.url, headers: httpHeaders)
+        player?.play(url: asset.url, headers: headers)
       }
     case .queue:
       nextPreloadedUrl = asset.url.absoluteString
-      if httpHeaders.isEmpty {
+      if headers.isEmpty {
         player?.queue(url: asset.url)
       } else {
-        player?.queue(url: asset.url, headers: httpHeaders)
+        player?.queue(url: asset.url, headers: headers)
       }
     }
+  }
+
+  private static func cookieHeaders(for url: URL) -> [String: String] {
+    guard let cookies = HTTPCookieStorage.shared.cookies(for: url), !cookies.isEmpty else {
+      return [:]
+    }
+    return HTTPCookie.requestHeaderFields(with: cookies)
   }
 
   // MARK: - EQ Implementation
