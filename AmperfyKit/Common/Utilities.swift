@@ -271,6 +271,240 @@ extension Array {
   }
 }
 
+// MARK: - Balanced Shuffle
+
+extension Array {
+  /// Returns the elements shuffled so that elements sharing an artist are spread
+  /// across the whole array instead of clustering.
+  ///
+  /// A uniform shuffle often places songs by the same artist next to each other
+  /// (with 10 songs by one artist in a 100-song playlist, 63% of all orders do),
+  /// which listeners do not perceive as random. This follows the approach Spotify
+  /// described in "How to shuffle songs?" (2014): every artist's songs are
+  /// stretched evenly along the array with a random offset and a small random
+  /// jitter, and the array is ordered by those positions. Songs of one artist are
+  /// spread across their albums the same way. Positions wrap around, so an artist
+  /// with many songs is as likely to open the array as any other song. A final
+  /// pass removes the adjacent repeats the spreading leaves behind. When one
+  /// artist has more songs than all others together (plus one), repeats are
+  /// unavoidable; the artist's songs are then split into runs of equal length.
+  ///
+  /// - Parameters:
+  ///   - artistKey: Grouping key per element. Elements without a key are treated
+  ///     as their own group.
+  ///   - albumKey: Grouping key inside an artist.
+  ///   - firstIndex: Index of an element that must stay at index 0.
+  public func balancedShuffled(
+    artistKey: (Element) -> AnyHashable?,
+    albumKey: (Element) -> AnyHashable?,
+    keepingFirst firstIndex: Int? = nil
+  )
+    -> [Element] {
+    var generator = SystemRandomNumberGenerator()
+    return balancedShuffled(
+      artistKey: artistKey,
+      albumKey: albumKey,
+      keepingFirst: firstIndex,
+      using: &generator
+    )
+  }
+
+  public func balancedShuffled<G: RandomNumberGenerator>(
+    artistKey: (Element) -> AnyHashable?,
+    albumKey: (Element) -> AnyHashable?,
+    keepingFirst firstIndex: Int? = nil,
+    using generator: inout G
+  )
+    -> [Element] {
+    var entries = enumerated().map { index, element in
+      BalancedShuffle.Entry(
+        element: element,
+        artist: BalancedShuffle.Key(artistKey(element), unique: index),
+        album: BalancedShuffle.Key(albumKey(element), unique: index)
+      )
+    }
+    guard let firstIndex, entries.indices.contains(firstIndex) else {
+      return BalancedShuffle.balance(entries, using: &generator).map { $0.element }
+    }
+    let firstEntry = entries.remove(at: firstIndex)
+    var ordered = [firstEntry] + BalancedShuffle.balance(entries, using: &generator)
+    if BalancedShuffle.isAvoidable([firstEntry] + entries) {
+      ordered = BalancedShuffle.repairAdjacent(ordered, start: 1, using: &generator)
+    }
+    return ordered.map { $0.element }
+  }
+}
+
+// MARK: - BalancedShuffle
+
+private enum BalancedShuffle {
+  enum Key: Hashable {
+    case key(AnyHashable)
+    case unique(Int)
+
+    init(_ key: AnyHashable?, unique index: Int) {
+      if let key, key != AnyHashable("") {
+        self = .key(key)
+      } else {
+        self = .unique(index)
+      }
+    }
+  }
+
+  struct Entry<Element> {
+    let element: Element
+    let artist: Key
+    let album: Key
+  }
+
+  static func random<G: RandomNumberGenerator>(_ generator: inout G) -> Double {
+    Double.random(in: 0 ..< 1, using: &generator)
+  }
+
+  /// Groups in order of first appearance, so a seeded generator gives a
+  /// reproducible result.
+  static func groups<E>(
+    _ entries: [Entry<E>],
+    by key: KeyPath<Entry<E>, Key>
+  )
+    -> [[Entry<E>]] {
+    var indexOfKey = [Key: Int]()
+    var groups = [[Entry<E>]]()
+    for entry in entries {
+      if let index = indexOfKey[entry[keyPath: key]] {
+        groups[index].append(entry)
+      } else {
+        indexOfKey[entry[keyPath: key]] = groups.count
+        groups.append([entry])
+      }
+    }
+    return groups
+  }
+
+  static func dominantArtist<E>(_ entries: [Entry<E>]) -> (artist: Key?, count: Int) {
+    var dominant: (artist: Key?, count: Int) = (nil, 0)
+    for group in groups(entries, by: \.artist) where group.count > dominant.count {
+      dominant = (group[0].artist, group.count)
+    }
+    return dominant
+  }
+
+  /// Adjacent repeats can be avoided only if no artist holds more than half
+  /// of the entries (rounded up).
+  static func isAvoidable<E>(_ entries: [Entry<E>]) -> Bool {
+    let count = dominantArtist(entries).count
+    return count <= entries.count - count + 1
+  }
+
+  /// Stretches every group evenly along a circle of length 1: the k-th of n
+  /// entries lands at k/n plus a random offset per group plus up to 10% of the
+  /// spacing as jitter. `orderGroup` decides which entry takes which slot.
+  static func spread<E, G: RandomNumberGenerator>(
+    _ entries: [Entry<E>],
+    by key: KeyPath<Entry<E>, Key>,
+    using generator: inout G,
+    orderGroup: ([Entry<E>], inout G) -> [Entry<E>]
+  )
+    -> [Entry<E>] {
+    var positioned = [(entry: Entry<E>, position: Double, tiebreak: Double)]()
+    for group in groups(entries, by: key) {
+      let ordered = orderGroup(group, &generator)
+      let spacing = 1.0 / Double(ordered.count)
+      let offset = random(&generator)
+      for (k, entry) in ordered.enumerated() {
+        let jitter = (random(&generator) * 2 - 1) * 0.1 * spacing
+        let position = (Double(k) * spacing + offset + jitter + 1)
+          .truncatingRemainder(dividingBy: 1)
+        positioned.append((entry, position, random(&generator)))
+      }
+    }
+    positioned.sort { ($0.position, $0.tiebreak) < ($1.position, $1.tiebreak) }
+    return positioned.map { $0.entry }
+  }
+
+  /// Removes adjacent repeats of the same artist. A repeat at index i is fixed
+  /// by pulling the next entry of another artist forward; when none is left,
+  /// the entry moves to a random earlier gap between two other artists.
+  /// Entries before `start` never move.
+  static func repairAdjacent<E, G: RandomNumberGenerator>(
+    _ entries: [Entry<E>],
+    start: Int,
+    using generator: inout G
+  )
+    -> [Entry<E>] {
+    var list = entries
+    var i = Swift.max(start, 1)
+    while i < list.count {
+      if list[i].artist != list[i - 1].artist {
+        i += 1
+        continue
+      }
+      let previous = list[i - 1].artist
+      if let j = list[(i + 1)...].firstIndex(where: { $0.artist != previous }) {
+        list.insert(list.remove(at: j), at: i)
+        i += 1
+        continue
+      }
+      let entry = list.remove(at: i)
+      var gaps = [Int]()
+      if start == 0, !list.isEmpty, list[0].artist != entry.artist {
+        gaps.append(0)
+      }
+      for p in Swift.max(start, 1) ..< i
+        where list[p - 1].artist != entry.artist && list[p].artist != entry.artist {
+        gaps.append(p)
+      }
+      if let gap = gaps.randomElement(using: &generator) {
+        list.insert(entry, at: gap)
+      } else {
+        list.insert(entry, at: i)
+        i += 1
+      }
+    }
+    return list
+  }
+
+  static func balance<E, G: RandomNumberGenerator>(
+    _ entries: [Entry<E>],
+    using generator: inout G
+  )
+    -> [Entry<E>] {
+    guard entries.count > 1 else { return entries }
+    let byAlbum: ([Entry<E>], inout G) -> [Entry<E>] = { group, generator in
+      spread(group, by: \.album, using: &generator) { album, generator in
+        album.shuffled(using: &generator)
+      }
+    }
+    if isAvoidable(entries) {
+      let spread = spread(entries, by: \.artist, using: &generator, orderGroup: byAlbum)
+      return repairAdjacent(spread, start: 0, using: &generator)
+    }
+
+    // Too many entries by one artist: place the others first, then fill the
+    // gaps around them with runs of the dominant artist of (almost) equal size.
+    let artist = dominantArtist(entries).artist
+    let others = balance(entries.filter { $0.artist != artist }, using: &generator)
+    let dominant = byAlbum(entries.filter { $0.artist == artist }, &generator)
+    let slots = others.count + 1
+    let baseRun = dominant.count / slots
+    let longerRuns = Set(
+      Array(0 ..< slots).shuffled(using: &generator)
+        .prefix(dominant.count % slots)
+    )
+    var result = [Entry<E>]()
+    var next = 0
+    for slot in 0 ..< slots {
+      let run = baseRun + (longerRuns.contains(slot) ? 1 : 0)
+      result.append(contentsOf: dominant[next ..< next + run])
+      next += run
+      if slot < others.count {
+        result.append(others[slot])
+      }
+    }
+    return result
+  }
+}
+
 extension UIColor {
   public convenience init(hue: CGFloat, saturation: CGFloat, lightness: CGFloat, alpha: CGFloat) {
     precondition(
