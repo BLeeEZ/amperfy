@@ -337,6 +337,12 @@ class BackendAudioPlayer: NSObject {
     player?.rate = Float(newValue.asDouble)
   }
 
+  /// Temporarily overrides the playback speed (e.g. hold-to-seek) without changing the user defined rate.
+  /// Pass nil to go back to the user defined rate.
+  func setTemporaryPlaybackSpeed(_ speed: Double?) {
+    player?.rate = Float(speed ?? userDefinedPlaybackRate.asDouble)
+  }
+
   func seek(toSecond: Double) {
     if currentPlayUrl != "", player?.getState() == .playing || player?.getState() == .paused {
       seekTimeWhenStarted = nil
