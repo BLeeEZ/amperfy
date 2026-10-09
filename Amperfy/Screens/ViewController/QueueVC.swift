@@ -503,6 +503,7 @@ extension QueueVC: MusicPlayable {
 /// "tentativeIndexPaths cannot be empty in beginDragForTentativeRows" on recent iOS versions.
 /// A local-only placeholder item keeps the drag alive; the actual move is handled by
 /// `tableView(_:moveRowAt:to:)`.
+@MainActor
 func reorderDragItems(for indexPath: IndexPath) -> [UIDragItem] {
   let item = UIDragItem(itemProvider: NSItemProvider())
   item.localObject = indexPath
