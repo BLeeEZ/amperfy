@@ -32,8 +32,16 @@ struct HomeItem: Hashable, @unchecked Sendable {
   /// The section is part of the identity as an entity can show up in several sections.
   let id: String
   var playableContainable: PlayableContainable
+  /// Not part of the identity: a changed value only makes the cell reconfigure (no flicker),
+  /// e.g. when a playlist cover gets created after the item was first shown.
+  let artworkFingerprint: [NSManagedObjectID]
 
   init(section: HomeSection, playableContainable: PlayableContainable) {
+    if let playlist = playableContainable as? Playlist {
+      self.artworkFingerprint = playlist.managedObject.artworkItems.map(\.objectID)
+    } else {
+      self.artworkFingerprint = []
+    }
     let identifier = playableContainable.containerIdentifier
     self.id = "\(section)|\(identifier.type.map { "\($0)" } ?? "")|\(identifier.objectID ?? playableContainable.id)"
     self.playableContainable = playableContainable
