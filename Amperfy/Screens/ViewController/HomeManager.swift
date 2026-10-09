@@ -27,8 +27,17 @@ import UIKit
 // MARK: - HomeItem
 
 struct HomeItem: Hashable, @unchecked Sendable {
-  let id = UUID()
+  /// Stable per section and entity: the diffable data source only sees real changes,
+  /// so unchanged covers are not recreated (flicker) when a section is rebuilt.
+  /// The section is part of the identity as an entity can show up in several sections.
+  let id: String
   var playableContainable: PlayableContainable
+
+  init(section: HomeSection, playableContainable: PlayableContainable) {
+    let identifier = playableContainable.containerIdentifier
+    self.id = "\(section)|\(identifier.type.map { "\($0)" } ?? "")|\(identifier.objectID ?? playableContainable.id)"
+    self.playableContainable = playableContainable
+  }
 
   static func == (lhs: HomeItem, rhs: HomeItem) -> Bool {
     lhs.id == rhs.id
@@ -267,7 +276,7 @@ class HomeManager: NSObject {
     if let albums = albumsRecentlyPlayedFetchController?.fetchedObjects as? [AlbumMO] {
       data[.recentlyPlayedAlbums] = albums.prefix(Self.sectionMaxItemCount)
         .compactMap { Album(managedObject: $0) }.compactMap {
-          HomeItem(playableContainable: $0)
+          HomeItem(section: .recentlyPlayedAlbums, playableContainable: $0)
         }
       applySnapshotCB?()
     }
@@ -277,7 +286,7 @@ class HomeManager: NSObject {
     if let albums = albumsNewestFetchController?.fetchedObjects as? [AlbumMO] {
       data[.newestAlbums] = albums.prefix(Self.sectionMaxItemCount)
         .compactMap { Album(managedObject: $0) }.compactMap {
-          HomeItem(playableContainable: $0)
+          HomeItem(section: .newestAlbums, playableContainable: $0)
         }
       applySnapshotCB?()
     }
@@ -290,7 +299,7 @@ class HomeManager: NSObject {
       onlyCached: isOfflineMode
     )
     data[.randomAlbums] = randomAlbums.compactMap {
-      HomeItem(playableContainable: $0)
+      HomeItem(section: .randomAlbums, playableContainable: $0)
     }
     applySnapshotCB?()
   }
@@ -302,7 +311,7 @@ class HomeManager: NSObject {
       onlyCached: isOfflineMode
     )
     data[.randomArtists] = randomArtists.compactMap {
-      HomeItem(playableContainable: $0)
+      HomeItem(section: .randomArtists, playableContainable: $0)
     }
     applySnapshotCB?()
   }
@@ -313,7 +322,7 @@ class HomeManager: NSObject {
       count: Self.sectionMaxItemCount
     )
     data[.randomGenres] = randomGenres.compactMap {
-      HomeItem(playableContainable: $0)
+      HomeItem(section: .randomGenres, playableContainable: $0)
     }
     applySnapshotCB?()
   }
@@ -325,7 +334,7 @@ class HomeManager: NSObject {
       onlyCached: isOfflineMode
     )
     data[.randomSongs] = randomSongs.compactMap {
-      HomeItem(playableContainable: $0)
+      HomeItem(section: .randomSongs, playableContainable: $0)
     }
     applySnapshotCB?()
   }
@@ -337,7 +346,7 @@ class HomeManager: NSObject {
           library: storage.main.library,
           managedObject: $0
         ) }.compactMap {
-          HomeItem(playableContainable: $0)
+          HomeItem(section: .lastTimePlayedPlaylists, playableContainable: $0)
         }
       applySnapshotCB?()
     }
@@ -348,7 +357,7 @@ class HomeManager: NSObject {
       .fetchedObjects as? [PodcastEpisodeMO] {
       data[.newestPodcastEpisodes] = podcastEpisodes.prefix(Self.sectionMaxItemCount)
         .compactMap { PodcastEpisode(managedObject: $0) }.compactMap {
-          HomeItem(playableContainable: $0)
+          HomeItem(section: .newestPodcastEpisodes, playableContainable: $0)
         }
       applySnapshotCB?()
     }
@@ -358,7 +367,7 @@ class HomeManager: NSObject {
     if let podcasts = podcastsFetchedController?.fetchedObjects as? [PodcastMO] {
       data[.podcasts] = podcasts.prefix(Self.sectionMaxItemCount)
         .compactMap { Podcast(managedObject: $0) }.compactMap {
-          HomeItem(playableContainable: $0)
+          HomeItem(section: .podcasts, playableContainable: $0)
         }
       applySnapshotCB?()
     }
@@ -368,7 +377,7 @@ class HomeManager: NSObject {
     if let radios = radiosFetchedController?.fetchedObjects as? [RadioMO] {
       data[.radios] = radios.prefix(Self.sectionMaxItemCount)
         .compactMap { Radio(managedObject: $0) }.compactMap {
-          HomeItem(playableContainable: $0)
+          HomeItem(section: .radios, playableContainable: $0)
         }
       applySnapshotCB?()
     }
