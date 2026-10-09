@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 
 // MARK: - LibrarySyncerProxy
@@ -33,6 +34,13 @@ class LibrarySyncerProxy {
     account: account,
     storage: storage
   ) }
+
+  /// Album syncs currently in flight, keyed by the album's local object ID.
+  /// Concurrent callers for the same album await the running sync instead of
+  /// starting a second one, which would insert duplicate songs because each
+  /// sync opens its own background context and cannot see the other's unsaved
+  /// inserts (see `sync(album:)`).
+  private var runningAlbumSyncs = [NSManagedObjectID: Task<(), Error>]()
 
   init(backendApi: BackendApi, account: Account, storage: PersistentStorage) {
     self.backendApi = backendApi
@@ -61,7 +69,25 @@ extension LibrarySyncerProxy: LibrarySyncer {
 
   @MainActor
   func sync(album: Album) async throws {
-    try await activeSyncer.sync(album: album)
+    // Coalesce concurrent syncs of the same album: the second caller awaits the
+    // first sync's result instead of fetching the album a second time. Without
+    // this, the two newest-albums syncs started right after the initial sync
+    // (background syncer and home screen) each fetch and insert every song, so
+    // the whole library appears duplicated (upstream issue #778).
+    let albumObjectID = album.managedObject.objectID
+    if let runningSync = runningAlbumSyncs[albumObjectID] {
+      return try await runningSync.value
+    }
+    let syncTask = Task { @MainActor in
+      try await activeSyncer.sync(album: album)
+    }
+    runningAlbumSyncs[albumObjectID] = syncTask
+    defer { runningAlbumSyncs[albumObjectID] = nil }
+    try await withTaskCancellationHandler {
+      try await syncTask.value
+    } onCancel: {
+      syncTask.cancel()
+    }
   }
 
   @MainActor
