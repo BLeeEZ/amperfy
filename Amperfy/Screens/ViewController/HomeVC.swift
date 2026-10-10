@@ -236,7 +236,9 @@ final class HomeVC: UICollectionViewController {
     var snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>()
     snapshot.appendSections(sharedHome.orderedVisibleSections)
     for section in sharedHome.orderedVisibleSections {
-      let items = sharedHome.data[section] ?? []
+      // Ids are stable per entity, so a repeated entity would be a duplicate identifier (assert).
+      var seenIds = Set<String>()
+      let items = (sharedHome.data[section] ?? []).filter { seenIds.insert($0.id).inserted }
       snapshot.appendItems(items, toSection: section)
     }
     let oldItems = dataSource.snapshot().itemIdentifiers
