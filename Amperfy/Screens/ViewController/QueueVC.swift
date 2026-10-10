@@ -415,7 +415,7 @@ extension QueueVC: UITableViewDragDelegate {
     at indexPath: IndexPath
   )
     -> [UIDragItem] {
-    reorderDragItems(for: indexPath)
+    reorderDragItems()
   }
 
   func tableView(
@@ -504,8 +504,7 @@ extension QueueVC: MusicPlayable {
 /// A local-only placeholder item keeps the drag alive; the actual move is handled by
 /// `tableView(_:moveRowAt:to:)`.
 @MainActor
-func reorderDragItems(for indexPath: IndexPath) -> [UIDragItem] {
+func reorderDragItems() -> [UIDragItem] {
   let item = UIDragItem(itemProvider: NSItemProvider())
-  item.localObject = indexPath
   return [item]
 }

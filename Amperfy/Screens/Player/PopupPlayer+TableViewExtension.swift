@@ -352,7 +352,7 @@ extension PopupPlayerVC: UITableViewDragDelegate {
   )
     -> [UIDragItem] {
     // Reordering is done via tableView(_:moveRowAt:to:); the item only has to be non-empty.
-    reorderDragItems(for: indexPath)
+    reorderDragItems()
   }
 
   func tableView(
