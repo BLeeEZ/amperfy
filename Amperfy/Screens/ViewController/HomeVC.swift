@@ -268,9 +268,14 @@ final class HomeVC: UICollectionViewController {
       sharedHome.createFetchController()
       sharedHome.updateFromRemote()
     }
-    let nav = UINavigationController(rootViewController: editor)
-    nav.modalPresentationStyle = .formSheet
-    present(nav, animated: true)
+    #if targetEnvironment(macCatalyst)
+      // reordering via drag & drop did not drop inside a form sheet on macOS
+      navigationController?.pushViewController(editor, animated: true)
+    #else
+      let nav = UINavigationController(rootViewController: editor)
+      nav.modalPresentationStyle = .formSheet
+      present(nav, animated: true)
+    #endif
   }
 
   @objc
