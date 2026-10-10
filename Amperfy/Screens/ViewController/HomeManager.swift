@@ -43,7 +43,9 @@ struct HomeItem: Hashable, @unchecked Sendable {
       self.artworkFingerprint = []
     }
     let identifier = playableContainable.containerIdentifier
-    self.id = "\(section)|\(identifier.type.map { "\($0)" } ?? "")|\(identifier.objectID ?? playableContainable.id)"
+    self
+      .id =
+      "\(section)|\(identifier.type.map { "\($0)" } ?? "")|\(identifier.objectID ?? playableContainable.id)"
     self.playableContainable = playableContainable
   }
 

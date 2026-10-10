@@ -242,7 +242,9 @@ final class HomeVC: UICollectionViewController {
       snapshot.appendItems(items, toSection: section)
     }
     let oldItems = dataSource.snapshot().itemIdentifiers
-    let oldFingerprints = Dictionary(oldItems.map { ($0.id, $0.artworkFingerprint) }) { first, _ in first }
+    let oldFingerprints = Dictionary(oldItems.map { ($0.id, $0.artworkFingerprint) }) { first, _ in
+      first
+    }
     let changedItems = snapshot.itemIdentifiers.filter {
       guard let old = oldFingerprints[$0.id] else { return false }
       return old != $0.artworkFingerprint
