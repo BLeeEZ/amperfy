@@ -361,7 +361,6 @@ extension PopupPlayerVC: UITableViewDragDelegate {
   )
     -> UIDragPreviewParameters? {
     let parameter = UIDragPreviewParameters()
-    parameter.backgroundColor = .clear
     return parameter
   }
 }
@@ -369,8 +368,21 @@ extension PopupPlayerVC: UITableViewDragDelegate {
 // MARK: - PopupPlayerVC + UITableViewDropDelegate
 
 extension PopupPlayerVC: UITableViewDropDelegate {
+  // Only accept drags that originate from this table view (reordering).
   func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
-    false
+    tableView.hasActiveDrag && session.localDragSession != nil
+  }
+
+  func tableView(
+    _ tableView: UITableView,
+    dropSessionDidUpdate session: UIDropSession,
+    withDestinationIndexPath destinationIndexPath: IndexPath?
+  )
+    -> UITableViewDropProposal {
+    guard tableView.hasActiveDrag, session.localDragSession != nil else {
+      return UITableViewDropProposal(operation: .cancel)
+    }
+    return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
   }
 
   func tableView(
@@ -391,7 +403,6 @@ extension PopupPlayerVC: UITableViewDropDelegate {
     -> UIDragPreviewParameters? {
     refreshCellMasks()
     let parameter = UIDragPreviewParameters()
-    parameter.backgroundColor = .clear
     return parameter
   }
 }
