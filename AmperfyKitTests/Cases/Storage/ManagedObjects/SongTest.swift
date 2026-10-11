@@ -20,6 +20,7 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
 
 @MainActor
@@ -210,5 +211,48 @@ class SongTest: XCTestCase {
     XCTAssertFalse(musicFolder.isCached)
     XCTAssertFalse(playlist1.isCached)
     XCTAssertFalse(playlist2.isCached)
+  }
+
+  private func isFetchedAsAvailable(_ song: Song) -> Bool {
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = SongMO.excludeServerDeleteUncachedSongsFetchPredicate
+    let songsMO = try? song.managedObject.managedObjectContext?.fetch(fetchRequest)
+    return songsMO?.contains(song.managedObject) ?? false
+  }
+
+  func testAvailabilityWithoutAlbum() {
+    testSong.size = 1234
+    library.saveContext()
+    XCTAssertNil(testSong.album)
+    XCTAssertTrue(testSong.isAvailableToUser())
+    XCTAssertTrue(isFetchedAsAvailable(testSong))
+
+    testSong.size = 0
+    library.saveContext()
+    XCTAssertFalse(testSong.isAvailableToUser())
+    XCTAssertFalse(isFetchedAsAvailable(testSong))
+  }
+
+  func testAvailabilityWithAlbum() {
+    guard let album = library.getAlbum(
+      for: account,
+      id: cdHelper.seeder.albums[0].id,
+      isDetailFaultResolution: true
+    ) else { XCTFail(); return }
+    testSong.size = 1234
+    testSong.album = album
+    library.saveContext()
+    XCTAssertTrue(testSong.isAvailableToUser())
+    XCTAssertTrue(isFetchedAsAvailable(testSong))
+
+    album.remoteStatus = .deleted
+    library.saveContext()
+    XCTAssertFalse(testSong.isAvailableToUser())
+    XCTAssertFalse(isFetchedAsAvailable(testSong))
+
+    testSong.relFilePath = URL(string: "blub")
+    library.saveContext()
+    XCTAssertTrue(testSong.isAvailableToUser())
+    XCTAssertTrue(isFetchedAsAvailable(testSong))
   }
 }
