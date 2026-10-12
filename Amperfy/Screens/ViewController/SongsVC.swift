@@ -528,6 +528,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         self.appDelegate.eventLogger.report(topic: "Songs Newest Elements Sync", error: error)
       }
       detailHeaderView?.refresh()
+      self.updateSearchResults(for: self.searchController)
       self.refreshControl?.endRefreshing()
     }
   }
