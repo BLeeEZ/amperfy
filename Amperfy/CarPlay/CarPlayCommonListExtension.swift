@@ -230,16 +230,16 @@ extension CarPlaySceneDelegate {
     section.handler = { [weak self] item, completion in
       guard let self = self else { completion(); return }
       var songItems = [CPListItem]()
+      let playables = artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
       songItems.append(createPlayShuffledListItem(playContext: PlayContext(
         containable: artist,
-        playables: artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+        playables: playables
       )))
-      let artistSongs = artist.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-        .sortByTitle().prefix(LibraryStorage.carPlayMaxElements)
+      let artistSongs = Array(playables.sortByTitle().prefix(LibraryStorage.carPlayMaxElements))
       for (index, song) in artistSongs.enumerated() {
         let listItem = createDetailTemplate(
           for: song,
-          playContext: PlayContext(containable: artist, index: index, playables: Array(artistSongs))
+          playContext: PlayContext(containable: artist, index: index, playables: artistSongs)
         )
         songItems.append(listItem)
       }
@@ -284,16 +284,16 @@ extension CarPlaySceneDelegate {
 
   func createAlbumSongListTemplate(for album: Album, onlyCached: Bool) -> CPListTemplate {
     var songItems = [CPListItem]()
+    let playables = album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
     songItems.append(createPlayShuffledListItem(playContext: PlayContext(
       containable: album,
-      playables: album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
+      playables: playables
     )))
-    let albumSongs = album.playables.filterCached(dependigOn: onlyCached || isOfflineMode)
-      .prefix(LibraryStorage.carPlayMaxElements)
+    let albumSongs = Array(playables.prefix(LibraryStorage.carPlayMaxElements))
     for (index, song) in albumSongs.enumerated() {
       let listItem = createDetailTemplate(
         for: song,
-        playContext: PlayContext(containable: album, index: index, playables: Array(albumSongs)),
+        playContext: PlayContext(containable: album, index: index, playables: albumSongs),
         isTrackDisplayed: true
       )
       songItems.append(listItem)
