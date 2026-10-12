@@ -603,4 +603,23 @@ class PlaylistTest: XCTestCase {
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 2)
   }
+
+  func testReorderUpdatesArtworkItems() {
+    let playables = testPlaylist.playables
+    for playable in playables {
+      playable.artwork = library.createArtwork(account: account)
+    }
+    testPlaylist.updateArtworkItems()
+    XCTAssertEqual(
+      testPlaylist.artworkItems.map { $0.playable.id },
+      Array(playables.prefix(4)).map(\.id)
+    )
+
+    testPlaylist.movePlaylistItem(fromIndex: 4, to: 0)
+
+    XCTAssertEqual(
+      testPlaylist.artworkItems.map { $0.playable.id },
+      [playables[4].id, playables[0].id, playables[1].id, playables[2].id]
+    )
+  }
 }
