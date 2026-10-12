@@ -39,6 +39,9 @@ extension Notification.Name {
     .Name(rawValue: "de.amperfy.settings.offline-mode")
   public static let networkStatusChanged = Notification
     .Name(rawValue: "de.amperfy.settings.network.status.changed")
+  // posted by the background library sync after its newest elements step and at its natural end
+  public static let librarySongsSynced = Notification
+    .Name(rawValue: "de.amperfy.library.songs.synced")
 }
 
 // MARK: - DownloadNotification
