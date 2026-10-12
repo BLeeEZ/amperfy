@@ -20,7 +20,10 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
+
+// MARK: - HelperTest
 
 @MainActor
 class HelperTest: XCTestCase {
@@ -70,4 +73,55 @@ class HelperTest: XCTestCase {
     XCTAssertEqual(library.getPlaylists(for: account2).count, 2)
     XCTAssertEqual(library.getRadios(for: account2).count, 2)
   }
+
+  func testCachedResultsControllerDoesNotRetainDelegate() {
+    let controller = createCachedResultsController()
+    var delegate: TestFetchedResultsDelegate? = TestFetchedResultsDelegate()
+    weak var weakDelegate = delegate
+    controller.delegate = delegate
+    XCTAssertTrue(controller.delegate === delegate)
+
+    delegate = nil
+
+    XCTAssertNil(weakDelegate)
+    XCTAssertNil(controller.delegate)
+    controller.delegate = nil
+  }
+
+  func testCachedResultsControllerForwardsRetainedDelegate() {
+    let controller = createCachedResultsController()
+    let delegate = TestFetchedResultsDelegate()
+    controller.delegate = delegate
+    XCTAssertTrue(controller.fetchResultsController.delegate === delegate)
+
+    controller.isSearchActive = true
+    XCTAssertTrue(controller.fetchResultsController.delegate === delegate)
+    controller.isSearchActive = false
+    XCTAssertTrue(controller.fetchResultsController.delegate === delegate)
+    controller.clearResults()
+    XCTAssertTrue(controller.fetchResultsController.delegate === delegate)
+
+    controller.keepAllResultsUpdated = false
+    controller.isSearchActive = false
+    XCTAssertNil(controller.fetchResultsController.delegate)
+    controller.isSearchActive = true
+    XCTAssertTrue(controller.fetchResultsController.delegate === delegate)
+
+    controller.delegate = nil
+    XCTAssertNil(controller.delegate)
+    XCTAssertNil(controller.fetchResultsController.delegate)
+  }
+
+  private func createCachedResultsController() -> CachedFetchedResultsController<ArtistMO> {
+    CachedFetchedResultsController(
+      coreDataCompanion: CoreDataCompanion(context: cdHelper.persistentContainer.viewContext),
+      fetchRequest: ArtistMO.identifierSortedFetchRequest,
+      account: library.getAccount(info: TestAccountInfo.create1()),
+      isGroupedInAlphabeticSections: false
+    )
+  }
 }
+
+// MARK: - TestFetchedResultsDelegate
+
+private final class TestFetchedResultsDelegate: NSObject, NSFetchedResultsControllerDelegate {}

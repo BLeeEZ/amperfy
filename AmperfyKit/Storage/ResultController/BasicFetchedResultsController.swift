@@ -472,7 +472,7 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
   private let searchFetchResulsController: CustomSectionIndexFetchedResultsController<ResultType>
   private var sectionIndexType: SectionIndexType
 
-  private var delegateInternal: NSFetchedResultsControllerDelegate?
+  private weak var delegateInternal: NSFetchedResultsControllerDelegate?
   override public var delegate: NSFetchedResultsControllerDelegate? {
     set {
       delegateInternal = newValue
