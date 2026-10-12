@@ -85,8 +85,8 @@ extension CarPlaySceneDelegate {
       allowsMultipleLines: isDetailTemplate
     )
     // handler CB is called when user pressed the section title
-    row.handler = { [weak self] selectedRow, completion in
-      guard let self else { completion(); return }
+    row.handler = { [weak self, weak row] selectedRow, completion in
+      guard let self, let row else { completion(); return }
       if !isDetailTemplate {
         Task { @MainActor in
           let detailSectionRow = createHomeRow(section: section, isDetailTemplate: true)
