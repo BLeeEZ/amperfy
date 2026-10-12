@@ -514,20 +514,24 @@ class EntityPreviewActionBuilder {
   private func createMusicQueueAction() -> UIMenuElement {
     UIMenu(title: "Music Queue", image: .listBullet, children: [
       UIAction(title: "Insert Context Queue", image: .contextQueueInsert) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.insertContextQueue(playables: self.entityPlayables)
+        let playables = self.entityPlayables
+        guard !playables.isEmpty else { return }
+        self.appDelegate.player.insertContextQueue(playables: playables)
       },
       UIAction(title: "Append Context Queue", image: .contextQueueAppend) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.appendContextQueue(playables: self.entityPlayables)
+        let playables = self.entityPlayables
+        guard !playables.isEmpty else { return }
+        self.appDelegate.player.appendContextQueue(playables: playables)
       },
       UIAction(title: "Insert User Queue", image: .userQueueInsert) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.insertUserQueue(playables: self.entityPlayables)
+        let playables = self.entityPlayables
+        guard !playables.isEmpty else { return }
+        self.appDelegate.player.insertUserQueue(playables: playables)
       },
       UIAction(title: "Append User Queue", image: .userQueueAppend) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.appendUserQueue(playables: self.entityPlayables)
+        let playables = self.entityPlayables
+        guard !playables.isEmpty else { return }
+        self.appDelegate.player.appendUserQueue(playables: playables)
       },
     ])
   }
@@ -535,12 +539,14 @@ class EntityPreviewActionBuilder {
   private func createPodcastQueueAction() -> UIMenuElement {
     UIMenu(image: .listBullet, options: .displayInline, children: [
       UIAction(title: "Insert Podcast Queue", image: .podcastQueueInsert) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.insertPodcastQueue(playables: self.entityPlayables)
+        let playables = self.entityPlayables
+        guard !playables.isEmpty else { return }
+        self.appDelegate.player.insertPodcastQueue(playables: playables)
       },
       UIAction(title: "Append Podcast Queue", image: .podcastQueueAppend) { action in
-        guard !self.entityPlayables.isEmpty else { return }
-        self.appDelegate.player.appendPodcastQueue(playables: self.entityPlayables)
+        let playables = self.entityPlayables
+        guard !playables.isEmpty else { return }
+        self.appDelegate.player.appendPodcastQueue(playables: playables)
       },
     ])
   }
