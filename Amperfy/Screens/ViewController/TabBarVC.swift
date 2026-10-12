@@ -173,6 +173,7 @@ class TabBarVC: UITabBarController {
     let isInline = miniPlayer.glassContainer.traitCollection.tabAccessoryEnvironment == .inline
 
     if traitCollection.horizontalSizeClass == .regular {
+      centerConstraint?.isActive = false
       centerConstraint = miniPlayer.glassContainer.safeAreaLayoutGuide.centerXAnchor.constraint(
         equalTo: mainContent().safeAreaLayoutGuide.centerXAnchor,
         constant: 0
