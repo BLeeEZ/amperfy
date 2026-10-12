@@ -20,6 +20,7 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
 
 @MainActor
@@ -69,5 +70,40 @@ class HelperTest: XCTestCase {
     XCTAssertEqual(library.getSongs(for: account2).count, 4)
     XCTAssertEqual(library.getPlaylists(for: account2).count, 2)
     XCTAssertEqual(library.getRadios(for: account2).count, 2)
+  }
+
+  func testRequiresMigrationForStoreVersion() throws {
+    let cases: [(CoreDataMigrationVersion, CoreDataMigrationVersion, Bool)] = [
+      (.current, .current, false),
+      (.v48, .current, true),
+      (.v48, .v48, false),
+    ]
+    for (sourceVersion, targetVersion, expected) in cases {
+      let directory = FileManager.default.temporaryDirectory
+        .appendingPathComponent(UUID().uuidString)
+      try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+      defer { try? FileManager.default.removeItem(at: directory) }
+      let storeURL = directory.appendingPathComponent("Library.sqlite")
+      let model = NSManagedObjectModel.managedObjectModel(forResource: sourceVersion.rawValue)
+      let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
+      let store = try coordinator.addPersistentStore(
+        ofType: NSSQLiteStoreType,
+        configurationName: nil,
+        at: storeURL,
+        options: nil
+      )
+      try coordinator.remove(store)
+
+      XCTAssertEqual(
+        CoreDataMigrator().requiresMigration(at: storeURL, toVersion: targetVersion),
+        expected,
+        "\(sourceVersion) to \(targetVersion)"
+      )
+    }
+  }
+
+  func testMissingStoreDoesNotRequireMigration() {
+    let storeURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+    XCTAssertFalse(CoreDataMigrator().requiresMigration(at: storeURL, toVersion: .current))
   }
 }

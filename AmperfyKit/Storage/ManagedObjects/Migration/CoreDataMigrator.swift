@@ -40,6 +40,11 @@ class CoreDataMigrator: CoreDataMigratorProtocol {
       return false
     }
 
+    let model = NSManagedObjectModel.managedObjectModel(forResource: version.rawValue)
+    if model.isConfiguration(withName: nil, compatibleWithStoreMetadata: metadata) {
+      return false
+    }
+
     return CoreDataMigrationVersion.compatibleVersionForStoreMetadata(metadata) != version
   }
 
