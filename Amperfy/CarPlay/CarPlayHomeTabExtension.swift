@@ -180,8 +180,8 @@ extension CarPlaySceneDelegate {
     if !isDetail {
       homeRowData[section] = requestedData
     } else {
-      for var container in homeArtworkUpdate {
-        container.value.detailRow.removeAll()
+      for artworkID in Array(homeArtworkUpdate.keys) {
+        homeArtworkUpdate[artworkID]?.detailRow.removeAll()
       }
     }
 

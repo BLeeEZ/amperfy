@@ -517,6 +517,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         }
       }
       container.detailRow = newCreatedRowImages
+      homeArtworkUpdate[downloadNotification.id] = container
     }
 
     // refresh List items
