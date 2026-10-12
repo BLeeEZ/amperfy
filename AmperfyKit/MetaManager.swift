@@ -127,8 +127,8 @@ public class MetaManager {
   }
 
   public lazy var playableDownloadManager: DownloadManageable = {
-    let getDownloadDelegateCB = { @MainActor in
-      return self.playableDownloadDelegate
+    let getDownloadDelegateCB = { @MainActor [playableDownloadDelegate] in
+      return playableDownloadDelegate
     }
     let requestManager = DownloadRequestManager(
       accountObjectId: account.managedObject.objectID,
@@ -172,8 +172,8 @@ public class MetaManager {
   }()
 
   private func createArtworkDownloadManager() -> DownloadManageable {
-    let getDownloadDelegateCB = { @MainActor in
-      return self.backendApi.getActiveArtworkDownloadDelegate()
+    let getDownloadDelegateCB = { @MainActor [backendApi] in
+      return backendApi.getActiveArtworkDownloadDelegate()
     }
     let requestManager = DownloadRequestManager(
       accountObjectId: account.managedObject.objectID,
@@ -195,18 +195,22 @@ public class MetaManager {
       isFailWithPopupError: false
     )
 
+    let getSettings: @MainActor () -> AmperfySettings = { [storage] in
+      storage.settings
+    }
+    let asyncStorage = storage.async
     let validationCB: PreDownloadIsValidCB =
       { (downloadInfos: [DownloadElementInfo]) -> [DownloadElementInfo] in
         let artworkDownloadInfos = downloadInfos.filter { $0.type == .artwork }
 
-        guard let accountInfo = await self.settings.accounts.active
+        guard let accountInfo = await getSettings().accounts.active
         else { return [DownloadElementInfo]() }
-        let artworkDownloadSetting = await self.settings.accounts.getSetting(accountInfo).read
+        let artworkDownloadSetting = await getSettings().accounts.getSetting(accountInfo).read
           .artworkDownloadSetting
         guard artworkDownloadSetting != .never else { return [DownloadElementInfo]() }
         guard artworkDownloadSetting != .updateOncePerSession else { return artworkDownloadInfos }
 
-        let dlInfos = try? await self.asyncStorage.performAndGet { asyncCompanion in
+        let dlInfos = try? await asyncStorage.performAndGet { asyncCompanion in
           var validDls = [DownloadElementInfo]()
           for dlInfo in artworkDownloadInfos {
             guard dlInfo.type == .artwork else { continue }
