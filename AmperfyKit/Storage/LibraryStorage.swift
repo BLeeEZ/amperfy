@@ -1674,7 +1674,13 @@ public class LibraryStorage: PlayableFileCachable {
       getFetchPredicate(forAccount: account),
       SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
       NSPredicate(format: "%K == nil", #keyPath(SongMO.relFilePath)),
-      NSPredicate(format: "%K == nil", #keyPath(SongMO.download)),
+      // Skip only songs with a pending download. Finished (cache since deleted), failed and
+      // canceled downloads are stale and must be requested again.
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        NSPredicate(format: "%K == nil", #keyPath(SongMO.download)),
+        NSPredicate(format: "%K != nil", #keyPath(SongMO.download.finishDate)),
+        NSPredicate(format: "%K != nil", #keyPath(SongMO.download.errorDate)),
+      ]),
     ])
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
