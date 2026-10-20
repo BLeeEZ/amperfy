@@ -98,6 +98,9 @@ class BackendAudioPlayer: NSObject {
   private var currentPlayUrl: String = ""
   private var nextPreloadedPlayable: AbstractPlayable?
   private var nextPreloadedUrl: String = ""
+  /// Duration from the server metadata, used while the player can't determine it
+  /// (e.g. transcoded MP3 streams without Content-Length)
+  private var currentMetadataDuration: Double = 0.0
   private var isPreviousPlaylableFinshed = true
   private var isAutoStartPlayback = true
   private var seekTimeWhenStarted: Double?
@@ -179,7 +182,9 @@ class BackendAudioPlayer: NSObject {
   }
 
   var duration: Double {
-    player?.duration ?? 0.0
+    let playerDuration = player?.duration ?? 0.0
+    guard playerDuration.isFinite, playerDuration > 0 else { return currentMetadataDuration }
+    return playerDuration
   }
 
   var playbackRate: PlaybackRate {
@@ -393,6 +398,7 @@ class BackendAudioPlayer: NSObject {
   }
 
   private func handleRequest(playable: AbstractPlayable) {
+    currentMetadataDuration = Double(playable.duration)
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
        nextPreloadedPlayable == playable {
       // Do nothing next preloaded playable has already been queued to player
@@ -509,6 +515,7 @@ class BackendAudioPlayer: NSObject {
     currentPlayUrl = ""
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
+    currentMetadataDuration = 0.0
     playType = nil
     perloadedPlayType = nil
     activeStreamingBitrate = nil
