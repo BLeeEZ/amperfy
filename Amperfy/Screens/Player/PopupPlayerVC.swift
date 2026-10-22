@@ -297,11 +297,57 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   }
 
   func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
+    #if targetEnvironment(macCatalyst)
+      if view.window?.windowScene?.delegate is MiniPlayerSceneDelegate {
+        displayInMainWindowAndCloseMiniPlayer(vc: vc)
+        return
+      }
+    #endif
     guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true, completion: { () in
       hostingSplitVC.pushNavLibrary(vc: vc)
     })
   }
+
+  #if targetEnvironment(macCatalyst)
+    /// The mini player lives in its own window scene: show the content in the main window (opening it if necessary)
+    /// and close the mini player afterwards, so it stays open if the main window can't be reached.
+    private func displayInMainWindowAndCloseMiniPlayer(vc: UIViewController) {
+      if appDelegate.isMainWindowOpen {
+        if let mainSession = AppDelegate.mainSceneDelegate?.window?.windowScene?.session {
+          UIApplication.shared.requestSceneSessionActivation(
+            mainSession,
+            userActivity: nil,
+            options: nil,
+            errorHandler: nil
+          )
+        }
+      } else {
+        appDelegate.openMainWindow()
+      }
+      Task { @MainActor [weak self] in
+        // a newly requested main window needs a moment until its content is loaded
+        for _ in 0 ..< 50 {
+          if let hostVC = AppDelegate.mainWindowHostVC, Self.isLibraryReady(hostVC: hostVC) {
+            // the main window's popup player might be expanded, it would cover the pushed screen
+            hostVC.visualizePopupPlayer(direction: .close, animated: true, completion: {
+              hostVC.pushNavLibrary(vc: vc)
+              // the main window exists by now, so closing the mini player won't open another one
+              self?.appDelegate.closeMiniPlayer()
+              self?.appDelegate.rebuildMainMenu()
+            })
+            return
+          }
+          try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+      }
+    }
+
+    private static func isLibraryReady(hostVC: MainSceneHostingViewController) -> Bool {
+      guard let splitVC = hostVC as? SplitVC else { return true }
+      return splitVC.viewController(for: .secondary) is UINavigationController
+    }
+  #endif
 
   func refreshUserQueueSectionHeader() {
     guard let userQueueSectionView = userQueueSectionHeader else { return }
