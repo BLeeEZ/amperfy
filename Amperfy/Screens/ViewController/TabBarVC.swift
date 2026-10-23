@@ -238,8 +238,12 @@ class TabBarVC: UITabBarController {
 
   public func push(vc: UIViewController) {
     guard let libraryGroup else { return }
+    // Select the library first: changing the selection rebuilds the managed navigation stack,
+    // which would otherwise drop a view controller pushed beforehand (no back button).
+    if selectedTab?.managingTabGroup !== libraryGroup, selectedTab !== libraryGroup {
+      selectedTab = libraryGroup
+    }
     libraryGroup.managingNavigationController?.pushViewController(vc, animated: true)
-    selectedTab = libraryGroup
   }
 }
 
