@@ -107,6 +107,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     #if false
       windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
     #endif
+    #if targetEnvironment(macCatalyst)
+      restoreMainWindowFrame(of: windowScene)
+    #endif
     if let activeAccountInfo = AmperKit.shared.storage.settings.accounts.active {
       let account = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
       if !AmperKit.shared.storage.settings.app.isLibrarySynced {
@@ -126,6 +129,67 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.user.appearanceMode)
     AmperfyAppShortcuts.updateAppShortcutParameters()
   }
+
+  #if targetEnvironment(macCatalyst)
+    private static let mainWindowFrameKey = "mainWindowFrame"
+    private static let minimumWindowSize = CGSize(width: 400, height: 300)
+    /// Last frame of a main window in this app run. It lets a main window that is reopened
+    /// (e.g. after the mini player is closed) return to its position.
+    private static var lastFrameInThisRun: CGRect?
+    /// Size requested on connect; saving is paused until the window reports it.
+    private var restoringWindowSize: CGSize?
+
+    /// Across launches only the size is restored. The position stays with macOS, so a window
+    /// can never end up on a display that is no longer connected.
+    private func restoreMainWindowFrame(of windowScene: UIWindowScene) {
+      guard let frameString = UserDefaults.standard.string(forKey: Self.mainWindowFrameKey)
+      else { return }
+      let screenSize = windowScene.screen.bounds.size
+      let saved = NSCoder.cgRect(for: frameString).size
+      let size = CGSize(
+        width: min(max(saved.width, Self.minimumWindowSize.width), screenSize.width),
+        height: min(max(saved.height, Self.minimumWindowSize.height), screenSize.height)
+      )
+      var frame = windowScene.effectiveGeometry.systemFrame
+      if let lastFrame = Self.lastFrameInThisRun {
+        frame.origin = lastFrame.origin
+      }
+      let currentSize = windowScene.effectiveGeometry.systemFrame.size
+      frame.size = size
+      guard frame != windowScene.effectiveGeometry.systemFrame else { return }
+      if abs(currentSize.width - size.width) > 1 || abs(currentSize.height - size.height) > 1 {
+        restoringWindowSize = size
+      }
+      windowScene.requestGeometryUpdate(.Mac(systemFrame: frame)) { [weak self] error in
+        os_log(
+          "restore window frame failed: %s",
+          log: self?.log ?? .default,
+          type: .info,
+          error.localizedDescription
+        )
+        Task { @MainActor in self?.restoringWindowSize = nil }
+      }
+    }
+
+    func windowScene(
+      _ windowScene: UIWindowScene,
+      didUpdateEffectiveGeometry previousEffectiveGeometry: UIWindowScene.Geometry
+    ) {
+      let frame = windowScene.effectiveGeometry.systemFrame
+      if let target = restoringWindowSize {
+        if abs(frame.width - target.width) <= 1, abs(frame.height - target.height) <= 1 {
+          restoringWindowSize = nil
+        }
+        return
+      }
+      guard !windowScene.isFullScreen,
+            frame.width >= Self.minimumWindowSize.width,
+            frame.height >= Self.minimumWindowSize.height
+      else { return }
+      Self.lastFrameInThisRun = frame
+      UserDefaults.standard.set(NSCoder.string(for: frame), forKey: Self.mainWindowFrameKey)
+    }
+  #endif
 
   func replaceMainRootViewController(vc: UIViewController) {
     window?.rootViewController = vc
