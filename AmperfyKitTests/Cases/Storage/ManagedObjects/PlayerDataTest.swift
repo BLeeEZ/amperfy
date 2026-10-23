@@ -118,6 +118,33 @@ class PlayerDataTest: XCTestCase {
     testPlayer.setShuffle(true)
   }
 
+  func testShuffleSpreadsArtistsOfAllAccountsAndKeepsCurrentSongFirst() {
+    // artist server id "4" exists in both accounts: seeds 0-2 and 16
+    let account2 = library.getAccount(info: TestAccountInfo.create2())
+    var songs = [AbstractPlayable]()
+    for i in [0, 1, 2, 3, 5] {
+      guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[i].id)
+      else { XCTFail(); return }
+      songs.append(song)
+    }
+    guard let song = library.getSong(for: account2, id: cdHelper.seeder.songs[16].id)
+    else { XCTFail(); return }
+    songs.append(song)
+    testPlayer.appendActiveQueue(playables: songs)
+
+    for _ in 0 ..< 20 {
+      testPlayer.setShuffle(false)
+      testPlayer.setCurrentIndex(0)
+      let current = testPlayer.currentItem
+      testPlayer.setShuffle(true)
+      let queue = testPlayer.activeQueue.playables
+      XCTAssertEqual(queue.count, songs.count)
+      XCTAssertEqual(queue.first?.playableManagedObject, current?.playableManagedObject)
+      let artists = queue.map { $0.asSong?.artist?.managedObject }
+      XCTAssertFalse(zip(artists, artists.dropFirst()).contains { $0 != nil && $0 == $1 })
+    }
+  }
+
   func testRepeat() {
     testPlayer.setRepeatMode(RepeatMode.all)
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.all)
