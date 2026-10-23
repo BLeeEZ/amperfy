@@ -26,16 +26,18 @@ import UIKit
 
 /// One list with all home sections: the checkbox on the left (tap on the row) toggles the visibility,
 /// the handle on the right reorders the row (works with touch and mouse on all platforms).
+/// Rows stay where the user put them, also hidden ones.
 final class HomeEditorVC: UICollectionViewController {
-  private var orderedSections: [HomeSection]
-  private var visibleSections: Set<HomeSection>
-  private let onDone: ([HomeSection]) -> ()
+  private let editor: ReorderableListEditor<HomeSection>
+  private let onDone: (_ order: [HomeSection], _ visible: [HomeSection]) -> ()
   private var diffableDataSource: UICollectionViewDiffableDataSource<Int, HomeSection>!
 
-  init(current: [HomeSection], onDone: @escaping ([HomeSection]) -> ()) {
-    self.visibleSections = Set(current)
-    // visible sections in their current order, followed by the hidden ones
-    self.orderedSections = current + HomeSection.allCases.filter { !current.contains($0) }
+  init(
+    order: [HomeSection],
+    visible: [HomeSection],
+    onDone: @escaping (_ order: [HomeSection], _ visible: [HomeSection]) -> ()
+  ) {
+    self.editor = ReorderableListEditor(items: order, checkedItems: Set(visible))
     self.onDone = onDone
     super.init(collectionViewLayout: UICollectionViewCompositionalLayout { _, environment in
       let config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
@@ -55,13 +57,12 @@ final class HomeEditorVC: UICollectionViewController {
     collectionView.isEditing = true
     collectionView.allowsSelectionDuringEditing = true
     configureDataSource()
-    applySnapshot(animated: false)
+    applySnapshot()
   }
 
   @objc
   private func doneTapped() {
-    // Persist order of only visible sections
-    onDone(orderedSections.filter { visibleSections.contains($0) })
+    onDone(editor.items, editor.orderedCheckedItems)
     if navigationController?.viewControllers.first === self {
       dismiss(animated: true)
     } else {
@@ -76,16 +77,7 @@ final class HomeEditorVC: UICollectionViewController {
       var content = cell.defaultContentConfiguration()
       content.text = section.title
       cell.contentConfiguration = content
-
-      // same checkbox/reorder handle accessories as the library editor
-      cell.accessories = [
-        .reorder(),
-        .customView(
-          configuration: visibleSections.contains(section)
-            ? .createIsSelected()
-            : .createUnSelected()
-        ),
-      ]
+      cell.accessories = editor.editingAccessories(for: section)
     }
     diffableDataSource = UICollectionViewDiffableDataSource<Int, HomeSection>(
       collectionView: collectionView
@@ -96,30 +88,13 @@ final class HomeEditorVC: UICollectionViewController {
         item: section
       )
     }
-    diffableDataSource.reorderingHandlers.canReorderItem = { [weak self] _ in
-      self?.collectionView.isEditing ?? false
-    }
-    diffableDataSource.reorderingHandlers.didReorder = { [weak self] transaction in
-      self?.orderedSections = transaction.finalSnapshot.itemIdentifiers
-    }
+    editor.installReordering(on: diffableDataSource, collectionView: collectionView)
   }
 
-  private func applySnapshot(animated: Bool) {
+  private func applySnapshot() {
     var snapshot = NSDiffableDataSourceSnapshot<Int, HomeSection>()
     snapshot.appendSections([0])
-    snapshot.appendItems(orderedSections, toSection: 0)
-    diffableDataSource.apply(snapshot, animatingDifferences: animated)
-  }
-
-  private func toggleVisibility(of section: HomeSection) {
-    if visibleSections.contains(section) {
-      visibleSections.remove(section)
-    } else {
-      visibleSections.insert(section)
-    }
-    // identifiers are unchanged -> reconfigure the cell to refresh the checkbox
-    var snapshot = diffableDataSource.snapshot()
-    snapshot.reconfigureItems([section])
+    snapshot.appendItems(editor.items, toSection: 0)
     diffableDataSource.apply(snapshot, animatingDifferences: false)
   }
 }
@@ -141,6 +116,6 @@ extension HomeEditorVC {
   ) {
     collectionView.deselectItem(at: indexPath, animated: true)
     guard let section = diffableDataSource.itemIdentifier(for: indexPath) else { return }
-    toggleVisibility(of: section)
+    editor.toggle(section, in: diffableDataSource)
   }
 }
