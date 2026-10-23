@@ -202,6 +202,15 @@ public class Playlist: Identifyable {
     }
   }
 
+  public var isPinned: Bool {
+    get { managedObject.isPinned }
+    set {
+      guard managedObject.isPinned != newValue else { return }
+      managedObject.isPinned = newValue
+      library.saveContext()
+    }
+  }
+
   public var duration: Int { Int(managedObject.duration) }
 
   public var remoteDuration: Int {

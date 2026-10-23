@@ -20,10 +20,19 @@
 //
 
 import AmperfyKit
+import CoreData
 import UIKit
+
+// MARK: - SideBarVC
 
 class SideBarVC: KeyCommandCollectionViewController {
   private let account: Account!
+  private var pinnedPlaylistsFetchedResultsController: PinnedPlaylistFetchedResultsController!
+  private let pinnedPlaylistsHeader = LibraryNavigatorItem(
+    title: "Pinned",
+    isInteractable: false
+  )
+  private var pinnedPlaylistItems = [NSManagedObjectID: LibraryNavigatorItem]()
 
   init(collectionViewLayout: UICollectionViewLayout, account: Account) {
     self.account = account
@@ -55,6 +64,7 @@ class SideBarVC: KeyCommandCollectionViewController {
     super.viewDidLoad()
 
     clearsSelectionOnViewWillAppear = false
+    configurePinnedPlaylists()
     libraryItemConfigurator.viewDidLoad(
       navigationItem: navigationItem,
       collectionView: collectionView
@@ -100,6 +110,60 @@ class SideBarVC: KeyCommandCollectionViewController {
         ))
     } else if let libraryItem = selectedItem.tab {
       AppDelegate.mainWindowHostVC?.pushTabCategory(tabCategory: libraryItem)
+    } else if let objectID = selectedItem.playlistObjectID,
+              let managedObject = try? appDelegate.storage.main.context
+              .existingObject(with: objectID),
+              let playlistMO = managedObject as? PlaylistMO {
+      let playlist = Playlist(
+        library: appDelegate.storage.main.library,
+        managedObject: playlistMO
+      )
+      AppDelegate.mainWindowHostVC?.pushLibraryCategory(
+        vc: AppStoryboard.Main.segueToPlaylistDetail(account: account, playlist: playlist)
+      )
+    }
+  }
+
+  private func configurePinnedPlaylists() {
+    pinnedPlaylistsFetchedResultsController = PinnedPlaylistFetchedResultsController(
+      coreDataCompanion: appDelegate.storage.main,
+      account: account
+    )
+    pinnedPlaylistsFetchedResultsController.delegate = self
+    pinnedPlaylistsFetchedResultsController.fetch()
+    updatePinnedPlaylists()
+  }
+
+  private func updatePinnedPlaylists() {
+    let previousItems = pinnedPlaylistItems
+    let playlists = pinnedPlaylistsFetchedResultsController.fetchedObjects?.map {
+      Playlist(library: appDelegate.storage.main.library, managedObject: $0)
+    } ?? []
+
+    pinnedPlaylistItems = Dictionary(uniqueKeysWithValues: playlists.map { playlist in
+      let objectID = playlist.managedObject.objectID
+      let item = previousItems[objectID].flatMap { existingItem in
+        existingItem.title == playlist.name ? existingItem : nil
+      } ?? LibraryNavigatorItem(
+        title: playlist.name,
+        playlistObjectID: objectID
+      )
+      return (objectID, item)
+    })
+
+    let playlistItems = playlists.compactMap { pinnedPlaylistItems[$0.managedObject.objectID] }
+    let additionalData = playlistItems.isEmpty ? [] : [pinnedPlaylistsHeader] + playlistItems
+    libraryItemConfigurator.updateAdditionalData(additionalData)
+  }
+}
+
+extension SideBarVC: @preconcurrency NSFetchedResultsControllerDelegate {
+  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    MainActor.assumeIsolated {
+      guard controller == pinnedPlaylistsFetchedResultsController.fetchResultsController else {
+        return
+      }
+      updatePinnedPlaylists()
     }
   }
 }
