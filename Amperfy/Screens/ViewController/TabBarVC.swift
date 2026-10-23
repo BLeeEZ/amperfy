@@ -237,10 +237,14 @@ class TabBarVC: UITabBarController {
   }
 
   public func push(vc: UIViewController) {
-    guard let libraryGroup,
-          let navController = libraryGroup.managingNavigationController
-    else { return }
-    
+    guard let libraryGroup else { return }
+    // Select the library first: changing the selection rebuilds the managed navigation stack,
+    // which would otherwise drop a view controller pushed beforehand (no back button).
+    if selectedTab?.managingTabGroup !== libraryGroup, selectedTab !== libraryGroup {
+      selectedTab = libraryGroup
+    }
+    guard let navController = libraryGroup.managingNavigationController else { return }
+
     // Ensure the navigation controller has a root view controller before pushing
     // This prevents the pushed VC from becoming the root (which would have no back button)
     if navController.viewControllers.isEmpty {
@@ -249,8 +253,6 @@ class TabBarVC: UITabBarController {
     } else {
       navController.pushViewController(vc, animated: true)
     }
-    
-    selectedTab = libraryGroup
   }
 }
 
