@@ -49,6 +49,9 @@ class QueueVC: UIViewController {
   }
 
   var tableView: UITableView?
+  /// Draws the navigation bar background (the real navigation bar is transparent), see
+  /// `addFakeNavigationBar()`
+  private var fakeNavigationBar: UIView?
 
   var mainViewController: UIViewController? {
     AppDelegate.mainWindowHostVC as? UIViewController
@@ -118,12 +121,64 @@ class QueueVC: UIViewController {
       contextNextQueueSectionHeader = sectionView
     }
 
-    // hard top border -> other glass effect is to big and covers top sidebar elements
-    self.tableView!.topEdgeEffect.style = .hard
-    navigationController?.navigationBar.isTranslucent = false
+    if #available(macCatalyst 27.0, *) {
+      // Empty navigation bar that looks like the section headers: no system edge effect and a
+      // transparent navigation bar. Its background is drawn by a fake navigation bar instead.
+      self.tableView!.topEdgeEffect.isHidden = true
+      configureTransparentNavigationBar()
+      addFakeNavigationBar()
+    } else {
+      // hard top border -> other glass effect is to big and covers top sidebar elements
+      self.tableView!.topEdgeEffect.style = .hard
+      navigationController?.navigationBar.isTranslucent = false
+    }
 
     player.addNotifier(notifier: self)
     refresh()
+  }
+
+  /// Blurred view (same style as the section headers) behind the transparent navigation bar.
+  /// It covers the navigation bar area and extends down when the queue is pulled beyond its top
+  /// (rubber band), so the navigation bar looks like it stretches.
+  /// The fake navigation bar is part of the table view, so that it can be placed above the
+  /// section headers (scrollbarZPosition - 1) but below the scroll indicator (scrollbarZPosition).
+  private func addFakeNavigationBar() {
+    guard let tableView else { return }
+    let fakeBar = UIView()
+    fakeBar.isUserInteractionEnabled = false
+    fakeBar.setBackgroundBlur(style: .prominent)
+    fakeBar.layer.zPosition = scrollbarZPosition - 0.5
+    tableView.addSubview(fakeBar)
+    fakeNavigationBar = fakeBar
+  }
+
+  private func updateFakeNavigationBar() {
+    guard let fakeNavigationBar, let tableView else { return }
+    let overscroll = -tableView.adjustedContentInset.top - tableView.contentOffset.y
+    // In table view coordinates: pin the bar to the top of the visible area
+    fakeNavigationBar.frame = CGRect(
+      x: 0,
+      y: tableView.contentOffset.y,
+      width: tableView.bounds.width,
+      height: tableView.adjustedContentInset.top + max(0, overscroll)
+    )
+  }
+
+  /// Transparent navigation bar without separator line. The background is drawn by the fake
+  /// navigation bar.
+  private func configureTransparentNavigationBar() {
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithTransparentBackground()
+    appearance.shadowColor = .clear
+    navigationItem.standardAppearance = appearance
+    navigationItem.compactAppearance = appearance
+    navigationItem.scrollEdgeAppearance = appearance
+    navigationItem.compactScrollEdgeAppearance = appearance
+  }
+
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    updateFakeNavigationBar()
   }
 
   override var traitCollection: UITraitCollection {
@@ -403,6 +458,10 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
           .performPreviewTransition()
       }
     }
+  }
+
+  func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    updateFakeNavigationBar()
   }
 }
 
