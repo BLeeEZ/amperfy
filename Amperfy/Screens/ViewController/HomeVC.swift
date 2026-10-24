@@ -255,22 +255,31 @@ final class HomeVC: UICollectionViewController {
 
   private func presentSectionEditor() {
     // Build a simple editor using a temporary UIViewController with a table view
-    let editor = HomeEditorVC(current: sharedHome.orderedVisibleSections) { [weak self] newOrder in
+    let editor = HomeEditorVC(
+      order: appDelegate.storage.settings.accounts.getSetting(account.info).read.homeSectionOrder,
+      visible: sharedHome.orderedVisibleSections
+    ) { [weak self] order, visible in
       guard let self else { return }
-      sharedHome.orderedVisibleSections = newOrder
-      if let accountInfo = appDelegate.storage.settings.accounts.active {
-        appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
-          accountSettings.homeSections = newOrder
-        }
+      sharedHome.orderedVisibleSections = visible
+      // same account the order was read from
+      appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
+        accountSettings.homeSections = visible
+        accountSettings.homeSectionOrder = order
       }
       applySnapshot(animated: true)
 
       sharedHome.createFetchController()
       sharedHome.updateFromRemote()
     }
-    let nav = UINavigationController(rootViewController: editor)
-    nav.modalPresentationStyle = .formSheet
-    present(nav, animated: true)
+    #if targetEnvironment(macCatalyst)
+      // reordering via drag & drop did not drop inside a form sheet on macOS
+      // revert to the form sheet once fixed: https://developer.apple.com/forums/thread/850756
+      navigationController?.pushViewController(editor, animated: true)
+    #else
+      let nav = UINavigationController(rootViewController: editor)
+      nav.modalPresentationStyle = .formSheet
+      present(nav, animated: true)
+    #endif
   }
 
   @objc

@@ -482,6 +482,16 @@ extension Array where Element: Equatable {
   }
 }
 
+extension Array where Element: Hashable {
+  /// The elements without duplicates, followed by the ones of `allElements` missing (e.g. new cases).
+  /// Used to complete an order arranged by the user.
+  public func completingOrder(with allElements: [Element]) -> [Element] {
+    var seen = Set<Element>()
+    let unique = filter { seen.insert($0).inserted }
+    return unique + allElements.filter { !seen.contains($0) }
+  }
+}
+
 extension Array where Element == String {
   public func sortAlphabeticallyAscending() -> [String] {
     sorted { $0.localizedStandardCompare($1) == ComparisonResult.orderedAscending }
