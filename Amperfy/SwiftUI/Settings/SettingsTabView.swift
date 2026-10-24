@@ -27,6 +27,8 @@ struct SettingsTabView: View {
   var selectedMenu: NavigationTarget = .general
   @State
   private var columnVisibility = NavigationSplitViewVisibility.doubleColumn
+  @State
+  private var detailPath = NavigationPath()
 
   var body: some View {
     NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -55,8 +57,13 @@ struct SettingsTabView: View {
       }
       .listStyle(.sidebar)
     } detail: {
-      NavigationStack {
+      NavigationStack(path: $detailPath) {
         AnyView(selectedMenu.view())
+      }
+      // Pop views pushed in the previous menu (e.g. Support -> Event Log) when another menu is
+      // selected. This requires all pushes to be value based (NavigationLink(value:)).
+      .onChange(of: selectedMenu) {
+        detailPath = NavigationPath()
       }
     }
   }

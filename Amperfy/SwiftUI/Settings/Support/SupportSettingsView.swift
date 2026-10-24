@@ -26,6 +26,10 @@ import SwiftUI
 // MARK: - SupportSettingsView
 
 struct SupportSettingsView: View {
+  enum Destination: Hashable {
+    case eventLog
+  }
+
   let splitPercentage = 0.15
 
   @State
@@ -63,7 +67,7 @@ struct SupportSettingsView: View {
         }
 
         SettingsSection {
-          NavigationLink(destination: EventLogSettingsView()) {
+          NavigationLink(value: Destination.eventLog) {
             Text("Event Log")
           }
         }
@@ -90,6 +94,11 @@ struct SupportSettingsView: View {
     }
     .navigationTitle("Support")
     .navigationBarTitleDisplayMode(.inline)
+    .navigationDestination(for: Destination.self) { destination in
+      switch destination {
+      case .eventLog: EventLogSettingsView()
+      }
+    }
     .onAppear {
       appDelegate.userStatistics.visited(.settingsSupport)
     }

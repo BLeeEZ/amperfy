@@ -25,6 +25,11 @@ import SwiftUI
 // MARK: - ArtworkSettingsView
 
 struct ArtworkSettingsView: View {
+  enum Destination: Hashable {
+    case download
+    case display
+  }
+
   nonisolated static let artworkNotCheckedThreshold = 10
 
   @EnvironmentObject
@@ -141,10 +146,10 @@ struct ArtworkSettingsView: View {
           }
         }
         SettingsSection {
-          NavigationLink(destination: ArtworkDownloadSettingsView()) {
+          NavigationLink(value: Destination.download) {
             Text("Artwork Download Settings")
           }
-          NavigationLink(destination: ArtworkDisplaySettings()) {
+          NavigationLink(value: Destination.display) {
             Text("Artwork Display Settings")
           }
         }
@@ -152,6 +157,12 @@ struct ArtworkSettingsView: View {
     }
     .navigationTitle("Artwork")
     .navigationBarTitleDisplayMode(.inline)
+    .navigationDestination(for: Destination.self) { destination in
+      switch destination {
+      case .download: ArtworkDownloadSettingsView()
+      case .display: ArtworkDisplaySettings()
+      }
+    }
     .onAppear {
       updateValues()
     }
