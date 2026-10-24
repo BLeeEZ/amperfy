@@ -1,0 +1,4 @@
+module AudioCodecs {
+    umbrella header "AudioCodecs.h"
+    export *
+}
