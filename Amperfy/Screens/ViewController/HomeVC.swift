@@ -273,6 +273,7 @@ final class HomeVC: UICollectionViewController {
     }
     #if targetEnvironment(macCatalyst)
       // reordering via drag & drop did not drop inside a form sheet on macOS
+      // revert to the form sheet once fixed: https://developer.apple.com/forums/thread/850756
       navigationController?.pushViewController(editor, animated: true)
     #else
       let nav = UINavigationController(rootViewController: editor)
