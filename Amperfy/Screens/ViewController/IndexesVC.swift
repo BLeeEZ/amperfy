@@ -58,7 +58,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
+    tableView.backgroundColor = .systemBackground
     resultUpdateHandler?.changesDidEnd = {
       self.updateContentUnavailable()
     }

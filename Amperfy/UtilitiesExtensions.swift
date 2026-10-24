@@ -198,34 +198,6 @@ extension UIView {
     blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     insertSubview(blurEffectView, at: 0)
   }
-
-  func addLeftSideBorder() {
-    let separator = UIView()
-    separator.backgroundColor = .separator
-    addSubview(separator)
-    separator.translatesAutoresizingMaskIntoConstraints = false
-
-    NSLayoutConstraint.activate([
-      separator.widthAnchor.constraint(equalToConstant: 1),
-      separator.leadingAnchor.constraint(equalTo: leadingAnchor),
-      separator.topAnchor.constraint(equalTo: topAnchor),
-      separator.bottomAnchor.constraint(equalTo: bottomAnchor),
-    ])
-  }
-
-  func addTopSideBorder() {
-    let separator = UIView()
-    separator.backgroundColor = .separator
-    addSubview(separator)
-    separator.translatesAutoresizingMaskIntoConstraints = false
-
-    NSLayoutConstraint.activate([
-      separator.heightAnchor.constraint(equalToConstant: 1),
-      separator.leadingAnchor.constraint(equalTo: leadingAnchor),
-      separator.topAnchor.constraint(equalTo: topAnchor),
-      separator.trailingAnchor.constraint(equalTo: trailingAnchor),
-    ])
-  }
 }
 
 extension UINavigationController {

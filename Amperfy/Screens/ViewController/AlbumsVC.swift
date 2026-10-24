@@ -198,7 +198,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
+    tableView.backgroundColor = .systemBackground
 
     detailHeader = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,

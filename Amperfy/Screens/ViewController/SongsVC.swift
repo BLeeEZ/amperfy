@@ -67,7 +67,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
-    tableView.backgroundColor = .backgroundColor
+    tableView.backgroundColor = .systemBackground
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {

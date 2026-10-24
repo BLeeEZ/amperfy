@@ -362,14 +362,6 @@ extension UIColor {
       return UIColor.systemGray
     }
   }
-
-  public static var backgroundColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.systemBackground
-    } else {
-      return UIColor.white
-    }
-  }
 }
 
 extension UIActivityIndicatorView {
