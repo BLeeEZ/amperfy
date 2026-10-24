@@ -173,9 +173,9 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),

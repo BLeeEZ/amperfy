@@ -141,9 +141,9 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),

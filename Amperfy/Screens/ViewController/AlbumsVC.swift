@@ -161,9 +161,9 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
 
     appDelegate.userStatistics.visited(.albums)
 
