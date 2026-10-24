@@ -48,7 +48,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
   init(account: Account, album: Album) {
     self.album = album
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -97,7 +97,6 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .systemBackground
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },

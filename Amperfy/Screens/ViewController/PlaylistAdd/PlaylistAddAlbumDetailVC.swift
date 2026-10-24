@@ -34,7 +34,7 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
 
   init(account: Account, album: Album) {
     self.album = album
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -82,7 +82,6 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .systemBackground
   }
 
   override func viewIsAppearing(_ animated: Bool) {

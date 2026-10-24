@@ -33,7 +33,7 @@ class DirectoriesVC: MultiSourceTableViewController {
 
   init(account: Account, directory: Directory) {
     self.directory = directory
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -68,7 +68,6 @@ class DirectoriesVC: MultiSourceTableViewController {
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .systemBackground
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {

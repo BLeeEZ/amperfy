@@ -36,7 +36,7 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
 
   init(account: Account, artist: Artist) {
     self.artist = artist
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -68,7 +68,6 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .systemBackground
 
     configureSearchController(placeholder: "Albums and Songs", scopeButtonTitles: ["All", "Cached"])
   }

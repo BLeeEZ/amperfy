@@ -32,7 +32,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -65,7 +65,6 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .systemBackground
 
     let playShuffleConfig = PlayShuffleInfoConfiguration(
       infoCB: {

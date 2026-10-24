@@ -123,6 +123,25 @@ class BasicTableViewController: KeyCommandTableViewController {
     tableView.keyboardDismissMode = .onDrag
   }
 
+  #if targetEnvironment(macCatalyst)
+    // The table view is the root view of a UITableViewController, so this is called on every
+    // layout pass of the table view (scrolling, inserts, deletes, reloads).
+    override func viewDidLayoutSubviews() {
+      super.viewDidLayoutSubviews()
+      updateSectionEndSeparators()
+    }
+
+    private func updateSectionEndSeparators() {
+      let showSeparators = tableView.separatorStyle != .none
+      for case let cell as BasicTableCell in tableView.visibleCells {
+        guard let indexPath = tableView.indexPath(for: cell) else { continue }
+        let isLastRowInSection = indexPath.row == tableView
+          .numberOfRows(inSection: indexPath.section) - 1
+        cell.isSectionEndSeparatorVisible = showSeparators && isLastRowInSection
+      }
+    }
+  #endif
+
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
 

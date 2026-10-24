@@ -27,7 +27,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override var sceneTitle: String? { "Genres" }
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -63,7 +63,6 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .systemBackground
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),

@@ -37,7 +37,7 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
 
   init(account: Account, genre: Genre) {
     self.genre = genre
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -75,7 +75,6 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .systemBackground
 
     configureSearchController(
       placeholder: "Artists, Albums and Songs",

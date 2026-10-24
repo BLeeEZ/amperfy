@@ -41,7 +41,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   private static var maxPlayContextCount = 40
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -67,7 +67,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
     tableView.estimatedRowHeight = PlayableTableCell.rowHeight
-    tableView.backgroundColor = .systemBackground
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {
