@@ -415,7 +415,7 @@ extension QueueVC: UITableViewDragDelegate {
     at indexPath: IndexPath
   )
     -> [UIDragItem] {
-    reorderDragItems(for: indexPath)
+    []
   }
 
   func tableView(
@@ -497,14 +497,4 @@ extension QueueVC: MusicPlayable {
   func didElapsedTimeChange() {}
   func didArtworkChange() {}
   func didPlaybackRateChange() {}
-}
-
-/// Returning an empty array from `itemsForBeginning` makes UIKit throw
-/// "tentativeIndexPaths cannot be empty in beginDragForTentativeRows" on recent iOS versions.
-/// A local-only placeholder item keeps the drag alive; the actual move is handled by
-/// `tableView(_:moveRowAt:to:)`.
-func reorderDragItems(for indexPath: IndexPath) -> [UIDragItem] {
-  let item = UIDragItem(itemProvider: NSItemProvider())
-  item.localObject = indexPath
-  return [item]
 }
