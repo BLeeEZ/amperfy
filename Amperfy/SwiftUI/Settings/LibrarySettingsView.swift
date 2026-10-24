@@ -234,8 +234,12 @@ struct LibrarySettingsView: View {
                     .getAccount(info: activeAccountInfo)
                   let allSongsToDownload = appDelegate.storage.main.library
                     .getSongsForCompleteLibraryDownload(for: account)
-                  appDelegate.getMeta(account.info).playableDownloadManager
-                    .download(objects: allSongsToDownload)
+                  let playableDownloadManager = appDelegate.getMeta(account.info)
+                    .playableDownloadManager
+                  playableDownloadManager.download(objects: allSongsToDownload)
+                  // Also resume pending downloads that are no longer queued
+                  // (e.g. the app was suspended while they were waiting).
+                  playableDownloadManager.start()
                 },
                 secondaryButton: .cancel()
               )
