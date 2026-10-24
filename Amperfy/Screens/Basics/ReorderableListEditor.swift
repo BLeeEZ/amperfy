@@ -3,7 +3,7 @@
 //  Amperfy
 //
 //  Created by Chrizz Gelbach on 23.10.26.
-//  Copyright (c) 2026 Chrizz Gelbach. All rights reserved.
+//  Copyright (c) 2026 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
