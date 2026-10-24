@@ -171,10 +171,15 @@
 		50AE79AC2C1CCBEC0085CBB3 /* DeveloperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */; };
 		50AE79AE2C1E23930085CBB3 /* SsOpenSubsonicExtensionsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79AD2C1E23920085CBB3 /* SsOpenSubsonicExtensionsParserDelegate.swift */; };
 		50AE79B02C1F58C60085CBB3 /* SsLyricsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79AF2C1F58C60085CBB3 /* SsLyricsParserDelegate.swift */; };
+		87932E65BE2F66B35626BAE9 /* SsDepictionParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6171F8AEF202F2D8C32D9D1 /* SsDepictionParserDelegate.swift */; };
 		50AE79B22C1F64E40085CBB3 /* getLyricsBySongId_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50AE79B12C1F64E30085CBB3 /* getLyricsBySongId_example_1.xml */; };
 		50AE79B42C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50AE79B32C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml */; };
+		418E2C575CD5E076F8502A66 /* artistInfo2_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 49D814D5B425A4ABFC092C58 /* artistInfo2_example_1.xml */; };
+		97F1D0DA73CB21328ACCFF47 /* albumInfo2_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 0D15DDC3EB0FA5CC0EB39FDD /* albumInfo2_example_1.xml */; };
 		50AE79B62C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79B52C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift */; };
 		50AE79B82C1F68090085CBB3 /* SsLyricsBySongId2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79B72C1F68080085CBB3 /* SsLyricsBySongId2ParserTest.swift */; };
+		5EFF5E97E1F4FB1C06E14313 /* SsArtistInfo2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21AEFC41E49D4A37154C1935 /* SsArtistInfo2ParserTest.swift */; };
+		8466EAD07B093859AD8688E7 /* SsAlbumInfo2ParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFE2C45A7132E2CFD7DE6530 /* SsAlbumInfo2ParserTest.swift */; };
 		50AE79BA2C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml in Resources */ = {isa = PBXBuildFile; fileRef = 50AE79B92C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml */; };
 		50AE79BC2C1F6ADF0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79BB2C1F6ADE0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift */; };
 		50AE79C22C20709C0085CBB3 /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AE79C12C20709C0085CBB3 /* LyricsView.swift */; };
@@ -927,10 +932,15 @@
 		50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperView.swift; sourceTree = "<group>"; };
 		50AE79AD2C1E23920085CBB3 /* SsOpenSubsonicExtensionsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsOpenSubsonicExtensionsParserDelegate.swift; sourceTree = "<group>"; };
 		50AE79AF2C1F58C60085CBB3 /* SsLyricsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsLyricsParserDelegate.swift; sourceTree = "<group>"; };
+		A6171F8AEF202F2D8C32D9D1 /* SsDepictionParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsDepictionParserDelegate.swift; sourceTree = "<group>"; };
 		50AE79B12C1F64E30085CBB3 /* getLyricsBySongId_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = getLyricsBySongId_example_1.xml; sourceTree = "<group>"; };
 		50AE79B32C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = getLyricsBySongId_example_2.xml; sourceTree = "<group>"; };
+		49D814D5B425A4ABFC092C58 /* artistInfo2_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = artistInfo2_example_1.xml; sourceTree = "<group>"; };
+		0D15DDC3EB0FA5CC0EB39FDD /* albumInfo2_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = albumInfo2_example_1.xml; sourceTree = "<group>"; };
 		50AE79B52C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsLyricsBySongId1ParserTest.swift; sourceTree = "<group>"; };
 		50AE79B72C1F68080085CBB3 /* SsLyricsBySongId2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsLyricsBySongId2ParserTest.swift; sourceTree = "<group>"; };
+		21AEFC41E49D4A37154C1935 /* SsArtistInfo2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsArtistInfo2ParserTest.swift; sourceTree = "<group>"; };
+		DFE2C45A7132E2CFD7DE6530 /* SsAlbumInfo2ParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumInfo2ParserTest.swift; sourceTree = "<group>"; };
 		50AE79B92C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = OpenSubsonicExtensions_example_1.xml; sourceTree = "<group>"; };
 		50AE79BB2C1F6ADE0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsOpenSubsonicExtensionsParserTest.swift; sourceTree = "<group>"; };
 		50AE79BD2C1F704B0085CBB3 /* Amperfy v38.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v38.xcdatamodel"; sourceTree = "<group>"; };
@@ -1524,6 +1534,7 @@
 				50AE79AD2C1E23920085CBB3 /* SsOpenSubsonicExtensionsParserDelegate.swift */,
 				5086F886223BD68B00546F5A /* SsArtistParserDelegate.swift */,
 				50AE79AF2C1F58C60085CBB3 /* SsLyricsParserDelegate.swift */,
+				A6171F8AEF202F2D8C32D9D1 /* SsDepictionParserDelegate.swift */,
 				5086F88A223E867500546F5A /* SsAlbumParserDelegate.swift */,
 				50A738802244B03700D3F2D4 /* SsPlayableParserDelegate.swift */,
 				50A85EEC2689C5DB00FB3E31 /* SsSongParserDelegate.swift */,
@@ -2038,6 +2049,8 @@
 				50AE79B52C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift */,
 				50AE79BB2C1F6ADE0085CBB3 /* SsOpenSubsonicExtensionsParserTest.swift */,
 				50AE79B72C1F68080085CBB3 /* SsLyricsBySongId2ParserTest.swift */,
+				21AEFC41E49D4A37154C1935 /* SsArtistInfo2ParserTest.swift */,
+				DFE2C45A7132E2CFD7DE6530 /* SsAlbumInfo2ParserTest.swift */,
 			);
 			path = Subsonic;
 			sourceTree = "<group>";
@@ -2065,6 +2078,8 @@
 				50AE79B92C1F69A00085CBB3 /* OpenSubsonicExtensions_example_1.xml */,
 				50AE79B12C1F64E30085CBB3 /* getLyricsBySongId_example_1.xml */,
 				50AE79B32C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml */,
+				49D814D5B425A4ABFC092C58 /* artistInfo2_example_1.xml */,
+				0D15DDC3EB0FA5CC0EB39FDD /* albumInfo2_example_1.xml */,
 				50F3A1C3308A1B8A00A1B2C3 /* similarSongs2_example_1.xml */,
 				50CEC6392D1EDB0000D0E696 /* internetRadioStations_example_1.xml */,
 			);
@@ -2384,6 +2399,8 @@
 				50BE5D7D2850F50700156FC6 /* catalogs.xml in Resources */,
 				50BE5D7C2850F50700156FC6 /* podcast_episodes.xml in Resources */,
 				50AE79B42C1F64F50085CBB3 /* getLyricsBySongId_example_2.xml in Resources */,
+				418E2C575CD5E076F8502A66 /* artistInfo2_example_1.xml in Resources */,
+				97F1D0DA73CB21328ACCFF47 /* albumInfo2_example_1.xml in Resources */,
 				50BE5D572850F4F600156FC6 /* album_missing_artistId.xml in Resources */,
 				50CEC6382D1EDA6B00D0E696 /* live_streams.xml in Resources */,
 				50CA61242D4CE9E500EEF515 /* podcast_example_1.xml in Resources */,
@@ -2733,6 +2750,7 @@
 				50C9D696284FAA6C007F18D0 /* DownloadMO+CoreDataProperties.swift in Sources */,
 				50C9D6B7284FAA87007F18D0 /* UserStatistics.swift in Sources */,
 				50AE79B02C1F58C60085CBB3 /* SsLyricsParserDelegate.swift in Sources */,
+				87932E65BE2F66B35626BAE9 /* SsDepictionParserDelegate.swift in Sources */,
 				50C9D69D284FAA6C007F18D0 /* AbstractPlayableMO+CoreDataClass.swift in Sources */,
 				50C9D63E284FA9C7007F18D0 /* BackgroundLibrarySyncer.swift in Sources */,
 				50C9D67E284FAA6C007F18D0 /* UserStatisticsMO+CoreDataClass.swift in Sources */,
@@ -2904,6 +2922,8 @@
 				50BE5D8A2850F50F00156FC6 /* ErrorParserTest.swift in Sources */,
 				50BE5D942850F51E00156FC6 /* UnitTestHelper.swift in Sources */,
 				50AE79B82C1F68090085CBB3 /* SsLyricsBySongId2ParserTest.swift in Sources */,
+				5EFF5E97E1F4FB1C06E14313 /* SsArtistInfo2ParserTest.swift in Sources */,
+				8466EAD07B093859AD8688E7 /* SsAlbumInfo2ParserTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
