@@ -98,6 +98,16 @@ class BackendAudioPlayer: NSObject {
   private var currentPlayUrl: String = ""
   private var nextPreloadedPlayable: AbstractPlayable?
   private var nextPreloadedUrl: String = ""
+  /// Duration from the server metadata, used while the player can't determine it
+  /// (e.g. transcoded MP3 streams without Content-Length)
+  private var currentMetadataDuration: Double = 0.0
+  private var currentPlayable: AbstractPlayable?
+  /// Start position of the current stream when it was requested with a server side time offset
+  private var streamTimeOffset: Double = 0.0
+  /// Invalidates pending stream restarts once a newer one or another playable is requested
+  private var streamRestartRequest = 0
+  /// Play state to restore after a stream restart; nil if no restart is pending
+  private var shouldPlayAfterStreamRestart: Bool?
   private var isPreviousPlaylableFinshed = true
   private var isAutoStartPlayback = true
   private var seekTimeWhenStarted: Double?
@@ -175,11 +185,25 @@ class BackendAudioPlayer: NSObject {
   }
 
   var elapsedTime: Double {
-    player?.elapsedTime() ?? 0.0
+    streamTimeOffset + (player?.elapsedTime() ?? 0.0)
   }
 
   var duration: Double {
-    player?.duration ?? 0.0
+    // a stream restarted at an offset only covers the remaining part of the playable
+    guard streamTimeOffset == 0, isPlayerDurationKnown else { return currentMetadataDuration }
+    return player?.duration ?? 0.0
+  }
+
+  private var isPlayerDurationKnown: Bool {
+    let playerDuration = player?.duration ?? 0.0
+    return playerDuration.isFinite && playerDuration > 0
+  }
+
+  /// Transcoded streams have no Content-Length and no range support, so the player can't seek in them
+  private var isSeekByStreamRestartNeeded: Bool {
+    guard playType == .stream, let currentPlayable, !currentPlayable.isRadio,
+          let activeTranscodingFormat, activeTranscodingFormat != .raw else { return false }
+    return streamTimeOffset > 0 || !isPlayerDurationKnown
   }
 
   var playbackRate: PlaybackRate {
@@ -302,6 +326,9 @@ class BackendAudioPlayer: NSObject {
     perloadedStreamingBitrate = nil
     activeTranscodingFormat = nil
     preloadTranscodingFormat = nil
+    streamTimeOffset = 0.0
+    streamRestartRequest += 1
+    shouldPlayAfterStreamRestart = nil
     restartPlayer()
     eventLogger.report(topic: "Player Status", error: error)
     responder?.notifyErrorOccurred(error: error)
@@ -312,6 +339,9 @@ class BackendAudioPlayer: NSObject {
   }
 
   func continuePlay() {
+    if shouldPlayAfterStreamRestart != nil {
+      shouldPlayAfterStreamRestart = true
+    }
     isPlaying = true
     player?.resume()
     startTimers()
@@ -320,6 +350,9 @@ class BackendAudioPlayer: NSObject {
   }
 
   func pause() {
+    if shouldPlayAfterStreamRestart != nil {
+      shouldPlayAfterStreamRestart = false
+    }
     isPlaying = false
     player?.pause()
     stopTimers()
@@ -338,11 +371,71 @@ class BackendAudioPlayer: NSObject {
   }
 
   func seek(toSecond: Double) {
-    if currentPlayUrl != "", player?.getState() == .playing || player?.getState() == .paused {
+    // before the stream has started, the seek is applied in didStartPlaying
+    if isSeekByStreamRestartNeeded, currentPlayUrl != "" || shouldPlayAfterStreamRestart != nil {
+      restartStream(atSecond: toSecond)
+    } else if currentPlayUrl != "",
+              player?.getState() == .playing || player?.getState() == .paused {
       seekTimeWhenStarted = nil
       player?.seek(to: toSecond)
     } else {
       seekTimeWhenStarted = toSecond
+    }
+  }
+
+  private func restartStream(atSecond second: Double) {
+    guard let playable = currentPlayable, let accountInfo = playable.account?.info,
+          let streamingMaxBitrate = activeStreamingBitrate,
+          let streamingTranscodingFormat = activeTranscodingFormat else { return }
+    guard second.isFinite else { return }
+    let timeOffset = Int(max(second, 0).rounded())
+    if shouldPlayAfterStreamRestart == nil {
+      shouldPlayAfterStreamRestart = isPlaying
+    }
+    streamRestartRequest += 1
+    let request = streamRestartRequest
+    Task { @MainActor in
+      let backendApi = getBackendApiCB(accountInfo)
+      let streamUrl: URL
+      do {
+        streamUrl = try await backendApi.generateUrl(
+          forStreamingPlayable: playable.info,
+          maxBitrate: streamingMaxBitrate,
+          formatPreference: streamingTranscodingFormat,
+          timeOffset: timeOffset
+        )
+      } catch {
+        guard request == streamRestartRequest else { return }
+        shouldPlayAfterStreamRestart = nil
+        if case BackendError.notSupported = error {
+          os_log(.default, "Stream time offset not supported by server")
+        } else {
+          eventLogger.report(topic: "Player", error: error)
+        }
+        // seeking in the player only works within the original stream
+        if streamTimeOffset == 0 {
+          player?.seek(to: second)
+        }
+        return
+      }
+      guard request == streamRestartRequest, currentPlayable == playable else { return }
+      os_log(.default, "Restart Stream at %ds: %s", timeOffset, playable.displayString)
+      // the new stream replaces the player queue, a preloaded next item has to be queued again
+      nextPreloadedPlayable = nil
+      nextPreloadedUrl = ""
+      perloadedPlayType = nil
+      perloadedStreamingBitrate = nil
+      preloadTranscodingFormat = nil
+      // no finish notification for the replaced stream
+      currentPlayUrl = ""
+      streamTimeOffset = Double(timeOffset)
+      insert(
+        playable: playable,
+        withUrl: streamUrl,
+        streamingMaxBitrate: streamingMaxBitrate,
+        queueType: .play,
+        httpHeaders: backendApi.httpHeaders
+      )
     }
   }
 
@@ -393,6 +486,11 @@ class BackendAudioPlayer: NSObject {
   }
 
   private func handleRequest(playable: AbstractPlayable) {
+    currentMetadataDuration = Double(playable.duration)
+    currentPlayable = playable
+    streamTimeOffset = 0.0
+    streamRestartRequest += 1
+    shouldPlayAfterStreamRestart = nil
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
        nextPreloadedPlayable == playable {
       // Do nothing next preloaded playable has already been queued to player
@@ -509,6 +607,11 @@ class BackendAudioPlayer: NSObject {
     currentPlayUrl = ""
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
+    currentMetadataDuration = 0.0
+    currentPlayable = nil
+    streamTimeOffset = 0.0
+    streamRestartRequest += 1
+    shouldPlayAfterStreamRestart = nil
     playType = nil
     perloadedPlayType = nil
     activeStreamingBitrate = nil
@@ -586,7 +689,10 @@ class BackendAudioPlayer: NSObject {
         )
       }
     }
+    let request = streamRestartRequest
     let streamUrl = try await provideUrl()
+    // a preload requested before a stream restart would be queued behind the new stream
+    guard queueType == .play || request == streamRestartRequest else { return }
 
     if queueType == .play {
       os_log(
@@ -791,7 +897,9 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
 
       currentPreparedUrl = ""
       currentPlayUrl = url
-      if shouldPlaybackStart {
+      let shouldPlay = shouldPlayAfterStreamRestart ?? shouldPlaybackStart
+      shouldPlayAfterStreamRestart = nil
+      if shouldPlay {
         continuePlay()
         audioAnalyzer.play()
       } else {
@@ -800,8 +908,13 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
       }
 
       if let seekTimeWhenStarted {
-        player?.seek(to: seekTimeWhenStarted)
         self.seekTimeWhenStarted = nil
+        // the duration isn't known yet at start, restart only if transcoding is certain
+        if isSeekByStreamRestartNeeded, activeTranscodingFormat == .mp3 {
+          restartStream(atSecond: seekTimeWhenStarted)
+        } else {
+          player?.seek(to: seekTimeWhenStarted)
+        }
       }
     }
   }

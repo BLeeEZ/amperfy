@@ -240,6 +240,14 @@ final class MOCK_BackendApi: BackendApi {
   ) async throws
     -> URL { Helper.testURL }
 
+  func generateUrl(
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference,
+    timeOffset: Int
+  ) async throws
+    -> URL { throw BackendError.notSupported }
+
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL { Helper.testURL }
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { nil }
   func createLibrarySyncer(
