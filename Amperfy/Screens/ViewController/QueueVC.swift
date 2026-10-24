@@ -424,6 +424,7 @@ extension QueueVC: UITableViewDragDelegate {
   )
     -> UIDragPreviewParameters? {
     let parameter = UIDragPreviewParameters()
+    parameter.backgroundColor = .clear
     return parameter
   }
 }
@@ -431,21 +432,8 @@ extension QueueVC: UITableViewDragDelegate {
 // MARK: UITableViewDropDelegate
 
 extension QueueVC: UITableViewDropDelegate {
-  // Only accept drags that originate from this table view (reordering).
   func tableView(_ tableView: UITableView, canHandle session: UIDropSession) -> Bool {
-    tableView.hasActiveDrag && session.localDragSession != nil
-  }
-
-  func tableView(
-    _ tableView: UITableView,
-    dropSessionDidUpdate session: UIDropSession,
-    withDestinationIndexPath destinationIndexPath: IndexPath?
-  )
-    -> UITableViewDropProposal {
-    guard tableView.hasActiveDrag, session.localDragSession != nil else {
-      return UITableViewDropProposal(operation: .cancel)
-    }
-    return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+    false
   }
 
   // Local drags with one item go through the existing tableView(_:moveRowAt:to:) method on the data source
@@ -462,6 +450,7 @@ extension QueueVC: UITableViewDropDelegate {
   )
     -> UIDragPreviewParameters? {
     let parameter = UIDragPreviewParameters()
+    parameter.backgroundColor = .clear
     return parameter
   }
 }
