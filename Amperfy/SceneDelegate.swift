@@ -131,35 +131,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   #if targetEnvironment(macCatalyst)
-    private static let mainWindowFrameKey = "mainWindowFrame"
     private static let minimumWindowSize = CGSize(width: 400, height: 300)
-    /// Last frame of a main window in this app run. It lets a main window that is reopened
-    /// (e.g. after the mini player is closed) return to its position.
-    private static var lastFrameInThisRun: CGRect?
-    /// Size requested on connect; saving is paused until the window reports it.
-    private var restoringWindowSize: CGSize?
+    /// Frame of the last main window that was closed in this app run. Closing the window
+    /// (e.g. Cmd+W or switching to the mini player) discards its scene session, so macOS
+    /// cannot restore the frame and the next main window would open in the default size.
+    private static var lastClosedFrame: CGRect?
 
-    /// Across launches only the size is restored. The position stays with macOS, so a window
-    /// can never end up on a display that is no longer connected.
     private func restoreMainWindowFrame(of windowScene: UIWindowScene) {
-      guard let frameString = UserDefaults.standard.string(forKey: Self.mainWindowFrameKey)
+      guard let frame = Self.lastClosedFrame,
+            frame != windowScene.effectiveGeometry.systemFrame
       else { return }
-      let screenSize = windowScene.screen.bounds.size
-      let saved = NSCoder.cgRect(for: frameString).size
-      let size = CGSize(
-        width: min(max(saved.width, Self.minimumWindowSize.width), screenSize.width),
-        height: min(max(saved.height, Self.minimumWindowSize.height), screenSize.height)
-      )
-      var frame = windowScene.effectiveGeometry.systemFrame
-      if let lastFrame = Self.lastFrameInThisRun {
-        frame.origin = lastFrame.origin
-      }
-      let currentSize = windowScene.effectiveGeometry.systemFrame.size
-      frame.size = size
-      guard frame != windowScene.effectiveGeometry.systemFrame else { return }
-      if abs(currentSize.width - size.width) > 1 || abs(currentSize.height - size.height) > 1 {
-        restoringWindowSize = size
-      }
       windowScene.requestGeometryUpdate(.Mac(systemFrame: frame)) { [weak self] error in
         os_log(
           "restore window frame failed: %s",
@@ -167,27 +148,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
           type: .info,
           error.localizedDescription
         )
-        Task { @MainActor in self?.restoringWindowSize = nil }
       }
     }
 
-    func windowScene(
-      _ windowScene: UIWindowScene,
-      didUpdateEffectiveGeometry previousEffectiveGeometry: UIWindowScene.Geometry
-    ) {
+    private func rememberMainWindowFrame(of scene: UIScene) {
+      guard let windowScene = scene as? UIWindowScene, !windowScene.isFullScreen else { return }
       let frame = windowScene.effectiveGeometry.systemFrame
-      if let target = restoringWindowSize {
-        if abs(frame.width - target.width) <= 1, abs(frame.height - target.height) <= 1 {
-          restoringWindowSize = nil
-        }
-        return
-      }
-      guard !windowScene.isFullScreen,
-            frame.width >= Self.minimumWindowSize.width,
+      guard frame.width >= Self.minimumWindowSize.width,
             frame.height >= Self.minimumWindowSize.height
       else { return }
-      Self.lastFrameInThisRun = frame
-      UserDefaults.standard.set(NSCoder.string(for: frame), forKey: Self.mainWindowFrameKey)
+      Self.lastClosedFrame = frame
     }
   #endif
 
@@ -218,6 +188,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Release any resources associated with this scene that can be re-created the next time the scene connects.
     // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
     os_log("sceneDidDisconnect", log: self.log, type: .info)
+    #if targetEnvironment(macCatalyst)
+      rememberMainWindowFrame(of: scene)
+    #endif
     appDelegate.rebuildMainMenu()
   }
 
