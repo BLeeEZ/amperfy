@@ -76,6 +76,9 @@ final class HomeEditorVC: UICollectionViewController {
       guard let self else { return }
       var content = cell.defaultContentConfiguration()
       content.text = section.title
+      // taller rows for a larger hit target
+      content.directionalLayoutMargins.top = 12
+      content.directionalLayoutMargins.bottom = 12
       cell.contentConfiguration = content
       cell.accessories = editor.editingAccessories(for: section)
     }
