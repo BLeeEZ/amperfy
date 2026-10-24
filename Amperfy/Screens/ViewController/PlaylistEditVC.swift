@@ -285,7 +285,7 @@ extension PlaylistEditVC: UITableViewDragDelegate {
   )
     -> [UIDragItem] {
     // Reordering is done via tableView(_:moveRowAt:to:); the item only has to be non-empty.
-    reorderDragItems()
+    reorderDragItems(for: indexPath)
   }
 
   func tableView(
