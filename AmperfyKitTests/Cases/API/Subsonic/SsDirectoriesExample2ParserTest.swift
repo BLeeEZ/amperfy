@@ -64,6 +64,28 @@ class SsDirectoriesExample2ParserTest: AbstractSsParserTest {
     XCTAssertFalse((ssParserDelegate as! SsPlayableParserDelegate).isCollectionCached)
   }
 
+  func testSongWithoutAlbumIsDisplayed() {
+    testParsing()
+    library.saveContext()
+
+    // song "112" has no albumId in the response
+    guard let songWithoutAlbum = directory.songs.first(where: { $0.id == "112" })
+    else { XCTFail(); return }
+    XCTAssertNil(songWithoutAlbum.album)
+    XCTAssertTrue(songWithoutAlbum.isAvailableToUser())
+
+    // same predicates as DirectorySongsFetchedResultsController
+    let fetchRequest = SongMO.trackNumberSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      library.getSongFetchPredicate(forDirectory: directory),
+    ])
+    let foundSongs = try? context.fetch(fetchRequest)
+    let songs = foundSongs?.compactMap { Song(managedObject: $0) }
+    guard let songs = songs else { XCTFail(); return }
+    XCTAssertEqual(songs.map { $0.id }.sorted(), ["111", "112"])
+  }
+
   override func checkCorrectParsing() {
     prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 2,
