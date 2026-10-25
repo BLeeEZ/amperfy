@@ -132,6 +132,7 @@ public class PersistentStorage {
     case ShowArtistDuration = "showArtistDuration"
     case PlayerShuffleButtonEnabled = "enablePlayerShuffleButton"
     case ShowMusicPlayerSkipButtons = "showMusicPlayerSkipButtons"
+    case ToolbarAutoCollapse = "toolbarAutoCollapse"
     case AlwaysHidePlayerLyricsButton = "alwaysHidePlayerLyricsButton"
     case IsLyricsSmoothScrolling = "isLyricsSmoothScrolling"
     case AppearanceMode = "appearanceMode"

@@ -372,6 +372,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       userInfo: nil
     )
   }
+    
+  func switchToolbarCollapseMode(isToolbarPlayerAutoCollapse: Bool) {
+    appDelegate.storage.settings.user.isToolbarPlayerAutoCollapse = isToolbarPlayerAutoCollapse
+    appDelegate.notificationHandler.post(
+      name: .autoCollapseToolbarPlayerChanged,
+      object: nil,
+      userInfo: nil
+    )
+  }
 
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
     if #available(iOS 13.0, *) {

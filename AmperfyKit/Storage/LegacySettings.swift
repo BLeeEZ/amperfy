@@ -237,6 +237,17 @@ extension PersistentStorage {
       ) }
     }
 
+    public var isToolbarPlayerAutoCollapse: Bool {
+      get {
+        UserDefaults.standard
+          .object(forKey: UserDefaultsKey.ToolbarAutoCollapse.rawValue) as? Bool ?? true
+      }
+      set { UserDefaults.standard.set(
+        newValue,
+        forKey: UserDefaultsKey.ToolbarAutoCollapse.rawValue
+      ) }
+    }
+
     public var isLyricsSmoothScrolling: Bool {
       get {
         UserDefaults.standard
