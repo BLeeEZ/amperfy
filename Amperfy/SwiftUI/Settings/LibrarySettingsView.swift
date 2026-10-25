@@ -20,8 +20,8 @@
 //
 
 import AmperfyKit
-import SwiftUI
 import Combine
+import SwiftUI
 
 // MARK: - LibrarySettingsView
 

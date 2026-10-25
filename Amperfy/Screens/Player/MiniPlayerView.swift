@@ -34,7 +34,6 @@ class MiniPlayerView: UIView {
 
   static let mediumButtonSize: CGFloat = 20.0
 
-
   fileprivate lazy var artworkOverlay: UIView = {
     let view = UIView()
     view.backgroundColor = .black.withAlphaComponent(0.4)
