@@ -35,9 +35,6 @@ class MiniPlayerView: UIView {
 
   static let mediumButtonSize: CGFloat = 20.0
 
-  #if targetEnvironment(macCatalyst) // ok
-    var airplayVolume: MPVolumeView?
-  #endif
 
   fileprivate lazy var artworkOverlay: UIView = {
     let view = UIView()
@@ -349,15 +346,9 @@ class MiniPlayerView: UIView {
     return button
   }()
 
-  @IBAction
+  @objc
   func airplayButtonPushed(_ sender: UIButton) {
-    #if targetEnvironment(macCatalyst) // ok
-      playerHandler?.airplayButtonPushed(
-        rootView: self,
-        airplayButton: airplayButton,
-        airplayVolume: airplayVolume
-      )
-    #endif
+    playerHandler?.airplayButtonPushed(rootView: self)
   }
 
   fileprivate lazy var volumeButton: UIButton = {
@@ -561,16 +552,7 @@ class MiniPlayerView: UIView {
   init(player: PlayerFacade) {
     self.player = player
 
-    #if targetEnvironment(macCatalyst) // ok
-      self.airplayVolume = MPVolumeView(frame: .zero)
-      airplayVolume!.showsVolumeSlider = false
-      airplayVolume!.isHidden = true
-    #endif
-
     super.init(frame: .zero)
-    #if targetEnvironment(macCatalyst) // ok
-      addSubview(airplayVolume!)
-    #endif
 
     player.addNotifier(notifier: self)
     
