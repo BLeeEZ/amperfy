@@ -134,6 +134,14 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$isShowMusicPlayerSkipButtons.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.isShowMusicPlayerSkipButtons = newValue
     }))
+      
+  settings.isToolbarPlayerAutoCollapse = appDelegate.storage.settings.user
+    .isToolbarPlayerAutoCollapse
+  changesAgent.append(settings.$isToolbarPlayerAutoCollapse.sink(receiveValue: { newValue in
+    let hasValueChanged = self.appDelegate.storage.settings.user.isToolbarPlayerAutoCollapse != newValue
+    guard hasValueChanged else { return }
+    self.appDelegate.switchToolbarCollapseMode(isToolbarPlayerAutoCollapse: newValue)
+  }))
 
     settings.isLyricsSmoothScrolling = appDelegate.storage.settings.user.isLyricsSmoothScrolling
     changesAgent.append(settings.$isLyricsSmoothScrolling.sink(receiveValue: { newValue in

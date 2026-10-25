@@ -106,6 +106,13 @@ class TabBarVC: UITabBarController {
       name: .LibraryItemsChanged,
       object: nil
     )
+      
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleAutoCollapseToolbarPlayer(notification:)),
+      name: .autoCollapseToolbarPlayerChanged,
+      object: nil
+    )
 
     tabBarMinimizeBehavior = .onScrollDown
 
@@ -203,6 +210,11 @@ class TabBarVC: UITabBarController {
   @objc
   func handleLibraryItemsChanged(notification: Notification) {
     refresh()
+  }
+    
+  @objc
+  func handleAutoCollapseToolbarPlayer(notification: Notification) {
+    self.tabBarMinimizeBehavior = appDelegate.storage.settings.user.isToolbarPlayerAutoCollapse ? .onScrollDown : .never
   }
 
   func refresh() {
