@@ -109,4 +109,23 @@ class DownloadTest: XCTestCase {
     XCTAssertNil(library.getDownload(account: account, id: failed.id))
     XCTAssertNotNil(library.getDownload(account: account2, id: otherAccountFinished.id))
   }
+
+  func testDeleteCacheRemovesDownloadRecords() {
+    let cached = createUncachedSong(id: "cached", account: account)
+    cached.relFilePath = URL(string: "cached.mp3")
+    let download = createDownload(for: cached, account: account)
+    download.finishDate = Date()
+    let otherAccountCached = createUncachedSong(id: "otherAccount", account: account2)
+    otherAccountCached.relFilePath = URL(string: "otherAccount.mp3")
+    let otherAccountDownload = createDownload(for: otherAccountCached, account: account2)
+    otherAccountDownload.finishDate = Date()
+    library.saveContext()
+
+    library.deletePlayableCachePaths(for: account)
+    library.saveContext()
+
+    XCTAssertFalse(cached.isCached)
+    XCTAssertNil(library.getDownload(account: account, id: download.id))
+    XCTAssertNotNil(library.getDownload(account: account2, id: otherAccountDownload.id))
+  }
 }

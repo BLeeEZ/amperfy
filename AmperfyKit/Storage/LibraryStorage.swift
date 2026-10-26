@@ -690,6 +690,9 @@ public class LibraryStorage: PlayableFileCachable {
   private func deleteCacheFinalStep(playable: AbstractPlayable) {
     playable.contentTypeTranscoded = nil
     playable.relFilePath = nil
+    if let download = playable.playableManagedObject.download {
+      context.delete(download)
+    }
     playable.deleteCache()
   }
 
