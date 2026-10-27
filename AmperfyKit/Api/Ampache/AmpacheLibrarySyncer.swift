@@ -360,6 +360,13 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(album: Album) async throws {
+    try await AlbumSyncCoalescer.sync(album) {
+      try await self.syncAlbumUncoalesced(album)
+    }
+  }
+
+  @MainActor
+  private func syncAlbumUncoalesced(_ album: Album) async throws {
     guard isSyncAllowed else { return }
     let albumResponse = try await ampacheXmlServerApi.requestAlbumInfo(id: album.id)
     let albumObjectId = album.managedObject.objectID
