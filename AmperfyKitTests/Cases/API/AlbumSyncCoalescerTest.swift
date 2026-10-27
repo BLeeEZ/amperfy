@@ -2,7 +2,7 @@
 //  AlbumSyncCoalescerTest.swift
 //  AmperfyKitTests
 //
-//  Created by Maximilian Bauer on 08.10.26.
+//  Created by Jerome Mohm on 08.10.26.
 //  Copyright (c) 2026 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
