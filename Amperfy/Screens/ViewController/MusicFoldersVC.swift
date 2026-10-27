@@ -29,7 +29,7 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
   private var fetchedResultsController: MusicFolderFetchedResultsController!
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -55,7 +55,6 @@ class MusicFoldersVC: SingleFetchedResultsTableViewController<MusicFolderMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
     resultUpdateHandler?.changesDidEnd = {
       self.updateContentUnavailable()
     }

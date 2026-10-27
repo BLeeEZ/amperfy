@@ -20,11 +20,16 @@
 //
 
 import AmperfyKit
+import Combine
 import SwiftUI
 
 // MARK: - LibrarySettingsView
 
 struct LibrarySettingsView: View {
+  enum Destination: Hashable {
+    case cacheSizeLimit
+  }
+
   @EnvironmentObject
   private var settings: Settings
 
@@ -205,13 +210,7 @@ struct LibrarySettingsView: View {
             )
             .onChange(of: cacheSelection, changeHandler)
           #else
-            NavigationLink {
-              MultiPickerView(
-                data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
-                selection: $cacheSelection
-              )
-              .navigationTitle("Cache Size Limit")
-            } label: {
+            NavigationLink(value: Destination.cacheSizeLimit) {
               SettingsRow(title: "Cache Size Limit") {
                 SecondaryText(cacheSizeLimit.description)
               }
@@ -234,8 +233,12 @@ struct LibrarySettingsView: View {
                     .getAccount(info: activeAccountInfo)
                   let allSongsToDownload = appDelegate.storage.main.library
                     .getSongsForCompleteLibraryDownload(for: account)
-                  appDelegate.getMeta(account.info).playableDownloadManager
-                    .download(objects: allSongsToDownload)
+                  let playableDownloadManager = appDelegate.getMeta(account.info)
+                    .playableDownloadManager
+                  playableDownloadManager.download(objects: allSongsToDownload)
+                  // Also resume pending downloads that are no longer queued
+                  // (e.g. the app was suspended while they were waiting).
+                  playableDownloadManager.start()
                 },
                 secondaryButton: .cancel()
               )
@@ -271,6 +274,16 @@ struct LibrarySettingsView: View {
     }
     .navigationTitle("Library")
     .navigationBarTitleDisplayMode(.inline)
+    .navigationDestination(for: Destination.self) { destination in
+      switch destination {
+      case .cacheSizeLimit:
+        MultiPickerView(
+          data: [("Size", byteValues), (" Bytes", [" MB", " GB"])],
+          selection: $cacheSelection
+        )
+        .navigationTitle("Cache Size Limit")
+      }
+    }
     .onAppear {
       updateValues()
       appDelegate.userStatistics.visited(.settingsLibrary)

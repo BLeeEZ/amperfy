@@ -34,7 +34,7 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
 
   init(account: Account, album: Album) {
     self.album = album
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -82,7 +82,6 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -160,7 +159,7 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
   override func updateSearchResults(for searchController: UISearchController) {
     fetchedResultsController.search(
       searchText: searchController.searchBar.text ?? "",
-      onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCachedSongs: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
   }

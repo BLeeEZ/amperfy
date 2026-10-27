@@ -198,34 +198,6 @@ extension UIView {
     blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     insertSubview(blurEffectView, at: 0)
   }
-
-  func addLeftSideBorder() {
-    let separator = UIView()
-    separator.backgroundColor = .separator
-    addSubview(separator)
-    separator.translatesAutoresizingMaskIntoConstraints = false
-
-    NSLayoutConstraint.activate([
-      separator.widthAnchor.constraint(equalToConstant: 1),
-      separator.leadingAnchor.constraint(equalTo: leadingAnchor),
-      separator.topAnchor.constraint(equalTo: topAnchor),
-      separator.bottomAnchor.constraint(equalTo: bottomAnchor),
-    ])
-  }
-
-  func addTopSideBorder() {
-    let separator = UIView()
-    separator.backgroundColor = .separator
-    addSubview(separator)
-    separator.translatesAutoresizingMaskIntoConstraints = false
-
-    NSLayoutConstraint.activate([
-      separator.heightAnchor.constraint(equalToConstant: 1),
-      separator.leadingAnchor.constraint(equalTo: leadingAnchor),
-      separator.topAnchor.constraint(equalTo: topAnchor),
-      separator.trailingAnchor.constraint(equalTo: trailingAnchor),
-    ])
-  }
 }
 
 extension UINavigationController {
@@ -446,5 +418,17 @@ extension UIViewController {
       bottom: hostVC.getSafeAreaExtension(),
       right: 0
     )
+  }
+}
+
+extension UISearchBar {
+  /// Whether the list is limited to cached entries. Mac Catalyst has no scope bar
+  /// (see `configureSearchController`), so offline mode alone decides there.
+  @MainActor
+  var isCachedScopeSelected: Bool {
+    if scopeButtonTitles?.count ?? 0 > 1 {
+      return selectedScopeButtonIndex == 1
+    }
+    return appDelegate.storage.settings.user.isOfflineMode
   }
 }

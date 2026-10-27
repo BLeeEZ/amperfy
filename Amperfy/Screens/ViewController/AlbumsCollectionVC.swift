@@ -256,9 +256,9 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
       collectionView.showsVerticalScrollIndicator = true
     }
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
 
     refreshControl?.addTarget(
       common,

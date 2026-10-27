@@ -107,6 +107,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     #if false
       windowScene.sizeRestrictions?.minimumSize = Self.mainWindowSize
     #endif
+    #if targetEnvironment(macCatalyst)
+      restoreMainWindowFrame(of: windowScene)
+    #endif
     if let activeAccountInfo = AmperKit.shared.storage.settings.accounts.active {
       let account = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
       if !AmperKit.shared.storage.settings.app.isLibrarySynced {
@@ -126,6 +129,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.setAppAppearanceMode(style: appDelegate.storage.settings.user.appearanceMode)
     AmperfyAppShortcuts.updateAppShortcutParameters()
   }
+
+  #if targetEnvironment(macCatalyst)
+    private static let minimumWindowSize = CGSize(width: 400, height: 300)
+    /// Frame of the last main window that was closed in this app run. Closing the window
+    /// (e.g. Cmd+W or switching to the mini player) discards its scene session, so macOS
+    /// cannot restore the frame and the next main window would open in the default size.
+    private static var lastClosedFrame: CGRect?
+
+    private func restoreMainWindowFrame(of windowScene: UIWindowScene) {
+      guard let frame = Self.lastClosedFrame,
+            frame != windowScene.effectiveGeometry.systemFrame
+      else { return }
+      windowScene.requestGeometryUpdate(.Mac(systemFrame: frame)) { [weak self] error in
+        os_log(
+          "restore window frame failed: %s",
+          log: self?.log ?? .default,
+          type: .info,
+          error.localizedDescription
+        )
+      }
+    }
+
+    private func rememberMainWindowFrame(of scene: UIScene) {
+      guard let windowScene = scene as? UIWindowScene, !windowScene.isFullScreen else { return }
+      let frame = windowScene.effectiveGeometry.systemFrame
+      guard frame.width >= Self.minimumWindowSize.width,
+            frame.height >= Self.minimumWindowSize.height
+      else { return }
+      Self.lastClosedFrame = frame
+    }
+  #endif
 
   func replaceMainRootViewController(vc: UIViewController) {
     window?.rootViewController = vc
@@ -154,6 +188,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Release any resources associated with this scene that can be re-created the next time the scene connects.
     // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
     os_log("sceneDidDisconnect", log: self.log, type: .info)
+    #if targetEnvironment(macCatalyst)
+      rememberMainWindowFrame(of: scene)
+    #endif
     appDelegate.rebuildMainMenu()
   }
 

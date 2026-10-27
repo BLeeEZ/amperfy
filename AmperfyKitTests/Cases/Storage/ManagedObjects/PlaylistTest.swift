@@ -560,6 +560,34 @@ class PlaylistTest: XCTestCase {
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 3)
   }
 
+  func checkTestPlaylistOrdersStrictlyIncreasing() {
+    for index in 1 ..< testPlaylist.items.count {
+      XCTAssertLessThan(testPlaylist.items[index - 1].order, testPlaylist.items[index].order)
+    }
+  }
+
+  /// The persisted `order` decides the position after a reload. Moving an item towards the end
+  /// must therefore keep the orders consistent with the item array.
+  func testMovePlaylistSong_OrderMatchesIndexAfterMovingDown() {
+    for (from, to) in [(0, 1), (0, 2), (1, 3), (2, 3), (1, 4), (0, 4)] {
+      resetTestPlaylist()
+      let movedId = testPlaylist.playables[from].id
+      testPlaylist.movePlaylistItem(fromIndex: from, to: to)
+      XCTAssertEqual(testPlaylist.playables[to].id, movedId)
+      checkTestPlaylistOrdersStrictlyIncreasing()
+    }
+  }
+
+  func testMovePlaylistSong_OrderMatchesIndexAfterMovingUp() {
+    for (from, to) in [(1, 0), (2, 0), (3, 1), (3, 2), (4, 1), (4, 0)] {
+      resetTestPlaylist()
+      let movedId = testPlaylist.playables[from].id
+      testPlaylist.movePlaylistItem(fromIndex: from, to: to)
+      XCTAssertEqual(testPlaylist.playables[to].id, movedId)
+      checkTestPlaylistOrdersStrictlyIncreasing()
+    }
+  }
+
   func testMovePlaylistSongToStart() {
     resetTestPlaylist()
     testPlaylist.movePlaylistItem(fromIndex: 1, to: 0)

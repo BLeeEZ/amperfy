@@ -31,7 +31,7 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
   private var downloadManager: DownloadManageable!
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -56,7 +56,6 @@ class DownloadsVC: SingleFetchedResultsTableViewController<DownloadMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     optionsButton = UIBarButtonItem.createOptionsBarButton()
     optionsButton.menu = createActionButtonMenu()

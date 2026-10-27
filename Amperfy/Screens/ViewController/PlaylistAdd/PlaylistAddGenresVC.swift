@@ -32,7 +32,7 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
   private var doneButton: UIBarButtonItem!
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -63,7 +63,6 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {
@@ -101,7 +100,7 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCached: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
   }

@@ -88,7 +88,7 @@ class SearchVC: BasicTableViewController {
 
   init(account: Account) {
     self.account = account
-    super.init(style: .grouped)
+    super.init(style: .plain)
   }
 
   required init?(coder: NSCoder) {
@@ -158,7 +158,7 @@ class SearchVC: BasicTableViewController {
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
+    tableView.sectionHeaderTopPadding = 0.0
 
     containableAtIndexPathCallback = { indexPath in
       switch SearchSection(rawValue: indexPath.section) {
@@ -501,7 +501,7 @@ class SearchVC: BasicTableViewController {
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text, let accountObjectId else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)
@@ -592,7 +592,7 @@ class SearchVC: BasicTableViewController {
       } catch {
         // do nothing
       }}
-    } else if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if !searchText.isEmpty, searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         let searchResult = try await appDelegate.storage.async.performAndGet { asyncCompanion in
           let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)

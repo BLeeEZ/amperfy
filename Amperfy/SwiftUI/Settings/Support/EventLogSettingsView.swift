@@ -30,12 +30,24 @@ struct EventLogSettingsView: View {
 
   var body: some View {
     ZStack {
-      List {
-        ForEach(entries, id: \.self) { entry in
-          EventLogCellView(entry: LogEntry(managedObject: entry))
+      if entries.isEmpty {
+        ContentUnavailableView(
+          "No Events",
+          systemImage: "list.bullet.rectangle",
+          description: Text("Errors and other events will be listed here.")
+        )
+      } else {
+        List {
+          ForEach(entries, id: \.self) { entry in
+            EventLogCellView(entry: LogEntry(managedObject: entry))
+          }
         }
+        #if targetEnvironment(macCatalyst) // ok
+        .listStyle(.plain)
+        #else
+        .listStyle(.grouped)
+        #endif
       }
-      .listStyle(.grouped)
     }
     .navigationTitle("Event Log")
   }

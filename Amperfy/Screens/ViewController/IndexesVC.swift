@@ -31,7 +31,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
 
   init(account: Account, musicFolder: MusicFolder) {
     self.musicFolder = musicFolder
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -58,7 +58,6 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
     resultUpdateHandler?.changesDidEnd = {
       self.updateContentUnavailable()
     }

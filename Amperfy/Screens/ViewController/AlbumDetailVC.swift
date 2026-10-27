@@ -48,7 +48,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
   init(account: Account, album: Album) {
     self.album = album
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -97,7 +97,6 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
@@ -203,7 +202,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
   override func updateSearchResults(for searchController: UISearchController) {
     fetchedResultsController.search(
       searchText: searchController.searchBar.text ?? "",
-      onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCachedSongs: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
   }

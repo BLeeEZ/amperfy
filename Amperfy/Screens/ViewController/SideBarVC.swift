@@ -59,8 +59,13 @@ class SideBarVC: KeyCommandCollectionViewController {
       navigationItem: navigationItem,
       collectionView: collectionView
     )
-    // hard top border -> other glass effect is to big and covers top sidebar elements
-    collectionView.topEdgeEffect.style = .hard
+    if #available(macCatalyst 27.0, *) {
+      // soft top border -> works fine on macOS 27, no sidebar item is covered
+      collectionView.topEdgeEffect.style = .soft
+    } else {
+      // hard top border -> other glass effect is to big and covers top sidebar elements
+      collectionView.topEdgeEffect.style = .hard
+    }
   }
 
   override func viewIsAppearing(_ animated: Bool) {

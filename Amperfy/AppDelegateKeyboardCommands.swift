@@ -84,8 +84,17 @@ enum KeyboardCommands: CaseIterable {
     }
   }
 
+  /// The popup player can't be reached or dismissed on Mac (the mini player is not tappable there)
+  var isAvailable: Bool {
+    #if targetEnvironment(macCatalyst)
+      return self != .openClosePlayer
+    #else
+      return true
+    #endif
+  }
+
   static func isA(cmd: KeyboardCommand) -> KeyboardCommands? {
-    for cmdEnum in Self.allCases {
+    for cmdEnum in Self.allCases where cmdEnum.isAvailable {
       if cmdEnum.asCommand == cmd {
         return cmdEnum
       }
@@ -107,7 +116,7 @@ extension AppDelegate {
   }
 
   open override var keyCommands: [UIKeyCommand]? {
-    KeyboardCommands.allCases.map { cmd in
+    KeyboardCommands.allCases.filter(\.isAvailable).map { cmd in
       cmd.asUIKeyCommand(action: #selector(handleKeyCommand(sender:)))
     }
   }

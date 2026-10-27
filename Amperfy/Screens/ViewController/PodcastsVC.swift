@@ -32,7 +32,7 @@ class PodcastsVC: MultiSourceTableViewController {
   private var showType: PodcastsShowType = .podcasts
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -65,7 +65,6 @@ class PodcastsVC: MultiSourceTableViewController {
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     swipeDisplaySettings.playContextTypeOfElements = .podcast
     containableAtIndexPathCallback = { indexPath in
@@ -266,14 +265,14 @@ class PodcastsVC: MultiSourceTableViewController {
       let searchText = searchController.searchBar.text ?? ""
       podcastsFetchedResultsController.search(
         searchText: searchText,
-        onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
+        onlyCached: searchController.searchBar.isCachedScopeSelected
       )
       tableView.reloadData()
     case .episodesSortedByReleaseDate:
       let searchText = searchController.searchBar.text ?? ""
       episodesFetchedResultsController.search(
         searchText: searchText,
-        onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+        onlyCachedSongs: searchController.searchBar.isCachedScopeSelected
       )
       tableView.reloadData()
     }

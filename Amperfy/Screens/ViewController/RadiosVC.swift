@@ -32,7 +32,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -42,9 +42,9 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
 
     appDelegate.userStatistics.visited(.radios)
 
@@ -65,7 +65,6 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     let playShuffleConfig = PlayShuffleInfoConfiguration(
       infoCB: {

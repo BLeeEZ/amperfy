@@ -362,14 +362,6 @@ extension UIColor {
       return UIColor.systemGray
     }
   }
-
-  public static var backgroundColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.systemBackground
-    } else {
-      return UIColor.white
-    }
-  }
 }
 
 extension UIActivityIndicatorView {
@@ -479,6 +471,16 @@ extension Array where Element: Equatable {
     }.map {
       $0.offset
     }
+  }
+}
+
+extension Array where Element: Hashable {
+  /// The elements without duplicates, followed by the ones of `allElements` missing (e.g. new cases).
+  /// Used to complete an order arranged by the user.
+  public func completingOrder(with allElements: [Element]) -> [Element] {
+    var seen = Set<Element>()
+    let unique = filter { seen.insert($0).inserted }
+    return unique + allElements.filter { !seen.contains($0) }
   }
 }
 

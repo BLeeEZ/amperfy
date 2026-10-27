@@ -35,7 +35,7 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
 
   init(account: Account, musicFolder: MusicFolder) {
     self.musicFolder = musicFolder
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -63,7 +63,6 @@ class PlaylistAddIndexesVC: SingleFetchedResultsTableViewController<DirectoryMO>
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
   }
 
   override func viewIsAppearing(_ animated: Bool) {

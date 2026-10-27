@@ -136,7 +136,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
 
   init(account: Account) {
     self.common = AlbumsCommonVCInteractions(account: account)
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -161,9 +161,9 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
 
     appDelegate.userStatistics.visited(.albums)
 
@@ -198,7 +198,6 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     detailHeader = LibraryElementDetailTableHeaderView.createTableHeader(
       rootView: self,

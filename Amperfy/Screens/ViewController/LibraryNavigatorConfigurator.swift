@@ -28,21 +28,17 @@ final class LibraryNavigatorItem: Hashable, Sendable {
   let id = UUID()
   let title: String
   let library: LibraryDisplayType?
-  @MainActor
-  var isSelected = false
   let isInteractable: Bool
   let tab: TabNavigatorItem?
 
   init(
     title: String,
     library: LibraryDisplayType? = nil,
-    isSelected: Bool = false,
     isInteractable: Bool = true,
     tab: TabNavigatorItem? = nil
   ) {
     self.title = title
     self.library = library
-    self.isSelected = isSelected
     self.isInteractable = isInteractable
     self.tab = tab
   }
@@ -99,7 +95,6 @@ class LibraryNavigatorConfigurator: NSObject {
   static let sectionHeaderElementKind = "section-header-element-kind"
 
   private let account: Account
-  private var data = [LibraryNavigatorItem]()
   private let offsetData: [LibraryNavigatorItem]
   private var collectionView: UICollectionView!
   private var dataSource: SideBarDiffableDataSource!
@@ -111,9 +106,10 @@ class LibraryNavigatorConfigurator: NSObject {
   #endif
 
   private var editButton: UIBarButtonItem!
-  private var librarySettings = LibraryDisplaySettings.defaultSettings
-  private var libraryInUse = [LibraryNavigatorItem]()
-  private var libraryNotUsed = [LibraryNavigatorItem]()
+  /// one item per library type for the whole lifetime: unchanged items keep their identity on refresh
+  private let libraryItems: [LibraryDisplayType: LibraryNavigatorItem]
+  /// all library items in the order arranged by the user, checked ones are in use
+  private let editor: ReorderableListEditor<LibraryNavigatorItem>
 
   init(
     account: Account,
@@ -124,10 +120,14 @@ class LibraryNavigatorConfigurator: NSObject {
   ) {
     self.account = account
     self.offsetData = offsetData
-    self.librarySettings = librarySettings
+    self.libraryItems = Dictionary(uniqueKeysWithValues: LibraryDisplayType.allCases.map {
+      ($0, LibraryNavigatorItem(title: $0.displayName, library: $0))
+    })
+    self.editor = ReorderableListEditor(items: [], checkedItems: [])
     self.layoutConfig = layoutConfig
     self.pressedOnLibraryItemCB = pressedOnLibraryItemCB
     super.init()
+    resetEditor(librarySettings: librarySettings)
 
     NotificationCenter.default.addObserver(
       self,
@@ -155,14 +155,6 @@ class LibraryNavigatorConfigurator: NSObject {
       action: #selector(editingPressed)
     )
     navigationItem.rightBarButtonItems = [editButton]
-    libraryInUse = librarySettings.inUse.map { LibraryNavigatorItem(
-      title: $0.displayName,
-      library: $0
-    ) }
-    libraryNotUsed = librarySettings.notUsed.map { LibraryNavigatorItem(
-      title: $0.displayName,
-      library: $0
-    ) }
     self.collectionView.allowsSelectionDuringEditing = true
     self.collectionView.delegate = self
     self.collectionView.collectionViewLayout = createLayout() // 1 Configure the layout
@@ -196,45 +188,19 @@ class LibraryNavigatorConfigurator: NSObject {
       #endif
 
       collectionView.isEditing.toggle()
-      var snapshot = dataSource.snapshot(for: 0)
-      snapshot.append(libraryNotUsed)
-      dataSource.apply(snapshot, to: 0, animatingDifferences: true)
+      // show the items not in use at the position the user put them
+      applyLibraryItems(animated: true)
     } else {
       collectionView.isEditing.toggle()
-      var snapshot = dataSource.snapshot(for: 0)
-      let inUse = snapshot.items.filter { $0.isSelected && ($0.library != nil) }.compactMap { $0 }
-      struct Temp {
-        let indexPath: IndexPath
-        let item: LibraryNavigatorItem
-      }
-      let inUseItems = inUse.compactMap {
-        if let indexPath = dataSource.indexPath(for: $0) {
-          return Temp(indexPath: indexPath, item: $0)
-        } else {
-          return nil
-        }
-      }
-      .sorted(by: { $0.indexPath < $1.indexPath })
-      .compactMap { $0.item }
-      libraryInUse = inUseItems
-
-      var snapshot2 = dataSource.snapshot(for: 0)
-      if !offsetData.isEmpty {
-        let offsetItems = Array(snapshot.items[0 ... (offsetData.count - 1)])
-        snapshot2.delete(offsetItems)
-      }
-      snapshot2.delete(libraryInUse)
-      libraryNotUsed = snapshot2.items
-      snapshot.delete(libraryNotUsed)
-
+      let newSettings = LibraryDisplaySettings(
+        order: editor.items.compactMap { $0.library },
+        inUse: Set(editor.checkedItems.compactMap { $0.library })
+      )
       appDelegate.storage.settings.accounts
         .updateSetting(account.info) { accountSetting in
-          accountSetting.libraryDisplaySettings = LibraryDisplaySettings(
-            inUse: libraryInUse
-              .compactMap { $0.library }
-          )
+          accountSetting.libraryDisplaySettings = newSettings
         }
-      dataSource.apply(snapshot, to: 0, animatingDifferences: true)
+      applyLibraryItems(animated: true)
 
       // Restore selection after editing endet on macOS
       #if targetEnvironment(macCatalyst) // ok
@@ -247,31 +213,20 @@ class LibraryNavigatorConfigurator: NSObject {
   }
 
   func refresh(librarySettings: LibraryDisplaySettings) {
+    // not loaded yet, or editing: keep the pending changes of the user, they are saved on Done
+    guard dataSource != nil, !collectionView.isEditing else { return }
+
     #if targetEnvironment(macCatalyst) // ok
       let selectedIndexPath = collectionView.indexPathsForSelectedItems?.first ?? .zero
       preEditItem = dataSource.itemIdentifier(for: selectedIndexPath)
     #endif
 
-    var snapshot = dataSource.snapshot(for: 0)
-    snapshot.deleteAll()
-
-    libraryInUse = librarySettings.inUse.map { LibraryNavigatorItem(
-      title: $0.displayName,
-      library: $0,
-      isSelected: true
-    ) }
-    #if targetEnvironment(macCatalyst) // ok
-      // update the preEditItem based on title
-      preEditItem = libraryInUse.first(where: { $0.title == preEditItem?.title })
-    #endif
-    libraryNotUsed = librarySettings.notUsed.map { LibraryNavigatorItem(
-      title: $0.displayName,
-      library: $0
-    ) }
-
-    snapshot.append(offsetData)
-    snapshot.append(libraryInUse)
-    dataSource.apply(snapshot, to: 0, animatingDifferences: true)
+    resetEditor(librarySettings: librarySettings)
+    applyLibraryItems(animated: true)
+    // items keep their identity -> refresh the checkboxes of the cells
+    var snapshot = dataSource.snapshot()
+    snapshot.reconfigureItems(snapshot.itemIdentifiers)
+    dataSource.apply(snapshot, animatingDifferences: false)
 
     // Restore selection after refresh endet on macOS
     #if targetEnvironment(macCatalyst) // ok
@@ -279,6 +234,21 @@ class LibraryNavigatorConfigurator: NSObject {
         collectionView.selectItem(at: indexPath, animated: true, scrollPosition: .top)
       }
     #endif
+  }
+
+  private func resetEditor(librarySettings: LibraryDisplaySettings) {
+    editor.reset(
+      items: librarySettings.order.compactMap { libraryItems[$0] },
+      checkedItems: Set(librarySettings.inUse.compactMap { libraryItems[$0] })
+    )
+  }
+
+  /// fixed items followed by the library items: all while editing, otherwise only the ones in use
+  private func applyLibraryItems(animated: Bool) {
+    var snapshot = NSDiffableDataSourceSectionSnapshot<LibraryNavigatorItem>()
+    snapshot.append(offsetData)
+    snapshot.append(collectionView.isEditing ? editor.items : editor.orderedCheckedItems)
+    dataSource.apply(snapshot, to: 0, animatingDifferences: animated)
   }
 
   private func createLayout() -> UICollectionViewLayout {
@@ -310,7 +280,7 @@ class LibraryNavigatorConfigurator: NSObject {
     let cellRegistration = UICollectionView.CellRegistration<
       UICollectionViewListCell,
       LibraryNavigatorItem
-    > { cell, indexPath, item in
+    > { [weak self] cell, indexPath, item in
       if !item.isInteractable {
         var content = cell.defaultContentConfiguration()
         content.text = item.title
@@ -327,12 +297,7 @@ class LibraryNavigatorConfigurator: NSObject {
           cell.accessories = [.disclosureIndicator(displayed: .whenNotEditing)]
         #endif
 
-        if item.isSelected {
-          cell.accessories.append(.reorder())
-          cell.accessories.append(.customView(configuration: .createIsSelected()))
-        } else {
-          cell.accessories.append(.customView(configuration: .createUnSelected()))
-        }
+        cell.accessories.append(contentsOf: self?.editor.editingAccessories(for: item) ?? [])
         cell.contentConfiguration = content
       } else if let tabItem = item.tab {
         #if targetEnvironment(macCatalyst) // ok
@@ -372,10 +337,7 @@ class LibraryNavigatorConfigurator: NSObject {
     }
 
     /// 4 - data source reordering
-    dataSource.reorderingHandlers.canReorderItem = { [weak self] item in
-      let isEdit = self?.collectionView.isEditing ?? false
-      return item.isSelected && isEdit && (item.tab == nil)
-    }
+    editor.installReordering(on: dataSource, collectionView: collectionView)
   }
 
   @MainActor
@@ -398,18 +360,7 @@ class LibraryNavigatorConfigurator: NSObject {
     var snapshot = NSDiffableDataSourceSnapshot<Int, LibraryNavigatorItem>()
     snapshot.appendSections([0])
     dataSource.apply(snapshot, animatingDifferences: false)
-
-    data.append(contentsOf: offsetData)
-    let libraryItems = librarySettings.inUse.map { LibraryNavigatorItem(
-      title: $0.displayName,
-      library: $0,
-      isSelected: true
-    ) }
-    data.append(contentsOf: libraryItems)
-
-    var outlineSnapshot = NSDiffableDataSourceSectionSnapshot<LibraryNavigatorItem>()
-    outlineSnapshot.append(data)
-    dataSource.apply(outlineSnapshot, to: 0, animatingDifferences: false)
+    applyLibraryItems(animated: false)
   }
 }
 
@@ -445,15 +396,8 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
     toProposedIndexPath proposedIndexPath: IndexPath
   )
     -> IndexPath {
-    let selectedRowsCount = dataSource.snapshot().itemIdentifiers.filter(\.isSelected).count
-    if proposedIndexPath.row >= offsetData.count + selectedRowsCount {
-      // don't allow reordering unused items
-      return IndexPath(row: offsetData.count + selectedRowsCount - 1, section: 0)
-    } else if proposedIndexPath.row >= offsetData.count {
-      return proposedIndexPath
-    } else {
-      return IndexPath(row: offsetData.count, section: 0)
-    }
+    // don't allow moving library items in between the fixed items
+    editor.targetIndexPath(forProposed: proposedIndexPath, in: dataSource)
   }
 
   func collectionView(
@@ -464,41 +408,8 @@ extension LibraryNavigatorConfigurator: UICollectionViewDelegate {
     guard !collectionView.isEditing else {
       collectionView.deselectItem(at: indexPath, animated: true)
       guard let item = dataSource.itemIdentifier(for: indexPath) else { return }
-      var snapshot = dataSource.snapshot()
-
-      if !item.isSelected {
-        if let lastInUsedItem = snapshot.itemIdentifiers.last(where: \.isSelected),
-           lastInUsedItem != item {
-          // move freshly selected item to end of selected items
-          snapshot.moveItem(item, afterItem: lastInUsedItem)
-          dataSource.apply(snapshot, animatingDifferences: true)
-        } else if let firstItem = snapshot.itemIdentifiers[offsetData.count...].first,
-                  firstItem != item {
-          // no active item exists
-          snapshot.moveItem(item, beforeItem: firstItem)
-          dataSource.apply(snapshot, animatingDifferences: true)
-        }
-      }
-
-      if item.isSelected, let lib = item.library {
-        if let beforeUnusedInsertionItem = snapshot.itemIdentifiers
-          .filter({ !$0.isSelected && $0.library != nil })
-          .first(where: { $0.library!.rawValue >= lib.rawValue }),
-          beforeUnusedInsertionItem != item {
-          // move deselected item to its correct position based on the ordering defined in LibraryDisplaySettings
-          snapshot.moveItem(item, beforeItem: beforeUnusedInsertionItem)
-          dataSource.apply(snapshot, animatingDifferences: true)
-        } else if let lastItem = snapshot.itemIdentifiers.last, lastItem != item {
-          // no insertion index exists, therefore this must be the last element
-          snapshot.moveItem(item, afterItem: lastItem)
-          dataSource.apply(snapshot, animatingDifferences: true)
-        }
-      }
-
-      // don't animate selection
-      item.isSelected.toggle()
-      snapshot.reconfigureItems([item])
-      dataSource.apply(snapshot, animatingDifferences: false)
+      // toggle in use without moving the item
+      editor.toggle(item, in: dataSource)
       return
     }
     // Retrieve the item identifier using index path.

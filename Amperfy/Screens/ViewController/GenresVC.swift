@@ -27,7 +27,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override var sceneTitle: String? { "Genres" }
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -39,9 +39,9 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
 
     appDelegate.userStatistics.visited(.genres)
 
@@ -63,7 +63,6 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),
@@ -153,7 +152,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCached: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
     updateContentUnavailable()

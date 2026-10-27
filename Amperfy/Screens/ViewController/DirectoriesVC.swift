@@ -33,7 +33,7 @@ class DirectoriesVC: MultiSourceTableViewController {
 
   init(account: Account, directory: Directory) {
     self.directory = directory
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -68,7 +68,6 @@ class DirectoriesVC: MultiSourceTableViewController {
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {
@@ -352,10 +351,10 @@ class DirectoriesVC: MultiSourceTableViewController {
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       subdirectoriesFetchedResultsController.search(searchText: searchText)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if searchController.searchBar.isCachedScopeSelected {
       subdirectoriesFetchedResultsController.search(searchText: searchText)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
     } else {
