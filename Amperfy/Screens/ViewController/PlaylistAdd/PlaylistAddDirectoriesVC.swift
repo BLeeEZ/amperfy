@@ -223,10 +223,10 @@ class PlaylistAddDirectoriesVC: MultiSourceTableViewController, PlaylistVCAddabl
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       subdirectoriesFetchedResultsController.search(searchText: searchText)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if searchController.searchBar.isCachedScopeSelected {
       subdirectoriesFetchedResultsController.search(searchText: searchText)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
     } else {

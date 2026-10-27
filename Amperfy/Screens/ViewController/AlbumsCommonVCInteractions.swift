@@ -534,7 +534,7 @@ class AlbumsCommonVCInteractions {
 
   func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchAlbums(searchText: searchText)
@@ -544,7 +544,7 @@ class AlbumsCommonVCInteractions {
     }
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
+      onlyCached: searchController.searchBar.isCachedScopeSelected,
       displayFilter: displayFilter
     )
     updateContentUnavailable()

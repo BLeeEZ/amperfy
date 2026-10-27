@@ -185,11 +185,11 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
+      onlyCached: searchController.searchBar.isCachedScopeSelected,
       displayFilter: displayFilter
     )
     tableView.reloadData()
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
           .searchArtists(searchText: searchText)
