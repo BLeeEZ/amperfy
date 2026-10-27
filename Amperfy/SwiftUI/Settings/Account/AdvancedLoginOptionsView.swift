@@ -29,9 +29,6 @@ import SwiftUI
 /// certificate for mTLS. Both are independent and layered on top of the regular
 /// username/password login.
 struct AdvancedLoginOptionsView: View {
-  @Environment(\.dismiss)
-  private var dismiss
-
   @State
   private var headers: [String: String]
   @State
@@ -39,15 +36,20 @@ struct AdvancedLoginOptionsView: View {
 
   private let onHeadersChange: ([String: String]) -> ()
   private let onDismiss: () -> ()
+  /// Closes the sheet. Provided by the presenting UIKit controller, since
+  /// `@Environment(\.dismiss)` is unreliable for a UIHostingController root (#848).
+  private let onDone: () -> ()
 
   init(
     headers: [String: String],
     onHeadersChange: @escaping ([String: String]) -> (),
-    onDismiss: @escaping () -> ()
+    onDismiss: @escaping () -> (),
+    onDone: @escaping () -> ()
   ) {
     _headers = State(initialValue: headers)
     self.onHeadersChange = onHeadersChange
     self.onDismiss = onDismiss
+    self.onDone = onDone
   }
 
   private var headersSubtitle: String {
@@ -94,7 +96,7 @@ struct AdvancedLoginOptionsView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
-          Button("Done") { dismiss() }
+          Button("Done") { onDone() }
         }
       }
       .onAppear { reloadCertificate() }

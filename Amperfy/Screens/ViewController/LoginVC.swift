@@ -224,13 +224,16 @@ class LoginVC: UIViewController {
 
   @IBAction
   func advancedPressed() {
-    let root = AdvancedLoginOptionsView(
-      headers: httpHeaders,
-      onHeadersChange: { [weak self] updated in self?.httpHeaders = updated },
-      onDismiss: { [weak self] in self?.updateAdvancedSummary() }
+    let hostingController = UIHostingController(rootView: AnyView(EmptyView()))
+    hostingController.rootView = AnyView(
+      AdvancedLoginOptionsView(
+        headers: httpHeaders,
+        onHeadersChange: { [weak self] updated in self?.httpHeaders = updated },
+        onDismiss: { [weak self] in self?.updateAdvancedSummary() },
+        onDone: { [weak hostingController] in hostingController?.dismiss(animated: true) }
+      )
+      .environmentObject(Settings())
     )
-    .environmentObject(Settings())
-    let hostingController = UIHostingController(rootView: root)
     hostingController.modalPresentationStyle = .formSheet
     present(hostingController, animated: true)
   }
@@ -696,7 +699,8 @@ class LoginVC: UIViewController {
   @objc
   private func keyboardWillChangeFrame(_ notification: Notification) {
     guard let userInfo = notification.userInfo,
-          let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue
+          let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?
+          .cgRectValue
     else { return }
 
     let keyboardTop = view.convert(endFrame, from: nil).minY
