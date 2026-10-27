@@ -124,7 +124,7 @@ class AlbumSyncCoalescerTest: XCTestCase {
 
   /// Two overlapping syncs of the same album must run the sync only once
   /// (upstream issue #778). Without coalescing the second caller would run the
-  /// operation through the open gate as well and the count would be 2.
+  /// operation as well and the count would be 2.
   func testConcurrentSyncOfSameAlbumRunsOnce() async throws {
     let firstEntered = expectation(description: "first sync entered the operation")
     operation.onEntered = { count in
