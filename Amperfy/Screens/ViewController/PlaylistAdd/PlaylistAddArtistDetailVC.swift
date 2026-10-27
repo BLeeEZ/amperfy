@@ -258,10 +258,10 @@ class PlaylistAddArtistDetailVC: MultiSourceTableViewController, PlaylistVCAddab
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       albumsFetchedResultsController.search(searchText: searchText, onlyCached: false)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if searchController.searchBar.isCachedScopeSelected {
       albumsFetchedResultsController.search(searchText: searchText, onlyCached: true)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)
     } else {

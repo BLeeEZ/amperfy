@@ -152,7 +152,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCached: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
     updateContentUnavailable()

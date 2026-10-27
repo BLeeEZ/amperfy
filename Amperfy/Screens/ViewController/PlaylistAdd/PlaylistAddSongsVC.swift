@@ -223,7 +223,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
           .searchSongs(searchText: searchText)
@@ -235,7 +235,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         onlyCachedSongs: false,
         displayFilter: displayFilter
       )
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if searchController.searchBar.isCachedScopeSelected {
       fetchedResultsController.search(
         searchText: searchText,
         onlyCachedSongs: true,
@@ -244,7 +244,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     } else if displayFilter != .all {
       fetchedResultsController.search(
         searchText: searchText,
-        onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1,
+        onlyCachedSongs: searchController.searchBar.isCachedScopeSelected,
         displayFilter: displayFilter
       )
     } else {

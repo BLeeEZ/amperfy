@@ -420,3 +420,15 @@ extension UIViewController {
     )
   }
 }
+
+extension UISearchBar {
+  /// Whether the list is limited to cached entries. Mac Catalyst has no scope bar
+  /// (see `configureSearchController`), so offline mode alone decides there.
+  @MainActor
+  var isCachedScopeSelected: Bool {
+    if scopeButtonTitles?.count ?? 0 > 1 {
+      return selectedScopeButtonIndex == 1
+    }
+    return appDelegate.storage.settings.user.isOfflineMode
+  }
+}

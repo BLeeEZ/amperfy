@@ -159,7 +159,7 @@ class PlaylistAddAlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<
   override func updateSearchResults(for searchController: UISearchController) {
     fetchedResultsController.search(
       searchText: searchController.searchBar.text ?? "",
-      onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCachedSongs: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
   }
