@@ -333,6 +333,13 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(album: Album) async throws {
+    try await AlbumSyncCoalescer.sync(album) {
+      try await self.syncAlbumUncoalesced(album)
+    }
+  }
+
+  @MainActor
+  private func syncAlbumUncoalesced(_ album: Album) async throws {
     guard isSyncAllowed, album.remoteStatus != .deleted else { return }
     let albumObjectId = album.managedObject.objectID
 

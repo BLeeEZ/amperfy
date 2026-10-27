@@ -23,6 +23,44 @@ import CoreData
 import Foundation
 import os.log
 
+// MARK: - AlbumSyncCoalescer
+
+/// Coalesces concurrent syncs of the same album. Each album sync opens its own
+/// background context and cannot see another sync's unsaved inserts, so two
+/// overlapping syncs of one album would both insert every song and the library
+/// would appear duplicated (upstream issue #778). A caller that finds a sync of
+/// the album in flight awaits it instead of starting a second one.
+@MainActor
+enum AlbumSyncCoalescer {
+  /// Album syncs in flight, keyed by the album's local object ID: unsynced
+  /// albums share the empty server id, so the server id cannot be the key.
+  /// Static because the proxy creates a new syncer for every call.
+  private static var runningSyncs = [NSManagedObjectID: Task<(), Error>]()
+
+  static func sync(
+    _ album: Album,
+    operation: @escaping @MainActor @Sendable () async throws -> ()
+  ) async throws {
+    let albumObjectID = album.managedObject.objectID
+    if let runningSync = runningSyncs[albumObjectID] {
+      return try await runningSync.value
+    }
+    // The task owns its entry and removes it only once the whole sync,
+    // including its Core Data write, has finished. A cancelled caller does not
+    // cancel it, because other callers may be awaiting the same sync. The task
+    // only starts once this caller suspends below, so the entry is always
+    // stored before the task's defer removes it.
+    let syncTask = Task { @MainActor in
+      defer { Self.runningSyncs[albumObjectID] = nil }
+      try await operation()
+    }
+    runningSyncs[albumObjectID] = syncTask
+    try await syncTask.value
+  }
+}
+
+// MARK: - CommonLibrarySyncer
+
 @MainActor
 class CommonLibrarySyncer {
   let account: Account
