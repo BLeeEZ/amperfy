@@ -20,27 +20,18 @@
                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="TxE-Fh-ozu">
                         <rect key="frame" x="110" y="27" width="415" height="38"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Playlist Name" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MMM-Yr-IkZ">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Playlist Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MMM-Yr-IkZ" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="415" height="20"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="MBe-4a-Yhx"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
-                                <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                </variation>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4aC-eY-cVv" userLabel="Info Label">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="20 Songs" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4aC-eY-cVv" userLabel="Info Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="22" width="415" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="180" id="6qd-Cl-jB4"/>
-                                    <constraint firstAttribute="height" constant="16" id="NkY-6C-FCB">
-                                        <variation key="widthClass=regular" constant="18"/>
-                                    </constraint>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                 <color key="textColor" systemColor="secondaryLabelColor"/>
                                 <nil key="highlightedColor"/>
                                 <variation key="default">
@@ -49,10 +40,13 @@
                                     </mask>
                                 </variation>
                                 <variation key="widthClass=regular">
-                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                    <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                     <mask key="constraints">
                                         <include reference="6qd-Cl-jB4"/>
                                     </mask>
+                                </variation>
+                                <variation key="userInterfaceIdiom=mac-widthClass=regular">
+                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                 </variation>
                             </label>
                         </subviews>

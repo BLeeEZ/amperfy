@@ -79,6 +79,8 @@ final class Settings: ObservableObject {
   var themePreference: ThemePreference = .defaultValue
   @Published
   var appearanceMode: UIUserInterfaceStyle = .unspecified
+  @Published
+  var textSize: UIContentSizeCategory?
 
   @Published
   var isEqualizerEnabled = false

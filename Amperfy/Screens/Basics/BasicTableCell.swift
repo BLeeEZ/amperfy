@@ -24,6 +24,14 @@ import UIKit
 class BasicTableCell: UITableViewCell {
   static let margin = UIView.defaultMarginCell
 
+  // MARK: Text size
+
+  /// Row height for a cell whose content (without the cell margins) is `contentHeight` tall at
+  /// the default text size. Scales with the user's text size (see `TextScaling`).
+  static func scaledRowHeight(contentHeight: CGFloat) -> CGFloat {
+    TextScaling.scaledValue(contentHeight) + margin.top + margin.bottom
+  }
+
   required init?(coder: NSCoder) {
     super.init(coder: coder)
     self.layoutMargins = BasicTableCell.margin

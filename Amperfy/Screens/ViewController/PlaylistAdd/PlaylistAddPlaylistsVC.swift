@@ -111,8 +111,7 @@ class PlaylistAddPlaylistsVC: SingleSnapshotFetchedResultsTableViewController<Pl
       scopeButtonTitles: searchTiles
     )
     tableView.register(nibName: PlaylistTableCell.typeName)
-    tableView.rowHeight = PlaylistTableCell.rowHeight
-    tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlaylistTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0

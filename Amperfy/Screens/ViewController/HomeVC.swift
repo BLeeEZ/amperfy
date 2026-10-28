@@ -84,6 +84,13 @@ final class HomeVC: UICollectionViewController {
       )
     }
 
+    registerForTraitChanges(
+      [UITraitPreferredContentSizeCategory.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.collectionView.collectionViewLayout.invalidateLayout()
+      }
+    )
+
     navigationController?.navigationBar.prefersLargeTitles = true
     navigationItem.rightBarButtonItem = UIBarButtonItem(
       title: "Edit",
@@ -118,21 +125,22 @@ final class HomeVC: UICollectionViewController {
   // MARK: - Layout
 
   private static func createLayout() -> UICollectionViewCompositionalLayout {
-    let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
+    let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in
       guard let _ = HomeSection(rawValue: sectionIndex) else { return nil }
 
-      // Item: square image with title below -> estimate height accommodates label
+      // Item: square image with title below
       let itemSize = NSCollectionLayoutSize(
         widthDimension: .fractionalWidth(1.0),
         heightDimension: .fractionalHeight(1.0)
       )
       let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
-      // Group: fixed width to show large image; height estimated to fit image + label
-      // We'll use a vertical group containing the cell's content; the cell itself handles layout.
+      // Group: fixed width to show large image; height fits image + labels for the text size
+      let labelAreaHeight = AlbumCollectionCell
+        .labelAreaHeight(for: environment.traitCollection, defaultHeight: 50.0)
       let groupSize = NSCollectionLayoutSize(
         widthDimension: .absolute(itemWidth),
-        heightDimension: .estimated(210)
+        heightDimension: .absolute(itemWidth + labelAreaHeight)
       )
       let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -200,14 +208,14 @@ final class HomeVC: UICollectionViewController {
       return cell
     }
 
-    dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+    dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
       guard kind == UICollectionView.elementKindSectionHeader,
             let header = collectionView.dequeueReusableSupplementaryView(
               ofKind: kind,
               withReuseIdentifier: SectionHeaderView.reuseID,
               for: indexPath
             ) as? SectionHeaderView,
-            let section = self.sharedHome.orderedVisibleSections.element(at: indexPath.section)
+            let section = self?.sharedHome.orderedVisibleSections.element(at: indexPath.section)
       else {
         return nil
       }
@@ -457,9 +465,14 @@ final class SectionHeaderView: UICollectionReusableView {
   }()
 
   private let titleLabel: UILabel = {
-    let lbl = UILabel()
+    let lbl = ScaledLabel()
     lbl.translatesAutoresizingMaskIntoConstraints = false
-    lbl.font = UIFont.preferredFont(forTextStyle: .title3).withWeight(.semibold)
+    // title 3 at the default text size, scaled with the user's text size
+    let defaultTraits = UITraitCollection(preferredContentSizeCategory: .large)
+    let font = UIFont.preferredFont(forTextStyle: .title3, compatibleWith: defaultTraits)
+      .withWeight(.semibold)
+    lbl.font = UIFontMetrics(forTextStyle: .title3).scaledFont(for: font)
+    lbl.adjustsFontForContentSizeCategory = true
     lbl.textColor = .label
     return lbl
   }()

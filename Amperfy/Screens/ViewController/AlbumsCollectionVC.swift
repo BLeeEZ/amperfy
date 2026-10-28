@@ -249,6 +249,14 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
       forCellWithReuseIdentifier: AlbumCollectionCell.typeName
     )
 
+    registerForTraitChanges(
+      [UITraitPreferredContentSizeCategory.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.invalidateItemSizeCache()
+        self.collectionView.collectionViewLayout.invalidateLayout()
+      }
+    )
+
     switch common.sortType {
     case .artist, .duration, .name, .rating, .year:
       collectionView.showsVerticalScrollIndicator = false
@@ -395,7 +403,9 @@ extension AlbumsCollectionVC: UICollectionViewDelegateFlowLayout {
         (collectionView.bounds.size.width - marginsAndInsets) /
           CGFloat(gridSize)
       ).rounded(.down)
-    let itemSize = CGSize(width: itemWidth, height: itemWidth + 45)
+    let labelAreaHeight = AlbumCollectionCell
+      .labelAreaHeight(for: collectionView.traitCollection)
+    let itemSize = CGSize(width: itemWidth, height: itemWidth + labelAreaHeight)
     cachedItemSize = itemSize
     return itemSize
   }

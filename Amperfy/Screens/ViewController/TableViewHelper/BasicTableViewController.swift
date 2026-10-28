@@ -154,6 +154,26 @@ class BasicTableViewController: KeyCommandTableViewController {
     updateSearchResults(for: searchController)
   }
 
+  /// Section headers created from `tableView(_:titleForHeaderInSection:)` have a fixed text
+  /// size: use a text style that scales with the user's text size (see `TextScaling`)
+  override func tableView(
+    _ tableView: UITableView,
+    willDisplayHeaderView view: UIView,
+    forSection section: Int
+  ) {
+    guard let header = view as? UITableViewHeaderFooterView else { return }
+    var content = (header.contentConfiguration as? UIListContentConfiguration) ??
+      header.defaultContentConfiguration()
+    if content.text == nil {
+      content.text = tableView.dataSource?.tableView?(tableView, titleForHeaderInSection: section)
+    }
+    let traits = header.traitCollection
+    let font = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: traits)
+    content.textProperties.font = TextScaling.scaledFont(font, compatibleWith: traits)
+    content.textProperties.adjustsFontForContentSizeCategory = true
+    header.contentConfiguration = content
+  }
+
   override func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
     isSingleCellEditingModeActive = true
   }

@@ -65,8 +65,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.rowHeight = PlayableTableCell.rowHeight
-    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlayableTableCell.rowHeight }
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {

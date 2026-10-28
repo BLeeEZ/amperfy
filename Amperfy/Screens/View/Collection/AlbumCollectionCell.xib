@@ -42,46 +42,28 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="fZp-PJ-7R1" userLabel="HStack Text View">
                                 <rect key="frame" x="0.0" y="274" width="363" height="36"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hHv-Ol-9T7" userLabel="Title Label">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hHv-Ol-9T7" userLabel="Title Label" adjustsFontForContentSizeCategory="YES" verticalCompressionResistancePriority="749" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="31.666666666666668" height="17"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="17" id="hQa-4Q-xIT">
-                                                <variation key="widthClass=regular" constant="18"/>
-                                            </constraint>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                         <variation key="widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        </variation>
-                                        <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         </variation>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d1W-z7-anZ" userLabel="Subtitle Label">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="250" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="d1W-z7-anZ" userLabel="Subtitle Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="21" width="46.666666666666664" height="15"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="15" id="F1P-zn-bmx">
-                                                <variation key="widthClass=regular" constant="16"/>
-                                            </constraint>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                         <color key="textColor" systemColor="secondaryLabelColor"/>
                                         <nil key="highlightedColor"/>
                                         <variation key="widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                         </variation>
                                         <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         </variation>
                                     </label>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="36" id="RXp-z1-4PU">
-                                        <variation key="widthClass=regular" constant="38"/>
-                                    </constraint>
-                                </constraints>
                                 <variation key="widthClass=regular" spacing="4"/>
                             </stackView>
                         </subviews>
@@ -107,6 +89,7 @@
                 <outlet property="artworkImageWidthConstraint" destination="OsA-td-n73" id="Q6V-ou-Bix"/>
                 <outlet property="entityImage" destination="vhw-xr-Op6" id="0UN-yk-SoR"/>
                 <outlet property="subtitleLabel" destination="d1W-z7-anZ" id="NeW-X1-aKJ"/>
+                <outlet property="textStackView" destination="fZp-PJ-7R1" id="txt-St-Out"/>
                 <outlet property="titleLabel" destination="hHv-Ol-9T7" id="rDP-vC-J3G"/>
             </connections>
             <point key="canvasLocation" x="-353.07692307692304" y="-247.39336492890993"/>

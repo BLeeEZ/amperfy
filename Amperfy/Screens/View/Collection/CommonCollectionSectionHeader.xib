@@ -17,10 +17,13 @@
                 <rect key="frame" x="0.0" y="0.0" width="500" height="30"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jQQ-CF-NUZ">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jQQ-CF-NUZ" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="28.000000000000004" y="5.6666666666666661" width="44.333333333333343" height="20.333333333333336"/>
-                        <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                         <nil key="highlightedColor"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                        <variation key="userInterfaceIdiom=mac">
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                        </variation>
                     </label>
                 </subviews>
                 <constraints>

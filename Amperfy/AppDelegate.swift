@@ -387,6 +387,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
 
+  /// Applies the in-app text size (see `TextScaling`) to the app and all windows
+  func applyTextSize() {
+    let textSize = storage.settings.user.textSize
+    TextScaling.textSize = textSize
+    UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .flatMap { $0.windows }
+      .forEach { window in
+        if let textSize {
+          window.traitOverrides.preferredContentSizeCategory = textSize
+        } else {
+          window.traitOverrides.remove(UITraitPreferredContentSizeCategory.self)
+        }
+      }
+  }
+
   func applicationWillResignActive(_ application: UIApplication) {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.

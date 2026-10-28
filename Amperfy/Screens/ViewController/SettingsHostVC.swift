@@ -251,6 +251,13 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.setAppAppearanceMode(style: newValue)
     }))
 
+    settings.textSize = appDelegate.storage.settings.user.textSize
+    changesAgent.append(settings.$textSize.sink(receiveValue: { newValue in
+      guard self.appDelegate.storage.settings.user.textSize != newValue else { return }
+      self.appDelegate.storage.settings.user.textSize = newValue
+      self.appDelegate.applyTextSize()
+    }))
+
     // following account specific setting sinks are assigned.
     // the correct assignment is done in the account switched callback
 

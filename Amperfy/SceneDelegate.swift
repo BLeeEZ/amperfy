@@ -102,6 +102,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard let windowScene = scene as? UIWindowScene else { return }
     window = UIWindow(windowScene: windowScene)
     appDelegate.window = window
+    // before the first screen is created, so that it starts with the right text size
+    appDelegate.applyTextSize()
     var initialViewController: UIViewController?
 
     #if false
