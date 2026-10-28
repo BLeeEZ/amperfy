@@ -44,6 +44,8 @@ struct ArtworkSettingsView: View {
   var artworkNotCheckedCountText = ""
   @State
   var cachedArtworksCountText = ""
+  @State
+  var artworkCacheSizeText = ""
 
   @State
   var isShowDownloadArtworksAlert = false
@@ -82,6 +84,20 @@ struct ArtworkSettingsView: View {
     }}
   }
 
+  private func updateArtworkCacheSize() {
+    guard let activeAccountInfo = settings.activeAccountInfo else { return }
+    // Walks the artwork directory on disk, so keep it off the main thread and only
+    // trigger it on-demand rather than on the view's 1-second refresh timer.
+    Task.detached(priority: .utility) {
+      let artworkByteSize = fileManager.getArtworkCacheSize(for: activeAccountInfo)
+      let text = (artworkByteSize > 1_000_000) ? artworkByteSize.asByteString : Int64(0)
+        .asByteString
+      await MainActor.run {
+        artworkCacheSizeText = text
+      }
+    }
+  }
+
   var body: some View {
     ZStack {
       SettingsList {
@@ -94,6 +110,9 @@ struct ArtworkSettingsView: View {
           }
           SettingsRow(title: "Cached Artworks") {
             SecondaryText(cachedArtworksCountText)
+          }
+          SettingsRow(title: "Artwork Cache Size") {
+            SecondaryText(artworkCacheSizeText)
           }
 
           if let activeAccountInfo = settings.activeAccountInfo {
@@ -139,6 +158,7 @@ struct ArtworkSettingsView: View {
                   appDelegate.storage.main.library.saveContext()
                   fileManager.deleteRemoteArtworkCache(accountInfo: activeAccountInfo)
                   appDelegate.getMeta(activeAccountInfo).artworkDownloadManager.start()
+                  updateArtworkCacheSize()
                 },
                 secondaryButton: .cancel()
               )
@@ -165,6 +185,7 @@ struct ArtworkSettingsView: View {
     }
     .onAppear {
       updateValues()
+      updateArtworkCacheSize()
     }
     .onReceive(timer) { _ in
       updateValues()
