@@ -334,12 +334,19 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   @MainActor
   func sync(album: Album) async throws {
     try await AlbumSyncCoalescer.sync(album) {
-      try await self.syncAlbumUncoalesced(album)
+      try await self.syncAlbumUncoalesced(album) {
+        try await self.subsonicServerApi.requestAlbum(id: album.id)
+      }
     }
   }
 
+  /// Call `sync(album:)` instead, which coalesces concurrent syncs. Internal
+  /// only so tests can pass a fixed server answer as `requestAlbum`.
   @MainActor
-  private func syncAlbumUncoalesced(_ album: Album) async throws {
+  func syncAlbumUncoalesced(
+    _ album: Album,
+    requestAlbum: @MainActor () async throws -> APIDataResponse
+  ) async throws {
     guard isSyncAllowed, album.remoteStatus != .deleted else { return }
     let albumObjectId = album.managedObject.objectID
 
@@ -367,7 +374,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var albumResponse: APIDataResponse?
     do {
-      albumResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+      albumResponse = try await requestAlbum()
     } catch {
       try await handleNotAvailableAlbum(error: error)
     }
