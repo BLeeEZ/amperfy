@@ -465,12 +465,15 @@ extension UICollectionViewCell {
     })
   }
 
+  /// `@objc` so that subclasses can override it (e.g. `KeyboardFocusableListCell`)
+  @objc
   func markAsFocused() {
     let focuseBackground = UIView(frame: bounds)
     focuseBackground.backgroundColor = .systemGray4
     backgroundView = focuseBackground
   }
 
+  @objc
   func markAsUnfocused() {
     backgroundView = nil
   }

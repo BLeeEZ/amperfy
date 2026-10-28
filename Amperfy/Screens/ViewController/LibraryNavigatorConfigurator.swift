@@ -308,7 +308,7 @@ class LibraryNavigatorConfigurator: NSObject {
   @MainActor
   private func configureDataSource() {
     let cellRegistration = UICollectionView.CellRegistration<
-      UICollectionViewListCell,
+      KeyboardFocusableListCell,
       LibraryNavigatorItem
     > { cell, indexPath, item in
       if !item.isInteractable {
