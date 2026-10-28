@@ -61,11 +61,11 @@ class PlaylistsDiffableDataSource: BasicUITableViewDiffableDataSource {
       return
     }
 
+    guard let account = playlist.account else { return }
     let playlistId = playlist.id
     appDelegate.storage.main.library.deletePlaylist(playlist)
     appDelegate.storage.main.saveContext()
 
-    guard let account = playlist.account else { return }
     Task { @MainActor in do {
       try await self.appDelegate.getMeta(account.info).librarySyncer
         .syncUpload(playlistIdToDelete: playlistId)

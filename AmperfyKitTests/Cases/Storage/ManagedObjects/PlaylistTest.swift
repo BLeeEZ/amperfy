@@ -96,6 +96,16 @@ class PlaylistTest: XCTestCase {
     XCTAssertEqual(playlist.id, id)
   }
 
+  func testAccountIsLostAfterDelete() {
+    let playlist = library.createPlaylist(account: account)
+    XCTAssertNotNil(playlist.account)
+
+    library.deletePlaylist(playlist)
+    library.saveContext()
+    // Callers must read the account before deleting to sync the deletion to the server.
+    XCTAssertNil(playlist.account)
+  }
+
   func testFetch() {
     let playlist = library.createPlaylist(account: account)
     XCTAssertEqual(playlist.account?.serverHash, TestAccountInfo.test1ServerHash)
