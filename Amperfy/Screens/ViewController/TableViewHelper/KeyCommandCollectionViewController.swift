@@ -81,6 +81,11 @@ class CollectionViewKeyCommandsController {
           collectionView.hasItemAt(indexPath: focussedIndexPath)
     else { return }
 
+    // behave like a click: move the selection to the item before handling it
+    let shouldSelect = collectionView.delegate?
+      .collectionView?(collectionView, shouldSelectItemAt: focussedIndexPath) ?? true
+    guard shouldSelect else { return }
+    collectionView.selectItem(at: focussedIndexPath, animated: false, scrollPosition: [])
     collectionView.delegate?.collectionView?(collectionView, didSelectItemAt: focussedIndexPath)
   }
 
@@ -200,5 +205,42 @@ class CollectionViewKeyCommandsController {
     } else {
       return nil
     }
+  }
+}
+
+// MARK: - KeyboardFocusableListCell
+
+/// List cell that shows the keyboard focus (j/k navigation) through its background configuration.
+/// Setting `backgroundView`/`backgroundColor` instead would replace the background configuration
+/// and break the appearance of the selection (e.g. in the sidebar).
+class KeyboardFocusableListCell: UICollectionViewListCell {
+  private var isKeyboardFocused = false {
+    didSet {
+      guard oldValue != isKeyboardFocused else { return }
+      setNeedsUpdateConfiguration()
+    }
+  }
+
+  override func markAsFocused() {
+    isKeyboardFocused = true
+  }
+
+  override func markAsUnfocused() {
+    isKeyboardFocused = false
+  }
+
+  override func prepareForReuse() {
+    super.prepareForReuse()
+    isKeyboardFocused = false
+  }
+
+  override func updateConfiguration(using state: UICellConfigurationState) {
+    super.updateConfiguration(using: state)
+    var background = defaultBackgroundConfiguration().updated(for: state)
+    // the selection appearance has priority over the focus
+    if isKeyboardFocused, !state.isSelected, !state.isHighlighted {
+      background.backgroundColor = .systemGray4
+    }
+    backgroundConfiguration = background
   }
 }
