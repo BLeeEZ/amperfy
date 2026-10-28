@@ -230,6 +230,7 @@
 		50BE5D672850F4FB00156FC6 /* AbstractSsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB92DF2667564800DCE45C /* AbstractSsTest.swift */; };
 		50BE5D682850F4FB00156FC6 /* SsPodcastEpisodesParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501A7D3E2680B04F0055A51B /* SsPodcastEpisodesParserTest.swift */; };
 		50BE5D692850F4FB00156FC6 /* SsXmlParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DB11A9266536290033BFFA /* SsXmlParserTest.swift */; };
+		5000FACE000000000000AC02 /* SubsonicLibrarySyncerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5000FACE000000000000AC01 /* SubsonicLibrarySyncerTest.swift */; };
 		50BE5D6A2850F4FB00156FC6 /* SsAlbumParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50AB92C326661F2600DCE45C /* SsAlbumParserTest.swift */; };
 		50BE5D6B2850F4FB00156FC6 /* SsGenreParserTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DB11B626653B3A0033BFFA /* SsGenreParserTest.swift */; };
 		50BE5D6C2850F4FB00156FC6 /* SsAlbumParserPreCreatedArtistsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */; };
@@ -1072,6 +1073,7 @@
 		50DB11A42665336B0033BFFA /* error-4700.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "error-4700.xml"; sourceTree = "<group>"; };
 		50DB11A6266533720033BFFA /* ErrorParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorParserTest.swift; sourceTree = "<group>"; };
 		50DB11A9266536290033BFFA /* SsXmlParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsXmlParserTest.swift; sourceTree = "<group>"; };
+		5000FACE000000000000AC01 /* SubsonicLibrarySyncerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubsonicLibrarySyncerTest.swift; sourceTree = "<group>"; };
 		50DB11AB266536540033BFFA /* ping_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ping_example_1.xml; sourceTree = "<group>"; };
 		50DB11AE266537910033BFFA /* error_example_1.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = error_example_1.xml; sourceTree = "<group>"; };
 		50DB11B0266537C30033BFFA /* SsPingParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsPingParserTest.swift; sourceTree = "<group>"; };
@@ -2026,6 +2028,7 @@
 				50AB92DF2667564800DCE45C /* AbstractSsTest.swift */,
 				50DB11B0266537C30033BFFA /* SsPingParserTest.swift */,
 				50DB11A9266536290033BFFA /* SsXmlParserTest.swift */,
+				5000FACE000000000000AC01 /* SubsonicLibrarySyncerTest.swift */,
 				50DB11B626653B3A0033BFFA /* SsGenreParserTest.swift */,
 				50AB92BD26660FE000DCE45C /* SsArtistParserTest.swift */,
 				5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */,
@@ -2912,6 +2915,7 @@
 				50BE5D762850F4FB00156FC6 /* SsArtistParserTest.swift in Sources */,
 				50BE5D682850F4FB00156FC6 /* SsPodcastEpisodesParserTest.swift in Sources */,
 				50BE5D692850F4FB00156FC6 /* SsXmlParserTest.swift in Sources */,
+				5000FACE000000000000AC02 /* SubsonicLibrarySyncerTest.swift in Sources */,
 				50BE5D8C2850F50F00156FC6 /* AlbumParserTest.swift in Sources */,
 				50BE5D8A2850F50F00156FC6 /* ErrorParserTest.swift in Sources */,
 				50BE5D942850F51E00156FC6 /* UnitTestHelper.swift in Sources */,
