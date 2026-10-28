@@ -139,6 +139,21 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
     }
   }
 
+  /// Songs without an album are never part of an album sync, which is where remote deleted
+  /// songs are normally detected. Mark them as deleted once they are no longer contained in
+  /// any directory or music folder. If such a song was only moved, parsing it in its new
+  /// location sets it back to available.
+  private func markAlbumlessSongsAsRemoteDeleted(_ songs: Set<Song>) {
+    songs.lazy
+      .filter {
+        $0.album == nil && $0.managedObject.directory == nil && $0.managedObject.musicFolder == nil
+      }
+      .forEach {
+        os_log("Song <%s> is remote deleted", log: self.log, type: .info, $0.displayString)
+        $0.remoteStatus = .deleted
+      }
+  }
+
   override func parser(
     _ parser: XMLParser,
     didEndElement elementName: String,
@@ -152,10 +167,12 @@ class SsDirectoryParserDelegate: SsSongParserDelegate {
       if let directory = directory {
         let removedSongs = songsBeforeFetch.subtracting(songsParsed)
         removedSongs.forEach { directory.managedObject.removeFromSongs($0.managedObject) }
+        markAlbumlessSongsAsRemoteDeleted(removedSongs)
         directory.isCached = isCollectionCached
       } else if let musicFolder = musicFolder {
         let removedSongs = songsBeforeFetch.subtracting(songsParsed)
         removedSongs.forEach { musicFolder.managedObject.removeFromSongs($0.managedObject) }
+        markAlbumlessSongsAsRemoteDeleted(removedSongs)
         musicFolder.isCached = isCollectionCached
       }
     }
