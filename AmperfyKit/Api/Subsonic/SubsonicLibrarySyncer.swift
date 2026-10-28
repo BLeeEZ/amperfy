@@ -367,7 +367,14 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var albumResponse: APIDataResponse?
     do {
-      albumResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+      let response = try await subsonicServerApi.requestAlbum(id: album.id)
+      // Servers like Navidrome answer a deleted album with HTTP 200 and error 70;
+      // parsing it below cannot report that, the storage swallows thrown errors
+      if let error = await errorResponse(of: response),
+         error.asSubsonicError?.isRemoteAvailable == false {
+        throw error
+      }
+      albumResponse = response
     } catch {
       try await handleNotAvailableAlbum(error: error)
     }
@@ -1379,6 +1386,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private func parseForError(response: APIDataResponse) throws {
     let parserDelegate = SsPingParserDelegate(performanceMonitor: performanceMonitor)
     try parse(response: response, delegate: parserDelegate)
+  }
+
+  /// Parses the server's error, if any, off the main actor.
+  nonisolated private func errorResponse(of response: APIDataResponse) async -> ResponseError? {
+    subsonicServerApi.checkForErrorResponse(response: response)
   }
 
   nonisolated private func parse(
