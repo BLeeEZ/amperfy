@@ -23,7 +23,8 @@ import AmperfyKit
 import UIKit
 
 class CommonCollectionSectionHeader: UICollectionReusableView {
-  static let frameHeight: CGFloat = 30.0
+  /// Scales with the user's text size (30pt at the default text size)
+  static var frameHeight: CGFloat { TextScaling.scaledValue(30.0) }
 
   @IBOutlet
   weak var titleLabel: UILabel!

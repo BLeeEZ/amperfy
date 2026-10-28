@@ -81,8 +81,7 @@ class PlaylistAddArtistsVC: SingleSnapshotFetchedResultsTableViewController<Arti
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
-    tableView.rowHeight = GenericTableCell.rowHeight
-    tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { GenericTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0

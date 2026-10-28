@@ -154,6 +154,7 @@ class SearchVC: BasicTableViewController {
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.reloadOnTextSizeChange()
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
