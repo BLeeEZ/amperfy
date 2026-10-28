@@ -383,12 +383,23 @@ class BackendAudioPlayer: NSObject {
     }
   }
 
+  /// A time offset at or behind the end makes the server answer with a stream without audio frames,
+  /// the player then stalls on the last position. Start the last second instead.
+  static func streamRestartTimeOffset(forSecond second: Double, duration: Double) -> Int {
+    let timeOffset = Int(max(second, 0).rounded())
+    guard duration.isFinite, duration >= 1 else { return timeOffset }
+    return min(timeOffset, Int(duration) - 1)
+  }
+
   private func restartStream(atSecond second: Double) {
     guard let playable = currentPlayable, let accountInfo = playable.account?.info,
           let streamingMaxBitrate = activeStreamingBitrate,
           let streamingTranscodingFormat = activeTranscodingFormat else { return }
     guard second.isFinite else { return }
-    let timeOffset = Int(max(second, 0).rounded())
+    let timeOffset = Self.streamRestartTimeOffset(
+      forSecond: second,
+      duration: currentMetadataDuration
+    )
     if shouldPlayAfterStreamRestart == nil {
       shouldPlayAfterStreamRestart = isPlaying
     }

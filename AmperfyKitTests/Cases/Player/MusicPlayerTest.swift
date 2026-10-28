@@ -1680,6 +1680,17 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(elapsedTime, 3.0)
   }
 
+  func testStreamRestartTimeOffset() {
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 20.4, duration: 35), 20)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: -3, duration: 35), 0)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 34, duration: 35), 34)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 35, duration: 35), 34)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 100, duration: 35), 34)
+    // unknown or too short metadata duration: no clamping
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 20, duration: 0), 20)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 20, duration: 0.5), 20)
+  }
+
   func testPlayPreviousOrReplay_EmptyPlaylist() {
     testPlayer.playPreviousOrReplay()
     XCTAssertEqual(testPlayer.currentlyPlaying, nil)
