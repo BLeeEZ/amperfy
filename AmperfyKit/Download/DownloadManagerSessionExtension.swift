@@ -115,11 +115,12 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
   nonisolated func urlSession(
     _ session: URLSession,
     didReceive challenge: URLAuthenticationChallenge,
-    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()
   ) {
-    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodClientCertificate,
-          let credential = ClientCertificateManager.shared
-          .credentialForAccountOrLogin(accountIdent: clientCertificateAccountIdent)
+    guard challenge.protectionSpace
+      .authenticationMethod == NSURLAuthenticationMethodClientCertificate,
+      let credential = ClientCertificateManager.shared
+      .credentialForAccountOrLogin(accountIdent: clientCertificateAccountIdent)
     else {
       completionHandler(.performDefaultHandling, nil)
       return

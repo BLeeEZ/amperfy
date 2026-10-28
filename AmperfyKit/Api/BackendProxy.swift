@@ -345,7 +345,8 @@ public final class BackendProxy: Sendable {
       // Present the client certificate on the reachability probe itself. With per-request mTLS
       // (no session cookie) every connection must carry the certificate, so a plain session is
       // rejected with 403 before login can proceed.
-      let sessionDelegate = clientCredential.map { ClientCertificateURLSessionDelegate(credential: $0) }
+      let sessionDelegate = clientCredential
+        .map { ClientCertificateURLSessionDelegate(credential: $0) }
       let session = URLSession(
         configuration: sessionConfig,
         delegate: sessionDelegate,

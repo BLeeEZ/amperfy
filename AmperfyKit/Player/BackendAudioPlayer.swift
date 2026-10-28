@@ -586,7 +586,8 @@ class BackendAudioPlayer: NSObject {
           "Streaming mTLS certificate for account %{public}@: %{public}@",
           accountInfo.ident,
           ClientCertificateManager.shared
-            .credentialForAccountOrLogin(accountIdent: accountInfo.ident) != nil ? "found" : "MISSING"
+            .credentialForAccountOrLogin(accountIdent: accountInfo.ident) != nil ? "found" :
+            "MISSING"
         )
         return try await backendApi.generateUrl(
           forStreamingPlayable: playable.info,
