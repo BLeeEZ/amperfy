@@ -464,7 +464,7 @@ extension BasicFetchedResultsController where ResultType == DownloadMO {
 public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsController<ResultType>
   where ResultType: NSFetchRequestResult {
   let account: Account
-  var keepAllResultsUpdated = true
+  let keepAllResultsUpdated: Bool
   private var didFetchAll = false
   private var didFetchSearch = false
   private var lastSearchPredicateFormat: String?
@@ -495,9 +495,11 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
     fetchRequest: NSFetchRequest<ResultType>,
     account: Account,
     sectionIndexType: SectionIndexType = .defaultValue,
-    isGroupedInAlphabeticSections: Bool
+    isGroupedInAlphabeticSections: Bool,
+    keepAllResultsUpdated: Bool = true
   ) {
     self.account = account
+    self.keepAllResultsUpdated = keepAllResultsUpdated
     self.sectionIndexType = sectionIndexType
     let sectionNameKeyPath: String? = isGroupedInAlphabeticSections ? fetchRequest
       .sortDescriptors![0].key : nil
@@ -505,7 +507,9 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
       fetchRequest: fetchRequest.copy() as! NSFetchRequest<ResultType>,
       coreDataCompanion: coreDataCompanion,
       sectionNameKeyPath: sectionNameKeyPath,
-      cacheName: "\(Self.typeName)-\(account.serverHash)-\(account.userHash)"
+      // no delegate means no change tracking, so a persistent cache would go stale
+      cacheName: keepAllResultsUpdated ?
+        "\(Self.typeName)-\(account.serverHash)-\(account.userHash)" : nil
     )
     allFetchResulsController.sectionIndexType = sectionIndexType
     self.searchFetchResulsController = CustomSectionIndexFetchedResultsController<ResultType>(
