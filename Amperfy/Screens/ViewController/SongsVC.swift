@@ -292,10 +292,13 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     return convertIndexPathToPlayContext(songIndexPath: indexPath)
   }
 
+  private let searchTaskRunner = SearchTaskRunner()
+
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
+    searchTaskRunner.cancelAll()
     if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
-      Task { @MainActor in do {
+      searchTaskRunner.runRemoteSearch(searchText: searchText) { do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchSongs(searchText: searchText)
       } catch {

@@ -1235,6 +1235,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed, !searchText.isEmpty else { return }
     os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchArtists(searchText: searchText)
+    guard !Task.isCancelled else { return }
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -1261,6 +1262,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed, !searchText.isEmpty else { return }
     os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchAlbums(searchText: searchText)
+    guard !Task.isCancelled else { return }
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -1287,6 +1289,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed, !searchText.isEmpty else { return }
     os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchSongs(searchText: searchText)
+    guard !Task.isCancelled else { return }
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
