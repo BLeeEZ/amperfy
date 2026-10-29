@@ -233,6 +233,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     guard appDelegate.isNormalInteraction else {
       return
     }
+    appDelegate.player.savePlayPosition()
+    appDelegate.storage.main.saveContext()
     appDelegate.scheduleAppRefresh()
   }
 

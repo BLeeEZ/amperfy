@@ -231,6 +231,7 @@ public protocol PlayerFacade {
   func updateEqualizerEnabled(isEnabled: Bool)
   func updateEqualizerSetting(eqSetting: EqualizerSetting)
   func updateReplayGainEnabled(isEnabled: Bool)
+  func savePlayPosition()
 }
 
 extension PlayerFacade {
@@ -672,5 +673,9 @@ class PlayerFacadeImpl: PlayerFacade {
 
   func addNotifier(notifier: MusicPlayable) {
     musicPlayer.addNotifier(notifier: notifier)
+  }
+
+  func savePlayPosition() {
+    musicPlayer.savePlayPosition()
   }
 }
