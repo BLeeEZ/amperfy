@@ -269,6 +269,13 @@ public protocol BackendApi: URLCleanser, Sendable {
     maxBitrate: StreamingMaxBitratePreference,
     formatPreference: StreamingFormatPreference
   ) async throws -> URL
+  /// Stream starting at `timeOffset` seconds; throws `BackendError.notSupported` if the server can't do it
+  func generateUrl(
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference,
+    timeOffset: Int
+  ) async throws -> URL
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError?
   @MainActor

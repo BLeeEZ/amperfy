@@ -94,6 +94,24 @@ extension SubsonicApi: BackendApi {
     )
   }
 
+  func generateUrl(
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference,
+    timeOffset: Int
+  ) async throws
+    -> URL {
+    guard await subsonicServerApi.isOpenSubsonicExtensionSupported(extension: .transcodeOffset)
+    else { throw BackendError.notSupported }
+    let apiId = playableInfo.streamId ?? playableInfo.id
+    return try await subsonicServerApi.generateUrl(
+      forStreamingPlayableId: apiId,
+      maxBitrate: maxBitrate,
+      formatPreference: formatPreference,
+      timeOffset: timeOffset
+    )
+  }
+
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
     try await subsonicServerApi.generateUrl(forArtworkId: artwork.id)
   }
