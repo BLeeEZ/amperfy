@@ -92,6 +92,9 @@ actor DownloadManager: NSObject, DownloadManageable {
   private let eventLogger: EventLogger
   private let settings: AmperfySettings
   private let urlCleanser: URLCleanser
+  // Account ident used to resolve the client certificate to present on mTLS challenges.
+  // Immutable and Sendable, so it is safe to read from the nonisolated URLSession delegate.
+  internal let clientCertificateAccountIdent: String?
 
   private var isRunning = false
   private var taskOperations = [DownloadRequest: DownloadOperation]()
@@ -115,7 +118,8 @@ actor DownloadManager: NSObject, DownloadManageable {
     notificationHandler: EventNotificationHandler,
     urlCleanser: URLCleanser,
     limitCacheSize: Bool,
-    isFailWithPopupError: Bool
+    isFailWithPopupError: Bool,
+    clientCertificateAccountIdent: String? = nil
   ) {
     self.name = name
     self.log = OSLog(subsystem: "Amperfy", category: name)
@@ -129,6 +133,7 @@ actor DownloadManager: NSObject, DownloadManageable {
     self.urlCleanser = urlCleanser
     self.isCacheSizeLimited = limitCacheSize
     self.isFailWithPopupError = isFailWithPopupError
+    self.clientCertificateAccountIdent = clientCertificateAccountIdent
     self.taskQueue = OperationQueue()
 
     super.init()
