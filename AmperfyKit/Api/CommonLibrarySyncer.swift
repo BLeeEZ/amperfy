@@ -36,12 +36,22 @@ enum AlbumSyncCoalescer {
   /// albums share the empty server id, so the server id cannot be the key.
   /// Static because the proxy creates a new syncer for every call.
   private static var runningSyncs = [NSManagedObjectID: Task<(), Error>]()
+  /// Albums claimed by a batched sync. Other batches skip them; a single album
+  /// sync waits for the batch and then syncs the album itself, so its caller
+  /// still gets that album's own result.
+  private static var batchSyncs = [NSManagedObjectID: Task<(), Never>]()
+  /// A write that may touch songs of any album, such as a bulk song page. While
+  /// it is pending or running, every album sync waits for it.
+  private static var exclusiveSync: Task<(), Never>?
 
   static func sync(
     _ album: Album,
     operation: @escaping @MainActor @Sendable () async throws -> ()
   ) async throws {
     let albumObjectID = album.managedObject.objectID
+    while let pendingSync = exclusiveSync ?? batchSyncs[albumObjectID] {
+      await pendingSync.value
+    }
     if let runningSync = runningSyncs[albumObjectID] {
       return try await runningSync.value
     }
@@ -57,12 +67,70 @@ enum AlbumSyncCoalescer {
     runningSyncs[albumObjectID] = syncTask
     try await syncTask.value
   }
+
+  /// Batched variant: one operation syncs several albums at once. Albums with a
+  /// sync in flight elsewhere are awaited instead of synced again, so the
+  /// operation only receives the albums it claimed.
+  static func sync(
+    albumObjectIDs: [NSManagedObjectID],
+    operation: @escaping @MainActor @Sendable ([NSManagedObjectID]) async -> ()
+  ) async {
+    while let pendingSync = exclusiveSync {
+      await pendingSync.value
+    }
+    let albumSyncsElsewhere = albumObjectIDs.compactMap { runningSyncs[$0] }
+    let batchSyncsElsewhere = albumObjectIDs.compactMap { batchSyncs[$0] }
+    let claimedObjectIDs = albumObjectIDs.filter {
+      runningSyncs[$0] == nil && batchSyncs[$0] == nil
+    }
+    if !claimedObjectIDs.isEmpty {
+      let syncTask = Task { @MainActor in
+        defer { claimedObjectIDs.forEach { Self.batchSyncs[$0] = nil } }
+        await operation(claimedObjectIDs)
+      }
+      claimedObjectIDs.forEach { batchSyncs[$0] = syncTask }
+      await syncTask.value
+    }
+    for albumSync in albumSyncsElsewhere {
+      _ = try? await albumSync.value
+    }
+    for batchSync in batchSyncsElsewhere {
+      await batchSync.value
+    }
+  }
+
+  /// Exclusive variant for a write that may touch songs of any album: it waits
+  /// until no album sync is in flight, and album syncs started meanwhile wait
+  /// until it has finished.
+  static func syncExclusively<Result: Sendable>(
+    operation: @escaping @MainActor @Sendable () async throws -> Result
+  ) async throws
+    -> Result {
+    while let pendingSync = exclusiveSync {
+      await pendingSync.value
+    }
+    let syncTask = Task { @MainActor in
+      defer { Self.exclusiveSync = nil }
+      while let albumSync = runningSyncs.values.first {
+        _ = try? await albumSync.value
+      }
+      while let batchSync = batchSyncs.values.first {
+        await batchSync.value
+      }
+      return try await operation()
+    }
+    exclusiveSync = Task { @MainActor in _ = try? await syncTask.value }
+    return try await syncTask.value
+  }
 }
 
 // MARK: - CommonLibrarySyncer
 
 @MainActor
 class CommonLibrarySyncer {
+  static let maxParallelSyncRequests: Int = 4
+  static let songSyncBatchSize: Int = 16
+
   let account: Account
   let accountObjectId: NSManagedObjectID
   let networkMonitor: NetworkMonitorFacade
@@ -177,4 +245,139 @@ class CommonLibrarySyncer {
       }
     }
   }
+
+  @MainActor
+  func waitWhileThermalStateCritical(
+    previousWaitCount: Int,
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async
+    -> (isCancelled: Bool, waitCount: Int) {
+    var waitCount = previousWaitCount
+    guard ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 else {
+      return (false, waitCount)
+    }
+    os_log("Album songs sync paused: critical thermal state", log: log, type: .info)
+    while ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 {
+      waitCount += 1
+      try? await Task.sleep(nanoseconds: 10_000_000_000)
+      guard !isCancelled() else { return (true, waitCount) }
+    }
+    return (false, waitCount)
+  }
+
+  @MainActor
+  func syncAlbumSongsBatched<Payload: Sendable>(
+    targets: [AlbumSyncTarget],
+    batchSize: Int,
+    maxParallelFetches: Int,
+    isCancelled: @escaping @Sendable () -> Bool,
+    fetch: @escaping @MainActor @Sendable (String) async throws -> Payload,
+    write: @escaping @Sendable (CoreDataCompanion, NSManagedObjectID, Payload) throws -> (),
+    classifyNotAvailable: @escaping @Sendable (Error) -> Bool
+  ) async {
+    var index = 0
+    var lastParallelFetches = maxParallelFetches
+    var criticalThermalWaits = 0
+    while index < targets.count {
+      guard !isCancelled() else { return }
+      let thermalWait = await waitWhileThermalStateCritical(
+        previousWaitCount: criticalThermalWaits,
+        isCancelled: isCancelled
+      )
+      criticalThermalWaits = thermalWait.waitCount
+      guard !thermalWait.isCancelled else { return }
+      let thermalState = ProcessInfo.processInfo.thermalState
+      let isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
+      let isThermalThrottled = thermalState == .serious || thermalState == .critical
+      let parallelFetches = isLowPower || thermalState == .critical
+        ? 1 : (isThermalThrottled ? 2 : maxParallelFetches)
+      if parallelFetches != lastParallelFetches {
+        os_log(
+          "Album songs sync parallel fetches: %i (thermal throttled: %s, low power: %s)",
+          log: log,
+          type: .info,
+          parallelFetches,
+          isThermalThrottled ? "yes" : "no",
+          isLowPower ? "yes" : "no"
+        )
+        lastParallelFetches = parallelFetches
+      }
+      let batch = Array(targets[index ..< min(index + batchSize, targets.count)])
+      index += batchSize
+
+      await AlbumSyncCoalescer.sync(albumObjectIDs: batch.map(\.objectID)) { claimedObjectIDs in
+        let claimedTargets = batch.filter { claimedObjectIDs.contains($0.objectID) }
+        var results = [(NSManagedObjectID, AlbumSongsFetchResult<Payload>)]()
+        var iterator = claimedTargets.makeIterator()
+        await withTaskGroup(of: (NSManagedObjectID, AlbumSongsFetchResult<Payload>).self) { group in
+          for _ in 0 ..< parallelFetches {
+            guard let target = iterator.next() else { break }
+            group.addTask { @MainActor @Sendable in
+              do {
+                return (target.objectID, .fetched(try await fetch(target.id)))
+              } catch {
+                self.eventLogger.report(
+                  topic: "Album Background Sync",
+                  error: error,
+                  displayPopup: false
+                )
+                return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
+              }
+            }
+          }
+          while let result = await group.next() {
+            results.append(result)
+            guard let target = iterator.next() else { continue }
+            group.addTask { @MainActor @Sendable in
+              do {
+                return (target.objectID, .fetched(try await fetch(target.id)))
+              } catch {
+                self.eventLogger.report(
+                  topic: "Album Background Sync",
+                  error: error,
+                  displayPopup: false
+                )
+                return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
+              }
+            }
+          }
+        }
+
+        let batchResults = results
+        guard !isCancelled() else { return }
+        try? await self.storage.async.perform { asyncCompanion in
+          for (objectID, result) in batchResults {
+            guard let albumMO = try? asyncCompanion.context
+              .existingObject(with: objectID) as? AlbumMO
+            else { continue }
+            let albumAsync = Album(managedObject: albumMO)
+            switch result {
+            case let .fetched(payload):
+              do {
+                try write(asyncCompanion, objectID, payload)
+              } catch {
+                if classifyNotAvailable(error) {
+                  albumAsync.markAsRemoteDeleted()
+                } else {
+                  albumAsync.isSongsMetaDataSynced = true
+                }
+              }
+            case .notAvailable:
+              albumAsync.markAsRemoteDeleted()
+            case .failed:
+              albumAsync.isSongsMetaDataSynced = true
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// MARK: - AlbumSongsFetchResult
+
+enum AlbumSongsFetchResult<Payload: Sendable>: Sendable {
+  case fetched(Payload)
+  case notAvailable
+  case failed
 }
