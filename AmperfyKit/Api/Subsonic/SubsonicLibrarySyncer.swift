@@ -1426,27 +1426,30 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         songOffset: songOffset,
         count: Self.maxItemCountToPollAtOnce
       )
-      let page = try await storage.async.performAndGet { asyncCompanion in
-        let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-        let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
-        try self.parse(
-          response: songResponse,
-          delegate: idParserDelegate,
-          isThrowingErrorsAllowed: false
-        )
-        let prefetch = asyncCompanion.library.getElements(
-          account: accountAsync,
-          prefetchIDs: idParserDelegate.prefetchIDs
-        )
-        let parserDelegate = SsSongParserDelegate(
-          performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
-          library: asyncCompanion.library
-        )
-        try self.parse(response: songResponse, delegate: parserDelegate)
-        return (
-          songCount: parserDelegate.parsedSongs.count,
-          albumIDs: parserDelegate.parsedSongs.compactMap { $0.album?.id }
-        )
+      let page = try await AlbumSyncCoalescer.syncExclusively {
+        try await self.storage.async.performAndGet { asyncCompanion in
+          let accountAsync = asyncCompanion.library
+            .getAccount(managedObjectId: self.accountObjectId)
+          let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+          try self.parse(
+            response: songResponse,
+            delegate: idParserDelegate,
+            isThrowingErrorsAllowed: false
+          )
+          let prefetch = asyncCompanion.library.getElements(
+            account: accountAsync,
+            prefetchIDs: idParserDelegate.prefetchIDs
+          )
+          let parserDelegate = SsSongParserDelegate(
+            performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
+            library: asyncCompanion.library
+          )
+          try self.parse(response: songResponse, delegate: parserDelegate)
+          return (
+            songCount: parserDelegate.parsedSongs.count,
+            albumIDs: parserDelegate.parsedSongs.compactMap { $0.album?.id }
+          )
+        }
       }
       guard !isCancelled() else { return false }
       guard page.songCount > 0 else { break }
