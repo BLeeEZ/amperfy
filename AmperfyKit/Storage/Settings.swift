@@ -118,6 +118,12 @@ public struct UserSettings: Sendable, Codable {
     set { _isShowMusicPlayerSkipButtons = newValue }
   }
 
+  private var _isToolbarPlayerAutoCollapse: Bool = true
+  public var isToolbarPlayerAutoCollapse: Bool {
+    get { _isToolbarPlayerAutoCollapse }
+    set { _isToolbarPlayerAutoCollapse = newValue }
+  }
+
   private var _isLyricsSmoothScrolling: Bool = true
   public var isLyricsSmoothScrolling: Bool {
     get { _isLyricsSmoothScrolling }

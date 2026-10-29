@@ -164,6 +164,16 @@ struct DisplaySettingsView: View {
           footer:
           "The player shuffle button is displayed but non-interactive."
         )
+
+        #if !targetEnvironment(macCatalyst)
+          SettingsSection(
+            content: {
+              SettingsCheckBoxRow(title: "Collapse Toolbar Player", isOn: $settings.isToolbarPlayerAutoCollapse)
+            },
+            footer:
+            "Collapse the toolbar player into a compact view when scrolling"
+          )
+        #endif
       }
     }
     .navigationTitle("Display")
