@@ -650,6 +650,45 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertTrue(songDownloader.isNoDownloadRequested())
   }
 
+  func testPlayContextWindow_ShortList_WholeListKept() {
+    let w = PlayContext.window(count: 50, index: 10, maxCount: 500)
+    XCTAssertEqual(w.range, 0 ..< 50)
+    XCTAssertEqual(w.index, 10)
+  }
+
+  func testPlayContextWindow_ExactlyMaxCount_WholeListKept() {
+    let w = PlayContext.window(count: 500, index: 250, maxCount: 500)
+    XCTAssertEqual(w.range, 0 ..< 500)
+    XCTAssertEqual(w.index, 250)
+  }
+
+  func testPlayContextWindow_LongList_Start() {
+    let w = PlayContext.window(count: 1000, index: 0, maxCount: 500)
+    XCTAssertEqual(w.range, 0 ..< 500)
+    XCTAssertEqual(w.index, 0)
+  }
+
+  func testPlayContextWindow_LongList_Middle() {
+    let w = PlayContext.window(count: 1000, index: 500, maxCount: 500)
+    XCTAssertEqual(w.range, 250 ..< 750)
+    XCTAssertEqual(w.index, 250)
+  }
+
+  func testPlayContextWindow_LongList_End() {
+    let w = PlayContext.window(count: 1000, index: 999, maxCount: 500)
+    XCTAssertEqual(w.range, 500 ..< 1000)
+    XCTAssertEqual(w.index, 499)
+  }
+
+  func testPlayContextWindow_LongList_TappedTrackAlwaysInside() {
+    for index in stride(from: 0, to: 1000, by: 37) {
+      let w = PlayContext.window(count: 1000, index: index, maxCount: 500)
+      XCTAssertEqual(w.range.count, 500)
+      XCTAssertTrue(w.range.contains(index))
+      XCTAssertEqual(w.range.lowerBound + w.index, index)
+    }
+  }
+
   func testPlay_EmptyPlaylist() {
     testPlayer.play()
     XCTAssertFalse(testPlayer.isPlaying)
