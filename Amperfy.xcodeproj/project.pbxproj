@@ -539,6 +539,8 @@
 		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
+		FF29759467EF5E3E621BB9C8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FF92BC30113A52E6D0172980 /* Localizable.xcstrings */; };
+		FF995AF613AA26D4DA4B3F7C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = FFA55C6D2E28417BCE4EDB04 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1164,6 +1166,8 @@
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v39.xcdatamodel"; sourceTree = "<group>"; };
 		64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v46.xcdatamodel"; sourceTree = "<group>"; };
+		FF92BC30113A52E6D0172980 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		FFA55C6D2E28417BCE4EDB04 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1492,6 +1496,7 @@
 				508EBB522850CB070053D9F0 /* Intents */,
 				508385F321C5965E00C4BB32 /* Info.plist */,
 				5078AFB32B44AE260038FD17 /* AppIntentVocabulary.plist */,
+				FF92BC30113A52E6D0172980 /* Localizable.xcstrings */,
 				50ACAF1327B277B50039913C /* Amperfy.entitlements */,
 				641708582C13BF5100BA2619 /* Haptics.swift */,
 			);
@@ -1914,6 +1919,7 @@
 				5087DE382EF0437F00644893 /* MetaManager.swift */,
 				50C9D607284FA847007F18D0 /* AmperfyKit.h */,
 				50C9D608284FA847007F18D0 /* AmperfyKit.docc */,
+				FFA55C6D2E28417BCE4EDB04 /* Localizable.xcstrings */,
 			);
 			path = AmperfyKit;
 			sourceTree = "<group>";
@@ -2316,6 +2322,8 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
+				"zh-Hant",
 			);
 			mainGroup = 508385DB21C5965B00C4BB32;
 			packageReferences = (
@@ -2371,6 +2379,7 @@
 				508385ED21C5965B00C4BB32 /* Main.storyboard in Resources */,
 				500B97D02B7C9555005554BF /* EntityPreviewVC.xib in Resources */,
 				50A30E642B756CF100722894 /* CurrentlyPlayingTableCell.xib in Resources */,
+				FF29759467EF5E3E621BB9C8 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2381,6 +2390,7 @@
 				50C9D71D2850880A007F18D0 /* EntityImageView.xib in Resources */,
 				50D770A02E4F20000075D3BF /* AmperfyAppIcon.icon in Resources */,
 				508EBB292850C8DF0053D9F0 /* Assets.xcassets in Resources */,
+				FF995AF613AA26D4DA4B3F7C /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
