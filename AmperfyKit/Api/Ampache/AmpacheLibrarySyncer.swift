@@ -402,11 +402,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       let albumSongsResponse = try await ampacheXmlServerApi.requestAlbumSongs(id: album.id)
       let payload = AlbumSyncPayload(albumInfo: albumInfoResponse, albumSongs: albumSongsResponse)
       try await storage.async.perform { asyncCompanion in
-        try self.writeAlbumSongs(
-          asyncCompanion: asyncCompanion,
-          albumObjectId: albumObjectId,
-          payload: payload
-        )
+        do {
+          try self.writeAlbumSongs(
+            asyncCompanion: asyncCompanion,
+            albumObjectId: albumObjectId,
+            payload: payload
+          )
+        } catch let error as ResponseError where error.asAmpacheError?.isRemoteAvailable == false {
+          Album(managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO)
+            .markAsRemoteDeleted()
+        }
       }
     } catch {
       try await handleNotAvailableAlbum(error: error)
