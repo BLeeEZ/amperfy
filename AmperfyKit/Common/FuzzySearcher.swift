@@ -50,7 +50,9 @@ public class FuzzySearcher {
     let fuse = Fuse()
     let foldedSearch = search.folding(options: foldOptions, locale: nil)
     let searchWords = splitInWords(foldedSearch)
-    guard !searchWords.isEmpty else { return [] }
+    guard !searchWords.isEmpty else {
+      return findBestFuzzyMatch(in: items, search: search, searchableText: searchableText)
+    }
     // Improve performance by creating the patterns once
     let patterns = searchWords.map { fuse.createPattern(from: $0) }
 
