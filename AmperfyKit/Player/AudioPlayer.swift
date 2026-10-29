@@ -41,6 +41,8 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   static let progressTimeStartThreshold: Double = 15.0
   static let progressTimeEndThreshold: Double = 15.0
 
+  var trackChangeDebounceDelay: TimeInterval = 0.3
+
   var currentlyPlaying: AbstractPlayable? {
     queueHandler.currentlyPlaying
   }
@@ -64,6 +66,9 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   private var notifierList: [WeakMusicPlayable] = []
   public private(set) var currentRadioNowPlaying: RadioNowPlayingInfo?
   private var lastRadioStreamTitle: String?
+  private var pendingTrackChange: DispatchWorkItem?
+  private var pendingTrackChangePlayable: AbstractPlayable?
+  private var lastTrackChangeDate: Date = .distantPast
 
   init(
     coreData: PlayerStatusPersistent,
@@ -108,6 +113,29 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func insertIntoPlayer(playable: AbstractPlayable) {
+    cancelPendingTrackChange()
+    if Date().timeIntervalSince(lastTrackChangeDate) >= trackChangeDebounceDelay {
+      performTrackChange(playable: playable)
+    } else {
+      pendingTrackChangePlayable = playable
+      let workItem = DispatchWorkItem { [weak self] in
+        MainActor.assumeIsolated {
+          guard let self = self else { return }
+          self.pendingTrackChange = nil
+          self.pendingTrackChangePlayable = nil
+          self.performTrackChange(playable: playable)
+        }
+      }
+      pendingTrackChange = workItem
+      DispatchQueue.main.asyncAfter(
+        deadline: .now() + trackChangeDebounceDelay,
+        execute: workItem
+      )
+    }
+  }
+
+  private func performTrackChange(playable: AbstractPlayable) {
+    lastTrackChangeDate = Date()
     userStatistics.playedItem(
       repeatMode: playerStatus.repeatMode,
       isShuffle: playerStatus.isShuffle
@@ -120,11 +148,26 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     )
   }
 
+  private func cancelPendingTrackChange() {
+    pendingTrackChange?.cancel()
+    pendingTrackChange = nil
+    pendingTrackChangePlayable = nil
+  }
+
+  private func flushPendingTrackChange() {
+    guard let playable = pendingTrackChangePlayable else { return }
+    cancelPendingTrackChange()
+    performTrackChange(playable: playable)
+  }
+
   // BackendAudioPlayerNotifiable
   func notifyItemPreparationFinished() {
     handleRadioStartIfNeeded()
     notifyItemStartedPlayingFromBeginning()
     notifyItemStartedPlaying()
+    if backendAudioPlayer.isPlaybackStartSuppressed {
+      notifyItemPaused()
+    }
   }
 
   // BackendAudioPlayerNotifiable
@@ -147,7 +190,9 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   func play() {
-    if !backendAudioPlayer.canBeContinued {
+    if pendingTrackChangePlayable != nil {
+      flushPendingTrackChange()
+    } else if !backendAudioPlayer.canBeContinued {
       if let currentPlayable = currentlyPlaying {
         insertIntoPlayer(playable: currentPlayable)
       }
@@ -243,6 +288,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   func pause() {
+    flushPendingTrackChange()
     if let currentlyPlaying = currentlyPlaying,
        currentlyPlaying.isRadio {
       stopButRemainIndex()
@@ -254,12 +300,14 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
 
   // BackendAudioPlayerNotifiable
   func stop() {
+    cancelPendingTrackChange()
     backendAudioPlayer.stop()
     playerStatus.stop()
     notifyPlayerStopped()
   }
 
   func stopButRemainIndex() {
+    cancelPendingTrackChange()
     backendAudioPlayer.stop()
     notifyPlayerStopped()
   }
@@ -307,7 +355,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   private func savePlayInformation(of playable: AbstractPlayable) {
     let playDuration = backendAudioPlayer.duration
     let playProgress = backendAudioPlayer.elapsedTime
-    if playDuration != 0.0, playProgress != 0.0, playable == currentlyPlaying {
+    if playDuration != 0.0, playProgress != 0.0, playable == backendAudioPlayer.nowPlayingPlayable {
       playable.playDuration = Int(playDuration)
       if playProgress > Self.progressTimeStartThreshold,
          playProgress < (playDuration - Self.progressTimeEndThreshold) {
