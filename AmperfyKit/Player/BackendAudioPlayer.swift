@@ -96,6 +96,9 @@ class BackendAudioPlayer: NSObject {
   private var userDefinedPlaybackRate: PlaybackRate = .one
   private var currentPreparedUrl: String = ""
   private var currentPlayUrl: String = ""
+  private var requestGeneration = 0
+  private(set) var isPlaybackStartSuppressed = false
+  private(set) var nowPlayingPlayable: AbstractPlayable?
   private var nextPreloadedPlayable: AbstractPlayable?
   private var nextPreloadedUrl: String = ""
   /// Duration from the server metadata, used while the player can't determine it
@@ -291,12 +294,15 @@ class BackendAudioPlayer: NSObject {
           Task { @MainActor in
             do {
               try await insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
+              guard nextPreloadedPlayable == self.nextPreloadedPlayable else { return }
               if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable,
                  let accountInfo = nextPreloadedPlayable.account?.info {
                 self.getPlayableDownloaderCB(accountInfo).download(object: nextPreloadedPlayable)
               }
             } catch {
-              self.nextPreloadedPlayable = nil
+              if nextPreloadedPlayable == self.nextPreloadedPlayable {
+                self.nextPreloadedPlayable = nil
+              }
               self.eventLogger.report(topic: "Player", error: error)
             }
           }
@@ -326,7 +332,7 @@ class BackendAudioPlayer: NSObject {
     }
     isErrorOccurred = true
     elapsedTimeBeforeErrorOccurred = elapsedTime
-    pause()
+    pausePlayer()
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
     isPreviousPlaylableFinshed = true
@@ -350,6 +356,7 @@ class BackendAudioPlayer: NSObject {
     if shouldPlayAfterStreamRestart != nil {
       shouldPlayAfterStreamRestart = true
     }
+    isPlaybackStartSuppressed = false
     isPlaying = true
     player?.resume()
     startTimers()
@@ -361,6 +368,11 @@ class BackendAudioPlayer: NSObject {
     if shouldPlayAfterStreamRestart != nil {
       shouldPlayAfterStreamRestart = false
     }
+    isPlaybackStartSuppressed = true
+    pausePlayer()
+  }
+
+  private func pausePlayer() {
     isPlaying = false
     player?.pause()
     stopTimers()
@@ -490,7 +502,11 @@ class BackendAudioPlayer: NSObject {
   }
 
   var shouldPlaybackStart: Bool {
-    (!isErrorOccurred && isAutoStartPlayback) || (isErrorOccurred && wasPlayingBeforeErrorOccurred)
+    !isPlaybackStartSuppressed &&
+      (
+        (!isErrorOccurred && isAutoStartPlayback) ||
+          (isErrorOccurred && wasPlayingBeforeErrorOccurred)
+      )
   }
 
   /// Leaves the error state once playback has actually resumed.
@@ -515,6 +531,7 @@ class BackendAudioPlayer: NSObject {
     // `handleError` updating this value. Reset it so that path never reports the
     // position of an earlier error.
     elapsedTimeBeforeErrorOccurred = 0.0
+    isPlaybackStartSuppressed = false
     handleRequest(playable: playable)
   }
 
@@ -524,8 +541,10 @@ class BackendAudioPlayer: NSObject {
     streamTimeOffset = 0.0
     streamRestartRequest += 1
     shouldPlayAfterStreamRestart = nil
+    requestGeneration &+= 1
+    let generation = requestGeneration
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
-       nextPreloadedPlayable == playable {
+       nextPreloadedPlayable == playable, !nextPreloadedUrl.isEmpty {
       // Do nothing next preloaded playable has already been queued to player
       os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)
       currentPreparedUrl = ""
@@ -541,6 +560,7 @@ class BackendAudioPlayer: NSObject {
       applyReplayGain()
       self.nextPreloadedPlayable = nil
       nextPreloadedUrl = ""
+      nowPlayingPlayable = playable
       responder?.notifyItemPreparationFinished()
     } else if let relFilePath = playable.relFilePath,
               fileManager.fileExits(relFilePath: relFilePath) {
@@ -560,6 +580,7 @@ class BackendAudioPlayer: NSObject {
       }
       currentReplayGainValue = playable.replayGainTrackGain
       applyReplayGain()
+      nowPlayingPlayable = playable
       insertCachedPlayable(playable: playable)
       isPlaying = shouldPlaybackStart
       responder?.notifyItemPreparationFinished()
@@ -593,7 +614,8 @@ class BackendAudioPlayer: NSObject {
         do {
           currentReplayGainValue = playable.replayGainTrackGain
           applyReplayGain()
-          try await insertStreamPlayable(playable: playable)
+          try await insertStreamPlayable(playable: playable, requestGeneration: generation)
+          guard generation == requestGeneration else { return }
           isPlaying = shouldPlaybackStart
           if self.isAutoCachePlayedItems, !playable.isRadio,
              let accountInfo = playable.account?.info {
@@ -601,6 +623,7 @@ class BackendAudioPlayer: NSObject {
           }
           self.responder?.notifyItemPreparationFinished()
         } catch {
+          guard generation == requestGeneration else { return }
           self.responder?.notifyErrorOccurred(error: error)
           self.responder?.notifyItemPreparationFinished()
           self.eventLogger.report(topic: "Player", error: error)
@@ -638,6 +661,8 @@ class BackendAudioPlayer: NSObject {
     isPreviousPlaylableFinshed = true
     currentPreparedUrl = ""
     currentPlayUrl = ""
+    requestGeneration &+= 1
+    nowPlayingPlayable = nil
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
     currentMetadataDuration = 0.0
@@ -682,7 +707,8 @@ class BackendAudioPlayer: NSObject {
   @MainActor
   private func insertStreamPlayable(
     playable: AbstractPlayable,
-    queueType: BackendAudioQueueType = .play
+    queueType: BackendAudioQueueType = .play,
+    requestGeneration: Int? = nil
   ) async throws {
     let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
     let streamingTranscodingFormat = streamingTranscodings.getActive(networkMonitor: networkMonitor)
@@ -724,10 +750,17 @@ class BackendAudioPlayer: NSObject {
     }
     let request = streamRestartRequest
     let streamUrl = try await provideUrl()
-    // a preload requested before a stream restart would be queued behind the new stream
-    guard queueType == .play || request == streamRestartRequest else { return }
+
+    switch queueType {
+    case .play:
+      guard requestGeneration == self.requestGeneration else { return }
+    case .queue:
+      // a preload requested before a stream restart would be queued behind the new stream
+      guard request == streamRestartRequest, playable == nextPreloadedPlayable else { return }
+    }
 
     if queueType == .play {
+      nowPlayingPlayable = playable
       os_log(
         .default,
         "Play Stream: %s (%s)",
@@ -787,6 +820,8 @@ class BackendAudioPlayer: NSObject {
     switch queueType {
     case .play:
       currentPreparedUrl = asset.url.absoluteString
+      nextPreloadedPlayable = nil
+      nextPreloadedUrl = ""
       if httpHeaders.isEmpty {
         player?.play(url: asset.url)
       } else {
@@ -936,7 +971,7 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
         continuePlay()
         audioAnalyzer.play()
       } else {
-        pause()
+        pausePlayer()
         audioAnalyzer.stop()
       }
 
