@@ -471,21 +471,28 @@ public class Playlist: Identifyable {
     library.saveContext()
   }
 
-  public func shuffle() {
+  /// Shuffles the items so that songs by the same artist are spread across the
+  /// playlist (see `Array.balancedShuffled`). `firstPlayable` stays at index 0.
+  public func shuffle(keepingFirst firstPlayable: AbstractPlayable? = nil) {
     guard !managedObject.items.isEmpty else { return }
 
-    var shuffeldIndexes = [Int]()
-    shuffeldIndexes += 0 ... Int(managedObject.items.count - 1)
-    shuffeldIndexes = shuffeldIndexes.shuffled()
-    assert(shuffeldIndexes.count == managedObject.items.count)
-
     let orgItems = managedObject.items.compactMap { AbstractPlayable(managedObject: $0.playable) }
-    assert(shuffeldIndexes.count == orgItems.count)
-    managedObject.removeAllItems()
-    for i in 0 ..< orgItems.count {
-      createAndAppendPlaylistItem(for: orgItems[shuffeldIndexes[i]])
+    assert(orgItems.count == managedObject.items.count)
+    let firstIndex = firstPlayable.flatMap { first in
+      orgItems.firstIndex(where: { $0.playableManagedObject == first.playableManagedObject })
     }
-    assert(shuffeldIndexes.count == managedObject.items.count)
+    // objectIDs keep artists of different accounts apart even if their ids match
+    let shuffledItems = orgItems.balancedShuffled(
+      artistKey: { $0.asSong?.artist?.managedObject.objectID },
+      albumKey: { $0.asSong?.album?.managedObject.objectID },
+      keepingFirst: firstIndex
+    )
+    assert(shuffledItems.count == orgItems.count)
+    managedObject.removeAllItems()
+    for item in shuffledItems {
+      createAndAppendPlaylistItem(for: item)
+    }
+    assert(shuffledItems.count == managedObject.items.count)
     library.saveContext()
   }
 
