@@ -41,6 +41,17 @@ class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
     }
   }
 
+  nonisolated(unsafe) private var _mockDuration: Double = 0.0
+  private let _mockDurationLock = NSLock()
+  nonisolated public var mockDuration: Double {
+    get {
+      _mockDurationLock.withLock { _mockDuration }
+    }
+    set {
+      _mockDurationLock.withLock { _mockDuration = newValue }
+    }
+  }
+
   nonisolated(unsafe) private var _isPlaying = false
   private let _isPlayingLock = NSLock()
   nonisolated public var isPlaying: Bool {
@@ -94,6 +105,10 @@ class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
 
   override func elapsedTime() -> Double {
     mockElapsedTime
+  }
+
+  override var duration: Double {
+    mockDuration
   }
 
   override func getState() -> AudioStreaming.AudioPlayerState {
@@ -269,9 +284,11 @@ class MOCK_MusicPlayable: MusicPlayable {
 
   var expectationDidStartPlaying: XCTestExpectation?
   var expectationErrorOccurred: XCTestExpectation?
+  var didStartPlayingCount = 0
 
   func didStartPlayingFromBeginning() {}
   func didStartPlaying() {
+    didStartPlayingCount += 1
     expectationDidStartPlaying?.fulfill()
   }
 
@@ -369,6 +386,7 @@ class MusicPlayerTest: XCTestCase {
       settings: storage.settings,
       userStatistics: userStatistics
     )
+    testMusicPlayer.trackChangeDebounceDelay = 0
     testPlayer = PlayerFacadeImpl(
       playerStatus: playerData,
       queueHandler: testQueueHandler,
@@ -995,7 +1013,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlayMulitpleSongs_WaitingQueuePlaying() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
-    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
     prepareWithCachedPlaylist()
     playerData.setCurrentIndex(1)
     guard let songId0 = library.getSong(
@@ -1029,7 +1046,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlayMulitpleSongs_WaitingQueuePlaying2() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
-    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
     prepareWithCachedPlaylist()
     playerData.setCurrentIndex(1)
     guard let songId0 = library.getSong(
@@ -1114,7 +1130,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlaySong_WaitingQueuePlaying9() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
-    mockMusicPlayable.expectationDidStartPlaying?.expectedFulfillmentCount = 2
     prepareWithCachedPlaylist()
     playerData.setCurrentIndex(1)
     guard let songId0 = library.getSong(
@@ -1202,7 +1217,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlayMulitpleSongs_WaitingQueuePlaying5() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
-    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
     prepareWithCachedPlaylist()
     playerData.setCurrentIndex(1)
     guard let songId0 = library.getSong(
@@ -1723,7 +1737,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPauseRadio() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "DidStartPlaying")
-    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
 
     let radios = library.getRadios(for: account)
     XCTAssertEqual(radios.count, 4)
@@ -1817,6 +1830,79 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.currentlyPlaying, nil)
   }
 
+  func testPlayNext_RapidTrackChangesAreDebounced() {
+    prepareWithCachedPlaylist()
+    testMusicPlayer.trackChangeDebounceDelay = 0.2
+    let queueItems = testPlayer.getAllNextQueueItems()
+    let playCountsBefore = queueItems.prefix(3).map { $0.playCount }
+    testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+    testPlayer.playNext()
+    testPlayer.playNext()
+    XCTAssertEqual(playerData.currentIndex, 3)
+    XCTAssertEqual(queueItems[0].playCount, playCountsBefore[0] + 1)
+    XCTAssertEqual(queueItems[1].playCount, playCountsBefore[1])
+    XCTAssertEqual(queueItems[2].playCount, playCountsBefore[2])
+    let debounceExpectation = expectation(description: "pending track change executed")
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { debounceExpectation.fulfill() }
+    wait(for: [debounceExpectation], timeout: 2.0)
+    XCTAssertEqual(queueItems[1].playCount, playCountsBefore[1])
+    XCTAssertEqual(queueItems[2].playCount, playCountsBefore[2] + 1)
+  }
+
+  func testPause_AfterDebouncedTrackChange_DoesNotStartPlayback() {
+    prepareWithCachedPlaylist()
+    testMusicPlayer.trackChangeDebounceDelay = 10
+    let queueItems = testPlayer.getAllNextQueueItems()
+    testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+    testPlayer.playNext()
+    testMusicPlayer.pause()
+    waitForPlayerPreparation()
+    XCTAssertFalse(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying, queueItems[1])
+    XCTAssertEqual(backendPlayer.nowPlayingPlayable, queueItems[1])
+    testPlayer.play()
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying, queueItems[1])
+    XCTAssertEqual(backendPlayer.nowPlayingPlayable, queueItems[1])
+  }
+
+  func testElapsedTime_DuringStreamPreparation_IsNotSavedOnTheNewTrack() {
+    prepareWithCachedPlaylist()
+    let queueItems = testPlayer.getAllNextQueueItems()
+    testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+    waitForPlayerPreparation()
+    mockAudioStreamingPlayer.mockDuration = 200
+    mockAudioStreamingPlayer.mockElapsedTime = 100
+    testMusicPlayer.didElapsedTimeChange()
+    XCTAssertEqual(queueItems[0].playDuration, 200)
+    XCTAssertEqual(queueItems[0].playProgress, 100)
+    let playDurationBefore = queueItems[1].playDuration
+    let playProgressBefore = queueItems[1].playProgress
+    testPlayer.playNext()
+    XCTAssertEqual(testPlayer.currentlyPlaying, queueItems[1])
+    testMusicPlayer.didElapsedTimeChange()
+    XCTAssertEqual(queueItems[1].playDuration, playDurationBefore)
+    XCTAssertEqual(queueItems[1].playProgress, playProgressBefore)
+    waitForPlayerPreparation()
+    XCTAssertEqual(backendPlayer.nowPlayingPlayable, queueItems[1])
+  }
+
+  private func waitForPlayerPreparation() {
+    let preparationDone = expectation(description: "player preparation finished")
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { preparationDone.fulfill() }
+    wait(for: [preparationDone], timeout: 2.0)
+  }
+
+  func testPlay_SameStreamRequestedTwice_FinishesPreparationOnce() {
+    testPlayer.appendContextQueue(playables: [songToDownload])
+    testPlayer.play()
+    testPlayer.play()
+    waitForPlayerPreparation()
+    XCTAssertEqual(mockMusicPlayable.didStartPlayingCount, 1)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.currentlyPlaying, songToDownload)
+  }
+
   func testPlayNext_Normal() {
     prepareWithCachedPlaylist()
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 2))
@@ -1855,7 +1941,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlayNext_StartPlayIfPaused() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
-    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
     prepareWithCachedPlaylist()
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 3))
     testMusicPlayer.pause()
@@ -1867,7 +1952,6 @@ class MusicPlayerTest: XCTestCase {
 
   func testPlayNext_IsPlayingStaysTrue() {
     mockMusicPlayable.expectationDidStartPlaying = expectation(description: "download is triggered")
-    mockMusicPlayable.expectationDidStartPlaying!.expectedFulfillmentCount = 2
     prepareWithCachedPlaylist()
     testPlayer.play(playerIndex: PlayerIndex(queueType: .next, index: 3))
     testPlayer.playNext()
