@@ -78,7 +78,6 @@ class SearchVC: BasicTableViewController {
   fileprivate var playlists: [Playlist] = []
   fileprivate var songs: [Song] = []
 
-  private var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   private var userButton: UIButton?
   private var userBarButtonItem: UIBarButtonItem?
   private var isSearchActive = false
@@ -104,7 +103,9 @@ class SearchVC: BasicTableViewController {
     return source
   }
 
-  func updateDataSource(animated: Bool) {
+  /// `reloadingSections`: sections whose header changed (applying a snapshot doesn't update the
+  /// headers of unchanged sections)
+  func updateDataSource(animated: Bool, reloadingSections: [SearchSection] = []) {
     guard let dataSource = tableView?.dataSource as? UITableViewDiffableDataSource<
       Int,
       NSManagedObjectID
@@ -135,6 +136,7 @@ class SearchVC: BasicTableViewController {
       songs.compactMap { $0.managedObject.objectID },
       toSection: SearchSection.Song.rawValue
     )
+    snapshot.reloadSections(reloadingSections.map(\.rawValue))
     dataSource.apply(snapshot, animatingDifferences: animated)
   }
 
@@ -240,28 +242,13 @@ class SearchVC: BasicTableViewController {
     }
   }
 
-  override func configureSearchController(
-    placeholder: String?,
-    scopeButtonTitles: [String]? = nil
-  ) {
-    super.configureSearchController(
-      placeholder: placeholder,
-      scopeButtonTitles: scopeButtonTitles
-    )
-
-    // Install the options button
-    optionsButton = UIBarButtonItem.createOptionsBarButton()
-    optionsButton.menu = UIMenu(children: [
-      UIAction(title: "Clear Search History", image: .clear, handler: { _ in
-        self.appDelegate.storage.main.library.deleteSearchHistory()
-        self.appDelegate.storage.main.library.saveContext()
-        self.searchHistory = []
-        self.updateDataSource(animated: true)
-        self.updateContentUnavailable()
-      }),
-    ])
-
-    navigationItem.rightBarButtonItem = optionsButton
+  private func clearSearchHistory() {
+    appDelegate.storage.main.library.deleteSearchHistory()
+    appDelegate.storage.main.library.saveContext()
+    searchHistory = []
+    // also hide the history header with the "Clear" button
+    updateDataSource(animated: true, reloadingSections: [.History])
+    updateContentUnavailable()
   }
 
   func determSwipeActionContext(
@@ -399,6 +386,40 @@ class SearchVC: BasicTableViewController {
     case .none:
       return UITableViewCell()
     }
+  }
+
+  /// The search history header has a "Clear" button. It is part of the table (not the navigation
+  /// bar), because on iPhone the search tab activates the search automatically, which hides the
+  /// navigation bar.
+  override func tableView(
+    _ tableView: UITableView,
+    viewForHeaderInSection section: Int
+  )
+    -> UIView? {
+    // nil: default header for all other sections
+    guard SearchSection(rawValue: section) == .History, !isSearchActive,
+          !searchHistory.isEmpty else { return nil }
+
+    let header = UITableViewHeaderFooterView(reuseIdentifier: nil)
+    var content = header.defaultContentConfiguration()
+    content.text = tableView.dataSource?.tableView?(tableView, titleForHeaderInSection: section)
+    header.contentConfiguration = content
+
+    let clearButton = UIButton(
+      type: .system,
+      primaryAction: UIAction(title: "Clear") { [weak self] _ in
+        self?.clearSearchHistory()
+      }
+    )
+    clearButton.translatesAutoresizingMaskIntoConstraints = false
+    clearButton.preferredBehavioralStyle = .pad
+    header.contentView.addSubview(clearButton)
+    NSLayoutConstraint.activate([
+      clearButton.trailingAnchor
+        .constraint(equalTo: header.contentView.layoutMarginsGuide.trailingAnchor),
+      clearButton.centerYAnchor.constraint(equalTo: header.contentView.centerYAnchor),
+    ])
+    return header
   }
 
   override func tableView(
