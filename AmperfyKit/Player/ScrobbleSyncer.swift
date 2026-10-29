@@ -193,7 +193,6 @@ public class ScrobbleSyncer {
 
     // Reset tracking variables
     accumulatedPlayTime = 0
-    playStartTimestamp = Date()
 
     // Calculate threshold time (half of duration or maximum)
     let waitDuration = TimeInterval(curPlayingSong.duration) / 2
@@ -203,6 +202,9 @@ public class ScrobbleSyncer {
       currentSongThreshold = waitDuration
     }
 
+    // Paused before playback started: didStartPlaying arms the timer on resume
+    guard player.isPlaying else { return }
+    playStartTimestamp = Date()
     startScrobbleTimer(forSong: curPlayingSong, withDuration: currentSongThreshold)
   }
 
