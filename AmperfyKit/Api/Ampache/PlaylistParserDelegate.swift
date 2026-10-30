@@ -32,6 +32,9 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
   private var parsedPlaylists: Set<Playlist>
   private var account: Account
   private var library: LibraryStorage
+  /// Cover of the current playlist, nil if the response contains no art info
+  private var artRemoteInfo: ArtworkRemoteInfo?
+  private var hasArt: Bool?
 
   init(
     performanceMonitor: ThreadPerformanceMonitor,
@@ -111,13 +114,22 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
     switch elementName {
     case "name":
       playlist?.name = buffer
+    case "art":
+      // a playlist without own art gets the generic blankalbum.png, which is no artwork URL
+      artRemoteInfo = AmpacheXmlServerApi.extractArtworkInfoFromURL(urlString: buffer)
+      hasArt = hasArt ?? (artRemoteInfo != nil)
+    case "has_art":
+      hasArt = buffer != "0"
     case "items":
       playlist?.remoteSongCount = Int(buffer) ?? 0
     case "playlist":
       if let parsedPlaylist = playlist {
+        updateArtwork(of: parsedPlaylist)
         parsedPlaylists.insert(parsedPlaylist)
       }
       playlist = nil
+      artRemoteInfo = nil
+      hasArt = nil
       parseNotifier?.notifyParsedObject(ofType: .playlist)
     case "root":
       if playlistToValidate == nil {
@@ -138,5 +150,17 @@ class PlaylistParserDelegate: AmpacheNotifiableXmlParser {
       namespaceURI: namespaceURI,
       qualifiedName: qName
     )
+  }
+
+  private func updateArtwork(of playlist: Playlist) {
+    // only responses with art info can tell that the server has no cover (anymore)
+    guard let hasArt else { return }
+    if hasArt, let artRemoteInfo {
+      if playlist.artwork?.remoteInfo != artRemoteInfo {
+        playlist.artwork = library.getOrCreateArtwork(account: account, remoteInfo: artRemoteInfo)
+      }
+    } else {
+      playlist.artwork = nil
+    }
   }
 }

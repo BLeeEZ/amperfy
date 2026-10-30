@@ -51,6 +51,19 @@ public class Playlist: Identifyable {
     managedObject.items.compactMap { PlaylistItem(library: library, managedObject: $0) }
   }
 
+  /// Cover provided by the server. Preferred over the cover generated from the songs.
+  public var artwork: Artwork? {
+    get {
+      guard let artworkMO = managedObject.artwork else { return nil }
+      return Artwork(managedObject: artworkMO)
+    }
+    set {
+      if managedObject.artwork != newValue?.managedObject {
+        managedObject.artwork = newValue?.managedObject
+      }
+    }
+  }
+
   public var artworkItems: [PlaylistItem] {
     managedObject.artworkItems.compactMap { PlaylistItem(library: library, managedObject: $0) }
   }
@@ -547,21 +560,28 @@ extension Playlist: PlayableContainable {
   }
 
   public func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection {
+    // The server cover replaces the song covers once it is downloaded
     let artworkItems = artworkItems
 
     if artworkItems.isEmpty {
-      return ArtworkCollection(defaultArtworkType: getDefaultArtworkType(), singleImageEntity: nil)
+      return ArtworkCollection(
+        defaultArtworkType: getDefaultArtworkType(),
+        singleImageEntity: nil,
+        serverArtwork: artwork
+      )
     } else if artworkItems.count == 1 {
       return ArtworkCollection(
         defaultArtworkType: getDefaultArtworkType(),
-        singleImageEntity: artworkItems[0].playable
+        singleImageEntity: artworkItems[0].playable,
+        serverArtwork: artwork
       )
     } else {
       let quadImages = artworkItems.compactMap { $0.playable }.prefix(upToAsArray: 4)
       return ArtworkCollection(
         defaultArtworkType: getDefaultArtworkType(),
         singleImageEntity: artworkItems[0].playable,
-        quadImageEntity: quadImages
+        quadImageEntity: quadImages,
+        serverArtwork: artwork
       )
     }
   }

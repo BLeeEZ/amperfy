@@ -750,6 +750,16 @@ public class LibraryStorage: PlayableFileCachable {
     return artwork
   }
 
+  func getOrCreateArtwork(account: Account, remoteInfo: ArtworkRemoteInfo) -> Artwork {
+    if let existing = getArtwork(for: account, remoteInfo: remoteInfo) {
+      return existing
+    }
+    let createdArtwork = createArtwork(account: account)
+    createdArtwork.remoteInfo = remoteInfo
+    createdArtwork.status = .NotChecked
+    return createdArtwork
+  }
+
   func deleteArtwork(artwork: Artwork) {
     context.delete(artwork.managedObject)
   }

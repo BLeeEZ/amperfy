@@ -22,6 +22,8 @@
 @testable import AmperfyKit
 import XCTest
 
+// MARK: - PlaylistsParserTest
+
 class PlaylistsParserTest: AbstractAmpacheTest {
   override func setUp() async throws {
     try await super.setUp()
@@ -43,6 +45,64 @@ class PlaylistsParserTest: AbstractAmpacheTest {
       playlist.name = i.description
     }
     testParsing()
+  }
+
+  private static let customArtURL =
+    "http://localhost:8090/image.php?object_id=2&object_type=playlist&id=6&name=art.jpg"
+  private static let blankArtURL = "http://localhost:8090/images/blankalbum.png"
+
+  /// Parses a playlists response (as sent by Ampache 7) with the given art info
+  private func parsePlaylist(art: String?, hasArt: String?) -> Playlist? {
+    let xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <root>
+      <total_count>1</total_count>
+      <playlist id="2">
+        <name><![CDATA[WithCover]]></name>
+        <items>2</items>
+        <type>public</type>
+        \(art.map { "<art><![CDATA[\($0)]]></art>" } ?? "")
+        <has_access>1</has_access>
+        \(hasArt.map { "<has_art>\($0)</has_art>" } ?? "")
+        <last_update>1793354119</last_update>
+      </playlist>
+    </root>
+    """
+    createParserDelegate()
+    let parser = XMLParser(data: xml.data(using: .utf8)!)
+    parser.delegate = parserDelegate
+    parser.parse()
+    return library.getPlaylists(for: account).first { $0.id == "2" }
+  }
+
+  func testServerCover() {
+    let playlist = parsePlaylist(art: Self.customArtURL, hasArt: "1")
+    XCTAssertEqual(playlist?.artwork?.remoteInfo, ArtworkRemoteInfo(id: "2", type: "playlist"))
+    XCTAssertEqual(playlist?.artwork?.status, .NotChecked)
+  }
+
+  func testNoServerCover() {
+    XCTAssertNil(parsePlaylist(art: Self.blankArtURL, hasArt: "0")?.artwork)
+  }
+
+  func testRemovedServerCover() {
+    XCTAssertNotNil(parsePlaylist(art: Self.customArtURL, hasArt: "1")?.artwork)
+    XCTAssertNil(parsePlaylist(art: Self.blankArtURL, hasArt: "0")?.artwork)
+  }
+
+  func testArtURLWithoutHasArt() {
+    // older servers send no has_art
+    XCTAssertNotNil(parsePlaylist(art: Self.customArtURL, hasArt: nil)?.artwork)
+    XCTAssertNil(parsePlaylist(art: Self.blankArtURL, hasArt: nil)?.artwork)
+  }
+
+  func testHasArtZeroWinsOverArtURL() {
+    XCTAssertNil(parsePlaylist(art: Self.customArtURL, hasArt: "0")?.artwork)
+  }
+
+  func testResponseWithoutArtInfoKeepsServerCover() {
+    XCTAssertNotNil(parsePlaylist(art: Self.customArtURL, hasArt: "1")?.artwork)
+    XCTAssertNotNil(parsePlaylist(art: nil, hasArt: nil)?.artwork)
   }
 
   override func checkCorrectParsing() {
@@ -94,3 +154,5 @@ class PlaylistsParserTest: AbstractAmpacheTest {
     XCTAssertEqual(playlist.remoteDuration, 0)
   }
 }
+
+// MARK: - AmpacheLivePlaylistCoverTest
