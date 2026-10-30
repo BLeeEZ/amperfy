@@ -228,4 +228,14 @@ extension LibrarySyncerProxy: LibrarySyncer {
   func parseLyrics(relFilePath: URL) async throws -> LyricsList {
     try await activeSyncer.parseLyrics(relFilePath: relFilePath)
   }
+
+  @MainActor
+  func requestDepiction(artist: Artist) async throws -> String? {
+    try await activeSyncer.requestDepiction(artist: artist)
+  }
+
+  @MainActor
+  func requestDepiction(album: Album) async throws -> String? {
+    try await activeSyncer.requestDepiction(album: album)
+  }
 }

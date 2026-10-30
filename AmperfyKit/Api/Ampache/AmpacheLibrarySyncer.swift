@@ -1428,6 +1428,16 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     throw ResponseError(type: .xml, cleansedURL: nil, data: nil)
   }
 
+  @MainActor
+  func requestDepiction(artist: Artist) async throws -> String? {
+    nil
+  }
+
+  @MainActor
+  func requestDepiction(album: Album) async throws -> String? {
+    nil
+  }
+
   private func parseForError(response: APIDataResponse) throws {
     let parserDelegate = AmpacheXmlParser(performanceMonitor: performanceMonitor)
     try parse(response: response, delegate: parserDelegate)

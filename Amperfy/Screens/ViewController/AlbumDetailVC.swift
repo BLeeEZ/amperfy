@@ -44,6 +44,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
   private var fetchedResultsController: AlbumSongsFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
+  private var isDepictionRequested = false
   let album: Album
 
   init(account: Account, album: Album) {
@@ -156,6 +157,19 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
         self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
       }
       self.detailOperationsView?.refresh()
+      await self.requestDepiction()
+    }
+  }
+
+  private func requestDepiction() async {
+    guard !isDepictionRequested, appDelegate.storage.settings.user.isOnlineMode else { return }
+    isDepictionRequested = true
+    do {
+      let depiction = try await appDelegate.getMeta(account.info).librarySyncer
+        .requestDepiction(album: album)
+      detailOperationsView?.display(descriptionText: depiction)
+    } catch {
+      appDelegate.eventLogger.report(topic: "Album Info", error: error, displayPopup: false)
     }
   }
 

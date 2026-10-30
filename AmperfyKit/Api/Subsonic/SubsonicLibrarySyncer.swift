@@ -1326,6 +1326,30 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   }
 
   @MainActor
+  func requestDepiction(artist: Artist) async throws -> String? {
+    guard isSyncAllowed else { return nil }
+    let response = try await subsonicServerApi.requestArtistInfo(id: artist.id)
+    return try parseDepiction(response: response)
+  }
+
+  @MainActor
+  func requestDepiction(album: Album) async throws -> String? {
+    guard isSyncAllowed else { return nil }
+    let response = try await subsonicServerApi.requestAlbumInfo(id: album.id)
+    return try parseDepiction(response: response)
+  }
+
+  @MainActor
+  private func parseDepiction(response: APIDataResponse) throws -> String? {
+    let parserDelegate = SsDepictionParserDelegate(performanceMonitor: performanceMonitor)
+    try parse(response: response, delegate: parserDelegate)
+    // servers send HTML here, e.g. Last.fm biographies end with a "Read more on Last.fm" link
+    let depiction = parserDelegate.depiction?.html2String
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+    return depiction?.isEmpty == false ? depiction : nil
+  }
+
+  @MainActor
   private func createPlaylistRemote(playlist: Playlist) async throws {
     os_log("Create playlist on server", log: log, type: .info)
     let response = try await subsonicServerApi.requestPlaylistCreate(name: playlist.name)
