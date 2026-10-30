@@ -56,6 +56,7 @@ public class LibraryEntityImage: RoundedImage {
   private let appDelegate: AmperKit
 
   private var entity: AbstractLibraryEntity?
+  private var standaloneArtwork: Artwork?
   private var backupArtworkType: ArtworkType?
   private var accountNotificationHandler: AccountNotificationHandler?
 
@@ -109,6 +110,7 @@ public class LibraryEntityImage: RoundedImage {
 
   public func display(entity: AbstractLibraryEntity) {
     self.entity = entity
+    standaloneArtwork = nil
     backupArtworkType = entity.getDefaultArtworkType()
     refresh()
   }
@@ -122,20 +124,35 @@ public class LibraryEntityImage: RoundedImage {
     }
   }
 
+  /// Displays an artwork that is not owned by an AbstractLibraryEntity (e.g. playlist server cover)
+  public func displayAndUpdate(artwork: Artwork, artworkType: ArtworkType) {
+    guard standaloneArtwork != artwork else { return }
+
+    entity = nil
+    standaloneArtwork = artwork
+    backupArtworkType = artworkType
+    refresh()
+    if let accountInfo = artwork.account?.info {
+      appDelegate.getMeta(accountInfo).artworkDownloadManager.download(object: artwork)
+    }
+  }
+
   internal func display(image: UIImage) {
     self.image = image
     entity = nil
+    standaloneArtwork = nil
   }
 
   public func display(artworkType: ArtworkType) {
     backupArtworkType = artworkType
     entity = nil
+    standaloneArtwork = nil
     refresh()
   }
 
   private var placeholderImage: UIImage {
     var theme = appDelegate.storage.settings.accounts.activeSetting.read.themePreference
-    if let accountInfo = entity?.account?.info {
+    if let accountInfo = entity?.account?.info ?? standaloneArtwork?.account?.info {
       theme = appDelegate.storage.settings.accounts.getSetting(accountInfo).read.themePreference
     }
     return UIImage.getGeneratedArtwork(
@@ -147,13 +164,14 @@ public class LibraryEntityImage: RoundedImage {
   private var entityImagePathToDisplay: String? {
     var artworkDisplayPreference = appDelegate.storage.settings.accounts.activeSetting.read
       .artworkDisplayPreference
-    if let accountInfo = entity?.account?.info {
+    if let accountInfo = entity?.account?.info ?? standaloneArtwork?.account?.info {
       artworkDisplayPreference = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
         .artworkDisplayPreference
     }
-    return entity?.imagePath(
-      setting: artworkDisplayPreference
-    )
+    if let entity {
+      return entity.imagePath(setting: artworkDisplayPreference)
+    }
+    return standaloneArtwork?.imagePath
   }
 
   private func refresh() {
@@ -190,8 +208,17 @@ public class LibraryEntityImage: RoundedImage {
 
   @objc
   private func downloadFinishedSuccessful(notification: Notification) {
-    guard let downloadNotification = DownloadNotification.fromNotification(notification), let entity
+    guard let downloadNotification = DownloadNotification.fromNotification(notification)
     else { return }
+    if entity == nil, let artwork = standaloneArtwork,
+       artwork.uniqueID == downloadNotification.id {
+      Task { @MainActor in
+        guard let imagePath = artwork.imagePath else { return }
+        await self.loadImageAndCacheIt(imagePath: imagePath)
+      }
+      return
+    }
+    guard let entity else { return }
     if let playable = entity as? AbstractPlayable,
        playable.uniqueID == downloadNotification.id, let accountInfo = playable.account?.info {
       Task { @MainActor in
