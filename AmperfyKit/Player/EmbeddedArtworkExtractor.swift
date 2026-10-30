@@ -30,69 +30,61 @@ final class EmbeddedArtworkExtractor: Sendable {
     playableInfo: AbstractPlayableInfo,
     storage: AsyncCoreDataAccessWrapper
   ) async throws {
-    let absFilePath: URL? = try await storage.performAndGet { asyncCompanion in
+    let relativeFilePath: URL? = try await storage.performAndGet { asyncCompanion in
       let playable = AbstractPlayable(
         managedObject: asyncCompanion.context
           .object(with: playableInfo.objectID) as! AbstractPlayableMO
       )
-      guard let relFilePath = playable.relFilePath else { return nil }
-      return self.fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+      return playable.relFilePath
     }
-    guard let absFilePath else { return }
+    guard let relativeFilePath else { return }
 
-    guard let id3Tag = try? id3TagEditor.read(from: absFilePath.path) else { return }
-    let tagContentReader = ID3TagContentReader(id3Tag: id3Tag)
-    let artworks = tagContentReader.attachedPictures()
+    let artworks: [AttachedPicture] = try fileManager.withCacheFile(
+      relativePath: relativeFilePath
+    ) { fileURL in
+      guard let id3Tag = try? id3TagEditor.read(from: fileURL.path) else { return [] }
+      return ID3TagContentReader(id3Tag: id3Tag).attachedPictures()
+    }
 
-    try await storage.perform { asyncCompanion in
+    let embeddedImage: UIImage?
+    if let frontCoverArtwork = artworks.lazy.first(where: { $0.type == .frontCover }) {
+      embeddedImage = UIImage(data: frontCoverArtwork.picture)
+    } else {
+      embeddedImage = artworks.lazy.compactMap { UIImage(data: $0.picture) }.first
+    }
+    guard let pngData = embeddedImage?.pngData() else { return }
+
+    let sourceURL = FileManager.default.temporaryDirectory
+      .appendingPathComponent("embedded-artwork-\(UUID().uuidString).png")
+    try pngData.write(to: sourceURL, options: [.atomic])
+    let rootLease = try fileManager.currentRootLease()
+
+    let preparedCommit = try await storage.performWithCommitValidation { asyncCompanion in
       let playable = AbstractPlayable(
         managedObject: asyncCompanion.context
           .object(with: playableInfo.objectID) as! AbstractPlayableMO
       )
-
-      // if there is a frontCover artwork take this as embedded artwork
-      if let frontCoverArtwork = artworks.lazy.filter({ $0.type == .frontCover }).first,
-         let artworkImage = UIImage(data: frontCoverArtwork.picture) {
-        self.saveEmbeddedImageInLibrary(
-          library: asyncCompanion.library,
-          playable: playable,
-          embeddedImage: artworkImage
-        )
-        // take the first other available artwork
-      } else if let artworkImage = artworks.lazy.compactMap({ UIImage(data: $0.picture) }).first {
-        self.saveEmbeddedImageInLibrary(
-          library: asyncCompanion.library,
-          playable: playable,
-          embeddedImage: artworkImage
-        )
+      guard let account = playable.account else { throw CacheRootError.unavailable }
+      let embeddedArtwork = asyncCompanion.library.createEmbeddedArtwork(account: account)
+      embeddedArtwork.owner = playable
+      guard let relFilePath = self.fileManager.createRelPath(for: embeddedArtwork) else {
+        throw CacheRootError.unavailable
       }
-    }
-  }
-
-  private func saveEmbeddedImageInLibrary(
-    library: LibraryStorage,
-    playable: AbstractPlayable,
-    embeddedImage: UIImage
-  ) {
-    guard let account = playable.account else { return }
-    let embeddedArtwork = library.createEmbeddedArtwork(account: account)
-    embeddedArtwork.owner = playable
-
-    guard let relFilePath = fileManager.createRelPath(for: embeddedArtwork),
-          let absFilePath = fileManager.getAbsoluteAmperfyPath(relFilePath: relFilePath),
-          let pngData = embeddedImage.pngData()
-    else { return }
-
-    do {
-      try fileManager.writeDataExcludedFromBackup(
-        data: pngData,
-        to: absFilePath,
-        accountInfo: account.info
+      let absFilePath = try self.fileManager.getAbsoluteAmperfyPath(
+        relFilePath: relFilePath,
+        using: rootLease
+      )
+      let transaction = try self.fileManager.prepareRecoverableFileCommit(
+        sourceURL: sourceURL,
+        destinationURL: absFilePath,
+        accountInfo: account.info,
+        using: rootLease
       )
       embeddedArtwork.relFilePath = relFilePath
-    } catch {
-      embeddedArtwork.relFilePath = nil
+      return transaction
+    } validateBeforeSave: {
+      try rootLease.validateCurrent()
     }
-    library.saveContext()
+    try preparedCommit.finishAfterCoreDataCommit()
   }
 }

@@ -178,7 +178,9 @@ public class LibraryEntityImage: RoundedImage {
     imagePath: String
   ) async {
     guard !Task.isCancelled else { return }
-    let loadedImage = UIImage(contentsOfFile: imagePath)
+    let loadedImage = try? UIImage(
+      data: CacheFileManager.shared.readCacheData(at: URL(fileURLWithPath: imagePath))
+    )
     let readyImage = await loadedImage?.byPreparingForDisplay()
     guard !Task.isCancelled else { return }
     Task { @MainActor [weak self] in

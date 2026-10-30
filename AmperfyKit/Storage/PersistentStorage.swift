@@ -95,6 +95,33 @@ public actor AsyncCoreDataAccessWrapper {
     }
     return syncRequestedValue
   }
+
+  /// Performs a Core Data mutation only when a caller-supplied final commit validation succeeds.
+  /// Unlike the legacy `perform` APIs, this method propagates errors and rolls back instead of
+  /// saving changes from a failed body.
+  public func performWithCommitValidation<T: Sendable>(
+    body: @escaping @Sendable (_ asyncCompanion: CoreDataCompanion) throws -> T,
+    validateBeforeSave: @escaping @Sendable () throws -> ()
+  ) async throws
+    -> T {
+    let context = persistentContainer.newBackgroundContext()
+    NSPersistentContainer.configureContext(context)
+
+    return try await context.perform {
+      let asyncCompanion = CoreDataCompanion(context: context)
+      do {
+        let result = try body(asyncCompanion)
+        try validateBeforeSave()
+        if context.hasChanges {
+          try context.save()
+        }
+        return result
+      } catch {
+        context.rollback()
+        throw error
+      }
+    }
+  }
 }
 
 // MARK: - PersistentStorage

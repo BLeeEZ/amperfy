@@ -72,6 +72,20 @@ public class AmperKit {
     metaManager
   }
 
+  public func pauseDownloadsForCacheMove() async {
+    for meta in Array(metaManager.values) {
+      await meta.playableDownloadManager.pauseForCacheMove()
+      await meta.artworkDownloadManager.pauseForCacheMove()
+    }
+  }
+
+  public func resumeDownloadsAfterCacheMove() async {
+    for meta in Array(metaManager.values) {
+      await meta.playableDownloadManager.resumeAfterCacheMove()
+      await meta.artworkDownloadManager.resumeAfterCacheMove()
+    }
+  }
+
   public func resetMeta(_ accountInfo: AccountInfo) {
     metaManager[accountInfo] = nil
   }

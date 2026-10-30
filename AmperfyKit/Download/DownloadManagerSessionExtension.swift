@@ -115,9 +115,11 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
   nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
     os_log("URLSession urlSessionDidFinishEvents", log: self.log, type: .info)
     Task { @MainActor in
-      guard let completionHandler = await getBackgroundFetchCompletionHandler() else { return }
+      guard let completionHandler = await getBackgroundFetchCompletionHandler(),
+            let rootLease = try? fileManager.currentRootLease()
+      else { return }
       os_log("Calling application backgroundFetchCompletionHandler", log: self.log, type: .info)
-      completionHandler()
+      try? rootLease.performAtCommitBoundary { completionHandler() }
       setBackgroundFetchCompletionHandler(nil)
     }
   }

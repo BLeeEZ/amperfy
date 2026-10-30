@@ -95,8 +95,8 @@ public enum ShareSongAction {
 
   private static func cachedFileURL(for playable: AbstractPlayable) -> URL? {
     guard let relPath = playable.relFilePath,
-          let absoluteURL = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relPath),
-          FileManager.default.fileExists(atPath: absoluteURL.path)
+          CacheFileManager.shared.fileExits(relFilePath: relPath),
+          let absoluteURL = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relPath)
     else { return nil }
     return absoluteURL
   }
@@ -119,8 +119,12 @@ public enum ShareSongAction {
       .appendingPathComponent(safeFileName)
       .appendingPathExtension(fileURL.pathExtension)
     try? FileManager.default.removeItem(at: tempURL)
-    try? FileManager.default.copyItem(at: fileURL, to: tempURL)
-    let shareURL = FileManager.default.fileExists(atPath: tempURL.path) ? tempURL : fileURL
+    do {
+      try CacheFileManager.shared.copyCacheItem(at: fileURL, to: tempURL)
+    } catch {
+      return
+    }
+    let shareURL = tempURL
 
     let artwork = artworkImage(for: playable)
     let fileItemSource = SongShareItemSource(
