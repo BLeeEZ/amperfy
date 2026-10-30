@@ -273,14 +273,25 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func seekToLastStoppedPlayTime() {
+    // An error tears the player down and re-inserts the current playable, which
+    // makes it start from the beginning. Resume from the position captured when
+    // the error occurred instead. The persisted `playProgress` cannot be used
+    // for this: `savePlayInformation` deliberately resets it to zero within
+    // `progressTimeEndThreshold` of the end of the track, which is exactly where
+    // a stream error is most likely to happen.
+    if backendAudioPlayer.isErrorOccurred {
+      let resumeTime = backendAudioPlayer.elapsedTimeBeforeErrorOccurred
+      if resumeTime > 0 {
+        backendAudioPlayer.seek(toSecond: resumeTime)
+      }
+      return
+    }
+
     if let playable = currentlyPlaying,
        playable.playProgress > 0,
        playable
        .isPodcastEpisode ||
-       (
-         (playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user
-           .isPlayerSongPlaybackResumeEnabled
-       ) {
+       (playable.isSong && settings.user.isPlayerSongPlaybackResumeEnabled) {
       backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
     }
   }

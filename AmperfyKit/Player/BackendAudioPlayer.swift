@@ -124,6 +124,10 @@ class BackendAudioPlayer: NSObject {
   public var triggerReinsertPlayableCB: TriggerReinsertPlayableCallback?
   public private(set) var isPlaying: Bool = false
   public private(set) var isErrorOccurred: Bool = false
+  /// Playback position in seconds at the moment the last error occurred.
+  /// Captured before `restartPlayer()` tears the engine down, so that error
+  /// recovery can resume where playback stopped instead of starting over.
+  public private(set) var elapsedTimeBeforeErrorOccurred: Double = 0.0
   public private(set) var playType: PlayType?
   private var perloadedPlayType: PlayType?
   public private(set) var activeStreamingBitrate: StreamingMaxBitratePreference?
@@ -294,6 +298,7 @@ class BackendAudioPlayer: NSObject {
   private func handleError(error: Error) {
     isErrorOccurred = true
     wasPlayingBeforeErrorOccurred = isPlaying
+    elapsedTimeBeforeErrorOccurred = elapsedTime
     pause()
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
@@ -379,6 +384,16 @@ class BackendAudioPlayer: NSObject {
 
   var shouldPlaybackStart: Bool {
     (!isErrorOccurred && isAutoStartPlayback) || (isErrorOccurred && wasPlayingBeforeErrorOccurred)
+  }
+
+  /// Leaves the error state once playback has actually resumed.
+  /// `isErrorOccurred` is otherwise never reset, so after the first error of a
+  /// session `shouldPlaybackStart` would keep ignoring `isAutoStartPlayback`.
+  /// Only call this after every reader of `shouldPlaybackStart` has run.
+  private func clearErrorState() {
+    isErrorOccurred = false
+    wasPlayingBeforeErrorOccurred = false
+    elapsedTimeBeforeErrorOccurred = 0.0
   }
 
   func requestToPlay(
@@ -803,6 +818,10 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
         player?.seek(to: seekTimeWhenStarted)
         self.seekTimeWhenStarted = nil
       }
+
+      // Playback is running again and every reader of `shouldPlaybackStart` has
+      // had its turn, so it is safe to leave the error state here.
+      clearErrorState()
     }
   }
 
