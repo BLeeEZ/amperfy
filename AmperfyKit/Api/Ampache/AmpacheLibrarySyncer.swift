@@ -1039,7 +1039,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         parseNotifier: nil
       )
       try self.parse(response: response, delegate: parserDelegate)
-      return parserDelegate.parsedSongs.compactMap { $0.managedObject.objectID }
+      return try asyncCompanion.getPermanentObjectIDs(of: parserDelegate.parsedSongs)
     }
 
     return try similarSongObjectIds.map {
