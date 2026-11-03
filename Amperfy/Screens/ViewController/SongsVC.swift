@@ -38,8 +38,6 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   private var sortType: SongElementSortType = .name
   private var filterTitle = "Songs"
 
-  private static var maxPlayContextCount = 40
-
   init(account: Account) {
     super.init(style: .plain, account: account)
   }
@@ -279,12 +277,13 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
           let arrayIndex = allFetchedObjects.firstIndex(of: song.managedObject)
     else { return PlayContext(containable: song) }
 
-    var contextPlayables = [AbstractPlayable]()
-    let endIndex = min(arrayIndex + Self.maxPlayContextCount - 1, allFetchedObjects.count - 1)
-    for i in arrayIndex ... endIndex {
-      contextPlayables.append(Song(managedObject: allFetchedObjects[i]))
-    }
-    return PlayContext(name: filterTitle, playables: contextPlayables)
+    let window = PlayContext.window(
+      count: allFetchedObjects.count,
+      index: arrayIndex,
+      maxCount: appDelegate.player.maxSongsToAddOnce
+    )
+    let contextPlayables = window.range.map { Song(managedObject: allFetchedObjects[$0]) }
+    return PlayContext(name: filterTitle, index: window.index, playables: contextPlayables)
   }
 
   func convertCellViewToPlayContext(cell: UITableViewCell) -> PlayContext? {
