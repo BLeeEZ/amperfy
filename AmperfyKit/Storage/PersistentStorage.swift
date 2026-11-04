@@ -38,6 +38,13 @@ public class CoreDataCompanion {
     library.saveContext()
   }
 
+  /// Newly created objects only have a temporary object ID, which other contexts can't resolve
+  public func getPermanentObjectIDs(of songs: [Song]) throws -> [NSManagedObjectID] {
+    let managedObjects = songs.map { $0.managedObject }
+    try context.obtainPermanentIDs(for: managedObjects)
+    return managedObjects.map { $0.objectID }
+  }
+
   public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) -> ()) {
     context.performAndWait {
       body(self)

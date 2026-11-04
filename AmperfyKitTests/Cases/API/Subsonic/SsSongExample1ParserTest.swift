@@ -20,6 +20,7 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
 
 class SsSongExample1ParserTest: AbstractSsParserTest {
@@ -203,5 +204,42 @@ class SsSongExample1ParserTest: AbstractSsParserTest {
     XCTAssertEqual(songs[0].title, "It's A Long Way To The Top")
     XCTAssertEqual(songs[1].id, "71463")
     XCTAssertEqual(songs[1].title, "The Jack")
+  }
+
+  func testSimilarSongsNotYetInLibraryAreAccessibleInMainContext() async throws {
+    let similarSongsData = getTestFileData(name: "similarSongs2_example_1")
+    // one of the similar songs is already known, the other one needs to be created
+    library.createSong(account: account).id = "71458"
+    library.saveContext()
+    let accountObjectId = account.managedObject.objectID
+
+    let storage = AsyncCoreDataAccessWrapper(persistentContainer: cdHelper.persistentContainer)
+    let songObjectIds: [NSManagedObjectID] = try await storage.performAndGet { asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectId)
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: MOCK_PerformanceMonitor())
+      let idParser = XMLParser(data: similarSongsData)
+      idParser.delegate = idParserDelegate
+      idParser.parse()
+
+      let parserDelegate = SsSongParserDelegate(
+        performanceMonitor: MOCK_PerformanceMonitor(),
+        prefetch: asyncCompanion.library.getElements(
+          account: accountAsync,
+          prefetchIDs: idParserDelegate.prefetchIDs
+        ),
+        account: accountAsync,
+        library: asyncCompanion.library,
+        parseNotifier: nil
+      )
+      let parser = XMLParser(data: similarSongsData)
+      parser.delegate = parserDelegate
+      parser.parse()
+      return try asyncCompanion.getPermanentObjectIDs(of: parserDelegate.parsedSongs)
+    }
+
+    let songs = try songObjectIds.map {
+      Song(managedObject: try context.existingObject(with: $0) as! SongMO)
+    }
+    XCTAssertEqual(songs.map { $0.id }.sorted(), ["71458", "71463"])
   }
 }
