@@ -152,6 +152,11 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
   func sync(genre: Genre) async throws {}
   func sync(artist: Artist) async throws {}
   func sync(album: Album) async throws {}
+  func syncSongsInBackground(
+    targets: [AlbumSyncTarget],
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async {}
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool { false }
   func sync(song: Song) async throws {}
   func sync(podcast: Podcast) async throws {}
   func syncNewestPodcastEpisodes() async throws {}

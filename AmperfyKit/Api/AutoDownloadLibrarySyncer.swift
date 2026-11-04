@@ -72,14 +72,10 @@ public class AutoDownloadLibrarySyncer {
     }
 
     fetchNeededNewestAlbums = newNewestAlbums.filter { !$0.isSongsMetaDataSynced }
-    try await withThrowingTaskGroup(of: Void.self) { taskGroup in
-      for album in fetchNeededNewestAlbums {
-        taskGroup.addTask { @MainActor @Sendable in
-          try await self.librarySyncer.sync(album: album)
-        }
-      }
-      try await taskGroup.waitForAll()
+    let targets = fetchNeededNewestAlbums.map {
+      AlbumSyncTarget(objectID: $0.managedObject.objectID, id: $0.id)
     }
+    await librarySyncer.syncSongsInBackground(targets: targets) { false }
 
     if offset == 0, !oldNewestAlbums.isEmpty, !newNewestAlbums.isEmpty,
        storage.settings.accounts.getSetting(account.info).read.isAutoDownloadLatestSongsActive {
