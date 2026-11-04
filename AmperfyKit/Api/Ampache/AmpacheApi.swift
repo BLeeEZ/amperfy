@@ -81,6 +81,16 @@ final class AmpacheApi: BackendApi {
     )
   }
 
+  func generateUrl(
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference,
+    timeOffset: Int
+  ) async throws
+    -> URL {
+    throw BackendError.notSupported
+  }
+
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
     try await ampacheXmlServerApi.generateUrlForArtwork(artworkRemoteInfo: artwork.remoteInfo)
   }
