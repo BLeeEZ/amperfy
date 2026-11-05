@@ -73,6 +73,7 @@ public class AmperKit {
   }
 
   public func resetMeta(_ accountInfo: AccountInfo) {
+    metaManager[accountInfo]?.invalidateDownloadManagers()
     metaManager[accountInfo] = nil
   }
 

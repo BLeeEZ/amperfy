@@ -249,18 +249,22 @@ class BackendAudioPlayer: NSObject {
       repeats: true
     ) { [weak self] _ in
       // Timer already fires on main thread, no need to dispatch again
-      guard let self else { return }
-      self.checkForPreloadNextPlayerItem()
-      self.checkForStuckPlayback()
-      self.responder?.didElapsedTimeChange()
+      MainActor.assumeIsolated {
+        guard let self else { return }
+        self.checkForPreloadNextPlayerItem()
+        self.checkForStuckPlayback()
+        self.responder?.didElapsedTimeChange()
+      }
     }
     timerLyricsTimeInterval = Timer.scheduledTimer(
       withTimeInterval: updateLyricsTimeInterval.seconds,
       repeats: true
     ) { [weak self] _ in
-      guard let self else { return }
-      let cmTime = CMTime(value: Int64(self.elapsedTime * 1_000), timescale: 1_000)
-      self.responder?.didLyricsTimeChange(time: cmTime)
+      MainActor.assumeIsolated {
+        guard let self else { return }
+        let cmTime = CMTime(value: Int64(self.elapsedTime * 1_000), timescale: 1_000)
+        self.responder?.didLyricsTimeChange(time: cmTime)
+      }
     }
   }
 

@@ -124,6 +124,7 @@ class MOCK_SongDownloader: DownloadManageable {
   func cancelDownloads() {}
   func start() {}
   func stop() {}
+  func invalidate() {}
 }
 
 // MARK: - MOCK_AlertDisplayable

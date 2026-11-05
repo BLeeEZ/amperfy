@@ -303,4 +303,9 @@ public class MetaManager {
     artworkDownloadManager.stop()
     playableDownloadManager.stop()
   }
+
+  public func invalidateDownloadManagers() {
+    artworkDownloadManager.invalidate()
+    playableDownloadManager.invalidate()
+  }
 }

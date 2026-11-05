@@ -53,6 +53,10 @@ public protocol DownloadManageable {
   func cancelDownloads()
   func start()
   func stop()
+  /// Stops the manager for good and invalidates its URLSession.
+  /// Must be called before the manager is discarded, otherwise a background session
+  /// with the same identifier stays alive and a new manager can't download anything.
+  func invalidate()
 }
 
 // MARK: - DownloadManagerDelegate

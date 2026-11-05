@@ -296,6 +296,23 @@ actor DownloadManager: NSObject, DownloadManageable {
     cancelDownloads()
   }
 
+  nonisolated func invalidate() {
+    Task {
+      await self._invalidate()
+    }
+  }
+
+  private func _invalidate() async {
+    isRunning = false
+    await _cancelDownloads()
+    // A background URLSession keeps existing (and keeps its delegate alive) until it is
+    // invalidated. Creating a new session with the same identifier while the old one is
+    // still valid is undefined behavior: tasks of the new session never deliver their
+    // callbacks, the download operations never complete and the queue is blocked.
+    urlSession?.invalidateAndCancel()
+    urlSession = nil
+  }
+
   nonisolated func cancelDownloads() {
     Task {
       await self._cancelDownloads()
