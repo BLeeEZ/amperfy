@@ -44,6 +44,47 @@ class SsPlaylistsParserTest: AbstractSsParserTest {
     testParsing()
   }
 
+  /// Parses a getPlaylists response with the given coverArt attribute
+  private func parsePlaylist(coverArt: String?) -> Playlist? {
+    let coverArtAttribute = coverArt.map { " coverArt=\"\($0)\"" } ?? ""
+    let xml = """
+    <?xml version="1.0" encoding="UTF-8"?>
+    <subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.16.1">
+      <playlists>
+        <playlist id="15" name="Some random songs" songCount="6" duration="1391"\(
+          coverArtAttribute
+        )/>
+      </playlists>
+    </subsonic-response>
+    """
+    createParserDelegate()
+    let parser = XMLParser(data: xml.data(using: .utf8)!)
+    parser.delegate = ssParserDelegate
+    parser.parse()
+    return library.getPlaylists(for: account).first { $0.id == "15" }
+  }
+
+  func testServerCover() {
+    let playlist = parsePlaylist(coverArt: "pl-15_6720f1b2")
+    XCTAssertEqual(playlist?.artwork?.remoteInfo, ArtworkRemoteInfo(id: "pl-15_6720f1b2", type: ""))
+    XCTAssertEqual(playlist?.artwork?.status, .NotChecked)
+  }
+
+  func testChangedServerCover() {
+    let oldArtwork = parsePlaylist(coverArt: "pl-15_6720f1b2")?.artwork
+    let newArtwork = parsePlaylist(coverArt: "pl-15_6720f1c3")?.artwork
+    XCTAssertNotNil(newArtwork)
+    XCTAssertNotEqual(oldArtwork, newArtwork)
+    XCTAssertEqual(newArtwork?.remoteInfo.id, "pl-15_6720f1c3")
+  }
+
+  func testRemovedServerCover() {
+    XCTAssertNotNil(parsePlaylist(coverArt: "pl-15_6720f1b2")?.artwork)
+    XCTAssertNil(parsePlaylist(coverArt: nil)?.artwork)
+    XCTAssertNotNil(parsePlaylist(coverArt: "pl-15_6720f1b2")?.artwork)
+    XCTAssertNil(parsePlaylist(coverArt: "")?.artwork)
+  }
+
   override func checkCorrectParsing() {
     let playlists = library.getPlaylists(for: account)
     XCTAssertEqual(playlists.count, 2)

@@ -26,14 +26,25 @@ public class ArtworkCollection {
   public let defaultArtworkType: ArtworkType
   public let singleImageEntity: AbstractLibraryEntity?
   public let quadImageEntity: [AbstractLibraryEntity]?
+  /// Cover provided by the server (e.g. for a playlist). Shown instead of the entities as soon
+  /// as it is downloaded, until then the entities are shown.
+  public let serverArtwork: Artwork?
 
   init(
     defaultArtworkType: ArtworkType,
     singleImageEntity: AbstractLibraryEntity?,
-    quadImageEntity: [AbstractLibraryEntity]? = nil
+    quadImageEntity: [AbstractLibraryEntity]? = nil,
+    serverArtwork: Artwork? = nil
   ) {
+    self.serverArtwork = serverArtwork
     self.defaultArtworkType = defaultArtworkType
     self.singleImageEntity = singleImageEntity
     self.quadImageEntity = quadImageEntity
+  }
+
+  /// The server cover if it is downloaded, it then replaces the entities
+  public var downloadedServerArtwork: Artwork? {
+    guard let serverArtwork, serverArtwork.imagePath != nil else { return nil }
+    return serverArtwork
   }
 }
