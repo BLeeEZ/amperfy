@@ -137,7 +137,9 @@ class BasicTableViewController: KeyCommandTableViewController {
         guard let indexPath = tableView.indexPath(for: cell) else { continue }
         let isLastRowInSection = indexPath.row == tableView
           .numberOfRows(inSection: indexPath.section) - 1
-        cell.isSectionEndSeparatorVisible = showSeparators && isLastRowInSection
+        // nothing follows the last row of the table, so it doesn't need a separator
+        let isLastSection = indexPath.section == tableView.numberOfSections - 1
+        cell.isSectionEndSeparatorVisible = showSeparators && isLastRowInSection && !isLastSection
       }
     }
   #endif
