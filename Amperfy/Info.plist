@@ -31,7 +31,7 @@
 			<string>de.familie-zimba.Amperfy</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>amperfy</string>
+				<string>imusify</string>
 			</array>
 		</dict>
 	</array>

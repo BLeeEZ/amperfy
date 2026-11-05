@@ -184,8 +184,8 @@ public class IntentManager {
         name: "SearchAndPlay",
         description: "Plays the first search result for searchTerm in searchCategory from the currently active account with the given player options",
         exampleURLs: [
-          "amperfy://x-callback-url/searchAndPlay?searchTerm=Awesome&searchCategory=playlist",
-          "amperfy://x-callback-url/searchAndPlay?searchTerm=Example&searchCategory=artist&shuffleOption=1&repeatOption=2",
+          "imusify://x-callback-url/searchAndPlay?searchTerm=Awesome&searchCategory=playlist",
+          "imusify://x-callback-url/searchAndPlay?searchTerm=Example&searchCategory=artist&shuffleOption=1&repeatOption=2",
         ],
         action: "searchAndPlay",
         parameters: [
@@ -295,8 +295,8 @@ public class IntentManager {
         name: "PlayID",
         description: "Plays the library element with the given ID from the currently active account with the provided player options",
         exampleURLs: [
-          "amperfy://x-callback-url/playID?id=123456&libraryElementType=playlist",
-          "amperfy://x-callback-url/playID?id=aa2349&libraryElementType=artist&shuffleOption=1&repeatOption=2",
+          "imusify://x-callback-url/playID?id=123456&libraryElementType=playlist",
+          "imusify://x-callback-url/playID?id=aa2349&libraryElementType=artist&shuffleOption=1&repeatOption=2",
         ],
         action: "playID",
         parameters: [
@@ -403,8 +403,8 @@ public class IntentManager {
         name: "PlayRandomSongs",
         description: "Plays \(player.maxSongsToAddOnce) random songs from the currently active account",
         exampleURLs: [
-          "amperfy://x-callback-url/playRandomSongs",
-          "amperfy://x-callback-url/playRandomSongs?onlyCached=1",
+          "imusify://x-callback-url/playRandomSongs",
+          "imusify://x-callback-url/playRandomSongs?onlyCached=1",
         ],
         action: "playRandomSongs",
         parameters: [
@@ -450,7 +450,7 @@ public class IntentManager {
         name: "Play",
         description: "Changes the play state of the player to play",
         exampleURLs: [
-          "amperfy://x-callback-url/play",
+          "imusify://x-callback-url/play",
         ],
         action: "play",
         parameters: [
@@ -467,7 +467,7 @@ public class IntentManager {
         name: "Pause",
         description: "Changes the play state of the player to pause",
         exampleURLs: [
-          "amperfy://x-callback-url/pause",
+          "imusify://x-callback-url/pause",
         ],
         action: "pause",
         parameters: [
@@ -484,7 +484,7 @@ public class IntentManager {
         name: "TogglePlayPause",
         description: "Toggles the play state of the player (play/pause)",
         exampleURLs: [
-          "amperfy://x-callback-url/togglePlayPause",
+          "imusify://x-callback-url/togglePlayPause",
         ],
         action: "togglePlayPause",
         parameters: [
@@ -501,7 +501,7 @@ public class IntentManager {
         name: "PlayNext",
         description: "The next track will be played",
         exampleURLs: [
-          "amperfy://x-callback-url/playNext",
+          "imusify://x-callback-url/playNext",
         ],
         action: "playNext",
         parameters: [
@@ -518,7 +518,7 @@ public class IntentManager {
         name: "PlayPreviousOrReplay",
         description: "The previous track will be played (if the tracked plays longer than \(AudioPlayer.replayInsteadPlayPreviousTimeInSec) seconds the track starts from the beginning)",
         exampleURLs: [
-          "amperfy://x-callback-url/playPreviousOrReplay",
+          "imusify://x-callback-url/playPreviousOrReplay",
         ],
         action: "playPreviousOrReplay",
         parameters: [
@@ -536,7 +536,7 @@ public class IntentManager {
         name: "SetShuffle",
         description: "Sets the shuffle state of the player",
         exampleURLs: [
-          "amperfy://x-callback-url/setShuffle?shuffleOption=1",
+          "imusify://x-callback-url/setShuffle?shuffleOption=1",
         ],
         action: "setShuffle",
         parameters: [
@@ -581,7 +581,7 @@ public class IntentManager {
         name: "SetRepeat",
         description: "Sets the shuffle state of the player",
         exampleURLs: [
-          "amperfy://x-callback-url/setRepeat?repeatOption=2",
+          "imusify://x-callback-url/setRepeat?repeatOption=2",
         ],
         action: "setRepeat",
         parameters: [
@@ -621,7 +621,7 @@ public class IntentManager {
         name: "SetOfflineMode",
         description: "Sets the Musify offline mode to active/inactive",
         exampleURLs: [
-          "amperfy://x-callback-url/setOfflineMode?offlineMode=1",
+          "imusify://x-callback-url/setOfflineMode?offlineMode=1",
         ],
         action: "setOfflineMode",
         parameters: [
@@ -662,8 +662,8 @@ public class IntentManager {
         name: "RateCurrentlyPlayingSong",
         description: "Rate the currently playing song.",
         exampleURLs: [
-          "amperfy://x-callback-url/rateCurrentlyPlayingSong?rating=0",
-          "amperfy://x-callback-url/rateCurrentlyPlayingSong?rating=5",
+          "imusify://x-callback-url/rateCurrentlyPlayingSong?rating=0",
+          "imusify://x-callback-url/rateCurrentlyPlayingSong?rating=5",
         ],
         action: "rateCurrentlyPlayingSong",
         parameters: [
@@ -734,8 +734,8 @@ public class IntentManager {
         name: "FavoriteCurrentlyPlayingSong",
         description: "Mark the currently playing song as favorite.",
         exampleURLs: [
-          "amperfy://x-callback-url/favoriteCurrentlyPlayingSong?favorite=0",
-          "amperfy://x-callback-url/favoriteCurrentlyPlayingSong?favorite=1",
+          "imusify://x-callback-url/favoriteCurrentlyPlayingSong?favorite=0",
+          "imusify://x-callback-url/favoriteCurrentlyPlayingSong?favorite=1",
         ],
         action: "favoriteCurrentlyPlayingSong",
         parameters: [

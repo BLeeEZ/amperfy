@@ -20,18 +20,12 @@
 //
 
 import AmperfyKit
-import MessageUI
 import SwiftUI
 
 // MARK: - SupportSettingsView
 
 struct SupportSettingsView: View {
   let splitPercentage = 0.15
-
-  @State
-  var result: Result<MFMailComposeResult, Error>? = nil
-  @State
-  var isShowingMailView = false
 
   var body: some View {
     ZStack {
@@ -41,23 +35,8 @@ struct SupportSettingsView: View {
             title: "Report an issue on GitHub",
             splitPercentage: splitPercentage
           ) {
-            if let url = URL(string: "https://github.com/BLeeEZ/amperfy/issues") {
+            if let url = URL(string: "https://github.com/DCM4711/amperfy/issues") {
               UIApplication.shared.open(url)
-            }
-          }
-          SettingsButtonRow(
-            title: "Send issue or feedback to developer",
-            splitPercentage: splitPercentage
-          ) {
-            if MFMailComposeViewController.canSendMail() {
-              isShowingMailView.toggle()
-            } else {
-              appDelegate.eventLogger.info(
-                topic: "Email Info",
-                statusCode: .emailError,
-                message: "Email is not configured in settings app or Musify is not able to send an email.",
-                displayPopup: true
-              )
             }
           }
         }
@@ -67,25 +46,6 @@ struct SupportSettingsView: View {
             Text("Event Log")
           }
         }
-      }
-      .sheet(isPresented: $isShowingMailView) {
-        MailView(
-          result: $result,
-          subject: "Musify support",
-          messageBody: """
-          \nPlease describe your issue.
-          \nFeedback is always welcome too.
-          \n
-          \n
-          --- Please don't remove the attachment ---
-          """,
-          recipients: ["amperfy@familie-zimba.de"],
-          attachments: [MailAttachment(
-            data: LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData(),
-            mimeType: "application/json",
-            fileName: "MusifyLog.json"
-          )]
-        )
       }
     }
     .navigationTitle("Support")
