@@ -757,15 +757,15 @@ public class SongsFetchedResultsController: CachedFetchedResultsController<SongM
     ])
     fetchRequest.relationshipKeyPathsForPrefetching = SongMO.relationshipKeyPathsForPrefetching
     fetchRequest.returnsObjectsAsFaults = false
+    // CPU load for song VCs is high when background sync is active
+    // reduce the CPU load on song VCs by turning updates off for those VCs
     super.init(
       coreDataCompanion: coreDataCompanion,
       fetchRequest: fetchRequest, account: account,
       sectionIndexType: sortType.asSectionIndexType,
-      isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
+      isGroupedInAlphabeticSections: isGroupedInAlphabeticSections,
+      keepAllResultsUpdated: false
     )
-    // CPU load for song VCs is high when background sync is active
-    // reduce the CPU load on song VCs by turning updates off for those VCs
-    keepAllResultsUpdated = false
   }
 
   public func search(
