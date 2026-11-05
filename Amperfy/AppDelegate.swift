@@ -373,6 +373,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
   }
 
+  func switchToolbarCollapseMode(isToolbarPlayerAutoCollapse: Bool) {
+    appDelegate.storage.settings.user.isToolbarPlayerAutoCollapse = isToolbarPlayerAutoCollapse
+    appDelegate.notificationHandler.post(
+      name: .autoCollapseToolbarPlayerChanged,
+      object: nil,
+      userInfo: nil
+    )
+  }
+
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
     if #available(iOS 13.0, *) {
       UIApplication.shared.connectedScenes
