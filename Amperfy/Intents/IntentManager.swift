@@ -619,7 +619,7 @@ public class IntentManager {
     documentation.append(
       XCallbackActionDocu(
         name: "SetOfflineMode",
-        description: "Sets the Musify offline mode to active/inactive",
+        description: "Sets the iMusify offline mode to active/inactive",
         exampleURLs: [
           "imusify://x-callback-url/setOfflineMode?offlineMode=1",
         ],

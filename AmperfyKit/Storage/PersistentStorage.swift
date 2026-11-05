@@ -220,6 +220,38 @@ public class CoreDataPersistentManager: CoreDataManagable {
       name: "Amperfy",
       managedObjectModel: Self.managedObjectModel
     )
+
+    // On Mac Catalyst, NSPersistentContainer uses
+    // `Application Support/<executableName>/<containerName>.sqlite` by
+    // default, so any change to PRODUCT_NAME (e.g. renaming the app bundle
+    // from "Amperfy" to "iMusify") would silently start a brand-new empty
+    // store and the user's existing library would appear to have been wiped.
+    // Pin the store path to "Application Support/Amperfy/Amperfy.sqlite" so
+    // it is independent of the executable name.
+    //
+    // On iOS the default path is `Application Support/<containerName>.sqlite`
+    // (no per-executable subfolder, because iOS apps are sandboxed
+    // individually), so PRODUCT_NAME does not affect the path there. We
+    // therefore leave the iOS default in place to avoid moving the existing
+    // SQLite away from where prior installs already created it.
+    #if targetEnvironment(macCatalyst)
+      if let appSupportURL = try? FileManager.default.url(
+        for: .applicationSupportDirectory,
+        in: .userDomainMask,
+        appropriateFor: nil,
+        create: true
+      ) {
+        let amperfyDirectoryURL = appSupportURL
+          .appendingPathComponent("Amperfy", isDirectory: true)
+        try? FileManager.default.createDirectory(
+          at: amperfyDirectoryURL,
+          withIntermediateDirectories: true
+        )
+        let pinnedStoreURL = amperfyDirectoryURL.appendingPathComponent("Amperfy.sqlite")
+        container.persistentStoreDescriptions.first?.url = pinnedStoreURL
+      }
+    #endif
+
     let description = container.persistentStoreDescriptions.first
     description?.shouldInferMappingModelAutomatically = false
     description?.shouldMigrateStoreAutomatically = false

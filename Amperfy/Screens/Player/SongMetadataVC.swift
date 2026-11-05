@@ -2,7 +2,7 @@
 //  SongMetadataVC.swift
 //  Amperfy
 //
-//  Created for Musify
+//  Created for iMusify
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ import UIKit
 class SongMetadataVC: UIViewController {
   var playable: AbstractPlayable?
   private var amperKit: AmperKit { AmperKit.shared }
-  
+
   private let scrollView = UIScrollView()
   private let stackView = UIStackView()
   private var isUserDownloaded = false
-  
+
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+
     // Dynamic background based on light/dark mode
     view.backgroundColor = UIColor { traitCollection in
       if traitCollection.userInterfaceStyle == .dark {
@@ -42,7 +42,7 @@ class SongMetadataVC: UIViewController {
         return UIColor.white.withAlphaComponent(0.45)
       }
     }
-    
+
     setupScrollView()
     setupBorderOverlay()
     buildMetadataContent()
@@ -74,22 +74,22 @@ class SongMetadataVC: UIViewController {
       subview.layer.borderColor = UIColor.separator.cgColor
     }
   }
-  
+
   private func setupScrollView() {
     scrollView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(scrollView)
-    
+
     stackView.translatesAutoresizingMaskIntoConstraints = false
     stackView.axis = .vertical
     stackView.spacing = 12
     scrollView.addSubview(stackView)
-    
+
     NSLayoutConstraint.activate([
       scrollView.topAnchor.constraint(equalTo: view.topAnchor),
       scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-      
+
       stackView.topAnchor.constraint(equalTo: scrollView.topAnchor, constant: 16),
       stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor, constant: 16),
       stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor, constant: -16),
@@ -97,10 +97,10 @@ class SongMetadataVC: UIViewController {
       stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor, constant: -32),
     ])
   }
-  
+
   private func buildMetadataContent() {
     guard let playable = playable else { return }
-    
+
     // General Section
     var generalRows: [(String, String)] = []
     generalRows.append(("Title", playable.title))
@@ -119,7 +119,10 @@ class SongMetadataVC: UIViewController {
     generalRows.append(("Track", playable.track > 0 ? "\(playable.track)" : ""))
     generalRows.append(("Disc", playable.disk ?? ""))
     generalRows.append(("Year", playable.year > 0 ? "\(playable.year)" : ""))
-    generalRows.append(("Duration", playable.duration > 0 ? playable.duration.asDurationString : ""))
+    generalRows.append((
+      "Duration",
+      playable.duration > 0 ? playable.duration.asDurationString : ""
+    ))
 
     if let song = playable.asSong {
       generalRows.append(("Rating", song.rating > 0 ? "\(song.rating) / 5" : "Not rated"))
@@ -156,15 +159,27 @@ class SongMetadataVC: UIViewController {
     // ReplayGain Section
     var replayGainRows: [(String, String)] = []
     let trackGainSign = playable.replayGainTrackGain >= 0 ? "+" : ""
-    replayGainRows.append(("Track Gain", playable.replayGainTrackGain != 0
-      ? String(format: "%@%.2f dB", trackGainSign, playable.replayGainTrackGain) : ""))
-    replayGainRows.append(("Track Peak", playable.replayGainTrackPeak != 0
-      ? String(format: "%.6f", playable.replayGainTrackPeak) : ""))
+    replayGainRows.append((
+      "Track Gain",
+      playable.replayGainTrackGain != 0
+        ? String(format: "%@%.2f dB", trackGainSign, playable.replayGainTrackGain) : ""
+    ))
+    replayGainRows.append((
+      "Track Peak",
+      playable.replayGainTrackPeak != 0
+        ? String(format: "%.6f", playable.replayGainTrackPeak) : ""
+    ))
     let albumGainSign = playable.replayGainAlbumGain >= 0 ? "+" : ""
-    replayGainRows.append(("Album Gain", playable.replayGainAlbumGain != 0
-      ? String(format: "%@%.2f dB", albumGainSign, playable.replayGainAlbumGain) : ""))
-    replayGainRows.append(("Album Peak", playable.replayGainAlbumPeak != 0
-      ? String(format: "%.6f", playable.replayGainAlbumPeak) : ""))
+    replayGainRows.append((
+      "Album Gain",
+      playable.replayGainAlbumGain != 0
+        ? String(format: "%@%.2f dB", albumGainSign, playable.replayGainAlbumGain) : ""
+    ))
+    replayGainRows.append((
+      "Album Peak",
+      playable.replayGainAlbumPeak != 0
+        ? String(format: "%.6f", playable.replayGainAlbumPeak) : ""
+    ))
 
     addSection(title: "ReplayGain", rows: replayGainRows)
 
@@ -172,12 +187,15 @@ class SongMetadataVC: UIViewController {
     var downloadRows: [(String, String)] = []
     isUserDownloaded = playable.isCached
     downloadRows.append(("Downloaded", isUserDownloaded ? "Yes" : "No"))
-    downloadRows.append(("Downloaded Format", isUserDownloaded
-      ? (playable.contentTypeTranscoded ?? "") : ""))
+    downloadRows.append((
+      "Downloaded Format",
+      isUserDownloaded
+        ? (playable.contentTypeTranscoded ?? "") : ""
+    ))
 
     addDownloadSection(rows: downloadRows, isDownloaded: isUserDownloaded)
   }
-  
+
   private func addDownloadSection(rows: [(String, String)], isDownloaded: Bool) {
     // Section header
     let headerLabel = UILabel()
@@ -185,58 +203,58 @@ class SongMetadataVC: UIViewController {
     headerLabel.font = .systemFont(ofSize: 12, weight: .medium)
     headerLabel.textColor = .secondaryLabel
     headerLabel.translatesAutoresizingMaskIntoConstraints = false
-    
+
     let headerContainer = UIView()
     headerContainer.translatesAutoresizingMaskIntoConstraints = false
     headerContainer.addSubview(headerLabel)
-    
+
     NSLayoutConstraint.activate([
       headerLabel.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor, constant: 12),
       headerLabel.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor, constant: -12),
       headerLabel.topAnchor.constraint(equalTo: headerContainer.topAnchor, constant: 8),
       headerLabel.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor, constant: -4),
     ])
-    
+
     stackView.addArrangedSubview(headerContainer)
-    
+
     // Section content container
     let sectionContainer = UIView()
     sectionContainer.backgroundColor = .clear
     sectionContainer.translatesAutoresizingMaskIntoConstraints = false
-    
+
     let rowsStackView = UIStackView()
     rowsStackView.axis = .vertical
     rowsStackView.spacing = 0
     rowsStackView.translatesAutoresizingMaskIntoConstraints = false
     sectionContainer.addSubview(rowsStackView)
-    
+
     NSLayoutConstraint.activate([
       rowsStackView.topAnchor.constraint(equalTo: sectionContainer.topAnchor),
       rowsStackView.leadingAnchor.constraint(equalTo: sectionContainer.leadingAnchor),
       rowsStackView.trailingAnchor.constraint(equalTo: sectionContainer.trailingAnchor),
       rowsStackView.bottomAnchor.constraint(equalTo: sectionContainer.bottomAnchor),
     ])
-    
+
     // Add info rows
     for (index, row) in rows.enumerated() {
       let rowView = createRowView(label: row.0, value: row.1, isLast: false)
       rowsStackView.addArrangedSubview(rowView)
     }
-    
+
     // Add download/delete button row
     let buttonRow = createDownloadButtonRow(isDownloaded: isDownloaded)
     rowsStackView.addArrangedSubview(buttonRow)
-    
+
     stackView.addArrangedSubview(sectionContainer)
   }
-  
+
   private func createDownloadButtonRow(isDownloaded: Bool) -> UIView {
     let container = UIView()
     container.translatesAutoresizingMaskIntoConstraints = false
-    
+
     var config = UIButton.Configuration.plain()
     config.imagePadding = 8
-    
+
     if isDownloaded {
       config.title = "Delete from Device"
       config.image = UIImage(systemName: "trash")
@@ -246,39 +264,39 @@ class SongMetadataVC: UIViewController {
       config.image = UIImage(systemName: "arrow.down.circle")
       config.baseForegroundColor = .label
     }
-    
+
     let button = UIButton(configuration: config)
     button.translatesAutoresizingMaskIntoConstraints = false
     button.addTarget(self, action: #selector(downloadButtonTapped), for: .touchUpInside)
-    
+
     container.addSubview(button)
-    
+
     NSLayoutConstraint.activate([
       button.centerXAnchor.constraint(equalTo: container.centerXAnchor),
       button.centerYAnchor.constraint(equalTo: container.centerYAnchor),
       container.heightAnchor.constraint(equalToConstant: 50),
     ])
-    
+
     return container
   }
-  
+
   @objc
   private func downloadButtonTapped() {
     guard let playable = playable else { return }
-    
+
     if isUserDownloaded {
       // Delete the cache file
       amperKit.storage.main.library.deleteCache(ofPlayable: playable)
-      
+
       // Also delete the DownloadMO record
       if let song = playable.asSong, let downloadMO = song.managedObject.download {
         amperKit.storage.main.context.delete(downloadMO)
       }
-      
+
       amperKit.storage.main.saveContext()
-      
+
       showCopiedToast(message: "Removed from device")
-      
+
       // Refresh the view
       refreshContent()
     } else {
@@ -296,18 +314,18 @@ class SongMetadataVC: UIViewController {
       }
     }
   }
-  
+
   private func refreshContent() {
     // Remove all arranged subviews
     for subview in stackView.arrangedSubviews {
       stackView.removeArrangedSubview(subview)
       subview.removeFromSuperview()
     }
-    
+
     // Rebuild content
     buildMetadataContent()
   }
-  
+
   private func addSection(title: String, rows: [(String, String)]) {
     // Section header
     let headerLabel = UILabel()
@@ -315,43 +333,43 @@ class SongMetadataVC: UIViewController {
     headerLabel.font = .systemFont(ofSize: 12, weight: .medium)
     headerLabel.textColor = .secondaryLabel
     headerLabel.translatesAutoresizingMaskIntoConstraints = false
-    
+
     let headerContainer = UIView()
     headerContainer.translatesAutoresizingMaskIntoConstraints = false
     headerContainer.addSubview(headerLabel)
-    
+
     NSLayoutConstraint.activate([
       headerLabel.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor, constant: 12),
       headerLabel.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor, constant: -12),
       headerLabel.topAnchor.constraint(equalTo: headerContainer.topAnchor, constant: 8),
       headerLabel.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor, constant: -4),
     ])
-    
+
     stackView.addArrangedSubview(headerContainer)
-    
+
     // Section content container
     let sectionContainer = UIView()
     sectionContainer.backgroundColor = .clear
     sectionContainer.translatesAutoresizingMaskIntoConstraints = false
-    
+
     let rowsStackView = UIStackView()
     rowsStackView.axis = .vertical
     rowsStackView.spacing = 0
     rowsStackView.translatesAutoresizingMaskIntoConstraints = false
     sectionContainer.addSubview(rowsStackView)
-    
+
     NSLayoutConstraint.activate([
       rowsStackView.topAnchor.constraint(equalTo: sectionContainer.topAnchor),
       rowsStackView.leadingAnchor.constraint(equalTo: sectionContainer.leadingAnchor),
       rowsStackView.trailingAnchor.constraint(equalTo: sectionContainer.trailingAnchor),
       rowsStackView.bottomAnchor.constraint(equalTo: sectionContainer.bottomAnchor),
     ])
-    
+
     for (index, row) in rows.enumerated() {
       let rowView = createRowView(label: row.0, value: row.1, isLast: index == rows.count - 1)
       rowsStackView.addArrangedSubview(rowView)
     }
-    
+
     stackView.addArrangedSubview(sectionContainer)
   }
 
@@ -458,17 +476,23 @@ class SongMetadataVC: UIViewController {
     return container
   }
 
-  private func createRowView(label: String, value: String, isLast: Bool, showCopyIcon: Bool = false) -> UIView {
+  private func createRowView(
+    label: String,
+    value: String,
+    isLast: Bool,
+    showCopyIcon: Bool = false
+  )
+    -> UIView {
     let container = UIView()
     container.translatesAutoresizingMaskIntoConstraints = false
-    
+
     let labelLabel = UILabel()
     labelLabel.text = label
     labelLabel.font = .systemFont(ofSize: 15)
     labelLabel.textColor = .label
     labelLabel.translatesAutoresizingMaskIntoConstraints = false
     labelLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-    
+
     let valueLabel = UILabel()
     valueLabel.text = value
     valueLabel.font = .systemFont(ofSize: 15)
@@ -477,10 +501,10 @@ class SongMetadataVC: UIViewController {
     valueLabel.numberOfLines = 2
     valueLabel.lineBreakMode = .byTruncatingMiddle
     valueLabel.translatesAutoresizingMaskIntoConstraints = false
-    
+
     container.addSubview(labelLabel)
     container.addSubview(valueLabel)
-    
+
     // Add copy icon if requested
     var copyIcon: UIImageView?
     if showCopyIcon {
@@ -491,23 +515,23 @@ class SongMetadataVC: UIViewController {
       container.addSubview(icon)
       copyIcon = icon
     }
-    
+
     let separator = UIView()
     separator.backgroundColor = .separator
     separator.translatesAutoresizingMaskIntoConstraints = false
     separator.isHidden = isLast
     container.addSubview(separator)
-    
+
     if let copyIcon = copyIcon {
       NSLayoutConstraint.activate([
         labelLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 16),
         labelLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-        
+
         copyIcon.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
         copyIcon.centerYAnchor.constraint(equalTo: container.centerYAnchor),
         copyIcon.widthAnchor.constraint(equalToConstant: 18),
         copyIcon.heightAnchor.constraint(equalToConstant: 18),
-        
+
         valueLabel.leadingAnchor.constraint(equalTo: labelLabel.trailingAnchor, constant: 8),
         valueLabel.trailingAnchor.constraint(equalTo: copyIcon.leadingAnchor, constant: -8),
         valueLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
@@ -516,43 +540,43 @@ class SongMetadataVC: UIViewController {
       NSLayoutConstraint.activate([
         labelLabel.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 16),
         labelLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
-        
+
         valueLabel.leadingAnchor.constraint(equalTo: labelLabel.trailingAnchor, constant: 8),
         valueLabel.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -16),
         valueLabel.centerYAnchor.constraint(equalTo: container.centerYAnchor),
       ])
     }
-    
+
     NSLayoutConstraint.activate([
       container.heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
-      
+
       separator.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 16),
       separator.trailingAnchor.constraint(equalTo: container.trailingAnchor),
       separator.bottomAnchor.constraint(equalTo: container.bottomAnchor),
       separator.heightAnchor.constraint(equalToConstant: 0.5),
     ])
-    
+
     // Add tap gesture to copy value
     let tap = UITapGestureRecognizer(target: self, action: #selector(rowTapped(_:)))
     container.addGestureRecognizer(tap)
     container.isUserInteractionEnabled = true
     container.accessibilityLabel = value
-    
+
     return container
   }
-  
+
   @objc
   private func rowTapped(_ gesture: UITapGestureRecognizer) {
     guard let view = gesture.view, let value = view.accessibilityLabel else { return }
     UIPasteboard.general.string = value
-    
+
     let generator = UINotificationFeedbackGenerator()
     generator.notificationOccurred(.success)
-    
+
     // Show toast notification
     showCopiedToast(message: "Copied to clipboard")
   }
-  
+
   private func showCopiedToast(message: String = "Copied to clipboard") {
     let toast = UILabel()
     toast.text = message
@@ -570,19 +594,19 @@ class SongMetadataVC: UIViewController {
     toast.clipsToBounds = true
     toast.translatesAutoresizingMaskIntoConstraints = false
     toast.alpha = 0
-    
+
     view.addSubview(toast)
-    
+
     NSLayoutConstraint.activate([
       toast.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       toast.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
       toast.widthAnchor.constraint(greaterThanOrEqualToConstant: 150),
       toast.heightAnchor.constraint(equalToConstant: 36),
     ])
-    
+
     // Add padding
     toast.layoutMargins = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
-    
+
     UIView.animate(withDuration: 0.2) {
       toast.alpha = 1
     } completion: { _ in
@@ -595,13 +619,14 @@ class SongMetadataVC: UIViewController {
   }
 }
 
-// MARK: - UIPopoverPresentationControllerDelegate
+// MARK: UIPopoverPresentationControllerDelegate
 
 extension SongMetadataVC: UIPopoverPresentationControllerDelegate {
   func adaptivePresentationStyle(
     for controller: UIPresentationController,
     traitCollection: UITraitCollection
-  ) -> UIModalPresentationStyle {
-    .none  // Keep popover style on iPhone too
+  )
+    -> UIModalPresentationStyle {
+    .none // Keep popover style on iPhone too
   }
 }

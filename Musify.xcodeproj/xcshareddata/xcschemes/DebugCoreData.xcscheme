@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "508385E321C5965B00C4BB32"
-               BuildableName = "Amperfy.app"
+               BuildableName = "iMusify.app"
                BlueprintName = "Amperfy"
                ReferencedContainer = "container:Musify.xcodeproj">
             </BuildableReference>
@@ -97,7 +97,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "508385E321C5965B00C4BB32"
-            BuildableName = "Amperfy.app"
+            BuildableName = "iMusify.app"
             BlueprintName = "Amperfy"
             ReferencedContainer = "container:Musify.xcodeproj">
          </BuildableReference>
@@ -120,7 +120,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "508385E321C5965B00C4BB32"
-            BuildableName = "Amperfy.app"
+            BuildableName = "iMusify.app"
             BlueprintName = "Amperfy"
             ReferencedContainer = "container:Musify.xcodeproj">
          </BuildableReference>

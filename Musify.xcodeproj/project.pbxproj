@@ -3086,10 +3086,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.1;
-				"MARKETING_VERSION[sdk=macosx*]" = 2.1.1;
+				MARKETING_VERSION = 1.1.0;
+				"MARKETING_VERSION[sdk=macosx*]" = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cc.silversurfer.musifyapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = Amperfy;
+				PRODUCT_NAME = iMusify;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -3126,10 +3127,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.1.1;
-				"MARKETING_VERSION[sdk=macosx*]" = 2.1.1;
+				MARKETING_VERSION = 1.1.0;
+				"MARKETING_VERSION[sdk=macosx*]" = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = cc.silversurfer.musifyapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_MODULE_NAME = Amperfy;
+				PRODUCT_NAME = iMusify;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -3281,7 +3283,7 @@
 				SWIFT_UPCOMING_FEATURE_REGION_BASED_ISOLATION = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Amperfy.app/Amperfy";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iMusify.app/iMusify";
 			};
 			name = Debug;
 		};
@@ -3313,7 +3315,7 @@
 				SWIFT_UPCOMING_FEATURE_REGION_BASED_ISOLATION = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Amperfy.app/Amperfy";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iMusify.app/iMusify";
 			};
 			name = Release;
 		};

@@ -40,7 +40,7 @@ public struct LogData: Encodable {
     var logData = LogData()
 
     var basicInfo = BasicInfo()
-    basicInfo.appName = "Musify"
+    basicInfo.appName = "iMusify"
     basicInfo.appVersion = AmperKit.version
     basicInfo.appBuildNumber = AmperKit.buildNumber
     logData.basicInfo = basicInfo

@@ -48,9 +48,9 @@ extension AppDelegate {
     guard builder.system == .main else { return }
 
     #if targetEnvironment(macCatalyst) // ok
-      // Replace About menu with custom Musify version info
+      // Replace About menu with custom iMusify version info
       builder.replace(menu: .about, with: UIMenu(options: .displayInline, children: [
-        UIAction(title: "About Musify") { _ in
+        UIAction(title: "About iMusify") { _ in
           self.showCustomAboutPanel()
         },
       ]))
@@ -127,7 +127,7 @@ extension AppDelegate {
     A fork of Amperfy by Maximilian Bauer
     Licensed under GPLv3
     """
-    let alert = UIAlertController(title: "Musify", message: message, preferredStyle: .alert)
+    let alert = UIAlertController(title: "iMusify", message: message, preferredStyle: .alert)
     alert.addAction(UIAlertAction(title: "OK", style: .default))
 
     if let windowScene = UIApplication.shared.connectedScenes

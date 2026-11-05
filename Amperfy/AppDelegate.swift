@@ -37,7 +37,7 @@ let defaultWindowActivityType = "amperfy.main"
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-  static let name = "Musify"
+  static let name = "iMusify"
   static var version: String {
     (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
   }
@@ -236,8 +236,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func restartByUser() {
     Task {
       await localNotificationManager.notifyDebugAndWait(
-        title: "Musify Restart",
-        body: "Tap to reopen Musify"
+        title: "iMusify Restart",
+        body: "Tap to reopen iMusify"
       )
       stopForInit()
       // close Amperfy

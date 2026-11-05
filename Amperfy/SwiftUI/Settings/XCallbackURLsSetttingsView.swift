@@ -30,7 +30,7 @@ struct XCallbackURLsSetttingsView: View {
       SettingsList {
         Section {
           Text(
-            "Musify's X-Callback-URL API can be used to perform actions from other Apps or via Siri Shortcuts. All available actions with their detail information can be found below:"
+            "iMusify's X-Callback-URL API can be used to perform actions from other Apps or via Siri Shortcuts. All available actions with their detail information can be found below:"
           )
           .font(.caption)
         }

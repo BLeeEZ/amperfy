@@ -15,9 +15,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>Musify</string>
+	<string>iMusify</string>
 	<key>CFBundleName</key>
-	<string>Musify</string>
+	<string>iMusify</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -41,9 +41,9 @@
 	<array>
 		<dict>
 			<key>INAlternativeAppName</key>
-			<string>Musify Music</string>
+			<string>iMusify Music</string>
 			<key>INAlternativeAppNamePronunciationHint</key>
-			<string>musify music</string>
+			<string>i musify music</string>
 		</dict>
 	</array>
 	<key>INIntentsSupported</key>

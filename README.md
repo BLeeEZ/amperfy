@@ -1,6 +1,6 @@
-# ![App Icon](Assets/icon-64.png) Musify
-Musify is a fork of the Amperfy project with adjustments for my personal needs. I want to thank BLeeEZ for the awesome work that Amperfy represents. My modifications to Amperfy will probably not be liked by most Amperfy users as I have even removed features/settings that I personally do not need. I am a big advocate of a simple UI and provide a minimal number of settings options.
-I do not implement pull requests - please support the Amperfy project if you want features to be added. I will include Amperfy updates in Musify from time to time though.
+# ![App Icon](Assets/icon-64.png) iMusify
+iMusify is a fork of the Amperfy project with adjustments for my personal needs. I want to thank BLeeEZ for the awesome work that Amperfy represents. My modifications to Amperfy will probably not be liked by most Amperfy users as I have even removed features/settings that I personally do not need. I am a big advocate of a simple UI and provide a minimal number of settings options.
+I do not implement pull requests - please support the Amperfy project if you want features to be added. I will include Amperfy updates in iMusify from time to time though.
 
 ### This is a list of changes I made to Amperfy:
 
@@ -52,23 +52,23 @@ I do not implement pull requests - please support the Amperfy project if you wan
 
 ## Comparision:
 
-#### Grid view (Amperfy / Musify):
-<img src="Assets/amperfy01.jpeg" width="400" alt="GridView Amperfy"> <img src="Assets/musify01.jpeg" width="400" alt="GridView Musify">
+#### Grid view (Amperfy / iMusify):
+<img src="Assets/amperfy01.jpeg" width="400" alt="GridView Amperfy"> <img src="Assets/musify01.jpeg" width="400" alt="GridView iMusify">
 
-#### Star ratings in song lists (Amperfy / Musify):
-<img src="Assets/amperfy02.jpeg" width="400" alt="Song-List Amperfy"> <img src="Assets/musify02.jpeg" width="400" alt="Song-List Musify">
+#### Star ratings in song lists (Amperfy / iMusify):
+<img src="Assets/amperfy02.jpeg" width="400" alt="Song-List Amperfy"> <img src="Assets/musify02.jpeg" width="400" alt="Song-List iMusify">
 
-#### Currently playing view (Amperfy / Musify):
-<img src="Assets/amperfy03.jpeg" width="400" alt="Currently Playing Amperfy"> <img src="Assets/musify03.jpeg" width="400" alt="Currently Playing Musify">
+#### Currently playing view (Amperfy / iMusify):
+<img src="Assets/amperfy03.jpeg" width="400" alt="Currently Playing Amperfy"> <img src="Assets/musify03.jpeg" width="400" alt="Currently Playing iMusify">
 
-#### Lyrics view (Amperfy / Musify):
-<img src="Assets/amperfy04.jpeg" width="400" alt="Lyrics View Amperfy"> <img src="Assets/musify04.jpeg" width="400" alt="Lyrics View Musify">
+#### Lyrics view (Amperfy / iMusify):
+<img src="Assets/amperfy04.jpeg" width="400" alt="Lyrics View Amperfy"> <img src="Assets/musify04.jpeg" width="400" alt="Lyrics View iMusify">
 
 #### Context Menu (Amperfy / Amperfy):
 <img src="Assets/amperfy05a.jpeg" width="400" alt="Context Menu Amperfy"> <img src="Assets/amperfy05b.jpeg" width="400" alt="Context Menu Amperfy">
 
-#### Context Menu & Song Info view (Musify / Musify):
-<img src="Assets/musify05.jpeg" width="400" alt="Context Menu Musify"> <img src="Assets/musify06.jpeg" width="400" alt="Song Info Musify">
+#### Context Menu & Song Info view (iMusify / iMusify):
+<img src="Assets/musify05.jpeg" width="400" alt="Context Menu iMusify"> <img src="Assets/musify06.jpeg" width="400" alt="Song Info iMusify">
 
 * * *
 

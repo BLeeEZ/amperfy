@@ -9,9 +9,9 @@
 			<string>INPlayMediaIntent</string>
 			<key>IntentExamples</key>
 			<array>
-				<string>Play the example band in Musify</string>
-				<string>Play playlist example in Musify</string>
-				<string>Play title by artist in Musify</string>
+				<string>Play the example band in iMusify</string>
+				<string>Play playlist example in iMusify</string>
+				<string>Play title by artist in iMusify</string>
 			</array>
 		</dict>
 	</array>

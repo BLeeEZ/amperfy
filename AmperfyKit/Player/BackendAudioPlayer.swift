@@ -104,19 +104,19 @@ class BackendAudioPlayer: NSObject {
   private var timerElapsedTimeInterval: Timer?
   private var timerLyricsTimeInterval: Timer?
   private var volumePlayer: Float = 1.0
-  
+
   // Playback watchdog - detects stuck playback
   private var lastKnownElapsedTime: Double = 0.0
   private var stuckPlaybackCheckCount: Int = 0
-  private let maxStuckPlaybackChecks: Int = 3  // After 3 seconds of no progress, attempt recovery
-  
+  private let maxStuckPlaybackChecks: Int = 3 // After 3 seconds of no progress, attempt recovery
+
   // Startup watchdog - detects when playback fails to start
   private var startupWatchdogTimer: Timer?
   private var expectedPlaybackStartTime: Date?
-  
+
   // Pending asset to play when user presses play (used when autoStartPlayback is false)
   private var pendingPlayAsset: AVURLAsset?
-  
+
   // Track the currently playing playable (for switching from stream to cache on seek)
   private var currentPlayable: AbstractPlayable?
 
@@ -237,11 +237,11 @@ class BackendAudioPlayer: NSObject {
 
   private func startTimers() {
     stopTimers()
-    
+
     // Reset watchdog state
     lastKnownElapsedTime = elapsedTime
     stuckPlaybackCheckCount = 0
-    
+
     // Use DispatchQueue timers instead of creating Tasks every tick
     // This prevents Task accumulation when main thread is busy
     timerElapsedTimeInterval = Timer.scheduledTimer(
@@ -301,7 +301,7 @@ class BackendAudioPlayer: NSObject {
       }
     }
   }
-  
+
   /// Watchdog to detect and recover from stuck playback
   /// This handles cases where the UI shows "playing" but audio isn't actually progressing
   private func checkForStuckPlayback() {
@@ -311,26 +311,40 @@ class BackendAudioPlayer: NSObject {
       lastKnownElapsedTime = 0
       return
     }
-    
+
     let currentElapsed = elapsedTime
     let playerState = player?.getState()
-    
+
     // Check if elapsed time is stuck (either at 0 or not advancing)
     let isStuck = abs(currentElapsed - lastKnownElapsedTime) < 0.1
-    
+
     if isStuck {
       // Elapsed time hasn't changed significantly
       stuckPlaybackCheckCount += 1
-      os_log(.debug, "Playback watchdog: no progress detected (%d/%d), elapsed=%f, state=%s", 
-             stuckPlaybackCheckCount, maxStuckPlaybackChecks, currentElapsed, String(describing: playerState))
-      
+      os_log(
+        .debug,
+        "Playback watchdog: no progress detected (%d/%d), elapsed=%f, state=%s",
+        stuckPlaybackCheckCount,
+        maxStuckPlaybackChecks,
+        currentElapsed,
+        String(describing: playerState)
+      )
+
       if stuckPlaybackCheckCount >= maxStuckPlaybackChecks {
-        os_log(.default, "Playback watchdog: attempting recovery - elapsed time stuck at %f", currentElapsed)
+        os_log(
+          .default,
+          "Playback watchdog: attempting recovery - elapsed time stuck at %f",
+          currentElapsed
+        )
         stuckPlaybackCheckCount = 0
-        
-        os_log(.debug, "Playback watchdog: player state is %s, currentPlayUrl=%s", 
-               String(describing: playerState), currentPlayUrl.isEmpty ? "(empty)" : "(set)")
-        
+
+        os_log(
+          .debug,
+          "Playback watchdog: player state is %s, currentPlayUrl=%s",
+          String(describing: playerState),
+          currentPlayUrl.isEmpty ? "(empty)" : "(set)"
+        )
+
         if playerState == .paused || playerState == .stopped {
           // Player is paused/stopped but we think it should be playing - resume it
           os_log(.default, "Playback watchdog: resuming paused/stopped player")
@@ -339,14 +353,21 @@ class BackendAudioPlayer: NSObject {
         } else if playerState == .bufferring {
           // Still buffering - reset counter and wait longer
           os_log(.debug, "Playback watchdog: player is buffering, waiting...")
-          stuckPlaybackCheckCount = -3  // Give extra time for buffering
-        } else if playerState == .playing && currentElapsed == 0 {
+          stuckPlaybackCheckCount = -3 // Give extra time for buffering
+        } else if playerState == .playing, currentElapsed == 0 {
           // Player thinks it's playing but elapsed time is 0 - try to restart
-          os_log(.default, "Playback watchdog: player state is playing but elapsed=0, attempting restart")
+          os_log(
+            .default,
+            "Playback watchdog: player state is playing but elapsed=0, attempting restart"
+          )
           if let playable = currentPlayable {
             // Re-request playback
             player?.stop()
-            requestToPlay(playable: playable, playbackRate: userDefinedPlaybackRate, autoStartPlayback: true)
+            requestToPlay(
+              playable: playable,
+              playbackRate: userDefinedPlaybackRate,
+              autoStartPlayback: true
+            )
           }
         }
       }
@@ -354,44 +375,56 @@ class BackendAudioPlayer: NSObject {
       // Playback is progressing normally
       stuckPlaybackCheckCount = 0
     }
-    
+
     lastKnownElapsedTime = currentElapsed
   }
-  
+
   /// Starts a watchdog timer that monitors if playback actually begins
   /// This catches cases where the didStartPlaying callback never fires
   private func startStartupWatchdog() {
     stopStartupWatchdog()
     expectedPlaybackStartTime = Date()
-    
-    startupWatchdogTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] _ in
-      guard let self else { return }
-      self.checkStartupWatchdog()
-    }
+
+    startupWatchdogTimer = Timer
+      .scheduledTimer(withTimeInterval: 5.0, repeats: false) { [weak self] _ in
+        guard let self else { return }
+        checkStartupWatchdog()
+      }
   }
-  
+
   private func stopStartupWatchdog() {
     startupWatchdogTimer?.invalidate()
     startupWatchdogTimer = nil
     expectedPlaybackStartTime = nil
   }
-  
+
   private func checkStartupWatchdog() {
     // Only check if we expected playback to start and timers aren't running
     guard isPlaying, timerElapsedTimeInterval == nil else {
-      os_log(.debug, "Startup watchdog: conditions not met (isPlaying=%s, timersRunning=%s)", 
-             isPlaying.description, (timerElapsedTimeInterval != nil).description)
+      os_log(
+        .debug,
+        "Startup watchdog: conditions not met (isPlaying=%s, timersRunning=%s)",
+        isPlaying.description,
+        (timerElapsedTimeInterval != nil).description
+      )
       return
     }
-    
+
     let playerState = player?.getState()
-    os_log(.default, "Startup watchdog: playback expected but timers not running! state=%s, elapsed=%f", 
-           String(describing: playerState), elapsedTime)
-    
+    os_log(
+      .default,
+      "Startup watchdog: playback expected but timers not running! state=%s, elapsed=%f",
+      String(describing: playerState),
+      elapsedTime
+    )
+
     // Timers should be running but aren't - this means didStartPlaying callback likely failed
     // Force start the timers and attempt recovery
     if playerState == .playing || playerState == .bufferring {
-      os_log(.default, "Startup watchdog: player seems active, forcing timer start and continuePlay")
+      os_log(
+        .default,
+        "Startup watchdog: player seems active, forcing timer start and continuePlay"
+      )
       continuePlay()
     } else if playerState == .paused || playerState == .stopped {
       os_log(.default, "Startup watchdog: player is paused/stopped, attempting to resume")
@@ -401,7 +434,11 @@ class BackendAudioPlayer: NSObject {
     } else if let playable = currentPlayable {
       os_log(.default, "Startup watchdog: unknown state, re-requesting playback")
       // Something went wrong - try re-requesting playback
-      requestToPlay(playable: playable, playbackRate: userDefinedPlaybackRate, autoStartPlayback: true)
+      requestToPlay(
+        playable: playable,
+        playbackRate: userDefinedPlaybackRate,
+        autoStartPlayback: true
+      )
     }
   }
 
@@ -409,7 +446,7 @@ class BackendAudioPlayer: NSObject {
   private func itemFinishedPlaying() {
     isTriggerReinsertPlayableAllowed = true
     isPreviousPlaylableFinshed = true
-    
+
     if nextPreloadedPlayable != nil {
       isPlaying = true
       startTimers()
@@ -442,14 +479,14 @@ class BackendAudioPlayer: NSObject {
 
   func continuePlay() {
     isPlaying = true
-    
+
     // Playback is starting - stop the startup watchdog
     stopStartupWatchdog()
-    
+
     // Reset watchdog state since we're actively starting/continuing playback
     stuckPlaybackCheckCount = 0
     lastKnownElapsedTime = elapsedTime
-    
+
     // If there's a pending asset (from next/prev while paused), play it now
     if let pendingAsset = pendingPlayAsset {
       pendingPlayAsset = nil
@@ -457,7 +494,7 @@ class BackendAudioPlayer: NSObject {
     } else {
       player?.resume()
     }
-    
+
     startTimers()
     player?.rate = Float(userDefinedPlaybackRate.asDouble)
     audioAnalyzer.play()
@@ -478,7 +515,7 @@ class BackendAudioPlayer: NSObject {
     pendingPlayAsset = nil
     currentPlayable = nil
     stopStartupWatchdog()
-    
+
     clearPlayer()
     audioAnalyzer.stop()
   }
@@ -498,7 +535,7 @@ class BackendAudioPlayer: NSObject {
       String(describing: state),
       String(describing: playType)
     )
-    
+
     // If currently streaming but song is now cached, switch to cached version for seeking
     if playType == .stream,
        let playable = currentPlayable,
@@ -507,7 +544,7 @@ class BackendAudioPlayer: NSObject {
        fileManager.fileExits(relFilePath: relFilePath) {
       os_log(.debug, "Song now cached - switching from stream to cache for seeking to %f", toSecond)
       let wasPlaying = isPlaying
-      
+
       // Match the exact flow from handleRequest for cached files
       currentPlayUrl = ""
       nextPreloadedPlayable = nil
@@ -516,17 +553,17 @@ class BackendAudioPlayer: NSObject {
       perloadedStreamingBitrate = nil
       activeTranscodingFormat = nil
       preloadTranscodingFormat = nil
-      
+
       // Set isAutoStartPlayback so shouldPlaybackStart returns correct value
       isAutoStartPlayback = true
-      
+
       currentReplayGainValue = playable.replayGainTrackGain
       applyReplayGain()
-      
+
       // Use seekTo parameter to pass the seek position
       insertCachedPlayable(playable: playable, autoStartPlayback: true, seekTo: toSecond)
       isPlaying = true
-      
+
       // Safety net: if didStartPlaying callback doesn't fire or URL doesn't match,
       // perform the seek after a delay as backup
       let seekPosition = toSecond
@@ -534,19 +571,19 @@ class BackendAudioPlayer: NSObject {
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
         guard let self else { return }
         // Only seek if it wasn't already done (seekTimeWhenStarted would be nil if processed)
-        if self.seekTimeWhenStarted != nil {
+        if seekTimeWhenStarted != nil {
           os_log(.debug, "Safety net: Executing backup seek to %f", seekPosition)
-          self.player?.seek(to: seekPosition)
-          self.seekTimeWhenStarted = nil
+          player?.seek(to: seekPosition)
+          seekTimeWhenStarted = nil
         }
         if shouldPause {
-          self.pause()
+          pause()
         }
       }
-      
+
       return
     }
-    
+
     if currentPlayUrl != "",
        state == .playing || state == .paused || state == .bufferring {
       seekTimeWhenStarted = nil
@@ -557,7 +594,7 @@ class BackendAudioPlayer: NSObject {
       os_log(.debug, "Seek deferred to seekTimeWhenStarted")
     }
   }
-  
+
   private func clearPlayerState() {
     currentPreparedUrl = ""
     currentPlayUrl = ""
@@ -624,7 +661,7 @@ class BackendAudioPlayer: NSObject {
   ) {
     // Don't clean up on every skip - let the periodic cleanup handle it
     // This prevents excessive Core Data fetches during rapid skipping
-    
+
     userDefinedPlaybackRate = playbackRate
     player?.rate = Float(userDefinedPlaybackRate.asDouble)
     isAutoStartPlayback = autoStartPlayback
@@ -634,14 +671,18 @@ class BackendAudioPlayer: NSObject {
   private func handleRequest(playable: AbstractPlayable) {
     currentPlayable = playable
     startingStreamID = nil
-    
+
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
        nextPreloadedPlayable == playable {
       // Do nothing next preloaded playable has already been queued to player
       os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)
       currentPreparedUrl = ""
       currentPlayUrl = nextPreloadedUrl
-      os_log(.debug, "Preloaded - currentPlayUrl set to: %s", nextPreloadedUrl.prefix(80).description)
+      os_log(
+        .debug,
+        "Preloaded - currentPlayUrl set to: %s",
+        nextPreloadedUrl.prefix(80).description
+      )
       playType = perloadedPlayType
       perloadedPlayType = nil
       activeStreamingBitrate = perloadedStreamingBitrate
@@ -713,7 +754,10 @@ class BackendAudioPlayer: NSObject {
         do {
           currentReplayGainValue = playable.replayGainTrackGain
           applyReplayGain()
-          try await insertStreamPlayable(playable: playable, autoStartPlayback: self.shouldPlaybackStart)
+          try await insertStreamPlayable(
+            playable: playable,
+            autoStartPlayback: self.shouldPlaybackStart
+          )
           self.isPlaying = self.shouldPlaybackStart
           if self.shouldPlaybackStart {
             self.startStartupWatchdog()
@@ -740,7 +784,7 @@ class BackendAudioPlayer: NSObject {
     eventLogger.info(
       topic: "Player Info",
       statusCode: .playerError,
-      message: "Content type \"\(contentType)\" of \"\(playableDisplayTitle)\" is not playable via Musify. Activating transcoding in Settings could resolve this issue.",
+      message: "Content type \"\(contentType)\" of \"\(playableDisplayTitle)\" is not playable via iMusify. Activating transcoding in Settings could resolve this issue.",
       displayPopup: true
     )
     responder?.notifyItemPreparationFinished()
@@ -797,7 +841,13 @@ class BackendAudioPlayer: NSObject {
       os_log(.default, "Insert Cache: %s (%s)", playable.displayString, fileURL.absoluteString)
     }
     if playable.isSong { userStatistics.playedSong(isPlayedFromCache: true) }
-    insert(playable: playable, withUrl: fileURL, queueType: queueType, autoStartPlayback: autoStartPlayback, seekTo: seekTo)
+    insert(
+      playable: playable,
+      withUrl: fileURL,
+      queueType: queueType,
+      autoStartPlayback: autoStartPlayback,
+      seekTo: seekTo
+    )
   }
 
   @MainActor
@@ -877,7 +927,7 @@ class BackendAudioPlayer: NSObject {
     seekTo: Double? = nil
   ) {
     if queueType == .play {
-      seekTimeWhenStarted = seekTo  // Set seek time instead of clearing (nil if not provided)
+      seekTimeWhenStarted = seekTo // Set seek time instead of clearing (nil if not provided)
       player?.pause()
       audioSessionHandler.configureBackgroundPlayback()
     }
@@ -904,7 +954,7 @@ class BackendAudioPlayer: NSObject {
     switch queueType {
     case .play:
       currentPreparedUrl = asset.url.absoluteString
-      
+
       if !autoStartPlayback {
         // Don't start audio at all - just store the asset for when user presses play
         pendingPlayAsset = asset
@@ -999,11 +1049,12 @@ class BackendAudioPlayer: NSObject {
     isReplayGainEnabled = isEnabled
     applyReplayGain()
   }
-  
+
   func updateReplayGainPreamp(preamp: Int) {
     replayGainPreamp = preamp
     applyReplayGain()
   }
+
   private func applyReplayGain() {
     guard let replayGain = replayGainNode else { return }
 

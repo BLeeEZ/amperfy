@@ -25,7 +25,7 @@ import SwiftUI
 
 struct LicenseSettingsView: View {
   var licenseText = """
-  Musify
+  iMusify
   Copyright © 2026 DonkeyCat GmbH
   A fork of Amperfy
   https://github.com/DCM4711/amperfy/tree/custom-features

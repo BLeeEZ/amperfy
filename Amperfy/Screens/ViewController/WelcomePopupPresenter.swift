@@ -54,7 +54,7 @@ class WelcomePopupPresenter: NSObject {
       let popupVC = AppStoryboard.Main.segueToLibrarySyncPopup()
       popupVC.setContent(
         topic: "Notifications",
-        detailMessage: "Musify can inform you about the latest podcast episodes. If you want to, please authorize Musify to send you notifications.",
+        detailMessage: "iMusify can inform you about the latest podcast episodes. If you want to, please authorize iMusify to send you notifications.",
         customIcon: .bell,
         customAnimation: .swing,
         onClosePressed: { _ in
