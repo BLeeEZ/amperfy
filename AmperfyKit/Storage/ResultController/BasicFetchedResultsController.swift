@@ -541,10 +541,6 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
     searchFetchResulsController.fetch()
   }
 
-  public static func deleteCache() {
-    NSFetchedResultsController<ResultType>.deleteCache(withName: Self.typeName)
-  }
-
   override public func fetch() {
     let wasSearchActive = isSearchActive
     isSearchActive = false
