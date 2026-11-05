@@ -112,6 +112,22 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
 //    // ignore progress: don't save progress in CoreData -> huge CPU load
 //  }
 
+  nonisolated func urlSession(
+    _ session: URLSession,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()
+  ) {
+    guard challenge.protectionSpace
+      .authenticationMethod == NSURLAuthenticationMethodClientCertificate,
+      let credential = ClientCertificateManager.shared
+      .credentialForAccountOrLogin(accountIdent: clientCertificateAccountIdent)
+    else {
+      completionHandler(.performDefaultHandling, nil)
+      return
+    }
+    completionHandler(.useCredential, credential)
+  }
+
   nonisolated func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
     os_log("URLSession urlSessionDidFinishEvents", log: self.log, type: .info)
     Task { @MainActor in
