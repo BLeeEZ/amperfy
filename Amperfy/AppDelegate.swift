@@ -372,7 +372,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       userInfo: nil
     )
   }
-    
+
   func switchToolbarCollapseMode(isToolbarPlayerAutoCollapse: Bool) {
     appDelegate.storage.settings.user.isToolbarPlayerAutoCollapse = isToolbarPlayerAutoCollapse
     appDelegate.notificationHandler.post(

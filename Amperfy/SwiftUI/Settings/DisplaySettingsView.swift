@@ -168,7 +168,10 @@ struct DisplaySettingsView: View {
         #if !targetEnvironment(macCatalyst)
           SettingsSection(
             content: {
-              SettingsCheckBoxRow(title: "Collapse Toolbar Player", isOn: $settings.isToolbarPlayerAutoCollapse)
+              SettingsCheckBoxRow(
+                title: "Collapse Toolbar Player",
+                isOn: $settings.isToolbarPlayerAutoCollapse
+              )
             },
             footer:
             "Collapse the toolbar player into a compact view when scrolling"
