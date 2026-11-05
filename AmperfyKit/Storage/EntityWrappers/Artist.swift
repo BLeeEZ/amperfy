@@ -123,10 +123,13 @@ extension Artist: PlayableContainable {
   public var subsubtitle: String? { nil }
   public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
-    if let managedObjectContext = managedObject.managedObjectContext, let account {
+    if details.type == .long, let managedObjectContext = managedObject.managedObjectContext,
+       let account {
       let library = LibraryStorage(context: managedObjectContext)
-      let relatedAlbumCount = library.getAlbums(for: account, whichContainsSongsWithArtist: self)
-        .count
+      let relatedAlbumCount = library.getAlbumsCount(
+        for: account,
+        whichContainsSongsWithArtist: self
+      )
       if relatedAlbumCount == 1 {
         infoContent.append("1 Album")
       } else if relatedAlbumCount > 1 {
@@ -138,11 +141,13 @@ extension Artist: PlayableContainable {
       infoContent.append("\(albumCount) Albums")
     }
 
-    if details.artistFilterSetting == .albumArtists,
+    if details.type == .long, details.artistFilterSetting == .albumArtists,
        let managedObjectContext = managedObject.managedObjectContext, let account {
       let library = LibraryStorage(context: managedObjectContext)
-      let relatedSongsCount = library.getSongs(for: account, whichContainsSongsWithArtist: self)
-        .count
+      let relatedSongsCount = library.getSongsCount(
+        for: account,
+        whichContainsSongsWithArtist: self
+      )
       if relatedSongsCount == 1 {
         infoContent.append("1 Song")
       } else if relatedSongsCount > 1 {
