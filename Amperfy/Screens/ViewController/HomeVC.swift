@@ -341,7 +341,12 @@ final class HomeVC: UICollectionViewController {
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let song = playableContainer as? Song {
-      appDelegate.player.play(context: PlayContext(containable: song))
+      // Like in song lists: insert the song into the queue and play it, keep the queue
+      appDelegate.player.insertContextQueue(playables: [song])
+      appDelegate.player.play(
+        playerIndex: PlayerIndex(queueType: .next, index: 0),
+        autoStartPlayback: true
+      )
     } else if let podcastEpisode = playableContainer as? PodcastEpisode,
               let podcast = podcastEpisode.podcast {
       navigationController?.pushViewController(
