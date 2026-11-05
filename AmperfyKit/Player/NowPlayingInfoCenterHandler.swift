@@ -84,7 +84,14 @@ public class NowPlayingInfoCenterHandler {
     updateNowPlayingInfo(playable: playable)
   }
 
-  private func updateNowPlayingInfo(playable: AbstractPlayable) {
+  /// Shows the queued playable as paused, e.g. after an app start where nothing has been played yet.
+  /// Without now playing info CarPlay's Now Playing screen is empty and offers no Play button.
+  public func showAsPaused(playable: AbstractPlayable) {
+    updateNowPlayingInfo(playable: playable, isPaused: true)
+    nowPlayingInfoCenter.playbackState = .paused
+  }
+
+  private func updateNowPlayingInfo(playable: AbstractPlayable, isPaused: Bool = false) {
     let albumTitle = playable.asSong?.album?.name ?? ""
     let nowPlaying = displayNowPlayingInfo(for: playable)
 
@@ -106,6 +113,12 @@ public class NowPlayingInfoCenterHandler {
       artworkImage = transform(artworkImage, playable)
     }
 
+    // Before the playable is loaded into the player, the player knows neither duration nor position
+    let isLoadedInPlayer = backendAudioPlayer.duration > 0
+    let duration = isLoadedInPlayer ? backendAudioPlayer.duration : Double(playable.duration)
+    let elapsedTime = isLoadedInPlayer ? backendAudioPlayer.elapsedTime : Double(playable.playProgress)
+    let playbackRate = isPaused ? 0.0 : backendAudioPlayer.playbackRate.asDouble
+
     let concurrentSafeArtworkImage = artworkImage
     nowPlayingInfoCenter.nowPlayingInfo = [
       MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
@@ -116,15 +129,12 @@ public class NowPlayingInfoCenterHandler {
       MPMediaItemPropertyAlbumTitle: albumTitle,
       MPMediaItemPropertyArtist: nowPlaying.artist,
 
-      MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
-      MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
+      MPMediaItemPropertyPlaybackDuration: duration,
+      MPNowPlayingInfoPropertyElapsedPlaybackTime: elapsedTime,
       MPNowPlayingInfoPropertyIsLiveStream: playable.isRadio,
 
       MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
-      MPNowPlayingInfoPropertyPlaybackRate: NSNumber(
-        value: backendAudioPlayer.playbackRate
-          .asDouble
-      ),
+      MPNowPlayingInfoPropertyPlaybackRate: NSNumber(value: playbackRate),
 
       MPMediaItemPropertyArtwork: MPMediaItemArtwork(
         boundsSize: concurrentSafeArtworkImage.size,

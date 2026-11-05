@@ -155,7 +155,8 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   func play() {
     if !backendAudioPlayer.canBeContinued {
       if let currentPlayable = currentlyPlaying {
-        insertIntoPlayer(playable: currentPlayable)
+        // an explicit play always starts playback
+        insertIntoPlayer(playable: currentPlayable, autoStartPlayback: true)
       }
     } else {
       backendAudioPlayer.continuePlay()

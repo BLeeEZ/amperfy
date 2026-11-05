@@ -154,7 +154,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
           }
         }
 
-      if self.appDelegate.player.currentlyPlaying != nil, self.appDelegate.player.isPlaying {
+      // Show the player whenever a song is queued, also when it isn't playing (e.g. after an
+      // app start), so it can be started with Play. Only an empty queue shows the library.
+      if let currentlyPlaying = self.appDelegate.player.currentlyPlaying {
+        if !self.appDelegate.player.isPlaying {
+          AmperKit.shared.nowPlayingInfoCenterHandler?.showAsPaused(playable: currentlyPlaying)
+        }
         self.updatePlayerQueueSection()
         self.displayNowPlaying(immediately: true) {}
       }
