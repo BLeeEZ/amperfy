@@ -44,11 +44,11 @@ I do not implement pull requests - please support the Amperfy project if you wan
 - Removed 'Lyrics Smooth Scrolling' (always enabled) in 'Display and Interaction'
 - Moved "Resync Library" to the 'Library' section
 - Moved 'Theme Color' from 'Account' to 'Display & Interaction'
-- Moved Autocache 'Newest Songs and 'Newest Podcast Episodes' from 'Library' to 'Player, Stream & Scrobble'
-- Added 'Preamp' Setting to 'ReplayGain' in 'Player, Stream & Scrobble'
-- Removed 'Manual Playback' in 'Player, Stream & Scrobble'
-- Removed the "Scrobble streamed Songs" setting (always enabled) in 'Player, Stream & Scrobble'
-- Removed setting 'Song Playback Resume' in 'Player, Stream & Scrobble'
+- Moved Autocache 'Newest Songs and 'Newest Podcast Episodes' from 'Library' to 'Player & Stream'
+- Added 'Preamp' Setting to 'ReplayGain' in 'Player & Stream'
+- Removed 'Manual Playback' in 'Player & Stream'
+- Removed the "Scrobble streamed Songs" setting (always enabled) in 'Player & Stream'
+- Removed setting 'Song Playback Resume' in 'Player & Stream'
 
 ## Comparision:
 
