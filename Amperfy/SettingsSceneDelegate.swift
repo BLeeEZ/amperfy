@@ -48,6 +48,7 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.settingsSceneSession = session
 
     window = UIWindow(windowScene: windowScene)
+    appDelegate.applyTextSize()
     window?.backgroundColor = .clear
 
     window?.rootViewController = SettingsHostVC(isForOwnWindow: true)

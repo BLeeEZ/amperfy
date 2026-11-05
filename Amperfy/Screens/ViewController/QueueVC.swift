@@ -194,8 +194,7 @@ class QueueVC: UIViewController {
 extension QueueVC: UITableViewDelegate, UITableViewDataSource {
   func setupTableView() {
     tableView?.register(nibName: PlayableTableCell.typeName)
-    tableView?.rowHeight = PlayableTableCell.rowHeight
-    tableView?.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView?.reloadOnTextSizeChange { PlayableTableCell.rowHeight }
     tableView?.backgroundColor = .clear
     tableView?.sectionHeaderTopPadding = 0.0
   }

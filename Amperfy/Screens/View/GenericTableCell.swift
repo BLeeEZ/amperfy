@@ -37,8 +37,8 @@ class GenericTableCell: BasicTableCell {
   @IBOutlet
   weak var infoLabelWidthConstraint: NSLayoutConstraint!
 
-  static let rowHeight: CGFloat = 48.0 + margin.bottom + margin.top
-  static let rowHeightWithoutImage: CGFloat = 28.0 + margin.bottom + margin.top
+  static var rowHeight: CGFloat { scaledRowHeight(contentHeight: 48.0) }
+  static var rowHeightWithoutImage: CGFloat { scaledRowHeight(contentHeight: 28.0) }
 
   private var container: PlayableContainable?
   private var rootView: UITableViewController?

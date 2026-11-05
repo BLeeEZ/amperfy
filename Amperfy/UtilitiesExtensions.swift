@@ -233,6 +233,152 @@ extension UITableView {
     indexPath.section < numberOfSections && indexPath
       .row < numberOfRows(inSection: indexPath.section)
   }
+
+  // MARK: Text size
+
+  /// Keeps the rows up to date with the user's text size (see `TextScaling`): whenever it
+  /// changes, the table is reloaded, so that cells and `tableView(_:heightForRowAt:)` pick up
+  /// the new size. Tables with one height for all rows pass it as `rowHeight`: it is applied to
+  /// `rowHeight` and `estimatedRowHeight` now and before every reload.
+  func reloadOnTextSizeChange(rowHeight: (@MainActor () -> CGFloat)? = nil) {
+    let applyRowHeight = { (tableView: UITableView) in
+      guard let rowHeight else { return }
+      tableView.rowHeight = rowHeight()
+      tableView.estimatedRowHeight = tableView.rowHeight
+    }
+    applyRowHeight(self)
+    registerForTraitChanges(
+      [UITraitPreferredContentSizeCategory.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        applyRowHeight(self)
+        self.reloadData()
+      }
+    )
+  }
+}
+
+// MARK: - TextScaling
+
+/// Proxy for everything that scales with the user's text size: fonts of `ScaledLabel`s, row
+/// heights and other text dependent sizes. The text size is the system's or the in-app text size
+/// (Settings > Display), which `AppDelegate.applyTextSize()` sets as `preferredContentSizeCategory`
+/// trait override on all windows, so views get notified like for Dynamic Type changes.
+/// - iOS/iPadOS: forwards to Dynamic Type (text styles in the xibs, `UIFontMetrics`).
+/// - Mac Catalyst: macOS has no Dynamic Type, text styles always have the same size. Fonts and
+///   sizes are scaled with the factors of the iOS text sizes instead.
+@MainActor
+enum TextScaling {
+  /// Text sizes that can be chosen in the settings
+  static let textSizes: [UIContentSizeCategory] = [
+    .extraSmall, .small, .medium, .large, .extraLarge, .extraExtraLarge, .extraExtraExtraLarge,
+    .accessibilityMedium, .accessibilityLarge, .accessibilityExtraLarge,
+    .accessibilityExtraExtraLarge, .accessibilityExtraExtraExtraLarge,
+  ]
+
+  /// The in-app text size, nil: system text size (iOS) / default text size (Mac)
+  static var textSize: UIContentSizeCategory?
+
+  /// Size of the body text style on iOS for each text size (17pt at the default size)
+  private static let bodySizes: [UIContentSizeCategory: CGFloat] = [
+    .extraSmall: 14, .small: 15, .medium: 16, .large: 17, .extraLarge: 19,
+    .extraExtraLarge: 21, .extraExtraExtraLarge: 23, .accessibilityMedium: 28,
+    .accessibilityLarge: 33, .accessibilityExtraLarge: 40, .accessibilityExtraExtraLarge: 47,
+    .accessibilityExtraExtraExtraLarge: 53,
+  ]
+
+  /// `.footnote` scales slightly stronger than `.body`, so scaled sizes leave enough room
+  private static let metrics = UIFontMetrics(forTextStyle: .footnote)
+
+  /// iOS: unchanged, Dynamic Type scales the font. Mac: scaled to the traits' text size.
+  static func scaledFont(_ font: UIFont, compatibleWith traits: UITraitCollection) -> UIFont {
+    #if targetEnvironment(macCatalyst)
+      return font.withSize((font.pointSize * factor(for: currentTextSize(traits))).rounded())
+    #else
+      return font
+    #endif
+  }
+
+  /// `value` at the default text size, scaled to the text size of `traits` (or the app's)
+  static func scaledValue(
+    _ value: CGFloat,
+    compatibleWith traits: UITraitCollection? = nil,
+    maximum: UIContentSizeCategory? = nil
+  )
+    -> CGFloat {
+    var textSize = currentTextSize(traits)
+    if let maximum, textSize > maximum {
+      textSize = maximum
+    }
+    #if targetEnvironment(macCatalyst)
+      return value * factor(for: textSize)
+    #else
+      return metrics.scaledValue(
+        for: value,
+        compatibleWith: UITraitCollection(preferredContentSizeCategory: textSize)
+      )
+    #endif
+  }
+
+  /// The traits of a view in a window already contain the in-app text size (and its maximum)
+  private static func currentTextSize(_ traits: UITraitCollection?) -> UIContentSizeCategory {
+    if let traitsTextSize = traits?.preferredContentSizeCategory,
+       traitsTextSize != .unspecified {
+      return traitsTextSize
+    }
+    return textSize ?? UIApplication.shared.preferredContentSizeCategory
+  }
+
+  private static func factor(for textSize: UIContentSizeCategory) -> CGFloat {
+    (bodySizes[textSize] ?? 17.0) / 17.0
+  }
+}
+
+// MARK: - ScaledLabel
+
+/// Label whose text scales with the user's text size. Use it as custom class in xibs together
+/// with a text style font (incl. size class variations).
+/// - iOS/iPadOS: a plain `UILabel`, Dynamic Type scales the text style.
+/// - Mac Catalyst: every font that gets assigned (by the xib or code) is the unscaled base font,
+///   the label displays it scaled by `TextScaling`.
+class ScaledLabel: UILabel {
+  #if targetEnvironment(macCatalyst)
+    private var unscaledFont: UIFont?
+    private var isRegisteredForTextSizeChanges = false
+
+    override var font: UIFont! {
+      get { super.font }
+      set {
+        unscaledFont = newValue
+        guard newValue != nil else {
+          super.font = nil
+          return
+        }
+        applyScaledFont()
+      }
+    }
+
+    override func didMoveToWindow() {
+      super.didMoveToWindow()
+      if !isRegisteredForTextSizeChanges {
+        isRegisteredForTextSizeChanges = true
+        registerForTraitChanges(
+          [UITraitPreferredContentSizeCategory.self],
+          handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+            self.applyScaledFont()
+          }
+        )
+      }
+      applyScaledFont()
+    }
+
+    private func applyScaledFont() {
+      if unscaledFont == nil {
+        unscaledFont = super.font
+      }
+      guard let unscaledFont else { return }
+      super.font = TextScaling.scaledFont(unscaledFont, compatibleWith: traitCollection)
+    }
+  #endif
 }
 
 extension UICollectionView {
