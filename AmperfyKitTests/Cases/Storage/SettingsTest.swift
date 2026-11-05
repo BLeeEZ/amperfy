@@ -81,7 +81,8 @@ class SettingsTest: XCTestCase {
 
     let reread = AmperfySettings().user
     assertChangedValuesKept(reread)
-    XCTAssertFalse(reread.isLyricsSmoothScrolling)
+    // lyrics smooth scrolling is always enabled, regardless of the saved value
+    XCTAssertTrue(reread.isLyricsSmoothScrolling)
   }
 
   func testAppSettingsMissingFieldKeepsSavedValues() throws {

@@ -146,7 +146,9 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
       ) {
       replayCurrentItem()
     } else if !settings.user.isPlaybackStartOnlyOnPlay {
-      playNext()
+      // The finished item already set isPlaying to false, so don't derive the
+      // play state from it: the end of an item always continues playback
+      playNext(autoStartPlayback: true)
     }
   }
 
@@ -216,7 +218,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
 
   func playPreviousOrReplay() {
     // Preserve the current play/pause state when switching tracks
-    let wasPlaying = backendAudioPlayer.isPlaying
+    let wasPlaying = backendAudioPlayer.isPlayingOrStarting
     if shouldCurrentItemReplayedInsteadOfPrevious() {
       replayCurrentItem(autoStartPlayback: wasPlaying)
     } else {
@@ -227,7 +229,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   // BackendAudioPlayerNotifiable
   func playPrevious() {
     // Preserve the current play/pause state when switching tracks
-    let wasPlaying = backendAudioPlayer.isPlaying
+    let wasPlaying = backendAudioPlayer.isPlayingOrStarting
     if queueHandler.prevQueueCount > 0 {
       play(
         playerIndex: PlayerIndex(queueType: .prev, index: queueHandler.prevQueueCount - 1),
@@ -246,9 +248,12 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   // BackendAudioPlayerNotifiable
   func playNext() {
     // Preserve the current play/pause state when switching tracks
-    let wasPlaying = backendAudioPlayer.isPlaying
+    playNext(autoStartPlayback: backendAudioPlayer.isPlayingOrStarting)
+  }
+
+  private func playNext(autoStartPlayback: Bool) {
     if let nextPlayerIndex = nextPlayerIndex {
-      play(playerIndex: nextPlayerIndex, autoStartPlayback: wasPlaying)
+      play(playerIndex: nextPlayerIndex, autoStartPlayback: autoStartPlayback)
     } else {
       stop()
     }

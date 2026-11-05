@@ -288,7 +288,10 @@ class BackendAudioPlayer: NSObject {
           Task { @MainActor in
             do {
               try await insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-              // AVPlayer handles seeking on streamed content natively - no download needed
+              if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable,
+                 let accountInfo = nextPreloadedPlayable.account?.info {
+                self.getPlayableDownloaderCB(accountInfo).download(object: nextPreloadedPlayable)
+              }
             } catch {
               self.nextPreloadedPlayable = nil
               self.eventLogger.report(topic: "Player", error: error)
@@ -462,6 +465,7 @@ class BackendAudioPlayer: NSObject {
 
   func pause() {
     isPlaying = false
+    startingStreamID = nil
     stopStartupWatchdog()
     player?.pause()
     stopTimers()
@@ -470,6 +474,7 @@ class BackendAudioPlayer: NSObject {
 
   func stop() {
     isPlaying = false
+    startingStreamID = nil
     pendingPlayAsset = nil
     currentPlayable = nil
     stopStartupWatchdog()
@@ -599,6 +604,15 @@ class BackendAudioPlayer: NSObject {
     os_log(.debug, "Player setup completed with EQ and ReplayGain support")
   }
 
+  /// Set while a stream is loaded that should start playing once ready.
+  /// `isPlaying` only becomes true after the stream is loaded.
+  private var startingStreamID: UUID?
+
+  /// True while playing, and while a stream that will start playing is still loading.
+  var isPlayingOrStarting: Bool {
+    isPlaying || startingStreamID != nil
+  }
+
   var shouldPlaybackStart: Bool {
     (!isErrorOccurred && isAutoStartPlayback) || (isErrorOccurred && wasPlayingBeforeErrorOccurred)
   }
@@ -619,6 +633,7 @@ class BackendAudioPlayer: NSObject {
 
   private func handleRequest(playable: AbstractPlayable) {
     currentPlayable = playable
+    startingStreamID = nil
     
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
        nextPreloadedPlayable == playable {
@@ -689,7 +704,12 @@ class BackendAudioPlayer: NSObject {
         }
       }
 
+      let streamID = UUID()
+      startingStreamID = shouldPlaybackStart ? streamID : nil
       Task { @MainActor in
+        defer {
+          if self.startingStreamID == streamID { self.startingStreamID = nil }
+        }
         do {
           currentReplayGainValue = playable.replayGainTrackGain
           applyReplayGain()
@@ -698,9 +718,10 @@ class BackendAudioPlayer: NSObject {
           if self.shouldPlaybackStart {
             self.startStartupWatchdog()
           }
-          
-          // AVPlayer handles seeking on streamed content natively - no download needed
-          
+          if self.isAutoCachePlayedItems, !playable.isRadio,
+             let accountInfo = playable.account?.info {
+            self.getPlayableDownloaderCB(accountInfo).download(object: playable)
+          }
           self.responder?.notifyItemPreparationFinished()
         } catch {
           self.responder?.notifyErrorOccurred(error: error)

@@ -235,6 +235,10 @@ public protocol PlayerFacade {
 }
 
 extension PlayerFacade {
+  public func play(playerIndex: PlayerIndex) {
+    play(playerIndex: playerIndex, autoStartPlayback: nil)
+  }
+
   public var maxSongsToAddOnce: Int { 500 }
   public var skipForwardPodcastInterval: Double { 30.0 }
   public var skipBackwardPodcastInterval: Double { 15.0 }
