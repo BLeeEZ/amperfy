@@ -1048,33 +1048,31 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
     }
   }
 
+  /// Whether `receivedUrl` reported by the player is the entry that was requested as `preparedUrl`.
+  /// Streaming URLs carry a random auth salt, so they are compared by host, path and song id.
+  /// Host and path alone are the same for every song (e.g. `/rest/stream.view`) and must not match.
+  nonisolated static func isSameEntry(preparedUrl: String, receivedUrl: String) -> Bool {
+    guard !preparedUrl.isEmpty else { return false }
+    if preparedUrl == receivedUrl { return true }
+    guard let prepared = URLComponents(string: preparedUrl),
+          let received = URLComponents(string: receivedUrl),
+          prepared.scheme == received.scheme
+    else { return false }
+    if prepared.scheme == "file" {
+      // file URLs may differ in their encoding
+      let preparedFilename = URL(string: preparedUrl)?.lastPathComponent
+      let receivedFilename = URL(string: receivedUrl)?.lastPathComponent
+      return preparedFilename != nil && preparedFilename == receivedFilename
+    }
+    let preparedId = prepared.queryItems?.first(where: { $0.name == "id" })?.value
+    let receivedId = received.queryItems?.first(where: { $0.name == "id" })?.value
+    return prepared.host == received.host && prepared.path == received.path &&
+      preparedId != nil && preparedId == receivedId
+  }
+
   @MainActor
   public func didStartPlaying(url: String) {
-    // Check for exact match
-    var isMatch = currentPreparedUrl == url
-    
-    // For file URLs, also check if the filenames match (URLs may have different encoding/format)
-    if !isMatch, currentPreparedUrl.hasPrefix("file://"), url.hasPrefix("file://") {
-      let preparedFilename = URL(string: currentPreparedUrl)?.lastPathComponent
-      let receivedFilename = URL(string: url)?.lastPathComponent
-      if let pf = preparedFilename, let rf = receivedFilename, pf == rf {
-        isMatch = true
-        os_log(.debug, "File URL match by filename: %s", pf)
-      }
-    }
-    
-    // For streaming URLs, check if the base URLs match (ignoring query parameters that might differ)
-    if !isMatch, !currentPreparedUrl.hasPrefix("file://"), !url.hasPrefix("file://") {
-      if let preparedURL = URL(string: currentPreparedUrl),
-         let receivedURL = URL(string: url) {
-        // Compare host and path, ignoring query parameters
-        if preparedURL.host == receivedURL.host && preparedURL.path == receivedURL.path {
-          isMatch = true
-          os_log(.debug, "Streaming URL match by host+path: %s%s", preparedURL.host ?? "", preparedURL.path)
-        }
-      }
-    }
-    
+    let isMatch = Self.isSameEntry(preparedUrl: currentPreparedUrl, receivedUrl: url)
     os_log(
       .debug,
       "didStartPlaying called - url: %s, currentPreparedUrl: %s, match: %s",
@@ -1082,55 +1080,30 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
       currentPreparedUrl.prefix(80).description,
       isMatch.description
     )
-    if isMatch {
-      if let sampleRate = player?.mainMixerNode.outputFormat(forBus: 0).sampleRate {
-        audioAnalyzer.playing(sampleRate: Float(sampleRate))
-      }
+    // A late start of an entry that was already replaced (e.g. while skipping quickly) must be
+    // ignored: taking it as the current entry would make its stop look like the end of the song
+    // and skip to the next one by itself.
+    guard isMatch else { return }
 
-      currentPreparedUrl = ""
-      currentPlayUrl = url
-      os_log(.debug, "currentPlayUrl set to: %s", url.prefix(80).description)
-      if shouldPlaybackStart {
-        continuePlay()
-        audioAnalyzer.play()
-      } else {
-        pause()
-        audioAnalyzer.stop()
-      }
+    if let sampleRate = player?.mainMixerNode.outputFormat(forBus: 0).sampleRate {
+      audioAnalyzer.playing(sampleRate: Float(sampleRate))
+    }
 
-      if let seekTimeWhenStarted {
-        os_log(.debug, "Executing deferred seek to: %f", seekTimeWhenStarted)
-        player?.seek(to: seekTimeWhenStarted)
-        self.seekTimeWhenStarted = nil
-      }
+    currentPreparedUrl = ""
+    currentPlayUrl = url
+    os_log(.debug, "currentPlayUrl set to: %s", url.prefix(80).description)
+    if shouldPlaybackStart {
+      continuePlay()
+      audioAnalyzer.play()
     } else {
-      os_log(.debug, "didStartPlaying: URL mismatch - currentPlayUrl NOT updated!")
-      
-      // Fallback: Process the playback anyway if we have a prepared URL pending
-      // This handles cases where the URL format differs between what we set and what we receive
-      if !currentPreparedUrl.isEmpty {
-        os_log(.debug, "Fallback: Processing URL despite mismatch (prepared URL was pending)")
-        currentPreparedUrl = ""
-        currentPlayUrl = url
-        
-        if let sampleRate = player?.mainMixerNode.outputFormat(forBus: 0).sampleRate {
-          audioAnalyzer.playing(sampleRate: Float(sampleRate))
-        }
-        
-        if shouldPlaybackStart {
-          continuePlay()
-          audioAnalyzer.play()
-        } else {
-          pause()
-          audioAnalyzer.stop()
-        }
-        
-        if let seekTimeWhenStarted {
-          os_log(.debug, "Fallback: Executing deferred seek to: %f", seekTimeWhenStarted)
-          player?.seek(to: seekTimeWhenStarted)
-          self.seekTimeWhenStarted = nil
-        }
-      }
+      pause()
+      audioAnalyzer.stop()
+    }
+
+    if let seekTimeWhenStarted {
+      os_log(.debug, "Executing deferred seek to: %f", seekTimeWhenStarted)
+      player?.seek(to: seekTimeWhenStarted)
+      self.seekTimeWhenStarted = nil
     }
   }
 
@@ -1154,11 +1127,18 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
   ) {
     let entryID = entryId.id
     Task { @MainActor in
+      // Stops caused by the app (skipping replaces or disposes the entry) are not the end of the
+      // song and must not advance the queue
+      guard Self.isSongFinished(stopReason: stopReason) else { return }
       if self.currentPlayUrl == entryID {
         self.currentPlayUrl = ""
         self.itemFinishedPlaying()
       }
     }
+  }
+
+  nonisolated static func isSongFinished(stopReason: AudioStreaming.AudioPlayerStopReason) -> Bool {
+    stopReason != .userAction && stopReason != .disposed
   }
 
   nonisolated func audioPlayerUnexpectedError(

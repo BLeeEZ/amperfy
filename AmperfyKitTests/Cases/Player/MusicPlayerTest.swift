@@ -2846,3 +2846,63 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
   }
 }
+
+// MARK: - BackendAudioPlayerEntryMatchingTest
+
+class BackendAudioPlayerEntryMatchingTest: XCTestCase {
+  let streamA1 =
+    "https://music.example.com/rest/stream.view?u=me&v=1.16.1&c=Amperfy&t=aaa&s=salt1&id=songA"
+  let streamA2 =
+    "https://music.example.com/rest/stream.view?u=me&v=1.16.1&c=Amperfy&t=bbb&s=salt2&id=songA"
+  let streamB =
+    "https://music.example.com/rest/stream.view?u=me&v=1.16.1&c=Amperfy&t=ccc&s=salt3&id=songB"
+
+  func testSameUrl_Matches() {
+    XCTAssertTrue(BackendAudioPlayer.isSameEntry(preparedUrl: streamA1, receivedUrl: streamA1))
+  }
+
+  func testStream_SameSongDifferentAuth_Matches() {
+    XCTAssertTrue(BackendAudioPlayer.isSameEntry(preparedUrl: streamA1, receivedUrl: streamA2))
+  }
+
+  func testStream_DifferentSong_DoesNotMatch() {
+    // all streams share host and path, only the id tells them apart
+    XCTAssertFalse(BackendAudioPlayer.isSameEntry(preparedUrl: streamB, receivedUrl: streamA1))
+  }
+
+  func testNothingPrepared_DoesNotMatch() {
+    XCTAssertFalse(BackendAudioPlayer.isSameEntry(preparedUrl: "", receivedUrl: streamA1))
+  }
+
+  func testFile_SameFilenameDifferentEncoding_Matches() {
+    XCTAssertTrue(BackendAudioPlayer.isSameEntry(
+      preparedUrl: "file:///var/mobile/Music%20Cache/songA.mp3",
+      receivedUrl: "file:///private/var/mobile/Music%20Cache/songA.mp3"
+    ))
+  }
+
+  func testFile_DifferentFile_DoesNotMatch() {
+    XCTAssertFalse(BackendAudioPlayer.isSameEntry(
+      preparedUrl: "file:///var/mobile/Cache/songB.mp3",
+      receivedUrl: "file:///var/mobile/Cache/songA.mp3"
+    ))
+  }
+
+  func testStopByApp_IsNotSongEnd() {
+    // skipping replaces or disposes the entry: must not advance the queue
+    XCTAssertFalse(BackendAudioPlayer.isSongFinished(stopReason: .userAction))
+    XCTAssertFalse(BackendAudioPlayer.isSongFinished(stopReason: .disposed))
+  }
+
+  func testEndOfSong_IsSongEnd() {
+    XCTAssertTrue(BackendAudioPlayer.isSongFinished(stopReason: .eof))
+    XCTAssertTrue(BackendAudioPlayer.isSongFinished(stopReason: .error))
+  }
+
+  func testFileAndStream_DoNotMatch() {
+    XCTAssertFalse(BackendAudioPlayer.isSameEntry(
+      preparedUrl: "file:///var/mobile/Cache/songA.mp3",
+      receivedUrl: streamA1
+    ))
+  }
+}
