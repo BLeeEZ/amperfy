@@ -32,6 +32,7 @@ public class NowPlayingInfoCenterHandler {
   private var nowPlayingInfoCenter: MPNowPlayingInfoCenter
   private let getArtworkDownloaderCB: GetArtworkDownloadManagerCallback
   private var accountNotificationHandler: AccountNotificationHandler?
+  private var published: PublishedNowPlaying?
 
   init(
     musicPlayer: AudioPlayer,
@@ -74,6 +75,7 @@ public class NowPlayingInfoCenterHandler {
   private func updateNowPlayingInfo(playable: AbstractPlayable) {
     let albumTitle = playable.asSong?.album?.name ?? ""
     let nowPlaying = displayNowPlayingInfo(for: playable)
+    let timing = currentTiming()
 
     var artworkImage = UIImage()
     if let accountInfo = playable.account?.info {
@@ -90,7 +92,7 @@ public class NowPlayingInfoCenterHandler {
     }
 
     let concurrentSafeArtworkImage = artworkImage
-    nowPlayingInfoCenter.nowPlayingInfo = [
+    let info: [String: Any] = [
       MPNowPlayingInfoPropertyMediaType: NSNumber(value: MPNowPlayingInfoMediaType.audio.rawValue),
       MPNowPlayingInfoPropertyServiceIdentifier: AmperKit.name,
 
@@ -99,24 +101,44 @@ public class NowPlayingInfoCenterHandler {
       MPMediaItemPropertyAlbumTitle: albumTitle,
       MPMediaItemPropertyArtist: nowPlaying.artist,
 
-      MPMediaItemPropertyPlaybackDuration: backendAudioPlayer.duration,
-      MPNowPlayingInfoPropertyElapsedPlaybackTime: backendAudioPlayer.elapsedTime,
+      MPMediaItemPropertyPlaybackDuration: timing.duration,
+      MPNowPlayingInfoPropertyElapsedPlaybackTime: timing.elapsedTime,
       MPNowPlayingInfoPropertyIsLiveStream: playable.isRadio,
 
       MPNowPlayingInfoPropertyDefaultPlaybackRate: NSNumber(value: 1.0),
-      MPNowPlayingInfoPropertyPlaybackRate: NSNumber(
-        value: backendAudioPlayer.playbackRate
-          .asDouble
-      ),
+      MPNowPlayingInfoPropertyPlaybackRate: NSNumber(value: timing.playbackRate),
 
       MPMediaItemPropertyArtwork: MPMediaItemArtwork(
         boundsSize: concurrentSafeArtworkImage.size,
         requestHandler: { @Sendable size -> UIImage in
           // this completion handler is not called in main thread!
-          return concurrentSafeArtworkImage
+          NowPlayingArtwork.image(concurrentSafeArtworkImage, fittingIn: size)
         }
       ),
     ]
+    nowPlayingInfoCenter.nowPlayingInfo = info
+    published = PublishedNowPlaying(playableID: playable.uniqueID, info: info, timing: timing)
+  }
+
+  private func currentTiming() -> NowPlayingTiming {
+    NowPlayingTiming(
+      elapsedTime: backendAudioPlayer.elapsedTime,
+      duration: backendAudioPlayer.duration,
+      playbackRate: backendAudioPlayer.playbackRate.asDouble,
+      measuredAt: ProcessInfo.processInfo.systemUptime
+    )
+  }
+
+  private func refreshTimingIfDrifted() {
+    guard var published else { return }
+    let timing = currentTiming()
+    guard published.timing.needsRefresh(comparedTo: timing) else { return }
+    published.info[MPMediaItemPropertyPlaybackDuration] = timing.duration
+    published.info[MPNowPlayingInfoPropertyElapsedPlaybackTime] = timing.elapsedTime
+    published.info[MPNowPlayingInfoPropertyPlaybackRate] = NSNumber(value: timing.playbackRate)
+    published.timing = timing
+    nowPlayingInfoCenter.nowPlayingInfo = published.info
+    self.published = published
   }
 
   private func displayNowPlayingInfo(for playable: AbstractPlayable) -> RadioNowPlayingInfo {
@@ -169,10 +191,14 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   public func didStopPlaying() {
     nowPlayingInfoCenter.nowPlayingInfo = nil
     nowPlayingInfoCenter.playbackState = .stopped
+    published = nil
   }
 
   public func didElapsedTimeChange() {
-    if let curPlayable = musicPlayer.currentlyPlaying {
+    guard let curPlayable = musicPlayer.currentlyPlaying else { return }
+    if curPlayable.uniqueID == published?.playableID {
+      refreshTimingIfDrifted()
+    } else {
       updateNowPlayingInfo(playable: curPlayable)
     }
   }
@@ -192,4 +218,48 @@ extension NowPlayingInfoCenterHandler: MusicPlayable {
   public func didRepeatChange() {}
 
   public func didPlaybackRateChange() {}
+}
+
+// MARK: - PublishedNowPlaying
+
+private struct PublishedNowPlaying {
+  let playableID: String
+  var info: [String: Any]
+  var timing: NowPlayingTiming
+}
+
+// MARK: - NowPlayingTiming
+
+struct NowPlayingTiming {
+  static let driftTolerance: TimeInterval = 1.0
+
+  let elapsedTime: Double
+  let duration: Double
+  let playbackRate: Double
+  let measuredAt: TimeInterval
+
+  func needsRefresh(comparedTo current: NowPlayingTiming) -> Bool {
+    let extrapolatedElapsedTime = elapsedTime + (current.measuredAt - measuredAt) * playbackRate
+    return current.playbackRate != playbackRate ||
+      !Self.isWithinDriftTolerance(current.duration, duration) ||
+      !Self.isWithinDriftTolerance(current.elapsedTime, extrapolatedElapsedTime)
+  }
+
+  private static func isWithinDriftTolerance(_ lhs: Double, _ rhs: Double) -> Bool {
+    abs(lhs - rhs) <= driftTolerance
+  }
+}
+
+// MARK: - NowPlayingArtwork
+
+enum NowPlayingArtwork {
+  static func image(_ image: UIImage, fittingIn requestedSize: CGSize) -> UIImage {
+    let scale = min(
+      requestedSize.width / image.size.width,
+      requestedSize.height / image.size.height
+    )
+    guard scale > 0, scale < 1 else { return image }
+    let fittingSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+    return image.preparingThumbnail(of: fittingSize) ?? image
+  }
 }
