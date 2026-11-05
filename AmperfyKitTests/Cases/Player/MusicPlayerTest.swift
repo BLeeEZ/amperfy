@@ -397,7 +397,11 @@ class MusicPlayerTest: XCTestCase {
     playlistAllCached = playlistAllCachedFetched
   }
 
-  override func tearDown() {}
+  override func tearDown() async throws {
+    // Stop the player so its timers don't keep firing during later tests: the
+    // stuck playback watchdog would "recover" this player while another test runs
+    backendPlayer.stop()
+  }
 
   func getAccountForSong(atIndex: Int) -> Account {
     let accIndex = cdHelper.seeder.songs[atIndex].accountIndex
