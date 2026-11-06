@@ -21,6 +21,7 @@
 
 import AmperfyKit
 import BackgroundTasks
+import CoreData
 import Intents
 import MediaPlayer
 import os.log
@@ -82,6 +83,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   public lazy var userStatistics = {
     AmperKit.shared.userStatistics
   }()
+
+  private var recentPlaylistObjectIds = [AccountInfo: NSManagedObjectID]()
+
+  func rememberRecentPlaylist(_ playlist: Playlist) {
+    guard let account = playlist.account else { return }
+    recentPlaylistObjectIds[account.info] = playlist.managedObject.objectID
+  }
+
+  func recentPlaylist(for account: Account) -> Playlist? {
+    guard let objectId = recentPlaylistObjectIds[account.info],
+          let object = try? storage.main.context.existingObject(with: objectId),
+          let playlistMO = object as? PlaylistMO,
+          !playlistMO.isDeleted
+    else {
+      recentPlaylistObjectIds.removeValue(forKey: account.info)
+      return nil
+    }
+    return Playlist(library: storage.main.library, managedObject: playlistMO)
+  }
 
   public lazy var localNotificationManager = {
     AmperKit.shared.localNotificationManager
