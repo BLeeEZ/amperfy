@@ -371,7 +371,7 @@ class PlayableTableCell: BasicTableCell {
 
   private func configureTrackNumberLabel() {
     guard let playable = playable else { return }
-    trackNumberLabel.text = playable.track > 0 ? "\(playable.track)" : ""
+    trackNumberLabel.text = playable.trackInDisc > 0 ? "\(playable.trackInDisc)" : ""
   }
 
   func refreshCacheAndDuration() {
