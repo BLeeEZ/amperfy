@@ -95,6 +95,22 @@ public struct LogData: Encodable {
   }
 }
 
+extension LogData {
+  public static let exportFileName = "AmperfyLog.json"
+
+  /// Writes encoded log data to a new temporary directory and returns the file URL.
+  /// The file is named `exportFileName`, the name the support mail attachment uses.
+  /// Safe to call off the main actor.
+  public nonisolated static func writeExportFile(data: Data) throws -> URL {
+    let directory = FileManager.default.temporaryDirectory
+      .appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+    let fileURL = directory.appendingPathComponent(exportFileName)
+    try data.write(to: fileURL)
+    return fileURL
+  }
+}
+
 // MARK: - BasicInfo
 
 public struct BasicInfo: Encodable {

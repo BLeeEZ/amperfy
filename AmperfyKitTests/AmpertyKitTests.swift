@@ -57,3 +57,33 @@ class MimeFileConverterTest: XCTestCase {
     XCTAssertEqual(MimeFileConverter.getFilenameExtension(mimeType: "audio/x-m4b"), "mp4")
   }
 }
+
+// MARK: - LogDataExportTest
+
+@MainActor
+class LogDataExportTest: XCTestCase {
+  func testExportFileIsValidJSON() throws {
+    let logData = LogData.collectInformation(amperfyData: AmperKit.shared)
+    let encoded = try XCTUnwrap(logData.asJSONData())
+    let fileURL = try LogData.writeExportFile(data: encoded)
+    defer { try? FileManager.default.removeItem(at: fileURL.deletingLastPathComponent()) }
+
+    XCTAssertEqual(fileURL.lastPathComponent, "AmperfyLog.json")
+    let data = try Data(contentsOf: fileURL)
+    let json = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+    let basicInfo = try XCTUnwrap(json["basicInfo"] as? [String: Any])
+    XCTAssertEqual(basicInfo["appName"] as? String, "Amperfy")
+  }
+
+  func testEachExportGetsItsOwnDirectory() throws {
+    let first = try LogData.writeExportFile(data: Data("{}".utf8))
+    let second = try LogData.writeExportFile(data: Data("{}".utf8))
+    defer {
+      try? FileManager.default.removeItem(at: first.deletingLastPathComponent())
+      try? FileManager.default.removeItem(at: second.deletingLastPathComponent())
+    }
+    XCTAssertEqual(second.lastPathComponent, "AmperfyLog.json")
+    XCTAssertNotEqual(first, second)
+    XCTAssertTrue(FileManager.default.fileExists(atPath: first.path))
+  }
+}

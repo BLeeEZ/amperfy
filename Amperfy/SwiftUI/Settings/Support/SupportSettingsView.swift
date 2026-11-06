@@ -36,6 +36,10 @@ struct SupportSettingsView: View {
   var result: Result<MFMailComposeResult, Error>? = nil
   @State
   var isShowingMailView = false
+  @State
+  var isPreparingLogExport = false
+  @State
+  var logExportError: String? = nil
 
   var body: some View {
     ZStack {
@@ -64,6 +68,16 @@ struct SupportSettingsView: View {
               )
             }
           }
+          Button(action: exportLog) {
+            HStack {
+              Text("Export log")
+              Spacer()
+              if isPreparingLogExport {
+                ProgressView()
+              }
+            }
+          }
+          .disabled(isPreparingLogExport)
         }
 
         SettingsSection {
@@ -101,6 +115,72 @@ struct SupportSettingsView: View {
     }
     .onAppear {
       appDelegate.userStatistics.visited(.settingsSupport)
+    }
+    .alert(
+      "Export log failed",
+      isPresented: Binding(
+        get: { logExportError != nil },
+        set: { if !$0 { logExportError = nil } }
+      ),
+      presenting: logExportError
+    ) { _ in
+      Button("OK", role: .cancel) {}
+    } message: { message in
+      Text(message)
+    }
+  }
+
+  /// Collects the log once, writes `AmperfyLog.json` and presents the share sheet.
+  /// The row shows progress and ignores taps until the sheet is up or preparation failed.
+  private func exportLog() {
+    guard !isPreparingLogExport else { return }
+    isPreparingLogExport = true
+    Task { @MainActor in
+      // Let the progress indicator render before the main-actor work starts.
+      await Task.yield()
+      do {
+        guard let data = LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData()
+        else { throw CocoaError(.fileWriteUnknown) }
+        let fileURL = try await Task.detached {
+          try LogData.writeExportFile(data: data)
+        }.value
+        try presentShareSheet(fileURL: fileURL)
+      } catch {
+        isPreparingLogExport = false
+        logExportError = error.localizedDescription
+        appDelegate.eventLogger.error(
+          topic: "Export log",
+          statusCode: .internalError,
+          message: "Export log failed: \(error.localizedDescription)",
+          displayPopup: false
+        )
+      }
+    }
+  }
+
+  private func presentShareSheet(fileURL: URL) throws {
+    guard var presenter = AppDelegate.window?.rootViewController else {
+      throw CocoaError(.featureUnsupported)
+    }
+    while let presented = presenter.presentedViewController, !presented.isBeingDismissed {
+      presenter = presented
+    }
+    let activityVC = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
+    if let popover = activityVC.popoverPresentationController {
+      popover.sourceView = presenter.view
+      popover.sourceRect = CGRect(
+        x: presenter.view.bounds.midX,
+        y: presenter.view.bounds.midY,
+        width: 0,
+        height: 0
+      )
+      popover.permittedArrowDirections = []
+    }
+    activityVC.completionWithItemsHandler = { _, _, _, _ in
+      try? FileManager.default.removeItem(at: fileURL.deletingLastPathComponent())
+    }
+    presenter.present(activityVC, animated: true) {
+      isPreparingLogExport = false
     }
   }
 }
