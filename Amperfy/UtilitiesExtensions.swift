@@ -434,4 +434,10 @@ extension UISearchBar {
     }
     return appDelegate.storage.settings.user.isOfflineMode
   }
+
+  /// Lists limited to cached entries by design have no scope bar.
+  @MainActor
+  func isShowingCachedOnly(isCachedOnlyList: Bool) -> Bool {
+    isCachedOnlyList || isCachedScopeSelected
+  }
 }

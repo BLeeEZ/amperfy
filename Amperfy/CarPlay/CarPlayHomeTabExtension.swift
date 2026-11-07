@@ -99,20 +99,7 @@ extension CarPlaySceneDelegate {
         }
       } else if isRandomSection {
         Task { @MainActor in
-          switch section {
-          case .randomAlbums:
-            await sharedHome.updateRandomAlbums(isOfflineMode: isOfflineMode)
-          case .randomArtists:
-            await sharedHome.updateRandomArtists(isOfflineMode: isOfflineMode)
-          case .randomGenres:
-            await sharedHome.updateRandomGenres()
-          case .randomSongs:
-            await sharedHome.updateRandomSongs(isOfflineMode: isOfflineMode)
-          case .lastTimePlayedPlaylists, .newestAlbums, .newestPodcastEpisodes, .podcasts, .radios,
-               .recentlyPlayedAlbums:
-            // do nothing
-            break
-          }
+          await sharedHome.refreshRandomSection(section)
           if section.isRandomSection {
             row.elements = createHomeRowImageElements(section: section, isDetail: true)
           }
@@ -141,7 +128,10 @@ extension CarPlaySceneDelegate {
           }
         }
         if let album = selectedPlayable as? Album {
-          let albumTemplate = createAlbumSongListTemplate(for: album, onlyCached: isOfflineMode)
+          let albumTemplate = createAlbumSongListTemplate(
+            for: album,
+            onlyCached: isOfflineMode || section.isCachedSection
+          )
           let _ = try? await interfaceController?.pushTemplate(albumTemplate, animated: true)
           completion()
         } else if let playlist = selectedPlayable as? Playlist {
@@ -153,7 +143,11 @@ extension CarPlaySceneDelegate {
           interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
           completion()
         } else {
-          self.appDelegate.player.play(context: PlayContext(containable: selectedPlayable))
+          let playContext = section.isCachedSection ? PlayContext(
+            containable: selectedPlayable,
+            playables: selectedPlayable.playables.filter { $0.isCached }
+          ) : PlayContext(containable: selectedPlayable)
+          self.appDelegate.player.play(context: playContext)
           displayNowPlaying {
             completion()
           }

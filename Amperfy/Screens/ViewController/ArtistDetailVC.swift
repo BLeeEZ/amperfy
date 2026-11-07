@@ -74,9 +74,9 @@ class ArtistDetailVC: MultiSourceTableViewController {
         "\(self.artist.albumCount) Album\(self.artist.albumCount == 1 ? "" : "s") \(CommonString.oneMiddleDot) \(self.artist.songCount) Song\(self.artist.songCount == 1 ? "" : "s")"
       },
       playContextCb: { () in
+        let isCachedOnly = self.searchController.searchBar.isCachedScopeSelected
         let songs = self.songsFetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
-          []
+          .getContextSongs(onlyCachedSongs: isCachedOnly) ?? []
         let sortedSongs = songs.filterSongs().sortByAlbum()
         return PlayContext(containable: self.artist, playables: sortedSongs)
       },
@@ -214,7 +214,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = songsFetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: searchController.searchBar.isCachedScopeSelected)
     else { return nil }
     let selectedSong = songsFetchedResultsController.getWrappedEntity(at: songIndexPath)
     guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
@@ -343,7 +343,11 @@ class ArtistDetailVC: MultiSourceTableViewController {
         section: 0
       ))
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
+        AppStoryboard.Main.segueToAlbumDetail(
+          account: account,
+          album: album,
+          isCachedScopePreselected: searchController.searchBar.isCachedScopeSelected
+        ),
         animated: true
       )
     case LibraryElement.Song.rawValue: break

@@ -137,24 +137,9 @@ class HomeManager: NSObject {
       albumsNewestFetchController = nil
     }
 
-    if orderedVisibleSections.contains(where: { $0 == .randomAlbums }) {
+    for section in orderedVisibleSections where section.isRandomSection {
       Task { @MainActor in
-        await updateRandomAlbums(isOfflineMode: isOfflineMode)
-      }
-    }
-    if orderedVisibleSections.contains(where: { $0 == .randomArtists }) {
-      Task { @MainActor in
-        await updateRandomArtists(isOfflineMode: isOfflineMode)
-      }
-    }
-    if orderedVisibleSections.contains(where: { $0 == .randomGenres }) {
-      Task { @MainActor in
-        await updateRandomGenres()
-      }
-    }
-    if orderedVisibleSections.contains(where: { $0 == .randomSongs }) {
-      Task { @MainActor in
-        await updateRandomSongs(isOfflineMode: isOfflineMode)
+        await refreshRandomSection(section)
       }
     }
 
@@ -302,49 +287,31 @@ class HomeManager: NSObject {
     }
   }
 
-  func updateRandomAlbums(isOfflineMode: Bool) async {
-    let randomAlbums = storage.main.library.getRandomAlbums(
-      for: account,
-      count: Self.sectionMaxItemCount,
-      onlyCached: isOfflineMode
-    )
-    data[.randomAlbums] = randomAlbums.compactMap {
-      HomeItem(section: .randomAlbums, playableContainable: $0)
+  func refreshRandomSection(_ section: HomeSection) async {
+    let onlyCached = section.isCachedSection || isOfflineMode
+    let library = storage.main.library
+    let count = Self.sectionMaxItemCount
+    switch section {
+    case .cachedAlbums, .randomAlbums:
+      show(library.getRandomAlbums(for: account, count: count, onlyCached: onlyCached), in: section)
+    case .cachedArtists, .randomArtists:
+      show(
+        library.getRandomArtists(for: account, count: count, onlyCached: onlyCached),
+        in: section
+      )
+    case .cachedSongs, .randomSongs:
+      show(library.getRandomSongs(for: account, count: count, onlyCached: onlyCached), in: section)
+    case .randomGenres:
+      show(library.getRandomGenres(for: account, count: count), in: section)
+    case .lastTimePlayedPlaylists, .newestAlbums, .newestPodcastEpisodes, .podcasts, .radios,
+         .recentlyPlayedAlbums:
+      break
     }
-    applySnapshotCB?()
   }
 
-  func updateRandomArtists(isOfflineMode: Bool) async {
-    let randomArtists = storage.main.library.getRandomArtists(
-      for: account,
-      count: Self.sectionMaxItemCount,
-      onlyCached: isOfflineMode
-    )
-    data[.randomArtists] = randomArtists.compactMap {
-      HomeItem(section: .randomArtists, playableContainable: $0)
-    }
-    applySnapshotCB?()
-  }
-
-  func updateRandomGenres() async {
-    let randomGenres = storage.main.library.getRandomGenres(
-      for: account,
-      count: Self.sectionMaxItemCount
-    )
-    data[.randomGenres] = randomGenres.compactMap {
-      HomeItem(section: .randomGenres, playableContainable: $0)
-    }
-    applySnapshotCB?()
-  }
-
-  func updateRandomSongs(isOfflineMode: Bool) async {
-    let randomSongs = storage.main.library.getRandomSongs(
-      for: account,
-      count: Self.sectionMaxItemCount,
-      onlyCached: isOfflineMode
-    )
-    data[.randomSongs] = randomSongs.compactMap {
-      HomeItem(section: .randomSongs, playableContainable: $0)
+  private func show(_ containables: [PlayableContainable], in section: HomeSection) {
+    data[section] = containables.compactMap {
+      HomeItem(section: section, playableContainable: $0)
     }
     applySnapshotCB?()
   }

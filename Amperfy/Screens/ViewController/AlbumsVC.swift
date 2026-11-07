@@ -130,6 +130,11 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     get { common.displayFilter }
   }
 
+  public var isCachedOnly: Bool {
+    set { common.isCachedOnly = newValue }
+    get { common.isCachedOnly }
+  }
+
   private var albumsDataSource: AlbumsDiffableDataSource? {
     diffableDataSource as? AlbumsDiffableDataSource
   }
@@ -189,7 +194,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     common.applyFilter()
     configureSearchController(
       placeholder: "Search in \"\(common.filterTitle)\"",
-      scopeButtonTitles: ["All", "Cached"]
+      scopeButtonTitles: isCachedOnly ? nil : ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.rowHeight = GenericTableCell.rowHeight
@@ -214,7 +219,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     }
     playContextAtIndexPathCallback = { indexPath in
       guard let album = self.albumsDataSource?.getAlbum(at: indexPath) else { return nil }
-      return PlayContext(containable: album)
+      return self.common.playContext(of: album)
     }
     swipeCallback = { indexPath, completionHandler in
       guard let album = self.albumsDataSource?.getAlbum(at: indexPath) else {
@@ -232,7 +237,10 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
         } catch {
           self.appDelegate.eventLogger.report(topic: "Album Sync", error: error)
         }
-        completionHandler(SwipeActionContext(containable: album))
+        completionHandler(SwipeActionContext(
+          containable: album,
+          playContext: self.common.swipePlayContext(of: album)
+        ))
       }
     }
     snapshotDidChange = {
@@ -298,7 +306,12 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
     guard let album = (diffableDataSource as? AlbumsDiffableDataSource)?.getAlbum(at: indexPath)
     else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
+      AppStoryboard.Main.segueToAlbumDetail(
+        account: account,
+        album: album,
+        isCachedScopePreselected: searchController.searchBar
+          .isShowingCachedOnly(isCachedOnlyList: isCachedOnly)
+      ),
       animated: true
     )
   }

@@ -26,7 +26,7 @@ import UIKit
 class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   override var sceneTitle: String? {
     switch displayFilter {
-    case .all, .newest, .recent: "Songs"
+    case .all, .newest, .recent: isCachedOnly ? "Cached Songs" : "Songs"
     case .favorites: "Favorite Songs"
     }
   }
@@ -35,6 +35,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   private var detailHeaderView: LibraryElementDetailTableHeaderView?
   private var optionsButton: UIBarButtonItem!
   public var displayFilter: DisplayCategoryFilter = .all
+  public var isCachedOnly = false
   private var sortType: SongElementSortType = .name
   private var filterTitle = "Songs"
 
@@ -60,7 +61,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     applyFilter()
     configureSearchController(
       placeholder: "Search in \"\(filterTitle)\"",
-      scopeButtonTitles: ["All", "Cached"]
+      scopeButtonTitles: isCachedOnly ? nil : ["All", "Cached"]
     )
     tableView.register(nibName: PlayableTableCell.typeName)
     tableView.rowHeight = PlayableTableCell.rowHeight
@@ -139,7 +140,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   func applyFilter() {
     switch displayFilter {
     case .all:
-      filterTitle = "Songs"
+      filterTitle = isCachedOnly ? "Cached Songs" : "Songs"
       isIndexTitelsHidden = false
       change(sortType: appDelegate.storage.settings.user.songsSortSetting)
     case .newest, .recent:
@@ -200,7 +201,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   func updateRightBarButtonItems() {
     var actions = [UIMenu]()
     actions.append(createSortButtonMenu())
-    if appDelegate.storage.settings.user.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode, !isCachedOnly {
       actions.append(createActionButtonMenu())
     }
     optionsButton = UIBarButtonItem.createOptionsBarButton()
@@ -306,7 +307,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
+    let isShowingCachedOnly = searchController.searchBar
+      .isShowingCachedOnly(isCachedOnlyList: isCachedOnly)
+    if !searchText.isEmpty, !isShowingCachedOnly {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchSongs(searchText: searchText)
@@ -318,7 +321,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
         onlyCachedSongs: false,
         displayFilter: displayFilter
       )
-    } else if searchController.searchBar.isCachedScopeSelected {
+    } else if isShowingCachedOnly {
       fetchedResultsController.search(
         searchText: searchText,
         onlyCachedSongs: true,
@@ -327,7 +330,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     } else if displayFilter != .all {
       fetchedResultsController.search(
         searchText: searchText,
-        onlyCachedSongs: searchController.searchBar.isCachedScopeSelected,
+        onlyCachedSongs: false,
         displayFilter: displayFilter
       )
     } else {
@@ -509,7 +512,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.user.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode, !isCachedOnly else {
       self.refreshControl?.endRefreshing()
       return
     }

@@ -102,12 +102,11 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
-      playContextCb: { () in PlayContext(
-        containable: self.album,
-        playables: self.fetchedResultsController
-          .getContextSongs(onlyCachedSongs: self.appDelegate.storage.settings.user.isOfflineMode) ??
-          []
-      ) },
+      playContextCb: { () in
+        let isCachedOnly = self.searchController.searchBar.isCachedScopeSelected
+        let songs = self.fetchedResultsController.getContextSongs(onlyCachedSongs: isCachedOnly)
+        return PlayContext(containable: self.album, playables: songs ?? [])
+      },
       player: appDelegate.player,
       isInfoAlwaysHidden: true
     )
@@ -173,7 +172,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
   func convertIndexPathToPlayContext(songIndexPath: IndexPath) -> PlayContext? {
     guard let songs = fetchedResultsController
-      .getContextSongs(onlyCachedSongs: appDelegate.storage.settings.user.isOfflineMode)
+      .getContextSongs(onlyCachedSongs: searchController.searchBar.isCachedScopeSelected)
     else { return nil }
     let selectedSong = fetchedResultsController.getWrappedEntity(at: songIndexPath)
     guard let playContextIndex = songs.firstIndex(of: selectedSong) else { return nil }
