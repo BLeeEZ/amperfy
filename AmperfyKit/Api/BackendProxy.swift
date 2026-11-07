@@ -48,10 +48,10 @@ public enum BackenApiType: Int, Sendable, Codable {
 
   public var selectorDescription: String {
     switch self {
-    case .notDetected: return "Auto-Detect"
+    case .notDetected: return String(localized: "Auto-Detect", bundle: #bundle)
     case .ampache: return "Ampache"
     case .subsonic: return "Subsonic"
-    case .subsonic_legacy: return "Subsonic (legacy login)"
+    case .subsonic_legacy: return String(localized: "Subsonic (legacy login)", bundle: #bundle)
     }
   }
 
@@ -77,11 +77,14 @@ public enum AuthenticationError: LocalizedError {
     var ret = ""
     switch self {
     case .notAbleToLogin:
-      ret = "Not able to login, please check credentials!"
+      ret = String(localized: "Not able to login, please check credentials!", bundle: #bundle)
     case .invalidUrl:
-      ret = "Server URL is invalid!"
+      ret = String(localized: "Server URL is invalid!", bundle: #bundle)
     case let .requestStatusError(message: message):
-      ret = "Requesting server URL finished with status response error code '\(message)'!"
+      ret = String(
+        localized: "Requesting server URL finished with status response error code '\(message)'!",
+        bundle: #bundle
+      )
     case let .downloadError(message: message):
       ret = message
     }
