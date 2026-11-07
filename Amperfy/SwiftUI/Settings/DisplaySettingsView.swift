@@ -1,4 +1,3 @@
-
 //
 //  DisplaySettingsView.swift
 //  Amperfy
@@ -29,175 +28,179 @@ struct DisplaySettingsView: View {
   @EnvironmentObject
   private var settings: Settings
 
-  #if !targetEnvironment(macCatalyst)
-    @State
-    private var selectedAppIconName: String?
-    @State
-    private var selectedAppIconCategory: AppIconCategory = .amperfy
-    @State
-    private var isChangingAppIcon = false
-    @State
-    private var isShowingAppIconError = false
-    @State
-    private var appIconErrorMessage = ""
+  @State
+  private var selectedAppIconName: String?
+  @State
+  private var selectedAppIconCategory: AppIconCategory = .amperfy
+  @State
+  private var isChangingAppIcon = false
+  @State
+  private var isShowingAppIconError = false
+  @State
+  private var appIconErrorMessage = ""
 
-    private let appIconGridColumns = [
-      GridItem(.adaptive(minimum: 72, maximum: 96), spacing: 12),
-    ]
+  private let appIconGridColumns = [
+    GridItem(.adaptive(minimum: 72, maximum: 96), spacing: 12),
+  ]
 
-    private let appIconOptions = [
-      AppIconOption(
-        title: "Default",
-        iconName: nil,
-        previewName: "AmperfyAppIconPreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Teal",
-        iconName: "AmperfyTeal",
-        previewName: "AmperfyTealPreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Green",
-        iconName: "AmperfyGreen",
-        previewName: "AmperfyGreenPreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Yellow",
-        iconName: "AmperfyYellow",
-        previewName: "AmperfyYellowPreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Orange",
-        iconName: "AmperfyOrange",
-        previewName: "AmperfyOrangePreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Red",
-        iconName: "AmperfyRed",
-        previewName: "AmperfyRedPreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Pink",
-        iconName: "AmperfyPink",
-        previewName: "AmperfyPinkPreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Purple",
-        iconName: "AmperfyPurple",
-        previewName: "AmperfyPurplePreview",
-        category: .amperfy
-      ),
-      AppIconOption(
-        title: "Music Blue",
-        iconName: "AmperfyMusicBlue",
-        previewName: "AmperfyMusicBluePreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Teal",
-        iconName: "AmperfyMusicTeal",
-        previewName: "AmperfyMusicTealPreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Green",
-        iconName: "AmperfyMusicGreen",
-        previewName: "AmperfyMusicGreenPreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Yellow",
-        iconName: "AmperfyMusicYellow",
-        previewName: "AmperfyMusicYellowPreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Orange",
-        iconName: "AmperfyMusicOrange",
-        previewName: "AmperfyMusicOrangePreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Red",
-        iconName: "AmperfyMusicRed",
-        previewName: "AmperfyMusicRedPreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Pink",
-        iconName: "AmperfyMusicPink",
-        previewName: "AmperfyMusicPinkPreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Purple",
-        iconName: "AmperfyMusicPurple",
-        previewName: "AmperfyMusicPurplePreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Single",
-        iconName: "AmperfyMusicSingle",
-        previewName: "AmperfyMusicSinglePreview",
-        category: .music
-      ),
-      AppIconOption(
-        title: "Music Single Gradient",
-        iconName: "AmperfyMusicSingleGradient",
-        previewName: "AmperfyMusicSingleGradientPreview",
-        category: .music
-      ),
-    ]
+  private let appIconOptions = [
+    AppIconOption(
+      title: "Default",
+      iconName: nil,
+      previewName: "AmperfyAppIconPreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Teal",
+      iconName: "AmperfyTeal",
+      previewName: "AmperfyTealPreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Green",
+      iconName: "AmperfyGreen",
+      previewName: "AmperfyGreenPreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Yellow",
+      iconName: "AmperfyYellow",
+      previewName: "AmperfyYellowPreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Orange",
+      iconName: "AmperfyOrange",
+      previewName: "AmperfyOrangePreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Red",
+      iconName: "AmperfyRed",
+      previewName: "AmperfyRedPreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Pink",
+      iconName: "AmperfyPink",
+      previewName: "AmperfyPinkPreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Purple",
+      iconName: "AmperfyPurple",
+      previewName: "AmperfyPurplePreview",
+      category: .amperfy
+    ),
+    AppIconOption(
+      title: "Music Blue",
+      iconName: "AmperfyMusicBlue",
+      previewName: "AmperfyMusicBluePreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Teal",
+      iconName: "AmperfyMusicTeal",
+      previewName: "AmperfyMusicTealPreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Green",
+      iconName: "AmperfyMusicGreen",
+      previewName: "AmperfyMusicGreenPreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Yellow",
+      iconName: "AmperfyMusicYellow",
+      previewName: "AmperfyMusicYellowPreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Orange",
+      iconName: "AmperfyMusicOrange",
+      previewName: "AmperfyMusicOrangePreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Red",
+      iconName: "AmperfyMusicRed",
+      previewName: "AmperfyMusicRedPreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Pink",
+      iconName: "AmperfyMusicPink",
+      previewName: "AmperfyMusicPinkPreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Purple",
+      iconName: "AmperfyMusicPurple",
+      previewName: "AmperfyMusicPurplePreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Single",
+      iconName: "AmperfyMusicSingle",
+      previewName: "AmperfyMusicSinglePreview",
+      category: .music
+    ),
+    AppIconOption(
+      title: "Music Single Gradient",
+      iconName: "AmperfyMusicSingleGradient",
+      previewName: "AmperfyMusicSingleGradientPreview",
+      category: .music
+    ),
+  ]
 
-    private var visibleAppIcons: [AppIconOption] {
-      guard selectedAppIconCategory != .all else {
-        return appIconOptions
-      }
-
-      return appIconOptions.filter {
-        $0.category == selectedAppIconCategory
-      }
+  private var visibleAppIcons: [AppIconOption] {
+    guard selectedAppIconCategory != .all else {
+      return appIconOptions
     }
-  #endif
+
+    return appIconOptions.filter {
+      $0.category == selectedAppIconCategory
+    }
+  }
+
+  init() {
+    let iconName = UIApplication.shared.alternateIconName
+    _selectedAppIconName = State(initialValue: iconName)
+    _selectedAppIconCategory = State(initialValue: appIconOptions.first {
+      $0.iconName == iconName
+    }?.category ?? .amperfy)
+  }
 
   func setAppearanceMode(style: UIUserInterfaceStyle) {
     settings.appearanceMode = style
     appDelegate.setAppAppearanceMode(style: style)
   }
 
-  #if !targetEnvironment(macCatalyst)
-    private func changeAppIcon(to iconName: String?) {
-      guard !isChangingAppIcon else { return }
-      guard UIApplication.shared.alternateIconName != iconName else { return }
+  private func changeAppIcon(to iconName: String?) {
+    guard !isChangingAppIcon else { return }
+    guard UIApplication.shared.alternateIconName != iconName else { return }
 
-      guard UIApplication.shared.supportsAlternateIcons else {
-        appIconErrorMessage = "Alternate app icons are not supported on this device."
+    guard UIApplication.shared.supportsAlternateIcons else {
+      appIconErrorMessage = "Alternate app icons are not supported on this device."
+      isShowingAppIconError = true
+      return
+    }
+
+    isChangingAppIcon = true
+    Task { @MainActor in
+      defer { isChangingAppIcon = false }
+
+      do {
+        try await UIApplication.shared.setAlternateIconName(iconName)
+        selectedAppIconName = UIApplication.shared.alternateIconName
+      } catch {
+        selectedAppIconName = UIApplication.shared.alternateIconName
+        appIconErrorMessage = error.localizedDescription
         isShowingAppIconError = true
-        return
-      }
-
-      isChangingAppIcon = true
-      Task { @MainActor in
-        defer { isChangingAppIcon = false }
-
-        do {
-          try await UIApplication.shared.setAlternateIconName(iconName)
-          selectedAppIconName = UIApplication.shared.alternateIconName
-        } catch {
-          selectedAppIconName = UIApplication.shared.alternateIconName
-          appIconErrorMessage = error.localizedDescription
-          isShowingAppIconError = true
-        }
       }
     }
-  #endif
+  }
 
   var body: some View {
     ZStack {
@@ -221,7 +224,9 @@ struct DisplaySettingsView: View {
           }
         }
 
-        #if !targetEnvironment(macCatalyst)
+        // Mac Catalyst compiles alternate icons but doesn't support switching them
+        // in our tests, so only show the picker when the system allows it.
+        if UIApplication.shared.supportsAlternateIcons {
           SettingsSection(
             content: {
               VStack(spacing: 16) {
@@ -274,7 +279,7 @@ struct DisplaySettingsView: View {
             },
             header: "App Icon"
           )
-        #endif
+        }
 
         #if !targetEnvironment(macCatalyst)
           SettingsSection(
@@ -389,49 +394,49 @@ struct DisplaySettingsView: View {
     }
     .navigationTitle("Display")
     .navigationBarTitleDisplayMode(.inline)
-    #if !targetEnvironment(macCatalyst)
-      .onAppear {
-        selectedAppIconName = UIApplication.shared.alternateIconName
+    .onAppear {
+      selectedAppIconName = UIApplication.shared.alternateIconName
 
-        selectedAppIconCategory = appIconOptions.first {
-          $0.iconName == selectedAppIconName
-        }?.category ?? .amperfy
-      }
-      .alert("Unable to Change App Icon", isPresented: $isShowingAppIconError) {
-        Button("OK", role: .cancel) {}
-      } message: {
-        Text(appIconErrorMessage)
-      }
-    #endif
+      selectedAppIconCategory = appIconOptions.first {
+        $0.iconName == selectedAppIconName
+      }?.category ?? .amperfy
+    }
+    .alert("Unable to Change App Icon", isPresented: $isShowingAppIconError) {
+      Button("OK", role: .cancel) {}
+    } message: {
+      Text(appIconErrorMessage)
+    }
   }
 }
 
-#if !targetEnvironment(macCatalyst)
-  private enum AppIconCategory: String, CaseIterable, Identifiable {
-    case amperfy
-    case music
-    case all
+// MARK: - AppIconCategory
 
-    var id: Self { self }
+private enum AppIconCategory: String, CaseIterable, Identifiable {
+  case amperfy
+  case music
+  case all
 
-    var title: String {
-      switch self {
-      case .amperfy: "Amperfy"
-      case .music: "Music"
-      case .all: "All"
-      }
+  var id: Self { self }
+
+  var title: String {
+    switch self {
+    case .amperfy: "Amperfy"
+    case .music: "Music"
+    case .all: "All"
     }
   }
+}
 
-  private struct AppIconOption: Identifiable {
-    let title: String
-    let iconName: String?
-    let previewName: String
-    let category: AppIconCategory
+// MARK: - AppIconOption
 
-    var id: String { iconName ?? "Default" }
-  }
-#endif
+private struct AppIconOption: Identifiable {
+  let title: String
+  let iconName: String?
+  let previewName: String
+  let category: AppIconCategory
+
+  var id: String { iconName ?? "Default" }
+}
 
 // MARK: - DisplaySettingsView_Previews
 
