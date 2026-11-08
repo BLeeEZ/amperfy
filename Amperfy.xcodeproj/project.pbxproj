@@ -3140,7 +3140,7 @@
 		5083860D21C5965E00C4BB32 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AmperfyGreen AmperfyOrange AmperfyPurple AmperfyRed AmperfyYellow AmperfyMusicBlue AmperfyMusicGreen AmperfyMusicOrange AmperfyMusicPurple AmperfyMusicRed AmperfyMusicYellow AmperfyPink AmperfyMusicPink AmperfyMusicSingle AmperfyMusicSingleGradient AmperfyTeal AmperfyMusicTeal";
+				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=iphone*]" = "AmperfyGreen AmperfyOrange AmperfyPurple AmperfyRed AmperfyYellow AmperfyMusicBlue AmperfyMusicGreen AmperfyMusicOrange AmperfyMusicPurple AmperfyMusicRed AmperfyMusicYellow AmperfyPink AmperfyMusicPink AmperfyMusicSingle AmperfyMusicSingleGradient AmperfyTeal AmperfyMusicTeal";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -3180,7 +3180,7 @@
 		5083860E21C5965E00C4BB32 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AmperfyGreen AmperfyOrange AmperfyPurple AmperfyRed AmperfyYellow AmperfyMusicBlue AmperfyMusicGreen AmperfyMusicOrange AmperfyMusicPurple AmperfyMusicRed AmperfyMusicYellow AmperfyPink AmperfyMusicPink AmperfyMusicSingle AmperfyMusicSingleGradient AmperfyTeal AmperfyMusicTeal";
+				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=iphone*]" = "AmperfyGreen AmperfyOrange AmperfyPurple AmperfyRed AmperfyYellow AmperfyMusicBlue AmperfyMusicGreen AmperfyMusicOrange AmperfyMusicPurple AmperfyMusicRed AmperfyMusicYellow AmperfyPink AmperfyMusicPink AmperfyMusicSingle AmperfyMusicSingleGradient AmperfyTeal AmperfyMusicTeal";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
