@@ -189,8 +189,9 @@ extension AppDelegate: AlertDisplayable {
     logType: LogEntryType
   )
     -> UIViewController {
-    let popupVC = NotificationDetailVC()
-    popupVC.display(title: topic, message: detailMessage, type: logType)
-    return popupVC
+    let detailVC = NotificationDetailVC()
+    detailVC.display(title: topic, message: detailMessage, type: logType)
+    // the navigation bar shows the title and the system close button
+    return UINavigationController(rootViewController: detailVC)
   }
 }

@@ -21,12 +21,9 @@
 
 import AmperfyKit
 import Foundation
-import MarqueeLabel
 import UIKit
 
 class NotificationDetailVC: UIViewController {
-  @IBOutlet
-  weak var titleLabel: UILabel!
   @IBOutlet
   weak var descriptionTextView: UITextView!
 
@@ -37,19 +34,30 @@ class NotificationDetailVC: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     view.setBackgroundBlur(style: .prominent)
-
-    if let presentationController = presentationController as? UISheetPresentationController {
-      presentationController.detents = [
-        .large(),
-      ]
-      if traitCollection.horizontalSizeClass == .compact {
-        presentationController.detents.append(.medium())
-      }
-    }
+    // system close button: drawn by the system on every platform (glass on iOS and macOS 26)
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      systemItem: .close,
+      primaryAction: UIAction { [weak self] _ in self?.pressedClose() }
+    )
+    let barAppearance = UINavigationBarAppearance()
+    barAppearance.configureWithTransparentBackground()
+    navigationItem.standardAppearance = barAppearance
+    navigationItem.scrollEdgeAppearance = barAppearance
+    // the scroll view starts below the navigation bar (safe area); the text view does not scroll,
+    // an inset of its own would push the text out of its bounds
+    descriptionTextView.contentInsetAdjustmentBehavior = .never
+    descriptionTextView.backgroundColor = .clear
   }
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    // the size class is only known once the view is in the presentation; the sheet belongs to the
+    // navigation controller, which sheetPresentationController returns for its child
+    if let sheet = sheetPresentationController {
+      sheet.detents = traitCollection.horizontalSizeClass == .compact
+        ? [.large(), .medium()]
+        : [.large()]
+    }
     refresh()
   }
 
@@ -59,12 +67,11 @@ class NotificationDetailVC: UIViewController {
   }
 
   func refresh() {
-    titleLabel.text = topic
+    title = topic
     descriptionTextView.text = message
   }
 
-  @IBAction
-  func pressedClose(_ sender: Any) {
+  func pressedClose() {
     dismiss(animated: true)
   }
 }
