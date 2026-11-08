@@ -503,7 +503,11 @@ class EntityPreviewActionBuilder {
       appDelegate.eventLogger.info(
         topic: "Instant Mix",
         message: "Playing instant mix with \(allSongs.count) songs",
-        displayPopup: true
+        displayPopup: true,
+        toast: AlertToastText(
+          title: "Instant Mix",
+          subtitle: allSongs.count == 1 ? "1 song" : "\(allSongs.count) songs"
+        )
       )
 
     } catch {

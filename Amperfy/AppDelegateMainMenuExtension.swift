@@ -446,7 +446,8 @@ extension AppDelegate {
           self.appDelegate.player.pause()
           self.appDelegate.eventLogger.info(
             topic: "Sleep Timer",
-            message: "Sleep Timer paused playback."
+            message: "Sleep Timer paused playback.",
+            toast: AlertToastText(title: "Sleep Timer", subtitle: "Paused by sleep timer")
           )
           self.appDelegate.sleepTimer?.invalidate()
           self.appDelegate.sleepTimer = nil
