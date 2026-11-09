@@ -1,6 +1,18 @@
 {
   "images" : [
     {
+      "filename" : "AmperfyTealPreview@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AmperfyTealPreviewDark@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -10,6 +22,29 @@
       "scale" : "2x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AmperfyTealPreviewDark.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "AmperfyTealPreview@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AmperfyTealPreviewDark@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

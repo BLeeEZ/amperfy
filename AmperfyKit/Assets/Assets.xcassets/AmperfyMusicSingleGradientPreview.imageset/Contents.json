@@ -1,6 +1,18 @@
 {
   "images" : [
     {
+      "filename" : "AmperfyMusicSingleGradientPreview@1x.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AmperfyMusicSingleGradientPreviewDark@1x.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -10,6 +22,29 @@
       "scale" : "2x"
     },
     {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AmperfyMusicSingleGradientPreviewDark.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "AmperfyMusicSingleGradientPreview@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "AmperfyMusicSingleGradientPreviewDark@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
