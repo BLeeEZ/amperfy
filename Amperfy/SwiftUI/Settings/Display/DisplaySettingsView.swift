@@ -111,6 +111,17 @@ struct DisplaySettingsView: View {
             footer:
             "Lyrics are smoothly scrolled to next line. Deactivating will result in jumping from line to line."
           )
+
+          SettingsSection(
+            content: {
+              SettingsCheckBoxRow(
+                title: "Word-by-Word Lyrics",
+                isOn: $settings.isLyricsWordHighlightEnabled
+              )
+            },
+            footer:
+            "Highlight each word while it is sung, if the server provides word timing (OpenSubsonic songLyrics version 2)."
+          )
         }
 
         SettingsSection(

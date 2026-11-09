@@ -69,6 +69,8 @@ final class Settings: ObservableObject {
   @Published
   var isLyricsSmoothScrolling = true
   @Published
+  var isLyricsWordHighlightEnabled = true
+  @Published
   var swipeActionSettings = SwipeActionSettings(leading: [], trailing: [])
   @Published
   var cacheSizeLimit: Int = 0 // limit in byte

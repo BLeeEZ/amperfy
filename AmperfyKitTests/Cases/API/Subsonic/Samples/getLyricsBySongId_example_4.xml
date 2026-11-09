@@ -1,0 +1,30 @@
+<subsonic-response status="ok" version="1.16.1" type="AwesomeServerName" serverVersion="0.1.3 (tag)" openSubsonic="true">
+  <lyricsList>
+    <structuredLyrics displayArtist="Duet" displayTitle="Agents" kind="main" lang="eng" offset="-250" synced="true">
+      <agent id="lead" role="main" name="Lead Singer"/>
+      <agent id="backing" role="bg"/>
+      <line start="1000" end="2900">Hello (hello)</line>
+      <line start="3000" end="4500">Goodbye</line>
+      <cueLine index="0" start="1000" end="2000" value="Hello" agentId="lead">
+        <cue start="1000" end="2000" byteStart="0" byteEnd="4">Hello</cue>
+      </cueLine>
+      <cueLine index="0" start="2100" end="2900" value="hello" agentId="backing">
+        <cue start="2100" end="2900" byteStart="0" byteEnd="4">hello</cue>
+      </cueLine>
+      <cueLine index="1" start="3000" end="4500" value="Goodbye" agentId="lead">
+        <cue start="3000" end="3600" byteStart="0" byteEnd="3">Good</cue>
+        <cue start="3600" end="4500" byteStart="4" byteEnd="6">bye</cue>
+      </cueLine>
+    </structuredLyrics>
+    <structuredLyrics kind="pronunciation" lang="eng" synced="true">
+      <line start="1000">Heh-low</line>
+      <cueLine index="0" start="1000" end="2000" value="Heh-low">
+        <cue start="1000" end="1500" byteStart="0" byteEnd="3">Heh-</cue>
+        <cue start="1500" end="2000" byteStart="4" byteEnd="6">low</cue>
+      </cueLine>
+    </structuredLyrics>
+    <structuredLyrics kind="karaoke" lang="eng" synced="false">
+      <line>Unknown kind</line>
+    </structuredLyrics>
+  </lyricsList>
+</subsonic-response>

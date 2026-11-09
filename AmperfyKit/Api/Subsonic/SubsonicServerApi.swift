@@ -563,14 +563,29 @@ final class SubsonicServerApi: URLCleanser, Sendable {
     }
   }
 
+  public func isOpenSubsonicExtensionSupported(
+    extension oSsExtention: OpenSubsonicExtension,
+    minVersion: Int
+  ) async
+    -> Bool {
+    guard await isOpenSubsonicExtensionSupported(extension: oSsExtention),
+          let response = openSubsonicExtensionsSupport.wrappedValue?.extensionResponse
+    else { return false }
+    return response.isExtensionSupported(oSsExtention.rawValue, minVersion: minVersion)
+  }
+
   /// this requires that the server supports OpenSubsonicExtension "songLyrics"
-  public func requestLyricsBySongId(id: String) async throws -> APIDataResponse {
+  /// enhanced lyrics (word timing) require version 2 of "songLyrics"
+  public func requestLyricsBySongId(id: String, enhanced: Bool) async throws -> APIDataResponse {
     try await request { version in
-      let urlComp = try self.createAuthApiUrlComponent(
+      var urlComp = try self.createAuthApiUrlComponent(
         version: version,
         forAction: "getLyricsBySongId",
         id: id
       )
+      if enhanced {
+        urlComp.addQueryItem(name: "enhanced", value: "true")
+      }
       return try self.createUrl(from: urlComp)
     }
   }

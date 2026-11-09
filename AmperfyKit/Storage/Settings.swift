@@ -131,6 +131,12 @@ public struct UserSettings: Sendable, Codable {
     set { _isLyricsSmoothScrolling = newValue }
   }
 
+  private var _isLyricsWordHighlightEnabled: Bool = true
+  public var isLyricsWordHighlightEnabled: Bool {
+    get { _isLyricsWordHighlightEnabled }
+    set { _isLyricsWordHighlightEnabled = newValue }
+  }
+
   // limit in byte
   private var _cacheLimit: Int = 0
   public var cacheLimit: Int {

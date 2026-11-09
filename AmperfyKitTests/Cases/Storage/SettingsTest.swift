@@ -84,6 +84,31 @@ class SettingsTest: XCTestCase {
     XCTAssertFalse(reread.isLyricsSmoothScrolling)
   }
 
+  func testLyricsWordHighlightDefaultsToEnabled() {
+    XCTAssertTrue(UserSettings().isLyricsWordHighlightEnabled)
+  }
+
+  func testLyricsWordHighlightRoundTrip() {
+    var settings = AmperfySettings()
+    var user = changedUserSettings()
+    user.isLyricsWordHighlightEnabled = false
+    settings.user = user
+
+    let reread = AmperfySettings().user
+    assertChangedValuesKept(reread)
+    XCTAssertFalse(reread.isLyricsWordHighlightEnabled)
+  }
+
+  func testLyricsWordHighlightMissingFieldGetsDefault() throws {
+    var user = changedUserSettings()
+    user.isLyricsWordHighlightEnabled = false
+    try saveWithout("_isLyricsWordHighlightEnabled", user, forKey: userKey)
+
+    let reread = AmperfySettings().user
+    assertChangedValuesKept(reread)
+    XCTAssertTrue(reread.isLyricsWordHighlightEnabled, "missing field gets its default")
+  }
+
   func testAppSettingsMissingFieldKeepsSavedValues() throws {
     var app = AppSettings()
     app.isLibrarySynced = true

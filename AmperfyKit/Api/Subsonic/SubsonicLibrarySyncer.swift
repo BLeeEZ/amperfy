@@ -480,7 +480,12 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       let isSupported = await subsonicServerApi
         .isOpenSubsonicExtensionSupported(extension: .songLyrics)
       guard isSupported else { return }
-      let response = try await subsonicServerApi.requestLyricsBySongId(id: song.id)
+      let isEnhancedSupported = await subsonicServerApi
+        .isOpenSubsonicExtensionSupported(extension: .songLyrics, minVersion: 2)
+      let response = try await subsonicServerApi.requestLyricsBySongId(
+        id: song.id,
+        enhanced: isEnhancedSupported
+      )
       let songObjectId = song.managedObject.objectID
       try await storage.async.perform { asyncCompanion in
         guard let songAsyncMO = asyncCompanion.context.object(with: songObjectId) as? SongMO,
