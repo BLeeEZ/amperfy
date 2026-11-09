@@ -54,8 +54,7 @@ class PlaylistAddMusicFoldersVC: SingleFetchedResultsTableViewController<MusicFo
 
     configureSearchController(placeholder: "Search in \"Directories\"")
     tableView.register(nibName: DirectoryTableCell.typeName)
-    tableView.rowHeight = DirectoryTableCell.rowHeight
-    tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { DirectoryTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0

@@ -377,6 +377,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     )
   }
 
+  func switchToolbarCollapseMode(isToolbarPlayerAutoCollapse: Bool) {
+    appDelegate.storage.settings.user.isToolbarPlayerAutoCollapse = isToolbarPlayerAutoCollapse
+    appDelegate.notificationHandler.post(
+      name: .autoCollapseToolbarPlayerChanged,
+      object: nil,
+      userInfo: nil
+    )
+  }
+
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
     if #available(iOS 13.0, *) {
       UIApplication.shared.connectedScenes
@@ -389,6 +398,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           }
         }
     }
+  }
+
+  /// Applies the in-app text size (see `TextScaling`) to the app and all windows
+  func applyTextSize() {
+    let textSize = storage.settings.user.textSize
+    TextScaling.textSize = textSize
+    UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .flatMap { $0.windows }
+      .forEach { window in
+        if let textSize {
+          window.traitOverrides.preferredContentSizeCategory = textSize
+        } else {
+          window.traitOverrides.remove(UITraitPreferredContentSizeCategory.self)
+        }
+      }
   }
 
   func applicationWillResignActive(_ application: UIApplication) {

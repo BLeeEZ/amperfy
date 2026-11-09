@@ -91,6 +91,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
             displayPopup: false
           )
         }
+        notifyLibrarySongsSynced()
       }
 
       let hasAlbumsToSync = !(await self.nextUnsyncedAlbumTargets()).isEmpty
@@ -112,6 +113,10 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
         }
       }
 
+      // stop() resets isRunning before the loop ends: only a natural end notifies
+      if self.isRunning.wrappedValue {
+        self.notifyLibrarySongsSynced()
+      }
       self.isRunning.wrappedValue = false
       self.isCurrentlyActive.wrappedValue = false
       os_log("stopped", log: self.log, type: .info)
@@ -124,5 +129,11 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
       asyncCompanion.library.getAlbumWithoutSyncedSongs(fetchLimit: Self.albumSyncPageSize)
         .map { AlbumSyncTarget(objectID: $0.managedObject.objectID, id: $0.id) }
     }) ?? []
+  }
+
+  private func notifyLibrarySongsSynced() {
+    Task { @MainActor in
+      NotificationCenter.default.post(name: .librarySongsSynced, object: nil)
+    }
   }
 }

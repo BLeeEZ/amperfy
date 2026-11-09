@@ -146,6 +146,21 @@ public struct PlayContext {
       playables: playables
     )
   }
+
+  /// Returns the slice of a `count`-item list to queue when the item at `index` is
+  /// tapped, together with that item's index inside the slice. For `count <= maxCount`
+  /// the whole list is used; otherwise a `maxCount`-wide window centred on `index` and
+  /// clamped to the list bounds, so the tapped item is always contained.
+  public static func window(
+    count: Int,
+    index: Int,
+    maxCount: Int
+  )
+    -> (range: Range<Int>, index: Int) {
+    guard count > maxCount else { return (0 ..< count, index) }
+    let start = min(max(0, index - maxCount / 2), count - maxCount)
+    return (start ..< start + maxCount, index - start)
+  }
 }
 
 // MARK: - PlayerFacade

@@ -42,6 +42,10 @@ public class MimeFileConverter {
   static let conversionNeededMimeTypes = [
     "audio/x-flac": "audio/flac",
     "audio/m4a": "audio/mp4",
+    // m4b is MP4 audio. The player can't open an m4b whose index comes after the audio
+    // unless the file is named .mp4 or the server sends audio/mp4.
+    "audio/m4b": "audio/mp4",
+    "audio/x-m4b": "audio/mp4",
   ]
 
   static func convertToValidMimeTypeWhenNeccessary(mimeType: String) -> String {
@@ -65,7 +69,7 @@ public class MimeFileConverter {
   }
 
   static func getFilenameExtension(mimeType: String?) -> String {
-    guard let mimeType = mimeType?.lowercased()
+    guard let mimeType = mimeType.map(convertToValidMimeTypeWhenNeccessary)
     else { return Self.filenameExtensionUnknown }
 
     let fileExt = UTType(mimeType: mimeType)?.preferredFilenameExtension ??

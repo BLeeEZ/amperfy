@@ -668,7 +668,7 @@ extension CarPlaySceneDelegate {
   }
 
   func getImage(for playable: AbstractPlayable, isTrackDisplayed: Bool) -> UIImage {
-    isTrackDisplayed ? UIImage.numberToImage(number: playable.track) :
+    isTrackDisplayed ? UIImage.numberToImage(number: playable.trackInDisc) :
       LibraryEntityImage.getImageToDisplayImmediately(
         libraryEntity: playable,
         themePreference: getPreference(activeAccountInfo).theme,

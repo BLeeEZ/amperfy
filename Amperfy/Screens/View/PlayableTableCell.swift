@@ -83,7 +83,9 @@ class PlayableTableCell: BasicTableCell {
   private var ratingStackView: UIStackView?
   private var ratingStarViews: [UIImageView] = []
 
-  static let rowHeight: CGFloat = 48 + margin.bottom + margin.top
+  static var rowHeight: CGFloat { scaledRowHeight(contentHeight: 48.0) }
+  /// The artwork is square and as high as the row content (see xib)
+  static var artworkSize: CGFloat { rowHeight - margin.top - margin.bottom }
   private static let touchAnimation = 0.4
 
   private var style = PlayableTableCellStyle.none
@@ -280,7 +282,8 @@ class PlayableTableCell: BasicTableCell {
       playIndicator?.willHideIndicatorCB = nil
       trackNumberLabel.isHidden = true
       entityImage.isHidden = false
-      titleContainerLeadingConstraint.constant = 10 + 48 + 8 // heart + artwork width + offset
+      titleContainerLeadingConstraint.constant = 10 + Self
+        .artworkSize + 8 // heart + artwork + offset
     case .none:
       break // do nothing
     }
@@ -371,7 +374,7 @@ class PlayableTableCell: BasicTableCell {
 
   private func configureTrackNumberLabel() {
     guard let playable = playable else { return }
-    trackNumberLabel.text = playable.track > 0 ? "\(playable.track)" : ""
+    trackNumberLabel.text = playable.trackInDisc > 0 ? "\(playable.trackInDisc)" : ""
   }
 
   func refreshCacheAndDuration() {

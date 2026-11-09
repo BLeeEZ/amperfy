@@ -26,20 +26,26 @@
                             <constraint firstAttribute="width" secondItem="eg7-pd-DMm" secondAttribute="height" multiplier="1:1" id="XER-Ms-xhJ"/>
                         </constraints>
                     </view>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Episode with a very very very long title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Episode with a very very very long title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="84" y="28" width="275" height="42"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="42" id="K5Y-Cl-6p5"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="42" id="K5Y-Cl-6p5"/>
                         </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
+                        <variation key="userInterfaceIdiom=mac">
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                        </variation>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5. May - Cached " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g7h-Ca-aH3" userLabel="Info Label">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5. May - Cached " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g7h-Ca-aH3" userLabel="Info Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="84" y="13" width="97" height="15"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
+                        <variation key="userInterfaceIdiom=mac">
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                        </variation>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Eiy-n7-Hlt" userLabel="Play Eplisode Button">
                         <rect key="frame" x="16" y="131" width="25" height="25"/>
@@ -73,24 +79,24 @@
                             <constraint firstAttribute="width" constant="80" id="Afu-aF-9Rw"/>
                         </constraints>
                     </progressView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GdC-Xn-gpu" userLabel="Description Label">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GdC-Xn-gpu" userLabel="Description Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="16" y="76" width="343" height="50"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="50" id="NW6-He-BbA"/>
-                        </constraints>
                         <string key="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
-                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
+                        <variation key="userInterfaceIdiom=mac">
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                        </variation>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1h 30m 19s left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wFl-mR-cDH" userLabel="Play Progress Label">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1h 30m 19s left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wFl-mR-cDH" userLabel="Play Progress Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="137" y="135.5" width="130" height="16"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="16" id="bAn-R3-YQV"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
+                        <variation key="userInterfaceIdiom=mac">
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                        </variation>
                     </label>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="arrow.down.circle" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="iVr-ga-N6L" userLabel="Cache Icon">
                         <rect key="frame" x="275" y="134" width="20" height="19"/>
@@ -127,7 +133,7 @@
                     <constraint firstAttribute="trailingMargin" secondItem="ulS-LU-PlW" secondAttribute="trailing" id="BS7-SJ-YW4"/>
                     <constraint firstItem="GdC-Xn-gpu" firstAttribute="leading" secondItem="4aT-Z7-2jl" secondAttribute="leadingMargin" id="BfQ-y0-Yeh"/>
                     <constraint firstItem="GdC-Xn-gpu" firstAttribute="bottom" secondItem="Eiy-n7-Hlt" secondAttribute="top" constant="-5" id="CCu-zP-P6y"/>
-                    <constraint firstItem="GdC-Xn-gpu" firstAttribute="top" secondItem="eg7-pd-DMm" secondAttribute="bottom" constant="5" id="If8-XT-5aH"/>
+                    <constraint firstItem="GdC-Xn-gpu" firstAttribute="top" secondItem="eg7-pd-DMm" secondAttribute="bottom" constant="5" priority="999" id="If8-XT-5aH"/>
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="width" secondItem="Eiy-n7-Hlt" secondAttribute="width" id="IzF-ng-qvH"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="eg7-pd-DMm" secondAttribute="trailing" constant="8" id="LuL-b5-m52"/>
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="height" secondItem="yxO-LC-wiR" secondAttribute="height" id="NXh-KT-86q"/>
@@ -142,6 +148,8 @@
                     <constraint firstItem="ulS-LU-PlW" firstAttribute="leading" secondItem="yxO-LC-wiR" secondAttribute="trailing" constant="6" id="pZX-X4-ndQ"/>
                     <constraint firstItem="ZWe-re-U6e" firstAttribute="leading" secondItem="g7h-Ca-aH3" secondAttribute="leading" id="sNC-OG-0am"/>
                     <constraint firstItem="JqZ-Gw-nZk" firstAttribute="centerY" secondItem="Eiy-n7-Hlt" secondAttribute="centerY" id="vML-RP-SG7"/>
+                    <constraint firstAttribute="bottomMargin" secondItem="Eiy-n7-Hlt" secondAttribute="bottom" constant="-2" id="pod-Bt-Bot"/>
+                    <constraint firstItem="GdC-Xn-gpu" firstAttribute="top" relation="greaterThanOrEqual" secondItem="ZWe-re-U6e" secondAttribute="bottom" constant="5" id="pod-Ds-Ttl"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
