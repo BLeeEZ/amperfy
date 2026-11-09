@@ -42,6 +42,7 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
 
   override func checkCorrectParsing() {
     prefetchIdTester.checkPrefetchIdCounts(
+      artworkCount: 1,
       radioCount: 2
     )
 
@@ -86,6 +87,9 @@ class SsRadioExampleParserTest: AbstractSsParserTest {
     XCTAssertNil(radio.starredDate)
     XCTAssertNil(radio.contentType)
     XCTAssertEqual(radio.size, 0)
-    XCTAssertNil(radio.artwork)
+    XCTAssertEqual(radio.artwork?.account?.serverHash, TestAccountInfo.test1ServerHash)
+    XCTAssertEqual(radio.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
+    XCTAssertEqual(radio.artwork?.type, "")
+    XCTAssertEqual(radio.artwork?.id, "ra-1")
   }
 }

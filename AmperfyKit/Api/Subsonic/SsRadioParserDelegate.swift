@@ -24,7 +24,7 @@ import Foundation
 import os.log
 import UIKit
 
-class SsRadioParserDelegate: SsXmlLibParser {
+class SsRadioParserDelegate: SsXmlLibWithArtworkParser {
   var radioBuffer: Radio?
   var parsedRadios = [Radio]()
 
@@ -57,6 +57,9 @@ class SsRadioParserDelegate: SsXmlLibParser {
       }
       if let siteUrl = attributeDict["homePageUrl"] {
         radioBuffer?.siteURL = URL(string: siteUrl)
+      }
+      if let coverArtId = attributeDict["coverArt"] {
+        radioBuffer?.artwork = parseArtwork(id: coverArtId)
       }
     }
 
