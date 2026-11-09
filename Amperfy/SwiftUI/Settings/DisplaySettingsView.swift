@@ -39,9 +39,7 @@ struct DisplaySettingsView: View {
   @State
   private var appIconErrorMessage = ""
 
-  private let appIconGridColumns = [
-    GridItem(.adaptive(minimum: 72, maximum: 96), spacing: 12),
-  ]
+  private let appIconGridColumnCount = 4
 
   private let appIconOptions = [
     AppIconOption(
@@ -161,6 +159,14 @@ struct DisplaySettingsView: View {
 
     return appIconOptions.filter {
       $0.category == selectedAppIconCategory
+    }
+  }
+
+  /// `visibleAppIcons` split into rows of `appIconGridColumnCount`
+  private var visibleAppIconRows: [[AppIconOption]] {
+    let icons = visibleAppIcons
+    return stride(from: 0, to: icons.count, by: appIconGridColumnCount).map {
+      Array(icons[$0 ..< min($0 + appIconGridColumnCount, icons.count)])
     }
   }
 
@@ -314,41 +320,48 @@ struct DisplaySettingsView: View {
                 }
                 .pickerStyle(.segmented)
 
-                LazyVGrid(columns: appIconGridColumns, spacing: 16) {
-                  ForEach(visibleAppIcons) { option in
-                    let isSelected = selectedAppIconName == option.iconName
+                // Non-lazy grid: a LazyVGrid inside a List row leaves cells blank when the
+                // number of icons changes (e.g. switching the icon family).
+                Grid(horizontalSpacing: 12, verticalSpacing: 16) {
+                  ForEach(visibleAppIconRows.indices, id: \.self) { rowIndex in
+                    let row = visibleAppIconRows[rowIndex]
+                    GridRow {
+                      ForEach(row) { option in
+                        let isSelected = selectedAppIconName == option.iconName
 
-                    Button {
-                      changeAppIcon(to: option.iconName)
-                    } label: {
-                      VStack(spacing: 8) {
-                        Image(option.previewName)
-                          .resizable()
-                          .aspectRatio(contentMode: .fit)
-                          .frame(width: 64, height: 64)
-                          .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                          .overlay {
-                            if isSelected {
-                              RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(Color.accentColor, lineWidth: 3)
-                            }
+                        Button {
+                          changeAppIcon(to: option.iconName)
+                        } label: {
+                          VStack(spacing: 8) {
+                            Image(option.previewName)
+                              .resizable()
+                              .aspectRatio(contentMode: .fit)
+                              .frame(width: 64, height: 64)
+                              .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                              .overlay {
+                                if isSelected {
+                                  RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(Color.accentColor, lineWidth: 3)
+                                }
+                              }
+
+                            Text(option.title)
+                              .font(.caption)
+                              .multilineTextAlignment(.center)
+                              .lineLimit(2)
+                              .frame(height: 32, alignment: .top)
+                              .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
                           }
-
-                        Text(option.title)
-                          .font(.caption)
-                          .multilineTextAlignment(.center)
-                          .lineLimit(2)
-                          .frame(height: 32, alignment: .top)
-                          .foregroundStyle(isSelected ? Color.accentColor : Color.primary)
+                          .frame(maxWidth: .infinity)
+                          .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isChangingAppIcon)
+                        .accessibilityLabel(option.title)
+                        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
                       }
-                      .frame(maxWidth: .infinity)
-                      .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
-                    .disabled(isChangingAppIcon)
-                    .accessibilityLabel(option.title)
-                    .accessibilityValue(isSelected ? "Selected" : "Not selected")
-                    .accessibilityAddTraits(isSelected ? .isSelected : [])
                   }
                 }
               }
