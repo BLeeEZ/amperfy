@@ -130,6 +130,59 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     return ArtworkRemoteInfo(id: objectId, type: objectType)
   }
 
+  private static let sessionQueryItemNames = ["auth", "ssid"]
+
+  /// Artwork URL as sent by the server, without the session that expires
+  static func artworkUrlWithoutSession(urlString: String) -> String? {
+    guard let url = URL(string: urlString),
+          var urlComp = URLComponents(url: url, resolvingAgainstBaseURL: false)
+    else { return nil }
+    urlComp.percentEncodedQueryItems = urlComp.percentEncodedQueryItems?
+      .filter { !$0.name.isContainedIn(sessionQueryItemNames) }
+    return urlComp.string
+  }
+
+  /// Uses the file name and query of the artwork URL sent by the server (e.g. the token of
+  /// NextCloud Music) on the active server URL with a fresh session.
+  /// Without a usable stored artwork URL the URL is built from the remote info.
+  static func createArtworkUrl(
+    serverUrl: String,
+    artworkUrl: String?,
+    artworkRemoteInfo: ArtworkRemoteInfo,
+    authToken: String
+  ) throws
+    -> URL {
+    guard var apiUrl = URL(string: serverUrl) else { throw BackendError.invalidUrl }
+
+    if let artworkUrl,
+       extractArtworkInfoFromURL(urlString: artworkUrl) == artworkRemoteInfo,
+       let storedUrl = URL(string: artworkUrl),
+       let storedUrlComp = URLComponents(url: storedUrl, resolvingAgainstBaseURL: false),
+       !storedUrl.lastPathComponent.isEmpty, storedUrl.lastPathComponent != "/" {
+      var storedApiUrl = apiUrl
+      storedApiUrl.appendPathComponent(storedUrl.lastPathComponent)
+      if var urlComp = URLComponents(url: storedApiUrl, resolvingAgainstBaseURL: false) {
+        urlComp.addQueryItem(name: "auth", value: authToken)
+        let storedQueryItems = storedUrlComp.percentEncodedQueryItems?
+          .filter { !$0.name.isContainedIn(sessionQueryItemNames) } ?? []
+        urlComp.percentEncodedQueryItems = (urlComp.percentEncodedQueryItems ?? []) +
+          storedQueryItems
+        if let url = urlComp.url {
+          return url
+        }
+      }
+    }
+
+    apiUrl.appendPathComponent("image.php")
+    guard var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
+    else { throw BackendError.invalidUrl }
+    urlComp.addQueryItem(name: "auth", value: authToken)
+    urlComp.addQueryItem(name: "object_id", value: artworkRemoteInfo.id)
+    urlComp.addQueryItem(name: "object_type", value: artworkRemoteInfo.type)
+    guard let url = urlComp.url else { throw BackendError.invalidUrl }
+    return url
+  }
+
   private func isAuthenticated(auth: AuthentificationHandshake) -> Bool {
     let deltaTime: TimeInterval = auth.reauthenicateTime.timeIntervalSince(Date())
     return !deltaTime.isLess(than: 0.0)
@@ -245,6 +298,8 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
         outputItems.append(URLQueryItem(name: queryItem.name, value: "AUTH"))
       } else if queryItem.name == "user" {
         outputItems.append(URLQueryItem(name: queryItem.name, value: "USER"))
+      } else if queryItem.name == "token" {
+        outputItems.append(URLQueryItem(name: queryItem.name, value: "TOKEN"))
       } else {
         outputItems.append(queryItem)
       }
@@ -820,22 +875,20 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     return url
   }
 
-  public func generateUrlForArtwork(artworkRemoteInfo: ArtworkRemoteInfo) async throws -> URL {
+  public func generateUrlForArtwork(
+    artworkRemoteInfo: ArtworkRemoteInfo,
+    artworkUrl: String?
+  ) async throws
+    -> URL {
     guard let hostname = credentials
       .wrappedValue?.activeBackendServerUrl else { throw BackendError.noCredentials }
-    guard var apiUrl = URL(string: hostname) else { throw BackendError.invalidUrl }
-    apiUrl.appendPathComponent("image.php")
-
-    guard var urlComp = URLComponents(url: apiUrl, resolvingAgainstBaseURL: false)
-    else { throw BackendError.invalidUrl }
     let auth = try await reauthenticate()
-
-    urlComp.addQueryItem(name: "auth", value: auth.token)
-    urlComp.addQueryItem(name: "object_id", value: artworkRemoteInfo.id)
-    urlComp.addQueryItem(name: "object_type", value: artworkRemoteInfo.type)
-
-    let url = try createUrl(from: urlComp)
-    return url
+    return try Self.createArtworkUrl(
+      serverUrl: hostname,
+      artworkUrl: artworkUrl,
+      artworkRemoteInfo: artworkRemoteInfo,
+      authToken: auth.token
+    )
   }
 
   public func checkForErrorResponse(response: APIDataResponse) -> ResponseError? {
@@ -849,28 +902,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
       error: ampacheError,
       data: response.data
     )
-  }
-
-  private func updateUrlToken(urlString: String) async throws -> URL {
-    let auth = try await reauthenticate()
-    guard let inputUrlComp = URLComponents(string: urlString),
-          let inputUrl = URL(string: urlString),
-          var outputUrlComp = try? createAuthApiUrlComponent(auth: auth),
-          let queryItems = inputUrlComp.queryItems
-    else { throw BackendError.invalidUrl }
-
-    var outputItems = [URLQueryItem]()
-    for queryItem in queryItems {
-      if queryItem.name.isContainedIn(["ssid", "auth"]) {
-        outputItems.append(URLQueryItem(name: queryItem.name, value: auth.token))
-      } else {
-        outputItems.append(queryItem)
-      }
-    }
-
-    outputUrlComp.queryItems = outputItems
-    outputUrlComp.path = inputUrl.path
-    return try createUrl(from: outputUrlComp)
   }
 
   private func request(

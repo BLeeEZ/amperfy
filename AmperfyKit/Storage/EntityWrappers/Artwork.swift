@@ -70,6 +70,11 @@ public class Artwork: NSObject {
     set { if managedObject.type != newValue { managedObject.type = newValue } }
   }
 
+  public var url: String? {
+    get { managedObject.url }
+    set { if managedObject.url != newValue { managedObject.url = newValue } }
+  }
+
   public var status: ImageStatus {
     get { ImageStatus(rawValue: managedObject.status) ?? .NotChecked }
     set { managedObject.status = newValue.rawValue }
