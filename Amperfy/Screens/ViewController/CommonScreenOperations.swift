@@ -51,7 +51,9 @@ extension UIView {
 // MARK: - CommonScreenOperations
 
 class CommonScreenOperations {
-  static let tableSectionHeightLarge: CGFloat = 40
+  /// Scales with the user's text size (40pt at the default text size)
+  @MainActor
+  static var tableSectionHeightLarge: CGFloat { TextScaling.scaledValue(40) }
   static let tableSectionHeightFooter: CGFloat = 8
 }
 

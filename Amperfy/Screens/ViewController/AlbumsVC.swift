@@ -192,8 +192,7 @@ class AlbumsVC: SingleSnapshotFetchedResultsTableViewController<AlbumMO> {
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
-    tableView.rowHeight = GenericTableCell.rowHeight
-    tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { GenericTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0

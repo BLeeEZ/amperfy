@@ -48,6 +48,7 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.miniPlayerSceneSession = session
 
     window = UIWindow(windowScene: windowScene)
+    appDelegate.applyTextSize()
     window?.backgroundColor = .secondarySystemBackground
 
     #if targetEnvironment(macCatalyst)
