@@ -39,6 +39,7 @@ final class HomeVC: UICollectionViewController {
   private let account: Account
   private var accountNotificationHandler: AccountNotificationHandler?
   private let sharedHome: HomeManager
+  private var hasDownloadFinishedSinceCachedRefresh = false
 
   // MARK: - Init
 
@@ -109,6 +110,12 @@ final class HomeVC: UICollectionViewController {
       name: .offlineModeChanged,
       object: nil
     )
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(downloadFinishedSuccessful),
+      name: .downloadFinishedSuccess,
+      object: nil
+    )
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -120,6 +127,7 @@ final class HomeVC: UICollectionViewController {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
     sharedHome.updateFromRemote()
+    refreshCachedSectionsIfDownloadsChanged()
   }
 
   // MARK: - Layout
@@ -220,18 +228,9 @@ final class HomeVC: UICollectionViewController {
         return nil
       }
       header.title = section.title
-      if section == .randomAlbums {
+      if section.isRandomSection {
         header.showsRefreshButton = true
-        header.setRefreshHandler { [weak self] in self?.refreshRandomAlbumsSection() }
-      } else if section == .randomArtists {
-        header.showsRefreshButton = true
-        header.setRefreshHandler { [weak self] in self?.refreshRandomArtistsSection() }
-      } else if section == .randomGenres {
-        header.showsRefreshButton = true
-        header.setRefreshHandler { [weak self] in self?.refreshRandomGenresSection() }
-      } else if section == .randomSongs {
-        header.showsRefreshButton = true
-        header.setRefreshHandler { [weak self] in self?.refreshRandomSongsSection() }
+        header.setRefreshHandler { [weak self] in self?.refreshRandomSection(section) }
       } else {
         header.showsRefreshButton = false
         header.setRefreshHandler(nil)
@@ -301,32 +300,27 @@ final class HomeVC: UICollectionViewController {
     #endif
   }
 
-  @objc
-  func refreshRandomAlbumsSection() {
+  private func refreshRandomSection(_ section: HomeSection) {
     Task { @MainActor in
-      await sharedHome.updateRandomAlbums(isOfflineMode: sharedHome.isOfflineMode)
+      await sharedHome.refreshRandomSection(section)
     }
   }
 
   @objc
-  func refreshRandomArtistsSection() {
-    Task { @MainActor in
-      await sharedHome.updateRandomArtists(isOfflineMode: sharedHome.isOfflineMode)
+  private func downloadFinishedSuccessful() {
+    hasDownloadFinishedSinceCachedRefresh = true
+  }
+
+  private func refreshCachedSectionsIfDownloadsChanged() {
+    guard hasDownloadFinishedSinceCachedRefresh else { return }
+    hasDownloadFinishedSinceCachedRefresh = false
+    for section in sharedHome.orderedVisibleSections where section.isCachedSection {
+      refreshRandomSection(section)
     }
   }
 
-  @objc
-  func refreshRandomGenresSection() {
-    Task { @MainActor in
-      await sharedHome.updateRandomGenres()
-    }
-  }
-
-  @objc
-  func refreshRandomSongsSection() {
-    Task { @MainActor in
-      await sharedHome.updateRandomSongs(isOfflineMode: sharedHome.isOfflineMode)
-    }
+  private func isCachedSection(at indexPath: IndexPath) -> Bool {
+    sharedHome.orderedVisibleSections.element(at: indexPath.section)?.isCachedSection ?? false
   }
 
   // MARK: - Selection Handling
@@ -337,16 +331,25 @@ final class HomeVC: UICollectionViewController {
   ) {
     guard let playableContainer = dataSource.itemIdentifier(for: indexPath)?.playableContainable
     else { return }
+    let isCachedSection = isCachedSection(at: indexPath)
 
     if let album = playableContainer as? Album {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
+        AppStoryboard.Main.segueToAlbumDetail(
+          account: account,
+          album: album,
+          isCachedScopePreselected: isCachedSection
+        ),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
     } else if let artist = playableContainer as? Artist {
       navigationController?.pushViewController(
-        AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
+        AppStoryboard.Main.segueToArtistDetail(
+          account: account,
+          artist: artist,
+          isCachedScopePreselected: isCachedSection
+        ),
         animated: true
       )
       navigationController?.navigationBar.prefersLargeTitles = false
@@ -423,8 +426,15 @@ extension HomeVC {
       }
       return vc
     }) { suggestedActions in
+      let isCachedSection = self.isCachedSection(at: indexPath)
       var playIndexCB: (() -> PlayContext?)?
-      playIndexCB = { PlayContext(containable: containable) }
+      playIndexCB = {
+        guard isCachedSection else { return PlayContext(containable: containable) }
+        return PlayContext(
+          containable: containable,
+          playables: containable.playables.filter { $0.isCached }
+        )
+      }
       return EntityPreviewActionBuilder(
         container: containable,
         on: self,

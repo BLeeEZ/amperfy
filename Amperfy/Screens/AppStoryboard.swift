@@ -56,17 +56,20 @@ enum AppStoryboard: String {
   func createAlbumsVC(
     account: Account,
     style: AlbumsDisplayStyle,
-    category: DisplayCategoryFilter
+    category: DisplayCategoryFilter,
+    isCachedOnly: Bool = false
   )
     -> UIViewController {
     switch style {
     case .table:
       let vc = AlbumsVC(account: account)
       vc.displayFilter = category
+      vc.isCachedOnly = isCachedOnly
       return vc
     case .grid:
       let vc = AlbumsCollectionVC(collectionViewLayout: .verticalLayout, account: account)
       vc.displayFilter = category
+      vc.isCachedOnly = isCachedOnly
       return vc
     }
   }
@@ -117,12 +120,24 @@ enum AppStoryboard: String {
     return songsVC
   }
 
+  func segueToCachedSongs(account: Account)
+    -> UIViewController { let songsVC = SongsVC(account: account)
+    songsVC.isCachedOnly = true
+    return songsVC
+  }
+
   func segueToPodcasts(account: Account) -> UIViewController { PodcastsVC(account: account) }
   func segueToPlaylists(account: Account) -> UIViewController { PlaylistsVC(account: account) }
   func segueToArtists(account: Account) -> UIViewController { ArtistsVC(account: account) }
   func segueToFavoriteArtists(account: Account)
     -> UIViewController { let artistsVC = ArtistsVC(account: account)
     artistsVC.displayFilter = .favorites
+    return artistsVC
+  }
+
+  func segueToCachedArtists(account: Account)
+    -> UIViewController { let artistsVC = ArtistsVC(account: account)
+    artistsVC.isCachedOnly = true
     return artistsVC
   }
 
@@ -142,22 +157,26 @@ enum AppStoryboard: String {
   func segueToArtistDetail(
     account: Account,
     artist: Artist,
-    albumToScrollTo: Album? = nil
+    albumToScrollTo: Album? = nil,
+    isCachedScopePreselected: Bool = false
   )
     -> UIViewController {
     let artistDetailVC = ArtistDetailVC(account: account, artist: artist)
     artistDetailVC.albumToScrollTo = albumToScrollTo
+    artistDetailVC.isCachedScopePreselected = isCachedScopePreselected
     return artistDetailVC
   }
 
   func segueToAlbumDetail(
     account: Account,
     album: Album,
-    songToScrollTo: Song? = nil
+    songToScrollTo: Song? = nil,
+    isCachedScopePreselected: Bool = false
   )
     -> UIViewController {
     let albumDetailVC = AlbumDetailVC(account: account, album: album)
     albumDetailVC.songToScrollTo = songToScrollTo
+    albumDetailVC.isCachedScopePreselected = isCachedScopePreselected
     return albumDetailVC
   }
 

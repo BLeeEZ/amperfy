@@ -69,6 +69,17 @@ extension LibraryDisplayType {
       )
     case .radios:
       return AppStoryboard.Main.segueToRadios(account: account)
+    case .cachedArtists:
+      return AppStoryboard.Main.segueToCachedArtists(account: account)
+    case .cachedAlbums:
+      return AppStoryboard.Main.createAlbumsVC(
+        account: account,
+        style: settings.user.albumsStyleSetting,
+        category: .all,
+        isCachedOnly: true
+      )
+    case .cachedSongs:
+      return AppStoryboard.Main.segueToCachedSongs(account: account)
     }
   }
 }

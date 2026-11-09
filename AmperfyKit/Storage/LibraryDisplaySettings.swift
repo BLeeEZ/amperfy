@@ -43,6 +43,9 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
   case newestAlbums = 12
   case recentAlbums = 13
   case radios = 14
+  case cachedArtists = 15
+  case cachedAlbums = 16
+  case cachedSongs = 17
 
   public static func createByDisplayName(name: String) -> LibraryDisplayType? {
     .allCases.first {
@@ -80,6 +83,12 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
       return "Recently Played Albums"
     case .radios:
       return "Radios"
+    case .cachedArtists:
+      return "Cached Artists"
+    case .cachedAlbums:
+      return "Cached Albums"
+    case .cachedSongs:
+      return "Cached Songs"
     }
   }
 
@@ -113,6 +122,8 @@ public enum LibraryDisplayType: Int, CaseIterable, Sendable {
       return UIImage.albumRecent
     case .radios:
       return UIImage.radio
+    case .cachedAlbums, .cachedArtists, .cachedSongs:
+      return UIImage.cache
     }
   }
 }

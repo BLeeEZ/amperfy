@@ -91,7 +91,7 @@ class SliderMenuView: UIView {
 class AlbumsCommonVCInteractions {
   var sceneTitle: String? {
     switch displayFilter {
-    case .all: "Albums"
+    case .all: isCachedOnly ? "Cached Albums" : "Albums"
     case .newest: "Newest Albums"
     case .recent: "Recently Played Albums"
     case .favorites: "Favorite Albums"
@@ -111,6 +111,7 @@ class AlbumsCommonVCInteractions {
   public var fetchedResultsController: AlbumFetchedResultsController!
   public var optionsButton: UIBarButtonItem = .createOptionsBarButton()
   public var displayFilter: DisplayCategoryFilter = .all
+  public var isCachedOnly = false
   public var sortType: AlbumElementSortType = .name
   public var filterTitle = "Albums"
   public var newestElementsOffsetsSynced = Set<Int>()
@@ -154,7 +155,7 @@ class AlbumsCommonVCInteractions {
   func applyFilter() {
     switch displayFilter {
     case .all:
-      filterTitle = "Albums"
+      filterTitle = isCachedOnly ? "Cached Albums" : "Albums"
       isIndexTitelsHidden = false
       change(sortType: appDelegate.storage.settings.user.albumsSortSetting)
     case .newest:
@@ -270,7 +271,7 @@ class AlbumsCommonVCInteractions {
     }
     actions.append(createStyleButtonMenu())
 
-    if appDelegate.storage.settings.user.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode, !isCachedOnly {
       actions.append(createActionButtonMenu())
     }
 
@@ -419,7 +420,8 @@ class AlbumsCommonVCInteractions {
             .createAlbumsVC(
               account: self.account,
               style: self.appDelegate.storage.settings.user.albumsStyleSetting,
-              category: self.displayFilter
+              category: self.displayFilter,
+              isCachedOnly: self.isCachedOnly
             ),
           animated: false
         )
@@ -435,7 +437,8 @@ class AlbumsCommonVCInteractions {
             .createAlbumsVC(
               account: self.account,
               style: self.appDelegate.storage.settings.user.albumsStyleSetting,
-              category: self.displayFilter
+              category: self.displayFilter,
+              isCachedOnly: self.isCachedOnly
             ),
           animated: false
         )
@@ -511,7 +514,7 @@ class AlbumsCommonVCInteractions {
     ) }
     let firstAlbums = displayedAlbumsMO.prefix(5).compactMap { Album(managedObject: $0) }
     var songs = [AbstractPlayable]()
-    firstAlbums.forEach { songs.append(contentsOf: $0.playables) }
+    firstAlbums.forEach { songs.append(contentsOf: playablesToPlay(of: $0)) }
     return PlayContext(
       name: filterTitle,
       playables: Array(songs.prefix(appDelegate.player.maxSongsToAddOnce))
@@ -525,16 +528,31 @@ class AlbumsCommonVCInteractions {
     ) }
     let randomAlbums = displayedAlbumsMO[randomPick: 5].compactMap { Album(managedObject: $0) }
     var songs = [AbstractPlayable]()
-    randomAlbums.forEach { songs.append(contentsOf: $0.playables) }
+    randomAlbums.forEach { songs.append(contentsOf: playablesToPlay(of: $0)) }
     return PlayContext(
       name: filterTitle,
       playables: Array(songs.prefix(appDelegate.player.maxSongsToAddOnce))
     )
   }
 
+  private func playablesToPlay(of album: Album) -> [AbstractPlayable] {
+    isCachedOnly ? album.playables.filter { $0.isCached } : album.playables
+  }
+
+  func playContext(of album: Album) -> PlayContext {
+    PlayContext(containable: album, playables: playablesToPlay(of: album))
+  }
+
+  func swipePlayContext(of album: Album) -> PlayContext? {
+    guard isCachedOnly else { return nil }
+    return PlayContext(name: album.name, playables: playablesToPlay(of: album))
+  }
+
   func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
-    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
+    let isShowingCachedOnly = searchController.searchBar
+      .isShowingCachedOnly(isCachedOnlyList: isCachedOnly)
+    if !searchText.isEmpty, !isShowingCachedOnly {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchAlbums(searchText: searchText)
@@ -544,7 +562,7 @@ class AlbumsCommonVCInteractions {
     }
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.isCachedScopeSelected,
+      onlyCached: isShowingCachedOnly,
       displayFilter: displayFilter
     )
     updateContentUnavailable()
@@ -565,7 +583,7 @@ class AlbumsCommonVCInteractions {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.user.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode, !isCachedOnly else {
       endRefreshCB?()
       return
     }

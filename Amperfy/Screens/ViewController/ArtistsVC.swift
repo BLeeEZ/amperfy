@@ -111,7 +111,7 @@ class ArtistDiffableDataSource: BasicUITableViewDiffableDataSource {
 class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   override var sceneTitle: String? {
     switch displayFilter {
-    case .albumArtists, .all: "Artists"
+    case .albumArtists, .all: isCachedOnly ? "Cached Artists" : "Artists"
     case .favorites: "Favorite Artists"
     }
   }
@@ -119,6 +119,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   private var fetchedResultsController: ArtistFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   public var displayFilter: ArtistCategoryFilter = .all
+  public var isCachedOnly = false
   private var sortType: ArtistElementSortType = .name
   private var filterTitle = "Artists"
 
@@ -163,7 +164,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     change(filterType: appDelegate.storage.settings.user.artistsFilterSetting)
     configureSearchController(
       placeholder: "Search in \"\(filterTitle)\"",
-      scopeButtonTitles: ["All", "Cached"]
+      scopeButtonTitles: isCachedOnly ? nil : ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.reloadOnTextSizeChange { GenericTableCell.rowHeight }
@@ -234,7 +235,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   func applyFilter() {
     switch displayFilter {
     case .all:
-      filterTitle = "Artists"
+      filterTitle = isCachedOnly ? "Cached Artists" : "Artists"
     case .favorites:
       filterTitle = "Favorite Artists"
     case .albumArtists:
@@ -266,7 +267,9 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     // favorite views can't change the display filter
     guard displayFilter != .favorites else { return }
     displayFilter = filterType
-    appDelegate.storage.settings.user.artistsFilterSetting = filterType
+    if !isCachedOnly {
+      appDelegate.storage.settings.user.artistsFilterSetting = filterType
+    }
     updateSearchResults(for: searchController)
     updateRightBarButtonItems()
   }
@@ -290,7 +293,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     if displayFilter != .favorites {
       actions.append(createFilterButtonMenu())
     }
-    if appDelegate.storage.settings.user.isOnlineMode {
+    if appDelegate.storage.settings.user.isOnlineMode, !isCachedOnly {
       actions.append(createActionButtonMenu())
     }
     optionsButton = UIBarButtonItem.createOptionsBarButton()
@@ -369,20 +372,27 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     guard let artist = artistAt(indexPath: indexPath) else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
+      AppStoryboard.Main.segueToArtistDetail(
+        account: account,
+        artist: artist,
+        isCachedScopePreselected: searchController.searchBar
+          .isShowingCachedOnly(isCachedOnlyList: isCachedOnly)
+      ),
       animated: true
     )
   }
 
   override func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
+    let isShowingCachedOnly = searchController.searchBar
+      .isShowingCachedOnly(isCachedOnlyList: isCachedOnly)
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.isCachedScopeSelected,
+      onlyCached: isShowingCachedOnly,
       displayFilter: displayFilter
     )
     tableView.reloadData()
-    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
+    if !searchText.isEmpty, !isShowingCachedOnly {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)
@@ -504,7 +514,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
 
   @objc
   func handleRefresh(refreshControl: UIRefreshControl) {
-    guard appDelegate.storage.settings.user.isOnlineMode else {
+    guard appDelegate.storage.settings.user.isOnlineMode, !isCachedOnly else {
       self.refreshControl?.endRefreshing()
       return
     }

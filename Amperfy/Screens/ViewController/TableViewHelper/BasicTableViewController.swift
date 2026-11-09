@@ -117,6 +117,7 @@ class BasicTableViewController: KeyCommandTableViewController {
   var swipeCallback: SwipeActionCallback?
   var isEditLockedDueToActiveSwipe = false
   var isSingleCellEditingModeActive = false
+  var isCachedScopePreselected = false
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -148,7 +149,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     super.viewIsAppearing(animated)
 
     if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1,
-       appDelegate.storage.settings.user.isOfflineMode {
+       appDelegate.storage.settings.user.isOfflineMode || isCachedScopePreselected {
       searchController.searchBar.selectedScopeButtonIndex = 1
     } else {
       searchController.searchBar.selectedScopeButtonIndex = 0

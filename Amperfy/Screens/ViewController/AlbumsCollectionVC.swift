@@ -181,6 +181,11 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     get { common.displayFilter }
   }
 
+  public var isCachedOnly: Bool {
+    set { common.isCachedOnly = newValue }
+    get { common.isCachedOnly }
+  }
+
   private var albumsDataSource: AlbumsCollectionDiffableDataSource? {
     diffableDataSource as? AlbumsCollectionDiffableDataSource
   }
@@ -237,7 +242,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     common.applyFilter()
     configureSearchController(
       placeholder: "Search in \"\(common.filterTitle)\"",
-      scopeButtonTitles: ["All", "Cached"]
+      scopeButtonTitles: isCachedOnly ? nil : ["All", "Cached"]
     )
     collectionView.register(
       UINib(nibName: CommonCollectionSectionHeader.typeName, bundle: .main),
@@ -280,7 +285,7 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
     }
     playContextAtIndexPathCallback = { indexPath in
       guard let album = self.albumsDataSource?.getAlbum(at: indexPath) else { return nil }
-      return PlayContext(containable: album)
+      return self.common.playContext(of: album)
     }
     snapshotDidChange = {
       self.common.updateContentUnavailable()
@@ -331,7 +336,12 @@ class AlbumsCollectionVC: SingleSnapshotFetchedResultsCollectionViewController<A
           let album = albumsDataSource.getAlbum(at: indexPath)
     else { return }
     navigationController?.pushViewController(
-      AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
+      AppStoryboard.Main.segueToAlbumDetail(
+        account: account,
+        album: album,
+        isCachedScopePreselected: searchController.searchBar
+          .isShowingCachedOnly(isCachedOnlyList: isCachedOnly)
+      ),
       animated: true
     )
   }

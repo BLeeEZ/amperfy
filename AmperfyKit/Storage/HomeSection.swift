@@ -33,6 +33,9 @@ public enum HomeSection: Int, Sendable, CaseIterable, Codable {
   case randomArtists
   case randomGenres
   case randomSongs
+  case cachedArtists
+  case cachedAlbums
+  case cachedSongs
 
   static let defaultValue: [HomeSection] = [
     .randomAlbums,
@@ -53,6 +56,9 @@ public enum HomeSection: Int, Sendable, CaseIterable, Codable {
     case .randomArtists: return "Random Artists"
     case .randomGenres: return "Random Genres"
     case .randomSongs: return "Random Songs"
+    case .cachedArtists: return "Cached Artists"
+    case .cachedAlbums: return "Cached Albums"
+    case .cachedSongs: return "Cached Songs"
     }
   }
 
@@ -72,6 +78,18 @@ public enum HomeSection: Int, Sendable, CaseIterable, Codable {
     case .randomArtists: return true
     case .randomGenres: return true
     case .randomSongs: return true
+    case .cachedArtists: return true
+    case .cachedAlbums: return true
+    case .cachedSongs: return true
+    }
+  }
+
+  public var isCachedSection: Bool {
+    switch self {
+    case .cachedAlbums, .cachedArtists, .cachedSongs: return true
+    case .lastTimePlayedPlaylists, .newestAlbums, .newestPodcastEpisodes, .podcasts, .radios,
+         .randomAlbums, .randomArtists, .randomGenres, .randomSongs, .recentlyPlayedAlbums:
+      return false
     }
   }
 }
