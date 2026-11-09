@@ -123,8 +123,7 @@ extension Artist: PlayableContainable {
   public var subsubtitle: String? { nil }
   public func infoDetails(for api: ServerApiType?, details: DetailInfoType) -> [String] {
     var infoContent = [String]()
-    if details.type == .long, let managedObjectContext = managedObject.managedObjectContext,
-       let account {
+    if let managedObjectContext = managedObject.managedObjectContext, let account {
       let library = LibraryStorage(context: managedObjectContext)
       let relatedAlbumCount = library.getAlbumsCount(
         for: account,
@@ -141,7 +140,7 @@ extension Artist: PlayableContainable {
       infoContent.append("\(albumCount) Albums")
     }
 
-    if details.type == .long, details.artistFilterSetting == .albumArtists,
+    if details.artistFilterSetting == .albumArtists,
        let managedObjectContext = managedObject.managedObjectContext, let account {
       let library = LibraryStorage(context: managedObjectContext)
       let relatedSongsCount = library.getSongsCount(
