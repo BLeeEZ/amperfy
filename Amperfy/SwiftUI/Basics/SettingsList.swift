@@ -22,6 +22,8 @@
 import Foundation
 import SwiftUI
 
+// MARK: - SettingsList
+
 struct SettingsList<Content: View>: View {
   let content: () -> Content
 
@@ -32,7 +34,43 @@ struct SettingsList<Content: View>: View {
   var body: some View {
     List {
       content()
+        .settingsRowBackground()
     }
-    .background(Color.clear)
+    .settingsListBackground()
+  }
+}
+
+// MARK: - Settings colors
+
+extension Color {
+  #if targetEnvironment(macCatalyst) // ok
+    // macOS style (like System Settings): the content area uses the window background and the
+    // grouped rows are drawn as a subtle fill on top of it. The fill is translucent, so the rows
+    // become slightly darker in light mode and slightly lighter in dark mode.
+    static let settingsBackground = Color(UIColor.systemBackground)
+    static let settingsRowBackground = Color(UIColor.quaternarySystemFill)
+  #endif
+}
+
+extension View {
+  /// Background of a settings `List`
+  @ViewBuilder
+  func settingsListBackground() -> some View {
+    #if targetEnvironment(macCatalyst) // ok
+      scrollContentBackground(.hidden)
+        .background(Color.settingsBackground)
+    #else
+      background(Color.clear)
+    #endif
+  }
+
+  /// Background of the rows inside a settings `List`
+  @ViewBuilder
+  func settingsRowBackground() -> some View {
+    #if targetEnvironment(macCatalyst) // ok
+      listRowBackground(Color.settingsRowBackground)
+    #else
+      self
+    #endif
   }
 }

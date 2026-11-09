@@ -24,6 +24,14 @@ import UIKit
 class BasicTableCell: UITableViewCell {
   static let margin = UIView.defaultMarginCell
 
+  // MARK: Text size
+
+  /// Row height for a cell whose content (without the cell margins) is `contentHeight` tall at
+  /// the default text size. Scales with the user's text size (see `TextScaling`).
+  static func scaledRowHeight(contentHeight: CGFloat) -> CGFloat {
+    TextScaling.scaledValue(contentHeight) + margin.top + margin.bottom
+  }
+
   required init?(coder: NSCoder) {
     super.init(coder: coder)
     self.layoutMargins = BasicTableCell.margin
@@ -34,5 +42,46 @@ class BasicTableCell: UITableViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     markAsUnfocused()
+    #if targetEnvironment(macCatalyst)
+      isSectionEndSeparatorVisible = false
+    #endif
   }
+
+  #if targetEnvironment(macCatalyst)
+    // macOS does not draw the separator below the last row of a section (iOS does, as long as
+    // there is no section footer). We draw it ourselves inside the last cell of each section.
+    // Using a section footer instead does not work for plain table views: footers stick to the
+    // bottom of the visible area while scrolling.
+    // Grouped style does also not work, because that will draw a line from the left edge to the
+    // right edge of the tableView (ignoring the separator inset) at the end of a section.
+    private lazy var sectionEndSeparator: UIView = {
+      let separator = UIView()
+      separator.backgroundColor = .separator
+      separator.isHidden = true
+      separator.isUserInteractionEnabled = false
+      addSubview(separator)
+      return separator
+    }()
+
+    var isSectionEndSeparatorVisible = false {
+      didSet {
+        guard isSectionEndSeparatorVisible != oldValue else { return }
+        sectionEndSeparator.isHidden = !isSectionEndSeparatorVisible
+        setNeedsLayout()
+      }
+    }
+
+    override func layoutSubviews() {
+      super.layoutSubviews()
+      guard isSectionEndSeparatorVisible else { return }
+      let height = 1.0
+      sectionEndSeparator.frame = CGRect(
+        x: separatorInset.left,
+        y: bounds.height - height,
+        width: max(0, bounds.width - separatorInset.left - separatorInset.right),
+        height: height
+      )
+      bringSubviewToFront(sectionEndSeparator)
+    }
+  #endif
 }

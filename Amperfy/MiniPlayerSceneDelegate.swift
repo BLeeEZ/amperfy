@@ -48,6 +48,7 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.miniPlayerSceneSession = session
 
     window = UIWindow(windowScene: windowScene)
+    appDelegate.applyTextSize()
     window?.backgroundColor = .secondarySystemBackground
 
     #if targetEnvironment(macCatalyst)
@@ -77,7 +78,9 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
     os_log("MiniPlayer: sceneDidDisconnect", log: self.log, type: .info)
     appDelegate.rebuildMainMenu()
-    appDelegate.openMainWindow()
+    if !appDelegate.isMainWindowOpen {
+      appDelegate.openMainWindow()
+    }
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {

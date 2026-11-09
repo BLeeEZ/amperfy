@@ -40,7 +40,7 @@ struct ArtworkDownloadSettingsView: View {
 
   var body: some View {
     ZStack {
-      List {
+      SettingsList {
         Section {
           if let activeAccountInfo = settings.activeAccountInfo {
             ForEach(settingOptions, id: \.self) { option in

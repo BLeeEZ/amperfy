@@ -269,6 +269,20 @@ public class AbstractPlayable: AbstractLibraryEntity, Downloadable {
     }
   }
 
+  /// Disc number without server specific formatting ("1", "01" and "1/2" are all disc 1).
+  public var discNumber: Int? {
+    guard let disk, let disc = disk.split(separator: "/").first else { return nil }
+    return Int(disc.trimmingCharacters(in: .whitespaces))
+  }
+
+  /// Track number within its disc. Some servers send "disc * 100 + track" for albums with
+  /// multiple discs (203 is track 3 of disc 2).
+  public var trackInDisc: Int {
+    guard let discNumber, track > 100, track / 100 == discNumber, track % 100 > 0
+    else { return track }
+    return track % 100
+  }
+
   public var url: String? {
     get { playableManagedObject.url }
     set {

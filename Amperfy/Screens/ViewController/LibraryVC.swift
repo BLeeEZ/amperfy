@@ -85,6 +85,8 @@ class LibraryVC: KeyCommandCollectionViewController {
   }
 
   public func pushedOn(selectedItem: LibraryNavigatorItem) {
+    // selection changed -> the keyboard focus is no longer relevant
+    collectionViewKeyCommandsController.removeFocus()
     guard let libraryItem = selectedItem.library
     else { return }
     navigationController?.navigationBar.prefersLargeTitles = false

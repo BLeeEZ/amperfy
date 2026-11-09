@@ -67,10 +67,11 @@ class TabBarVC: UITabBarController {
     }
     fixTabs.append(homeTab!)
 
-    var libraryTabs = [UITab]()
-    let libraryTabsShown = appDelegate.storage.settings.accounts
+    // all library tabs in the order arranged by the user, the ones not in use are hidden
+    let librarySettings = appDelegate.storage.settings.accounts
       .getSetting(account.info).read
-      .libraryDisplaySettings.inUse
+      .libraryDisplaySettings
+    let libraryTabs = librarySettings.order
       .compactMap { item in
         let tab = UITab(
           title: item.displayName,
@@ -80,26 +81,9 @@ class TabBarVC: UITabBarController {
           item.controller(account: self.account, settings: self.appDelegate.storage.settings)
         }
         tab.allowsHiding = true
+        tab.isHiddenByDefault = !librarySettings.isVisible(libraryType: item)
         return tab
       }
-    libraryTabs.append(contentsOf: libraryTabsShown)
-
-    let libraryTabsHidden = appDelegate.storage.settings.accounts
-      .getSetting(account.info).read
-      .libraryDisplaySettings.notUsed
-      .compactMap { item in
-        let tab = UITab(
-          title: item.displayName,
-          image: item.image,
-          identifier: "Tabs.\(item.displayName)"
-        ) { tab in
-          item.controller(account: self.account, settings: self.appDelegate.storage.settings)
-        }
-        tab.allowsHiding = true
-        tab.isHiddenByDefault = true
-        return tab
-      }
-    libraryTabs.append(contentsOf: libraryTabsHidden)
 
     libraryGroup = UITabGroup(
       title: "Library",
@@ -120,6 +104,13 @@ class TabBarVC: UITabBarController {
       self,
       selector: #selector(handleLibraryItemsChanged(notification:)),
       name: .LibraryItemsChanged,
+      object: nil
+    )
+
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(handleAutoCollapseToolbarPlayer(notification:)),
+      name: .autoCollapseToolbarPlayerChanged,
       object: nil
     )
 
@@ -221,11 +212,17 @@ class TabBarVC: UITabBarController {
     refresh()
   }
 
+  @objc
+  func handleAutoCollapseToolbarPlayer(notification: Notification) {
+    tabBarMinimizeBehavior = appDelegate.storage.settings.user
+      .isToolbarPlayerAutoCollapse ? .onScrollDown : .never
+  }
+
   func refresh() {
     guard let libraryGroup else { return }
     let config = appDelegate.storage.settings.accounts.getSetting(account.info).read
       .libraryDisplaySettings
-    libraryGroup.displayOrderIdentifiers = config.inUse.compactMap { "Tabs.\($0.displayName)" }
+    libraryGroup.displayOrderIdentifiers = config.order.compactMap { "Tabs.\($0.displayName)" }
     for tab in libraryGroup.displayOrder {
       guard let item = LibraryDisplayType.createByDisplayName(name: tab.title) else { continue }
       if let _ = config.inUse.first(where: { $0 == item }) {
@@ -238,8 +235,12 @@ class TabBarVC: UITabBarController {
 
   public func push(vc: UIViewController) {
     guard let libraryGroup else { return }
+    // Select the library first: changing the selection rebuilds the managed navigation stack,
+    // which would otherwise drop a view controller pushed beforehand (no back button).
+    if selectedTab?.managingTabGroup !== libraryGroup, selectedTab !== libraryGroup {
+      selectedTab = libraryGroup
+    }
     libraryGroup.managingNavigationController?.pushViewController(vc, animated: true)
-    selectedTab = libraryGroup
   }
 }
 
@@ -247,17 +248,23 @@ class TabBarVC: UITabBarController {
 
 extension TabBarVC: UITabBarControllerDelegate {
   func tabBarControllerDidEndEditing(_ tabBarController: UITabBarController) {
-    var visibleItems = [LibraryDisplayType]()
+    var order = [LibraryDisplayType]()
+    var visibleItems = Set<LibraryDisplayType>()
     guard let libraryGroup else { return }
+    // display order contains the hidden tabs too -> keep their position
     for tab in libraryGroup.displayOrder {
       guard let item = LibraryDisplayType.createByDisplayName(name: tab.title) else { continue }
+      order.append(item)
       if !tab.isHidden {
-        visibleItems.append(item)
+        visibleItems.insert(item)
       }
     }
     appDelegate.storage.settings.accounts
       .updateSetting(account.info) { accountSettings in
-        accountSettings.libraryDisplaySettings = LibraryDisplaySettings(inUse: visibleItems)
+        accountSettings.libraryDisplaySettings = LibraryDisplaySettings(
+          order: order,
+          inUse: visibleItems
+        )
       }
     NotificationCenter.default.post(name: .LibraryItemsChanged, object: nil, userInfo: nil)
   }

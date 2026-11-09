@@ -494,7 +494,7 @@ class EntityPreviewActionBuilder {
       }
 
       // Create playlist: seed song + similar songs
-      var allSongs = [song] + similarSongs
+      let allSongs = [song] + similarSongs
 
       // Create play context and start playing
       let context = PlayContext(name: "Instant Mix: \(song.title)", playables: allSongs)
@@ -806,22 +806,22 @@ class EntityPreviewActionBuilder {
     UIAction(
       title: "Share",
       image: UIImage(systemName: "square.and.arrow.up")
-    ) { _ in
+    ) { [weak self] _ in
       // Used if the song is not cached, otherwise never called
       let downloadManagerProvider: () -> DownloadManageable? = { [weak self] in
-        guard let self = self,
-              let accountInfo = playable.account?.info
+        guard let self, let accountInfo = playable.account?.info
         else { return nil }
         return appDelegate
           .getMeta(accountInfo)
           .playableDownloadManager
       }
 
+      guard let self else { return }
       // Note: This is strongly coupled, I could protocolize and inject. But this is simplest and the project doesn't seem to do DI/tests for this target.
       ShareSongAction.share(
         playable: playable,
-        from: self.rootView.view,
-        presenter: self.rootView,
+        from: rootView.view,
+        presenter: rootView,
         downloadManagerProvider: downloadManagerProvider
       )
     }

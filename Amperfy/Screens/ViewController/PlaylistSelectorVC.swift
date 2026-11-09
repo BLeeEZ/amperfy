@@ -57,7 +57,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
 
   init(account: Account, itemsToAdd: [Song]) {
     self.itemsToAdd = itemsToAdd
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -97,13 +97,11 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
 
     configureSearchController(placeholder: "Search in \"Playlists\"")
     tableView.register(nibName: PlaylistTableCell.typeName)
-    tableView.rowHeight = PlaylistTableCell.rowHeight
-    tableView.estimatedRowHeight = PlaylistTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlaylistTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     tableView.tableHeaderView = UIView(frame: CGRect(
       x: 0,

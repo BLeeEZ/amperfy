@@ -26,6 +26,10 @@ import SwiftUI
 // MARK: - SupportSettingsView
 
 struct SupportSettingsView: View {
+  enum Destination: Hashable {
+    case eventLog
+  }
+
   let splitPercentage = 0.15
 
   @State
@@ -60,10 +64,16 @@ struct SupportSettingsView: View {
               )
             }
           }
+          ShareLink(
+            item: AmperfyLogExport(),
+            preview: SharePreview(AmperfyLogExport.fileName)
+          ) {
+            Text("Export log")
+          }
         }
 
         SettingsSection {
-          NavigationLink(destination: EventLogSettingsView()) {
+          NavigationLink(value: Destination.eventLog) {
             Text("Event Log")
           }
         }
@@ -83,16 +93,39 @@ struct SupportSettingsView: View {
           attachments: [MailAttachment(
             data: LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData(),
             mimeType: "application/json",
-            fileName: "AmperfyLog.json"
+            fileName: AmperfyLogExport.fileName
           )]
         )
       }
     }
     .navigationTitle("Support")
     .navigationBarTitleDisplayMode(.inline)
+    .navigationDestination(for: Destination.self) { destination in
+      switch destination {
+      case .eventLog: EventLogSettingsView()
+      }
+    }
     .onAppear {
       appDelegate.userStatistics.visited(.settingsSupport)
     }
+  }
+}
+
+// MARK: - AmperfyLogExport
+
+/// The support log as `AmperfyLog.json`, collected only when a share destination asks for it.
+struct AmperfyLogExport: Transferable {
+  static let fileName = "AmperfyLog.json"
+
+  static var transferRepresentation: some TransferRepresentation {
+    DataRepresentation(exportedContentType: .json) { _ in
+      let data = await MainActor.run {
+        LogData.collectInformation(amperfyData: AmperKit.shared).asJSONData()
+      }
+      guard let data else { throw CocoaError(.fileWriteUnknown) }
+      return data
+    }
+    .suggestedFileName(fileName)
   }
 }
 

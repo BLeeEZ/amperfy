@@ -359,7 +359,9 @@ actor DownloadManager: NSObject, DownloadManageable {
 
   private func setupDownloadQueue() async {
     guard isAllowedToTriggerDownload else { return }
-    let downloadRequests = await requestManager.getRequestedDownloads()
+    let activeObjectIDs = Set(taskOperations.keys.map { $0.objectID })
+    let downloadRequests = await requestManager
+      .getRequestedDownloads(excluding: activeObjectIDs)
     for downloadRequest in downloadRequests {
       addDownloadTaskOperation(downloadRequest: downloadRequest)
     }

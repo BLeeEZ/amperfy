@@ -176,7 +176,12 @@ final class DownloadRequestManager: Sendable {
     }
   }
 
-  func getRequestedDownloads() async -> [DownloadRequest] {
+  /// Returns all pending downloads. Downloads in `activeObjectIDs` are already being
+  /// processed and are skipped, so their start date is kept.
+  func getRequestedDownloads(
+    excluding activeObjectIDs: Set<NSManagedObjectID> = []
+  ) async
+    -> [DownloadRequest] {
     let predicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     let requestedDownloads = try? await storage.performAndGet { asyncCompanion in
       let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
@@ -190,6 +195,7 @@ final class DownloadRequestManager: Sendable {
       ])
       let downloadsMO = try? asyncCompanion.context.fetch(fetchRequest)
       let downloadRequests = downloadsMO?.compactMap { downloadMo -> DownloadRequest? in
+        guard !activeObjectIDs.contains(downloadMo.objectID) else { return nil }
         let download = Download(managedObject: downloadMo)
         download.startDate = nil
         let id = download.id
@@ -214,10 +220,10 @@ final class DownloadRequestManager: Sendable {
       let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
       fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: downloadPredicateFormat),
+        asyncCompanion.library.getFetchPredicate(forAccount: account),
         NSCompoundPredicate(orPredicateWithSubpredicates: [
           NSPredicate(format: "%K != nil", #keyPath(DownloadMO.finishDate)),
           NSPredicate(format: "%K != nil", #keyPath(DownloadMO.errorDate)),
-          asyncCompanion.library.getFetchPredicate(forAccount: account),
         ]),
       ])
       let results = try? asyncCompanion.context.fetch(fetchRequest)

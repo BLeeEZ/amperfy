@@ -47,7 +47,7 @@ struct SettingsView: View {
   }
 
   func navigationLink(_ item: NavigationTarget) -> some View {
-    NavigationLink(destination: AnyView(item.view())) {
+    NavigationLink(value: item) {
       Text(item.displayName)
     }
   }
@@ -121,11 +121,16 @@ struct SettingsView: View {
       .navigationTitle("General")
       .navigationBarTitleDisplayMode(.inline)
     #else
-      NavigationView {
+      NavigationStack {
         list
           .navigationTitle("Settings")
+          // All pushes in this stack must be value based. Mixing view based links
+          // (NavigationLink(destination:)) with the value based links of the sub pages
+          // results in a navigation loop.
+          .navigationDestination(for: NavigationTarget.self) { item in
+            AnyView(item.view())
+          }
       }
-      .navigationViewStyle(.stack)
     #endif
   }
 }

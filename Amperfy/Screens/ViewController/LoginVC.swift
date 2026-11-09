@@ -195,7 +195,17 @@ class LoginVC: UIViewController {
     let editor = CustomHTTPHeadersView(headers: httpHeaders) { [weak self] updated in
       self?.httpHeaders = updated
     }
-    let hostingController = UIHostingController(rootView: NavigationView { editor })
+    let hostingController = UIHostingController(rootView: AnyView(EmptyView()))
+    hostingController.rootView = AnyView(NavigationStack {
+      editor
+        .toolbar {
+          ToolbarItem(placement: .confirmationAction) {
+            Button("Done") { [weak hostingController] in
+              hostingController?.dismiss(animated: true)
+            }
+          }
+        }
+    })
     hostingController.modalPresentationStyle = .formSheet
     present(hostingController, animated: true)
   }

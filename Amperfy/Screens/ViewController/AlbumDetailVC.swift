@@ -48,7 +48,7 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
 
   init(account: Account, album: Album) {
     self.album = album
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -79,25 +79,25 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     fetchedResultsController = AlbumSongsFetchedResultsController(
       forAlbum: album,
       coreDataCompanion: appDelegate.storage.main,
-      isGroupedInAlphabeticSections: false
+      isGroupedInAlphabeticSections: true // sections are the album's discs
     )
     singleFetchedResultsController = fetchedResultsController
     singleFetchedResultsController?.delegate = self
     singleFetchedResultsController?.fetch()
+    updateDiscTitles()
+    snapshotDidChange = { [weak self] in self?.updateDiscTitles() }
 
     configureSearchController(
       placeholder: "Search in \"Album\"",
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.rowHeight = PlayableTableCell.rowHeight
     // Catalyst also need an estimate to calculate the correct height before scrolling
-    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlayableTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: { "\(self.album.songCount) Song\(self.album.songCount == 1 ? "" : "s")" },
@@ -200,11 +200,89 @@ class AlbumDetailVC: SingleSnapshotFetchedResultsTableViewController<SongMO> {
     return cell
   }
 
+  /// Only albums with two or more discs show a "Disc n" header above each disc's songs.
+  /// Decided on the whole album, so a search keeps the headers.
+  private var isMultiDisc = false
+  /// Header title per section. The sections follow the raw disk strings ("1", "01" and "1/2"
+  /// are different sections), so only the first section of a disc gets a title.
+  private var discTitles = [String?]()
+
+  private func updateDiscTitles() {
+    let discNumbers = (fetchedResultsController.sections ?? []).map { section in
+      (section.objects?.first as? SongMO).flatMap { Song(managedObject: $0).discNumber }
+    }
+    if !fetchedResultsController.isSearchActive {
+      isMultiDisc = Set(discNumbers.compactMap { $0 }).count > 1
+    }
+    var seenDiscs = Set<Int>()
+    let titles: [String?] = discNumbers.map { disc in
+      guard isMultiDisc, let disc, seenDiscs.insert(disc).inserted else { return nil }
+      return "Disc \(disc)"
+    }
+    guard titles != discTitles else { return }
+    discTitles = titles
+    tableView.reloadData()
+  }
+
+  private func discTitle(inSection section: Int) -> String? {
+    discTitles.indices.contains(section) ? discTitles[section] : nil
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    viewForHeaderInSection section: Int
+  )
+    -> UIView? {
+    guard let title = discTitle(inSection: section) else { return nil }
+    let header = DiscHeaderView()
+    var content = UIListContentConfiguration.header()
+    content.text = title
+    content.textProperties.font = .preferredFont(forTextStyle: .headline)
+    content.textProperties.color = .secondaryLabel
+    // a bit more room around the title, relative to the system margins
+    content.directionalLayoutMargins.top *= 2
+    content.directionalLayoutMargins.bottom *= 2
+    header.contentConfiguration = content
+    return header
+  }
+
+  override func tableView(
+    _ tableView: UITableView,
+    heightForHeaderInSection section: Int
+  )
+    -> CGFloat {
+    discTitle(inSection: section) != nil ? UITableView.automaticDimension : 0.0
+  }
+
+  /// Self-sizing needs an estimate, the table disables estimates for all other headers.
+  override func tableView(
+    _ tableView: UITableView,
+    estimatedHeightForHeaderInSection section: Int
+  )
+    -> CGFloat {
+    discTitle(inSection: section) != nil ? UITableView.automaticDimension : 0.0
+  }
+
   override func updateSearchResults(for searchController: UISearchController) {
     fetchedResultsController.search(
       searchText: searchController.searchBar.text ?? "",
-      onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1
+      onlyCachedSongs: searchController.searchBar.isCachedScopeSelected
     )
     tableView.reloadData()
   }
+}
+
+// MARK: - DiscHeaderView
+
+/// Mac: the table adds its scroll edge effect ("scroll pocket") interactions to the section
+/// headers, which makes the top edge effect blur the whole album header. The disc headers don't
+/// take part in the edge effect, they have their own blur instead.
+private final class DiscHeaderView: UITableViewHeaderFooterView {
+  #if targetEnvironment(macCatalyst)
+    override func addInteraction(_ interaction: UIInteraction) {
+      // the interactions are private (_UIScrollPocketContainerInteraction, _UIScrollPocketInteraction)
+      guard !String(describing: type(of: interaction)).hasPrefix("_UIScrollPocket") else { return }
+      super.addInteraction(interaction)
+    }
+  #endif
 }

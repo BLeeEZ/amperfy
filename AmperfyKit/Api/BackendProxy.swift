@@ -387,6 +387,21 @@ extension BackendProxy: BackendApi {
     )
   }
 
+  public func generateUrl(
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference,
+    timeOffset: Int
+  ) async throws
+    -> URL {
+    try await activeApi.generateUrl(
+      forStreamingPlayable: playableInfo,
+      maxBitrate: maxBitrate,
+      formatPreference: formatPreference,
+      timeOffset: timeOffset
+    )
+  }
+
   public func generateUrl(forArtwork artwork: Artwork) async throws -> URL {
     try await activeApi.generateUrl(forArtwork: artwork)
   }

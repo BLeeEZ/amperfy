@@ -39,7 +39,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
   public var addToPlaylistManager = AddToPlaylistManager()
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -54,13 +54,11 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
 
     applyFilter()
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.rowHeight = PlayableTableCell.rowHeight
-    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlayableTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     configureSearchController(
       placeholder: "Search in \"\(sceneTitle ?? "Songs")\"",
@@ -224,7 +222,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
           .searchSongs(searchText: searchText)
@@ -236,7 +234,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
         onlyCachedSongs: false,
         displayFilter: displayFilter
       )
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if searchController.searchBar.isCachedScopeSelected {
       fetchedResultsController.search(
         searchText: searchText,
         onlyCachedSongs: true,
@@ -245,7 +243,7 @@ class PlaylistAddSongsVC: SingleFetchedResultsTableViewController<SongMO>, Playl
     } else if displayFilter != .all {
       fetchedResultsController.search(
         searchText: searchText,
-        onlyCachedSongs: searchController.searchBar.selectedScopeButtonIndex == 1,
+        onlyCachedSongs: searchController.searchBar.isCachedScopeSelected,
         displayFilter: displayFilter
       )
     } else {

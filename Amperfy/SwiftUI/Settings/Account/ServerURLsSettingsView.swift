@@ -112,7 +112,9 @@ struct ServerURLsSettingsView: View {
         .onChange(of: selection) { oldSelection, newSelection in
           selection = nil
         }
+        .settingsRowBackground()
       }
+      .settingsListBackground()
     }
     .sheet(isPresented: $isAddDialogVisible) {
       AlternativeURLAddDialogView(

@@ -347,25 +347,14 @@ class PlayerUIHandler: NSObject {
     }
   }
 
-  func airplayButtonPushed(
-    rootView: UIView,
-    airplayButton: UIButton,
-    airplayVolume: MPVolumeView? = nil
-  ) {
+  func airplayButtonPushed(rootView: UIView) {
     appDelegate.userStatistics.usedAction(.airplay)
 
     #if targetEnvironment(macCatalyst) // ok
-      guard let airplayVolume else { return }
-      // Position the popup correctly on macOS
-      if let buttonCenter = airplayButton.superview?.convert(airplayButton.center, to: rootView) {
-        airplayVolume.center = buttonCenter
-      }
-
-      for view: UIView in airplayVolume.subviews {
-        if let button = view as? UIButton {
-          button.sendActions(for: .touchUpInside)
-          break
-        }
+      // macOS: in-app AirPlay routing only applies to AVPlayer, not to the audio unit based output
+      // of AudioStreaming. Open the system sound output settings instead.
+      if let url = URL(string: "x-apple.systempreferences:com.apple.Sound-Settings.extension") {
+        UIApplication.shared.open(url)
       }
     #else
       let rect = CGRect(x: -100, y: 0, width: 0, height: 0)

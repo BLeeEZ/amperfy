@@ -84,6 +84,13 @@ final class HomeVC: UICollectionViewController {
       )
     }
 
+    registerForTraitChanges(
+      [UITraitPreferredContentSizeCategory.self],
+      handler: { (self: Self, previousTraitCollection: UITraitCollection) in
+        self.collectionView.collectionViewLayout.invalidateLayout()
+      }
+    )
+
     navigationController?.navigationBar.prefersLargeTitles = true
     navigationItem.rightBarButtonItem = UIBarButtonItem(
       title: "Edit",
@@ -118,21 +125,22 @@ final class HomeVC: UICollectionViewController {
   // MARK: - Layout
 
   private static func createLayout() -> UICollectionViewCompositionalLayout {
-    let layout = UICollectionViewCompositionalLayout { sectionIndex, _ in
+    let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in
       guard let _ = HomeSection(rawValue: sectionIndex) else { return nil }
 
-      // Item: square image with title below -> estimate height accommodates label
+      // Item: square image with title below
       let itemSize = NSCollectionLayoutSize(
         widthDimension: .fractionalWidth(1.0),
         heightDimension: .fractionalHeight(1.0)
       )
       let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
-      // Group: fixed width to show large image; height estimated to fit image + label
-      // We'll use a vertical group containing the cell's content; the cell itself handles layout.
+      // Group: fixed width to show large image; height fits image + labels for the text size
+      let labelAreaHeight = AlbumCollectionCell
+        .labelAreaHeight(for: environment.traitCollection, defaultHeight: 50.0)
       let groupSize = NSCollectionLayoutSize(
         widthDimension: .absolute(itemWidth),
-        heightDimension: .estimated(210)
+        heightDimension: .absolute(itemWidth + labelAreaHeight)
       )
       let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
@@ -200,14 +208,14 @@ final class HomeVC: UICollectionViewController {
       return cell
     }
 
-    dataSource.supplementaryViewProvider = { collectionView, kind, indexPath in
+    dataSource.supplementaryViewProvider = { [weak self] collectionView, kind, indexPath in
       guard kind == UICollectionView.elementKindSectionHeader,
             let header = collectionView.dequeueReusableSupplementaryView(
               ofKind: kind,
               withReuseIdentifier: SectionHeaderView.reuseID,
               for: indexPath
             ) as? SectionHeaderView,
-            let section = self.sharedHome.orderedVisibleSections.element(at: indexPath.section)
+            let section = self?.sharedHome.orderedVisibleSections.element(at: indexPath.section)
       else {
         return nil
       }
@@ -236,9 +244,20 @@ final class HomeVC: UICollectionViewController {
     var snapshot = NSDiffableDataSourceSnapshot<HomeSection, HomeItem>()
     snapshot.appendSections(sharedHome.orderedVisibleSections)
     for section in sharedHome.orderedVisibleSections {
-      let items = sharedHome.data[section] ?? []
+      // Ids are stable per entity, so a repeated entity would be a duplicate identifier (assert).
+      var seenIds = Set<String>()
+      let items = (sharedHome.data[section] ?? []).filter { seenIds.insert($0.id).inserted }
       snapshot.appendItems(items, toSection: section)
     }
+    let oldItems = dataSource.snapshot().itemIdentifiers
+    let oldFingerprints = Dictionary(oldItems.map { ($0.id, $0.artworkFingerprint) }) { first, _ in
+      first
+    }
+    let changedItems = snapshot.itemIdentifiers.filter {
+      guard let old = oldFingerprints[$0.id] else { return false }
+      return old != $0.artworkFingerprint
+    }
+    snapshot.reconfigureItems(changedItems)
     dataSource.apply(snapshot, animatingDifferences: animated)
   }
 
@@ -255,22 +274,31 @@ final class HomeVC: UICollectionViewController {
 
   private func presentSectionEditor() {
     // Build a simple editor using a temporary UIViewController with a table view
-    let editor = HomeEditorVC(current: sharedHome.orderedVisibleSections) { [weak self] newOrder in
+    let editor = HomeEditorVC(
+      order: appDelegate.storage.settings.accounts.getSetting(account.info).read.homeSectionOrder,
+      visible: sharedHome.orderedVisibleSections
+    ) { [weak self] order, visible in
       guard let self else { return }
-      sharedHome.orderedVisibleSections = newOrder
-      if let accountInfo = appDelegate.storage.settings.accounts.active {
-        appDelegate.storage.settings.accounts.updateSetting(accountInfo) { accountSettings in
-          accountSettings.homeSections = newOrder
-        }
+      sharedHome.orderedVisibleSections = visible
+      // same account the order was read from
+      appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
+        accountSettings.homeSections = visible
+        accountSettings.homeSectionOrder = order
       }
       applySnapshot(animated: true)
 
       sharedHome.createFetchController()
       sharedHome.updateFromRemote()
     }
-    let nav = UINavigationController(rootViewController: editor)
-    nav.modalPresentationStyle = .formSheet
-    present(nav, animated: true)
+    #if targetEnvironment(macCatalyst)
+      // reordering via drag & drop did not drop inside a form sheet on macOS
+      // revert to the form sheet once fixed: https://developer.apple.com/forums/thread/850756
+      navigationController?.pushViewController(editor, animated: true)
+    #else
+      let nav = UINavigationController(rootViewController: editor)
+      nav.modalPresentationStyle = .formSheet
+      present(nav, animated: true)
+    #endif
   }
 
   @objc
@@ -437,9 +465,14 @@ final class SectionHeaderView: UICollectionReusableView {
   }()
 
   private let titleLabel: UILabel = {
-    let lbl = UILabel()
+    let lbl = ScaledLabel()
     lbl.translatesAutoresizingMaskIntoConstraints = false
-    lbl.font = UIFont.preferredFont(forTextStyle: .title3).withWeight(.semibold)
+    // title 3 at the default text size, scaled with the user's text size
+    let defaultTraits = UITraitCollection(preferredContentSizeCategory: .large)
+    let font = UIFont.preferredFont(forTextStyle: .title3, compatibleWith: defaultTraits)
+      .withWeight(.semibold)
+    lbl.font = UIFontMetrics(forTextStyle: .title3).scaledFont(for: font)
+    lbl.adjustsFontForContentSizeCategory = true
     lbl.textColor = .label
     return lbl
   }()

@@ -39,11 +39,23 @@ extension SongMO: CoreDataIdentifyable {
     NSCompoundPredicate(orPredicateWithSubpredicates: [
       NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
-        NSPredicate(
-          format: "%K == %i",
-          #keyPath(SongMO.album.remoteStatus),
-          RemoteStatus.available.rawValue
-        ),
+        NSCompoundPredicate(orPredicateWithSubpredicates: [
+          NSPredicate(
+            format: "%K == %i",
+            #keyPath(SongMO.album.remoteStatus),
+            RemoteStatus.available.rawValue
+          ),
+          // songs without an album (e.g. untagged files on directory based servers):
+          // use the song's own status, because remote deleted songs are detached from their album
+          NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == nil", #keyPath(SongMO.album)),
+            NSPredicate(
+              format: "%K == %i",
+              #keyPath(SongMO.remoteStatus),
+              RemoteStatus.available.rawValue
+            ),
+          ]),
+        ]),
       ]),
       NSPredicate(format: "%K != nil", #keyPath(SongMO.relFilePath)),
     ])

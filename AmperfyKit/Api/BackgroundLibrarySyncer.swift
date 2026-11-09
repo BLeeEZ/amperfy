@@ -115,6 +115,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
             displayPopup: false
           )
         }
+        notifyLibrarySongsSynced()
       }
 
       try? await storage.perform { asyncCompanion in
@@ -148,8 +149,18 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
 
   func addOperationsEndMessage() {
     taskQueue.addBarrierBlock {
+      // stop() resets isRunning before it adds this barrier: only a natural end notifies
+      if self.isRunning.wrappedValue {
+        self.notifyLibrarySongsSynced()
+      }
       self.isRunning.wrappedValue = false
       os_log("stopped", log: self.log, type: .info)
+    }
+  }
+
+  private func notifyLibrarySongsSynced() {
+    Task { @MainActor in
+      NotificationCenter.default.post(name: .librarySongsSynced, object: nil)
     }
   }
 }

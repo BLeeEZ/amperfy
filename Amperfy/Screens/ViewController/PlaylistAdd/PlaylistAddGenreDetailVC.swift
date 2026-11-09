@@ -37,7 +37,7 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
 
   init(account: Account, genre: Genre) {
     self.genre = genre
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -71,11 +71,11 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: GenericTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.reloadOnTextSizeChange()
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     configureSearchController(
       placeholder: "Artists, Albums and Songs",
@@ -298,11 +298,11 @@ class PlaylistAddGenreDetailVC: MultiSourceTableViewController, PlaylistVCAddabl
 
   override func updateSearchResults(for searchController: UISearchController) {
     guard let searchText = searchController.searchBar.text else { return }
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       artistsFetchedResultsController.search(searchText: searchText, onlyCached: false)
       albumsFetchedResultsController.search(searchText: searchText, onlyCached: false)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: false)
-    } else if searchController.searchBar.selectedScopeButtonIndex == 1 {
+    } else if searchController.searchBar.isCachedScopeSelected {
       artistsFetchedResultsController.search(searchText: searchText, onlyCached: true)
       albumsFetchedResultsController.search(searchText: searchText, onlyCached: true)
       songsFetchedResultsController.search(searchText: searchText, onlyCachedSongs: true)

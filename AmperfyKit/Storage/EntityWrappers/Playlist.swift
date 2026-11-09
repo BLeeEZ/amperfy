@@ -317,7 +317,16 @@ public class Playlist: Identifyable {
   }
 
   /// nil as return value -> no free space left
-  private func getOrdersToInsert(at: Int, itemToInsertCount: Int, isMove: Bool) -> [Int32]? {
+  /// `movingFromIndex`: for moves, the current index of the item that is moved. `at` is the final
+  /// index after the move, so for moves towards the end the item has to be ordered behind the
+  /// item currently at `at`.
+  private func getOrdersToInsert(
+    at: Int,
+    itemToInsertCount: Int,
+    isMove: Bool,
+    movingFromIndex: Int? = nil
+  )
+    -> [Int32]? {
     assert(at <= (isMove ? managedObject.items.count - 1 : managedObject.items.count))
     var orders = [Int32]()
     if at == 0 {
@@ -344,9 +353,10 @@ public class Playlist: Identifyable {
       assert(orders.count == itemToInsertCount)
     } else {
       // somewhere in the array
-      let oneBeforeToIndex = at - 1
-      let oneBeforeToItemMO = managedObject.items[oneBeforeToIndex]
-      let targetItemMO = managedObject.items[at]
+      let isMovingTowardsEnd = isMove && (movingFromIndex ?? at) < at
+      let insertBeforeIndex = isMovingTowardsEnd ? at + 1 : at
+      let oneBeforeToItemMO = managedObject.items[insertBeforeIndex - 1]
+      let targetItemMO = managedObject.items[insertBeforeIndex]
       let spaceToInsert = targetItemMO.order - oneBeforeToItemMO.order - 1
       if spaceToInsert < itemToInsertCount {
         // there is no space left to insert
@@ -398,7 +408,12 @@ public class Playlist: Identifyable {
           to < managedObject.items.count, fromIndex != to else { return }
 
     let fromItemMO = managedObject.items[fromIndex]
-    let newOrders = getOrdersToInsert(at: to, itemToInsertCount: 1, isMove: true)
+    let newOrders = getOrdersToInsert(
+      at: to,
+      itemToInsertCount: 1,
+      isMove: true,
+      movingFromIndex: fromIndex
+    )
     assert(newOrders == nil || newOrders?.count == 1)
     managedObject.moveInsideItems(fromIndex: fromIndex, to: to)
     if let newOrder = newOrders?.first {

@@ -22,151 +22,103 @@
 import AmperfyKit
 import UIKit
 
-final class HomeEditorVC: UITableViewController {
-  private var sections: [HomeSection]
-  private var visibility: [HomeSection: Bool]
-  private let onDone: ([HomeSection]) -> ()
+// MARK: - HomeEditorVC
 
-  init(current: [HomeSection], onDone: @escaping ([HomeSection]) -> ()) {
-    self.sections = current
+/// One list with all home sections: the checkbox on the left (tap on the row) toggles the visibility,
+/// the handle on the right reorders the row (works with touch and mouse on all platforms).
+/// Rows stay where the user put them, also hidden ones.
+final class HomeEditorVC: UICollectionViewController {
+  private let editor: ReorderableListEditor<HomeSection>
+  private let onDone: (_ order: [HomeSection], _ visible: [HomeSection]) -> ()
+  private var diffableDataSource: UICollectionViewDiffableDataSource<Int, HomeSection>!
+
+  init(
+    order: [HomeSection],
+    visible: [HomeSection],
+    onDone: @escaping (_ order: [HomeSection], _ visible: [HomeSection]) -> ()
+  ) {
+    self.editor = ReorderableListEditor(items: order, checkedItems: Set(visible))
     self.onDone = onDone
-    var vis: [HomeSection: Bool] = [:]
-    // Default all known sections to hidden=false, then mark visible ones
-    for s in HomeSection.allCases { vis[s] = false }
-    for s in current { vis[s] = true }
-    self.visibility = vis
-    super.init(style: .insetGrouped)
+    super.init(collectionViewLayout: UICollectionViewCompositionalLayout { _, environment in
+      let config = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
+      return NSCollectionLayoutSection.list(using: config, layoutEnvironment: environment)
+    })
   }
 
   required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    title = "Home Preferences"
     navigationItem.rightBarButtonItems = [
       UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneTapped)),
     ]
-    tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-    title = "Home Preferences"
-    isEditing = true
+    // reordering by drag & drop (touch and mouse) only works while the collection view is editing
+    collectionView.isEditing = true
+    collectionView.allowsSelectionDuringEditing = true
+    configureDataSource()
+    applySnapshot()
   }
 
   @objc
   private func doneTapped() {
-    // Persist order of only visible sections
-    let newOrder = sections.filter { visibility[$0] == true }
-    onDone(newOrder)
-    dismiss(animated: true)
-  }
-
-  // MARK: - Table
-
-  override func numberOfSections(in tableView: UITableView) -> Int { 2 }
-
-  override func tableView(
-    _ tableView: UITableView,
-    titleForHeaderInSection section: Int
-  )
-    -> String? {
-    section == 0 ? "Visible" : "Hidden"
-  }
-
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    if section == 0 {
-      return sections.filter { visibility[$0] == true }.count
+    onDone(editor.items, editor.orderedCheckedItems)
+    if navigationController?.viewControllers.first === self {
+      dismiss(animated: true)
     } else {
-      return HomeSection.allCases.filter { visibility[$0] != true }.count
+      navigationController?.popViewController(animated: true)
     }
   }
 
-  private func sectionFor(indexPath: IndexPath) -> HomeSection {
-    if indexPath.section == 0 {
-      return sections.filter { visibility[$0] == true }[indexPath.row]
-    } else {
-      return HomeSection.allCases.filter { visibility[$0] != true }[indexPath.row]
+  private func configureDataSource() {
+    let registration = UICollectionView.CellRegistration<UICollectionViewListCell, HomeSection> {
+      [weak self] cell, _, section in
+      guard let self else { return }
+      var content = cell.defaultContentConfiguration()
+      content.text = section.title
+      // taller rows for a larger hit target
+      content.directionalLayoutMargins.top = 12
+      content.directionalLayoutMargins.bottom = 12
+      cell.contentConfiguration = content
+      cell.accessories = editor.editingAccessories(for: section)
     }
+    diffableDataSource = UICollectionViewDiffableDataSource<Int, HomeSection>(
+      collectionView: collectionView
+    ) { collectionView, indexPath, section in
+      collectionView.dequeueConfiguredReusableCell(
+        using: registration,
+        for: indexPath,
+        item: section
+      )
+    }
+    editor.installReordering(on: diffableDataSource, collectionView: collectionView)
   }
 
-  override func tableView(
-    _ tableView: UITableView,
-    cellForRowAt indexPath: IndexPath
+  private func applySnapshot() {
+    var snapshot = NSDiffableDataSourceSnapshot<Int, HomeSection>()
+    snapshot.appendSections([0])
+    snapshot.appendItems(editor.items, toSection: 0)
+    diffableDataSource.apply(snapshot, animatingDifferences: false)
+  }
+}
+
+// MARK: UICollectionViewDelegate
+
+extension HomeEditorVC {
+  override func collectionView(
+    _ collectionView: UICollectionView,
+    canEditItemAt indexPath: IndexPath
   )
-    -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-    let s = sectionFor(indexPath: indexPath)
-    cell.textLabel?.text = s.title
-    cell.accessoryType = .none
-    return cell
+    -> Bool {
+    collectionView.isEditing
   }
 
-  override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-    true
-  }
-
-  override func tableView(
-    _ tableView: UITableView,
-    moveRowAt sourceIndexPath: IndexPath,
-    to destinationIndexPath: IndexPath
+  override func collectionView(
+    _ collectionView: UICollectionView,
+    didSelectItemAt indexPath: IndexPath
   ) {
-    var visible = sections.filter { visibility[$0] == true }
-    var hidden = HomeSection.allCases.filter { visibility[$0] != true }
-
-    // same as select
-    if sourceIndexPath.section != destinationIndexPath.section {
-      if destinationIndexPath.section == 0 {
-        // show
-        visibility[hidden[sourceIndexPath.row]] = true
-        let moved = hidden.remove(at: sourceIndexPath.row)
-        visible.insert(moved, at: destinationIndexPath.row)
-      } else {
-        // hide
-        visibility[visible[sourceIndexPath.row]] = false
-        let moved = visible.remove(at: sourceIndexPath.row)
-        hidden.insert(moved, at: destinationIndexPath.row)
-      }
-    } else if sourceIndexPath.section == destinationIndexPath.section,
-              sourceIndexPath.section == 1 {
-      // Reorder within hidden
-      let moved = hidden.remove(at: sourceIndexPath.row)
-      hidden.insert(moved, at: destinationIndexPath.row)
-    } else {
-      // Reorder within visible
-      let moved = visible.remove(at: sourceIndexPath.row)
-      visible.insert(moved, at: destinationIndexPath.row)
-    }
-    // Rebuild sections array: keep order of visible first, then append existing hidden order
-    sections = visible + hidden
-  }
-
-  override func tableView(
-    _ tableView: UITableView,
-    editingStyleForRowAt indexPath: IndexPath
-  )
-    -> UITableViewCell.EditingStyle {
-    .none
-  }
-
-  override func tableView(
-    _ tableView: UITableView,
-    shouldIndentWhileEditingRowAt indexPath: IndexPath
-  )
-    -> Bool { false }
-
-  override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    tableView.deselectRow(at: indexPath, animated: true)
-    let s = sectionFor(indexPath: indexPath)
-    // Toggle visibility
-    visibility[s] = !(visibility[s] ?? false)
-    updateSections()
-
-    tableView.performBatchUpdates({
-      tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
-      tableView.reloadSections(IndexSet(integer: 1), with: .automatic)
-    })
-  }
-
-  func updateSections() {
-    let visible = sections.filter { visibility[$0] == true }
-    let hidden = HomeSection.allCases.filter { visibility[$0] != true }
-    sections = visible + hidden
+    collectionView.deselectItem(at: indexPath, animated: true)
+    guard let section = diffableDataSource.itemIdentifier(for: indexPath) else { return }
+    editor.toggle(section, in: diffableDataSource)
   }
 }

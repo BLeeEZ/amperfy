@@ -22,6 +22,8 @@
 @testable import AmperfyKit
 import XCTest
 
+// MARK: - AmperfyKitTests
+
 class AmperfyKitTests: XCTestCase {
   override func setUpWithError() throws {
     // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -44,5 +46,14 @@ class AmperfyKitTests: XCTestCase {
     measure {
       // Put the code you want to measure the time of here.
     }
+  }
+}
+
+// MARK: - MimeFileConverterTest
+
+class MimeFileConverterTest: XCTestCase {
+  func testM4bGetsMp4Extension() {
+    XCTAssertEqual(MimeFileConverter.getFilenameExtension(mimeType: "audio/m4b"), "mp4")
+    XCTAssertEqual(MimeFileConverter.getFilenameExtension(mimeType: "audio/x-m4b"), "mp4")
   }
 }

@@ -25,6 +25,11 @@ import SwiftUI
 // MARK: - AccountSettingsView
 
 struct AccountSettingsView: View {
+  enum Destination: Hashable {
+    case serverURLs
+    case customHTTPHeaders
+  }
+
   let splitPercentage = 0.25
 
   @State
@@ -227,14 +232,10 @@ struct AccountSettingsView: View {
           }
 
           SettingsSection {
-            NavigationLink(destination: ServerURLsSettingsView()) {
+            NavigationLink(value: Destination.serverURLs) {
               Text("Manage Server URLs")
             }
-            NavigationLink(destination: CustomHTTPHeadersView(
-              headers: httpHeaders(accountInfo: activeAccountInfo)
-            ) { updated in
-              saveHTTPHeaders(updated, accountInfo: activeAccountInfo)
-            }) {
+            NavigationLink(value: Destination.customHTTPHeaders) {
               Text("Custom HTTP Headers")
             }
           }
@@ -286,6 +287,20 @@ struct AccountSettingsView: View {
     }
     .navigationTitle("Account")
     .navigationBarTitleDisplayMode(.inline)
+    .navigationDestination(for: Destination.self) { destination in
+      switch destination {
+      case .serverURLs:
+        ServerURLsSettingsView()
+      case .customHTTPHeaders:
+        if let activeAccountInfo = settings.activeAccountInfo {
+          CustomHTTPHeadersView(
+            headers: httpHeaders(accountInfo: activeAccountInfo)
+          ) { updated in
+            saveHTTPHeaders(updated, accountInfo: activeAccountInfo)
+          }
+        }
+      }
+    }
     .sheet(isPresented: $isPwUpdateDialogVisible) {
       UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
     }

@@ -360,6 +360,13 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(album: Album) async throws {
+    try await AlbumSyncCoalescer.sync(album) {
+      try await self.syncAlbumUncoalesced(album)
+    }
+  }
+
+  @MainActor
+  private func syncAlbumUncoalesced(_ album: Album) async throws {
     guard isSyncAllowed else { return }
     let albumResponse = try await ampacheXmlServerApi.requestAlbumInfo(id: album.id)
     let albumObjectId = album.managedObject.objectID
@@ -1032,7 +1039,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         parseNotifier: nil
       )
       try self.parse(response: response, delegate: parserDelegate)
-      return parserDelegate.parsedSongs.compactMap { $0.managedObject.objectID }
+      return try asyncCompanion.getPermanentObjectIDs(of: parserDelegate.parsedSongs)
     }
 
     return try similarSongObjectIds.map {

@@ -333,6 +333,13 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func sync(album: Album) async throws {
+    try await AlbumSyncCoalescer.sync(album) {
+      try await self.syncAlbumUncoalesced(album)
+    }
+  }
+
+  @MainActor
+  private func syncAlbumUncoalesced(_ album: Album) async throws {
     guard isSyncAllowed, album.remoteStatus != .deleted else { return }
     let albumObjectId = album.managedObject.objectID
 
@@ -360,7 +367,14 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var albumResponse: APIDataResponse?
     do {
-      albumResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+      let response = try await subsonicServerApi.requestAlbum(id: album.id)
+      // Servers like Navidrome answer a deleted album with HTTP 200 and error 70;
+      // parsing it below cannot report that, the storage swallows thrown errors
+      if let error = await errorResponse(of: response),
+         error.asSubsonicError?.isRemoteAvailable == false {
+        throw error
+      }
+      albumResponse = response
     } catch {
       try await handleNotAvailableAlbum(error: error)
     }
@@ -930,7 +944,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
-      return parserDelegate.parsedSongs.compactMap { $0.managedObject.objectID }
+      return try asyncCompanion.getPermanentObjectIDs(of: parserDelegate.parsedSongs)
     }
 
     return try similarSongObjectIds.map {
@@ -1372,6 +1386,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private func parseForError(response: APIDataResponse) throws {
     let parserDelegate = SsPingParserDelegate(performanceMonitor: performanceMonitor)
     try parse(response: response, delegate: parserDelegate)
+  }
+
+  /// Parses the server's error, if any, off the main actor.
+  nonisolated private func errorResponse(of response: APIDataResponse) async -> ResponseError? {
+    subsonicServerApi.checkForErrorResponse(response: response)
   }
 
   nonisolated private func parse(

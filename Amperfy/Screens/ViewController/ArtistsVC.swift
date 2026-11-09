@@ -123,7 +123,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
   private var filterTitle = "Artists"
 
   init(account: Account) {
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -166,17 +166,15 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
-    tableView.rowHeight = GenericTableCell.rowHeight
-    tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { GenericTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
-    #if !targetEnvironment(macCatalyst)
+    if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
-    #endif
+    }
     refreshControl?.addTarget(
       self,
       action: #selector(Self.handleRefresh),
@@ -380,11 +378,11 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     let searchText = searchController.searchBar.text ?? ""
     fetchedResultsController.search(
       searchText: searchText,
-      onlyCached: searchController.searchBar.selectedScopeButtonIndex == 1,
+      onlyCached: searchController.searchBar.isCachedScopeSelected,
       displayFilter: displayFilter
     )
     tableView.reloadData()
-    if !searchText.isEmpty, searchController.searchBar.selectedScopeButtonIndex == 0 {
+    if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
       Task { @MainActor in do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)

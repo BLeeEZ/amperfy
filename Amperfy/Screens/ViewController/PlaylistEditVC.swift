@@ -52,7 +52,7 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
 
   init(account: Account, playlist: Playlist) {
     self.playlist = playlist
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -91,13 +91,11 @@ class PlaylistEditVC: SingleSnapshotFetchedResultsTableViewController<PlaylistIt
     singleFetchedResultsController?.fetch()
 
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.rowHeight = PlayableTableCell.rowHeight
-    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlayableTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
 
     let detailHeaderConfig = DetailHeaderConfiguration(
       entityContainer: playlist,

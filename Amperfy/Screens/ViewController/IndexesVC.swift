@@ -31,7 +31,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
 
   init(account: Account, musicFolder: MusicFolder) {
     self.musicFolder = musicFolder
-    super.init(style: .grouped, account: account)
+    super.init(style: .plain, account: account)
   }
 
   required init?(coder: NSCoder) {
@@ -52,13 +52,11 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     configureSearchController(placeholder: "Search in \"Directories\"")
     setNavBarTitle(title: musicFolder.name)
     tableView.register(nibName: DirectoryTableCell.typeName)
-    tableView.rowHeight = DirectoryTableCell.rowHeight
-    tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { DirectoryTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
-    tableView.backgroundColor = .backgroundColor
     resultUpdateHandler?.changesDidEnd = {
       self.updateContentUnavailable()
     }

@@ -35,20 +35,21 @@ struct EventLogCellView: View {
   }
 
   var body: some View {
-    VStack(alignment: .leading) {
+    VStack(alignment: .leading, spacing: 4) {
       Text(entry.message)
         .font(.subheadline)
-        .padding([.bottom], 2)
+        .fixedSize(horizontal: false, vertical: true)
       HStack {
         Text(typeText)
-          .font(.caption)
-          .foregroundColor(.secondary)
         Spacer()
         Text("\(entry.creationDate.asIso8601String)")
-          .font(.caption)
-          .foregroundColor(.secondary)
+          .monospacedDigit()
       }
-    }.contextMenu {
+      .font(.caption)
+      .foregroundStyle(.secondary)
+    }
+    .padding(.vertical, 4)
+    .contextMenu {
       Button(action: {
         UIPasteboard.general.string = entry.message
       }) {
