@@ -64,6 +64,7 @@ class DirectoriesVC: MultiSourceTableViewController {
     setNavBarTitle(title: directory.name)
     tableView.register(nibName: DirectoryTableCell.typeName)
     tableView.register(nibName: PlayableTableCell.typeName)
+    tableView.reloadOnTextSizeChange()
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0

@@ -137,7 +137,9 @@ class BasicTableViewController: KeyCommandTableViewController {
         guard let indexPath = tableView.indexPath(for: cell) else { continue }
         let isLastRowInSection = indexPath.row == tableView
           .numberOfRows(inSection: indexPath.section) - 1
-        cell.isSectionEndSeparatorVisible = showSeparators && isLastRowInSection
+        // nothing follows the last row of the table, so it doesn't need a separator
+        let isLastSection = indexPath.section == tableView.numberOfSections - 1
+        cell.isSectionEndSeparatorVisible = showSeparators && isLastRowInSection && !isLastSection
       }
     }
   #endif
@@ -152,6 +154,26 @@ class BasicTableViewController: KeyCommandTableViewController {
       searchController.searchBar.selectedScopeButtonIndex = 0
     }
     updateSearchResults(for: searchController)
+  }
+
+  /// Section headers created from `tableView(_:titleForHeaderInSection:)` have a fixed text
+  /// size: use a text style that scales with the user's text size (see `TextScaling`)
+  override func tableView(
+    _ tableView: UITableView,
+    willDisplayHeaderView view: UIView,
+    forSection section: Int
+  ) {
+    guard let header = view as? UITableViewHeaderFooterView else { return }
+    var content = (header.contentConfiguration as? UIListContentConfiguration) ??
+      header.defaultContentConfiguration()
+    if content.text == nil {
+      content.text = tableView.dataSource?.tableView?(tableView, titleForHeaderInSection: section)
+    }
+    let traits = header.traitCollection
+    let font = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: traits)
+    content.textProperties.font = TextScaling.scaledFont(font, compatibleWith: traits)
+    content.textProperties.adjustsFontForContentSizeCategory = true
+    header.contentConfiguration = content
   }
 
   override func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {

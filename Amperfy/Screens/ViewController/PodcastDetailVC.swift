@@ -62,8 +62,7 @@ class PodcastDetailVC: SingleFetchedResultsTableViewController<PodcastEpisodeMO>
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: PodcastEpisodeTableCell.typeName)
-    tableView.rowHeight = PodcastEpisodeTableCell.rowHeight
-    tableView.estimatedRowHeight = PodcastEpisodeTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PodcastEpisodeTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0

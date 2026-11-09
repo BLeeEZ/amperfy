@@ -19,6 +19,7 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import os.log
 import UIKit
 
 // MARK: - AppSettings
@@ -116,6 +117,12 @@ public struct UserSettings: Sendable, Codable {
   public var isShowMusicPlayerSkipButtons: Bool {
     get { _isShowMusicPlayerSkipButtons }
     set { _isShowMusicPlayerSkipButtons = newValue }
+  }
+
+  private var _isToolbarPlayerAutoCollapse: Bool = true
+  public var isToolbarPlayerAutoCollapse: Bool {
+    get { _isToolbarPlayerAutoCollapse }
+    set { _isToolbarPlayerAutoCollapse = newValue }
   }
 
   private var _isLyricsSmoothScrolling: Bool = true
@@ -228,6 +235,13 @@ public struct UserSettings: Sendable, Codable {
   public var appearanceMode: UIUserInterfaceStyle {
     get { _appearanceMode }
     set { _appearanceMode = newValue }
+  }
+
+  /// In-app text size, nil: system text size (iOS) / default text size (macOS, no Dynamic Type)
+  private var _textSize: String?
+  public var textSize: UIContentSizeCategory? {
+    get { _textSize.map { UIContentSizeCategory(rawValue: $0) } }
+    set { _textSize = newValue?.rawValue }
   }
 
   private var _screenLockPreventionPreference: ScreenLockPreventionPreference = .defaultValue
@@ -494,6 +508,27 @@ public struct AmperfySettings: Sendable, Codable {
     return e
   }()
 
+  /// Settings saved by an older app version lack the fields added since. Decoding them would
+  /// fail, so fill those fields in from `defaults` and keep everything that was saved.
+  private static func decodeFillingMissingKeys<T: Codable>(
+    _ type: T.Type,
+    from data: Data,
+    defaults: T
+  ) throws
+    -> T {
+    if let settings = try? decoder.decode(type, from: data) {
+      return settings
+    }
+    guard let saved = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+          let defaultValues = try JSONSerialization
+          .jsonObject(with: encoder.encode(defaults)) as? [String: Any]
+    else {
+      return try decoder.decode(type, from: data)
+    }
+    let merged = defaultValues.merging(saved) { _, savedValue in savedValue }
+    return try decoder.decode(type, from: JSONSerialization.data(withJSONObject: merged))
+  }
+
   private var _appSettings: AppSettings = .init()
   public var app: AppSettings {
     get {
@@ -501,8 +536,9 @@ public struct AmperfySettings: Sendable, Codable {
         .data(forKey: PersistentStorage.UserDefaultsKey.SettingsApp.rawValue)
       else { return _appSettings }
       do {
-        return try Self.decoder.decode(AppSettings.self, from: data)
+        return try Self.decodeFillingMissingKeys(AppSettings.self, from: data, defaults: .init())
       } catch {
+        os_log("Decoding app settings failed: %s", type: .error, String(describing: error))
         return _appSettings
       }
     }
@@ -525,8 +561,9 @@ public struct AmperfySettings: Sendable, Codable {
         .data(forKey: PersistentStorage.UserDefaultsKey.SettingsUser.rawValue)
       else { return _userSettings }
       do {
-        return try Self.decoder.decode(UserSettings.self, from: data)
+        return try Self.decodeFillingMissingKeys(UserSettings.self, from: data, defaults: .init())
       } catch {
+        os_log("Decoding user settings failed: %s", type: .error, String(describing: error))
         return _userSettings
       }
     }

@@ -135,6 +135,15 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isShowMusicPlayerSkipButtons = newValue
     }))
 
+    settings.isToolbarPlayerAutoCollapse = appDelegate.storage.settings.user
+      .isToolbarPlayerAutoCollapse
+    changesAgent.append(settings.$isToolbarPlayerAutoCollapse.sink(receiveValue: { newValue in
+      let hasValueChanged = self.appDelegate.storage.settings.user
+        .isToolbarPlayerAutoCollapse != newValue
+      guard hasValueChanged else { return }
+      self.appDelegate.switchToolbarCollapseMode(isToolbarPlayerAutoCollapse: newValue)
+    }))
+
     settings.isLyricsSmoothScrolling = appDelegate.storage.settings.user.isLyricsSmoothScrolling
     changesAgent.append(settings.$isLyricsSmoothScrolling.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.isLyricsSmoothScrolling = newValue
@@ -249,6 +258,13 @@ class SettingsHostVC: UIViewController {
     changesAgent.append(settings.$appearanceMode.sink(receiveValue: { newValue in
       self.appDelegate.storage.settings.user.appearanceMode = newValue
       self.appDelegate.setAppAppearanceMode(style: newValue)
+    }))
+
+    settings.textSize = appDelegate.storage.settings.user.textSize
+    changesAgent.append(settings.$textSize.sink(receiveValue: { newValue in
+      guard self.appDelegate.storage.settings.user.textSize != newValue else { return }
+      self.appDelegate.storage.settings.user.textSize = newValue
+      self.appDelegate.applyTextSize()
     }))
 
     // following account specific setting sinks are assigned.

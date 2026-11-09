@@ -166,8 +166,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
       scopeButtonTitles: ["All", "Cached"]
     )
     tableView.register(nibName: GenericTableCell.typeName)
-    tableView.rowHeight = GenericTableCell.rowHeight
-    tableView.estimatedRowHeight = GenericTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { GenericTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0
@@ -375,8 +374,11 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     )
   }
 
+  private let searchTaskRunner = SearchTaskRunner()
+
   override func updateSearchResults(for searchController: UISearchController) {
     let searchText = searchController.searchBar.text ?? ""
+    searchTaskRunner.cancelAll()
     fetchedResultsController.search(
       searchText: searchText,
       onlyCached: searchController.searchBar.isCachedScopeSelected,
@@ -384,7 +386,7 @@ class ArtistsVC: SingleSnapshotFetchedResultsTableViewController<ArtistMO> {
     )
     tableView.reloadData()
     if !searchText.isEmpty, !searchController.searchBar.isCachedScopeSelected {
-      Task { @MainActor in do {
+      searchTaskRunner.runRemoteSearch(searchText: searchText) { do {
         try await self.appDelegate.getMeta(self.account.info).librarySyncer
           .searchArtists(searchText: searchText)
       } catch {

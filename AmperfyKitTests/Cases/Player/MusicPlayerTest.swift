@@ -240,6 +240,14 @@ final class MOCK_BackendApi: BackendApi {
   ) async throws
     -> URL { Helper.testURL }
 
+  func generateUrl(
+    forStreamingPlayable playableInfo: AbstractPlayableInfo,
+    maxBitrate: StreamingMaxBitratePreference,
+    formatPreference: StreamingFormatPreference,
+    timeOffset: Int
+  ) async throws
+    -> URL { throw BackendError.notSupported }
+
   func generateUrl(forArtwork artwork: Artwork) async throws -> URL { Helper.testURL }
   func checkForErrorResponse(response: APIDataResponse) -> ResponseError? { nil }
   func createLibrarySyncer(
@@ -648,6 +656,45 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.duration, 0.0)
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.off)
     XCTAssertTrue(songDownloader.isNoDownloadRequested())
+  }
+
+  func testPlayContextWindow_ShortList_WholeListKept() {
+    let w = PlayContext.window(count: 50, index: 10, maxCount: 500)
+    XCTAssertEqual(w.range, 0 ..< 50)
+    XCTAssertEqual(w.index, 10)
+  }
+
+  func testPlayContextWindow_ExactlyMaxCount_WholeListKept() {
+    let w = PlayContext.window(count: 500, index: 250, maxCount: 500)
+    XCTAssertEqual(w.range, 0 ..< 500)
+    XCTAssertEqual(w.index, 250)
+  }
+
+  func testPlayContextWindow_LongList_Start() {
+    let w = PlayContext.window(count: 1000, index: 0, maxCount: 500)
+    XCTAssertEqual(w.range, 0 ..< 500)
+    XCTAssertEqual(w.index, 0)
+  }
+
+  func testPlayContextWindow_LongList_Middle() {
+    let w = PlayContext.window(count: 1000, index: 500, maxCount: 500)
+    XCTAssertEqual(w.range, 250 ..< 750)
+    XCTAssertEqual(w.index, 250)
+  }
+
+  func testPlayContextWindow_LongList_End() {
+    let w = PlayContext.window(count: 1000, index: 999, maxCount: 500)
+    XCTAssertEqual(w.range, 500 ..< 1000)
+    XCTAssertEqual(w.index, 499)
+  }
+
+  func testPlayContextWindow_LongList_TappedTrackAlwaysInside() {
+    for index in stride(from: 0, to: 1000, by: 37) {
+      let w = PlayContext.window(count: 1000, index: index, maxCount: 500)
+      XCTAssertEqual(w.range.count, 500)
+      XCTAssertTrue(w.range.contains(index))
+      XCTAssertEqual(w.range.lowerBound + w.index, index)
+    }
   }
 
   func testPlay_EmptyPlaylist() {
@@ -1670,6 +1717,17 @@ class MusicPlayerTest: XCTestCase {
       )
     let elapsedTime = testPlayer.elapsedTime
     XCTAssertEqual(elapsedTime, 3.0)
+  }
+
+  func testStreamRestartTimeOffset() {
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 20.4, duration: 35), 20)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: -3, duration: 35), 0)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 34, duration: 35), 34)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 35, duration: 35), 34)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 100, duration: 35), 34)
+    // unknown or too short metadata duration: no clamping
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 20, duration: 0), 20)
+    XCTAssertEqual(BackendAudioPlayer.streamRestartTimeOffset(forSecond: 20, duration: 0.5), 20)
   }
 
   func testPlayPreviousOrReplay_EmptyPlaylist() {

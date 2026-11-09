@@ -422,7 +422,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func handleRadioStartIfNeeded() {
-    guard let radio = currentlyPlaying?.asRadio else {
+    guard (currentlyPlaying?.asRadio) != nil else {
       if currentRadioNowPlaying != nil {
         currentRadioNowPlaying = nil
         lastRadioStreamTitle = nil

@@ -367,7 +367,14 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     var albumResponse: APIDataResponse?
     do {
-      albumResponse = try await subsonicServerApi.requestAlbum(id: album.id)
+      let response = try await subsonicServerApi.requestAlbum(id: album.id)
+      // Servers like Navidrome answer a deleted album with HTTP 200 and error 70;
+      // parsing it below cannot report that, the storage swallows thrown errors
+      if let error = await errorResponse(of: response),
+         error.asSubsonicError?.isRemoteAvailable == false {
+        throw error
+      }
+      albumResponse = response
     } catch {
       try await handleNotAvailableAlbum(error: error)
     }
@@ -937,7 +944,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         library: asyncCompanion.library
       )
       try self.parse(response: response, delegate: parserDelegate)
-      return parserDelegate.parsedSongs.compactMap { $0.managedObject.objectID }
+      return try asyncCompanion.getPermanentObjectIDs(of: parserDelegate.parsedSongs)
     }
 
     return try similarSongObjectIds.map {
@@ -1228,6 +1235,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed, !searchText.isEmpty else { return }
     os_log("Search artists via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchArtists(searchText: searchText)
+    guard !Task.isCancelled else { return }
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -1254,6 +1262,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed, !searchText.isEmpty else { return }
     os_log("Search albums via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchAlbums(searchText: searchText)
+    guard !Task.isCancelled else { return }
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -1280,6 +1289,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed, !searchText.isEmpty else { return }
     os_log("Search songs via API: \"%s\"", log: log, type: .info, searchText)
     let response = try await subsonicServerApi.requestSearchSongs(searchText: searchText)
+    guard !Task.isCancelled else { return }
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -1379,6 +1389,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   private func parseForError(response: APIDataResponse) throws {
     let parserDelegate = SsPingParserDelegate(performanceMonitor: performanceMonitor)
     try parse(response: response, delegate: parserDelegate)
+  }
+
+  /// Parses the server's error, if any, off the main actor.
+  nonisolated private func errorResponse(of response: APIDataResponse) async -> ResponseError? {
+    subsonicServerApi.checkForErrorResponse(response: response)
   }
 
   nonisolated private func parse(

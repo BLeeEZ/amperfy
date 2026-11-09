@@ -55,6 +55,12 @@ struct DisplaySettingsView: View {
           }
         }
 
+        // Mac Catalyst compiles alternate icons but doesn't support switching them
+        // in our tests, so only show the picker when the system allows it.
+        if UIApplication.shared.supportsAlternateIcons {
+          AppIconSettingsSection()
+        }
+
         #if !targetEnvironment(macCatalyst)
           SettingsSection(
             content: {
@@ -64,6 +70,8 @@ struct DisplaySettingsView: View {
             "Certain interactions provide haptic feedback. Long pressing to display the details menu will always trigger haptic feedback."
           )
         #endif
+
+        TextSizeSettingsSection()
 
         #if targetEnvironment(macCatalyst)
           SettingsSection(
@@ -164,6 +172,19 @@ struct DisplaySettingsView: View {
           footer:
           "The player shuffle button is displayed but non-interactive."
         )
+
+        #if !targetEnvironment(macCatalyst)
+          SettingsSection(
+            content: {
+              SettingsCheckBoxRow(
+                title: "Collapse Toolbar Player",
+                isOn: $settings.isToolbarPlayerAutoCollapse
+              )
+            },
+            footer:
+            "Collapse the toolbar player into a compact view when scrolling"
+          )
+        #endif
       }
     }
     .navigationTitle("Display")

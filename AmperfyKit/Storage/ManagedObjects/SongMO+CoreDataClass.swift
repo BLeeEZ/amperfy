@@ -34,16 +34,39 @@ extension SongMO: CoreDataIdentifyable {
     \SongMO.title
   }
 
+  static func getTitleAndArtistSearchPredicate(searchText: String) -> NSPredicate {
+    guard !searchText.isEmpty else { return NSPredicate(value: true) }
+    let searchWords = searchText.split(whereSeparator: \.isWhitespace).map { String($0) }
+    return NSCompoundPredicate(andPredicateWithSubpredicates: searchWords.map { searchWord in
+      NSCompoundPredicate(orPredicateWithSubpredicates: [
+        NSPredicate(format: "%K contains[cd] %@", #keyPath(SongMO.title), searchWord),
+        NSPredicate(format: "%K contains[cd] %@", #keyPath(SongMO.artist.name), searchWord),
+      ])
+    })
+  }
+
   static var excludeServerDeleteUncachedSongsFetchPredicate: NSPredicate {
     // see also Song Array extension [Song].filterServerDeleteUncachedSongs()
     NSCompoundPredicate(orPredicateWithSubpredicates: [
       NSCompoundPredicate(andPredicateWithSubpredicates: [
         NSPredicate(format: "%K > 0", #keyPath(SongMO.size)),
-        NSPredicate(
-          format: "%K == %i",
-          #keyPath(SongMO.album.remoteStatus),
-          RemoteStatus.available.rawValue
-        ),
+        NSCompoundPredicate(orPredicateWithSubpredicates: [
+          NSPredicate(
+            format: "%K == %i",
+            #keyPath(SongMO.album.remoteStatus),
+            RemoteStatus.available.rawValue
+          ),
+          // songs without an album (e.g. untagged files on directory based servers):
+          // use the song's own status, because remote deleted songs are detached from their album
+          NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "%K == nil", #keyPath(SongMO.album)),
+            NSPredicate(
+              format: "%K == %i",
+              #keyPath(SongMO.remoteStatus),
+              RemoteStatus.available.rawValue
+            ),
+          ]),
+        ]),
       ]),
       NSPredicate(format: "%K != nil", #keyPath(SongMO.relFilePath)),
     ])
