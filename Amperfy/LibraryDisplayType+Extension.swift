@@ -23,6 +23,25 @@ import AmperfyKit
 import UIKit
 
 extension LibraryDisplayType {
+  /// Distinct icon color per library entry so rows are easier to tell apart at a glance.
+  /// System colors adapt automatically to light/dark mode.
+  public var iconColor: UIColor {
+    switch self {
+    case .favoriteArtists, .favoriteAlbums, .favoriteSongs: return .redHeart
+    case .artists: return .systemIndigo
+    case .albums: return .systemOrange
+    case .newestAlbums: return .systemGreen
+    case .recentAlbums: return .systemTeal
+    case .songs: return .systemPink
+    case .directories: return .systemBrown
+    case .playlists: return .systemBlue
+    case .podcasts: return .systemPurple
+    case .radios: return .systemMint
+    case .genres: return .systemCyan
+    case .downloads: return .systemGray
+    }
+  }
+
   public func controller(account: Account, settings: AmperfySettings) -> UIViewController {
     switch self {
     case .artists:
