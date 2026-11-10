@@ -54,6 +54,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let resumeAlbumBatches = storage.settings.accounts.getSetting(accountInfo).read
       .initialSyncCompletedAlbumBatches
     if resumeAlbumBatches == nil {
+      // A new initial sync gets a new bulk song sync
+      storage.settings.accounts.updateSetting(accountInfo) { $0.isBulkSongSyncCompleted = false }
       try await super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
     }
 
@@ -1390,9 +1392,16 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
   @MainActor
   func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool {
+    let library = storage.main.library
+    let accountSetting = storage.settings.accounts.getSetting(accountInfo).read
+    // Only until a bulk song sync has completed after the initial sync, and only while most of
+    // the account's albums have no songs yet: smaller backlogs, and albums a completed pass could
+    // not mark, are synced per album
     guard isSyncAllowed,
-          storage.settings.accounts.getSetting(accountInfo).read
-          .initialSyncCompletionStatus != .aborted
+          accountSetting.initialSyncCompletionStatus != .aborted,
+          !accountSetting.isBulkSongSyncCompleted,
+          library.getAlbumWithSyncedSongsCount(for: account) * 2
+          < library.getAlbumCount(for: account)
     else { return false }
     os_log("Sync all songs via bulk search3", log: log, type: .info)
 
@@ -1467,6 +1476,9 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     try await markAlbumSongsSynced(albumIDs: pendingAlbumIDs)
     markedAlbumCount += pendingAlbumIDs.count
     os_log("Bulk song sync marked %i albums", log: log, type: .info, markedAlbumCount)
+    // Not when stopped meanwhile (e.g. by a logout or a resync that changes the account settings)
+    guard !isCancelled() else { return false }
+    storage.settings.accounts.updateSetting(accountInfo) { $0.isBulkSongSyncCompleted = true }
     return true
   }
 

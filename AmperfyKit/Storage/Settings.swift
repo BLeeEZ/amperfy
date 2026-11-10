@@ -378,6 +378,13 @@ public struct AccountSetting: Sendable, Codable {
     initialSyncCompletionStatus == .aborted && initialSyncCompletedAlbumBatches != nil
   }
 
+  // optional: settings stored before this property existed must still decode
+  private var _isBulkSongSyncCompleted: Bool? = nil
+  public var isBulkSongSyncCompleted: Bool {
+    get { _isBulkSongSyncCompleted ?? false }
+    set { _isBulkSongSyncCompleted = newValue }
+  }
+
   private var _isAutoDownloadLatestPodcastEpisodesActive: Bool = false
   public var isAutoDownloadLatestPodcastEpisodesActive: Bool {
     get { _isAutoDownloadLatestPodcastEpisodesActive }
