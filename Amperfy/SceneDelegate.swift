@@ -92,7 +92,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     /** Process the quick action if the user selected one to launch the app.
          Grab a reference to the shortcutItem to use in the scene.
      */
-    if let shortcutItem = connectionOptions.shortcutItem {
+    // An online/offline mode quick action is applied right away, as it decides below whether an
+    // interrupted initial sync is resumed
+    if let shortcutItem = connectionOptions.shortcutItem,
+       !appDelegate.quickActionsManager.applyModeShortCutItem(shortcutItem) {
       // Save it off for later when we become active.
       appDelegate.quickActionsManager.savedShortCutItemForLaterUse(savedShortCutItem: shortcutItem)
     }
@@ -112,11 +115,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     #if targetEnvironment(macCatalyst)
       restoreMainWindowFrame(of: windowScene)
     #endif
+    // Once the library has been opened (isLibrarySynced), an interrupted initial sync is resumed
+    // once per launch: in the first main window, in online mode and when no library update is
+    // pending; other windows never resume. If a single account's first sync or resync was
+    // killed, isLibrarySynced is still false and every window opens the sync screen
+    let isFirstMainWindow = !appDelegate.isInitialSyncResumeChecked
+    appDelegate.isInitialSyncResumeChecked = true
     if let activeAccountInfo = AmperKit.shared.storage.settings.accounts.active {
       let account = appDelegate.storage.main.library.getAccount(info: activeAccountInfo)
-      let isInitialSyncResumable = AmperKit.shared.storage.settings.accounts
-        .getSetting(activeAccountInfo).read.isInitialSyncResumable
-      if !AmperKit.shared.storage.settings.app.isLibrarySynced || isInitialSyncResumable {
+      let isInitialSyncResumed = isFirstMainWindow
+        && AmperKit.shared.storage.settings.user.isOnlineMode
+        && !AmperKit.shared.libraryUpdater.isVisualUpadateNeeded
+        && AmperKit.shared.storage.settings.accounts.getSetting(activeAccountInfo).read
+        .isInitialSyncResumable
+      if !AmperKit.shared.storage.settings.app.isLibrarySynced || isInitialSyncResumed {
         initialViewController = AppStoryboard.Main.segueToSync(account: account)
       } else if AmperKit.shared.libraryUpdater.isVisualUpadateNeeded {
         initialViewController = AppStoryboard.Main.segueToUpdate()

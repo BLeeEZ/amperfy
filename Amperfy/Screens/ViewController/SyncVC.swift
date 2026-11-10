@@ -56,12 +56,14 @@ class SyncVC: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     syncTask = Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
-      if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
-        self.appDelegate.storage.settings.app.isLibrarySynced = false
-      }
       let isResumingSync = self.appDelegate.storage.settings.accounts.getSetting(account.info)
         .read.isInitialSyncResumable
       if !isResumingSync {
+        // Not on a resume: a resume keeps isLibrarySynced as it was. When it is set, other windows
+        // open the partial library and a killed resume goes through SceneDelegate's check again
+        if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
+          self.appDelegate.storage.settings.app.isLibrarySynced = false
+        }
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletedAlbumBatches = nil
           accountSettings.initialSyncAlbumCount = nil

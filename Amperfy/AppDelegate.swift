@@ -250,6 +250,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       .isVisualUpadateNeeded
   }
 
+  /// Only the first main window of a launch may resume an interrupted initial sync
+  var isInitialSyncResumeChecked = false
+
   func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
