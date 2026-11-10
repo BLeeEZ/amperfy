@@ -356,16 +356,17 @@ class CommonLibrarySyncer {
               do {
                 try write(asyncCompanion, objectID, payload)
               } catch {
+                // Other errors (e.g. a proxy error page or a changed password) leave the album
+                // unsynced, so a later run fetches it again
                 if classifyNotAvailable(error) {
                   albumAsync.markAsRemoteDeleted()
-                } else {
-                  albumAsync.isSongsMetaDataSynced = true
                 }
               }
             case .notAvailable:
               albumAsync.markAsRemoteDeleted()
             case .failed:
-              albumAsync.isSongsMetaDataSynced = true
+              // Not reachable or timed out: stays unsynced for a later run
+              break
             }
           }
         }
