@@ -1464,8 +1464,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       guard page.songCount > 0 else { break }
       let pageAlbumIDs = Set(page.albumIDs)
       let confirmedAlbumIDs = pendingAlbumIDs.subtracting(pageAlbumIDs)
-      try await markAlbumSongsSynced(albumIDs: confirmedAlbumIDs)
-      markedAlbumCount += confirmedAlbumIDs.count
+      markedAlbumCount += try await markAlbumSongsSynced(albumIDs: confirmedAlbumIDs)
       pendingAlbumIDs = pageAlbumIDs
       songOffset += page.songCount
       pageIndex += 1
@@ -1473,8 +1472,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     guard pageIndex < Self.maxBulkSongPages, !isCancelled() else { return false }
 
-    try await markAlbumSongsSynced(albumIDs: pendingAlbumIDs)
-    markedAlbumCount += pendingAlbumIDs.count
+    markedAlbumCount += try await markAlbumSongsSynced(albumIDs: pendingAlbumIDs)
     os_log("Bulk song sync marked %i albums", log: log, type: .info, markedAlbumCount)
     // Not when stopped meanwhile (e.g. by a logout or a resync that changes the account settings)
     guard !isCancelled() else { return false }
@@ -1482,10 +1480,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     return true
   }
 
+  /// Returns the number of albums marked as synced.
   @MainActor
-  private func markAlbumSongsSynced(albumIDs: Set<String>) async throws {
-    guard !albumIDs.isEmpty else { return }
-    try await storage.async.perform { asyncCompanion in
+  private func markAlbumSongsSynced(albumIDs: Set<String>) async throws -> Int {
+    guard !albumIDs.isEmpty else { return 0 }
+    return try await storage.async.performAndGet { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       var albumPrefetchIDs = LibraryStorage.PrefetchIdContainer()
       albumPrefetchIDs.albumIDs = albumIDs
@@ -1493,11 +1492,18 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         account: accountAsync,
         prefetchIDs: albumPrefetchIDs
       )
+      var markedAlbumCount = 0
       for album in albumPrefetch.prefetchedAlbumDict.values {
         let songs = album.songs
-        album.isCached = !songs.isEmpty && songs.allSatisfy { $0.isCached }
+        // The server does not guarantee that an album's songs are on consecutive pages: an album
+        // with songs still missing (e.g. after an interrupted pass) or created from song rows
+        // (no song count yet) is left to the per-album sync, which fetches it with getAlbum
+        guard album.remoteSongCount > 0, songs.count >= album.remoteSongCount else { continue }
+        album.isCached = songs.allSatisfy { $0.isCached }
         album.isSongsMetaDataSynced = true
+        markedAlbumCount += 1
       }
+      return markedAlbumCount
     }
   }
 
