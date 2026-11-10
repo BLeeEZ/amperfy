@@ -153,7 +153,13 @@ extension CarPlaySceneDelegate {
           interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
           completion()
         } else {
-          self.appDelegate.player.play(context: PlayContext(containable: selectedPlayable))
+          let playContext: PlayContext
+          if let playable = selectedPlayable as? AbstractPlayable {
+            playContext = sharedHome.playContext(for: playable, in: section)
+          } else {
+            playContext = PlayContext(containable: selectedPlayable)
+          }
+          self.appDelegate.player.play(context: playContext)
           displayNowPlaying {
             completion()
           }

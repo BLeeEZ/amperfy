@@ -77,6 +77,24 @@ class HomeManager: NSObject {
     storage.settings.user.isOfflineMode
   }
 
+  /// Play context for a single song/episode selected in a home section.
+  /// All playables of that section are queued, starting at the selected one,
+  /// so playback continues with the following items instead of stopping.
+  func playContext(
+    for selected: AbstractPlayable,
+    in section: HomeSection
+  )
+    -> PlayContext {
+    let playables = (data[section] ?? [])
+      .compactMap { $0.playableContainable as? AbstractPlayable }
+    guard playables.count > 1,
+          let index = playables.firstIndex(where: { $0 == selected })
+    else {
+      return PlayContext(containable: selected)
+    }
+    return PlayContext(name: section.title, index: index, playables: playables)
+  }
+
   private var albumsRecentlyPlayedFetchController: AlbumFetchedResultsController?
   private var albumsNewestFetchController: AlbumFetchedResultsController?
   private var playlistsLastTimePlayedFetchController: PlaylistFetchedResultsController?

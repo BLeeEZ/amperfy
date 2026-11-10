@@ -92,7 +92,7 @@ public class LocalNotificationManager {
         "account-\(account.ident)-podcast-\(podcastEpisode.podcast?.id ?? "0")-episode-\(podcastEpisode.id)"
       do {
         let fileIdentifier = identifier + ".png"
-        let artworkUrl = createLocalUrl(
+        let artworkUrl = try createLocalUrl(
           forImage: LibraryEntityImage.getImageToDisplayImmediately(
             libraryEntity: podcastEpisode,
             themePreference: storage.settings.accounts.getSetting(account.info).read
@@ -176,14 +176,14 @@ public class LocalNotificationManager {
     }
   }
 
-  private func createLocalUrl(forImage image: UIImage, fileIdentifier: String) -> URL {
+  private func createLocalUrl(forImage image: UIImage, fileIdentifier: String) throws -> URL {
     let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)
     let url = tempDirectoryURL.appendingPathComponent(fileIdentifier)
-    var imgData = image.pngData()
-    if imgData == nil {
-      imgData = UIImage.appIcon.pngData()
+    guard let imgData = image.pngData() ?? UIImage.appIcon.pngData() else {
+      throw CocoaError(.fileWriteUnknown)
     }
-    try! imgData!.write(to: url, options: Data.WritingOptions.atomic)
+    // A full disk must not crash the app just to attach notification artwork
+    try imgData.write(to: url, options: Data.WritingOptions.atomic)
     return url
   }
 }
