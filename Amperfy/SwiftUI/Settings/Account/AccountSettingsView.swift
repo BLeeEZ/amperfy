@@ -304,6 +304,9 @@ struct AccountSettingsView: View {
     .sheet(isPresented: $isPwUpdateDialogVisible) {
       UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
     }
+    // MacOS workaround: reading the state here makes the body depend on it. Without this, setting
+    // isPwUpdateDialogVisible to false from the sheet (Cancel) does not dismiss it.
+    .onChange(of: isPwUpdateDialogVisible) { _, _ in }
   }
 }
 
