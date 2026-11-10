@@ -316,11 +316,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     os_log("Start background manager for normal operation", log: self.log, type: .info)
     configureMainMenu()
     intentManager.registerXCallbackURLs()
-    let activeAccountInfo = storage.settings.accounts.active
     for accountInfo in storage.settings.accounts.allAccounts {
-      let isResumingInitialSync = accountInfo == activeAccountInfo
-        && storage.settings.accounts.getSetting(accountInfo).read.isInitialSyncResumable
-      guard !isResumingInitialSync else { continue }
       getMeta(accountInfo).startManagerForNormalOperation(player: appDelegate.player)
     }
     isAlreadyRegisteredToPlayer = true
