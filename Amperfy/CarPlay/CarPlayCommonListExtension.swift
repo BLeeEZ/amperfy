@@ -53,7 +53,7 @@ extension CarPlaySceneDelegate {
     }
   }
 
-  /// Lists with at least this many entries get an "A–Z" row on top
+  /// Alphabetic lists with at least this many entries get an "A–Z" row on top
   private static let letterPickerMinItemCount = 30
 
   /// Splits the item budget over the fetch sections and, for long alphabetic lists, puts an
@@ -67,8 +67,10 @@ extension CarPlaySceneDelegate {
     -> [CPListSection] {
     guard let currentSections = fetchSections(), !currentSections.isEmpty else { return [] }
     let totalCount = currentSections.reduce(0) { $0 + $1.numberOfObjects }
+    // also when the list doesn't fit: cars with a low item limit cut it off after a few letters
+    let fitsInList = totalCount <= CPListTemplate.maximumItemCount
     let showsLetterPicker = isAlphabetic && currentSections.count > 1 &&
-      totalCount >= Self.letterPickerMinItemCount
+      (totalCount >= Self.letterPickerMinItemCount || !fitsInList)
 
     var sections = [CPListSection]()
     var itemBudget = CPListTemplate.maximumItemCount
@@ -80,7 +82,8 @@ extension CarPlaySceneDelegate {
       ))
       itemBudget -= 1
     }
-    let maxSectionCount = max(1, itemBudget / currentSections.count)
+    let maxSectionCount = totalCount <= itemBudget ? itemBudget :
+      max(1, itemBudget / currentSections.count)
     for fetchSection in currentSections {
       guard itemBudget > 0 else { break }
       guard let fetchObjects = fetchSection.objects as? [MO] else { continue }
@@ -369,53 +372,38 @@ extension CarPlaySceneDelegate {
   }
 
   func createPlaylistsSections() -> [CPListSection] {
-    var sections = [CPListSection]()
-    var itemCount = 0
-    guard let fetchedController = playlistFetchController,
-          let fetchSections = fetchedController.sections else { return sections }
-    for fetchSection in fetchSections {
-      guard let fetchObjects = fetchSection.objects as? [PlaylistMO] else { continue }
-      var items = [CPListTemplateItem]()
-
-      var indexTitle: String?
-      if fetchedController.sortType.asSectionIndexType == .alphabet {
-        indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
-        if let _ = Int(indexTitle ?? "-") {
-          indexTitle = "#"
-        }
-      }
-
-      for fetchObject in fetchObjects {
-        let playlist = Playlist(
-          library: appDelegate.storage.main.library,
-          managedObject: fetchObject
-        )
-        let item = CPListItem(
-          text: playlist.name,
-          detailText: playlist.subtitle,
-          image: nil,
-          accessoryImage: nil,
-          accessoryType: .disclosureIndicator
-        )
-        item.handler = { [weak self] item, completion in
-          guard let self = self else { completion(); return }
-          let playlistDetailTemplate = CPListTemplate(title: playlist.name, sections: [
-            CPListSection(items: [CPListTemplateItem]()),
-          ])
-          playlistDetailSection = playlistDetailTemplate
-          createPlaylistDetailFetchController(playlist: playlist)
-          interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
-          completion()
-        }
-        items.append(item)
-        itemCount += 1
-        if itemCount > CPListTemplate.maximumItemCount { break }
-      }
-      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
-      sections.append(section)
-      if itemCount > CPListTemplate.maximumItemCount { break }
+    guard let fetchedController = playlistFetchController else { return [] }
+    return createAlphabeticSections(
+      fetchSections: { fetchedController.sections },
+      isAlphabetic: fetchedController.sortType.asSectionIndexType == .alphabet
+    ) { [weak self] (playlistMO: PlaylistMO) in
+      self?.createPlaylistItem(for: playlistMO)
     }
-    return sections
+  }
+
+  private func createPlaylistItem(for playlistMO: PlaylistMO) -> CPListItem {
+    let playlist = Playlist(
+      library: appDelegate.storage.main.library,
+      managedObject: playlistMO
+    )
+    let item = CPListItem(
+      text: playlist.name,
+      detailText: playlist.subtitle,
+      image: nil,
+      accessoryImage: nil,
+      accessoryType: .disclosureIndicator
+    )
+    item.handler = { [weak self] item, completion in
+      guard let self = self else { completion(); return }
+      let playlistDetailTemplate = CPListTemplate(title: playlist.name, sections: [
+        CPListSection(items: [CPListTemplateItem]()),
+      ])
+      playlistDetailSection = playlistDetailTemplate
+      createPlaylistDetailFetchController(playlist: playlist)
+      interfaceController?.pushTemplate(playlistDetailTemplate, animated: true, completion: nil)
+      completion()
+    }
+    return item
   }
 
   func createPodcastsSections(
