@@ -36,6 +36,7 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
   var account: Account!
   var storage: PersistentStorage!
   var syncer: CommonLibrarySyncer!
+  var fetchedAlbumIds = [String]()
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
@@ -72,6 +73,7 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
       maxParallelFetches: 2,
       isCancelled: { false },
       fetch: { albumId in
+        self.fetchedAlbumIds.append(albumId)
         switch albumId {
         case "fetchFails": throw MOCK_AlbumSyncError()
         case "fetchNotAvailable": throw MOCK_AlbumNotAvailableError()
@@ -145,6 +147,17 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
     let unsyncedIDs = try library
       .getAlbumObjectIDsWithoutSyncedSongs(among: albums.map(\.managedObject.objectID))
     XCTAssertEqual(unsyncedIDs, Set([albums[1], albums[2]].map(\.managedObject.objectID)))
+  }
+
+  func testAlbumSyncedMeanwhileIsNotFetchedAgain() async {
+    let syncedMeanwhile = createUnsyncedAlbum(id: "syncedMeanwhile")
+    let album = createUnsyncedAlbum(id: "written")
+    // Synced by another caller after the targets were chosen
+    syncedMeanwhile.isSongsMetaDataSynced = true
+    await syncAlbums([syncedMeanwhile, album])
+    XCTAssertEqual(fetchedAlbumIds, ["written"])
+    XCTAssertTrue(syncedMeanwhile.isSongsMetaDataSynced)
+    XCTAssertTrue(album.isSongsMetaDataSynced)
   }
 
   func testExcludedAlbumsAreNotFetchedForTheNextSync() {

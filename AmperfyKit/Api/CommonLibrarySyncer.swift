@@ -306,7 +306,16 @@ class CommonLibrarySyncer {
       index += batchSize
 
       await AlbumSyncCoalescer.sync(albumObjectIDs: batch.map(\.objectID)) { claimedObjectIDs in
-        let claimedTargets = batch.filter { claimedObjectIDs.contains($0.objectID) }
+        // Albums another caller synced since the targets were chosen (e.g. Home and the
+        // background syncing the newest albums at the same time) are not fetched again
+        let unsyncedObjectIDs = (try? await self.storage.async.performAndGet { asyncCompanion in
+          claimedObjectIDs.filter { objectID in
+            let albumMO = try? asyncCompanion.context.existingObject(with: objectID) as? AlbumMO
+            return albumMO?.isSongsMetaDataSynced != true
+          }
+        }) ?? claimedObjectIDs
+        let claimedTargets = batch.filter { unsyncedObjectIDs.contains($0.objectID) }
+        guard !claimedTargets.isEmpty else { return }
         var results = [(NSManagedObjectID, AlbumSongsFetchResult<Payload>)]()
         var iterator = claimedTargets.makeIterator()
         await withTaskGroup(of: (NSManagedObjectID, AlbumSongsFetchResult<Payload>).self) { group in
