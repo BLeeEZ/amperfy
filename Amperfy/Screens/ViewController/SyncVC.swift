@@ -54,6 +54,8 @@ class SyncVC: UIViewController {
   }
 
   override func viewDidAppear(_ animated: Bool) {
+    // Called again after a cancelled swipe on the sheet: only one sync, the one Skip cancels
+    guard syncTask == nil else { return }
     syncTask = Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
       let isResumingSync = self.appDelegate.storage.settings.accounts.getSetting(account.info)

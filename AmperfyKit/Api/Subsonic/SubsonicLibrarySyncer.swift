@@ -184,7 +184,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           statusNotifyier?.notifyParsedObject(ofType: .album)
 
           albumBatchesSinceCheckpoint += 1
-          if albumBatchesSinceCheckpoint >= Self.albumCheckpointSaveInterval {
+          // Skip cancels this sync and clears the checkpoint: don't write it back afterwards
+          if albumBatchesSinceCheckpoint >= Self.albumCheckpointSaveInterval, !Task.isCancelled {
             albumBatchesSinceCheckpoint = 0
             let checkpoint = completedAlbumBatches
             self.storage.settings.accounts.updateSetting(self.accountInfo) {
@@ -205,10 +206,12 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
       }
     } catch {
-      let checkpoint = completedAlbumBatches
-      storage.settings.accounts.updateSetting(accountInfo) {
-        $0.initialSyncCompletedAlbumBatches = checkpoint
-        $0.initialSyncAlbumCount = remoteAlbumCount
+      if !Task.isCancelled {
+        let checkpoint = completedAlbumBatches
+        storage.settings.accounts.updateSetting(accountInfo) {
+          $0.initialSyncCompletedAlbumBatches = checkpoint
+          $0.initialSyncAlbumCount = remoteAlbumCount
+        }
       }
       throw error
     }
