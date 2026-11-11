@@ -1483,7 +1483,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     return true
   }
 
-  /// Returns the number of albums marked as synced.
+  /// Returns the number of albums newly marked as synced.
   @MainActor
   private func markAlbumSongsSynced(albumIDs: Set<String>) async throws -> Int {
     guard !albumIDs.isEmpty else { return 0 }
@@ -1503,6 +1503,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         // (no song count yet) is left to the per-album sync, which fetches it with getAlbum
         guard album.remoteSongCount > 0, songs.count >= album.remoteSongCount else { continue }
         album.isCached = songs.allSatisfy { $0.isCached }
+        // Albums already synced, also those confirmed again on a later page, are not counted
+        guard !album.isSongsMetaDataSynced else { continue }
         album.isSongsMetaDataSynced = true
         markedAlbumCount += 1
       }
