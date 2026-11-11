@@ -316,8 +316,11 @@ class BackendAudioPlayer: NSObject {
   }
 
   private func handleError(error: Error) {
+    // a failing entry is reported more than once, keep the play state from before the first report
+    if !isErrorOccurred {
+      wasPlayingBeforeErrorOccurred = isPlaying
+    }
     isErrorOccurred = true
-    wasPlayingBeforeErrorOccurred = isPlaying
     pause()
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
@@ -910,6 +913,8 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
       currentPlayUrl = url
       let shouldPlay = shouldPlayAfterStreamRestart ?? shouldPlaybackStart
       shouldPlayAfterStreamRestart = nil
+      // the play state from before an error only applies to the first start after it
+      isErrorOccurred = false
       if shouldPlay {
         continuePlay()
         audioAnalyzer.play()
