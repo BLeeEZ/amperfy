@@ -20,7 +20,58 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
+
+// MARK: - MOCK_DownloadURLProtocol
+
+/// Answers a request with the response described by its own URL query, so the stub keeps no
+/// shared state: `status`, `contentType` and `size` (the number of body bytes).
+final class MOCK_DownloadURLProtocol: URLProtocol {
+  static func url(statusCode: Int, contentType: String, size: Int) -> URL {
+    var urlComp = URLComponents(string: "https://stub.amperfy.test/rest/download.view")!
+    urlComp.queryItems = [
+      URLQueryItem(name: "id", value: UUID().uuidString),
+      URLQueryItem(name: "status", value: "\(statusCode)"),
+      URLQueryItem(name: "contentType", value: contentType),
+      URLQueryItem(name: "size", value: "\(size)"),
+    ]
+    return urlComp.url!
+  }
+
+  override class func canInit(with request: URLRequest) -> Bool { true }
+  override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+  override func startLoading() {
+    guard let url = request.url,
+          let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
+    else {
+      client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+      return
+    }
+    let query = Dictionary(
+      queryItems.map { ($0.name, $0.value ?? "") },
+      uniquingKeysWith: { first, _ in first }
+    )
+    let body = Data(repeating: 0xFF, count: Int(query["size"] ?? "") ?? 0)
+    guard let response = HTTPURLResponse(
+      url: url,
+      statusCode: Int(query["status"] ?? "") ?? 0,
+      httpVersion: "HTTP/1.1",
+      headerFields: ["Content-Type": query["contentType"] ?? ""]
+    ) else {
+      client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
+      return
+    }
+    client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+    client?.urlProtocol(self, didLoad: body)
+    client?.urlProtocolDidFinishLoading(self)
+  }
+
+  override func stopLoading() {}
+}
+
+// MARK: - DownloadTest
 
 @MainActor
 class DownloadTest: XCTestCase {
@@ -128,4 +179,183 @@ class DownloadTest: XCTestCase {
     XCTAssertNil(library.getDownload(account: account, id: download.id))
     XCTAssertNotNil(library.getDownload(account: account2, id: otherAccountDownload.id))
   }
+
+  private func waitUntil(
+    timeout: TimeInterval = 20,
+    _ condition: @MainActor () async throws -> Bool
+  ) async throws {
+    let deadline = Date().addingTimeInterval(timeout)
+    while !(try await condition()) {
+      guard Date() < deadline else {
+        XCTFail("Timed out waiting for the download")
+        return
+      }
+      try await Task.sleep(nanoseconds: 50_000_000)
+    }
+  }
+
+  private func readSessionDownloadState(
+    downloadObjectID: NSManagedObjectID,
+    songObjectID: NSManagedObjectID,
+    storage: AsyncCoreDataAccessWrapper
+  ) async throws
+    -> SessionDownloadState {
+    try await storage.performAndGet { asyncCompanion in
+      let download = Download(
+        managedObject: asyncCompanion.context.object(with: downloadObjectID) as! DownloadMO
+      )
+      let playable = AbstractPlayable(
+        managedObject: asyncCompanion.context.object(with: songObjectID) as! AbstractPlayableMO
+      )
+      return SessionDownloadState(
+        error: download.error,
+        relFilePath: playable.relFilePath,
+        contentTypeTranscoded: playable.contentTypeTranscoded,
+        logMessages: asyncCompanion.library.getAllLogEntries().map { $0.message }
+      )
+    }
+  }
+
+  /// Downloads `url` through a real URLSessionDownloadTask that MOCK_DownloadURLProtocol answers,
+  /// handled by the app's PlayableDownloadDelegate. Waits until the download failed (and its
+  /// error was logged) or was cached.
+  private func sessionDownload(url: URL) async throws -> SessionDownloadState {
+    let song = createUncachedSong(id: UUID().uuidString, account: account)
+    let download = createDownload(for: song, account: account)
+    // object IDs are only permanent after saving
+    library.saveContext()
+    let downloadObjectID = download.managedObject.objectID
+    let songObjectID = song.managedObject.objectID
+    let asyncStorage = AsyncCoreDataAccessWrapper(persistentContainer: cdHelper.persistentContainer)
+    let storage = PersistentStorage(
+      coreDataManager: MOCK_CoreDataManager(persistentContainer: cdHelper.persistentContainer)
+    )
+    let eventLogger = EventLogger(storage: storage)
+    let delegate = PlayableDownloadDelegate(
+      backendApi: MOCK_BackendApi(),
+      artworkExtractor: EmbeddedArtworkExtractor(),
+      networkMonitor: MOCK_NetworkMonitor()
+    )
+    let requestManager = DownloadRequestManager(
+      accountObjectId: account.managedObject.objectID,
+      storage: asyncStorage,
+      getDownloadDelegateCB: { delegate }
+    )
+    let downloadManager = DownloadManager(
+      name: "TestDownloader",
+      storage: asyncStorage,
+      requestManager: requestManager,
+      getDownloadDelegateCB: { delegate },
+      eventLogger: eventLogger,
+      settings: storage.settings,
+      networkMonitor: MOCK_NetworkMonitor(),
+      notificationHandler: EventNotificationHandler(),
+      urlCleanser: MOCK_BackendApi(),
+      limitCacheSize: false,
+      isFailWithPopupError: false
+    )
+    let configuration = URLSessionConfiguration.ephemeral
+    configuration.protocolClasses = [MOCK_DownloadURLProtocol.self]
+    let urlSession = URLSession(
+      configuration: configuration,
+      delegate: downloadManager,
+      delegateQueue: nil
+    )
+    defer { urlSession.invalidateAndCancel() }
+    downloadManager.initialize(
+      urlSession: urlSession,
+      isCheckForCachedNeeded: true,
+      validationCB: nil
+    )
+    try await waitUntil { await downloadManager.urlSession != nil }
+
+    let request = DownloadRequest(
+      objectID: downloadObjectID,
+      id: download.id,
+      title: "song",
+      info: DownloadElementInfo(objectId: songObjectID, type: .playable)
+    )
+    await downloadManager.fetch(downloadTaskInfo: DownloadTaskInfo(request: request, url: url))
+
+    var state = try await readSessionDownloadState(
+      downloadObjectID: downloadObjectID,
+      songObjectID: songObjectID,
+      storage: asyncStorage
+    )
+    try await waitUntil {
+      state = try await readSessionDownloadState(
+        downloadObjectID: downloadObjectID,
+        songObjectID: songObjectID,
+        storage: asyncStorage
+      )
+      let isFailedAndLogged = state.error != nil && !state.logMessages.isEmpty
+      return isFailedAndLogged || state.relFilePath != nil
+    }
+    return state
+  }
+
+  /// Asserts that the downloaded file is in the cache and removes it again.
+  private func assertCachedAndRemove(_ state: SessionDownloadState) {
+    guard let relFilePath = state.relFilePath,
+          let absFilePath = CacheFileManager.shared.getAbsoluteAmperfyPath(relFilePath: relFilePath)
+    else {
+      XCTFail("Download was not cached")
+      return
+    }
+    XCTAssertTrue(FileManager.default.fileExists(atPath: absFilePath.path))
+    try? CacheFileManager.shared.removeItem(at: absFilePath, accountInfo: account.info)
+  }
+
+  func testSessionDownloadWithErrorStatusIsNotCached() async throws {
+    let state = try await sessionDownload(
+      url: MOCK_DownloadURLProtocol.url(statusCode: 404, contentType: "audio/mpeg", size: 50_000)
+    )
+    XCTAssertEqual(state.error, .apiErrorResponse)
+    XCTAssertNil(state.relFilePath)
+    XCTAssertEqual(state.logMessages.count, 1)
+    XCTAssertTrue(state.logMessages.first?.contains("status code: 404") ?? false)
+  }
+
+  func testSessionDownloadWithHtmlPageIsNotCached() async throws {
+    let state = try await sessionDownload(
+      url: MOCK_DownloadURLProtocol.url(
+        statusCode: 200,
+        contentType: "text/html; charset=utf-8",
+        size: 30_000
+      )
+    )
+    XCTAssertEqual(state.error, .apiErrorResponse)
+    XCTAssertNil(state.relFilePath)
+    XCTAssertEqual(state.logMessages.count, 1)
+    XCTAssertTrue(state.logMessages.first?.contains("MIME type: text/html") ?? false)
+  }
+
+  func testSessionDownloadWithLargePlainTextIsCached() async throws {
+    let state = try await sessionDownload(
+      url: MOCK_DownloadURLProtocol.url(statusCode: 200, contentType: "text/plain", size: 5_000_000)
+    )
+    XCTAssertNil(state.error)
+    XCTAssertEqual(state.contentTypeTranscoded, "text/plain")
+    XCTAssertTrue(state.logMessages.isEmpty)
+    assertCachedAndRemove(state)
+  }
+
+  func testSessionDownloadWithAudioIsCachedWithItsMimeType() async throws {
+    let state = try await sessionDownload(
+      url: MOCK_DownloadURLProtocol.url(statusCode: 200, contentType: "audio/mpeg", size: 50_000)
+    )
+    XCTAssertNil(state.error)
+    XCTAssertEqual(state.contentTypeTranscoded, "audio/mpeg")
+    XCTAssertTrue(state.logMessages.isEmpty)
+    assertCachedAndRemove(state)
+  }
+}
+
+// MARK: - SessionDownloadState
+
+private struct SessionDownloadState: Sendable {
+  let error: DownloadError?
+  let relFilePath: URL?
+  let contentTypeTranscoded: String?
+  let logMessages: [String]
 }
