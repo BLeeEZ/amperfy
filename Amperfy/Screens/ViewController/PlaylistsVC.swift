@@ -358,7 +358,8 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
         }
         self.appDelegate.eventLogger.info(
           topic: "Sync All Playlists",
-          message: "All playlists have been synced."
+          message: "All playlists have been synced.",
+          toast: AlertToastText(title: "Playlists", subtitle: "All playlists synced")
         )
       } catch {
         self.appDelegate.eventLogger.report(topic: "Sync All Playlists", error: error)

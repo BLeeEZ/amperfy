@@ -120,7 +120,6 @@
 		507BA5C92F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */; };
 		507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */; };
 		507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */; };
-		507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */; };
 		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
 		507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE542B1E587B002BBB1D /* Alamofire */; };
 		507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE632B1E5A03002BBB1D /* Alamofire */; };
@@ -459,7 +458,7 @@
 		50C9D70628507573007F18D0 /* ClockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2321E7A3AC00F086F0 /* ClockTime.swift */; };
 		50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
 		50C9D70C2850759B007F18D0 /* PlayIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */; };
-		50C9D70D2850759B007F18D0 /* NotificationBannerCustomization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */; };
+		50C9D70D2850759B007F18D0 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* ToastView.swift */; };
 		50C9D70F2850759B007F18D0 /* BasicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863D2208CC1E0057A1A6 /* BasicButton.swift */; };
 		50C9D7102850759B007F18D0 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863B2208CB650057A1A6 /* OptionsButton.swift */; };
 		50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
@@ -684,7 +683,7 @@
 		501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeCurrentlyPlayingPlayerView.swift; sourceTree = "<group>"; };
 		5019441A2B7A049A00082D2E /* PopupPlayer+Visuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopupPlayer+Visuals.swift"; sourceTree = "<group>"; };
 		5019441C2B7ACB0800082D2E /* PopupPlayer+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopupPlayer+Animations.swift"; sourceTree = "<group>"; };
-		501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBannerCustomization.swift; sourceTree = "<group>"; };
+		501999DB26806B8600F72D37 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		501A7D1E26808A9D0055A51B /* podcast_episodes.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcast_episodes.xml; sourceTree = "<group>"; };
 		501A7D1F26808A9D0055A51B /* podcasts.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcasts.xml; sourceTree = "<group>"; };
 		501A7D2226808AC10055A51B /* PodcastsParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastsParserTest.swift; sourceTree = "<group>"; };
@@ -1225,7 +1224,6 @@
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
 				507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */,
 				507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */,
-				507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */,
 				50C9D61A284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1291,7 +1289,7 @@
 				500EB36725F8B3EB00B4B998 /* Corners.swift */,
 				509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */,
 				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
-				501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */,
+				501999DB26806B8600F72D37 /* ToastView.swift */,
 				50DE29EE2B90642E00ABA78E /* SelectionAccessory.swift */,
 				C6A1E0012F0A000100ABCDEF /* ReorderableListEditor.swift */,
 			);
@@ -2301,7 +2299,6 @@
 			packageProductDependencies = (
 				509D55F7281274F500E0E0B5 /* VYPlayIndicator */,
 				507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */,
-				507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */,
 				507DFE512B1E5848002BBB1D /* ID3TagEditor */,
 				507DFE542B1E587B002BBB1D /* Alamofire */,
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
@@ -2407,7 +2404,6 @@
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
 				50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */,
 				507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
-				507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 				507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
 				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
@@ -2711,7 +2707,7 @@
 				50791E8128D365E9006CE6E5 /* UpdatePasswordView.swift in Sources */,
 				50C171582D107DC300C0C53A /* PlaylistAddIndexesVC.swift in Sources */,
 				5005939928E5C5E5008C8DF6 /* MultiPickerView.swift in Sources */,
-				50C9D70D2850759B007F18D0 /* NotificationBannerCustomization.swift in Sources */,
+				50C9D70D2850759B007F18D0 /* ToastView.swift in Sources */,
 				50BE5D9728511C3200156FC6 /* Amperfy.xcdatamodeld in Sources */,
 				5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */,
 				50AAB9F32F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift in Sources */,
@@ -3501,14 +3497,6 @@
 				version = 4.5.3;
 			};
 		};
-		507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Daltron/NotificationBanner";
-			requirement = {
-				kind = exactVersion;
-				version = 3.2.0;
-			};
-		};
 		507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/chicio/ID3TagEditor";
@@ -3589,11 +3577,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
 			productName = MarqueeLabel;
-		};
-		507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */;
-			productName = NotificationBannerSwift;
 		};
 		507DFE512B1E5848002BBB1D /* ID3TagEditor */ = {
 			isa = XCSwiftPackageProductDependency;

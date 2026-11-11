@@ -249,7 +249,8 @@ public class AddToPlaylistManager {
         if songsToAdd.count > Self.warningElementsToAddCount {
           self.appDelegate.eventLogger.info(
             topic: "Add Songs to Playlist",
-            message: "The Playlist \"\(self.playlist.name)\" has been successfully synced to the server."
+            message: "The Playlist \"\(self.playlist.name)\" has been successfully synced to the server.",
+            toast: AlertToastText(title: "Playlist", subtitle: "Uploaded to server")
           )
         }
       }

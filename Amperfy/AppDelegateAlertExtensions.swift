@@ -21,7 +21,6 @@
 
 import AmperfyKit
 import Foundation
-import NotificationBannerSwift
 import OSLog
 import UIKit
 
@@ -117,48 +116,60 @@ extension AppDelegate: AlertDisplayable {
     style: LogEntryType,
     notificationBanner popupVC: UIViewController
   ) {
-    guard NotificationBannerQueue.default.numberOfBanners < 1,
+    guard !Toast.isVisible,
           let topView = Self.topViewController(),
           topView.presentedViewController == nil,
-          let _ = UIApplication.shared.mainWindow
+          // no key window: the app is in the background
+          UIApplication.shared.mainWindow != nil,
+          let window = Self.window
     else { return }
 
-    let banner = FloatingNotificationBanner(
+    Toast.show(
       title: title,
       subtitle: subtitle,
-      style: BannerStyle.from(logType: style),
-      colors: AmperfyBannerColors()
-    )
-
-    banner.onTap = {
+      style: style,
+      in: window,
+      placement: Self.toastPlacement(in: window, host: topView)
+    ) {
       guard let topView = Self.topViewController(),
             topView.presentedViewController == nil
       else { return }
       topView.present(popupVC, animated: true, completion: nil)
     }
+  }
 
-    if UIDevice.current.userInterfaceIdiom == .pad {
-      banner.bannerHeight = 80
-    } else if UIDevice.current.userInterfaceIdiom == .phone {
-      banner.bannerHeight = 180
-    } else { // mac
-      banner.bannerHeight = 140
+  /// The toast floats above the mini player and is centered on it. In a split view the mini
+  /// player keeps its slot while no title is loaded, so the toast stays where it will be later.
+  /// Without a mini player slot it sits above the tab bar or the bottom safe area.
+  private static func toastPlacement(
+    in window: UIWindow,
+    host: UIViewController
+  )
+    -> ToastPlacement {
+    // frames in the upper half belong to a top tab bar (iPad), not to a bottom bar
+    func bottomFrame(of view: UIView, requiresVisible: Bool = true) -> CGRect? {
+      guard view.window === window else { return nil }
+      if requiresVisible, view.isHidden || view.alpha <= 0.01 { return nil }
+      let frame = view.convert(view.bounds, to: window)
+      return !frame.isEmpty && frame.minY > window.bounds.midY ? frame : nil
     }
 
-    let topViewInset = UIEdgeInsets(
-      top: 40,
-      left: 24,
-      bottom: 24,
-      right: 24
-    )
-    banner.show(
-      queuePosition: QueuePosition.back,
-      bannerPosition: BannerPosition.top,
-      on: topView,
-      edgeInsets: topViewInset,
-      cornerRadius: 10,
-      shadowOpacity: 0.5,
-      shadowBlurRadius: 5
+    let slotFrame: CGRect?
+    if let splitVC = host as? SplitVC {
+      slotFrame = splitVC.miniPlayer.flatMap {
+        bottomFrame(of: $0.glassContainer, requiresVisible: false)
+      }
+    } else {
+      slotFrame = (host as? TabBarVC)?.miniPlayer.flatMap {
+        bottomFrame(of: $0.glassContainer)
+      }
+    }
+    let tabBarFrame = (host as? TabBarVC).flatMap { bottomFrame(of: $0.tabBar) }
+
+    return ToastPlacement(
+      centerX: slotFrame?.midX ?? window.bounds.midX,
+      bottomEdge: (slotFrame ?? tabBarFrame)?.minY
+        ?? window.bounds.maxY - window.safeAreaInsets.bottom
     )
   }
 
@@ -178,8 +189,9 @@ extension AppDelegate: AlertDisplayable {
     logType: LogEntryType
   )
     -> UIViewController {
-    let popupVC = NotificationDetailVC()
-    popupVC.display(title: topic, message: detailMessage, type: logType)
-    return popupVC
+    let detailVC = NotificationDetailVC()
+    detailVC.display(title: topic, message: detailMessage, type: logType)
+    // the navigation bar shows the title and the system close button
+    return UINavigationController(rootViewController: detailVC)
   }
 }
