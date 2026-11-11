@@ -30,32 +30,13 @@ extension CarPlaySceneDelegate {
     onlyCached: Bool
   )
     -> [CPListSection] {
-    var sections = [CPListSection]()
-    guard let fetchedController = fetchedController,
-          let fetchSections = fetchedController.sections else { return sections }
-    let maxSectionCount = CPListTemplate
-      .maximumItemCount / (!fetchSections.isEmpty ? fetchSections.count : 1)
-    for fetchSection in fetchSections {
-      guard let fetchObjects = fetchSection.objects as? [ArtistMO] else { continue }
-      var items = [CPListTemplateItem]()
-
-      var indexTitle: String?
-      if fetchedController.sortType.asSectionIndexType == .alphabet {
-        indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
-        if let _ = Int(indexTitle ?? "-") {
-          indexTitle = "#"
-        }
-      }
-      for (index, fetchObject) in fetchObjects.enumerated() {
-        let artist = Artist(managedObject: fetchObject)
-        let detailTemplate = createDetailTemplate(for: artist, onlyCached: onlyCached)
-        items.append(detailTemplate)
-        if index >= maxSectionCount { break }
-      }
-      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
-      sections.append(section)
+    guard let fetchedController else { return [] }
+    return createAlphabeticSections(
+      fetchSections: { fetchedController.sections },
+      isAlphabetic: fetchedController.sortType.asSectionIndexType == .alphabet
+    ) { [weak self] (artistMO: ArtistMO) in
+      self?.createDetailTemplate(for: Artist(managedObject: artistMO), onlyCached: onlyCached)
     }
-    return sections
   }
 
   func createAlbumItems(
@@ -63,32 +44,116 @@ extension CarPlaySceneDelegate {
     onlyCached: Bool
   )
     -> [CPListSection] {
-    var sections = [CPListSection]()
-    guard let fetchedController = fetchedController,
-          let fetchSections = fetchedController.sections else { return sections }
-    let maxSectionCount = CPListTemplate
-      .maximumItemCount / (!fetchSections.isEmpty ? fetchSections.count : 1)
-    for fetchSection in fetchSections {
-      guard let fetchObjects = fetchSection.objects as? [AlbumMO] else { continue }
-      var items = [CPListTemplateItem]()
+    guard let fetchedController else { return [] }
+    return createAlphabeticSections(
+      fetchSections: { fetchedController.sections },
+      isAlphabetic: fetchedController.sortType.asSectionIndexType == .alphabet
+    ) { [weak self] (albumMO: AlbumMO) in
+      self?.createDetailTemplate(for: Album(managedObject: albumMO), onlyCached: onlyCached)
+    }
+  }
 
-      var indexTitle: String?
-      if fetchedController.sortType.asSectionIndexType == .alphabet {
-        indexTitle = fetchObjects.first?.name?.prefix(1).uppercased()
-        if let _ = Int(indexTitle ?? "-") {
-          indexTitle = "#"
-        }
-      }
-      for (index, fetchObject) in fetchObjects.enumerated() {
-        let album = Album(managedObject: fetchObject)
-        let detailTemplate = createDetailTemplate(for: album, onlyCached: onlyCached)
-        items.append(detailTemplate)
-        if index >= maxSectionCount { break }
-      }
-      let section = CPListSection(items: items, header: nil, sectionIndexTitle: indexTitle)
-      sections.append(section)
+  /// Lists with at least this many entries get an "A–Z" row on top
+  private static let letterPickerMinItemCount = 30
+
+  /// Splits the item budget over the fetch sections and, for long alphabetic lists, puts an
+  /// "A–Z" row on top. It opens the list of initials, because CarPlay on iOS 27 doesn't show the
+  /// `sectionIndexTitle` index anymore and the shortened sections hide most entries anyway.
+  private func createAlphabeticSections<MO: NSManagedObject>(
+    fetchSections: @escaping () -> [NSFetchedResultsSectionInfo]?,
+    isAlphabetic: Bool,
+    createItem: @escaping (MO) -> CPListTemplateItem?
+  )
+    -> [CPListSection] {
+    guard let currentSections = fetchSections(), !currentSections.isEmpty else { return [] }
+    let totalCount = currentSections.reduce(0) { $0 + $1.numberOfObjects }
+    let showsLetterPicker = isAlphabetic && currentSections.count > 1 &&
+      totalCount >= Self.letterPickerMinItemCount
+
+    var sections = [CPListSection]()
+    var itemBudget = CPListTemplate.maximumItemCount
+    if showsLetterPicker {
+      sections.append(CPListSection(
+        items: [createLetterPickerItem(fetchSections: fetchSections, createItem: createItem)],
+        header: nil,
+        sectionIndexTitle: nil
+      ))
+      itemBudget -= 1
+    }
+    let maxSectionCount = max(1, itemBudget / currentSections.count)
+    for fetchSection in currentSections {
+      guard itemBudget > 0 else { break }
+      guard let fetchObjects = fetchSection.objects as? [MO] else { continue }
+      let items = fetchObjects.prefix(min(maxSectionCount, itemBudget)).compactMap(createItem)
+      itemBudget -= items.count
+      sections.append(CPListSection(
+        items: items,
+        header: nil,
+        sectionIndexTitle: isAlphabetic && !fetchSection.name.isEmpty ? fetchSection.name : nil
+      ))
     }
     return sections
+  }
+
+  private func createLetterPickerItem<MO: NSManagedObject>(
+    fetchSections: @escaping () -> [NSFetchedResultsSectionInfo]?,
+    createItem: @escaping (MO) -> CPListTemplateItem?
+  )
+    -> CPListItem {
+    let img = UIImage.createArtwork(
+      with: UIImage.letterPicker,
+      iconSizeType: .small,
+      theme: getPreference(activeAccountInfo).theme,
+      lightDarkMode: traits.userInterfaceStyle.asModeType,
+      switchColors: true
+    ).carPlayImage(carTraitCollection: traits)
+    let pickerItem = CPListItem(
+      text: "A–Z",
+      detailText: nil,
+      image: img,
+      accessoryImage: nil,
+      accessoryType: .disclosureIndicator
+    )
+    pickerItem.handler = { [weak self] _, completion in
+      guard let self, let currentSections = fetchSections() else { completion(); return }
+      let letterItems = currentSections.map { fetchSection in
+        let letterItem = CPListItem(
+          text: fetchSection.name,
+          detailText: "\(fetchSection.numberOfObjects)",
+          image: nil,
+          accessoryImage: nil,
+          accessoryType: .disclosureIndicator
+        )
+        let letter = fetchSection.name
+        letterItem.handler = { [weak self] _, completion in
+          guard let self,
+                let letterSection = fetchSections()?.first(where: { $0.name == letter }),
+                let fetchObjects = letterSection.objects as? [MO]
+          else { completion(); return }
+          let items = fetchObjects.prefix(CPListTemplate.maximumItemCount).compactMap(createItem)
+          let letterTemplate = CPListTemplate(title: letter, sections: [
+            CPListSection(items: items),
+          ])
+          // replace the picker by the letter list: CarPlay allows audio apps only 5 templates
+          // (root included), and list -> artist -> album needs all of them
+          Task { @MainActor in
+            let _ = try? await self.interfaceController?.popTemplate(animated: false)
+            let _ = try? await self.interfaceController?.pushTemplate(
+              letterTemplate,
+              animated: true
+            )
+          }
+          completion()
+        }
+        return letterItem
+      }
+      let pickerTemplate = CPListTemplate(title: "A–Z", sections: [
+        CPListSection(items: letterItems),
+      ])
+      interfaceController?.pushTemplate(pickerTemplate, animated: true, completion: nil)
+      completion()
+    }
+    return pickerItem
   }
 
   func createSongItems(from fetchedController: BasicFetchedResultsController<SongMO>?)
