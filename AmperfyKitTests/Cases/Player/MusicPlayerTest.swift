@@ -3198,4 +3198,62 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertTrue(testPlayer.isPlaying)
     XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
   }
+
+  // MARK: - Resume after relaunch
+
+  @MainActor
+  func testPlay_AfterRelaunch_ResumesCurrentSongAtSavedPosition() async throws {
+    // A fresh player whose persisted queue points at a song that was paused
+    // mid-way, like after iOS terminated the suspended app.
+    storage.settings.user.isPlayerSongPlaybackResumeEnabled = false
+    prepareWithAllSongsCached()
+    guard let current = testPlayer.currentlyPlaying else { XCTFail(); return }
+    current.playProgress = 1800
+
+    testPlayer.play()
+    try await Task.sleep(nanoseconds: 500_000_000)
+
+    XCTAssertEqual(testPlayer.currentlyPlaying, current)
+    XCTAssertEqual(testPlayer.elapsedTime, 1800.0)
+  }
+
+  @MainActor
+  func testPlay_AfterStop_StartsFromBeginning() async throws {
+    storage.settings.user.isPlayerSongPlaybackResumeEnabled = false
+    try await startPlaybackAndSettle()
+    testPlayer.stop()
+    guard let current = testPlayer.currentlyPlaying else { XCTFail(); return }
+    current.playProgress = 1800
+
+    testPlayer.play()
+    try await Task.sleep(nanoseconds: 500_000_000)
+
+    XCTAssertEqual(testPlayer.elapsedTime, 0.0)
+  }
+
+  @MainActor
+  func testPlayContext_AfterRelaunch_StartsSelectedSongFromBeginning() async throws {
+    storage.settings.user.isPlayerSongPlaybackResumeEnabled = false
+    songCached.playProgress = 1800
+
+    testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+    try await Task.sleep(nanoseconds: 500_000_000)
+
+    XCTAssertEqual(testPlayer.elapsedTime, 0.0)
+  }
+
+  @MainActor
+  func testPause_PersistsPlaybackPosition() async throws {
+    prepareWithAllSongsCached()
+    guard let current = testPlayer.currentlyPlaying else { XCTFail(); return }
+    current.playDuration = 3600
+    testPlayer.play()
+    try await Task.sleep(nanoseconds: 500_000_000)
+    mockAudioStreamingPlayer.mockElapsedTime = 100.0
+
+    testPlayer.pause()
+
+    XCTAssertEqual(current.playProgress, 100)
+    XCTAssertFalse(current.playableManagedObject.hasChanges)
+  }
 }

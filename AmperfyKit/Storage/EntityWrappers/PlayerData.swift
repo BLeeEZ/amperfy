@@ -28,6 +28,7 @@ import UIKit
 
 protocol PlayerStatusPersistent {
   func stop()
+  func saveState()
   var isAutoCachePlayedItems: Bool { get }
   func setAutoCachePlayedItems(_ newValue: Bool)
   var isPopupBarAllowedToHide: Bool { get }
@@ -152,6 +153,10 @@ extension PlayerData: PlayerStatusPersistent {
     case .podcast:
       break
     }
+    library.saveContext()
+  }
+
+  func saveState() {
     library.saveContext()
   }
 

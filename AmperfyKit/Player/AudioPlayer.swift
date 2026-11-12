@@ -54,10 +54,15 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   var isShouldPauseAfterFinishedPlaying = false
-  /// Where to resume after a playback error tore down the player. Only applies to the
-  /// playable it was captured for and is used at most once, so it can't leak into a
-  /// different item if the recovery fails or the user plays something else.
-  private var errorResumePoint: (playable: AbstractPlayable, time: Double)?
+  /// Where to resume after the player was torn down, by a playback error or because the
+  /// app was terminated while paused. Only applies to the playable it was captured for and
+  /// is used at most once, so it can't leak into a different item if the recovery fails or
+  /// the user plays something else.
+  private var resumePoint: (playable: AbstractPlayable, time: Double)?
+  /// Whether the persisted progress of the current item still belongs to it: true after a
+  /// launch (the queue is restored with the item that was playing when the app was
+  /// terminated) and after a mode switch, false after an explicit stop.
+  private var isCurrentItemProgressResumable = true
   var autoplayCB: (@MainActor (Song) async throws -> [Song])?
 
   private var playerStatus: PlayerStatusPersistent
@@ -117,6 +122,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
       isShuffle: playerStatus.isShuffle
     )
     playable.countPlayed()
+    isCurrentItemProgressResumable = true
     backendAudioPlayer.requestToPlay(
       playable: playable,
       playbackRate: playerStatus.playbackRate,
@@ -153,6 +159,13 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   func play() {
     if !backendAudioPlayer.canBeContinued {
       if let currentPlayable = currentlyPlaying {
+        // Continuing an item whose player is gone (e.g. iOS terminated the suspended app
+        // and a car or headphones sent "play"): pick up where it was paused instead of
+        // restarting it, independent of "Song Playback Resume" which applies to every song.
+        if resumePoint == nil, isCurrentItemProgressResumable, !currentPlayable.isRadio,
+           currentPlayable.playProgress > 0 {
+          resumePoint = (playable: currentPlayable, time: Double(currentPlayable.playProgress))
+        }
         insertIntoPlayer(playable: currentPlayable)
       }
     } else {
@@ -251,13 +264,20 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
        currentlyPlaying.isRadio {
       stopButRemainIndex()
     } else {
+      if let currentlyPlaying {
+        savePlayInformation(of: currentlyPlaying)
+      }
       backendAudioPlayer.pause()
+      // A paused app gets suspended and may be terminated by iOS without notice,
+      // so persist the position now to be able to resume there later.
+      playerStatus.saveState()
       notifyItemPaused()
     }
   }
 
   // BackendAudioPlayerNotifiable
   func stop() {
+    isCurrentItemProgressResumable = false
     backendAudioPlayer.stop()
     playerStatus.stop()
     notifyPlayerStopped()
@@ -277,14 +297,14 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func seekToLastStoppedPlayTime() {
-    // An error tears the player down and re-inserts the current playable, which
-    // makes it start from the beginning. Resume from the position captured when
-    // the error occurred instead. The persisted `playProgress` cannot be used
-    // for this: `savePlayInformation` deliberately resets it to zero within
+    // An error or an app termination tears the player down and re-inserts the
+    // current playable, which makes it start from the beginning. Resume from the
+    // captured position instead. For errors the persisted `playProgress` cannot be
+    // used: `savePlayInformation` deliberately resets it to zero within
     // `progressTimeEndThreshold` of the end of the track, which is exactly where
     // a stream error is most likely to happen.
-    if let resumePoint = errorResumePoint {
-      errorResumePoint = nil
+    if let resumePoint {
+      self.resumePoint = nil
       if resumePoint.playable == currentlyPlaying {
         backendAudioPlayer.seek(toSecond: resumePoint.time)
         return
@@ -362,7 +382,7 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     // Radios are live streams and can't be seeked, they just reconnect.
     let resumeTime = backendAudioPlayer.elapsedTimeBeforeErrorOccurred
     if let playable = currentlyPlaying, !playable.isRadio, resumeTime > 0 {
-      errorResumePoint = (playable: playable, time: resumeTime)
+      resumePoint = (playable: playable, time: resumeTime)
     }
     notifyAll { $0.errorOccurred(error: error) }
   }
