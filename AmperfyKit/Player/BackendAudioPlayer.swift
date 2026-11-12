@@ -404,6 +404,10 @@ class BackendAudioPlayer: NSObject {
     userDefinedPlaybackRate = playbackRate
     player?.rate = Float(userDefinedPlaybackRate.asDouble)
     isAutoStartPlayback = autoStartPlayback
+    // `notifyErrorOccurred` is also called when preparing a request fails, without
+    // `handleError` updating this value. Reset it so that path never reports the
+    // position of an earlier error.
+    elapsedTimeBeforeErrorOccurred = 0.0
     handleRequest(playable: playable)
   }
 
