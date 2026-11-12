@@ -320,8 +320,11 @@ class BackendAudioPlayer: NSObject {
   }
 
   private func handleError(error: Error) {
+    // a failing entry is reported more than once, keep the play state from before the first report
+    if !isErrorOccurred {
+      wasPlayingBeforeErrorOccurred = isPlaying
+    }
     isErrorOccurred = true
-    wasPlayingBeforeErrorOccurred = isPlaying
     elapsedTimeBeforeErrorOccurred = elapsedTime
     pause()
     nextPreloadedPlayable = nil
@@ -984,7 +987,14 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
     player: AudioStreaming.AudioPlayer,
     error: AudioStreaming.AudioPlayerError
   ) {
+    // Only compared by identity on the main actor, never used otherwise. Holding the reference
+    // also keeps the instance alive, so a new player can't reuse its address before the check.
+    nonisolated(unsafe) let reportingPlayer = player
     Task { @MainActor in
+      // handleError replaces the player. A failing entry can be reported more than once,
+      // and a report from a player that has already been replaced must not tear down its
+      // successor, which may already be playing the retried item.
+      guard reportingPlayer === self.player else { return }
       self.handleError(error: error)
     }
   }
