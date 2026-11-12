@@ -273,14 +273,24 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func seekToLastStoppedPlayTime() {
-    if let playable = currentlyPlaying,
-       playable.playProgress > 0,
-       playable
-       .isPodcastEpisode ||
-       (
-         (playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user
-           .isPlayerSongPlaybackResumeEnabled
-       ) {
+    guard let playable = currentlyPlaying, playable.playProgress > 0 else { return }
+
+    // Restore playback position after app termination for the song
+    // that was interrupted. This applies once regardless of the
+    // isPlayerSongPlaybackResumeEnabled setting.
+    let resumeSongIdKey = "resumePlaybackSongId"
+    if let resumeId = UserDefaults.standard.string(forKey: resumeSongIdKey),
+       playable.objectID.uriRepresentation().absoluteString == resumeId {
+      backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
+      UserDefaults.standard.removeObject(forKey: resumeSongIdKey)
+      return
+    }
+
+    if playable.isPodcastEpisode ||
+      (
+        (playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user
+          .isPlayerSongPlaybackResumeEnabled
+      ) {
       backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
     }
   }
@@ -302,6 +312,19 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   func didReadStreamMetadata(_ metadata: [String: String]) {
     guard let radio = currentlyPlaying?.asRadio else { return }
     updateRadioNowPlaying(from: metadata, radio: radio)
+  }
+
+  func savePlayPosition() {
+    guard let playable = currentlyPlaying, !playable.isRadio else { return }
+    let playDuration = backendAudioPlayer.duration
+    let playProgress = backendAudioPlayer.elapsedTime
+    guard playDuration != 0.0, playProgress != 0.0 else { return }
+    playable.playDuration = Int(playDuration)
+    playable.playProgress = Int(playProgress)
+    UserDefaults.standard.set(
+      playable.objectID.uriRepresentation().absoluteString,
+      forKey: "resumePlaybackSongId"
+    )
   }
 
   private func savePlayInformation(of playable: AbstractPlayable) {
