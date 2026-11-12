@@ -54,6 +54,10 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   var isShouldPauseAfterFinishedPlaying = false
+  /// Where to resume after a playback error tore down the player. Only applies to the
+  /// playable it was captured for and is used at most once, so it can't leak into a
+  /// different item if the recovery fails or the user plays something else.
+  private var errorResumePoint: (playable: AbstractPlayable, time: Double)?
   var autoplayCB: (@MainActor (Song) async throws -> [Song])?
 
   private var playerStatus: PlayerStatusPersistent
@@ -273,14 +277,25 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func seekToLastStoppedPlayTime() {
+    // An error tears the player down and re-inserts the current playable, which
+    // makes it start from the beginning. Resume from the position captured when
+    // the error occurred instead. The persisted `playProgress` cannot be used
+    // for this: `savePlayInformation` deliberately resets it to zero within
+    // `progressTimeEndThreshold` of the end of the track, which is exactly where
+    // a stream error is most likely to happen.
+    if let resumePoint = errorResumePoint {
+      errorResumePoint = nil
+      if resumePoint.playable == currentlyPlaying {
+        backendAudioPlayer.seek(toSecond: resumePoint.time)
+        return
+      }
+    }
+
     if let playable = currentlyPlaying,
        playable.playProgress > 0,
        playable
        .isPodcastEpisode ||
-       (
-         (playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user
-           .isPlayerSongPlaybackResumeEnabled
-       ) {
+       (playable.isSong && settings.user.isPlayerSongPlaybackResumeEnabled) {
       backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
     }
   }
@@ -345,6 +360,11 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
 
   // BackendAudioPlayerNotifiable
   func notifyErrorOccurred(error: Error) {
+    // Radios are live streams and can't be seeked, they just reconnect.
+    let resumeTime = backendAudioPlayer.elapsedTimeBeforeErrorOccurred
+    if let playable = currentlyPlaying, !playable.isRadio, resumeTime > 0 {
+      errorResumePoint = (playable: playable, time: resumeTime)
+    }
     notifierList = notifierList.filter { $0.value != nil }
     for notifier in notifierList {
       notifier.value?.errorOccurred(error: error)

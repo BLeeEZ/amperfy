@@ -2883,6 +2883,33 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
   }
 
+  @MainActor
+  private func startPlaybackAndSettle() async throws {
+    prepareWithAllSongsCached()
+    testPlayer.play()
+    // playback start hops through the main actor several times, so let it settle
+    // before injecting an error, otherwise the two interleave.
+    try await Task.sleep(nanoseconds: 500_000_000)
+  }
+
+  @MainActor
+  func testStreamError_capturesPlaybackPositionForRecovery() async throws {
+    try await startPlaybackAndSettle()
+    mockAudioStreamingPlayer.mockElapsedTime = 200.0
+
+    XCTAssertFalse(backendPlayer.isErrorOccurred)
+    XCTAssertEqual(backendPlayer.elapsedTimeBeforeErrorOccurred, 0.0)
+
+    backendPlayer.audioPlayerUnexpectedError(
+      player: mockAudioStreamingPlayer,
+      error: .codecError
+    )
+    try await Task.sleep(nanoseconds: 300_000_000)
+
+    XCTAssertTrue(backendPlayer.isErrorOccurred)
+    XCTAssertEqual(backendPlayer.elapsedTimeBeforeErrorOccurred, 200.0)
+  }
+
   // -------------------------------------------------------------
   // Player errors
   //
@@ -2958,6 +2985,23 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertFalse(mockAudioStreamingPlayer.isPlaying)
 
     await playCachedAndWaitForPlayerStart(playlistAllCached.playables[2])
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+  }
+
+  func testPlayerError_FromReplacedPlayer_IsIgnored() async {
+    await playCachedAndWaitForPlayerStart(songCached)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    // a late report from a player instance that is no longer the active one
+    backendPlayer.audioPlayerUnexpectedError(
+      player: AudioStreaming.AudioPlayer(),
+      error: .networkError(.failure(NetworkError.serverError))
+    )
+    await Task { @MainActor in }.value
+    try? await Task.sleep(for: .milliseconds(200))
+
+    XCTAssertFalse(backendPlayer.isErrorOccurred)
     XCTAssertTrue(testPlayer.isPlaying)
     XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
   }

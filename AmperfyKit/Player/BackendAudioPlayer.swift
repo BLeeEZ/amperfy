@@ -134,6 +134,10 @@ class BackendAudioPlayer: NSObject {
   public var triggerReinsertPlayableCB: TriggerReinsertPlayableCallback?
   public private(set) var isPlaying: Bool = false
   public private(set) var isErrorOccurred: Bool = false
+  /// Playback position in seconds at the moment the last error occurred.
+  /// Captured before `restartPlayer()` tears the engine down, so that error
+  /// recovery can resume where playback stopped instead of starting over.
+  public private(set) var elapsedTimeBeforeErrorOccurred: Double = 0.0
   public private(set) var playType: PlayType?
   private var perloadedPlayType: PlayType?
   public private(set) var activeStreamingBitrate: StreamingMaxBitratePreference?
@@ -321,6 +325,7 @@ class BackendAudioPlayer: NSObject {
       wasPlayingBeforeErrorOccurred = isPlaying
     }
     isErrorOccurred = true
+    elapsedTimeBeforeErrorOccurred = elapsedTime
     pause()
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
@@ -488,6 +493,16 @@ class BackendAudioPlayer: NSObject {
     (!isErrorOccurred && isAutoStartPlayback) || (isErrorOccurred && wasPlayingBeforeErrorOccurred)
   }
 
+  /// Leaves the error state once playback has actually resumed.
+  /// `isErrorOccurred` is otherwise never reset, so after the first error of a
+  /// session `shouldPlaybackStart` would keep ignoring `isAutoStartPlayback`.
+  /// Only call this after every reader of `shouldPlaybackStart` has run.
+  private func clearErrorState() {
+    isErrorOccurred = false
+    wasPlayingBeforeErrorOccurred = false
+    elapsedTimeBeforeErrorOccurred = 0.0
+  }
+
   func requestToPlay(
     playable: AbstractPlayable,
     playbackRate: PlaybackRate,
@@ -496,6 +511,10 @@ class BackendAudioPlayer: NSObject {
     userDefinedPlaybackRate = playbackRate
     player?.rate = Float(userDefinedPlaybackRate.asDouble)
     isAutoStartPlayback = autoStartPlayback
+    // `notifyErrorOccurred` is also called when preparing a request fails, without
+    // `handleError` updating this value. Reset it so that path never reports the
+    // position of an earlier error.
+    elapsedTimeBeforeErrorOccurred = 0.0
     handleRequest(playable: playable)
   }
 
@@ -913,8 +932,6 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
       currentPlayUrl = url
       let shouldPlay = shouldPlayAfterStreamRestart ?? shouldPlaybackStart
       shouldPlayAfterStreamRestart = nil
-      // the play state from before an error only applies to the first start after it
-      isErrorOccurred = false
       if shouldPlay {
         continuePlay()
         audioAnalyzer.play()
@@ -932,6 +949,10 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
           player?.seek(to: seekTimeWhenStarted)
         }
       }
+
+      // Playback is running again and every reader of `shouldPlaybackStart` has
+      // had its turn, so it is safe to leave the error state here.
+      clearErrorState()
     }
   }
 
@@ -966,7 +987,14 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
     player: AudioStreaming.AudioPlayer,
     error: AudioStreaming.AudioPlayerError
   ) {
+    // Only compared by identity on the main actor, never used otherwise. Holding the reference
+    // also keeps the instance alive, so a new player can't reuse its address before the check.
+    nonisolated(unsafe) let reportingPlayer = player
     Task { @MainActor in
+      // handleError replaces the player. A failing entry can be reported more than once,
+      // and a report from a player that has already been replaced must not tear down its
+      // successor, which may already be playing the retried item.
+      guard reportingPlayer === self.player else { return }
       self.handleError(error: error)
     }
   }
