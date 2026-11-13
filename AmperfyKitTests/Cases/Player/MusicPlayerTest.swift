@@ -67,8 +67,41 @@ class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
   private var playedUrl = ""
   private(set) var queuedUrls = [URL]()
 
+  nonisolated(unsafe) private var _playCallCount = 0
+  nonisolated(unsafe) private var _startErrorsToRaise = 0
+  private let _startLock = NSLock()
+  /// How often `play(url:)` was called, i.e. how often an item was (re)inserted
+  nonisolated public var playCallCount: Int {
+    _startLock.withLock { _playCallCount }
+  }
+
+  /// The next `play(url:)` calls fail like a refused audio session does, instead of starting
+  nonisolated public var startErrorsToRaise: Int {
+    get { _startLock.withLock { _startErrorsToRaise } }
+    set { _startLock.withLock { _startErrorsToRaise = newValue } }
+  }
+
   override func play(url: URL) {
     Self.delegateBackup = delegate
+    let isStartFailing = _startLock.withLock {
+      _playCallCount += 1
+      guard _startErrorsToRaise > 0 else { return false }
+      _startErrorsToRaise -= 1
+      return true
+    }
+    if isStartFailing {
+      isPlaying = false
+      isStopped = true
+      // only passed on for the identity check of the reporting player
+      nonisolated(unsafe) let reportingPlayer = self
+      Task { @MainActor in
+        Self.delegateBackup?.audioPlayerUnexpectedError(
+          player: reportingPlayer,
+          error: .audioSystemError(.playerStartError)
+        )
+      }
+      return
+    }
     mockElapsedTime = 0.0
     isPlaying = true
     isStopped = false
@@ -3255,5 +3288,87 @@ class MusicPlayerTest: XCTestCase {
 
     XCTAssertEqual(current.playProgress, 100)
     XCTAssertFalse(current.playableManagedObject.hasChanges)
+  }
+
+  // -------------------------------------------------------------
+  // Audio system refuses to start
+  //
+  // e.g. navigation still holds the audio session when playback should continue.
+  // These tests wire the automatic reinsert, and mark the mock as stopped after the
+  // error, like the fresh player that `restartPlayer` creates in the app.
+
+  @MainActor
+  private func reportAudioStartError() async {
+    backendPlayer.audioPlayerUnexpectedError(
+      player: mockAudioStreamingPlayer,
+      error: .audioSystemError(.playerStartError)
+    )
+    await Task { @MainActor in }.value
+    mockAudioStreamingPlayer.isStopped = true
+  }
+
+  @MainActor
+  func testAudioStartError_WhilePlaying_RetriesAfterDelay() async throws {
+    backendPlayer.triggerReinsertPlayableCB = testMusicPlayer.play
+    backendPlayer.audioStartRetryDelays = [0.3]
+    await playCachedAndWaitForPlayerStart(songCached)
+    let playCount = mockAudioStreamingPlayer.playCallCount
+
+    await reportAudioStartError()
+    XCTAssertFalse(testPlayer.isPlaying)
+    XCTAssertEqual(mockAudioStreamingPlayer.playCallCount, playCount, "waits before retrying")
+
+    try await Task.sleep(for: .milliseconds(700))
+    XCTAssertEqual(mockAudioStreamingPlayer.playCallCount, playCount + 1)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+    XCTAssertFalse(backendPlayer.isErrorOccurred)
+  }
+
+  @MainActor
+  func testAudioStartError_FailingRetry_IsRetriedAgain() async throws {
+    backendPlayer.triggerReinsertPlayableCB = testMusicPlayer.play
+    backendPlayer.audioStartRetryDelays = [0.1, 0.1, 0.1]
+    await playCachedAndWaitForPlayerStart(songCached)
+    let playCount = mockAudioStreamingPlayer.playCallCount
+
+    // the first retry is refused as well, the second one starts
+    mockAudioStreamingPlayer.startErrorsToRaise = 1
+    await reportAudioStartError()
+
+    try await Task.sleep(for: .milliseconds(800))
+    XCTAssertEqual(mockAudioStreamingPlayer.playCallCount, playCount + 2)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+  }
+
+  @MainActor
+  func testAudioStartError_KeepsFailing_GivesUpAfterLastDelay() async throws {
+    backendPlayer.triggerReinsertPlayableCB = testMusicPlayer.play
+    backendPlayer.audioStartRetryDelays = [0.05, 0.05, 0.05]
+    await playCachedAndWaitForPlayerStart(songCached)
+    let playCount = mockAudioStreamingPlayer.playCallCount
+
+    mockAudioStreamingPlayer.startErrorsToRaise = 100
+    await reportAudioStartError()
+
+    try await Task.sleep(for: .milliseconds(1000))
+    XCTAssertEqual(mockAudioStreamingPlayer.playCallCount, playCount + 3)
+    XCTAssertFalse(testPlayer.isPlaying)
+  }
+
+  @MainActor
+  func testAudioStartError_UserPauses_RetryIsCancelled() async throws {
+    backendPlayer.triggerReinsertPlayableCB = testMusicPlayer.play
+    backendPlayer.audioStartRetryDelays = [0.3]
+    await playCachedAndWaitForPlayerStart(songCached)
+    let playCount = mockAudioStreamingPlayer.playCallCount
+
+    await reportAudioStartError()
+    testPlayer.pause()
+
+    try await Task.sleep(for: .milliseconds(700))
+    XCTAssertEqual(mockAudioStreamingPlayer.playCallCount, playCount)
+    XCTAssertFalse(testPlayer.isPlaying)
   }
 }
