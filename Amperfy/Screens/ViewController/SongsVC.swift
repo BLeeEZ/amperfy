@@ -49,6 +49,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    isInitialSearchUpdatePending = displayFilter == .all && appDelegate.storage.main.library
+      .getSongCount(for: account) > Self.deferredInitialUpdateThreshold
+
     if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
     }
@@ -194,6 +197,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     updateRightBarButtonItems()
     updateFromRemote()
     detailHeaderView?.refresh()
+    if isInitialSearchUpdatePending {
+      detailHeaderView?.isHidden = true
+    }
   }
 
   func updateRightBarButtonItems() {
