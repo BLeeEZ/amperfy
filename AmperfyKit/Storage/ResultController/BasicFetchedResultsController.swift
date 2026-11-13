@@ -256,6 +256,10 @@ public class BasicFetchedResultsController<ResultType>: NSObject
     fetchResultsController.fetchedObjects as? [ResultType]
   }
 
+  public var fetchedObjectsCount: Int {
+    fetchResultsController.sections?.reduce(0) { $0 + $1.numberOfObjects } ?? 0
+  }
+
   public var sections: [NSFetchedResultsSectionInfo]? {
     fetchResultsController.sections
   }

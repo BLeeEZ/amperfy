@@ -67,7 +67,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
 
     let playShuffleConfig = PlayShuffleInfoConfiguration(
       infoCB: {
-        "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Radio\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")"
+        "\(self.fetchedResultsController.fetchedObjectsCount) Radio\(self.fetchedResultsController.fetchedObjectsCount == 1 ? "" : "s")"
       },
       playContextCb: handleHeaderPlay,
       player: appDelegate.player,
@@ -101,7 +101,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
   }
 
   func updateContentUnavailable() {
-    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+    if fetchedResultsController.fetchedObjectsCount == 0 {
       if fetchedResultsController.isSearchActive {
         contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
       } else {
