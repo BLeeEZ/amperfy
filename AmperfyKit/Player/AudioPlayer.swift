@@ -59,9 +59,9 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   /// is used at most once, so it can't leak into a different item if the recovery fails or
   /// the user plays something else.
   private var resumePoint: (playable: AbstractPlayable, time: Double)?
-  /// Whether the persisted progress of the current item still belongs to it: true after a
-  /// launch (the queue is restored with the item that was playing when the app was
-  /// terminated) and after a mode switch, false after an explicit stop.
+  /// Whether `play()` may resume the current item at its persisted progress when the player
+  /// has to be set up again, e.g. after the app was terminated. False only between an
+  /// explicit stop and the next item being inserted into the player.
   private var isCurrentItemProgressResumable = true
   var autoplayCB: (@MainActor (Song) async throws -> [Song])?
 

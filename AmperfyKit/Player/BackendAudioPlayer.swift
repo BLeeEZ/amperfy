@@ -92,10 +92,15 @@ class BackendAudioPlayer: NSObject {
   private let fileManager = CacheFileManager.shared
   private var audioSessionHandler: AudioSessionHandler
   private var isTriggerReinsertPlayableAllowed = true
-  /// Waiting times in seconds before the next attempt to start again after the audio system
-  /// refused to start the player, e.g. because navigation still held the audio session.
+  /// Waiting times before the next attempt to start again after the audio system refused
+  /// to start the player, e.g. because navigation still held the audio session.
   /// The last entry is the final attempt. Internal for tests.
-  var audioStartRetryDelays: [Double] = [1, 2, 4, 8, 15, 30]
+  var audioStartRetryDelays: [Duration] = [
+    .seconds(1), .seconds(2), .seconds(4), .seconds(8), .seconds(15), .seconds(30),
+  ]
+  /// Index into `audioStartRetryDelays`. Reset by a successful start and by `stop()`, but
+  /// not by `requestToPlay`: the retry itself goes through it, so a reset there would make
+  /// the retries endless.
   private var audioStartRetryCount = 0
   private var audioStartRetryTask: Task<(), Never>?
   private var wasPlayingBeforeErrorOccurred: Bool = false
@@ -362,7 +367,7 @@ class BackendAudioPlayer: NSObject {
     }
   }
 
-  static func isAudioSystemStartError(_ error: Error) -> Bool {
+  private static func isAudioSystemStartError(_ error: Error) -> Bool {
     guard let playerError = error as? AudioStreaming.AudioPlayerError,
           case let .audioSystemError(systemError) = playerError else { return false }
     return systemError == .playerStartError || systemError == .engineFailure
@@ -377,9 +382,9 @@ class BackendAudioPlayer: NSObject {
     }
     let delay = audioStartRetryDelays[audioStartRetryCount]
     audioStartRetryCount += 1
-    os_log(.default, "Audio start: retry %d in %.1f s", audioStartRetryCount, delay)
+    os_log(.default, "Audio start: retry %d in %s", audioStartRetryCount, "\(delay)")
     audioStartRetryTask = Task { @MainActor [weak self] in
-      try? await Task.sleep(for: .seconds(delay))
+      try? await Task.sleep(for: delay)
       guard let self, !Task.isCancelled else { return }
       audioStartRetryTask = nil
       triggerReinsertPlayableCB?()
