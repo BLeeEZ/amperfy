@@ -53,8 +53,12 @@ class LyricsVC: UIViewController {
       lyricsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
     ])
 
-    lyricsView.onLyricSelected = { [weak self] lyric in
-      self?.player.seek(toSecond: lyric.startTime.seconds)
+    lyricsView.onLyricSelected = { [weak self] seconds in
+      self?.player.seek(toSecond: seconds)
+    }
+    lyricsView.playbackStateProvider = { [weak self] in
+      guard let player = self?.player else { return (0, 1, false) }
+      return (player.elapsedTime, player.playbackRate.asDouble, player.isPlaying)
     }
 
     self.lyricsView = lyricsView
@@ -65,6 +69,8 @@ class LyricsVC: UIViewController {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     refreshLyrics()
+    // the song can have started before this view existed (macOS inspector): fetch its lyrics now
+    fetchSongInfoAndUpdateLyrics()
   }
 
   private func fetchSongInfoAndUpdateLyrics() {
@@ -85,7 +91,8 @@ class LyricsVC: UIViewController {
   private func showLyrics(structuredLyrics: StructuredLyrics) {
     lyricsView?.display(
       lyrics: structuredLyrics,
-      scrollAnimation: appDelegate.storage.settings.user.isLyricsSmoothScrolling
+      scrollAnimation: appDelegate.storage.settings.user.isLyricsSmoothScrolling,
+      wordHighlight: appDelegate.storage.settings.user.isLyricsWordHighlightEnabled
     )
   }
 

@@ -1,0 +1,40 @@
+<subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.16.1" type="navidrome" serverVersion="0.64.2 (10114574)" openSubsonic="true">
+  <lyricsList>
+    <structuredLyrics displayArtist="Post Malone" displayTitle="Wow." kind="translation" lang="tur" synced="true">
+      <line start="9680">Burada yalnızca bir deneme satırı var</line>
+    </structuredLyrics>
+    <structuredLyrics displayArtist="Post Malone" displayTitle="Wow." kind="main" lang="en" synced="true">
+      <line start="9680">Here it&#39;s only a sample line with ten small cues</line>
+      <line start="12060">Nine more words follow in this second test line</line>
+      <line start="14490" end="16900">Çağla ışığında</line>
+      <line start="17170">Line without word timing</line>
+      <cueLine index="0" start="9680" end="11860" value="Here it&#39;s only a sample line with ten small cues">
+        <cue start="9680" end="9860" byteStart="0" byteEnd="4">Here </cue>
+        <cue start="9860" end="10040" byteStart="5" byteEnd="9">it&#39;s </cue>
+        <cue start="10040" end="10280" byteStart="10" byteEnd="14">only </cue>
+        <cue start="10280" end="10340" byteStart="15" byteEnd="16">a </cue>
+        <cue start="10340" end="10620" byteStart="17" byteEnd="23">sample </cue>
+        <cue start="10620" end="10920" byteStart="24" byteEnd="28">line </cue>
+        <cue start="10920" end="11080" byteStart="29" byteEnd="33">with </cue>
+        <cue start="11080" end="11260" byteStart="34" byteEnd="37">ten </cue>
+        <cue start="11260" end="11540" byteStart="38" byteEnd="43">small </cue>
+        <cue start="11540" end="11860" byteStart="44" byteEnd="47">cues</cue>
+      </cueLine>
+      <cueLine index="1" start="12060" end="14180" value="Nine more words follow in this second test line">
+        <cue start="12060" end="12240" byteStart="0" byteEnd="4">Nine </cue>
+        <cue start="12240" end="12480" byteStart="5" byteEnd="9">more </cue>
+        <cue start="12480" end="12700" byteStart="10" byteEnd="15">words </cue>
+        <cue start="12700" end="12960" byteStart="16" byteEnd="22">follow </cue>
+        <cue start="12960" end="13300" byteStart="23" byteEnd="25">in </cue>
+        <cue start="13300" end="13460" byteStart="26" byteEnd="30">this </cue>
+        <cue start="13460" end="13580" byteStart="31" byteEnd="37">second </cue>
+        <cue start="13580" end="13820" byteStart="38" byteEnd="42">test </cue>
+        <cue start="13820" end="14180" byteStart="43" byteEnd="46">line</cue>
+      </cueLine>
+      <cueLine index="2" start="14490" end="16900" value="Çağla ışığında">
+        <cue start="14490" end="15200" byteStart="0" byteEnd="7">Çağla </cue>
+        <cue start="15200" end="16900" byteStart="8" byteEnd="20">ışığında</cue>
+      </cueLine>
+    </structuredLyrics>
+  </lyricsList>
+</subsonic-response>

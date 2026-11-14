@@ -32,12 +32,18 @@ public struct OpenSubsonicExtensionsResponse {
   public var serverVersion = ""
   public var openSubsonic: Bool?
   public var supportedExtensions = [String]()
+  public var supportedExtensionVersions = [String: [Int]]()
+
+  public func isExtensionSupported(_ name: String, minVersion: Int) -> Bool {
+    supportedExtensionVersions[name]?.contains { $0 >= minVersion } ?? false
+  }
 }
 
 // MARK: - SsOpenSubsonicExtensionsParserDelegate
 
 class SsOpenSubsonicExtensionsParserDelegate: SsXmlParser {
   public var openSubsonicExtensionsResponse = OpenSubsonicExtensionsResponse()
+  private var currentExtensionName: String?
 
   override func parser(
     _ parser: XMLParser,
@@ -65,9 +71,32 @@ class SsOpenSubsonicExtensionsParserDelegate: SsXmlParser {
         openSubsonicExtensionsResponse.openSubsonic = false
       }
     } else if elementName == "openSubsonicExtensions" {
-      if let name = attributeDict["name"] {
+      currentExtensionName = attributeDict["name"]
+      if let name = currentExtensionName {
         openSubsonicExtensionsResponse.supportedExtensions.append(name)
+        openSubsonicExtensionsResponse.supportedExtensionVersions[name] = []
       }
     }
+  }
+
+  override func parser(
+    _ parser: XMLParser,
+    didEndElement elementName: String,
+    namespaceURI: String?,
+    qualifiedName qName: String?
+  ) {
+    if elementName == "versions", let name = currentExtensionName,
+       let version = Int(buffer.trimmingCharacters(in: .whitespacesAndNewlines)) {
+      openSubsonicExtensionsResponse.supportedExtensionVersions[name]?.append(version)
+    } else if elementName == "openSubsonicExtensions" {
+      currentExtensionName = nil
+    }
+
+    super.parser(
+      parser,
+      didEndElement: elementName,
+      namespaceURI: namespaceURI,
+      qualifiedName: qName
+    )
   }
 }

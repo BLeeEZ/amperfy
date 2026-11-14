@@ -95,11 +95,20 @@ public struct LyricsList {
   public var lyrics = [StructuredLyrics]()
 
   public func getFirstSyncedLyricsOrUnsyncedAsDefault() -> StructuredLyrics? {
-    guard let index = lyrics.firstIndex(where: { $0.synced }) else {
-      return lyrics.object(at: 0)
-    }
-    return lyrics[index]
+    lyrics.first(where: { $0.synced && $0.kind == .main })
+      ?? lyrics.first(where: { $0.synced })
+      ?? lyrics.first(where: { $0.kind == .main })
+      ?? lyrics.object(at: 0)
   }
+}
+
+// MARK: - LyricsKind
+
+/// The layer of a lyrics entry. Only sent for enhanced lyrics (OpenSubsonic songLyrics v2).
+public enum LyricsKind: String, Sendable {
+  case main
+  case translation
+  case pronunciation
 }
 
 // MARK: - StructuredLyrics
@@ -116,13 +125,203 @@ public struct StructuredLyrics {
   public var displayTitle: String? // The title to display. This could be the song title (localized), or any other value
   public var offset =
     0 // The offset to apply to all lyrics, in milliseconds. Positive means lyrics appear sooner, negative means later. If not included, the offset must be assumed to be 0
+  /// enhanced (OpenSubsonic songLyrics v2)
+  public var kind = LyricsKind.main
+  public var agents = [LyricsAgent]() // The singers that the cue lines refer to
+  public var cueLines =
+    [LyricsCueLine]() // Word or syllable timing. Each cue line refers to a line by its index
   public init() {}
+
+  /// Several cue lines can refer to the same line, one for each agent. The main agent comes first.
+  public func mainCueLine(forLine index: Int) -> LyricsCueLine? {
+    cueLines.first { $0.index == index }
+  }
+
+  /// The end of the last line in milliseconds, if the lyrics give it
+  public var lastLineEnd: Int? {
+    guard let lastLine = line.last else { return nil }
+    if let end = lastLine.end { return end }
+    guard let cueLine = mainCueLine(forLine: line.count - 1) else { return nil }
+    return cueLine.end ?? cueLine.cues.last?.end
+  }
+
+  /// The lyrics time in milliseconds at a playback time, with the offset applied
+  public func lyricsTime(at playbackTime: CMTime) -> Int {
+    lyricsTime(atSeconds: playbackTime.seconds)
+  }
+
+  /// The lyrics time in milliseconds at a playback time in seconds, with the offset applied
+  public func lyricsTime(atSeconds seconds: TimeInterval) -> Int {
+    guard seconds.isFinite else { return offset }
+    return Int((seconds * 1_000).rounded(.down)) + offset
+  }
+
+  /// The playback time in seconds at which a line is shown, with the offset applied
+  public func playbackSeconds(of line: LyricsLine) -> TimeInterval {
+    max(Double((line.start ?? 0) - offset) / 1_000, 0)
+  }
+}
+
+// MARK: - LyricsAgent
+
+public struct LyricsAgent {
+  public var id = "" // Unique in its lyrics entry
+  public var role = "" // main, voice, bg or group
+  public var name: String?
+
+  public init() {}
+}
+
+// MARK: - LyricsCueLine
+
+public struct LyricsCueLine {
+  public var index = 0 // The zero-based index of the line that this cue line refers to
+  public var start: Int?
+  public var end: Int?
+  public var value = "" // The text of the agent of this cue line. The cue byte offsets refer to it
+  public var agentId: String?
+  public var cues = [LyricsCue]()
+
+  public init() {}
+
+  /// The cue that is sung at a lyrics time in milliseconds. A cue stays active until the next cue starts.
+  public func activeCueIndex(at time: Int) -> Int? {
+    cues.lastIndex { $0.start <= time }
+  }
+
+  /// The active cue at a lyrics time in milliseconds and the sung part of it
+  public func progress(at time: Int) -> LyricsCueProgress? {
+    guard let index = activeCueIndex(at: time) else { return nil }
+    let cue = cues[index]
+    let end = cue.end ?? cues.object(at: index + 1)?.start ?? end ?? cue.start
+    guard end > cue.start else { return LyricsCueProgress(cueIndex: index, fraction: 1) }
+    let fraction = Double(time - cue.start) / Double(end - cue.start)
+    return LyricsCueProgress(cueIndex: index, fraction: min(max(fraction, 0), 1))
+  }
+
+  /// The range of each cue in `text`, or nil if a cue cannot be found
+  public func cueRanges(in text: String) -> [Range<String.Index>]? {
+    var byteShift = 0
+    if text != value, let valueRange = text.range(of: value) {
+      byteShift = text.utf8.distance(from: text.startIndex, to: valueRange.lowerBound)
+    }
+    var ranges = [Range<String.Index>]()
+    var searchStart = text.startIndex
+    for cue in cues {
+      if cue.value.isEmpty {
+        ranges.append(searchStart ..< searchStart)
+        continue
+      }
+      guard let range = cue.range(in: text, byteShift: byteShift, searchingFrom: searchStart)
+      else { return nil }
+      ranges.append(range)
+      searchStart = range.upperBound
+    }
+    return ranges
+  }
+}
+
+// MARK: - LyricsCueProgress
+
+public struct LyricsCueProgress: Equatable, Sendable {
+  public var cueIndex: Int
+  public var fraction: Double // The sung part of the cue, from 0 to 1
+
+  public init(cueIndex: Int, fraction: Double) {
+    self.cueIndex = cueIndex
+    self.fraction = fraction
+  }
+}
+
+// MARK: - LyricsPlaybackClock
+
+/// Gives a smooth playback time for each display frame. The player time changes in steps, so the clock
+/// runs on with the host time and follows the player time again only when the two drift apart.
+public struct LyricsPlaybackClock: Sendable {
+  public static let maxDrift: TimeInterval = 0.08
+
+  private var anchorTime: TimeInterval?
+  private var anchorHostTime: TimeInterval = 0
+  private var anchorRate: Double = 1
+
+  public init() {}
+
+  public mutating func time(
+    playerTime: TimeInterval,
+    rate: Double,
+    hostTime: TimeInterval
+  )
+    -> TimeInterval {
+    if let anchorTime, rate == anchorRate {
+      let predicted = anchorTime + (hostTime - anchorHostTime) * rate
+      if abs(predicted - playerTime) <= Self.maxDrift {
+        return predicted
+      }
+    }
+    anchorTime = playerTime
+    anchorHostTime = hostTime
+    anchorRate = rate
+    return playerTime
+  }
+
+  public mutating func reset() {
+    anchorTime = nil
+  }
+}
+
+// MARK: - LyricsCue
+
+public struct LyricsCue {
+  public var start = 0
+  public var end: Int?
+  public var value = "" // The text of this word or syllable
+  public var byteStart = 0 // Zero-based inclusive UTF-8 byte offset into the cue line value
+  public var byteEnd = 0 // Zero-based inclusive UTF-8 byte offset into the cue line value
+
+  public init() {}
+
+  /// The range of this cue in `text`. The byte offsets are used if they point at the cue value.
+  /// Else the cue value is searched from `searchStart`.
+  public func range(
+    in text: String,
+    byteShift: Int = 0,
+    searchingFrom searchStart: String.Index? = nil
+  )
+    -> Range<String.Index>? {
+    if let range = byteRange(in: text, shift: byteShift), text[range] == value {
+      return range
+    }
+    let lowerBound = searchStart ?? text.startIndex
+    guard !value.isEmpty, lowerBound <= text.endIndex else { return nil }
+    return text.range(of: value, range: lowerBound ..< text.endIndex)
+  }
+
+  /// The range of the byte offsets in `text`, or nil if they are outside of it or split a character
+  func byteRange(in text: String, shift: Int = 0) -> Range<String.Index>? {
+    let utf8 = text.utf8
+    guard byteStart >= 0, byteEnd >= byteStart,
+          let lower = utf8.index(
+            utf8.startIndex,
+            offsetBy: byteStart + shift,
+            limitedBy: utf8.endIndex
+          ),
+          let upper = utf8.index(
+            utf8.startIndex,
+            offsetBy: byteEnd + shift + 1,
+            limitedBy: utf8.endIndex
+          ),
+          lower.samePosition(in: text) != nil,
+          upper.samePosition(in: text) != nil
+    else { return nil }
+    return lower ..< upper
+  }
 }
 
 // MARK: - LyricsLine
 
 public struct LyricsLine {
   public var start: Int? // The start time of the lyrics, relative to the start time of the track, in milliseconds. If this is not part of synced lyrics, start must be omitted
+  public var end: Int? // The end time of the line in milliseconds. Only sent for enhanced lyrics, if the source has it
   public var value = "" // The actual text of this line
 
   public init() {}

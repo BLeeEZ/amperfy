@@ -54,5 +54,13 @@ class SsOpenSubsonicExtensionsParserTest: AbstractSsParserTest {
     XCTAssertEqual(response.supportedExtensions[0], "transcodeOffset")
     XCTAssertEqual(response.supportedExtensions[1], "formPost")
     XCTAssertEqual(response.supportedExtensions[2], "songLyrics")
+
+    XCTAssertEqual(response.supportedExtensionVersions, [
+      "transcodeOffset": [1],
+      "formPost": [1],
+      "songLyrics": [1],
+    ])
+    XCTAssertTrue(response.isExtensionSupported("songLyrics", minVersion: 1))
+    XCTAssertFalse(response.isExtensionSupported("songLyrics", minVersion: 2))
   }
 }

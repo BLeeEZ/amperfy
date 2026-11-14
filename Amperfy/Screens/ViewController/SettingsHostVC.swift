@@ -149,6 +149,12 @@ class SettingsHostVC: UIViewController {
       self.appDelegate.storage.settings.user.isLyricsSmoothScrolling = newValue
     }))
 
+    settings.isLyricsWordHighlightEnabled = appDelegate.storage.settings.user
+      .isLyricsWordHighlightEnabled
+    changesAgent.append(settings.$isLyricsWordHighlightEnabled.sink(receiveValue: { newValue in
+      self.appDelegate.storage.settings.user.isLyricsWordHighlightEnabled = newValue
+    }))
+
     settings.screenLockPreventionPreference = appDelegate.storage.settings.user
       .screenLockPreventionPreference
     changesAgent.append(settings.$screenLockPreventionPreference.sink(receiveValue: { newValue in

@@ -174,8 +174,12 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
 
     lyricsView = LyricsView()
     lyricsView!.frame = upperContainerView.bounds
-    lyricsView!.onLyricSelected = { [weak self] lyric in
-      self?.appDelegate.player.seek(toSecond: lyric.startTime.seconds)
+    lyricsView!.onLyricSelected = { [weak self] seconds in
+      self?.appDelegate.player.seek(toSecond: seconds)
+    }
+    lyricsView!.playbackStateProvider = { [weak self] in
+      guard let player = self?.appDelegate.player else { return (0, 1, false) }
+      return (player.elapsedTime, player.playbackRate.asDouble, player.isPlaying)
     }
     let lyricsTap = UITapGestureRecognizer(target: self, action: #selector(handleLyricsTap(_:)))
     lyricsTap.cancelsTouchesInView = false
@@ -413,7 +417,8 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
   private func showLyrics(structuredLyrics: StructuredLyrics) {
     lyricsView?.display(
       lyrics: structuredLyrics,
-      scrollAnimation: appDelegate.storage.settings.user.isLyricsSmoothScrolling
+      scrollAnimation: appDelegate.storage.settings.user.isLyricsSmoothScrolling,
+      wordHighlight: appDelegate.storage.settings.user.isLyricsWordHighlightEnabled
     )
     lyricsView?.isHidden = false
   }

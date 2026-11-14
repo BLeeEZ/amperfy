@@ -1,0 +1,24 @@
+<subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.16.1" type="navidrome" serverVersion="0.64.2 (10114574)" openSubsonic="true">
+  <openSubsonicExtensions name="transcodeOffset">
+    <versions>1</versions>
+  </openSubsonicExtensions>
+  <openSubsonicExtensions name="formPost">
+    <versions>1</versions>
+  </openSubsonicExtensions>
+  <openSubsonicExtensions name="songLyrics">
+    <versions>1</versions>
+    <versions>2</versions>
+  </openSubsonicExtensions>
+  <openSubsonicExtensions name="indexBasedQueue">
+    <versions>1</versions>
+  </openSubsonicExtensions>
+  <openSubsonicExtensions name="transcoding">
+    <versions>1</versions>
+  </openSubsonicExtensions>
+  <openSubsonicExtensions name="playbackReport">
+    <versions>1</versions>
+  </openSubsonicExtensions>
+  <openSubsonicExtensions name="topSongsByArtistId">
+    <versions>1</versions>
+  </openSubsonicExtensions>
+</subsonic-response>

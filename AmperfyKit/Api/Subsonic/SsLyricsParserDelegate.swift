@@ -28,6 +28,8 @@ class SsLyricsParserDelegate: SsXmlParser {
   private var structuredLyrics: StructuredLyrics?
   private var lines: [LyricsLine]?
   private var currentLine: LyricsLine?
+  private var currentCueLine: LyricsCueLine?
+  private var currentCue: LyricsCue?
 
   override func parser(
     _ parser: XMLParser,
@@ -49,11 +51,14 @@ class SsLyricsParserDelegate: SsXmlParser {
       structuredLyrics = nil
       lines = nil
       currentLine = nil
+      currentCueLine = nil
+      currentCue = nil
     } else if elementName == "structuredLyrics" {
       structuredLyrics = StructuredLyrics()
       structuredLyrics?.displayArtist = attributeDict["displayArtist"]
       structuredLyrics?.displayTitle = attributeDict["displayTitle"]
       structuredLyrics?.lang = attributeDict["lang"] ?? ""
+      structuredLyrics?.kind = LyricsKind(rawValue: attributeDict["kind"] ?? "") ?? .main
       if let offsetStr = attributeDict["offset"], let offsetInt = Int(offsetStr) {
         structuredLyrics?.offset = offsetInt
       } else {
@@ -67,10 +72,43 @@ class SsLyricsParserDelegate: SsXmlParser {
       }
       lines = [LyricsLine]()
       currentLine = nil
+      currentCueLine = nil
+      currentCue = nil
     } else if elementName == "line" {
       currentLine = LyricsLine()
       if let startStr = attributeDict["start"], let startInt = Int(startStr) {
         currentLine?.start = startInt
+      }
+      currentLine?.end = attributeDict["end"].flatMap { Int($0) }
+    } else if elementName == "agent", structuredLyrics != nil {
+      var agent = LyricsAgent()
+      agent.id = attributeDict["id"] ?? ""
+      agent.role = attributeDict["role"] ?? ""
+      agent.name = attributeDict["name"]
+      structuredLyrics?.agents.append(agent)
+    } else if elementName == "cueLine", structuredLyrics != nil {
+      currentCueLine = nil
+      if let index = attributeDict["index"].flatMap({ Int($0) }) {
+        var cueLine = LyricsCueLine()
+        cueLine.index = index
+        cueLine.start = attributeDict["start"].flatMap { Int($0) }
+        cueLine.end = attributeDict["end"].flatMap { Int($0) }
+        cueLine.value = attributeDict["value"] ?? ""
+        cueLine.agentId = attributeDict["agentId"]
+        currentCueLine = cueLine
+      }
+    } else if elementName == "cue", currentCueLine != nil {
+      currentCue = nil
+      if let start = attributeDict["start"].flatMap({ Int($0) }),
+         let byteStart = attributeDict["byteStart"].flatMap({ Int($0) }),
+         let byteEnd = attributeDict["byteEnd"].flatMap({ Int($0) }) {
+        var cue = LyricsCue()
+        cue.start = start
+        cue.end = attributeDict["end"].flatMap { Int($0) }
+        cue.byteStart = byteStart
+        cue.byteEnd = byteEnd
+        cue.value = attributeDict["value"] ?? ""
+        currentCue = cue
       }
     }
   }
@@ -81,7 +119,17 @@ class SsLyricsParserDelegate: SsXmlParser {
     namespaceURI: String?,
     qualifiedName qName: String?
   ) {
-    if elementName == "line" || elementName == "value", var curLine = currentLine {
+    if elementName == "cue", var curCue = currentCue {
+      // the cue text is the element content (XML) and keeps its trailing space
+      if !buffer.isEmpty {
+        curCue.value = buffer
+      }
+      currentCueLine?.cues.append(curCue)
+      currentCue = nil
+    } else if elementName == "cueLine", let curCueLine = currentCueLine {
+      structuredLyrics?.cueLines.append(curCueLine)
+      currentCueLine = nil
+    } else if elementName == "line" || elementName == "value", var curLine = currentLine {
       curLine.value = buffer
       lines?.append(curLine)
       currentLine = nil
