@@ -136,6 +136,9 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         songBuffer?.addedDate = dateFormatter.date(from: createdTag)
       }
+      if let composer = attributeDict["composer"] {
+        songBuffer?.composer = composer
+      }
     }
 
     super.parser(
