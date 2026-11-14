@@ -257,6 +257,7 @@ public class MetaManager {
     )
     return BackgroundLibrarySyncer(
       storage: storage.async,
+      account: account,
       settings: storage.settings,
       networkMonitor: networkMonitor,
       librarySyncer: librarySyncer,
