@@ -3080,6 +3080,7 @@ public class LibraryStorage: PlayableFileCachable {
   public func saveContext() {
     if context.hasChanges {
       do {
+        try context.obtainPermanentIDs(for: Array(context.insertedObjects))
         try context.save()
       } catch {
         // Log the error and attempt recovery instead of crashing
