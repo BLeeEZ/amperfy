@@ -1496,12 +1496,13 @@ public class LibraryStorage: PlayableFileCachable {
   }
 
   func getAlbumWithoutSyncedSongs(
+    for account: Account,
     fetchLimit: Int,
     excluding excludedObjectIDs: Set<NSManagedObjectID> = Set()
   )
     -> [Album] {
     let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-    var predicates = [albumWithoutSyncedSongsPredicate]
+    var predicates = [getFetchPredicate(forAccount: account), albumWithoutSyncedSongsPredicate]
     if !excludedObjectIDs.isEmpty {
       predicates.append(NSPredicate(format: "NOT (SELF IN %@)", Array(excludedObjectIDs)))
     }
