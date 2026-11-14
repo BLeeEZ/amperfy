@@ -56,8 +56,8 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
 
   override func tearDown() {}
 
-  private func createUnsyncedAlbum(id: String) -> Album {
-    let album = library.createAlbum(account: account)
+  private func createUnsyncedAlbum(id: String, account: Account? = nil) -> Album {
+    let album = library.createAlbum(account: account ?? self.account)
     album.id = id
     album.name = id
     album.isSongsMetaDataSynced = false
@@ -165,6 +165,7 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
     library.saveContext()
     let fetchedIDs = Set(
       library.getAlbumWithoutSyncedSongs(
+        for: account,
         fetchLimit: 1000,
         excluding: [albums[1].managedObject.objectID]
       ).map(\.id)
@@ -172,5 +173,18 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
     XCTAssertTrue(fetchedIDs.contains("first"))
     XCTAssertFalse(fetchedIDs.contains("excluded"))
     XCTAssertTrue(fetchedIDs.contains("last"))
+  }
+
+  func testAlbumsOfOtherAccountsAreNotFetchedForTheNextSync() {
+    _ = createUnsyncedAlbum(id: "ownAccount")
+    let otherAccount = library.getAccount(info: TestAccountInfo.create2())
+    _ = createUnsyncedAlbum(id: "otherAccount", account: otherAccount)
+    library.saveContext()
+    let fetchedIDs = Set(
+      library.getAlbumWithoutSyncedSongs(for: account, fetchLimit: 1000)
+        .map(\.id)
+    )
+    XCTAssertTrue(fetchedIDs.contains("ownAccount"))
+    XCTAssertFalse(fetchedIDs.contains("otherAccount"))
   }
 }

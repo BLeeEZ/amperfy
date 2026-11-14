@@ -27,6 +27,7 @@ import os.log
 
 public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sendable {
   private let storage: AsyncCoreDataAccessWrapper
+  private let accountObjectId: NSManagedObjectID
   private let settings: AmperfySettings
   private let networkMonitor: NetworkMonitorFacade
   private let librarySyncer: LibrarySyncer
@@ -46,6 +47,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   @MainActor
   init(
     storage: AsyncCoreDataAccessWrapper,
+    account: Account,
     settings: AmperfySettings,
     networkMonitor: NetworkMonitorFacade,
     librarySyncer: LibrarySyncer,
@@ -54,6 +56,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     eventLogger: EventLogger
   ) {
     self.storage = storage
+    self.accountObjectId = account.managedObject.objectID
     self.settings = settings
     self.networkMonitor = networkMonitor
     self.librarySyncer = librarySyncer
@@ -146,6 +149,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     (try? await storage.performAndGet { asyncCompanion in
       asyncCompanion.library
         .getAlbumWithoutSyncedSongs(
+          for: asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId),
           fetchLimit: Self.albumSyncPageSize,
           excluding: excludedAlbumIDs
         )
