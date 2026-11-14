@@ -188,31 +188,10 @@ class BasicTableViewController: KeyCommandTableViewController {
     leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
   )
     -> UISwipeActionsConfiguration? {
-    guard let swipeCB = swipeCallback,
-          let containableCB = containableAtIndexPathCallback,
-          let containable = containableCB(indexPath)
-    else { return UISwipeActionsConfiguration() }
-
-    var createdActionsIndex = 0
-    var actions = [UIContextualAction]()
-    for actionType in appDelegate.storage.settings.user.swipeActionSettings.leading {
-      if !swipeDisplaySettings.isAllowedToDisplay(
-        actionType: actionType,
-        containable: containable,
-        isOfflineMode: appDelegate.storage.settings.user.isOfflineMode
-      ) { continue }
-      let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self
-        .swipeButtonColors.last!
-      actions.append(createSwipeAction(
-        for: actionType,
-        buttonColor: buttonColor,
-        indexPath: indexPath,
-        preCbContainable: containable,
-        actionCallback: swipeCB
-      ))
-      createdActionsIndex += 1
-    }
-    return UISwipeActionsConfiguration(actions: actions)
+    createSwipeActionsConfiguration(
+      for: appDelegate.storage.settings.user.swipeActionSettings.leading,
+      at: indexPath
+    )
   }
 
   override func tableView(
@@ -225,13 +204,25 @@ class BasicTableViewController: KeyCommandTableViewController {
     // this empty configuration ensures to only perform one "Delete" action at a time (no confirmation is displayed)
     guard !(tableView.isEditing && isSingleCellEditingModeActive)
     else { return UISwipeActionsConfiguration() }
+    return createSwipeActionsConfiguration(
+      for: appDelegate.storage.settings.user.swipeActionSettings.trailing,
+      at: indexPath
+    )
+  }
+
+  private func createSwipeActionsConfiguration(
+    for actionTypes: [SwipeActionType],
+    at indexPath: IndexPath
+  )
+    -> UISwipeActionsConfiguration {
     guard let swipeCB = swipeCallback,
           let containableCB = containableAtIndexPathCallback,
           let containable = containableCB(indexPath)
     else { return UISwipeActionsConfiguration() }
+
     var createdActionsIndex = 0
     var actions = [UIContextualAction]()
-    for actionType in appDelegate.storage.settings.user.swipeActionSettings.trailing {
+    for actionType in actionTypes {
       if !swipeDisplaySettings.isAllowedToDisplay(
         actionType: actionType,
         containable: containable,

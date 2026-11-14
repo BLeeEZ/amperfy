@@ -368,17 +368,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
-    if #available(iOS 13.0, *) {
-      UIApplication.shared.connectedScenes
-        .forEach {
-          if let windowScene = $0 as? UIWindowScene {
-            windowScene.windows.forEach { window in
-              window.overrideUserInterfaceStyle = style
-              window.rootViewController?.overrideUserInterfaceStyle = style
-            }
+    UIApplication.shared.connectedScenes
+      .forEach {
+        if let windowScene = $0 as? UIWindowScene {
+          windowScene.windows.forEach { window in
+            window.overrideUserInterfaceStyle = style
+            window.rootViewController?.overrideUserInterfaceStyle = style
           }
         }
-    }
+      }
   }
 
   /// Applies the in-app text size (see `TextScaling`) to the app and all windows

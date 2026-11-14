@@ -326,7 +326,7 @@ class PlayableTableCell: BasicTableCell {
 
     if displayMode == .selection {
       let img = UIImageView(image: isMarked ? .checkmark : .circle)
-      img.tintColor = isMarked ? themePreference.asColor : .secondaryLabelColor
+      img.tintColor = isMarked ? themePreference.asColor : .secondaryLabel
       accessoryView = img
     } else if displayMode == .add {
       let img = UIImageView(image: isMarked ? .checkmark : .plusCircle)
@@ -334,21 +334,21 @@ class PlayableTableCell: BasicTableCell {
       accessoryView = img
     } else if displayMode == .reorder || playerIndexCb != nil {
       let img = UIImageView(image: .bars)
-      img.tintColor = .labelColor
+      img.tintColor = .label
       accessoryView = img
     } else if let download = download {
       if download.error != nil {
         let img = UIImageView(image: .exclamation)
-        img.tintColor = .labelColor
+        img.tintColor = .label
         accessoryView = img
       } else if download.isFinishedSuccessfully {
         let img = UIImageView(image: .check)
-        img.tintColor = .labelColor
+        img.tintColor = .label
         accessoryView = img
       } else if download.isDownloading {
         let spinner = UIActivityIndicatorView(style: .medium)
         spinner.startAnimating()
-        spinner.tintColor = .labelColor
+        spinner.tintColor = .label
         accessoryView = spinner
       } else {
         accessoryView = nil
@@ -456,13 +456,13 @@ class PlayableTableCell: BasicTableCell {
 
   private func refreshSubtitleColor() {
     if playerIndexCb != nil {
-      cacheIconImage.tintColor = UIColor.labelColor
-      artistLabel.textColor = UIColor.labelColor
-      durationLabel.textColor = UIColor.labelColor
+      cacheIconImage.tintColor = UIColor.label
+      artistLabel.textColor = UIColor.label
+      durationLabel.textColor = UIColor.label
     } else {
-      cacheIconImage.tintColor = UIColor.secondaryLabelColor
-      artistLabel.textColor = UIColor.secondaryLabelColor
-      durationLabel.textColor = UIColor.secondaryLabelColor
+      cacheIconImage.tintColor = UIColor.secondaryLabel
+      artistLabel.textColor = UIColor.secondaryLabel
+      durationLabel.textColor = UIColor.secondaryLabel
     }
   }
 

@@ -310,44 +310,6 @@ class EntityPreviewActionBuilder {
     isShowSongDetails = false
   }
 
-  private func configureFor(playlist: Playlist) {
-    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-      .hasCachedItems
-    isShuffle = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
-    isMusicQueue = true
-    isPodcastQueue = false
-    isShowAlbum = false
-    isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
-    isDeleteOnServer = false
-    isGoToSiteUrl = false
-    isShowPodcastDetails = false
-    isShowSongDetails = false
-  }
-
-  private func configureFor(genre: Genre) {
-    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-      .hasCachedItems
-    isShuffle = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
-    isMusicQueue = true
-    isPodcastQueue = false
-    isShowAlbum = false
-    isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
-    isDeleteOnServer = false
-    isGoToSiteUrl = false
-    isShowPodcastDetails = false
-    isShowSongDetails = false
-  }
-
   private func configureFor(podcast: Podcast) {
     isPlay = (
       appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
@@ -366,7 +328,8 @@ class EntityPreviewActionBuilder {
     isShowSongDetails = false
   }
 
-  private func configureFor(artist: Artist) {
+  /// Common configuration for a container of songs: playlist, genre, artist, album
+  private func configureForSongContainer() {
     isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
       .hasCachedItems
     isShuffle = (
@@ -385,23 +348,21 @@ class EntityPreviewActionBuilder {
     isShowSongDetails = false
   }
 
+  private func configureFor(playlist: Playlist) {
+    configureForSongContainer()
+  }
+
+  private func configureFor(genre: Genre) {
+    configureForSongContainer()
+  }
+
+  private func configureFor(artist: Artist) {
+    configureForSongContainer()
+  }
+
   private func configureFor(album: Album) {
-    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-      .hasCachedItems
-    isShuffle = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
-    isMusicQueue = true
-    isPodcastQueue = false
-    isShowAlbum = false
+    configureForSongContainer()
     isShowArtist = !(rootView is ArtistDetailVC)
-    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
-    isDeleteOnServer = false
-    isGoToSiteUrl = false
-    isShowPodcastDetails = false
-    isShowSongDetails = false
   }
 
   private func configureFor(directory: Directory) {

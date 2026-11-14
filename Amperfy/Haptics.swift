@@ -19,9 +19,7 @@ enum Haptics {
   case light
   case medium
   case heavy
-  @available(iOS 13.0, *)
   case soft
-  @available(iOS 13.0, *)
   case rigid
   case selection
   case oldSchool
@@ -42,13 +40,9 @@ enum Haptics {
     case .heavy:
       UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
     case .soft:
-      if #available(iOS 13.0, *) {
-        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-      }
+      UIImpactFeedbackGenerator(style: .soft).impactOccurred()
     case .rigid:
-      if #available(iOS 13.0, *) {
-        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-      }
+      UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
     case .selection:
       UISelectionFeedbackGenerator().selectionChanged()
     case .oldSchool:

@@ -239,24 +239,8 @@ extension UIColor {
     UIColor(displayP3Red: 0 / 255, green: 122 / 255, blue: 1.0, alpha: 1.0)
   }
 
-  public static var labelColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.label
-    } else {
-      return UIColor.black
-    }
-  }
-
   public static var redHeart: UIColor {
     .red.withAlphaComponent(0.8)
-  }
-
-  public static var secondaryLabelColor: UIColor {
-    if #available(iOS 13.0, *) {
-      return UIColor.secondaryLabel
-    } else {
-      return UIColor.systemGray
-    }
   }
 }
 

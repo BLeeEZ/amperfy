@@ -552,6 +552,6 @@ class PlayerUIHandler: NSObject {
     audioInfoLabel
       .text = (displayBitrateInKbps > 0) ? "\(formatText) \(displayBitrateInKbps) kbps" :
       "\(formatText)"
-    playTypeIcon.tintColor = .labelColor
+    playTypeIcon.tintColor = .label
   }
 }

@@ -21,14 +21,11 @@ extension NSManagedObjectModel {
     let mainBundle = Bundle.main
     let subdirectory = "Amperfy.momd"
 
-    var omoURL: URL?
-    if #available(iOS 11, *) {
-      omoURL = mainBundle.url(
-        forResource: resource,
-        withExtension: "omo",
-        subdirectory: subdirectory
-      ) // optimized model file
-    }
+    let omoURL = mainBundle.url(
+      forResource: resource,
+      withExtension: "omo",
+      subdirectory: subdirectory
+    ) // optimized model file
     let momURL = mainBundle.url(
       forResource: resource,
       withExtension: "mom",
