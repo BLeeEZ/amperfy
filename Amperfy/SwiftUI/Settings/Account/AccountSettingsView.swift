@@ -62,6 +62,9 @@ struct AccountSettingsView: View {
     appDelegate.configureMainMenu()
 
     appDelegate.storage.settings.user.isOfflineMode = false
+    appDelegate.storage.settings.accounts.updateSetting(accountInfo) {
+      $0.clearInitialSyncCheckpoint()
+    }
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)
     let syncVC = AppStoryboard.Main.segueToSync(account: account)

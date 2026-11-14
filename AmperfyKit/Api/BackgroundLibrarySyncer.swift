@@ -19,32 +19,14 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+import CoreData
 import Foundation
 import os.log
-
-// MARK: - BackgroundSyncOperation
-
-public class BackgroundSyncOperation: AsyncOperation, @unchecked Sendable {
-  private let completeBlock: VoidAsyncClosure
-
-  public init(completeBlock: @escaping VoidAsyncClosure) {
-    self.completeBlock = completeBlock
-  }
-
-  override public func main() {
-    Task {
-      await self.completeBlock()
-      finish()
-    }
-  }
-}
 
 // MARK: - BackgroundLibrarySyncer
 
 public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sendable {
   private let storage: AsyncCoreDataAccessWrapper
-  @MainActor
-  private let mainStorage: CoreDataCompanion
   private let settings: AmperfySettings
   private let networkMonitor: NetworkMonitorFacade
   private let librarySyncer: LibrarySyncer
@@ -54,16 +36,16 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   private let autoDownloadLibrarySyncer: AutoDownloadLibrarySyncer
   private let eventLogger: EventLogger
 
+  private static let albumSyncPageSize: Int = 500
+
   private let log = OSLog(subsystem: "Amperfy", category: "BackgroundLibrarySyncer")
   private let isRunning = Atomic<Bool>(wrappedValue: false)
   private let isCurrentlyActive = Atomic<Bool>(wrappedValue: false)
   private let backgroundTask = Atomic<Task<(), Never>?>(wrappedValue: nil)
-  private let taskQueue: OperationQueue
 
   @MainActor
   init(
     storage: AsyncCoreDataAccessWrapper,
-    mainStorage: CoreDataCompanion,
     settings: AmperfySettings,
     networkMonitor: NetworkMonitorFacade,
     librarySyncer: LibrarySyncer,
@@ -72,15 +54,12 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     eventLogger: EventLogger
   ) {
     self.storage = storage
-    self.mainStorage = mainStorage
     self.settings = settings
     self.networkMonitor = networkMonitor
     self.librarySyncer = librarySyncer
     self.playableDownloadManager = playableDownloadManager
     self.autoDownloadLibrarySyncer = autoDownloadLibrarySyncer
     self.eventLogger = eventLogger
-    self.taskQueue = OperationQueue()
-    taskQueue.maxConcurrentOperationCount = 1
   }
 
   var isActive: Bool { isCurrentlyActive.wrappedValue }
@@ -95,16 +74,18 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
 
   public func stop() {
     isRunning.wrappedValue = false
-    taskQueue.cancelAllOperations()
-    addOperationsEndMessage()
+  }
+
+  /// The sync has to end: it was stopped, the app is in offline mode or there is no network
+  private var shouldStop: Bool {
+    !isRunning.wrappedValue || !settings.user.isOnlineMode || !networkMonitor.isConnectedToNetwork
   }
 
   private func syncAlbumSongsInBackground() {
     backgroundTask.wrappedValue = Task {
       os_log("start", log: self.log, type: .info)
 
-      if self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
-         self.networkMonitor.isConnectedToNetwork {
+      if !self.shouldStop {
         do {
           try await autoDownloadLibrarySyncer
             .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
@@ -118,43 +99,74 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
         notifyLibrarySongsSynced()
       }
 
-      try? await storage.perform { asyncCompanion in
-        let albumsToSync = asyncCompanion.library.getAlbumWithoutSyncedSongs()
+      let hasAlbumsToSync = !(await self.nextUnsyncedAlbumTargets()).isEmpty
+      if hasAlbumsToSync, !self.shouldStop {
+        _ = try? await self.librarySyncer.syncAllSongs { self.shouldStop }
+      }
 
-        for albumToSync in albumsToSync {
-          let albumObjectID = albumToSync.managedObject.objectID
-          let asyncOperation = BackgroundSyncOperation {
-            guard !Task.isCancelled, self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
-                  self.networkMonitor.isConnectedToNetwork else { return }
-            let albumMO = self.mainStorage.context.object(with: albumObjectID) as! AlbumMO
-            let album = Album(managedObject: albumMO)
-            do {
-              try await self.librarySyncer.sync(album: album)
-            } catch {
-              self.eventLogger.report(
-                topic: "Album Background Sync",
-                error: error,
-                displayPopup: false
-              )
-              album.isSongsMetaDataSynced = true
-            }
+      // Albums whose songs could not be synced stay unsynced and are tried again in a later run.
+      // Within a run, the failed albums of a round that made progress are skipped
+      var failedAlbumIDs = Set<NSManagedObjectID>()
+      var isRetryAfterNoProgress = false
+      while !self.shouldStop {
+        let targets = await self.nextUnsyncedAlbumTargets(excluding: failedAlbumIDs)
+        guard !targets.isEmpty else { break }
+        await self.librarySyncer.syncSongsInBackground(targets: targets) { self.shouldStop }
+        let unsyncedAlbumIDs = await self.unsyncedAlbumIDs(among: targets)
+        if unsyncedAlbumIDs.count < targets.count {
+          failedAlbumIDs.formUnion(unsyncedAlbumIDs)
+          isRetryAfterNoProgress = false
+        } else {
+          // Not a single album could be synced (e.g. the server is down): the same albums are
+          // tried once more after a pause, so a short outage does not end the run
+          guard !isRetryAfterNoProgress else {
+            os_log("Album songs sync made no progress", log: self.log, type: .info)
+            break
           }
-          self.taskQueue.addOperation(asyncOperation)
+          isRetryAfterNoProgress = true
+          await self.waitBeforeRetry()
         }
       }
 
-      addOperationsEndMessage()
-    }
-  }
-
-  func addOperationsEndMessage() {
-    taskQueue.addBarrierBlock {
-      // stop() resets isRunning before it adds this barrier: only a natural end notifies
+      // stop() resets isRunning before the loop ends: only a natural end notifies
       if self.isRunning.wrappedValue {
         self.notifyLibrarySongsSynced()
       }
       self.isRunning.wrappedValue = false
+      self.isCurrentlyActive.wrappedValue = false
       os_log("stopped", log: self.log, type: .info)
+    }
+  }
+
+  @MainActor
+  private func nextUnsyncedAlbumTargets(
+    excluding excludedAlbumIDs: Set<NSManagedObjectID> = Set()
+  ) async
+    -> [AlbumSyncTarget] {
+    (try? await storage.performAndGet { asyncCompanion in
+      asyncCompanion.library
+        .getAlbumWithoutSyncedSongs(
+          fetchLimit: Self.albumSyncPageSize,
+          excluding: excludedAlbumIDs
+        )
+        .map { AlbumSyncTarget(objectID: $0.managedObject.objectID, id: $0.id) }
+    }) ?? []
+  }
+
+  @MainActor
+  private func unsyncedAlbumIDs(among targets: [AlbumSyncTarget]) async -> Set<NSManagedObjectID> {
+    let targetIDs = targets.map(\.objectID)
+    // A failed check counts as a round without progress
+    return (try? await storage.performAndGet { asyncCompanion in
+      try asyncCompanion.library.getAlbumObjectIDsWithoutSyncedSongs(among: targetIDs)
+    }) ?? Set(targetIDs)
+  }
+
+  /// Waits about a minute, in steps that end early when the sync has to stop
+  private func waitBeforeRetry() async {
+    for _ in 0 ..< 6 {
+      try? await Task.sleep(nanoseconds: 10_000_000_000)
+      guard !shouldStop else { return }
     }
   }
 

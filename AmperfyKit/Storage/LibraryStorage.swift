@@ -1484,9 +1484,8 @@ public class LibraryStorage: PlayableFileCachable {
     return albums?.lazy.compactMap { Album(managedObject: $0) }.first
   }
 
-  func getAlbumWithoutSyncedSongs() -> [Album] {
-    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+  private var albumWithoutSyncedSongsPredicate: NSPredicate {
+    NSCompoundPredicate(andPredicateWithSubpredicates: [
       NSPredicate(format: "%K == FALSE", #keyPath(AlbumMO.isSongsMetaDataSynced)),
       NSPredicate(
         format: "%K == %i",
@@ -1494,8 +1493,37 @@ public class LibraryStorage: PlayableFileCachable {
         RemoteStatus.available.rawValue
       ),
     ])
+  }
+
+  func getAlbumWithoutSyncedSongs(
+    fetchLimit: Int,
+    excluding excludedObjectIDs: Set<NSManagedObjectID> = Set()
+  )
+    -> [Album] {
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    var predicates = [albumWithoutSyncedSongsPredicate]
+    if !excludedObjectIDs.isEmpty {
+      predicates.append(NSPredicate(format: "NOT (SELF IN %@)", Array(excludedObjectIDs)))
+    }
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+    fetchRequest.fetchLimit = fetchLimit
     let albums = try? context.fetch(fetchRequest)
     return albums?.lazy.compactMap { Album(managedObject: $0) } ?? [Album]()
+  }
+
+  /// The given albums whose songs are still not synced
+  func getAlbumObjectIDsWithoutSyncedSongs(
+    among objectIDs: [NSManagedObjectID]
+  ) throws
+    -> Set<NSManagedObjectID> {
+    guard !objectIDs.isEmpty else { return Set() }
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      albumWithoutSyncedSongsPredicate,
+      NSPredicate(format: "SELF IN %@", objectIDs),
+    ])
+    fetchRequest.includesPropertyValues = false
+    return Set(try context.fetch(fetchRequest).map(\.objectID))
   }
 
   // MARK: Podcasts

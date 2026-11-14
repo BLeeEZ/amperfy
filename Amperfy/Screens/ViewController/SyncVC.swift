@@ -32,6 +32,7 @@ class SyncVC: UIViewController {
   var libObjectsToParseCount: Int = 1
   var syncFinished = false
   var account: Account!
+  private var syncTask: Task<(), Never>?
 
   @IBOutlet
   weak var progressBar: UIProgressView!
@@ -53,12 +54,27 @@ class SyncVC: UIViewController {
   }
 
   override func viewDidAppear(_ animated: Bool) {
-    Task { @MainActor in
+    // Called again after a cancelled swipe on the sheet: only one sync, the one Skip cancels
+    guard syncTask == nil else { return }
+    syncTask = Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
-      if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
-        self.appDelegate.storage.settings.app.isLibrarySynced = false
+      let isResumingSync = self.appDelegate.storage.settings.accounts.getSetting(account.info)
+        .read.isInitialSyncResumable
+      if !isResumingSync {
+        // Not on a resume: a resume keeps isLibrarySynced as it was. When it is set, other windows
+        // open the partial library and a killed resume goes through SceneDelegate's check again
+        if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
+          self.appDelegate.storage.settings.app.isLibrarySynced = false
+        }
+        self.appDelegate.storage.settings.accounts.updateSetting(account.info) {
+          $0.clearInitialSyncCheckpoint()
+        }
+        self.appDelegate.storage.main.library
+          .cleanStorageOfObsoleteAccountEntries(account: account)
       }
-      self.appDelegate.storage.main.library.cleanStorageOfObsoleteAccountEntries(account: account)
+      self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
+        accountSettings.initialSyncCompletionStatus = .aborted
+      }
 
       do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
@@ -66,6 +82,7 @@ class SyncVC: UIViewController {
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .completed
         }
+        self.finishSync()
       } catch {
         guard !self.syncFinished else { return }
         self.appDelegate.eventLogger.report(
@@ -76,8 +93,8 @@ class SyncVC: UIViewController {
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .aborted
         }
+        self.finishSync()
       }
-      self.finishSync()
     }
   }
 
@@ -124,9 +141,11 @@ class SyncVC: UIViewController {
       preferredStyle: .alert
     )
     let skip = UIAlertAction(title: "Skip", style: .destructive, handler: { action in
+      self.syncTask?.cancel()
       self.appDelegate.storage.settings.accounts
         .updateSetting(self.account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .skipped
+          accountSettings.clearInitialSyncCheckpoint()
         }
       self.finishSync()
     })
