@@ -209,6 +209,12 @@ public protocol LibrarySyncer: Sendable {
   func setFavorite(artist: Artist, isFavorite: Bool) async throws
   @MainActor
   func parseLyrics(relFilePath: URL) async throws -> LyricsList
+  /// The artist's biography as plain text, or nil if the server has none
+  @MainActor
+  func requestDepiction(artist: Artist) async throws -> String?
+  /// The album's notes as plain text, or nil if the server has none
+  @MainActor
+  func requestDepiction(album: Album) async throws -> String?
 }
 
 // MARK: - AbstractBackgroundLibrarySyncer

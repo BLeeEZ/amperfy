@@ -210,6 +210,17 @@ class GenericDetailTableHeader: UIView {
     frame = CGRect(x: 0, y: 0, width: rootView.view.bounds.size.width, height: height)
   }
 
+  /// Shows a description that is only known after the header was created (e.g. fetched from the server)
+  func display(descriptionText: String?) {
+    guard config != nil, config?.descriptionText != descriptionText else { return }
+    config?.descriptionText = descriptionText
+    descriptionLabel.text = descriptionText
+    descriptionLabel.isHidden = descriptionText == nil
+    applyTraitCollectionChange()
+    // UITableView only picks up a new header height when the header is assigned again
+    config?.tableView.tableHeaderView = config?.tableView.tableHeaderView
+  }
+
   func startEditing() {
     isEditing = true
     refresh()

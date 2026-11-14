@@ -1,0 +1,10 @@
+<subsonic-response status="ok" version="1.16.1" type="AwesomeServerName" serverVersion="0.1.3 (tag)" openSubsonic="true">
+  <albumInfo>
+    <notes>Paranoid is the second studio album by Black Sabbath. &lt;a target='_blank' href="http://www.last.fm/music/Black+Sabbath/Paranoid"&gt;Read more on Last.fm&lt;/a&gt;.</notes>
+    <musicBrainzId>06cb4a6d-9de1-4e8a-b0c1-b6e8b4b06aa3</musicBrainzId>
+    <lastFmUrl>http://www.last.fm/music/Black+Sabbath/Paranoid</lastFmUrl>
+    <smallImageUrl>http://userserve-ak.last.fm/serve/34s/88069661.png</smallImageUrl>
+    <mediumImageUrl>http://userserve-ak.last.fm/serve/64s/88069661.png</mediumImageUrl>
+    <largeImageUrl>http://userserve-ak.last.fm/serve/174s/88069661.png</largeImageUrl>
+  </albumInfo>
+</subsonic-response>

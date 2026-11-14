@@ -32,6 +32,7 @@ class ArtistDetailVC: MultiSourceTableViewController {
   private var songsFetchedResultsController: ArtistSongsItemsFetchedResultsController!
   private var optionsButton: UIBarButtonItem!
   private var detailOperationsView: GenericDetailTableHeader?
+  private var isDepictionRequested = false
 
   init(account: Account, artist: Artist) {
     self.artist = artist
@@ -193,6 +194,19 @@ class ArtistDetailVC: MultiSourceTableViewController {
         self.appDelegate.eventLogger.report(topic: "Artist Sync", error: error)
       }
       self.detailOperationsView?.refresh()
+      await self.requestDepiction()
+    }
+  }
+
+  private func requestDepiction() async {
+    guard !isDepictionRequested, appDelegate.storage.settings.user.isOnlineMode else { return }
+    isDepictionRequested = true
+    do {
+      let depiction = try await appDelegate.getMeta(account.info).librarySyncer
+        .requestDepiction(artist: artist)
+      detailOperationsView?.display(descriptionText: depiction)
+    } catch {
+      appDelegate.eventLogger.report(topic: "Artist Info", error: error, displayPopup: false)
     }
   }
 
