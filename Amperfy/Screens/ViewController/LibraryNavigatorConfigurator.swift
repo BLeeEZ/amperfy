@@ -351,6 +351,7 @@ class LibraryNavigatorConfigurator: NSObject {
       // special case for podcast icon
       contentView.image = libraryItem.image.withRenderingMode(.alwaysTemplate)
     }
+    contentView.imageProperties.tintColor = libraryItem.iconColor
     let imageSize = CGSize(width: 35.0, height: 25.0)
     contentView.imageProperties.maximumSize = imageSize
     contentView.imageProperties.reservedLayoutSize = imageSize

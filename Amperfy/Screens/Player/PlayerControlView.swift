@@ -97,6 +97,11 @@ class PlayerControlView: UIView {
     playerModeButton.tintColor = .label
     volumeButton.tintColor = .label
     optionsButton.imageView?.tintColor = .label
+    // Fixed-width digits so the time labels don't jitter while counting
+    for label in [elapsedTimeLabel, remainingTimeLabel] {
+      guard let label else { continue }
+      label.font = .monospacedDigitSystemFont(ofSize: label.font.pointSize, weight: .regular)
+    }
     refreshPlayer()
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,

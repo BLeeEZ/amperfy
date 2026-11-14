@@ -163,11 +163,11 @@ public class ScrobbleSyncer {
         }
         return scobbleEntry.managedObject.objectID
       }
-    guard let scobbleObjectId else { return nil }
-    return ScrobbleEntry(
-      managedObject: try! storage.main.context
-        .existingObject(with: scobbleObjectId) as! ScrobbleEntryMO
-    )
+    guard let scobbleObjectId,
+          let scrobbleMO = try storage.main.context
+          .existingObject(with: scobbleObjectId) as? ScrobbleEntryMO
+    else { return nil }
+    return ScrobbleEntry(managedObject: scrobbleMO)
   }
 
   private func cacheScrobbleRequest(playedSong: Song, isUploaded: Bool) {

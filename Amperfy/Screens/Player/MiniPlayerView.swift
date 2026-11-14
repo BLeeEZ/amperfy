@@ -150,7 +150,7 @@ class MiniPlayerView: UIView {
   fileprivate lazy var elapsedTimeLabel: UILabel = {
     let label = UILabel(frame: .zero)
     label.textColor = .secondaryLabel
-    label.font = .systemFont(ofSize: 12.0)
+    label.font = .monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)
     return label
   }()
 
@@ -158,7 +158,7 @@ class MiniPlayerView: UIView {
     let label = UILabel(frame: .zero)
     label.textAlignment = .right
     label.textColor = .secondaryLabel
-    label.font = .systemFont(ofSize: 12.0)
+    label.font = .monospacedDigitSystemFont(ofSize: 12.0, weight: .regular)
     return label
   }()
 
