@@ -97,6 +97,13 @@ struct AccountSettingsView: View {
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
 
+    let accountCertTag = ClientCertificateManager.accountTag(for: accountInfo.ident)
+    if ClientCertificateManager.shared.hasIdentity(tag: accountCertTag) {
+      try? ClientCertificateManager.shared.migrateIdentity(
+        from: accountCertTag, to: ClientCertificateManager.loginTag
+      )
+    }
+
     // delete cached files
     CacheFileManager.shared.deleteAccountCache(accountInfo: accountInfo)
     // reset login credentials -> at new start the login view is presented to auth and resync library
@@ -237,6 +244,12 @@ struct AccountSettingsView: View {
             }
             NavigationLink(value: Destination.customHTTPHeaders) {
               Text("Custom HTTP Headers")
+            }
+          }
+
+          SettingsSection {
+            NavigationLink(destination: ClientCertificateSettingsView()) {
+              Text("Client Certificate (mTLS)")
             }
           }
 
