@@ -69,6 +69,7 @@ protocol PlayerQueuesPersistent {
 
   func insertActiveQueue(playables: [AbstractPlayable])
   func appendActiveQueue(playables: [AbstractPlayable])
+  func replaceActiveQueue(playables: [AbstractPlayable], contextName: String)
   func insertContextQueue(playables: [AbstractPlayable])
   func appendContextQueue(playables: [AbstractPlayable])
   func insertUserQueue(playables: [AbstractPlayable])
@@ -290,8 +291,14 @@ extension PlayerData: PlayerQueuesPersistent {
   private var isUserQueuPlayingInternal: Bool { managedObject.isUserQueuePlaying }
 
   private func setUserQueuPlayingInternal(_ newValue: Bool) {
+    setUserQueuPlayingInternal(newValue, saveContext: true)
+  }
+
+  private func setUserQueuPlayingInternal(_ newValue: Bool, saveContext: Bool) {
     managedObject.isUserQueuePlaying = newValue
-    library.saveContext()
+    if saveContext {
+      library.saveContext()
+    }
   }
 
   var isUserQueueVisible: Bool {
@@ -347,7 +354,12 @@ extension PlayerData: PlayerQueuesPersistent {
   }
 
   func setContextName(_ newValue: String) {
-    contextPlaylist.name = newValue
+    setContextName(newValue, saveContext: true)
+  }
+
+  private func setContextName(_ newValue: String, saveContext: Bool) {
+    guard contextPlaylist.setNameWithoutSaving(newValue), saveContext else { return }
+    library.saveContext()
   }
 
   var currentIndex: Int {
@@ -360,13 +372,19 @@ extension PlayerData: PlayerQueuesPersistent {
   }
 
   func setCurrentIndex(_ newValue: Int) {
+    setCurrentIndex(newValue, saveContext: true)
+  }
+
+  private func setCurrentIndex(_ newValue: Int, saveContext: Bool) {
     switch playerMode {
     case .music:
       currentMusicIndex = newValue
     case .podcast:
       currentPodcastIndex = newValue
     }
-    library.saveContext()
+    if saveContext {
+      library.saveContext()
+    }
   }
 
   private var currentMusicIndex: Int {
@@ -455,6 +473,28 @@ extension PlayerData: PlayerQueuesPersistent {
     case .podcast:
       appendPodcastQueue(playables: playables)
     }
+  }
+
+  func replaceActiveQueue(playables: [AbstractPlayable], contextName: String) {
+    switch playerMode {
+    case .music:
+      setContextName(contextName, saveContext: false)
+      contextPlaylist.removeAllItemsWithoutSaving()
+      shuffledContextPlaylist.removeAllItemsWithoutSaving()
+      if userQueuePlaylistInternal.songCount > 0 {
+        setUserQueuPlayingInternal(true, saveContext: false)
+        currentMusicIndex = -1
+      } else {
+        currentMusicIndex = 0
+      }
+      contextPlaylist.appendWithoutSaving(playables: playables)
+      shuffledContextPlaylist.appendWithoutSaving(playables: playables)
+    case .podcast:
+      podcastPlaylist.removeAllItemsWithoutSaving()
+      setCurrentIndex(0, saveContext: false)
+      podcastPlaylist.appendWithoutSaving(playables: playables)
+    }
+    library.saveContext()
   }
 
   func insertContextQueue(playables: [AbstractPlayable]) {
