@@ -401,36 +401,12 @@ extension HomeVC {
     guard let containable = dataSource.itemIdentifier(for: indexPath)?.playableContainable
     else { return nil }
 
-    let identifier = NSString(string: TableViewPreviewInfo(
-      playableContainerIdentifier: containable.containerIdentifier,
-      indexPath: indexPath
-    ).asJSONString())
-    return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-      let vc = EntityPreviewVC()
-      vc.display(container: containable, on: self)
-      Task { @MainActor in
-        do {
-          try await containable.fetch(
-            storage: self.appDelegate.storage,
-            librarySyncer: self.appDelegate.getMeta(self.account.info).librarySyncer,
-            playableDownloadManager: self.appDelegate.getMeta(self.account.info)
-              .playableDownloadManager
-          )
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
-        }
-        vc.refresh()
-      }
-      return vc
-    }) { suggestedActions in
-      var playIndexCB: (() -> PlayContext?)?
-      playIndexCB = { PlayContext(containable: containable) }
-      return EntityPreviewActionBuilder(
-        container: containable,
-        on: self,
-        playContextCb: playIndexCB
-      ).createMenu()
-    }
+    return createEntityPreviewContextMenuConfiguration(
+      for: containable,
+      at: indexPath,
+      account: account,
+      playContextCb: { PlayContext(containable: containable) }
+    )
   }
 
   override func collectionView(
@@ -439,13 +415,7 @@ extension HomeVC {
     animator: UIContextMenuInteractionCommitAnimating
   ) {
     animator.addCompletion {
-      if let identifier = configuration.identifier as? String,
-         let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
-         let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
-         let container = self.appDelegate.storage.main.library
-         .getContainer(identifier: containerIdentifier) {
-        EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
-      }
+      self.performEntityPreviewTransition(for: configuration)
     }
   }
 }

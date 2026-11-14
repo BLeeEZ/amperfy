@@ -447,15 +447,7 @@ extension QueueVC: UITableViewDelegate, UITableViewDataSource {
     animator: UIContextMenuInteractionCommitAnimating
   ) {
     animator.addCompletion {
-      if let identifier = configuration.identifier as? String,
-         let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
-         let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
-         let container = self.appDelegate.storage.main.library
-         .getContainer(identifier: containerIdentifier),
-         let mainController = self.mainViewController {
-        EntityPreviewActionBuilder(container: container, on: mainController)
-          .performPreviewTransition()
-      }
+      self.mainViewController?.performEntityPreviewTransition(for: configuration)
     }
   }
 

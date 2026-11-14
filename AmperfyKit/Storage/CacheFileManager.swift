@@ -466,47 +466,28 @@ final public class CacheFileManager: Sendable {
   }
 
   public func getCachedSongs(for account: AccountInfo) -> [PlayableCacheInfo] {
-    var URLs = [URL]()
-    var cacheInfo = [PlayableCacheInfo]()
-    if let songsDir = getOrCreateAbsoluteSongsDirectory(for: account) {
-      URLs = contentsOfDirectory(url: songsDir)
-    }
-    for url in URLs {
-      let isDirectoryResourceValue: URLResourceValues
-      do {
-        isDirectoryResourceValue = try url.resourceValues(forKeys: [.isDirectoryKey])
-      } catch {
-        continue
-      }
-      guard isDirectoryResourceValue.isDirectory == nil || isDirectoryResourceValue
-        .isDirectory == false else {
-        continue
-      }
-
-      let fileName = url.lastPathComponent
-      var id = fileName
-      let pathExtension = url.pathExtension
-      var mimeType: String?
-      if !pathExtension.isEmpty {
-        id = (fileName as NSString).deletingPathExtension
-        mimeType = MimeFileConverter.getMIMEType(filenameExtension: pathExtension)
-      }
-      cacheInfo.append(PlayableCacheInfo(
-        url: url,
-        id: id,
-        fileType: pathExtension,
-        mimeType: mimeType,
-        relFilePath: getRelSongsDirectory(for: account)?.appendingPathComponent(fileName)
-      ))
-    }
-    return cacheInfo
+    getCachedPlayables(
+      inDirectory: getOrCreateAbsoluteSongsDirectory(for: account),
+      relDirectory: getRelSongsDirectory(for: account)
+    )
   }
 
   public func getCachedEpisodes(for account: AccountInfo) -> [PlayableCacheInfo] {
+    getCachedPlayables(
+      inDirectory: getOrCreateAbsolutePodcastEpisodesDirectory(for: account),
+      relDirectory: getRelPodcastEpisodesDirectory(for: account)
+    )
+  }
+
+  private func getCachedPlayables(
+    inDirectory directory: URL?,
+    relDirectory: URL?
+  )
+    -> [PlayableCacheInfo] {
     var URLs = [URL]()
     var cacheInfo = [PlayableCacheInfo]()
-    if let episodesDir = getOrCreateAbsolutePodcastEpisodesDirectory(for: account) {
-      URLs = contentsOfDirectory(url: episodesDir)
+    if let directory = directory {
+      URLs = contentsOfDirectory(url: directory)
     }
     for url in URLs {
       let isDirectoryResourceValue: URLResourceValues
@@ -533,7 +514,7 @@ final public class CacheFileManager: Sendable {
         id: id,
         fileType: pathExtension,
         mimeType: mimeType,
-        relFilePath: getRelPodcastEpisodesDirectory(for: account)?.appendingPathComponent(fileName)
+        relFilePath: relDirectory?.appendingPathComponent(fileName)
       ))
     }
     return cacheInfo

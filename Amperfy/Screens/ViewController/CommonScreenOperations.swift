@@ -56,6 +56,62 @@ class CommonScreenOperations {
   static var tableSectionHeightLarge: CGFloat { TextScaling.scaledValue(40) }
 }
 
+// MARK: - Entity preview context menu
+
+extension UIViewController {
+  /// Context menu with a preview of the container.
+  /// The container gets synced with the server of the account while the preview is displayed.
+  func createEntityPreviewContextMenuConfiguration(
+    for containable: PlayableContainable,
+    at indexPath: IndexPath,
+    account: Account?,
+    playContextCb: GetPlayContextCallback?
+  )
+    -> UIContextMenuConfiguration {
+    let identifier = NSString(string: TableViewPreviewInfo(
+      playableContainerIdentifier: containable.containerIdentifier,
+      indexPath: indexPath
+    ).asJSONString())
+    return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
+      let vc = EntityPreviewVC()
+      vc.display(container: containable, on: self)
+      Task { @MainActor in
+        do {
+          if let account = account {
+            try await containable.fetch(
+              storage: self.appDelegate.storage,
+              librarySyncer: self.appDelegate.getMeta(account.info).librarySyncer,
+              playableDownloadManager: self.appDelegate.getMeta(account.info)
+                .playableDownloadManager
+            )
+          }
+        } catch {
+          self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
+        }
+        vc.refresh()
+      }
+      return vc
+    }) { suggestedActions in
+      EntityPreviewActionBuilder(
+        container: containable,
+        on: self,
+        playContextCb: playContextCb
+      ).createMenu()
+    }
+  }
+
+  /// Opens the container the context menu preview has been created for.
+  func performEntityPreviewTransition(for configuration: UIContextMenuConfiguration) {
+    guard let identifier = configuration.identifier as? String,
+          let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
+          let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
+          let container = appDelegate.storage.main.library
+          .getContainer(identifier: containerIdentifier)
+    else { return }
+    EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
+  }
+}
+
 // MARK: - UIViewController
 
 extension UIViewController {
