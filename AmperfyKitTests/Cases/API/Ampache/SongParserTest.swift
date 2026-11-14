@@ -84,6 +84,10 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "album")
     XCTAssertEqual(song.artwork?.id, "12")
+    XCTAssertEqual(
+      song.artwork?.url,
+      "https://music.com.au/image.php?object_id=12&object_type=album&name=art.jpg"
+    )
     let song1Artwork = song.artwork
 
     song = songs[1]
@@ -159,6 +163,10 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "album")
     XCTAssertEqual(song.artwork?.id, "8")
+    XCTAssertEqual(
+      song.artwork?.url,
+      "https://music.com.au/image.php?object_id=8&object_type=album&name=art.jpg"
+    )
 
     song = songs[3]
     XCTAssertEqual(song.account?.serverHash, TestAccountInfo.test1ServerHash)
@@ -199,5 +207,9 @@ class SongParserTest: AbstractAmpacheTest {
     XCTAssertEqual(song.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(song.artwork?.type, "album")
     XCTAssertEqual(song.artwork?.id, "2")
+    XCTAssertEqual(
+      song.artwork?.url,
+      "https://music.com.au/image.php?object_id=2&object_type=album&name=art.png"
+    )
   }
 }

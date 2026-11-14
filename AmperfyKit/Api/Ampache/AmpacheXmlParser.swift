@@ -110,12 +110,14 @@ class AmpacheXmlLibParser: AmpacheNotifiableXmlParser {
     guard let artworkRemoteInfo = AmpacheXmlServerApi
       .extractArtworkInfoFromURL(urlString: urlString) else { return nil }
     if let prefetchedArtwork = prefetch.prefetchedArtworkDict[artworkRemoteInfo] {
+      prefetchedArtwork.url = AmpacheXmlServerApi.artworkUrlWithoutSession(urlString: urlString)
       return prefetchedArtwork
     } else {
       let createdArtwork = library.createArtwork(account: account)
       prefetch.prefetchedArtworkDict[artworkRemoteInfo] = createdArtwork
       createdArtwork.remoteInfo = artworkRemoteInfo
       createdArtwork.status = .NotChecked
+      createdArtwork.url = AmpacheXmlServerApi.artworkUrlWithoutSession(urlString: urlString)
       return createdArtwork
     }
   }
