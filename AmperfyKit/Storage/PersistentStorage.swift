@@ -46,9 +46,13 @@ public class CoreDataCompanion {
   }
 
   public func perform(body: @escaping (_ asyncCompanion: CoreDataCompanion) -> ()) {
+    // performAndWait runs the block synchronously on the calling thread,
+    // so neither value actually crosses a concurrency boundary.
+    nonisolated(unsafe) let companion = self
+    nonisolated(unsafe) let body = body
     context.performAndWait {
-      body(self)
-      library.saveContext()
+      body(companion)
+      companion.library.saveContext()
     }
   }
 }

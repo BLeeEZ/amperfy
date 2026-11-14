@@ -303,7 +303,7 @@ extension TabBarVC: MainSceneHostingViewController {
       self.selectedTab = searchTab
       searchTab.viewController?.navigationController?.popToRootViewController(animated: false)
       Task {
-        try await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         if let searchTabVC = searchTab.viewController?.navigationController?
           .topViewController as? SearchVC {
           searchTabVC.activateSearchBar()

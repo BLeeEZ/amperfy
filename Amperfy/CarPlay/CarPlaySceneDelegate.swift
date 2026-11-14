@@ -70,7 +70,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     _ templateApplicationScene: CPTemplateApplicationScene,
     didConnect interfaceController: CPInterfaceController
   ) {
-    Task { @MainActor in
+    Task { @MainActor [self] in
       os_log("CarPlay: didConnect", log: self.log, type: .info)
       appDelegate.notificationHandler.register(
         self,
@@ -163,7 +163,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     _ templateApplicationScene: CPTemplateApplicationScene,
     didDisconnectInterfaceController interfaceController: CPInterfaceController
   ) {
-    Task { @MainActor in
+    Task { @MainActor [self] in
       os_log("CarPlay: didDisconnect", log: self.log, type: .info)
       guard activeAccountInfo != nil, activeAccount != nil else {
         os_log("CarPlay: no account available -> do nothing", log: self.log, type: .info)
