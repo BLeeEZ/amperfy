@@ -30,6 +30,8 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
   var guessedArtist: Artist?
   var guessedAlbum: Album?
   var guessedGenre: Genre?
+  var collectedMultiArtists = [Artist]()
+  var collectedAlbumArtists = [Artist]()
 
   override func parser(
     _ parser: XMLParser,
@@ -59,6 +61,8 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
         guessedGenre = nil
       }
       playableBuffer = songBuffer
+      collectedMultiArtists = []
+      collectedAlbumArtists = []
 
       if let artistId = attributeDict["artistId"] {
         if let guessedArtist, guessedArtist.id == artistId {
@@ -138,6 +142,36 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
       }
     }
 
+    // OpenSubsonic multi-artist: <artists id="..." name="..."/>
+    if elementName == "artists", songBuffer != nil,
+       let artistId = attributeDict["id"] {
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        collectedMultiArtists.append(prefetchedArtist)
+      } else if let artistName = attributeDict["name"] {
+        let artist = library.createArtist(account: account)
+        prefetch.prefetchedArtistDict[artistId] = artist
+        artist.id = artistId
+        artist.name = artistName
+        os_log("Multi-artist <%s> id %s created", log: log, type: .error, artistName, artistId)
+        collectedMultiArtists.append(artist)
+      }
+    }
+
+    // OpenSubsonic album artist: <albumArtists id="..." name="..."/>
+    if elementName == "albumArtists", songBuffer != nil,
+       let artistId = attributeDict["id"] {
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        collectedAlbumArtists.append(prefetchedArtist)
+      } else if let artistName = attributeDict["name"] {
+        let artist = library.createArtist(account: account)
+        prefetch.prefetchedArtistDict[artistId] = artist
+        artist.id = artistId
+        artist.name = artistName
+        os_log("Album artist <%s> id %s created", log: log, type: .error, artistName, artistId)
+        collectedAlbumArtists.append(artist)
+      }
+    }
+
     super.parser(
       parser,
       didStartElement: elementName,
@@ -155,6 +189,14 @@ class SsSongParserDelegate: SsPlayableParserDelegate {
   ) {
     if elementName == "song" || elementName == "entry" || elementName == "child" || elementName ==
       "episode", songBuffer != nil {
+      if !collectedMultiArtists.isEmpty {
+        songBuffer?.multiArtists = collectedMultiArtists
+      }
+      if !collectedAlbumArtists.isEmpty {
+        songBuffer?.albumArtists = collectedAlbumArtists
+      }
+      collectedMultiArtists = []
+      collectedAlbumArtists = []
       parsedCount += 1
       resetPlayableBuffer()
       if let song = songBuffer {

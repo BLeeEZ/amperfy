@@ -35,7 +35,11 @@ extension SongMO {
   @NSManaged
   public var album: AlbumMO?
   @NSManaged
+  public var albumArtists: NSOrderedSet?
+  @NSManaged
   public var artist: ArtistMO?
+  @NSManaged
+  public var multiArtists: NSOrderedSet?
   @NSManaged
   public var directory: DirectoryMO?
   @NSManaged
@@ -50,4 +54,44 @@ extension SongMO {
     #keyPath(SongMO.artwork),
     #keyPath(SongMO.embeddedArtwork),
   ]
+}
+
+// MARK: Generated accessors for multiArtists
+
+extension SongMO {
+  @objc(addMultiArtistsObject:)
+  @NSManaged
+  public func addToMultiArtists(_ value: ArtistMO)
+
+  @objc(removeMultiArtistsObject:)
+  @NSManaged
+  public func removeFromMultiArtists(_ value: ArtistMO)
+
+  @objc(addMultiArtists:)
+  @NSManaged
+  public func addToMultiArtists(_ values: NSOrderedSet)
+
+  @objc(removeMultiArtists:)
+  @NSManaged
+  public func removeFromMultiArtists(_ values: NSOrderedSet)
+}
+
+// MARK: Generated accessors for albumArtists
+
+extension SongMO {
+  @objc(addAlbumArtistsObject:)
+  @NSManaged
+  public func addToAlbumArtists(_ value: ArtistMO)
+
+  @objc(removeAlbumArtistsObject:)
+  @NSManaged
+  public func removeFromAlbumArtists(_ value: ArtistMO)
+
+  @objc(addAlbumArtists:)
+  @NSManaged
+  public func addToAlbumArtists(_ values: NSOrderedSet)
+
+  @objc(removeAlbumArtists:)
+  @NSManaged
+  public func removeFromAlbumArtists(_ values: NSOrderedSet)
 }

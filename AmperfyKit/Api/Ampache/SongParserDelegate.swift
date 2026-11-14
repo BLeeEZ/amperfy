@@ -28,6 +28,7 @@ class SongParserDelegate: PlayableParserDelegate {
   var songBuffer: Song?
   var parsedSongs = [Song]()
   var artistIdToCreate: String?
+  var albumArtistIdToCreate: String?
   var albumIdToCreate: String?
   var genreIdToCreate: String?
 
@@ -80,6 +81,13 @@ class SongParserDelegate: PlayableParserDelegate {
       } else {
         artistIdToCreate = artistId
       }
+    case "albumartist":
+      guard songBuffer != nil, let artistId = attributeDict["id"] else { return }
+      if let prefetchedArtist = prefetch.prefetchedArtistDict[artistId] {
+        songBuffer?.albumArtists = [prefetchedArtist]
+      } else {
+        albumArtistIdToCreate = artistId
+      }
     case "album":
       guard let song = songBuffer, let albumId = attributeDict["id"] else { return }
       if let guessedAlbum, guessedAlbum.id == albumId {
@@ -119,6 +127,22 @@ class SongParserDelegate: PlayableParserDelegate {
         artist.name = buffer
         songBuffer?.artist = artist
         artistIdToCreate = nil
+      }
+    case "albumartist":
+      if let artistId = albumArtistIdToCreate {
+        os_log(
+          "AlbumArtist <%s> with id %s has been created",
+          log: log,
+          type: .error,
+          buffer,
+          artistId
+        )
+        let artist = library.createArtist(account: account)
+        prefetch.prefetchedArtistDict[artistId] = artist
+        artist.id = artistId
+        artist.name = buffer
+        songBuffer?.albumArtists = [artist]
+        albumArtistIdToCreate = nil
       }
     case "album":
       if let albumId = albumIdToCreate {
