@@ -116,8 +116,6 @@ public protocol PlayableContainable {
   @MainActor
   func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection
   @MainActor
-  func cachePlayables(downloadManager: DownloadManageable)
-  @MainActor
   func fetchFromServer(
     storage: PersistentStorage,
     librarySyncer: LibrarySyncer,
@@ -132,15 +130,6 @@ public protocol PlayableContainable {
 }
 
 extension PlayableContainable {
-  @MainActor
-  public func cachePlayables(downloadManager: DownloadManageable) {
-    for playable in playables {
-      if !playable.isCached {
-        downloadManager.download(object: playable)
-      }
-    }
-  }
-
   public func info(for api: ServerApiType?, details: DetailInfoType) -> String {
     infoDetails(for: api, details: details).joined(separator: " \(CommonString.oneMiddleDot) ")
   }

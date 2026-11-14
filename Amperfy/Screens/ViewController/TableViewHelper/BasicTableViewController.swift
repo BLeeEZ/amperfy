@@ -115,7 +115,6 @@ class BasicTableViewController: KeyCommandTableViewController {
   var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
   var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
   var swipeCallback: SwipeActionCallback?
-  var isEditLockedDueToActiveSwipe = false
   var isSingleCellEditingModeActive = false
 
   override func viewDidLoad() {

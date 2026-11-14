@@ -185,7 +185,6 @@ public struct AmperfyImage: Sendable {
   public static let home = Self("house.fill")
   public static let info = Self("info.circle")
   public static let isSelected = Self("checkmark.circle.fill")
-  public static let leftRightPlay = Self("play.rectangle.on.rectangle")
   public static let listBullet = Self("list.bullet")
   public static let login = Self("arrow.right.to.line")
   public static let lyrics = Self("quote.bubble")
@@ -275,12 +274,6 @@ public struct AmperfyImage: Sendable {
 
 @MainActor
 extension UIImage {
-  public static func symbolImageSize(scale: UIImage.SymbolScale) -> CGSize {
-    let config = UIImage.SymbolConfiguration(scale: scale)
-    let image = UIImage(systemName: AmperfyImage.plus.systemName, withConfiguration: config)!
-    return image.size
-  }
-
   public static let airplayaudio = UIImage.create(systemName: AmperfyImage.airplayaudio.systemName)
   public static let album = UIImage.create(systemName: AmperfyImage.album.systemName)
   public static let antenna = UIImage.create(systemName: AmperfyImage.antenna.systemName)
@@ -546,11 +539,5 @@ extension UIImage {
     UIGraphicsEndImageContext()
 
     return newImage!
-  }
-
-  public func styleForNavigationBar(pointSize: CGFloat, tintColor: UIColor) -> UIImage {
-    let navBarSymbolConfiguration = UIImage.SymbolConfiguration(pointSize: pointSize)
-    let img = applyingSymbolConfiguration(navBarSymbolConfiguration) ?? UIImage()
-    return img.withTintColor(tintColor)
   }
 }

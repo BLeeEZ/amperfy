@@ -851,28 +851,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     )
   }
 
-  private func updateUrlToken(urlString: String) async throws -> URL {
-    let auth = try await reauthenticate()
-    guard let inputUrlComp = URLComponents(string: urlString),
-          let inputUrl = URL(string: urlString),
-          var outputUrlComp = try? createAuthApiUrlComponent(auth: auth),
-          let queryItems = inputUrlComp.queryItems
-    else { throw BackendError.invalidUrl }
-
-    var outputItems = [URLQueryItem]()
-    for queryItem in queryItems {
-      if queryItem.name.isContainedIn(["ssid", "auth"]) {
-        outputItems.append(URLQueryItem(name: queryItem.name, value: auth.token))
-      } else {
-        outputItems.append(queryItem)
-      }
-    }
-
-    outputUrlComp.queryItems = outputItems
-    outputUrlComp.path = inputUrl.path
-    return try createUrl(from: outputUrlComp)
-  }
-
   private func request(
     urlCreation: @escaping (_: AuthentificationHandshake) throws
       -> URL

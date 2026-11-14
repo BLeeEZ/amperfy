@@ -22,8 +22,6 @@
 public import Foundation
 public import CoreData
 
-public typealias AccountMOCoreDataClassSet = NSSet
-
 // MARK: - AccountMO
 
 @objc(AccountMO)

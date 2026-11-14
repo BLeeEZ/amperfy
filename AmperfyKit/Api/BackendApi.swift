@@ -244,17 +244,6 @@ public protocol URLCleanser: Sendable {
   func cleanse(url: URL?) -> CleansedURL
 }
 
-// MARK: - TranscodingInfo
-
-public struct TranscodingInfo {
-  var format: CacheTranscodingFormatPreference?
-  var bitrate: StreamingMaxBitratePreference?
-
-  var description: String {
-    "Format: \(format?.description ?? "-"), Bitrate: \(bitrate?.description ?? "-")"
-  }
-}
-
 // MARK: - BackendApi
 
 public protocol BackendApi: URLCleanser, Sendable {

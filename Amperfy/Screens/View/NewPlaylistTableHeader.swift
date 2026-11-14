@@ -22,8 +22,6 @@
 import AmperfyKit
 import UIKit
 
-typealias PlaylistCreationResponder = (_ playlist: Playlist) -> ()
-
 // MARK: - NewPlaylistTableHeader
 
 class NewPlaylistTableHeader: UIView {

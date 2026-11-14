@@ -588,19 +588,3 @@ extension Playlist: Hashable, Equatable {
     hasher.combine(managedObject)
   }
 }
-
-extension Array where Element: Playlist {
-  func filterRegualarPlaylists() -> [Element] {
-    let filteredArray = filter { element in
-      !element.isSmartPlaylist
-    }
-    return filteredArray
-  }
-
-  func filterSmartPlaylists() -> [Element] {
-    let filteredArray = filter { element in
-      element.isSmartPlaylist
-    }
-    return filteredArray
-  }
-}

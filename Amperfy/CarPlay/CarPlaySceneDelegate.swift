@@ -37,8 +37,6 @@ struct CarPlayShortPreference {
 
 @MainActor
 class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
-  static let maxTreeDepth = 4
-
   private let log = OSLog(subsystem: "Amperfy", category: "CarPlay")
   private static let assistantConfig = CPAssistantCellConfiguration(
     position: .top,

@@ -36,8 +36,4 @@ class StringHasher {
   static func md5Hex(dataString: String) -> String {
     md5(dataString: dataString).map { String(format: "%02hhx", $0) }.joined()
   }
-
-  static func md5Base64(dataString: String) -> String {
-    md5(dataString: dataString).base64EncodedString()
-  }
 }

@@ -54,7 +54,6 @@ class CommonScreenOperations {
   /// Scales with the user's text size (40pt at the default text size)
   @MainActor
   static var tableSectionHeightLarge: CGFloat { TextScaling.scaledValue(40) }
-  static let tableSectionHeightFooter: CGFloat = 8
 }
 
 // MARK: - UIViewController

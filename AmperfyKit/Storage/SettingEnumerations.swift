@@ -112,10 +112,6 @@ public enum StreamingMaxBitratePreference: Int, CaseIterable, Sendable, Codable 
       return "\(rawValue) kbps"
     }
   }
-
-  public var asBitsPerSecondAV: Double {
-    Double(rawValue * 1000)
-  }
 }
 
 // MARK: - StreamingFormatPreference
@@ -232,10 +228,6 @@ public enum EqualizerPreset: Int, CaseIterable, Sendable, Codable {
     case .increasedTreble: return [0, 0, 0, 0, 1, 2, 3, 4, 5, 6]
     }
   }
-
-  public var asEqualizerSetting: EqualizerSetting {
-    EqualizerSetting(name: description, gains: gains)
-  }
 }
 
 // MARK: - SyncCompletionStatus
@@ -319,23 +311,6 @@ public enum ThemePreference: Int, CaseIterable, Sendable, Codable {
       return .systemOrange
     case .purple:
       return .systemPurple
-    }
-  }
-
-  public var contrastColor: UIColor {
-    switch self {
-    case .blue:
-      return .white
-    case .green:
-      return .white
-    case .red:
-      return .white
-    case .yellow:
-      return .black
-    case .orange:
-      return .white
-    case .purple:
-      return .white
     }
   }
 }

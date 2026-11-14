@@ -33,16 +33,3 @@ struct DefaultButtonStyle: ButtonStyle {
       .contentShape(Rectangle())
   }
 }
-
-// MARK: - ErrorButtonStyle
-
-struct ErrorButtonStyle: ButtonStyle {
-  func makeBody(configuration: Self.Configuration) -> some View {
-    configuration.label
-      .foregroundColor(.systemBackground)
-      .padding([.top, .bottom], 8)
-      .background(configuration.isPressed ? Color.error.opacity(0.75) : Color.error)
-      .cornerRadius(15.0)
-      .contentShape(Rectangle())
-  }
-}

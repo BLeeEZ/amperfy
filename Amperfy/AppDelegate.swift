@@ -27,7 +27,6 @@ import os.log
 @preconcurrency import UIKit
 
 let windowSettingsTitle = "Settings"
-let windowMiniPlayerTitle = "MiniPlayer"
 
 let settingsWindowActivityType = "amperfy.settings"
 let miniPlayerWindowActivityType = "amperfy.miniplayer"
@@ -52,7 +51,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   static let maxPlayablesDownloadsToAddAtOnceWithoutWarning = 200
 
   var window: UIWindow?
-  var focusedWindowTitle: String?
 
   lazy var player: PlayerFacade = {
     UIApplication.shared.beginReceivingRemoteControlEvents()
@@ -230,19 +228,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     sleepTimer?.invalidate()
     sleepTimer = nil
     player.stop()
-  }
-
-  // deprecated
-  func restartByUser() {
-    Task {
-      await localNotificationManager.notifyDebugAndWait(
-        title: "Amperfy Restart",
-        body: "Tap to reopen Amperfy"
-      )
-      stopForInit()
-      // close Amperfy
-      exit(0)
-    }
   }
 
   var isNormalInteraction: Bool {

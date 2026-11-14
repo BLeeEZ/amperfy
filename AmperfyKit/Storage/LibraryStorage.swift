@@ -597,10 +597,6 @@ public class LibraryStorage: PlayableFileCachable {
     return Podcast(managedObject: podcastMO)
   }
 
-  func deletePodcast(_ podcast: Podcast) {
-    context.delete(podcast.managedObject)
-  }
-
   func createPodcastEpisode(account: Account) -> PodcastEpisode {
     let podcastEpisodeMO = PodcastEpisodeMO(context: context)
     podcastEpisodeMO.account = account.managedObject
@@ -623,14 +619,6 @@ public class LibraryStorage: PlayableFileCachable {
     let scrobbleEntryMO = ScrobbleEntryMO(context: context)
     scrobbleEntryMO.account = account.managedObject
     return ScrobbleEntry(managedObject: scrobbleEntryMO)
-  }
-
-  func deleteRadio(_ radio: Radio) {
-    context.delete(radio.managedObject)
-  }
-
-  func deleteScrobbleEntry(_ scrobbleEntry: ScrobbleEntry) {
-    context.delete(scrobbleEntry.managedObject)
   }
 
   func createMusicFolder(account: Account) -> MusicFolder {
@@ -1984,21 +1972,6 @@ public class LibraryStorage: PlayableFileCachable {
     return musicFolders ?? [MusicFolder]()
   }
 
-  public func getMusicFolder(for account: Account, id: String) -> MusicFolder? {
-    let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      NSPredicate(
-        format: "%K == %@",
-        #keyPath(MusicFolderMO.id),
-        NSString(string: id)
-      ),
-    ])
-    fetchRequest.fetchLimit = 1
-    let musicFolders = try? context.fetch(fetchRequest)
-    return musicFolders?.lazy.compactMap { MusicFolder(managedObject: $0) }.first
-  }
-
   // MARK: Directories
 
   func getAllDirectories(isFaultsOptimized: Bool = false) -> [Directory] {
@@ -2010,21 +1983,6 @@ public class LibraryStorage: PlayableFileCachable {
     }
     let directories = try? context.fetch(fetchRequest)
     return directories?.lazy.compactMap { Directory(managedObject: $0) } ?? [Directory]()
-  }
-
-  func getDirectory(for account: Account, id: String) -> Directory? {
-    let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      NSPredicate(
-        format: "%K == %@",
-        #keyPath(DirectoryMO.id),
-        NSString(string: id)
-      ),
-    ])
-    fetchRequest.fetchLimit = 1
-    let directories = try? context.fetch(fetchRequest)
-    return directories?.lazy.compactMap { Directory(managedObject: $0) }.first
   }
 
   // MARK: Artworks
@@ -2109,18 +2067,6 @@ public class LibraryStorage: PlayableFileCachable {
     let embeddedArtworks = try? context.fetch(fetchRequest)
     return embeddedArtworks?
       .compactMap { EmbeddedArtwork(managedObject: $0) } ?? [EmbeddedArtwork]()
-  }
-
-  public func getEmbeddedArtwork(forOwner playable: AbstractPlayable) -> EmbeddedArtwork? {
-    let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
-    fetchRequest.predicate = NSPredicate(
-      format: "%K == %@",
-      #keyPath(EmbeddedArtworkMO.owner.id),
-      NSString(string: playable.id)
-    )
-    fetchRequest.fetchLimit = 1
-    let embeddedArtworks = try? context.fetch(fetchRequest)
-    return embeddedArtworks?.lazy.compactMap { EmbeddedArtwork(managedObject: $0) }.first
   }
 
   // MARK: LogEntries
@@ -2942,16 +2888,6 @@ public class LibraryStorage: PlayableFileCachable {
     return playlistMOs?.compactMap { Playlist(library: self, managedObject: $0) } ?? [Playlist]()
   }
 
-  private func getPlaylistsDict(account: Account, ids: Set<String>) -> [String: Playlist] {
-    let playlists = getPlaylists(account: account, ids: ids)
-
-    var playlistDict = [String: Playlist]()
-    for playlist in playlists {
-      playlistDict[playlist.id] = playlist
-    }
-    return playlistDict
-  }
-
   private func getPlaylistsDictList(account: Account, ids: Set<String>) -> [String: [Playlist]] {
     let playlists = getPlaylists(account: account, ids: ids)
 
@@ -3092,13 +3028,6 @@ public class LibraryStorage: PlayableFileCachable {
       request.predicate = getFetchPredicate(forAccount: account)
       clearStorage(fetchRequest: request as! NSFetchRequest<NSFetchRequestResult>)
     }
-  }
-
-  public func cleanStorage() {
-    for entityToDelete in LibraryStorage.entitiesToDelete {
-      clearStorage(ofType: entityToDelete)
-    }
-    saveContext()
   }
 
   private func clearStorage(ofType entityToDelete: String) {

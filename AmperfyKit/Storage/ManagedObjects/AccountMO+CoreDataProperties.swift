@@ -22,8 +22,6 @@
 public import Foundation
 public import CoreData
 
-public typealias AccountMOCoreDataPropertiesSet = NSSet
-
 extension AccountMO {
   @nonobjc
   public class func fetchRequest() -> NSFetchRequest<AccountMO> {

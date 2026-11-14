@@ -86,7 +86,6 @@ class PlayableTableCell: BasicTableCell {
   static var rowHeight: CGFloat { scaledRowHeight(contentHeight: 48.0) }
   /// The artwork is square and as high as the row content (see xib)
   static var artworkSize: CGFloat { rowHeight - margin.top - margin.bottom }
-  private static let touchAnimation = 0.4
 
   private var style = PlayableTableCellStyle.none
   private var playerIndexCb: GetPlayerIndexFromTableCellCallback?

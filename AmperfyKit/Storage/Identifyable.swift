@@ -70,24 +70,3 @@ extension CoreDataIdentifyable {
     return fetchRequest
   }
 }
-
-extension Array where Element: Identifyable {
-  func filterBy(searchText: String) -> [Element] {
-    let filteredArray = filter { element in
-      element.identifier.isFoundBy(searchText: searchText)
-    }
-    return filteredArray
-  }
-
-  func sortAlphabeticallyAscending() -> [Element] {
-    sorted {
-      $0.identifier.localizedStandardCompare($1.identifier) == ComparisonResult.orderedAscending
-    }
-  }
-
-  func sortAlphabeticallyDescending() -> [Element] {
-    sorted {
-      $0.identifier.localizedStandardCompare($1.identifier) == ComparisonResult.orderedDescending
-    }
-  }
-}
