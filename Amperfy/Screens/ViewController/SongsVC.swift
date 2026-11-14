@@ -49,6 +49,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    isInitialSearchUpdatePending = displayFilter == .all && appDelegate.storage.main.library
+      .getSongCount(for: account) > Self.deferredInitialUpdateThreshold
+
     if #available(macCatalyst 27.0, *) {
       refreshControl = UIRefreshControl()
     }
@@ -67,7 +70,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {
-        "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")"
+        "\(self.fetchedResultsController.fetchedObjectsCount) Song\(self.fetchedResultsController.fetchedObjectsCount == 1 ? "" : "s")"
       },
       playContextCb: handleHeaderPlay,
       player: appDelegate.player,
@@ -114,7 +117,7 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
   }
 
   func updateContentUnavailable() {
-    if fetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+    if fetchedResultsController.fetchedObjectsCount == 0 {
       if fetchedResultsController.isSearchActive {
         contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
       } else {
@@ -194,6 +197,9 @@ class SongsVC: SingleFetchedResultsTableViewController<SongMO> {
     updateRightBarButtonItems()
     updateFromRemote()
     detailHeaderView?.refresh()
+    if isInitialSearchUpdatePending {
+      detailHeaderView?.isHidden = true
+    }
   }
 
   func updateRightBarButtonItems() {

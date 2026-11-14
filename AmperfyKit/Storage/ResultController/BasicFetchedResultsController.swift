@@ -256,6 +256,10 @@ public class BasicFetchedResultsController<ResultType>: NSObject
     fetchResultsController.fetchedObjects as? [ResultType]
   }
 
+  public var fetchedObjectsCount: Int {
+    fetchResultsController.sections?.reduce(0) { $0 + $1.numberOfObjects } ?? 0
+  }
+
   public var sections: [NSFetchedResultsSectionInfo]? {
     fetchResultsController.sections
   }
@@ -525,6 +529,115 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
       isGroupedInAlphabeticSections: isGroupedInAlphabeticSections
     )
     fetchResultsController = allFetchResulsController
+    if !keepAllResultsUpdated,
+       let dependencies = Self.keyDependencies(of: fetchRequest, in: coreDataCompanion.context) {
+      self.allResultsKeyDependencies = dependencies
+      NotificationCenter.default.addObserver(
+        self,
+        selector: #selector(contextObjectsDidChange(_:)),
+        name: .NSManagedObjectContextObjectsDidChange,
+        object: coreDataCompanion.context
+      )
+      NotificationCenter.default.addObserver(
+        self,
+        selector: #selector(contextDidMergeChanges(_:)),
+        name: NSManagedObjectContext.didMergeChangesObjectIDsNotification,
+        object: coreDataCompanion.context
+      )
+    }
+  }
+
+  deinit {
+    NotificationCenter.default.removeObserver(self)
+  }
+
+  /// Keys per entity name that decide which objects the untracked all-results fetch returns and in which order
+  private var allResultsKeyDependencies: [String: Set<String>]?
+  private var isAllFetchStale = false
+
+  @objc
+  private func contextObjectsDidChange(_ notification: Notification) {
+    guard !isAllFetchStale, let userInfo = notification.userInfo else { return }
+    isAllFetchStale = userInfo.contains { key, value in
+      guard let objects = value as? Set<NSManagedObject> else { return false }
+      return objects.contains { object in
+        guard let dependentKeys = dependentKeys(of: object.entity) else { return false }
+        // only updates report their changed keys
+        guard key as? String == NSUpdatedObjectsKey else { return true }
+        let changedKeys = object.changedValuesForCurrentEvent().keys
+        return changedKeys.isEmpty || !dependentKeys.isDisjoint(with: changedKeys)
+      }
+    }
+  }
+
+  @objc
+  private func contextDidMergeChanges(_ notification: Notification) {
+    // merges also change objects this context hasn't loaded, and they don't report the changed keys
+    guard !isAllFetchStale, let userInfo = notification.userInfo else { return }
+    isAllFetchStale = userInfo.values.contains { value in
+      guard let objectIDs = value as? Set<NSManagedObjectID> else { return false }
+      return objectIDs.contains { dependentKeys(of: $0.entity) != nil }
+    }
+  }
+
+  private func dependentKeys(of entity: NSEntityDescription) -> Set<String>? {
+    entity.name.flatMap { allResultsKeyDependencies?[$0] }
+  }
+
+  private static func keyDependencies(
+    of fetchRequest: NSFetchRequest<ResultType>,
+    in context: NSManagedObjectContext
+  )
+    -> [String: Set<String>]? {
+    guard let entityName = fetchRequest.entityName,
+          let fetchedEntity = NSEntityDescription.entity(forEntityName: entityName, in: context)
+    else { return nil }
+    var keyPaths = fetchRequest.sortDescriptors?.compactMap { $0.key } ?? []
+    if let predicate = fetchRequest.predicate {
+      guard let predicateKeyPaths = predicateKeyPaths(of: predicate) else { return nil }
+      keyPaths += predicateKeyPaths
+    }
+    var dependencies = [String: Set<String>]()
+    func addDependency(on key: String, of entity: NSEntityDescription) {
+      // objects of subentities are reported with their own entity
+      if let name = entity.name {
+        dependencies[name, default: []].insert(key)
+      }
+      entity.subentities.forEach { addDependency(on: key, of: $0) }
+    }
+    for keyPath in keyPaths {
+      var entity: NSEntityDescription? = fetchedEntity
+      for key in keyPath.split(separator: ".").map(String.init) {
+        guard let currentEntity = entity else { break }
+        addDependency(on: key, of: currentEntity)
+        entity = currentEntity.relationshipsByName[key]?.destinationEntity
+      }
+    }
+    return dependencies
+  }
+
+  private static func predicateKeyPaths(of predicate: NSPredicate) -> [String]? {
+    if let compound = predicate as? NSCompoundPredicate {
+      var keyPaths = [String]()
+      for case let subpredicate as NSPredicate in compound.subpredicates {
+        guard let subpredicateKeyPaths = predicateKeyPaths(of: subpredicate) else { return nil }
+        keyPaths += subpredicateKeyPaths
+      }
+      return keyPaths
+    }
+    guard let comparison = predicate as? NSComparisonPredicate else { return nil }
+    var keyPaths = [String]()
+    for expression in [comparison.leftExpression, comparison.rightExpression] {
+      switch expression.expressionType {
+      case .keyPath:
+        keyPaths.append(expression.keyPath)
+      case .constantValue:
+        continue
+      default:
+        return nil
+      }
+    }
+    return keyPaths
   }
 
   override public func search(predicate: NSPredicate?) {
@@ -546,14 +659,23 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
     isSearchActive = false
     didFetchSearch = false
     lastSearchPredicateFormat = nil
-    if !wasSearchActive,
-       didFetchAll,
-       keepAllResultsUpdated,
-       allFetchResulsController.fetchedObjects != nil {
+    let canReuseAllResults: Bool
+    if keepAllResultsUpdated {
+      // changes are not tracked while a search is active
+      canReuseAllResults = !wasSearchActive
+    } else if allResultsKeyDependencies != nil {
+      // changes are only reported to the observers once they are processed
+      allFetchResulsController.managedObjectContext.processPendingChanges()
+      canReuseAllResults = !isAllFetchStale
+    } else {
+      canReuseAllResults = false
+    }
+    if canReuseAllResults, didFetchAll, allFetchResulsController.fetchedObjects != nil {
       return
     }
     didFetchAll = true
     allFetchResulsController.fetch()
+    isAllFetchStale = false
   }
 
   override public func showAllResults() {

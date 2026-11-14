@@ -119,7 +119,7 @@ class PodcastsVC: MultiSourceTableViewController {
   func updateContentUnavailable() {
     switch showType {
     case .podcasts:
-      if podcastsFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if podcastsFetchedResultsController.fetchedObjectsCount == 0 {
         if podcastsFetchedResultsController.isSearchActive {
           contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
         } else {
@@ -129,7 +129,7 @@ class PodcastsVC: MultiSourceTableViewController {
         contentUnavailableConfiguration = nil
       }
     case .episodesSortedByReleaseDate:
-      if episodesFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+      if episodesFetchedResultsController.fetchedObjectsCount == 0 {
         if episodesFetchedResultsController.isSearchActive {
           contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
         } else {

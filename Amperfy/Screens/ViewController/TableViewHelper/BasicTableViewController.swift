@@ -118,6 +118,9 @@ class BasicTableViewController: KeyCommandTableViewController {
   var isEditLockedDueToActiveSwipe = false
   var isSingleCellEditingModeActive = false
 
+  static let deferredInitialUpdateThreshold = 35_000
+  var isInitialSearchUpdatePending = false
+
   override func viewDidLoad() {
     super.viewDidLoad()
     tableView.keyboardDismissMode = .onDrag
@@ -153,6 +156,19 @@ class BasicTableViewController: KeyCommandTableViewController {
     } else {
       searchController.searchBar.selectedScopeButtonIndex = 0
     }
+    if isInitialSearchUpdatePending, !searchController.searchBar.isCachedScopeSelected {
+      contentUnavailableConfiguration = UIContentUnavailableConfiguration.loading()
+    } else {
+      isInitialSearchUpdatePending = false
+      updateSearchResults(for: searchController)
+    }
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    guard isInitialSearchUpdatePending else { return }
+    isInitialSearchUpdatePending = false
+    contentUnavailableConfiguration = nil
     updateSearchResults(for: searchController)
   }
 
