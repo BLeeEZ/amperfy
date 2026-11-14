@@ -187,11 +187,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
           // Skip cancels this sync and clears the checkpoint: don't write it back afterwards
           if albumBatchesSinceCheckpoint >= Self.albumCheckpointSaveInterval, !Task.isCancelled {
             albumBatchesSinceCheckpoint = 0
-            let checkpoint = completedAlbumBatches
-            self.storage.settings.accounts.updateSetting(self.accountInfo) {
-              $0.initialSyncCompletedAlbumBatches = checkpoint
-              $0.initialSyncAlbumCount = remoteAlbumCount
-            }
+            self.saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
           }
 
           if let nextBatchIndex = albumBatchIterator.next() {
@@ -207,11 +203,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       }
     } catch {
       if !Task.isCancelled {
-        let checkpoint = completedAlbumBatches
-        storage.settings.accounts.updateSetting(accountInfo) {
-          $0.initialSyncCompletedAlbumBatches = checkpoint
-          $0.initialSyncAlbumCount = remoteAlbumCount
-        }
+        saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
       }
       throw error
     }
@@ -269,10 +261,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     let isSupported = try await subsonicServerApi.requestServerPodcastSupport()
     guard isSupported else {
-      storage.settings.accounts.updateSetting(accountInfo) {
-        $0.initialSyncCompletedAlbumBatches = nil
-        $0.initialSyncAlbumCount = nil
-      }
+      storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
       return
     }
     statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
@@ -305,9 +294,14 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       )
       parserDelegate.performPostParseOperations()
     }
+    storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
+  }
+
+  @MainActor
+  private func saveInitialSyncCheckpoint(_ completedAlbumBatches: Set<Int>, albumCount: Int) {
     storage.settings.accounts.updateSetting(accountInfo) {
-      $0.initialSyncCompletedAlbumBatches = nil
-      $0.initialSyncAlbumCount = nil
+      $0.initialSyncCompletedAlbumBatches = completedAlbumBatches
+      $0.initialSyncAlbumCount = albumCount
     }
   }
 
@@ -470,21 +464,9 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       batchSize: Self.songSyncBatchSize,
       maxParallelFetches: Self.maxParallelSyncRequests,
       isCancelled: isCancelled,
-      fetch: { albumId in
-        try await self.subsonicServerApi.requestAlbum(id: albumId)
-      },
-      write: { asyncCompanion, albumObjectId, response in
-        try self.writeAlbumSongs(
-          asyncCompanion: asyncCompanion,
-          albumObjectId: albumObjectId,
-          response: response
-        )
-      },
-      classifyNotAvailable: { error in
-        guard let responseError = error as? ResponseError,
-              let subsonicError = responseError.asSubsonicError else { return false }
-        return !subsonicError.isRemoteAvailable
-      }
+      fetch: { try await self.subsonicServerApi.requestAlbum(id: $0) },
+      write: { try self.writeAlbumSongs(asyncCompanion: $0, albumObjectId: $1, response: $2) },
+      classifyNotAvailable: { ($0 as? ResponseError)?.asSubsonicError?.isRemoteAvailable == false }
     )
   }
 
@@ -1428,12 +1410,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     while pageIndex < Self.maxBulkSongPages {
       guard !isCancelled() else { return false }
-      let thermalWait = await waitWhileThermalStateCritical(
-        previousWaitCount: criticalThermalWaits,
+      let isCancelledWhileWaiting = await waitWhileThermalStateCritical(
+        waitCount: &criticalThermalWaits,
         isCancelled: isCancelled
       )
-      criticalThermalWaits = thermalWait.waitCount
-      guard !thermalWait.isCancelled else { return false }
+      guard !isCancelledWhileWaiting else { return false }
       let songResponse = try await subsonicServerApi.requestAllSongs(
         songOffset: songOffset,
         count: Self.maxItemCountToPollAtOnce

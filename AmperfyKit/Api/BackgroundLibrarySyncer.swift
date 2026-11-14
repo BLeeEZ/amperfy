@@ -76,12 +76,16 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     isRunning.wrappedValue = false
   }
 
+  /// The sync has to end: it was stopped, the app is in offline mode or there is no network
+  private var shouldStop: Bool {
+    !isRunning.wrappedValue || !settings.user.isOnlineMode || !networkMonitor.isConnectedToNetwork
+  }
+
   private func syncAlbumSongsInBackground() {
     backgroundTask.wrappedValue = Task {
       os_log("start", log: self.log, type: .info)
 
-      if self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
-         self.networkMonitor.isConnectedToNetwork {
+      if !self.shouldStop {
         do {
           try await autoDownloadLibrarySyncer
             .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
@@ -96,26 +100,18 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
       }
 
       let hasAlbumsToSync = !(await self.nextUnsyncedAlbumTargets()).isEmpty
-      if hasAlbumsToSync, self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
-         self.networkMonitor.isConnectedToNetwork {
-        _ = try? await self.librarySyncer.syncAllSongs {
-          !self.isRunning.wrappedValue || !self.settings.user.isOnlineMode
-            || !self.networkMonitor.isConnectedToNetwork
-        }
+      if hasAlbumsToSync, !self.shouldStop {
+        _ = try? await self.librarySyncer.syncAllSongs { self.shouldStop }
       }
 
       // Albums whose songs could not be synced stay unsynced and are tried again in a later run.
       // Within a run, the failed albums of a round that made progress are skipped
       var failedAlbumIDs = Set<NSManagedObjectID>()
       var isRetryAfterNoProgress = false
-      while self.isRunning.wrappedValue, self.settings.user.isOnlineMode,
-            self.networkMonitor.isConnectedToNetwork {
+      while !self.shouldStop {
         let targets = await self.nextUnsyncedAlbumTargets(excluding: failedAlbumIDs)
         guard !targets.isEmpty else { break }
-        await self.librarySyncer.syncSongsInBackground(targets: targets) {
-          !self.isRunning.wrappedValue || !self.settings.user.isOnlineMode
-            || !self.networkMonitor.isConnectedToNetwork
-        }
+        await self.librarySyncer.syncSongsInBackground(targets: targets) { self.shouldStop }
         let unsyncedAlbumIDs = await self.unsyncedAlbumIDs(among: targets)
         if unsyncedAlbumIDs.count < targets.count {
           failedAlbumIDs.formUnion(unsyncedAlbumIDs)
@@ -170,9 +166,7 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   private func waitBeforeRetry() async {
     for _ in 0 ..< 6 {
       try? await Task.sleep(nanoseconds: 10_000_000_000)
-      guard isRunning.wrappedValue, settings.user.isOnlineMode,
-            networkMonitor.isConnectedToNetwork
-      else { return }
+      guard !shouldStop else { return }
     }
   }
 

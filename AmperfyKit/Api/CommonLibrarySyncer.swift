@@ -247,22 +247,20 @@ class CommonLibrarySyncer {
   }
 
   @MainActor
+  /// Returns true if the sync got cancelled while waiting
   func waitWhileThermalStateCritical(
-    previousWaitCount: Int,
+    waitCount: inout Int,
     isCancelled: @escaping @Sendable () -> Bool
   ) async
-    -> (isCancelled: Bool, waitCount: Int) {
-    var waitCount = previousWaitCount
-    guard ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 else {
-      return (false, waitCount)
-    }
+    -> Bool {
+    guard ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 else { return false }
     os_log("Album songs sync paused: critical thermal state", log: log, type: .info)
     while ProcessInfo.processInfo.thermalState == .critical, waitCount < 6 {
       waitCount += 1
       try? await Task.sleep(nanoseconds: 10_000_000_000)
-      guard !isCancelled() else { return (true, waitCount) }
+      guard !isCancelled() else { return true }
     }
-    return (false, waitCount)
+    return false
   }
 
   @MainActor
@@ -280,12 +278,11 @@ class CommonLibrarySyncer {
     var criticalThermalWaits = 0
     while index < targets.count {
       guard !isCancelled() else { return }
-      let thermalWait = await waitWhileThermalStateCritical(
-        previousWaitCount: criticalThermalWaits,
+      let isCancelledWhileWaiting = await waitWhileThermalStateCritical(
+        waitCount: &criticalThermalWaits,
         isCancelled: isCancelled
       )
-      criticalThermalWaits = thermalWait.waitCount
-      guard !thermalWait.isCancelled else { return }
+      guard !isCancelledWhileWaiting else { return }
       let thermalState = ProcessInfo.processInfo.thermalState
       let isLowPower = ProcessInfo.processInfo.isLowPowerModeEnabled
       let isThermalThrottled = thermalState == .serious || thermalState == .critical
@@ -316,39 +313,30 @@ class CommonLibrarySyncer {
         }) ?? claimedObjectIDs
         let claimedTargets = batch.filter { unsyncedObjectIDs.contains($0.objectID) }
         guard !claimedTargets.isEmpty else { return }
-        var results = [(NSManagedObjectID, AlbumSongsFetchResult<Payload>)]()
+        typealias FetchResult = (NSManagedObjectID, AlbumSongsFetchResult<Payload>)
+        let fetchSongs: @MainActor @Sendable (AlbumSyncTarget) async -> FetchResult = { target in
+          do {
+            return (target.objectID, .fetched(try await fetch(target.id)))
+          } catch {
+            self.eventLogger.report(
+              topic: "Album Background Sync",
+              error: error,
+              displayPopup: false
+            )
+            return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
+          }
+        }
+        var results = [FetchResult]()
         var iterator = claimedTargets.makeIterator()
-        await withTaskGroup(of: (NSManagedObjectID, AlbumSongsFetchResult<Payload>).self) { group in
+        await withTaskGroup(of: FetchResult.self) { group in
           for _ in 0 ..< parallelFetches {
             guard let target = iterator.next() else { break }
-            group.addTask { @MainActor @Sendable in
-              do {
-                return (target.objectID, .fetched(try await fetch(target.id)))
-              } catch {
-                self.eventLogger.report(
-                  topic: "Album Background Sync",
-                  error: error,
-                  displayPopup: false
-                )
-                return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
-              }
-            }
+            group.addTask { await fetchSongs(target) }
           }
           while let result = await group.next() {
             results.append(result)
             guard let target = iterator.next() else { continue }
-            group.addTask { @MainActor @Sendable in
-              do {
-                return (target.objectID, .fetched(try await fetch(target.id)))
-              } catch {
-                self.eventLogger.report(
-                  topic: "Album Background Sync",
-                  error: error,
-                  displayPopup: false
-                )
-                return (target.objectID, classifyNotAvailable(error) ? .notAvailable : .failed)
-              }
-            }
+            group.addTask { await fetchSongs(target) }
           }
         }
 

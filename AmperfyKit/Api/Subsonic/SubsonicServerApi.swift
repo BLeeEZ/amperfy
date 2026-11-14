@@ -682,56 +682,37 @@ final class SubsonicServerApi: URLCleanser, Sendable {
   }
 
   public func requestSearchArtists(searchText: String) async throws -> APIDataResponse {
-    try await request { version in
-      var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
-      urlComp.addQueryItem(name: "query", value: searchText)
-      urlComp.addQueryItem(name: "artistCount", value: 40)
-      urlComp.addQueryItem(name: "artistOffset", value: 0)
-      urlComp.addQueryItem(name: "albumCount", value: 0)
-      urlComp.addQueryItem(name: "albumOffset", value: 0)
-      urlComp.addQueryItem(name: "songCount", value: 0)
-      urlComp.addQueryItem(name: "songOffset", value: 0)
-      return try self.createUrl(from: urlComp)
-    }
+    try await requestSearch(query: searchText, artistCount: 40)
   }
 
   public func requestSearchAlbums(searchText: String) async throws -> APIDataResponse {
-    try await request { version in
-      var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
-      urlComp.addQueryItem(name: "query", value: searchText)
-      urlComp.addQueryItem(name: "artistCount", value: 0)
-      urlComp.addQueryItem(name: "artistOffset", value: 0)
-      urlComp.addQueryItem(name: "albumCount", value: 40)
-      urlComp.addQueryItem(name: "albumOffset", value: 0)
-      urlComp.addQueryItem(name: "songCount", value: 0)
-      urlComp.addQueryItem(name: "songOffset", value: 0)
-      return try self.createUrl(from: urlComp)
-    }
+    try await requestSearch(query: searchText, albumCount: 40)
   }
 
   public func requestSearchSongs(searchText: String) async throws -> APIDataResponse {
-    try await request { version in
-      var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
-      urlComp.addQueryItem(name: "query", value: searchText)
-      urlComp.addQueryItem(name: "artistCount", value: 0)
-      urlComp.addQueryItem(name: "artistOffset", value: 0)
-      urlComp.addQueryItem(name: "albumCount", value: 0)
-      urlComp.addQueryItem(name: "albumOffset", value: 0)
-      urlComp.addQueryItem(name: "songCount", value: 40)
-      urlComp.addQueryItem(name: "songOffset", value: 0)
-      return try self.createUrl(from: urlComp)
-    }
+    try await requestSearch(query: searchText, songCount: 40)
   }
 
   public func requestAllSongs(songOffset: Int, count: Int) async throws -> APIDataResponse {
+    try await requestSearch(query: "", songCount: count, songOffset: songOffset)
+  }
+
+  private func requestSearch(
+    query: String,
+    artistCount: Int = 0,
+    albumCount: Int = 0,
+    songCount: Int = 0,
+    songOffset: Int = 0
+  ) async throws
+    -> APIDataResponse {
     try await request { version in
       var urlComp = try self.createAuthApiUrlComponent(version: version, forAction: "search3")
-      urlComp.addQueryItem(name: "query", value: "")
-      urlComp.addQueryItem(name: "artistCount", value: 0)
+      urlComp.addQueryItem(name: "query", value: query)
+      urlComp.addQueryItem(name: "artistCount", value: artistCount)
       urlComp.addQueryItem(name: "artistOffset", value: 0)
-      urlComp.addQueryItem(name: "albumCount", value: 0)
+      urlComp.addQueryItem(name: "albumCount", value: albumCount)
       urlComp.addQueryItem(name: "albumOffset", value: 0)
-      urlComp.addQueryItem(name: "songCount", value: count)
+      urlComp.addQueryItem(name: "songCount", value: songCount)
       urlComp.addQueryItem(name: "songOffset", value: songOffset)
       return try self.createUrl(from: urlComp)
     }

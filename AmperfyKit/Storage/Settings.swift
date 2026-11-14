@@ -378,6 +378,11 @@ public struct AccountSetting: Sendable, Codable {
     initialSyncCompletionStatus == .aborted && initialSyncCompletedAlbumBatches != nil
   }
 
+  public mutating func clearInitialSyncCheckpoint() {
+    initialSyncCompletedAlbumBatches = nil
+    initialSyncAlbumCount = nil
+  }
+
   // optional: settings stored before this property existed must still decode
   private var _isBulkSongSyncCompleted: Bool? = nil
   public var isBulkSongSyncCompleted: Bool {

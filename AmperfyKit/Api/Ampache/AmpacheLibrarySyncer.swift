@@ -434,18 +434,8 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         let albumSongs = try await self.ampacheXmlServerApi.requestAlbumSongs(id: albumId)
         return AlbumSyncPayload(albumInfo: albumInfo, albumSongs: albumSongs)
       },
-      write: { asyncCompanion, albumObjectId, payload in
-        try self.writeAlbumSongs(
-          asyncCompanion: asyncCompanion,
-          albumObjectId: albumObjectId,
-          payload: payload
-        )
-      },
-      classifyNotAvailable: { error in
-        guard let responseError = error as? ResponseError,
-              let ampacheError = responseError.asAmpacheError else { return false }
-        return !ampacheError.isRemoteAvailable
-      }
+      write: { try self.writeAlbumSongs(asyncCompanion: $0, albumObjectId: $1, payload: $2) },
+      classifyNotAvailable: { ($0 as? ResponseError)?.asAmpacheError?.isRemoteAvailable == false }
     )
   }
 

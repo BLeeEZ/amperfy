@@ -66,9 +66,8 @@ class SyncVC: UIViewController {
         if self.appDelegate.storage.settings.accounts.allAccounts.count <= 1 {
           self.appDelegate.storage.settings.app.isLibrarySynced = false
         }
-        self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
-          accountSettings.initialSyncCompletedAlbumBatches = nil
-          accountSettings.initialSyncAlbumCount = nil
+        self.appDelegate.storage.settings.accounts.updateSetting(account.info) {
+          $0.clearInitialSyncCheckpoint()
         }
         self.appDelegate.storage.main.library
           .cleanStorageOfObsoleteAccountEntries(account: account)
@@ -146,8 +145,7 @@ class SyncVC: UIViewController {
       self.appDelegate.storage.settings.accounts
         .updateSetting(self.account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .skipped
-          accountSettings.initialSyncCompletedAlbumBatches = nil
-          accountSettings.initialSyncAlbumCount = nil
+          accountSettings.clearInitialSyncCheckpoint()
         }
       self.finishSync()
     })
