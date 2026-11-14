@@ -136,7 +136,6 @@ final class SubsonicArtworkDownloadDelegate: DownloadManagerDelegate {
           .object(with: downloadInfo.objectId) as! ArtworkMO
       )
       artwork.markErrorIfNeeded()
-      asyncCompanion.saveContext()
     }
   }
 }

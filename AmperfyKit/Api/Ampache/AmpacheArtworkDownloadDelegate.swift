@@ -109,7 +109,6 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
       )
       artwork.status = .CustomImage
       artwork.relFilePath = relFilePath
-      asyncCompanion.saveContext()
     }
   }
 
@@ -137,7 +136,6 @@ final class AmpacheArtworkDownloadDelegate: DownloadManagerDelegate {
           .object(with: downloadInfo.objectId) as! ArtworkMO
       )
       artwork.markErrorIfNeeded()
-      asyncCompanion.saveContext()
     }
   }
 }
