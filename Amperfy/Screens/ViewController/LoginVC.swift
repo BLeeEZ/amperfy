@@ -97,6 +97,7 @@ class LoginVC: UIViewController {
     let textField = UITextField()
     textField.configuteForLogin(image: .serverUrl)
     textField.placeholder = "https://localhost/ampache"
+    textField.accessibilityLabel = "Server URL"
     textField.textContentType = .URL
     textField.keyboardType = .URL
     textField.autocorrectionType = .no
@@ -119,6 +120,7 @@ class LoginVC: UIViewController {
     let textField = UITextField()
     textField.configuteForLogin(image: .userPerson)
     textField.placeholder = "Username"
+    textField.accessibilityLabel = "Username"
     textField.textContentType = .username
     textField.keyboardType = .default
     textField.autocorrectionType = .no
@@ -141,6 +143,7 @@ class LoginVC: UIViewController {
     let textField = UITextField()
     textField.configuteForLogin(image: .password)
     textField.placeholder = "Password"
+    textField.accessibilityLabel = "Password"
     textField.textContentType = .password
     textField.keyboardType = .default
     textField.isSecureTextEntry = true

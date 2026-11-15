@@ -193,6 +193,7 @@ extension UIViewController {
 
     let button = UIButton(type: .system)
     button.setImage(image, for: .normal)
+    button.accessibilityLabel = "Account"
     button.layer.cornerRadius = 20
     button.clipsToBounds = true
     #if targetEnvironment(macCatalyst)

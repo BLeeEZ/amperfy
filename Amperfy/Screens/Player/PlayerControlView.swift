@@ -97,6 +97,9 @@ class PlayerControlView: UIView {
     playerModeButton.tintColor = .label
     volumeButton.tintColor = .label
     optionsButton.imageView?.tintColor = .label
+    airplayButton.accessibilityLabel = "AirPlay"
+    volumeButton.accessibilityLabel = "Volume"
+    optionsButton.accessibilityLabel = "Player Options"
     refreshPlayer()
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,
@@ -420,8 +423,10 @@ class PlayerControlView: UIView {
     switch player.playerMode {
     case .music:
       playerModeButton.setImage(UIImage.musicalNotes, for: .normal)
+      playerModeButton.accessibilityLabel = "Player Mode: Music"
     case .podcast:
       playerModeButton.setImage(UIImage.podcast, for: .normal)
+      playerModeButton.accessibilityLabel = "Player Mode: Podcast"
     }
     optionsStackView.layoutIfNeeded()
   }
