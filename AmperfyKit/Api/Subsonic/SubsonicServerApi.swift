@@ -971,7 +971,11 @@ final class SubsonicServerApi: URLCleanser, Sendable {
 
   private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
-      let afRequest = AF.request(url, method: .get, headers: headers)
+      var afRequest = AF.request(url, method: .get, headers: headers)
+      if let credential = ClientCertificateManager.shared
+        .credential(accountIdent: account?.ident) {
+        afRequest = afRequest.authenticate(with: credential)
+      }
       afRequest.validate().responseData { response in
         if response.response?.statusCode == 404 {
           let cleanedURL = self.cleanse(url: response.request?.url)
