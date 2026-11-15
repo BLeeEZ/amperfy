@@ -618,7 +618,8 @@ class BackendAudioPlayer: NSObject {
       topic: "Player Info",
       statusCode: .playerError,
       message: "Content type \"\(contentType)\" of \"\(playableDisplayTitle)\" is not playable via Amperfy. Activating transcoding in Settings could resolve this issue.",
-      displayPopup: true
+      displayPopup: true,
+      toast: AlertToastText(title: "Can't play stream", subtitle: "Tap for details")
     )
     responder?.notifyItemPreparationFinished()
   }
@@ -629,7 +630,8 @@ class BackendAudioPlayer: NSObject {
       topic: "Player Info",
       statusCode: .playerError,
       message: "Radio \"\(playableDisplayTitle)\" has an invalid stream URL.",
-      displayPopup: true
+      displayPopup: true,
+      toast: AlertToastText(title: "Can't play stream", subtitle: "Tap for details")
     )
     responder?.notifyItemPreparationFinished()
   }

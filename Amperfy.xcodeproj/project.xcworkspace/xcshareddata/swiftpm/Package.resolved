@@ -1,5 +1,5 @@
 {
-  "originHash" : "342b7059071c9c126ae06cb9cd10980536fa811e6732c2bf56264654476707eb",
+  "originHash" : "a058054c36ae6cd73351d7e303a5037115be6469e02036e7f533d3914a66f428",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -65,30 +65,12 @@
       }
     },
     {
-      "identity" : "notificationbanner",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Daltron/NotificationBanner",
-      "state" : {
-        "revision" : "a9ec5cd29b4669f5fdf3dcd494a08cea4776913c",
-        "version" : "3.2.0"
-      }
-    },
-    {
       "identity" : "ogg-binary-xcframework",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sbooth/ogg-binary-xcframework",
       "state" : {
         "revision" : "c0e822e18738ad913864e98d9614927ac1e9337c",
         "version" : "0.1.2"
-      }
-    },
-    {
-      "identity" : "snapkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SnapKit/SnapKit",
-      "state" : {
-        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
-        "version" : "5.7.1"
       }
     },
     {
