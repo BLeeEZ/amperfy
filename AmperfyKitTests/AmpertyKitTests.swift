@@ -57,3 +57,117 @@ class MimeFileConverterTest: XCTestCase {
     XCTAssertEqual(MimeFileConverter.getFilenameExtension(mimeType: "audio/x-m4b"), "mp4")
   }
 }
+
+// MARK: - PlayContextAlbumTest
+
+@MainActor
+class PlayContextAlbumTest: XCTestCase {
+  var cdHelper: CoreDataHelper!
+  var library: LibraryStorage!
+  var account: Account!
+  var album: Album!
+
+  override func setUp() async throws {
+    cdHelper = CoreDataHelper()
+    library = cdHelper.createSeededStorage()
+    account = library.getAccount(info: TestAccountInfo.create1())
+    album = library.createAlbum(account: account)
+    album.remoteStatus = .available
+  }
+
+  private func addSong(
+    track: Int,
+    disc: String? = nil,
+    cached: Bool = false,
+    size: Int = 1000
+  )
+    -> Song {
+    let song = library.createSong(account: account)
+    song.track = track
+    song.disk = disc
+    song.size = size
+    song.album = album
+    if cached {
+      song.relFilePath = URL(string: "song\(disc ?? "")\(track).mp3")
+    }
+    library.saveContext()
+    return song
+  }
+
+  private func queued(_ context: PlayContext) -> [Song] {
+    context.playables.compactMap { $0.asSong }
+  }
+
+  func testAlbumQueuedStartingAtSong() {
+    let songs = [addSong(track: 1), addSong(track: 2), addSong(track: 3)]
+    let context = PlayContext(songInAlbumContext: songs[1], onlyCached: false)
+    XCTAssertEqual(queued(context), songs)
+    XCTAssertEqual(context.index, 1)
+    XCTAssertEqual(context.getActivePlayable(), songs[1])
+  }
+
+  func testTwoDiscAlbumIsQueuedDiscByDisc() {
+    let disc2Track1 = addSong(track: 1, disc: "2")
+    let disc1Track2 = addSong(track: 2, disc: "1")
+    let disc2Track2 = addSong(track: 2, disc: "2")
+    let disc1Track1 = addSong(track: 1, disc: "1")
+    let context = PlayContext(songInAlbumContext: disc2Track1, onlyCached: false)
+    XCTAssertEqual(queued(context), [disc1Track1, disc1Track2, disc2Track1, disc2Track2])
+    XCTAssertEqual(context.index, 2)
+  }
+
+  func testSongWithoutAlbumIsQueuedAlone() {
+    let song = library.createSong(account: account)
+    let context = PlayContext(songInAlbumContext: song, onlyCached: false)
+    XCTAssertEqual(queued(context), [song])
+    XCTAssertEqual(context.index, 0)
+  }
+
+  func testOfflineQueuesOnlyCachedSongs() {
+    _ = addSong(track: 1)
+    let cached2 = addSong(track: 2, cached: true)
+    let cached3 = addSong(track: 3, cached: true)
+    let context = PlayContext(songInAlbumContext: cached3, onlyCached: true)
+    XCTAssertEqual(queued(context), [cached2, cached3])
+    XCTAssertEqual(context.index, 1)
+  }
+
+  func testOfflineUncachedSongIsQueuedAlone() {
+    let uncached = addSong(track: 1)
+    _ = addSong(track: 2, cached: true)
+    let context = PlayContext(songInAlbumContext: uncached, onlyCached: true)
+    XCTAssertEqual(queued(context), [uncached])
+  }
+
+  func testUnavailableSiblingIsNotQueued() {
+    let first = addSong(track: 1)
+    _ = addSong(track: 2, size: 0) // removed on the server, not cached
+    let third = addSong(track: 3)
+    let context = PlayContext(songInAlbumContext: third, onlyCached: false)
+    XCTAssertEqual(queued(context), [first, third])
+    XCTAssertEqual(context.getActivePlayable(), third)
+  }
+
+  func testUnavailableTappedSongIsStillQueued() {
+    let first = addSong(track: 1)
+    let tapped = addSong(track: 2, size: 0)
+    let context = PlayContext(songInAlbumContext: tapped, onlyCached: false)
+    XCTAssertEqual(queued(context), [first, tapped])
+    XCTAssertEqual(context.getActivePlayable(), tapped)
+  }
+
+  func testShuffleStartsAtTappedSong() {
+    let songs = (1 ... 10).map { addSong(track: $0) }
+    let context = PlayContext(songInAlbumContext: songs[6], onlyCached: false)
+    for _ in 0 ..< 20 {
+      XCTAssertEqual(context.getWithShuffledIndex().getActivePlayable(), songs[6])
+    }
+  }
+
+  func testAlbumPlayCountIsNotIncreased() {
+    let song = addSong(track: 1)
+    let before = album.playCount
+    _ = PlayContext(songInAlbumContext: song, onlyCached: false)
+    XCTAssertEqual(album.playCount, before)
+  }
+}

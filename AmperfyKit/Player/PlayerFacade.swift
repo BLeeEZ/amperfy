@@ -133,6 +133,29 @@ public struct PlayContext {
     containable.playedViaContext()
   }
 
+  /// Context for playing `song` from a list that is not an album (e.g. random songs):
+  /// the album's locally known, available songs in album order, starting at `song`.
+  /// Plays `song` alone if it has no album or is not among those songs.
+  /// The album is not marked as played, as only one of its songs was chosen.
+  /// Shuffle keeps `song` first.
+  public init(songInAlbumContext song: Song, onlyCached: Bool) {
+    guard let album = song.album else {
+      self.init(containable: song)
+      return
+    }
+    // a cached song is always available, so offline the cached check is enough;
+    // online the tapped song stays even if unavailable
+    let albumSongs = album.songs.filter {
+      onlyCached ? $0.isCached : ($0 == song || $0.isAvailableToUser())
+    }
+    guard let index = albumSongs.firstIndex(of: song) else {
+      self.init(containable: song)
+      return
+    }
+    self.init(name: album.name, type: album.playContextType, index: index, playables: albumSongs)
+    self.isKeepIndexDuringShuffle = true
+  }
+
   func getActivePlayable() -> AbstractPlayable? {
     guard !playables.isEmpty, index < playables.count else { return nil }
     return playables[index]
