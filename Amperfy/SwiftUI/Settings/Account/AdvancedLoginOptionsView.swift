@@ -24,92 +24,39 @@ import SwiftUI
 
 // MARK: - AdvancedLoginOptionsView
 
-/// Combined entry point for the optional network-access layers shown during login:
-/// custom HTTP headers (e.g. a Cloudflare Access service token) and a client
-/// certificate for mTLS. Both are independent and layered on top of the regular
-/// username/password login.
+/// The optional network-access layers shown during login: custom HTTP headers (e.g. a
+/// Cloudflare Access service token) and a client certificate for mTLS. Both are independent
+/// and layered on top of the regular username/password login. The page inlines the same
+/// sections the account settings use.
 struct AdvancedLoginOptionsView: View {
-  @State
-  private var headers: [String: String]
-  @State
-  private var certInfo: ClientCertificateInfo?
-
-  private let onHeadersChange: ([String: String]) -> ()
-  private let onDismiss: () -> ()
+  let headers: [String: String]
+  let onHeadersChange: ([String: String]) -> ()
+  let onDismiss: () -> ()
   /// Closes the sheet. Provided by the presenting UIKit controller, since
-  /// `@Environment(\.dismiss)` is unreliable for a UIHostingController root (#848).
-  private let onDone: () -> ()
-
-  init(
-    headers: [String: String],
-    onHeadersChange: @escaping ([String: String]) -> (),
-    onDismiss: @escaping () -> (),
-    onDone: @escaping () -> ()
-  ) {
-    _headers = State(initialValue: headers)
-    self.onHeadersChange = onHeadersChange
-    self.onDismiss = onDismiss
-    self.onDone = onDone
-  }
-
-  private var headersSubtitle: String {
-    guard !headers.isEmpty else { return "None" }
-    return headers.count == 1 ? "1 header" : "\(headers.count) headers"
-  }
-
-  private var certificateSubtitle: String {
-    guard let info = certInfo else { return "None" }
-    if info.isExpired {
-      return "\(info.subjectName) (Expired)"
-    }
-    return info.subjectName
-  }
-
-  private func reloadCertificate() {
-    certInfo = ClientCertificateManager.shared
-      .getCertificateInfo(tag: ClientCertificateManager.loginTag)
-  }
+  /// `@Environment(\.dismiss)` is unreliable for a UIHostingController root.
+  let onDone: () -> ()
 
   var body: some View {
     NavigationStack {
-      List {
-        Section(footer: Text(
-          "These options let you connect through a proxy or zero-trust gateway (e.g. Cloudflare Access) placed in front of your server. They are optional and applied on top of your username and password."
-        )) {
-          NavigationLink {
-            CustomHTTPHeadersView(headers: headers) { updated in
-              headers = updated
-              onHeadersChange(updated)
-            }
-          } label: {
-            optionRow(title: "Custom HTTP Headers", subtitle: headersSubtitle)
-          }
-
-          NavigationLink {
-            ClientCertificateSettingsView()
-          } label: {
-            optionRow(title: "Client Certificate", subtitle: certificateSubtitle)
-          }
-        }
+      SettingsList {
+        CustomHTTPHeaderSections(
+          title: "Custom HTTP Headers",
+          headers: headers,
+          onChange: onHeadersChange
+        )
+        ClientCertificateSections(certTag: ClientCertificateManager.loginTag)
       }
       .navigationTitle("Advanced")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          EditButton()
+        }
         ToolbarItem(placement: .confirmationAction) {
           Button("Done") { onDone() }
         }
       }
-      .onAppear { reloadCertificate() }
     }
     .onDisappear { onDismiss() }
-  }
-
-  private func optionRow(title: String, subtitle: String) -> some View {
-    HStack {
-      Text(title)
-      Spacer()
-      Text(subtitle)
-        .foregroundColor(.secondary)
-    }
   }
 }

@@ -88,7 +88,7 @@ public enum AuthenticationError: LocalizedError {
       ret = message
     case .clientCertificateRequired:
       ret =
-        "This server requires a client certificate (mTLS). Import one using the Certificate option."
+        "This server requires a client certificate (mTLS). Import one in the Advanced options."
     case .certificateExpired:
       ret =
         "The client certificate has expired. Please import a new certificate."
@@ -325,19 +325,11 @@ public final class BackendProxy: Sendable {
       throw AuthenticationError.invalidUrl
     }
 
-    let clientCredential = ClientCertificateManager.shared.getCredential(
+    let clientCredential = ClientCertificateManager.shared.credential(accountIdent: nil)
+    if let certInfo = ClientCertificateManager.shared.getCertificateInfo(
       tag: ClientCertificateManager.loginTag
-    )
-    if let clientCredential {
-      if let certInfo = ClientCertificateManager.shared.getCertificateInfo(
-        tag: ClientCertificateManager.loginTag
-      ), certInfo.isExpired {
-        throw AuthenticationError.certificateExpired
-      }
-      try await ClientCertificateSession.shared.performHandshake(
-        serverURL: activeBackendServerUrl, credential: clientCredential
-      )
-      os_log("mTLS authentication succeeded.", log: self.log, type: .info)
+    ), certInfo.isExpired {
+      throw AuthenticationError.certificateExpired
     }
 
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<(), Error>) in
@@ -358,9 +350,7 @@ public final class BackendProxy: Sendable {
       }
       let task = session.downloadTask(with: request) { tempLocalUrl, response, error in
         if let error = error {
-          let nsError = error as NSError
-          if nsError.domain == NSURLErrorDomain,
-             nsError.code == NSURLErrorClientCertificateRequired {
+          if (error as? URLError)?.code == .clientCertificateRequired {
             continuation.resume(throwing: AuthenticationError.clientCertificateRequired)
           } else {
             continuation
@@ -385,6 +375,7 @@ public final class BackendProxy: Sendable {
         }
       }
       task.resume()
+      session.finishTasksAndInvalidate()
     }
     os_log("Server url is reachable.", log: self.log, type: .info)
   }

@@ -26,259 +26,244 @@ import UniformTypeIdentifiers
 // MARK: - ClientCertificateSettingsView
 
 struct ClientCertificateSettingsView: View {
-  @EnvironmentObject
-  var settings: Settings
+  /// Keychain tag of the certificate to manage: the login tag or the tag of an account.
+  let certTag: String
+
+  var body: some View {
+    SettingsList {
+      ClientCertificateSections(certTag: certTag)
+    }
+    .navigationTitle("Client Certificate")
+    .navigationBarTitleDisplayMode(.inline)
+  }
+}
+
+// MARK: - ClientCertificateSections
+
+/// The list sections to show, import, replace and remove a client certificate.
+/// Shared by the account settings and the login options.
+struct ClientCertificateSections: View {
+  private let certTag: String
 
   @State
   private var certInfo: ClientCertificateInfo?
   @State
   private var isShowRemoveAlert = false
   @State
-  private var isShowFilePicker = false
-  @State
-  private var isShowPasswordPrompt = false
-  @State
-  private var selectedFileData: Data?
+  private var importer = CertificateImporter()
   @State
   private var errorMessage: String?
 
-  private var certTag: String {
-    guard let accountInfo = settings.activeAccountInfo else {
-      return ClientCertificateManager.loginTag
-    }
-    return ClientCertificateManager.accountTag(for: accountInfo.ident)
+  init(certTag: String) {
+    self.certTag = certTag
+    _certInfo = State(
+      initialValue: ClientCertificateManager.shared.getCertificateInfo(tag: certTag)
+    )
   }
 
   private func reload() {
     certInfo = ClientCertificateManager.shared.getCertificateInfo(tag: certTag)
   }
 
+  private func importCertificate() {
+    importer.importCertificate(tag: certTag) { error in
+      errorMessage = error
+      reload()
+    }
+  }
+
   private func removeCertificate() {
-    try? ClientCertificateManager.shared.removeIdentity(tag: certTag)
+    try? ClientCertificateManager.shared.removeCertificate(tag: certTag)
     reload()
   }
 
   var body: some View {
-    SettingsList {
-      if let info = certInfo {
-        SettingsSection(content: {
-          SettingsRow(title: "Subject", orientation: .vertical) {
-            SecondaryText(info.subjectName)
-          }
-          SettingsRow(title: "Issuer", orientation: .vertical) {
-            SecondaryText(info.issuerName)
-          }
-          if let expiry = info.expirationDate {
-            SettingsRow(title: "Expires") {
-              Text(expiry, style: .date)
-                .foregroundColor(info.isExpired ? .red : info.isExpiringSoon ? .orange : .secondary)
-            }
-          }
-        }, header: "Installed Certificate")
-
-        if info.isExpired {
-          SettingsSection {
-            Label(
-              "This certificate has expired. Replace it to maintain server access.",
-              systemImage: "exclamationmark.triangle.fill"
-            )
-            .foregroundColor(.red)
-            .font(.footnote)
-          }
-        } else if info.isExpiringSoon, let days = info.daysUntilExpiry {
-          SettingsSection {
-            Label(
-              "This certificate expires in \(days) day\(days == 1 ? "" : "s"). Consider replacing it soon.",
-              systemImage: "exclamationmark.triangle"
-            )
-            .foregroundColor(.orange)
-            .font(.footnote)
+    if let info = certInfo {
+      SettingsSection(content: {
+        SettingsRow(title: "Subject", orientation: .vertical) {
+          SecondaryText(info.subjectName)
+        }
+        if let expiry = info.expirationDate {
+          SettingsRow(title: "Expires") {
+            Text(expiry, style: .date)
+              .foregroundColor(info.isExpired ? .red : info.isExpiringSoon ? .orange : .secondary)
           }
         }
+      }, header: "Installed Certificate")
 
+      if info.isExpired {
         SettingsSection {
-          SettingsButtonRow(title: "Replace Certificate") {
-            isShowFilePicker = true
-          }
-          SettingsButtonRow(title: "Remove Certificate", actionType: .destructive) {
-            isShowRemoveAlert = true
-          }
+          Label(
+            "This certificate has expired. Replace it to maintain server access.",
+            systemImage: "exclamationmark.triangle.fill"
+          )
+          .foregroundColor(.red)
+          .font(.footnote)
         }
-      } else {
-        SettingsSection(content: {
-          SecondaryText("No client certificate configured.")
-        }, header: "Client Certificate")
-
+      } else if info.isExpiringSoon, let days = info.daysUntilExpiry {
         SettingsSection {
-          SettingsButtonRow(title: "Import Certificate") {
-            isShowFilePicker = true
-          }
+          Label(
+            "This certificate expires in \(days) day\(days == 1 ? "" : "s"). Consider replacing it soon.",
+            systemImage: "exclamationmark.triangle"
+          )
+          .foregroundColor(.orange)
+          .font(.footnote)
         }
       }
 
-      if let errorMessage {
-        SettingsSection {
-          Text(errorMessage)
-            .foregroundColor(.red)
-            .font(.footnote)
+      SettingsSection {
+        SettingsButtonRow(title: "Replace Certificate") {
+          importCertificate()
+        }
+        SettingsButtonRow(title: "Remove Certificate", actionType: .destructive) {
+          isShowRemoveAlert = true
+        }
+        .alert(isPresented: $isShowRemoveAlert) {
+          Alert(
+            title: Text("Remove Certificate"),
+            message: Text(
+              "This will remove the client certificate. You may not be able to connect to the server without it."
+            ),
+            primaryButton: .destructive(Text("Remove")) {
+              removeCertificate()
+            },
+            secondaryButton: .cancel()
+          )
+        }
+      }
+    } else {
+      SettingsSection(content: {
+        SecondaryText("No client certificate configured.")
+      }, header: "Client Certificate")
+
+      SettingsSection {
+        SettingsButtonRow(title: "Import Certificate") {
+          importCertificate()
         }
       }
     }
-    .navigationTitle("Client Certificate")
-    .navigationBarTitleDisplayMode(.inline)
-    .alert(isPresented: $isShowRemoveAlert) {
-      Alert(
-        title: Text("Remove Certificate"),
-        message: Text(
-          "This will remove the client certificate. You may not be able to connect to the server without it."
-        ),
-        primaryButton: .destructive(Text("Remove")) {
-          removeCertificate()
-        },
-        secondaryButton: .cancel()
-      )
-    }
-    .sheet(isPresented: $isShowFilePicker) {
-      CertificateDocumentPicker(fileData: $selectedFileData)
-    }
-    .sheet(isPresented: $isShowPasswordPrompt) {
-      CertificatePasswordPrompt(
-        fileData: selectedFileData ?? Data(),
-        certTag: certTag,
-        onComplete: { success, error in
-          isShowPasswordPrompt = false
-          if success {
-            errorMessage = nil
-            reload()
-          } else {
-            errorMessage = error
-          }
-        }
-      )
-    }
-    .onChange(of: selectedFileData) { _, newValue in
-      if newValue != nil {
-        isShowPasswordPrompt = true
+
+    if let errorMessage {
+      SettingsSection {
+        Text(errorMessage)
+          .foregroundColor(.red)
+          .font(.footnote)
       }
-    }
-    .onAppear { reload() }
-  }
-}
-
-// MARK: - CertificateDocumentPicker
-
-struct CertificateDocumentPicker: UIViewControllerRepresentable {
-  @Binding
-  var fileData: Data?
-  @Environment(\.dismiss)
-  var dismiss
-
-  func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-    var types: [UTType] = [
-      UTType(filenameExtension: "p12")!,
-      UTType(filenameExtension: "pfx")!,
-    ]
-    // Custom type for .p12 files renamed to .x-p12 so iOS doesn't intercept them as
-    // installable profiles (useful for getting a certificate into the Simulator).
-    if let renamedP12 = UTType("org.amperfy.x-p12") {
-      types.append(renamedP12)
-    }
-    let picker = UIDocumentPickerViewController(forOpeningContentTypes: types)
-    picker.allowsMultipleSelection = false
-    picker.delegate = context.coordinator
-    return picker
-  }
-
-  func updateUIViewController(
-    _ uiViewController: UIDocumentPickerViewController,
-    context: Context
-  ) {}
-
-  func makeCoordinator() -> Coordinator { Coordinator(self) }
-
-  class Coordinator: NSObject, UIDocumentPickerDelegate {
-    let parent: CertificateDocumentPicker
-
-    init(_ parent: CertificateDocumentPicker) {
-      self.parent = parent
-    }
-
-    func documentPicker(
-      _ controller: UIDocumentPickerViewController,
-      didPickDocumentsAt urls: [URL]
-    ) {
-      guard let url = urls.first else { return }
-      guard url.startAccessingSecurityScopedResource() else { return }
-      defer { url.stopAccessingSecurityScopedResource() }
-      parent.fileData = try? Data(contentsOf: url)
-      parent.dismiss()
-    }
-
-    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
-      parent.dismiss()
     }
   }
 }
 
-// MARK: - CertificatePasswordPrompt
+// MARK: - CertificateImporter
 
-struct CertificatePasswordPrompt: View {
-  let fileData: Data
-  let certTag: String
-  let onComplete: (Bool, String?) -> ()
+/// The whole import flow: pick a certificate file, ask for its password in an alert (only if
+/// the file has one) and store the certificate.
+///
+/// Presented with UIKit from the top-most view controller of the key window. SwiftUI presents
+/// from the navigation stack's hosting controller, which UIKit reports as detached, and does
+/// not reliably show a second presentation right after the file picker closes.
+@MainActor
+final class CertificateImporter: NSObject, UIDocumentPickerDelegate {
+  /// .p12/.pfx files, plus .p12 files renamed to .x-p12 so iOS doesn't intercept them as
+  /// installable profiles (useful for getting a certificate into the Simulator).
+  private static let contentTypes = [
+    UTType(filenameExtension: "p12"),
+    UTType(filenameExtension: "pfx"),
+    UTType("de.familie-zimba.amperfy-music.x-p12"),
+  ].compactMap { $0 }
 
-  @State
-  private var password = ""
-  @State
-  private var isImporting = false
-  @State
-  private var errorText: String?
+  private var tag = ""
+  private var onFinished: ((_ error: String?) -> ())?
+  private weak var presenter: UIViewController?
 
-  var body: some View {
-    NavigationView {
-      Form {
-        Section(header: Text("Certificate Password")) {
-          SecureField("Password", text: $password)
-        }
-
-        if let errorText {
-          Section {
-            Text(errorText)
-              .foregroundColor(.red)
-              .font(.footnote)
-          }
-        }
-
-        Section {
-          Button("Import") {
-            importCertificate()
-          }
-          .disabled(isImporting)
-        }
-      }
-      .navigationTitle("Import Certificate")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") {
-            onComplete(false, nil)
-          }
-        }
-      }
+  /// `onFinished` gets `nil` once the certificate is stored, otherwise the error message.
+  /// It is not called if the user cancels.
+  func importCertificate(tag: String, onFinished: @escaping (_ error: String?) -> ()) {
+    self.tag = tag
+    self.onFinished = onFinished
+    presenter = UIApplication.shared.connectedScenes
+      .compactMap { ($0 as? UIWindowScene)?.keyWindow }
+      .first { $0.isKeyWindow }?.rootViewController
+    while let presented = presenter?.presentedViewController {
+      presenter = presented
     }
+    let picker = UIDocumentPickerViewController(forOpeningContentTypes: Self.contentTypes)
+    picker.delegate = self
+    present(picker)
   }
 
-  private func importCertificate() {
-    isImporting = true
+  func documentPicker(
+    _ controller: UIDocumentPickerViewController,
+    didPickDocumentsAt urls: [URL]
+  ) {
+    // The picker can report the same pick twice (e.g. on a double tap), which would start two
+    // imports and ask for the password twice.
+    controller.delegate = nil
+    guard let url = urls.first else { return }
+    let isScoped = url.startAccessingSecurityScopedResource()
+    defer { if isScoped { url.stopAccessingSecurityScopedResource() } }
     do {
-      let (identity, _) = try ClientCertificateManager.shared.importPKCS12(
-        data: fileData, password: password
-      )
-      try ClientCertificateManager.shared.storeIdentity(identity, tag: certTag)
-      onComplete(true, nil)
+      // most certificate files have a password, but try without one first
+      store(try Data(contentsOf: url), password: "", fileName: url.lastPathComponent)
     } catch {
-      errorText = error.localizedDescription
-      isImporting = false
+      onFinished?(error.localizedDescription)
+    }
+  }
+
+  private func store(_ data: Data, password: String, fileName: String) {
+    do {
+      try ClientCertificateManager.shared.storeCertificate(
+        pkcs12: data, password: password, tag: tag
+      )
+      onFinished?(nil)
+    } catch {
+      if case ClientCertificateError.keychainError = error {
+        onFinished?(error.localizedDescription)
+      } else {
+        // the file could not be opened with this password: ask (again)
+        askPassword(
+          for: data,
+          fileName: fileName,
+          message: password.isEmpty
+            ? "Enter the password for \u{201C}\(fileName)\u{201D}."
+            : error.localizedDescription
+        )
+      }
+    }
+  }
+
+  private func askPassword(for data: Data, fileName: String, message: String) {
+    let alert = UIAlertController(
+      title: "Certificate Password",
+      message: message,
+      preferredStyle: .alert
+    )
+    alert.addTextField { textField in
+      textField.placeholder = "Password"
+      textField.isSecureTextEntry = true
+    }
+    alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    let importAction = UIAlertAction(
+      title: "Import",
+      style: .default
+    ) { [weak self, weak alert] _ in
+      let password = alert?.textFields?.first?.text ?? ""
+      self?.store(data, password: password, fileName: fileName)
+    }
+    alert.addAction(importAction)
+    alert.preferredAction = importAction
+    present(alert)
+  }
+
+  private func present(_ viewController: UIViewController) {
+    guard let presenter else { return }
+    if presenter.presentedViewController == nil {
+      presenter.present(viewController, animated: true)
+    } else {
+      // the file picker or the previous alert is still closing
+      Task { @MainActor in
+        try? await Task.sleep(for: .milliseconds(100))
+        present(viewController)
+      }
     }
   }
 }

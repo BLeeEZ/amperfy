@@ -100,21 +100,16 @@ class LoginVC: UIViewController {
     textField.accessibilityLabel = "Server URL"
     textField.textContentType = .URL
     textField.keyboardType = .URL
-    textField.returnKeyType = .next
+    textField.returnKeyType = .done
     textField.autocorrectionType = .no
     textField.autocapitalizationType = .none
     textField.addTarget(
       self,
-      action: #selector(Self.serverUrlActionPressed),
+      action: #selector(Self.dismissKeyboard),
       for: .primaryActionTriggered
     )
     return textField
   }()
-
-  @IBAction
-  func serverUrlActionPressed() {
-    usernameTF.becomeFirstResponder()
-  }
 
   fileprivate lazy var usernameTF: UITextField = {
     let textField = UITextField()
@@ -123,21 +118,16 @@ class LoginVC: UIViewController {
     textField.accessibilityLabel = "Username"
     textField.textContentType = .username
     textField.keyboardType = .default
-    textField.returnKeyType = .next
+    textField.returnKeyType = .done
     textField.autocorrectionType = .no
     textField.autocapitalizationType = .none
     textField.addTarget(
       self,
-      action: #selector(Self.usernameActionPressed),
+      action: #selector(Self.dismissKeyboard),
       for: .primaryActionTriggered
     )
     return textField
   }()
-
-  @IBAction
-  func usernameActionPressed() {
-    passwordTF.becomeFirstResponder()
-  }
 
   fileprivate lazy var passwordTF: UITextField = {
     let textField = UITextField()
@@ -146,45 +136,22 @@ class LoginVC: UIViewController {
     textField.accessibilityLabel = "Password"
     textField.textContentType = .password
     textField.keyboardType = .default
-    textField.returnKeyType = .go
+    textField.returnKeyType = .done
     textField.isSecureTextEntry = true
     textField.autocorrectionType = .no
     textField.autocapitalizationType = .none
     textField.addTarget(
       self,
-      action: #selector(Self.passwordActionPressed),
+      action: #selector(Self.dismissKeyboard),
       for: .primaryActionTriggered
     )
     return textField
   }()
 
-  @IBAction
-  func passwordActionPressed() {
-    passwordTF.resignFirstResponder()
-    login()
-  }
-
+  /// Return only dismisses the keyboard; the login is started with the Login button.
   @objc
   func dismissKeyboard() {
     view.endEditing(true)
-  }
-
-  /// Toolbar above the keyboard so the keyboard can always be dismissed, also on
-  /// devices/keyboards without a visible return key.
-  private func makeKeyboardToolbar() -> UIToolbar {
-    let toolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 0, height: 44))
-    let doneButton = UIBarButtonItem(
-      barButtonSystemItem: .done,
-      target: self,
-      action: #selector(Self.dismissKeyboard)
-    )
-    doneButton.accessibilityLabel = "Hide keyboard"
-    toolbar.items = [
-      UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-      doneButton,
-    ]
-    toolbar.sizeToFit()
-    return toolbar
   }
 
   fileprivate lazy var apiSelectorButton: UIButton = {
@@ -235,7 +202,6 @@ class LoginVC: UIViewController {
         onDismiss: { [weak self] in self?.updateAdvancedSummary() },
         onDone: { [weak hostingController] in hostingController?.dismiss(animated: true) }
       )
-      .environmentObject(Settings())
     )
     hostingController.modalPresentationStyle = .formSheet
     present(hostingController, animated: true)
@@ -252,7 +218,7 @@ class LoginVC: UIViewController {
 
   func updateAdvancedSummary() {
     let hasCert = ClientCertificateManager.shared
-      .hasIdentity(tag: ClientCertificateManager.loginTag)
+      .hasCertificate(tag: ClientCertificateManager.loginTag)
     advancedButton.setTitle(
       Self.advancedSummaryTitle(hasHeaders: !httpHeaders.isEmpty, hasCertificate: hasCert),
       for: .normal
@@ -521,12 +487,10 @@ class LoginVC: UIViewController {
         self.appDelegate.storage.settings.accounts.login(credentials)
         meta.backendApi.provideCredentials(credentials: credentials)
 
-        if ClientCertificateManager.shared.hasIdentity(tag: ClientCertificateManager.loginTag) {
-          let accountTag = ClientCertificateManager.accountTag(for: accountInfo.ident)
-          try? ClientCertificateManager.shared.migrateIdentity(
-            from: ClientCertificateManager.loginTag, to: accountTag
-          )
-        }
+        try? ClientCertificateManager.shared.moveCertificate(
+          from: ClientCertificateManager.loginTag,
+          to: ClientCertificateManager.accountTag(for: accountInfo.ident)
+        )
 
         self.appDelegate.notificationHandler.post(name: .accountAdded, object: nil, userInfo: nil)
         self.appDelegate.notificationHandler.post(
@@ -548,12 +512,8 @@ class LoginVC: UIViewController {
             .replaceMainRootViewController(vc: syncVC)
         }
       } catch {
-        if let authError = error as? AuthenticationError {
-          self.showErrorMsg(message: authError.localizedDescription)
-        } else if let certError = error as? ClientCertificateError {
-          self.showErrorMsg(message: certError.localizedDescription)
-        } else if let certSessionError = error as? ClientCertificateSessionError {
-          self.showErrorMsg(message: certSessionError.localizedDescription)
+        if error is AuthenticationError {
+          self.showErrorMsg(message: error.localizedDescription)
         } else {
           self.showErrorMsg(message: "Not able to login!")
         }
@@ -672,10 +632,6 @@ class LoginVC: UIViewController {
     let isModal = presentingViewController != nil || navigationController?
       .presentingViewController != nil
     closeButton.isHidden = !isModal
-
-    for textField in [serverUrlTF, usernameTF, passwordTF] {
-      textField.inputAccessoryView = makeKeyboardToolbar()
-    }
 
     let tapGesture = UITapGestureRecognizer(
       target: self,

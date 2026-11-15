@@ -750,15 +750,11 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
     }
   }
 
-  private func performAFRequest(
-    url: URL,
-    headers: HTTPHeaders? = nil
-  ) async throws
-    -> APIDataResponse {
+  private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
     try await withUnsafeThrowingContinuation { continuation in
       var afRequest = AF.request(url, method: .get, headers: headers)
       if let credential = ClientCertificateManager.shared
-        .credentialForAccountOrLogin(accountIdent: account?.ident) {
+        .credential(accountIdent: account?.ident) {
         afRequest = afRequest.authenticate(with: credential)
       }
       afRequest.validate().responseData { response in
@@ -773,26 +769,6 @@ final class AmpacheXmlServerApi: URLCleanser, Sendable {
         }
         fatalError("should not get here")
       }
-    }
-  }
-
-  private func request(url: URL, headers: HTTPHeaders? = nil) async throws -> APIDataResponse {
-    do {
-      return try await performAFRequest(url: url, headers: headers)
-    } catch {
-      if let account,
-         let serverURLString = credentials.wrappedValue?.activeBackendServerUrl,
-         let serverURL = URL(string: serverURLString),
-         ClientCertificateManager.shared.hasIdentity(
-           tag: ClientCertificateManager.accountTag(for: account.ident)
-         ) {
-        try await ClientCertificateSession.shared.reauthenticateIfNeeded(
-          accountTag: ClientCertificateManager.accountTag(for: account.ident),
-          serverURL: serverURL
-        )
-        return try await performAFRequest(url: url, headers: headers)
-      }
-      throw error
     }
   }
 

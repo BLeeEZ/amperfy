@@ -122,7 +122,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
     guard challenge.protectionSpace
       .authenticationMethod == NSURLAuthenticationMethodClientCertificate,
       let credential = ClientCertificateManager.shared
-      .credentialForAccountOrLogin(accountIdent: clientCertificateAccountIdent)
+      .credential(accountIdent: clientCertificateAccountIdent)
     else {
       completionHandler(.performDefaultHandling, nil)
       return

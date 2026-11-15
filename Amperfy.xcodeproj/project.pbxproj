@@ -440,7 +440,6 @@
 		50C9D6C7284FAB0C007F18D0 /* LogData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288626564C6800DA3A8F /* LogData.swift */; };
 		50C9D6C9284FAB0C007F18D0 /* EventNotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ED2B9027B7AE8500331BF7 /* EventNotificationHandler.swift */; };
 		B5C8DE010000000000000001 /* ClientCertificateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C8DE010000000000000002 /* ClientCertificateManager.swift */; };
-		B5C8DE010000000000000003 /* ClientCertificateSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C8DE010000000000000004 /* ClientCertificateSession.swift */; };
 		50C9D6D2284FAB0C007F18D0 /* StringHasher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5086F87822397B2900546F5A /* StringHasher.swift */; };
 		50C9D6D3284FAB0C007F18D0 /* JSONConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029288826564F3600DA3A8F /* JSONConverter.swift */; };
 		50C9D6D4284FAB88007F18D0 /* PlayerDownloadPreparationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */; };
@@ -1173,7 +1172,6 @@
 		50FE808D26A55CEA00CB434D /* DownloadMO+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DownloadMO+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		50FF31192BBB27AC00C2C3B9 /* Amperfy v36.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v36.xcdatamodel"; sourceTree = "<group>"; };
 		B5C8DE010000000000000002 /* ClientCertificateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientCertificateManager.swift; sourceTree = "<group>"; };
-		B5C8DE010000000000000004 /* ClientCertificateSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientCertificateSession.swift; sourceTree = "<group>"; };
 		B5C8DE010000000000000006 /* ClientCertificateSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientCertificateSettingsView.swift; sourceTree = "<group>"; };
 		50C0FFEE0000000000A00004 /* AdvancedLoginOptionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedLoginOptionsView.swift; sourceTree = "<group>"; };
 		50FF311A2BBC4D8000C2C3B9 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
@@ -1571,7 +1569,6 @@
 				509A7D832806A232009791D1 /* AutoDownloadLibrarySyncer.swift */,
 				50ED756528CBC5D200E5D347 /* LibrarySyncerProxy.swift */,
 				504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */,
-				B5C8DE010000000000000004 /* ClientCertificateSession.swift */,
 			);
 			path = Api;
 			sourceTree = "<group>";
@@ -2845,7 +2842,6 @@
 				50C9D65C284FAA0B007F18D0 /* GenreParserDelegate.swift in Sources */,
 				50C9D6D2284FAB0C007F18D0 /* StringHasher.swift in Sources */,
 				B5C8DE010000000000000001 /* ClientCertificateManager.swift in Sources */,
-				B5C8DE010000000000000003 /* ClientCertificateSession.swift in Sources */,
 				50C9D667284FAA0B007F18D0 /* PlaylistSongsParserDelegate.swift in Sources */,
 				50FF311B2BBC4D8000C2C3B9 /* NetworkMonitor.swift in Sources */,
 				5087DE392EF0437F00644893 /* MetaManager.swift in Sources */,

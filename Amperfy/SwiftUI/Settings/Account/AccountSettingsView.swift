@@ -28,6 +28,7 @@ struct AccountSettingsView: View {
   enum Destination: Hashable {
     case serverURLs
     case customHTTPHeaders
+    case clientCertificate
   }
 
   let splitPercentage = 0.25
@@ -100,11 +101,16 @@ struct AccountSettingsView: View {
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
 
-    let accountCertTag = ClientCertificateManager.accountTag(for: accountInfo.ident)
-    if ClientCertificateManager.shared.hasIdentity(tag: accountCertTag) {
-      try? ClientCertificateManager.shared.migrateIdentity(
-        from: accountCertTag, to: ClientCertificateManager.loginTag
-      )
+    // remove the client certificate and the session cookies of the server (e.g. set by a proxy
+    // in front of it)
+    try? ClientCertificateManager.shared.removeCertificate(
+      tag: ClientCertificateManager.accountTag(for: accountInfo.ident)
+    )
+    if let credentials = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+      .loginCredentials,
+      let serverUrl = URL(string: credentials.activeBackendServerUrl) {
+      HTTPCookieStorage.shared.cookies(for: serverUrl)?
+        .forEach { HTTPCookieStorage.shared.deleteCookie($0) }
     }
 
     // delete cached files
@@ -248,10 +254,7 @@ struct AccountSettingsView: View {
             NavigationLink(value: Destination.customHTTPHeaders) {
               Text("Custom HTTP Headers")
             }
-          }
-
-          SettingsSection {
-            NavigationLink(destination: ClientCertificateSettingsView()) {
+            NavigationLink(value: Destination.clientCertificate) {
               Text("Client Certificate (mTLS)")
             }
           }
@@ -314,6 +317,12 @@ struct AccountSettingsView: View {
           ) { updated in
             saveHTTPHeaders(updated, accountInfo: activeAccountInfo)
           }
+        }
+      case .clientCertificate:
+        if let activeAccountInfo = settings.activeAccountInfo {
+          ClientCertificateSettingsView(
+            certTag: ClientCertificateManager.accountTag(for: activeAccountInfo.ident)
+          )
         }
       }
     }

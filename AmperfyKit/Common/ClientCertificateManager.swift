@@ -29,7 +29,6 @@ public enum ClientCertificateError: LocalizedError, Equatable {
   case incorrectPassword
   case keychainError(status: OSStatus)
   case noIdentityFound
-  case certificateExpired
 
   public var errorDescription: String? {
     switch self {
@@ -41,8 +40,6 @@ public enum ClientCertificateError: LocalizedError, Equatable {
       return "Keychain error: \(status)"
     case .noIdentityFound:
       return "No identity found in the certificate file."
-    case .certificateExpired:
-      return "The certificate has expired."
     }
   }
 }
@@ -51,7 +48,6 @@ public enum ClientCertificateError: LocalizedError, Equatable {
 
 public struct ClientCertificateInfo: Sendable {
   public let subjectName: String
-  public let issuerName: String
   public let expirationDate: Date?
 
   public var isExpired: Bool {
@@ -73,6 +69,9 @@ public struct ClientCertificateInfo: Sendable {
 
 // MARK: - ClientCertificateManager
 
+/// Keeps one client certificate per tag. The PKCS#12 file and its password are stored as a
+/// generic keychain item: unlike a keychain identity, the same certificate can then be stored
+/// under several tags (accounts) and moved between them.
 public final class ClientCertificateManager: @unchecked Sendable {
   public static let shared = ClientCertificateManager()
   public static let loginTag = "amperfy.mtls.login"
@@ -81,252 +80,170 @@ public final class ClientCertificateManager: @unchecked Sendable {
     "amperfy.mtls.\(accountIdent)"
   }
 
+  private struct StoredCertificate: Codable {
+    let pkcs12: Data
+    let password: String
+  }
+
   private init() {}
+
+  private let lock = NSLock()
+  /// Identities already loaded from the keychain (`nil` value: tag has no certificate), so that
+  /// requests do not query the keychain every time.
+  private var identities = [String: SecIdentity?]()
+  private var _activeStreamingCertificateAccountIdent: String?
 
   /// Account ident of the currently streaming account, if any.
   /// Set on the main actor before playback starts and read from the streaming library's
   /// background URLSession delegate queue, so access is lock-protected.
-  private let activeStreamingTagLock = NSLock()
-  private var _activeStreamingCertificateAccountIdent: String?
-
   public var activeStreamingCertificateAccountIdent: String? {
-    get {
-      activeStreamingTagLock.lock()
-      defer { activeStreamingTagLock.unlock() }
-      return _activeStreamingCertificateAccountIdent
-    }
-    set {
-      activeStreamingTagLock.lock()
-      defer { activeStreamingTagLock.unlock() }
-      _activeStreamingCertificateAccountIdent = newValue
-    }
+    get { lock.withLock { _activeStreamingCertificateAccountIdent } }
+    set { lock.withLock { _activeStreamingCertificateAccountIdent = newValue } }
   }
 
   /// The `URLCredential` to present for the currently streaming account, or `nil` if no account is
-  /// set (e.g. radio). Uses the same accountTag→loginTag fallback as the API and download paths,
-  /// so it works even when the identity is still under the login tag. Safe to call from any thread.
+  /// set (e.g. radio). Safe to call from any thread.
   public func activeStreamingCredential() -> URLCredential? {
     guard let ident = activeStreamingCertificateAccountIdent else { return nil }
-    return credentialForAccountOrLogin(accountIdent: ident)
+    return credential(accountIdent: ident)
   }
 
-  public func importPKCS12(data: Data, password: String) throws -> (
-    identity: SecIdentity, info: ClientCertificateInfo
-  ) {
-    let options: [String: Any] = [kSecImportExportPassphrase as String: password]
-    var rawItems: CFArray?
-    let status = SecPKCS12Import(data as CFData, options as CFDictionary, &rawItems)
-
-    guard status == errSecSuccess else {
-      if status == errSecAuthFailed || status == errSecDecode {
-        throw ClientCertificateError.incorrectPassword
-      }
-      throw ClientCertificateError.invalidPKCS12Data
-    }
-
-    guard let items = rawItems as? [[String: Any]],
-          let firstItem = items.first,
-          let identityRef = firstItem[kSecImportItemIdentity as String]
-    else {
-      throw ClientCertificateError.noIdentityFound
-    }
-    // swiftlint:disable:next force_cast
-    let identity = identityRef as! SecIdentity
-
-    let info = try extractCertificateInfo(from: identity)
-    return (identity, info)
+  /// Validates the PKCS#12 file and stores it under the tag, replacing an existing certificate.
+  public func storeCertificate(pkcs12: Data, password: String, tag: String) throws {
+    let identity = try Self.importIdentity(pkcs12: pkcs12, password: password)
+    let stored = StoredCertificate(pkcs12: pkcs12, password: password)
+    try write(JSONEncoder().encode(stored), tag: tag)
+    lock.withLock { identities[tag] = identity }
   }
 
-  public func storeIdentity(_ identity: SecIdentity, tag: String) throws {
-    try removeIdentityIfExists(tag: tag)
-
-    let addQuery: [String: Any] = [
-      kSecClass as String: kSecClassIdentity,
-      kSecValueRef as String: identity,
-      kSecAttrLabel as String: tag,
-      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
-    ]
-
-    let status = SecItemAdd(addQuery as CFDictionary, nil)
-    guard status == errSecSuccess else {
-      throw ClientCertificateError.keychainError(status: status)
+  private func identity(tag: String) -> SecIdentity? {
+    lock.withLock { () -> SecIdentity? in
+      if let cached = identities[tag] { return cached }
+      let loaded = read(tag: tag)
+        .flatMap { try? JSONDecoder().decode(StoredCertificate.self, from: $0) }
+        .flatMap { try? Self.importIdentity(pkcs12: $0.pkcs12, password: $0.password) }
+      identities.updateValue(loaded, forKey: tag)
+      return loaded
     }
   }
 
-  public func getIdentity(tag: String) -> SecIdentity? {
-    let query: [String: Any] = [
-      kSecClass as String: kSecClassIdentity,
-      kSecAttrLabel as String: tag,
-      kSecReturnRef as String: true,
-      kSecMatchLimit as String: kSecMatchLimitOne,
-    ]
-
-    var result: CFTypeRef?
-    let status = SecItemCopyMatching(query as CFDictionary, &result)
-    guard status == errSecSuccess else { return nil }
-    return (result as! SecIdentity)
+  /// The client-certificate credential to present for the given account. Without an account
+  /// (during login) the login-time certificate is used; an existing account never falls back to it.
+  /// Shared by every per-request mTLS path: API requests, downloads, and streaming.
+  public func credential(accountIdent: String?) -> URLCredential? {
+    identity(tag: accountIdent.map { Self.accountTag(for: $0) } ?? Self.loginTag)
+      .map { URLCredential(identity: $0, certificates: nil, persistence: .forSession) }
   }
 
-  public func getCredential(tag: String) -> URLCredential? {
-    guard let identity = getIdentity(tag: tag) else { return nil }
-    return URLCredential(
-      identity: identity,
-      certificates: nil,
-      persistence: .forSession
-    )
-  }
-
-  /// Resolves the client-certificate credential to present for the given account, falling back to the
-  /// login-time certificate (used before the identity is migrated from the login tag to the account tag).
-  /// Shared by every per-request mTLS path: API requests, downloads, and the login reachability probe.
-  public func credentialForAccountOrLogin(accountIdent: String?) -> URLCredential? {
-    if let accountIdent,
-       let credential = getCredential(tag: Self.accountTag(for: accountIdent)) {
-      return credential
-    }
-    return getCredential(tag: Self.loginTag)
-  }
-
-  public func removeIdentity(tag: String) throws {
-    let query: [String: Any] = [
-      kSecClass as String: kSecClassIdentity,
-      kSecAttrLabel as String: tag,
-    ]
-
-    let status = SecItemDelete(query as CFDictionary)
+  public func removeCertificate(tag: String) throws {
+    let status = SecItemDelete(query(tag: tag) as CFDictionary)
+    lock.withLock { _ = identities.removeValue(forKey: tag) }
     guard status == errSecSuccess || status == errSecItemNotFound else {
       throw ClientCertificateError.keychainError(status: status)
     }
   }
 
-  public func hasIdentity(tag: String) -> Bool {
-    getIdentity(tag: tag) != nil
+  public func hasCertificate(tag: String) -> Bool {
+    identity(tag: tag) != nil
   }
 
   public func getCertificateInfo(tag: String) -> ClientCertificateInfo? {
-    guard let identity = getIdentity(tag: tag) else { return nil }
-    return try? extractCertificateInfo(from: identity)
+    var certificate: SecCertificate?
+    guard let identity = identity(tag: tag),
+          SecIdentityCopyCertificate(identity, &certificate) == errSecSuccess,
+          let cert = certificate
+    else { return nil }
+    return ClientCertificateInfo(
+      subjectName: SecCertificateCopySubjectSummary(cert) as String? ?? "Unknown",
+      expirationDate: SecCertificateCopyNotValidAfterDate(cert) as Date?
+    )
   }
 
-  public func migrateIdentity(from sourceTag: String, to destinationTag: String) throws {
-    guard let identity = getIdentity(tag: sourceTag) else { return }
-    try storeIdentity(identity, tag: destinationTag)
-    try removeIdentity(tag: sourceTag)
+  /// Moves the certificate to another tag, e.g. from the login tag to the account after login.
+  public func moveCertificate(from sourceTag: String, to destinationTag: String) throws {
+    guard let data = read(tag: sourceTag) else { return }
+    try write(data, tag: destinationTag)
+    try removeCertificate(tag: sourceTag)
   }
 
   // MARK: - Private
 
-  private func removeIdentityIfExists(tag: String) throws {
-    let query: [String: Any] = [
-      kSecClass as String: kSecClassIdentity,
-      kSecAttrLabel as String: tag,
+  private func query(tag: String) -> [String: Any] {
+    [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: "amperfy.mtls",
+      kSecAttrAccount as String: tag,
     ]
-    let status = SecItemDelete(query as CFDictionary)
-    if status != errSecSuccess, status != errSecItemNotFound {
+  }
+
+  private func read(tag: String) -> Data? {
+    var item = query(tag: tag)
+    item[kSecReturnData as String] = true
+    item[kSecMatchLimit as String] = kSecMatchLimitOne
+    var result: CFTypeRef?
+    guard SecItemCopyMatching(item as CFDictionary, &result) == errSecSuccess else { return nil }
+    return result as? Data
+  }
+
+  private func write(_ data: Data, tag: String) throws {
+    try removeCertificate(tag: tag)
+    var item = query(tag: tag)
+    item[kSecValueData as String] = data
+    item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+    let status = SecItemAdd(item as CFDictionary, nil)
+    guard status == errSecSuccess else {
       throw ClientCertificateError.keychainError(status: status)
     }
   }
 
-  private func extractCertificateInfo(from identity: SecIdentity) throws -> ClientCertificateInfo {
-    var certificate: SecCertificate?
-    let status = SecIdentityCopyCertificate(identity, &certificate)
-    guard status == errSecSuccess, let cert = certificate else {
+  private static func importIdentity(pkcs12: Data, password: String) throws -> SecIdentity {
+    // Memory only: on the Mac the identity would otherwise also be added to the keychain, and
+    // importing the same file again would fail as a duplicate.
+    let options: [String: Any] = [
+      kSecImportExportPassphrase as String: password,
+      kSecImportToMemoryOnly as String: true,
+    ]
+    var rawItems: CFArray?
+    let status = SecPKCS12Import(pkcs12 as CFData, options as CFDictionary, &rawItems)
+
+    guard status == errSecSuccess else {
+      throw status == errSecAuthFailed
+        ? ClientCertificateError.incorrectPassword
+        : ClientCertificateError.invalidPKCS12Data
+    }
+
+    guard let items = rawItems as? [[String: Any]],
+          let identityRef = items.first?[kSecImportItemIdentity as String]
+    else {
       throw ClientCertificateError.noIdentityFound
     }
+    // swiftlint:disable:next force_cast
+    return identityRef as! SecIdentity
+  }
+}
 
-    let subjectName = SecCertificateCopySubjectSummary(cert) as String? ?? "Unknown"
-    let derData = SecCertificateCopyData(cert) as Data
-    let expirationDate = Self.parseExpirationDate(from: derData)
+// MARK: - ClientCertificateURLSessionDelegate
 
-    return ClientCertificateInfo(
-      subjectName: subjectName,
-      issuerName: "Unknown",
-      expirationDate: expirationDate
-    )
+/// Presents the client certificate when the server asks for one. Everything else, including the
+/// validation of the server certificate, is left to the system.
+final class ClientCertificateURLSessionDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
+  private let credential: URLCredential
+
+  init(credential: URLCredential) {
+    self.credential = credential
+    super.init()
   }
 
-  /// Parses the notAfter date from DER-encoded X.509 certificate data.
-  /// X.509 structure: SEQUENCE { tbsCertificate SEQUENCE { version, serial, sigAlgo, issuer, validity SEQUENCE { notBefore, notAfter }, ... } }
-  private static func parseExpirationDate(from derData: Data) -> Date? {
-    var offset = 0
-    let bytes = [UInt8](derData)
-
-    func readTag() -> UInt8? {
-      guard offset < bytes.count else { return nil }
-      let tag = bytes[offset]
-      offset += 1
-      return tag
+  func urlSession(
+    _ session: URLSession,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> ()
+  ) {
+    if challenge.protectionSpace
+      .authenticationMethod == NSURLAuthenticationMethodClientCertificate {
+      completionHandler(.useCredential, credential)
+    } else {
+      completionHandler(.performDefaultHandling, nil)
     }
-
-    func readLength() -> Int? {
-      guard offset < bytes.count else { return nil }
-      let first = bytes[offset]
-      offset += 1
-      if first < 0x80 {
-        return Int(first)
-      }
-      let numBytes = Int(first & 0x7F)
-      guard offset + numBytes <= bytes.count else { return nil }
-      var length = 0
-      for _ in 0 ..< numBytes {
-        length = (length << 8) | Int(bytes[offset])
-        offset += 1
-      }
-      return length
-    }
-
-    func skipElement() -> Bool {
-      guard readTag() != nil, let len = readLength() else { return false }
-      offset += len
-      return offset <= bytes.count
-    }
-
-    func enterSequence() -> Bool {
-      guard let tag = readTag(), (tag & 0x30) == 0x30 else { return false }
-      return readLength() != nil
-    }
-
-    func parseTime() -> Date? {
-      guard let tag = readTag(), let len = readLength() else { return nil }
-      guard offset + len <= bytes.count else { return nil }
-      let timeBytes = Array(bytes[offset ..< (offset + len)])
-      offset += len
-      guard let timeString = String(bytes: timeBytes, encoding: .ascii) else { return nil }
-
-      let formatter = DateFormatter()
-      formatter.locale = Locale(identifier: "en_US_POSIX")
-      formatter.timeZone = TimeZone(identifier: "UTC")
-
-      if tag == 0x17 { // UTCTime
-        formatter.dateFormat = "yyMMddHHmmss'Z'"
-      } else if tag == 0x18 { // GeneralizedTime
-        formatter.dateFormat = "yyyyMMddHHmmss'Z'"
-      } else {
-        return nil
-      }
-      return formatter.date(from: timeString)
-    }
-
-    // Certificate SEQUENCE
-    guard enterSequence() else { return nil }
-    // tbsCertificate SEQUENCE
-    guard enterSequence() else { return nil }
-
-    // version [0] EXPLICIT (optional)
-    if offset < bytes.count, bytes[offset] == 0xA0 {
-      guard skipElement() else { return nil }
-    }
-    // serialNumber
-    guard skipElement() else { return nil }
-    // signature algorithm
-    guard skipElement() else { return nil }
-    // issuer
-    guard skipElement() else { return nil }
-    // validity SEQUENCE
-    guard enterSequence() else { return nil }
-    // notBefore
-    _ = parseTime()
-    // notAfter
-    return parseTime()
   }
 }
