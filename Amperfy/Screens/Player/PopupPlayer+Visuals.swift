@@ -133,11 +133,46 @@ extension PopupPlayerVC {
     }
     guard let artwork = artwork else { return }
     backgroundImage.image = artwork
-    artworkGradientColors = (try? artwork.dominantColors(max: 2)) ?? [
+    let fallbackColors = [
       themePreference.asColor,
       UIColor.systemBackground,
     ]
-    applyGradientBackground()
+    artworkPaletteFallbackColors = fallbackColors
+    guard let image = artwork.cgImage else {
+      artworkPaletteTask?.cancel()
+      artworkPaletteState.invalidate()
+      artworkGradientColors = fallbackColors
+      applyGradientBackground()
+      return
+    }
+
+    // Identity refers to the actual immutable pixels, not a song ID or file path:
+    // consecutive songs sharing artwork reuse a palette, while a replacement image
+    // at the same path (or a placeholder becoming real artwork) gets a new one.
+    let identity = ArtworkImageIdentity(image: image)
+    switch artworkPaletteState.select(identity) {
+    case let .cached(palette):
+      artworkPaletteTask?.cancel()
+      artworkGradientColors = palette.colors?.map { UIColor(cgColor: $0) } ?? fallbackColors
+      applyGradientBackground()
+    case .pending:
+      artworkGradientColors = fallbackColors
+      applyGradientBackground()
+    case let .start(generation):
+      artworkPaletteTask?.cancel()
+      artworkGradientColors = fallbackColors
+      applyGradientBackground()
+      let worker = artworkPaletteWorker
+      artworkPaletteTask = Task { [weak self] in
+        let palette = await worker.extract(identity)
+        guard !Task.isCancelled, let self,
+              artworkPaletteState.complete(identity, generation: generation, value: palette)
+        else { return }
+        artworkGradientColors = palette.colors?
+          .map { UIColor(cgColor: $0) } ?? artworkPaletteFallbackColors
+        applyGradientBackground()
+      }
+    }
   }
 
   internal func applyGradientBackground() {
@@ -161,14 +196,11 @@ extension PopupPlayerVC {
     guard let downloadNotification = DownloadNotification.fromNotification(notification),
           let curPlayable = player.currentlyPlaying
     else { return }
-    if curPlayable.uniqueID == downloadNotification.id {
+    if curPlayable.uniqueID == downloadNotification.id ||
+      curPlayable.artwork?.uniqueID == downloadNotification.id {
       Task { @MainActor in
-        refreshBackgroundItemArtwork()
-      }
-    }
-    if let artwork = curPlayable.artwork,
-       artwork.uniqueID == downloadNotification.id {
-      Task { @MainActor in
+        artworkPaletteTask?.cancel()
+        artworkPaletteState.invalidate()
         refreshBackgroundItemArtwork()
       }
     }
@@ -176,5 +208,82 @@ extension PopupPlayerVC {
 
   func adjustLayoutMargins() {
     view.layoutMargins = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
+  }
+}
+
+// MARK: - ArtworkImageIdentity
+
+// CGImage and CGColor are immutable Core Graphics objects. These wrappers retain
+// them while crossing the actor boundary; no UIImage, UIKit view, settings or
+// managed object is read by the worker.
+struct ArtworkImageIdentity: Equatable, @unchecked Sendable {
+  let image: CGImage
+
+  static func == (lhs: Self, rhs: Self) -> Bool {
+    lhs.image === rhs.image
+  }
+}
+
+// MARK: - ArtworkPalette
+
+struct ArtworkPalette: @unchecked Sendable {
+  let colors: [CGColor]?
+}
+
+// MARK: - ArtworkPaletteWorker
+
+actor ArtworkPaletteWorker {
+  func extract(_ identity: ArtworkImageIdentity) -> ArtworkPalette {
+    // The actor serializes extraction. Superseded queued requests are skipped;
+    // an extraction already running may finish, but cannot overwrite newer art.
+    guard !Task.isCancelled else { return ArtworkPalette(colors: nil) }
+    return ArtworkPalette(
+      colors: try? DominantColors.dominantColors(image: identity.image, maxCount: 2)
+    )
+  }
+}
+
+// MARK: - ArtworkPaletteCoordinator
+
+/// Retains only the current image and its result. Repeated refreshes share work,
+/// including failures; generations reject late results after a track change.
+@MainActor
+final class ArtworkPaletteCoordinator {
+  enum Selection {
+    case cached(ArtworkPalette)
+    case pending
+    case start(UInt64)
+  }
+
+  private var currentImage: ArtworkImageIdentity?
+  private var result: ArtworkPalette?
+  private var pendingGeneration: UInt64?
+  private var generation: UInt64 = 0
+
+  func select(_ image: ArtworkImageIdentity) -> Selection {
+    if currentImage == image {
+      if let result { return .cached(result) }
+      if pendingGeneration != nil { return .pending }
+    }
+    generation &+= 1
+    currentImage = image
+    result = nil
+    pendingGeneration = generation
+    return .start(generation)
+  }
+
+  @discardableResult
+  func complete(_ image: ArtworkImageIdentity, generation: UInt64, value: ArtworkPalette) -> Bool {
+    guard currentImage == image, pendingGeneration == generation else { return false }
+    pendingGeneration = nil
+    result = value
+    return true
+  }
+
+  func invalidate() {
+    currentImage = nil
+    result = nil
+    pendingGeneration = nil
+    generation &+= 1
   }
 }
