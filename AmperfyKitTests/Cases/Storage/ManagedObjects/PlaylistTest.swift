@@ -468,6 +468,124 @@ class PlaylistTest: XCTestCase {
     XCTAssertTrue(playlistThreeCached.playables.hasCachedItems)
   }
 
+  func testIndexedLookupTracksMutationsAndPersistentOrder() throws {
+    let songs = try (0 ..< 3).map { index in
+      try XCTUnwrap(library.getSong(for: account, id: cdHelper.seeder.songs[index].id))
+    }
+    let playlist = library.createPlaylist(account: account)
+    XCTAssertNil(playlist.getPlayable(at: 0))
+    XCTAssertTrue(playlist.getPlayables(from: 0).isEmpty)
+    playlist.shuffle()
+    XCTAssertEqual(playlist.items.count, 0)
+    playlist.append(playables: [songs[0], songs[1], songs[0], songs[2]])
+    XCTAssertNil(playlist.getPlayable(at: -1))
+    XCTAssertNil(playlist.getPlayable(at: 4))
+    XCTAssertEqual(playlist.getPlayable(at: 2)?.id, songs[0].id)
+
+    playlist.movePlaylistItem(fromIndex: 3, to: 0)
+    playlist.insert(playables: [songs[1]], index: 2)
+    playlist.remove(at: 3)
+    let expectedIDs = [songs[2].id, songs[0].id, songs[1].id, songs[0].id]
+    XCTAssertEqual(playlist.getPlayables(from: 0).map { $0.id }, expectedIDs)
+    XCTAssertEqual(
+      playlist.getPlayables(from: 1, to: 2).map { $0.id },
+      Array(expectedIDs[1 ... 2])
+    )
+    XCTAssertTrue(playlist.getPlayables(from: -1).isEmpty)
+    XCTAssertTrue(playlist.getPlayables(from: 3, to: 2).isEmpty)
+    XCTAssertTrue(playlist.getPlayables(from: 0, to: 4).isEmpty)
+
+    let objectID = playlist.managedObject.objectID
+    let context = cdHelper.persistentContainer.viewContext
+    context.reset()
+    let reloaded = Playlist(
+      library: library,
+      managedObject: try XCTUnwrap(context.existingObject(with: objectID) as? PlaylistMO)
+    )
+    for (index, expectedID) in expectedIDs.enumerated() {
+      XCTAssertEqual(reloaded.getPlayable(at: index)?.id, expectedID)
+    }
+    XCTAssertEqual(reloaded.getPlayables(from: 0).map { $0.id }, expectedIDs)
+  }
+
+  func testRepeatedShufflePreservesDuplicateEntriesWithoutCreatingRows() throws {
+    let songs = try (0 ..< 3).map { index in
+      try XCTUnwrap(library.getSong(for: account, id: cdHelper.seeder.songs[index].id))
+    }
+    songs[0].artwork = library.createArtwork(account: account)
+    let playables = (0 ..< 700).map { songs[$0 % songs.count] }
+    let playlist = library.createPlaylist(account: account)
+    playlist.append(playables: playables)
+    let expectedSongIDs = playables.map { $0.id }.sorted()
+    let entryIDs = Set(playlist.items.map { $0.objectID })
+    let artworkIDs = playlist.artworkItems.map { $0.objectID }
+    XCTAssertFalse(artworkIDs.isEmpty)
+    let rowCount = library.getAllPlaylistItems().count
+    let originalDuration = playlist.duration
+
+    let context = cdHelper.persistentContainer.viewContext
+    let fetchRequest = PlaylistItemMO.playlistOrderSortedFetchRequest
+    fetchRequest.predicate = NSPredicate(format: "playlist == %@", playlist.managedObject)
+    let results = NSFetchedResultsController(
+      fetchRequest: fetchRequest,
+      managedObjectContext: context,
+      sectionNameKeyPath: nil,
+      cacheName: nil
+    )
+    let changes = PlaylistChangeRecorder()
+    results.delegate = changes
+    try results.performFetch()
+
+    for _ in 0 ..< 3 {
+      let previousOrder = playlist.items.map { $0.objectID }
+      changes.didChange = false
+      playlist.shuffle()
+      context.processPendingChanges()
+      XCTAssertEqual(playlist.getPlayables(from: 0).map { $0.id }.sorted(), expectedSongIDs)
+      XCTAssertEqual(Set(playlist.items.map { $0.objectID }), entryIDs)
+      XCTAssertEqual(library.getAllPlaylistItems().count, rowCount)
+      XCTAssertEqual(playlist.songCount, 700)
+      XCTAssertEqual(playlist.duration, originalDuration)
+      let items = playlist.items
+      XCTAssertEqual(
+        library.getPlaylistItems(playlist: playlist).map { $0.objectID },
+        items.map { $0.objectID }
+      )
+      XCTAssertEqual(results.fetchedObjects?.map { $0.objectID }, items.map { $0.objectID })
+      if previousOrder != items.map({ $0.objectID }) {
+        XCTAssertTrue(changes.didChange)
+      }
+      for (index, item) in items.enumerated() {
+        XCTAssertEqual(item.order, (index + 1) * Int(PlaylistItemMO.orderDistance))
+        XCTAssertEqual(item.managedObject.playlist, playlist.managedObject)
+      }
+      XCTAssertEqual(playlist.artworkItems.map { $0.objectID }, artworkIDs)
+    }
+
+    let beforeEdits = playlist.items.map { $0.objectID }
+    playlist.insert(playables: [songs[1]], index: 0)
+    XCTAssertEqual(playlist.getPlayable(at: 0)?.id, songs[1].id)
+    playlist.remove(at: 0)
+    XCTAssertEqual(playlist.items.map { $0.objectID }, beforeEdits)
+    playlist.movePlaylistItem(fromIndex: 699, to: 0)
+    XCTAssertEqual(
+      playlist.items.map { $0.objectID },
+      [beforeEdits[699]] + Array(beforeEdits[0 ..< 699])
+    )
+
+    let orderedIDs = playlist.items.map { $0.objectID }
+    let objectID = playlist.managedObject.objectID
+    results.delegate = nil
+    context.reset()
+    let reloaded = Playlist(
+      library: library,
+      managedObject: try XCTUnwrap(context.existingObject(with: objectID) as? PlaylistMO)
+    )
+    XCTAssertEqual(reloaded.items.map { $0.objectID }, orderedIDs)
+    XCTAssertEqual(reloaded.getPlayables(from: 0).map { $0.id }.sorted(), expectedSongIDs)
+    XCTAssertEqual(library.getAllPlaylistItems().count, rowCount)
+  }
+
   func testMovePlaylistSong_InvalidValues() {
     resetTestPlaylist()
 
@@ -666,5 +784,17 @@ private final class SnapshotRecorder: NSObject, @preconcurrency NSFetchedResults
     didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference
   ) {
     itemIDs = snapshot.itemIdentifiers.compactMap { $0 as? NSManagedObjectID }
+  }
+}
+
+// MARK: - PlaylistChangeRecorder
+
+@MainActor
+private final class PlaylistChangeRecorder: NSObject,
+  @preconcurrency NSFetchedResultsControllerDelegate {
+  var didChange = false
+
+  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    didChange = true
   }
 }

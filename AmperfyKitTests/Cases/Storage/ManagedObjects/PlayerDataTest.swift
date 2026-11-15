@@ -20,6 +20,7 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
 
 @MainActor
@@ -125,6 +126,45 @@ class PlayerDataTest: XCTestCase {
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.single)
     testPlayer.setRepeatMode(RepeatMode.off)
     XCTAssertEqual(testPlayer.repeatMode, RepeatMode.off)
+  }
+
+  func testShuffleRetainsCurrentTrackAndRestoresNormalQueueWithDuplicates() throws {
+    let songs = try (0 ..< 3).map { index in
+      try XCTUnwrap(library.getSong(for: account, id: cdHelper.seeder.songs[index].id))
+    }
+    let playables = [songs[0], songs[1], songs[0], songs[2]]
+    testPlayer.appendActiveQueue(playables: playables)
+    testPlayer.setCurrentIndex(1)
+    let normalIDs = testNormalPlaylist.items.map { $0.objectID }
+    let shuffledIDs = Set(testShuffledPlaylist.items.map { $0.objectID })
+    let rowCount = library.getAllPlaylistItems().count
+    let currentSongID = songs[1].id
+    let expectedSongIDs = playables.map { $0.id }
+
+    for _ in 0 ..< 3 {
+      testPlayer.setShuffle(true)
+      XCTAssertEqual(testPlayer.currentIndex, 0)
+      XCTAssertEqual(testPlayer.currentItem?.id, currentSongID)
+      XCTAssertEqual(Set(testPlayer.activeQueue.items.map { $0.objectID }), shuffledIDs)
+      XCTAssertEqual(
+        testPlayer.activeQueue.playables.map { $0.id }.sorted(),
+        expectedSongIDs.sorted()
+      )
+      testPlayer.setShuffle(false)
+      XCTAssertEqual(testPlayer.currentIndex, 1)
+      XCTAssertEqual(testPlayer.currentItem?.id, currentSongID)
+      XCTAssertEqual(testPlayer.activeQueue.items.map { $0.objectID }, normalIDs)
+      XCTAssertEqual(testPlayer.activeQueue.playables.map { $0.id }, expectedSongIDs)
+      XCTAssertEqual(library.getAllPlaylistItems().count, rowCount)
+    }
+
+    cdHelper.persistentContainer.viewContext.reset()
+    let reloadedPlayer = library.getPlayerData()
+    XCTAssertFalse(reloadedPlayer.isShuffle)
+    XCTAssertEqual(reloadedPlayer.currentIndex, 1)
+    XCTAssertEqual(reloadedPlayer.currentItem?.id, currentSongID)
+    XCTAssertEqual(reloadedPlayer.activeQueue.items.map { $0.objectID }, normalIDs)
+    XCTAssertEqual(reloadedPlayer.activeQueue.playables.map { $0.id }, expectedSongIDs)
   }
 
   func testCurrentSongIndexSet() {
