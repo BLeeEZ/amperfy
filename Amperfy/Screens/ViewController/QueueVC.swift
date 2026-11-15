@@ -125,7 +125,7 @@ class QueueVC: UIViewController {
       // Empty navigation bar that looks like the section headers: no system edge effect and a
       // transparent navigation bar. Its background is drawn by a fake navigation bar instead.
       self.tableView!.topEdgeEffect.isHidden = true
-      configureTransparentNavigationBar()
+      navigationItem.configureTransparentAppearance()
       addFakeNavigationBar()
     } else {
       // hard top border -> other glass effect is to big and covers top sidebar elements
@@ -162,18 +162,6 @@ class QueueVC: UIViewController {
       width: tableView.bounds.width,
       height: tableView.adjustedContentInset.top + max(0, overscroll)
     )
-  }
-
-  /// Transparent navigation bar without separator line. The background is drawn by the fake
-  /// navigation bar.
-  private func configureTransparentNavigationBar() {
-    let appearance = UINavigationBarAppearance()
-    appearance.configureWithTransparentBackground()
-    appearance.shadowColor = .clear
-    navigationItem.standardAppearance = appearance
-    navigationItem.compactAppearance = appearance
-    navigationItem.scrollEdgeAppearance = appearance
-    navigationItem.compactScrollEdgeAppearance = appearance
   }
 
   override func viewDidLayoutSubviews() {

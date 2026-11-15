@@ -149,7 +149,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   #if targetEnvironment(macCatalyst)
     private static let minimumWindowSize = CGSize(width: 400, height: 300)
     /// Frame of the last main window that was closed in this app run. Closing the window
-    /// (e.g. Cmd+W or switching to the mini player) discards its scene session, so macOS
+    /// (e.g. Cmd+W) discards its scene session, so macOS
     /// cannot restore the frame and the next main window would open in the default size.
     private static var lastClosedFrame: CGRect?
 

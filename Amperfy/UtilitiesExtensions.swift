@@ -155,7 +155,42 @@ extension UIButton.Configuration {
   }
 }
 
+extension UIViewController {
+  /// macOS: shows or hides the title in the title bar of the view controller's window
+  public func setWindowTitle(isHidden: Bool) {
+    #if targetEnvironment(macCatalyst)
+      view.window?.windowScene?.titlebar?.titleVisibility = isHidden ? .hidden : .visible
+    #endif
+  }
+}
+
+extension UINavigationItem {
+  /// Transparent navigation bar without separator line
+  public func configureTransparentAppearance() {
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithTransparentBackground()
+    appearance.shadowColor = .clear
+    standardAppearance = appearance
+    compactAppearance = appearance
+    scrollEdgeAppearance = appearance
+    compactScrollEdgeAppearance = appearance
+  }
+}
+
 extension UIView {
+  /// Centers the view in `container` and sizes it relative to the container. The default
+  /// multiplier lets the view fill the container. The view must already be in the same view
+  /// hierarchy as `container`.
+  public func constrainCentered(in container: UIView, sizeMultiplier: CGFloat = 1.0) {
+    translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      centerXAnchor.constraint(equalTo: container.centerXAnchor),
+      centerYAnchor.constraint(equalTo: container.centerYAnchor),
+      widthAnchor.constraint(equalTo: container.widthAnchor, multiplier: sizeMultiplier),
+      heightAnchor.constraint(equalTo: container.heightAnchor, multiplier: sizeMultiplier),
+    ])
+  }
+
   public func setBackgroundBlur(style: UIBlurEffect.Style, alpha: CGFloat = 1.0) {
     backgroundColor = UIColor.clear
     let blurEffect = UIBlurEffect(style: style)
