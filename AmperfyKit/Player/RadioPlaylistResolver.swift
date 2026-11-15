@@ -64,7 +64,8 @@ enum RadioPlaylistResolver {
     defer { bytes.task.cancel() }
     if let httpResponse = response as? HTTPURLResponse,
        !(200 ..< 300).contains(httpResponse.statusCode) {
-      // a server error or rate limit may be temporary, the player's error handling retries it
+      // a server error or rate limit may be temporary, it is reported as a player error and
+      // playing the radio again may work, unlike a broken playlist
       if httpResponse.statusCode >= 500 || httpResponse.statusCode == 429 {
         throw URLError(.badServerResponse)
       }
@@ -80,11 +81,14 @@ enum RadioPlaylistResolver {
     for try await byte in bytes {
       data.append(byte)
       if !isPlaylistMimeType, data.count == sniffLength, !looksLikePlaylist(data) {
+        guard !looksLikeMarkup(data) else { throw InvalidPlaylistError(url: url) }
         return response.url ?? url
       }
       guard data.count <= maxPlaylistSize else { throw InvalidPlaylistError(url: url) }
       guard Date() < deadline else { throw URLError(.timedOut) }
     }
+    // an error or login page instead of the playlist, its lines would be read as relative URLs
+    guard !looksLikeMarkup(data) else { throw InvalidPlaylistError(url: url) }
     if !isPlaylistMimeType, !looksLikePlaylist(data) {
       return response.url ?? url
     }
@@ -103,19 +107,44 @@ enum RadioPlaylistResolver {
 
   /// The content decides, servers also deliver M3U for a .pls link and the other way round
   static func format(ofContent content: String) -> Format {
-    let lowercased = content.lowercased()
-    return lowercased.contains("[playlist]") || lowercased.contains("\nfile1=") ||
-      lowercased.hasPrefix("file1=") ? .pls : .m3u
+    let lines = content.components(separatedBy: .newlines)
+      .map {
+        $0.trimmingCharacters(in: CharacterSet(charactersIn: "\u{FEFF}").union(.whitespaces))
+          .lowercased()
+      }
+      .filter { !$0.isEmpty }
+    // only the header counts, an M3U title may contain "[playlist]" too
+    if lines.first == "[playlist]" { return .pls }
+    return lines.contains(where: isPLSEntry) ? .pls : .m3u
+  }
+
+  /// `File1=…`, an M3U entry is a URL or a comment and never looks like this
+  static func isPLSEntry(_ lowercasedLine: String) -> Bool {
+    guard lowercasedLine.hasPrefix("file"),
+          let separator = lowercasedLine.firstIndex(of: "=")
+    else { return false }
+    let number =
+      lowercasedLine[lowercasedLine.index(lowercasedLine.startIndex, offsetBy: 4) ..< separator]
+    return !number.isEmpty && number.allSatisfy { $0.isASCII && $0.isNumber }
   }
 
   static let sniffLength = 16
 
   /// Playlists start with a header, a comment or a URL, audio data doesn't
   static func looksLikePlaylist(_ data: Data) -> Bool {
-    let head = String(decoding: data.prefix(sniffLength), as: UTF8.self)
+    let head = sniffedHead(of: data)
+    return head.hasPrefix("#") || head.hasPrefix("[playlist]") || head.hasPrefix("http")
+  }
+
+  /// HTML or XML, e.g. an error page served instead of the playlist
+  static func looksLikeMarkup(_ data: Data) -> Bool {
+    sniffedHead(of: data).hasPrefix("<")
+  }
+
+  private static func sniffedHead(of data: Data) -> String {
+    String(decoding: data.prefix(sniffLength), as: UTF8.self)
       .trimmingCharacters(in: CharacterSet(charactersIn: "\u{FEFF}").union(.whitespacesAndNewlines))
       .lowercased()
-    return head.hasPrefix("#") || head.hasPrefix("[playlist]") || head.hasPrefix("http")
   }
 
   static func format(ofURL url: URL) -> Format? {
@@ -147,7 +176,7 @@ enum RadioPlaylistResolver {
     case .pls:
       // File1=…, File2=…; take the lowest number
       entries = lines.compactMap { line -> (Int, String)? in
-        guard line.lowercased().hasPrefix("file"), let separator = line.firstIndex(of: "=")
+        guard isPLSEntry(line.lowercased()), let separator = line.firstIndex(of: "=")
         else { return nil }
         let number = Int(line[line.index(line.startIndex, offsetBy: 4) ..< separator]) ?? .max
         let value = line[line.index(after: separator)...].trimmingCharacters(in: .whitespaces)
