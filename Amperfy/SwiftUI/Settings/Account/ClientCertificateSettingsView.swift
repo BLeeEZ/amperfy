@@ -163,12 +163,9 @@ struct ClientCertificateSections: View {
 /// not reliably show a second presentation right after the file picker closes.
 @MainActor
 final class CertificateImporter: NSObject, UIDocumentPickerDelegate {
-  /// .p12/.pfx files, plus .p12 files renamed to .x-p12 so iOS doesn't intercept them as
-  /// installable profiles (useful for getting a certificate into the Simulator).
   private static let contentTypes = [
     UTType(filenameExtension: "p12"),
     UTType(filenameExtension: "pfx"),
-    UTType("de.familie-zimba.amperfy-music.x-p12"),
   ].compactMap { $0 }
 
   private var tag = ""
