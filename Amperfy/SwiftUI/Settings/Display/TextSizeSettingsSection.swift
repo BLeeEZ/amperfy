@@ -2,7 +2,7 @@
 //  TextSizeSettingsSection.swift
 //  Amperfy
 //
-//  Created by Giacomo Sfratato on 09.11.26.
+//  Created by David Klopp on 09.11.26.
 //  Copyright (c) 2026 Maximilian Bauer. All rights reserved.
 //
 //  This program is free software: you can redistribute it and/or modify
