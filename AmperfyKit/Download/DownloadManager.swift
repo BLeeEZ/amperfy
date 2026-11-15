@@ -416,6 +416,32 @@ actor DownloadManager: NSObject, DownloadManageable {
     }
   }
 
+  /// Detects an HTTP error or a text response (e.g. an HTML error page) that must not be
+  /// cached as a playable. Large text responses are accepted because some servers label
+  /// audio files as text/plain.
+  static func validatePlayableResponse(
+    statusCode: Int?,
+    mimeType: String?,
+    fileSize: Int64?,
+    cleansedURL: CleansedURL?
+  )
+    -> ResponseError? {
+    guard let statusCode else { return nil }
+    let mimeType = mimeType?.lowercased() ?? ""
+    let isErrorStatus = !(200 ... 299).contains(statusCode)
+    let isApiResponse = mimeType == "application/xml" || mimeType == "application/json"
+    let isSmallTextResponse = mimeType.hasPrefix("text/") && (fileSize ?? 0) < 100_000
+    guard isErrorStatus || isApiResponse || isSmallTextResponse else { return nil }
+    let mimeTypeDescription = mimeType.isEmpty ? "none" : mimeType
+    return ResponseError(
+      type: .api,
+      statusCode: statusCode,
+      message: "Download response is not a playable file " +
+        "(status code: \(statusCode), MIME type: \(mimeTypeDescription))",
+      cleansedURL: cleansedURL
+    )
+  }
+
   func finishDownload(
     downloadRequest: DownloadRequest,
     task: URLSessionTask?,
@@ -470,12 +496,21 @@ actor DownloadManager: NSObject, DownloadManageable {
     downloadRequest: DownloadRequest,
     task: URLSessionTask,
     fileURL: URL,
-    fileMimeType: String?
+    fileMimeType: String?,
+    statusCode: Int?
   ) async {
-    let responseError = await getDownloadDelegateCB().validateDownloadedData(
+    var responseError = await getDownloadDelegateCB().validateDownloadedData(
       fileURL: fileURL,
       downloadURL: task.originalRequest?.url
     )
+    if responseError == nil, downloadRequest.info.type == .playable {
+      responseError = Self.validatePlayableResponse(
+        statusCode: statusCode,
+        mimeType: fileMimeType,
+        fileSize: fileManager.getFileSize(url: fileURL),
+        cleansedURL: task.originalRequest?.url?.asCleansedURL(cleanser: urlCleanser)
+      )
+    }
 
     if let responseError {
       os_log(

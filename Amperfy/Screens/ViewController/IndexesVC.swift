@@ -52,8 +52,7 @@ class IndexesVC: SingleFetchedResultsTableViewController<DirectoryMO> {
     configureSearchController(placeholder: "Search in \"Directories\"")
     setNavBarTitle(title: musicFolder.name)
     tableView.register(nibName: DirectoryTableCell.typeName)
-    tableView.rowHeight = DirectoryTableCell.rowHeight
-    tableView.estimatedRowHeight = DirectoryTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { DirectoryTableCell.rowHeight }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0

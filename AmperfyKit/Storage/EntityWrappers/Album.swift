@@ -37,10 +37,6 @@ public class Album: AbstractLibraryEntity {
     super.imagePath(setting: setting)
   }
 
-  private var embeddedArtworkImagePath: String? {
-    songs.lazy.compactMap { $0.embeddedArtwork }.first?.imagePath
-  }
-
   public var identifier: String {
     name
   }

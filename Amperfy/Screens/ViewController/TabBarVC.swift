@@ -114,7 +114,7 @@ class TabBarVC: UITabBarController {
       object: nil
     )
 
-    tabBarMinimizeBehavior = .onScrollDown
+    applyToolbarPlayerCollapseMode()
 
     miniPlayer = MiniPlayerView(player: appDelegate.player)
     miniPlayer!.configureForiOS()
@@ -214,6 +214,10 @@ class TabBarVC: UITabBarController {
 
   @objc
   func handleAutoCollapseToolbarPlayer(notification: Notification) {
+    applyToolbarPlayerCollapseMode()
+  }
+
+  func applyToolbarPlayerCollapseMode() {
     tabBarMinimizeBehavior = appDelegate.storage.settings.user
       .isToolbarPlayerAutoCollapse ? .onScrollDown : .never
   }
@@ -299,7 +303,7 @@ extension TabBarVC: MainSceneHostingViewController {
       self.selectedTab = searchTab
       searchTab.viewController?.navigationController?.popToRootViewController(animated: false)
       Task {
-        try await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         if let searchTabVC = searchTab.viewController?.navigationController?
           .topViewController as? SearchVC {
           searchTabVC.activateSearchBar()

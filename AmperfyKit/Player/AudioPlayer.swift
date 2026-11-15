@@ -54,6 +54,10 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   var isShouldPauseAfterFinishedPlaying = false
+  /// Where to resume after a playback error tore down the player. Only applies to the
+  /// playable it was captured for and is used at most once, so it can't leak into a
+  /// different item if the recovery fails or the user plays something else.
+  private var errorResumePoint: (playable: AbstractPlayable, time: Double)?
   var autoplayCB: (@MainActor (Song) async throws -> [Song])?
 
   private var playerStatus: PlayerStatusPersistent
@@ -273,14 +277,25 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func seekToLastStoppedPlayTime() {
+    // An error tears the player down and re-inserts the current playable, which
+    // makes it start from the beginning. Resume from the position captured when
+    // the error occurred instead. The persisted `playProgress` cannot be used
+    // for this: `savePlayInformation` deliberately resets it to zero within
+    // `progressTimeEndThreshold` of the end of the track, which is exactly where
+    // a stream error is most likely to happen.
+    if let resumePoint = errorResumePoint {
+      errorResumePoint = nil
+      if resumePoint.playable == currentlyPlaying {
+        backendAudioPlayer.seek(toSecond: resumePoint.time)
+        return
+      }
+    }
+
     if let playable = currentlyPlaying,
        playable.playProgress > 0,
        playable
        .isPodcastEpisode ||
-       (
-         (playable.isSong || backendAudioPlayer.isErrorOccurred) && settings.user
-           .isPlayerSongPlaybackResumeEnabled
-       ) {
+       (playable.isSong && settings.user.isPlayerSongPlaybackResumeEnabled) {
       backendAudioPlayer.seek(toSecond: Double(playable.playProgress))
     }
   }
@@ -324,105 +339,76 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     notifierList.append(WeakMusicPlayable(notifier))
   }
 
-  func removeAllNotifier() {
-    notifierList.removeAll()
+  private func notifyAll(_ notification: (MusicPlayable) -> ()) {
+    notifierList = notifierList.filter { $0.value != nil }
+    for notifier in notifierList {
+      if let value = notifier.value {
+        notification(value)
+      }
+    }
   }
 
   func notifyItemStartedPlayingFromBeginning() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didStartPlayingFromBeginning()
-    }
+    notifyAll { $0.didStartPlayingFromBeginning() }
     seekToLastStoppedPlayTime()
   }
 
   func notifyItemStartedPlaying() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didStartPlaying()
-    }
+    notifyAll { $0.didStartPlaying() }
   }
 
   // BackendAudioPlayerNotifiable
   func notifyErrorOccurred(error: Error) {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.errorOccurred(error: error)
+    // Radios are live streams and can't be seeked, they just reconnect.
+    let resumeTime = backendAudioPlayer.elapsedTimeBeforeErrorOccurred
+    if let playable = currentlyPlaying, !playable.isRadio, resumeTime > 0 {
+      errorResumePoint = (playable: playable, time: resumeTime)
     }
+    notifyAll { $0.errorOccurred(error: error) }
   }
 
   func notifyItemPaused() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didPause()
-    }
+    notifyAll { $0.didPause() }
   }
 
   func notifyPlayerStopped() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didStopPlaying()
-    }
+    notifyAll { $0.didStopPlaying() }
   }
 
   func notifyArtworkChanged() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didArtworkChange()
-    }
+    notifyAll { $0.didArtworkChange() }
   }
 
   func notifyElapsedTimeChanged() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didElapsedTimeChange()
-    }
+    notifyAll { $0.didElapsedTimeChange() }
   }
 
   func notifyLyricsTimeChanged(time: CMTime) {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didLyricsTimeChange(time: time)
-    }
+    notifyAll { $0.didLyricsTimeChange(time: time) }
   }
 
   func notifyPlaylistUpdated() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didPlaylistChange()
-    }
+    notifyAll { $0.didPlaylistChange() }
   }
 
   func notifyNowPlayingInfoChanged() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didNowPlayingInfoChange()
-    }
+    notifyAll { $0.didNowPlayingInfoChange() }
   }
 
   func notifyShuffleUpdated() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didShuffleChange()
-    }
+    notifyAll { $0.didShuffleChange() }
   }
 
   func notifyRepeatUpdated() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didRepeatChange()
-    }
+    notifyAll { $0.didRepeatChange() }
   }
 
   func notifyPlaybackRateUpdated() {
-    notifierList = notifierList.filter { $0.value != nil }
-    for notifier in notifierList {
-      notifier.value?.didPlaybackRateChange()
-    }
+    notifyAll { $0.didPlaybackRateChange() }
   }
 
   private func handleRadioStartIfNeeded() {
-    guard let radio = currentlyPlaying?.asRadio else {
+    guard (currentlyPlaying?.asRadio) != nil else {
       if currentRadioNowPlaying != nil {
         currentRadioNowPlaying = nil
         lastRadioStreamTitle = nil

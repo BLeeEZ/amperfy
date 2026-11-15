@@ -183,7 +183,7 @@ extension SplitVC: MainSceneHostingViewController {
       let searchVC = AppStoryboard.Main.segueToSearch(account: self.account)
       self.setViewController(self.embeddInNavigation(vc: searchVC), for: .secondary)
       Task {
-        try await Task.sleep(nanoseconds: 500_000_000)
+        try? await Task.sleep(nanoseconds: 500_000_000)
         searchVC.activateSearchBar()
       }
     }

@@ -57,8 +57,7 @@ class GenresVC: SingleFetchedResultsTableViewController<GenreMO> {
     )
     setNavBarTitle(title: "Genres")
     tableView.register(nibName: GenericTableCell.typeName)
-    tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
-    tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
+    tableView.reloadOnTextSizeChange { GenericTableCell.rowHeightWithoutImage }
     tableView.sectionFooterHeight = 0.0
     tableView.estimatedSectionFooterHeight = 0.0
     tableView.sectionHeaderHeight = 0.0

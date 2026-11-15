@@ -46,7 +46,7 @@ class PodcastEpisodeTableCell: BasicTableCell {
   @IBOutlet
   weak var playProgressLabelPlayButtonDistance: NSLayoutConstraint!
 
-  static let rowHeight: CGFloat = 143.0 + margin.bottom + margin.top
+  static var rowHeight: CGFloat { scaledRowHeight(contentHeight: 143.0) }
 
   private var episode: PodcastEpisode?
   private var rootView: UIViewController?
@@ -107,10 +107,10 @@ class PodcastEpisodeTableCell: BasicTableCell {
     playProgressLabel.text = progressText
     if episode.isCached {
       cacheIconImage.isHidden = false
-      playProgressLabel.textColor = .secondaryLabelColor
+      playProgressLabel.textColor = .secondaryLabel
     } else {
       cacheIconImage.isHidden = true
-      playProgressLabel.textColor = .secondaryLabelColor
+      playProgressLabel.textColor = .secondaryLabel
     }
     backgroundColor = .systemBackground
   }

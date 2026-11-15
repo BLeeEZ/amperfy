@@ -523,10 +523,6 @@ extension Array where Element: AbstractPlayable {
     isFilterActive ? filter { $0.isCached } : self
   }
 
-  public func filterCustomArt() -> [Element] {
-    filter { $0.artwork != nil }
-  }
-
   public var hasCachedItems: Bool {
     lazy.filter { $0.isCached }.first != nil
   }

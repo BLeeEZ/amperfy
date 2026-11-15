@@ -597,10 +597,6 @@ public class LibraryStorage: PlayableFileCachable {
     return Podcast(managedObject: podcastMO)
   }
 
-  func deletePodcast(_ podcast: Podcast) {
-    context.delete(podcast.managedObject)
-  }
-
   func createPodcastEpisode(account: Account) -> PodcastEpisode {
     let podcastEpisodeMO = PodcastEpisodeMO(context: context)
     podcastEpisodeMO.account = account.managedObject
@@ -623,14 +619,6 @@ public class LibraryStorage: PlayableFileCachable {
     let scrobbleEntryMO = ScrobbleEntryMO(context: context)
     scrobbleEntryMO.account = account.managedObject
     return ScrobbleEntry(managedObject: scrobbleEntryMO)
-  }
-
-  func deleteRadio(_ radio: Radio) {
-    context.delete(radio.managedObject)
-  }
-
-  func deleteScrobbleEntry(_ scrobbleEntry: ScrobbleEntry) {
-    context.delete(scrobbleEntry.managedObject)
   }
 
   func createMusicFolder(account: Account) -> MusicFolder {
@@ -1441,6 +1429,39 @@ public class LibraryStorage: PlayableFileCachable {
     return albums ?? [Album]()
   }
 
+  /// Same result as `getAlbums(for:whichContainsSongsWithArtist:).count`. The IDs are collected via the
+  /// relationships (indexed) because the OR + SUBQUERY predicate scans all albums for every artist cell.
+  public func getAlbumsCount(
+    for account: Account,
+    whichContainsSongsWithArtist artist: Artist
+  )
+    -> Int {
+    let artistMO = artist.managedObject
+    var albumIDs = Set(artistMO.objectIDs(forRelationshipNamed: #keyPath(ArtistMO.albums)))
+    // albums of other artists (e.g. compilations) that contain songs of the artist
+    let songIDs = artistMO.objectIDs(forRelationshipNamed: #keyPath(ArtistMO.songs))
+    if !songIDs.isEmpty {
+      let request = NSFetchRequest<NSDictionary>(entityName: Song.typeName)
+      request.resultType = .dictionaryResultType
+      request.predicate = NSPredicate(
+        format: "SELF IN %@ AND %K != nil",
+        songIDs,
+        #keyPath(SongMO.album)
+      )
+      request.propertiesToFetch = [#keyPath(SongMO.album)]
+      request.returnsDistinctResults = true
+      let rows = (try? context.fetch(request)) ?? []
+      albumIDs.formUnion(rows.compactMap { $0[#keyPath(SongMO.album)] as? NSManagedObjectID })
+    }
+    guard !albumIDs.isEmpty else { return 0 }
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      NSPredicate(format: "SELF IN %@", Array(albumIDs)),
+    ])
+    return (try? context.count(for: fetchRequest)) ?? 0
+  }
+
   public func getAlbum(for account: Account, id: String, isDetailFaultResolution: Bool) -> Album? {
     let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
     fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
@@ -1463,9 +1484,8 @@ public class LibraryStorage: PlayableFileCachable {
     return albums?.lazy.compactMap { Album(managedObject: $0) }.first
   }
 
-  func getAlbumWithoutSyncedSongs() -> [Album] {
-    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+  private var albumWithoutSyncedSongsPredicate: NSPredicate {
+    NSCompoundPredicate(andPredicateWithSubpredicates: [
       NSPredicate(format: "%K == FALSE", #keyPath(AlbumMO.isSongsMetaDataSynced)),
       NSPredicate(
         format: "%K == %i",
@@ -1473,8 +1493,38 @@ public class LibraryStorage: PlayableFileCachable {
         RemoteStatus.available.rawValue
       ),
     ])
+  }
+
+  func getAlbumWithoutSyncedSongs(
+    for account: Account,
+    fetchLimit: Int,
+    excluding excludedObjectIDs: Set<NSManagedObjectID> = Set()
+  )
+    -> [Album] {
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    var predicates = [getFetchPredicate(forAccount: account), albumWithoutSyncedSongsPredicate]
+    if !excludedObjectIDs.isEmpty {
+      predicates.append(NSPredicate(format: "NOT (SELF IN %@)", Array(excludedObjectIDs)))
+    }
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+    fetchRequest.fetchLimit = fetchLimit
     let albums = try? context.fetch(fetchRequest)
     return albums?.lazy.compactMap { Album(managedObject: $0) } ?? [Album]()
+  }
+
+  /// The given albums whose songs are still not synced
+  func getAlbumObjectIDsWithoutSyncedSongs(
+    among objectIDs: [NSManagedObjectID]
+  ) throws
+    -> Set<NSManagedObjectID> {
+    guard !objectIDs.isEmpty else { return Set() }
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      albumWithoutSyncedSongsPredicate,
+      NSPredicate(format: "SELF IN %@", objectIDs),
+    ])
+    fetchRequest.includesPropertyValues = false
+    return Set(try context.fetch(fetchRequest).map(\.objectID))
   }
 
   // MARK: Podcasts
@@ -1633,6 +1683,35 @@ public class LibraryStorage: PlayableFileCachable {
     let foundSongs = try? context.fetch(fetchRequest)
     let songs = foundSongs?.compactMap { Song(managedObject: $0) }
     return songs ?? [Song]()
+  }
+
+  /// Same result as `getSongs(for:whichContainsSongsWithArtist:).count`. The IDs are collected via the
+  /// relationships (indexed) because the OR across the album join scans all songs for every artist cell.
+  public func getSongsCount(
+    for account: Account,
+    whichContainsSongsWithArtist artist: Artist
+  )
+    -> Int {
+    let artistMO = artist.managedObject
+    var songIDs = Set(artistMO.objectIDs(forRelationshipNamed: #keyPath(ArtistMO.songs)))
+    // songs of other artists on the artist's albums
+    let albumIDs = artistMO.objectIDs(forRelationshipNamed: #keyPath(ArtistMO.albums))
+    if !albumIDs.isEmpty {
+      let albumsRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
+      albumsRequest.predicate = NSPredicate(format: "SELF IN %@", albumIDs)
+      albumsRequest.returnsObjectsAsFaults = false
+      for albumMO in (try? context.fetch(albumsRequest)) ?? [] {
+        songIDs.formUnion(albumMO.objectIDs(forRelationshipNamed: #keyPath(AlbumMO.songs)))
+      }
+    }
+    guard !songIDs.isEmpty else { return 0 }
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      getFetchPredicate(forAccount: account),
+      SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
+      NSPredicate(format: "SELF IN %@", Array(songIDs)),
+    ])
+    return (try? context.count(for: fetchRequest)) ?? 0
   }
 
   public func getCachedSongs(for account: Account) -> [Song] {
@@ -1922,21 +2001,6 @@ public class LibraryStorage: PlayableFileCachable {
     return musicFolders ?? [MusicFolder]()
   }
 
-  public func getMusicFolder(for account: Account, id: String) -> MusicFolder? {
-    let fetchRequest: NSFetchRequest<MusicFolderMO> = MusicFolderMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      NSPredicate(
-        format: "%K == %@",
-        #keyPath(MusicFolderMO.id),
-        NSString(string: id)
-      ),
-    ])
-    fetchRequest.fetchLimit = 1
-    let musicFolders = try? context.fetch(fetchRequest)
-    return musicFolders?.lazy.compactMap { MusicFolder(managedObject: $0) }.first
-  }
-
   // MARK: Directories
 
   func getAllDirectories(isFaultsOptimized: Bool = false) -> [Directory] {
@@ -1948,21 +2012,6 @@ public class LibraryStorage: PlayableFileCachable {
     }
     let directories = try? context.fetch(fetchRequest)
     return directories?.lazy.compactMap { Directory(managedObject: $0) } ?? [Directory]()
-  }
-
-  func getDirectory(for account: Account, id: String) -> Directory? {
-    let fetchRequest: NSFetchRequest<DirectoryMO> = DirectoryMO.fetchRequest()
-    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-      getFetchPredicate(forAccount: account),
-      NSPredicate(
-        format: "%K == %@",
-        #keyPath(DirectoryMO.id),
-        NSString(string: id)
-      ),
-    ])
-    fetchRequest.fetchLimit = 1
-    let directories = try? context.fetch(fetchRequest)
-    return directories?.lazy.compactMap { Directory(managedObject: $0) }.first
   }
 
   // MARK: Artworks
@@ -2047,18 +2096,6 @@ public class LibraryStorage: PlayableFileCachable {
     let embeddedArtworks = try? context.fetch(fetchRequest)
     return embeddedArtworks?
       .compactMap { EmbeddedArtwork(managedObject: $0) } ?? [EmbeddedArtwork]()
-  }
-
-  public func getEmbeddedArtwork(forOwner playable: AbstractPlayable) -> EmbeddedArtwork? {
-    let fetchRequest: NSFetchRequest<EmbeddedArtworkMO> = EmbeddedArtworkMO.fetchRequest()
-    fetchRequest.predicate = NSPredicate(
-      format: "%K == %@",
-      #keyPath(EmbeddedArtworkMO.owner.id),
-      NSString(string: playable.id)
-    )
-    fetchRequest.fetchLimit = 1
-    let embeddedArtworks = try? context.fetch(fetchRequest)
-    return embeddedArtworks?.lazy.compactMap { EmbeddedArtwork(managedObject: $0) }.first
   }
 
   // MARK: LogEntries
@@ -2198,7 +2235,7 @@ public class LibraryStorage: PlayableFileCachable {
     displayFilter: ArtistCategoryFilter
   )
     -> [Artist] {
-    let fetchRequest = ArtistMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<ArtistMO> = ArtistMO.fetchRequest()
     fetchRequest.predicate = getSearchArtistsPredicate(
       for: account,
       searchText: searchText,
@@ -2237,7 +2274,7 @@ public class LibraryStorage: PlayableFileCachable {
     displayFilter: DisplayCategoryFilter
   )
     -> [Album] {
-    let fetchRequest = AlbumMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
     fetchRequest.predicate = getSearchAlbumsPredicate(
       for: account,
       searchText: searchText,
@@ -2270,7 +2307,7 @@ public class LibraryStorage: PlayableFileCachable {
     playlistSearchCategory: PlaylistSearchCategory
   )
     -> [Playlist] {
-    let fetchRequest = PlaylistMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<PlaylistMO> = PlaylistMO.fetchRequest()
     fetchRequest.predicate = getSearchPlaylistsPredicate(
       for: account,
       searchText: searchText,
@@ -2304,7 +2341,7 @@ public class LibraryStorage: PlayableFileCachable {
     let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
       getFetchPredicate(forAccount: account),
       SongMO.excludeServerDeleteUncachedSongsFetchPredicate,
-      SongMO.getIdentifierBasedSearchPredicate(searchText: searchText),
+      SongMO.getTitleAndArtistSearchPredicate(searchText: searchText),
       getFetchPredicate(onlyCachedSongs: onlyCached),
       getFetchPredicate(songsDisplayFilter: displayFilter),
     ])
@@ -2318,7 +2355,7 @@ public class LibraryStorage: PlayableFileCachable {
     displayFilter: DisplayCategoryFilter
   )
     -> [Song] {
-    let fetchRequest = SongMO.identifierSortedFetchRequest
+    let fetchRequest: NSFetchRequest<SongMO> = SongMO.fetchRequest()
     fetchRequest.predicate = getSearchSongsPredicate(
       for: account,
       searchText: searchText,
@@ -2880,16 +2917,6 @@ public class LibraryStorage: PlayableFileCachable {
     return playlistMOs?.compactMap { Playlist(library: self, managedObject: $0) } ?? [Playlist]()
   }
 
-  private func getPlaylistsDict(account: Account, ids: Set<String>) -> [String: Playlist] {
-    let playlists = getPlaylists(account: account, ids: ids)
-
-    var playlistDict = [String: Playlist]()
-    for playlist in playlists {
-      playlistDict[playlist.id] = playlist
-    }
-    return playlistDict
-  }
-
   private func getPlaylistsDictList(account: Account, ids: Set<String>) -> [String: [Playlist]] {
     let playlists = getPlaylists(account: account, ids: ids)
 
@@ -3032,13 +3059,6 @@ public class LibraryStorage: PlayableFileCachable {
     }
   }
 
-  public func cleanStorage() {
-    for entityToDelete in LibraryStorage.entitiesToDelete {
-      clearStorage(ofType: entityToDelete)
-    }
-    saveContext()
-  }
-
   private func clearStorage(ofType entityToDelete: String) {
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityToDelete)
     let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
@@ -3061,6 +3081,7 @@ public class LibraryStorage: PlayableFileCachable {
   public func saveContext() {
     if context.hasChanges {
       do {
+        try context.obtainPermanentIDs(for: Array(context.insertedObjects))
         try context.save()
       } catch {
         // Log the error and attempt recovery instead of crashing

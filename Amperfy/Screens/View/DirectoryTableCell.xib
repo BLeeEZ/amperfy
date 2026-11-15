@@ -25,17 +25,11 @@
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="folder.fill" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="CTD-zX-CsU" userLabel="Icon">
                         <rect key="frame" x="36" y="15" width="40" height="37.5"/>
                     </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Directory" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e" userLabel="Genre Label">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Directory" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZWe-re-U6e" userLabel="Genre Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="88" y="23" width="271" height="22"/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="22" id="K5Y-Cl-6p5"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
-                        <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        </variation>
                     </label>
                 </subviews>
                 <constraints>

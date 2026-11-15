@@ -43,6 +43,29 @@ final class DebouncedSearchResultsUpdater: NSObject, UISearchResultsUpdating {
   }
 }
 
+// MARK: - SearchTaskRunner
+
+@MainActor
+final class SearchTaskRunner {
+  static let remoteSearchTextMinLength = 2
+
+  private var tasks = [Task<(), Never>]()
+
+  func run(_ operation: @escaping @MainActor () async -> ()) {
+    tasks.append(Task { @MainActor in await operation() })
+  }
+
+  func runRemoteSearch(searchText: String, _ operation: @escaping @MainActor () async -> ()) {
+    guard searchText.count >= Self.remoteSearchTextMinLength else { return }
+    run(operation)
+  }
+
+  func cancelAll() {
+    tasks.forEach { $0.cancel() }
+    tasks.removeAll()
+  }
+}
+
 // MARK: - SearchDebouncer
 
 @MainActor

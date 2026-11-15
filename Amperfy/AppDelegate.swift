@@ -27,7 +27,6 @@ import os.log
 @preconcurrency import UIKit
 
 let windowSettingsTitle = "Settings"
-let windowMiniPlayerTitle = "MiniPlayer"
 
 let settingsWindowActivityType = "amperfy.settings"
 let miniPlayerWindowActivityType = "amperfy.miniplayer"
@@ -52,7 +51,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   static let maxPlayablesDownloadsToAddAtOnceWithoutWarning = 200
 
   var window: UIWindow?
-  var focusedWindowTitle: String?
 
   lazy var player: PlayerFacade = {
     UIApplication.shared.beginReceivingRemoteControlEvents()
@@ -232,23 +230,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     player.stop()
   }
 
-  // deprecated
-  func restartByUser() {
-    Task {
-      await localNotificationManager.notifyDebugAndWait(
-        title: "Amperfy Restart",
-        body: "Tap to reopen Amperfy"
-      )
-      stopForInit()
-      // close Amperfy
-      exit(0)
-    }
-  }
-
   var isNormalInteraction: Bool {
     storage.settings.accounts.active != nil && !libraryUpdater
       .isVisualUpadateNeeded
   }
+
+  /// Only the first main window of a launch may resume an interrupted initial sync
+  var isInitialSyncResumeChecked = false
 
   func application(
     _ application: UIApplication,
@@ -383,17 +371,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func setAppAppearanceMode(style: UIUserInterfaceStyle) {
-    if #available(iOS 13.0, *) {
-      UIApplication.shared.connectedScenes
-        .forEach {
-          if let windowScene = $0 as? UIWindowScene {
-            windowScene.windows.forEach { window in
-              window.overrideUserInterfaceStyle = style
-              window.rootViewController?.overrideUserInterfaceStyle = style
-            }
+    UIApplication.shared.connectedScenes
+      .forEach {
+        if let windowScene = $0 as? UIWindowScene {
+          windowScene.windows.forEach { window in
+            window.overrideUserInterfaceStyle = style
+            window.rootViewController?.overrideUserInterfaceStyle = style
           }
         }
-    }
+      }
+  }
+
+  /// Applies the in-app text size (see `TextScaling`) to the app and all windows
+  func applyTextSize() {
+    let textSize = storage.settings.user.textSize
+    TextScaling.textSize = textSize
+    UIApplication.shared.connectedScenes
+      .compactMap { $0 as? UIWindowScene }
+      .flatMap { $0.windows }
+      .forEach { window in
+        if let textSize {
+          window.traitOverrides.preferredContentSizeCategory = textSize
+        } else {
+          window.traitOverrides.remove(UITraitPreferredContentSizeCategory.self)
+        }
+      }
   }
 
   func applicationWillResignActive(_ application: UIApplication) {

@@ -580,14 +580,6 @@ public class CachedFetchedResultsController<ResultType>: BasicFetchedResultsCont
     }
   }
 
-  public func hideResults() {
-    isSearchActive = true
-    didFetchSearch = false
-    lastSearchPredicateFormat = nil
-    searchFetchResulsController.fetchRequest.predicate = NSPredicate(format: "id == nil")
-    searchFetchResulsController.fetch()
-  }
-
   public func isOneOfThis(_ controller: NSFetchedResultsController<NSFetchRequestResult>) -> Bool {
     (controller == allFetchResulsController) || (controller == searchFetchResulsController)
   }

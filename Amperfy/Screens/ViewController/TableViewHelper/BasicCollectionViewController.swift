@@ -91,40 +91,16 @@ class BasicCollectionViewController: UICollectionViewController {
           let containable = containableCB(indexPath)
     else { return nil }
 
-    let identifier = NSString(string: TableViewPreviewInfo(
-      playableContainerIdentifier: containable.containerIdentifier,
-      indexPath: indexPath
-    ).asJSONString())
-    return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-      let vc = EntityPreviewVC()
-      vc.display(container: containable, on: self)
-      Task { @MainActor in
-        do {
-          if let account = containable.account {
-            try await containable.fetch(
-              storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(account.info)
-                .playableDownloadManager
-            )
-          }
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
-        }
-        vc.refresh()
-      }
-      return vc
-    }) { suggestedActions in
-      var playIndexCB: (() -> PlayContext?)?
-      if let playContextAtIndexPathCP = self.playContextAtIndexPathCallback {
-        playIndexCB = { playContextAtIndexPathCP(indexPath) }
-      }
-      return EntityPreviewActionBuilder(
-        container: containable,
-        on: self,
-        playContextCb: playIndexCB
-      ).createMenu()
+    var playContextCb: GetPlayContextCallback?
+    if let playContextAtIndexPathCB = playContextAtIndexPathCallback {
+      playContextCb = { playContextAtIndexPathCB(indexPath) }
     }
+    return createEntityPreviewContextMenuConfiguration(
+      for: containable,
+      at: indexPath,
+      account: containable.account,
+      playContextCb: playContextCb
+    )
   }
 
   override func collectionView(
@@ -133,13 +109,7 @@ class BasicCollectionViewController: UICollectionViewController {
     animator: UIContextMenuInteractionCommitAnimating
   ) {
     animator.addCompletion {
-      if let identifier = configuration.identifier as? String,
-         let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
-         let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
-         let container = self.appDelegate.storage.main.library
-         .getContainer(identifier: containerIdentifier) {
-        EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
-      }
+      self.performEntityPreviewTransition(for: configuration)
     }
   }
 }

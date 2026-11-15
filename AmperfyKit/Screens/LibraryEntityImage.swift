@@ -62,31 +62,17 @@ public class LibraryEntityImage: RoundedImage {
   required public init?(coder: NSCoder) {
     self.appDelegate = AmperKit.shared
     super.init(coder: coder)
-    self.accountNotificationHandler = AccountNotificationHandler(
-      storage: appDelegate.storage,
-      notificationHandler: appDelegate.notificationHandler
-    )
-    accountNotificationHandler?.registerCallbackForAllAccounts { [weak self] accountInfo in
-      guard let self else { return }
-      appDelegate.notificationHandler.register(
-        self,
-        selector: #selector(downloadFinishedSuccessful(notification:)),
-        name: .downloadFinishedSuccess,
-        object: appDelegate.getMeta(accountInfo).artworkDownloadManager
-      )
-      appDelegate.notificationHandler.register(
-        self,
-        selector: #selector(downloadFinishedSuccessful(notification:)),
-        name: .downloadFinishedSuccess,
-        object: appDelegate.getMeta(accountInfo).playableDownloadManager
-      )
-    }
+    registerForDownloadNotifications()
   }
 
   override public init(frame: CGRect) {
     self.appDelegate = AmperKit.shared
     super.init(frame: .zero)
-    self.accountNotificationHandler = AccountNotificationHandler(
+    registerForDownloadNotifications()
+  }
+
+  private func registerForDownloadNotifications() {
+    accountNotificationHandler = AccountNotificationHandler(
       storage: appDelegate.storage,
       notificationHandler: appDelegate.notificationHandler
     )

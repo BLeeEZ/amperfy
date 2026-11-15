@@ -32,7 +32,7 @@ class DirectoryTableCell: BasicTableCell {
   @IBOutlet
   weak var iconImage: UIImageView!
 
-  static let rowHeight: CGFloat = 40.0 + margin.bottom + margin.top
+  static var rowHeight: CGFloat { scaledRowHeight(contentHeight: 40.0) }
 
   private var folder: MusicFolder?
   private var directory: Directory?

@@ -57,8 +57,7 @@ class PlaylistAddGenresVC: SingleFetchedResultsTableViewController<GenreMO>, Pla
     )
     setNavBarTitle(title: "Genres")
     tableView.register(nibName: GenericTableCell.typeName)
-    tableView.rowHeight = GenericTableCell.rowHeightWithoutImage
-    tableView.estimatedRowHeight = GenericTableCell.rowHeightWithoutImage
+    tableView.reloadOnTextSizeChange { GenericTableCell.rowHeightWithoutImage }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0

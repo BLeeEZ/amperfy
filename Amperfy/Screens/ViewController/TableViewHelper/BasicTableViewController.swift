@@ -115,7 +115,6 @@ class BasicTableViewController: KeyCommandTableViewController {
   var containableAtIndexPathCallback: ContainableAtIndexPathCallback?
   var playContextAtIndexPathCallback: PlayContextAtIndexPathCallback?
   var swipeCallback: SwipeActionCallback?
-  var isEditLockedDueToActiveSwipe = false
   var isSingleCellEditingModeActive = false
 
   override func viewDidLoad() {
@@ -156,6 +155,26 @@ class BasicTableViewController: KeyCommandTableViewController {
     updateSearchResults(for: searchController)
   }
 
+  /// Section headers created from `tableView(_:titleForHeaderInSection:)` have a fixed text
+  /// size: use a text style that scales with the user's text size (see `TextScaling`)
+  override func tableView(
+    _ tableView: UITableView,
+    willDisplayHeaderView view: UIView,
+    forSection section: Int
+  ) {
+    guard let header = view as? UITableViewHeaderFooterView else { return }
+    var content = (header.contentConfiguration as? UIListContentConfiguration) ??
+      header.defaultContentConfiguration()
+    if content.text == nil {
+      content.text = tableView.dataSource?.tableView?(tableView, titleForHeaderInSection: section)
+    }
+    let traits = header.traitCollection
+    let font = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: traits)
+    content.textProperties.font = TextScaling.scaledFont(font, compatibleWith: traits)
+    content.textProperties.adjustsFontForContentSizeCategory = true
+    header.contentConfiguration = content
+  }
+
   override func tableView(_ tableView: UITableView, willBeginEditingRowAt indexPath: IndexPath) {
     isSingleCellEditingModeActive = true
   }
@@ -169,31 +188,10 @@ class BasicTableViewController: KeyCommandTableViewController {
     leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath
   )
     -> UISwipeActionsConfiguration? {
-    guard let swipeCB = swipeCallback,
-          let containableCB = containableAtIndexPathCallback,
-          let containable = containableCB(indexPath)
-    else { return UISwipeActionsConfiguration() }
-
-    var createdActionsIndex = 0
-    var actions = [UIContextualAction]()
-    for actionType in appDelegate.storage.settings.user.swipeActionSettings.leading {
-      if !swipeDisplaySettings.isAllowedToDisplay(
-        actionType: actionType,
-        containable: containable,
-        isOfflineMode: appDelegate.storage.settings.user.isOfflineMode
-      ) { continue }
-      let buttonColor = Self.swipeButtonColors.element(at: createdActionsIndex) ?? Self
-        .swipeButtonColors.last!
-      actions.append(createSwipeAction(
-        for: actionType,
-        buttonColor: buttonColor,
-        indexPath: indexPath,
-        preCbContainable: containable,
-        actionCallback: swipeCB
-      ))
-      createdActionsIndex += 1
-    }
-    return UISwipeActionsConfiguration(actions: actions)
+    createSwipeActionsConfiguration(
+      for: appDelegate.storage.settings.user.swipeActionSettings.leading,
+      at: indexPath
+    )
   }
 
   override func tableView(
@@ -206,13 +204,25 @@ class BasicTableViewController: KeyCommandTableViewController {
     // this empty configuration ensures to only perform one "Delete" action at a time (no confirmation is displayed)
     guard !(tableView.isEditing && isSingleCellEditingModeActive)
     else { return UISwipeActionsConfiguration() }
+    return createSwipeActionsConfiguration(
+      for: appDelegate.storage.settings.user.swipeActionSettings.trailing,
+      at: indexPath
+    )
+  }
+
+  private func createSwipeActionsConfiguration(
+    for actionTypes: [SwipeActionType],
+    at indexPath: IndexPath
+  )
+    -> UISwipeActionsConfiguration {
     guard let swipeCB = swipeCallback,
           let containableCB = containableAtIndexPathCallback,
           let containable = containableCB(indexPath)
     else { return UISwipeActionsConfiguration() }
+
     var createdActionsIndex = 0
     var actions = [UIContextualAction]()
-    for actionType in appDelegate.storage.settings.user.swipeActionSettings.trailing {
+    for actionType in actionTypes {
       if !swipeDisplaySettings.isAllowedToDisplay(
         actionType: actionType,
         containable: containable,
@@ -278,41 +288,16 @@ class BasicTableViewController: KeyCommandTableViewController {
           let containable = containableCB(indexPath)
     else { return nil }
 
-    let identifier = NSString(string: TableViewPreviewInfo(
-      playableContainerIdentifier: containable.containerIdentifier,
-      indexPath: indexPath
-    ).asJSONString())
-    return UIContextMenuConfiguration(identifier: identifier, previewProvider: {
-      let vc = EntityPreviewVC()
-      vc.display(container: containable, on: self)
-
-      Task { @MainActor in
-        do {
-          if let account = containable.account {
-            try await containable.fetch(
-              storage: self.appDelegate.storage,
-              librarySyncer: self.appDelegate.getMeta(account.info).librarySyncer,
-              playableDownloadManager: self.appDelegate.getMeta(account.info)
-                .playableDownloadManager
-            )
-          }
-        } catch {
-          self.appDelegate.eventLogger.report(topic: "Preview Sync", error: error)
-        }
-        vc.refresh()
-      }
-      return vc
-    }) { suggestedActions in
-      var playIndexCB: (() -> PlayContext?)?
-      if let playContextAtIndexPathCP = self.playContextAtIndexPathCallback {
-        playIndexCB = { playContextAtIndexPathCP(indexPath) }
-      }
-      return EntityPreviewActionBuilder(
-        container: containable,
-        on: self,
-        playContextCb: playIndexCB
-      ).createMenu()
+    var playContextCb: GetPlayContextCallback?
+    if let playContextAtIndexPathCB = playContextAtIndexPathCallback {
+      playContextCb = { playContextAtIndexPathCB(indexPath) }
     }
+    return createEntityPreviewContextMenuConfiguration(
+      for: containable,
+      at: indexPath,
+      account: containable.account,
+      playContextCb: playContextCb
+    )
   }
 
   override func tableView(
@@ -321,13 +306,7 @@ class BasicTableViewController: KeyCommandTableViewController {
     animator: UIContextMenuInteractionCommitAnimating
   ) {
     animator.addCompletion {
-      if let identifier = configuration.identifier as? String,
-         let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
-         let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
-         let container = self.appDelegate.storage.main.library
-         .getContainer(identifier: containerIdentifier) {
-        EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
-      }
+      self.performEntityPreviewTransition(for: configuration)
     }
   }
 

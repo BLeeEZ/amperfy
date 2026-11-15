@@ -181,20 +181,8 @@ public class Song: AbstractPlayable, Identifyable {
 }
 
 extension Array where Element: Song {
-  public func filterServerDeleteUncachedSongs() -> [Element] {
-    filter { $0.isAvailableToUser() }
-  }
-
   public func filterCached() -> [Element] {
     filter { $0.isCached }
-  }
-
-  public func filterCustomArt() -> [Element] {
-    filter { $0.artwork != nil }
-  }
-
-  public var hasCachedSongs: Bool {
-    lazy.filter { $0.isCached }.first != nil
   }
 
   public func sortByTrackNumber() -> [Element] {

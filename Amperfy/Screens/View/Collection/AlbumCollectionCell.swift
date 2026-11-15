@@ -31,8 +31,45 @@ class AlbumCollectionCell: BasicCollectionCell {
   weak var entityImage: EntityImageView!
   @IBOutlet
   weak var artworkImageWidthConstraint: NSLayoutConstraint!
+  @IBOutlet
+  weak var textStackView: UIStackView!
+
+  private var textStackHeightConstraint: NSLayoutConstraint?
 
   static let maxWidth: CGFloat = 250.0
+  /// The short labels below the artwork stop growing beyond this text size
+  static let maxContentSizeCategory: UIContentSizeCategory = .extraExtraExtraLarge
+
+  /// Height below the artwork that a layout reserves for the labels: `defaultHeight` at the
+  /// default text size, scaled for the given traits
+  static func labelAreaHeight(
+    for traits: UITraitCollection,
+    defaultHeight: CGFloat = 45.0
+  )
+    -> CGFloat {
+    scaledHeight(defaultHeight, for: traits)
+  }
+
+  /// Height of the title and subtitle (36pt, 38pt in regular width at the default text size)
+  private static func textHeight(for traits: UITraitCollection) -> CGFloat {
+    scaledHeight(traits.horizontalSizeClass == .regular ? 38.0 : 36.0, for: traits)
+  }
+
+  private static func scaledHeight(_ height: CGFloat, for traits: UITraitCollection) -> CGFloat {
+    TextScaling.scaledValue(height, compatibleWith: traits, maximum: maxContentSizeCategory)
+  }
+
+  override func awakeFromNib() {
+    super.awakeFromNib()
+    // This must be called in Main thread
+    MainActor.assumeIsolated {
+      maximumContentSizeCategory = Self.maxContentSizeCategory
+      let heightConstraint = textStackView.heightAnchor
+        .constraint(equalToConstant: Self.textHeight(for: traitCollection))
+      heightConstraint.isActive = true
+      textStackHeightConstraint = heightConstraint
+    }
+  }
 
   private var container: PlayableContainable?
   private var rootView: UICollectionViewController?
@@ -92,6 +129,7 @@ class AlbumCollectionCell: BasicCollectionCell {
     if let indexPath = rootView?.collectionView.indexPath(for: self) {
       updateArtworkImageConstraint(indexPath: indexPath)
     }
+    textStackHeightConstraint?.constant = Self.textHeight(for: traitCollection)
     super.layoutSubviews()
   }
 

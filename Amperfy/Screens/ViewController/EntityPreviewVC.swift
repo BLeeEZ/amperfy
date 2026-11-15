@@ -310,44 +310,6 @@ class EntityPreviewActionBuilder {
     isShowSongDetails = false
   }
 
-  private func configureFor(playlist: Playlist) {
-    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-      .hasCachedItems
-    isShuffle = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
-    isMusicQueue = true
-    isPodcastQueue = false
-    isShowAlbum = false
-    isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
-    isDeleteOnServer = false
-    isGoToSiteUrl = false
-    isShowPodcastDetails = false
-    isShowSongDetails = false
-  }
-
-  private func configureFor(genre: Genre) {
-    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-      .hasCachedItems
-    isShuffle = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
-    isMusicQueue = true
-    isPodcastQueue = false
-    isShowAlbum = false
-    isShowArtist = false
-    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
-    isDeleteOnServer = false
-    isGoToSiteUrl = false
-    isShowPodcastDetails = false
-    isShowSongDetails = false
-  }
-
   private func configureFor(podcast: Podcast) {
     isPlay = (
       appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
@@ -366,7 +328,8 @@ class EntityPreviewActionBuilder {
     isShowSongDetails = false
   }
 
-  private func configureFor(artist: Artist) {
+  /// Common configuration for a container of songs: playlist, genre, artist, album
+  private func configureForSongContainer() {
     isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
       .hasCachedItems
     isShuffle = (
@@ -385,23 +348,21 @@ class EntityPreviewActionBuilder {
     isShowSongDetails = false
   }
 
+  private func configureFor(playlist: Playlist) {
+    configureForSongContainer()
+  }
+
+  private func configureFor(genre: Genre) {
+    configureForSongContainer()
+  }
+
+  private func configureFor(artist: Artist) {
+    configureForSongContainer()
+  }
+
   private func configureFor(album: Album) {
-    isPlay = appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-      .hasCachedItems
-    isShuffle = (
-      appDelegate.storage.settings.user.isOnlineMode || entityContainer.playables
-        .hasCachedItems
-    ) &&
-      appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
-    isMusicQueue = true
-    isPodcastQueue = false
-    isShowAlbum = false
+    configureForSongContainer()
     isShowArtist = !(rootView is ArtistDetailVC)
-    isAddToPlaylist = appDelegate.storage.settings.user.isOnlineMode
-    isDeleteOnServer = false
-    isGoToSiteUrl = false
-    isShowPodcastDetails = false
-    isShowSongDetails = false
   }
 
   private func configureFor(directory: Directory) {
@@ -494,7 +455,7 @@ class EntityPreviewActionBuilder {
       }
 
       // Create playlist: seed song + similar songs
-      var allSongs = [song] + similarSongs
+      let allSongs = [song] + similarSongs
 
       // Create play context and start playing
       let context = PlayContext(name: "Instant Mix: \(song.title)", playables: allSongs)
@@ -810,22 +771,22 @@ class EntityPreviewActionBuilder {
     UIAction(
       title: "Share",
       image: UIImage(systemName: "square.and.arrow.up")
-    ) { _ in
+    ) { [weak self] _ in
       // Used if the song is not cached, otherwise never called
       let downloadManagerProvider: () -> DownloadManageable? = { [weak self] in
-        guard let self = self,
-              let accountInfo = playable.account?.info
+        guard let self, let accountInfo = playable.account?.info
         else { return nil }
         return appDelegate
           .getMeta(accountInfo)
           .playableDownloadManager
       }
 
+      guard let self else { return }
       // Note: This is strongly coupled, I could protocolize and inject. But this is simplest and the project doesn't seem to do DI/tests for this target.
       ShareSongAction.share(
         playable: playable,
-        from: self.rootView.view,
-        presenter: self.rootView,
+        from: rootView.view,
+        presenter: rootView,
         downloadManagerProvider: downloadManagerProvider
       )
     }

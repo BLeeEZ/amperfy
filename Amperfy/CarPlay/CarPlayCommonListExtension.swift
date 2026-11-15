@@ -590,39 +590,6 @@ extension CarPlaySceneDelegate {
     return listItem
   }
 
-  func createLibraryItem(
-    text: String,
-    subtitle: String? = nil,
-    icon: UIImage,
-    sectionToDisplay: CPListTemplate
-  )
-    -> CPListItem {
-    let item = CPListItem(
-      text: text,
-      detailText: subtitle,
-      image: UIImage
-        .createArtwork(
-          with: icon,
-          iconSizeType: .small,
-          theme: getPreference(activeAccountInfo).theme,
-          lightDarkMode: traits.userInterfaceStyle.asModeType,
-          switchColors: true
-        )
-        .carPlayImage(carTraitCollection: traits),
-      accessoryImage: nil,
-      accessoryType: .disclosureIndicator
-    )
-    item.handler = { [weak self] item, completion in
-      guard let self = self else { completion(); return }
-      Task { @MainActor in
-        let _ = try? await interfaceController?
-          .pushTemplate(sectionToDisplay, animated: true)
-        completion()
-      }
-    }
-    return item
-  }
-
   enum CarPlayListUserInfoKeys: String {
     case playableDownloadID
     case artworkDownloadID

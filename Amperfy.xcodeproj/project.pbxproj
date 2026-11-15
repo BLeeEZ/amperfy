@@ -54,6 +54,7 @@
 		50381FD12D8F1623002DD0E7 /* IDsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */; };
 		50381FD32D9410AE002DD0E7 /* PrefetchIdTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */; };
 		5000FACE000000000000AB02 /* AlbumSyncCoalescerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5000FACE000000000000AB01 /* AlbumSyncCoalescerTest.swift */; };
+		5000FACE000000000000AB04 /* AlbumSongsBatchedSyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5000FACE000000000000AB03 /* AlbumSongsBatchedSyncTest.swift */; };
 		503BAF342E4A1EB000AE50B4 /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAF332E4A1EAC00AE50B4 /* SettingsTabView.swift */; };
 		504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */; };
 		504262B12BF5FBDE00B5EF38 /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 50253F7A284A566700BCCFB2 /* Intents.intentdefinition */; settings = {ATTRIBUTES = (codegen, ); }; };
@@ -456,14 +457,11 @@
 		50C9D6ED284FADB8007F18D0 /* PlayerDisplayStyleType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EC284FADB8007F18D0 /* PlayerDisplayStyleType.swift */; };
 		50C9D6F028506EBC007F18D0 /* AmperfyKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EF28506EBC007F18D0 /* AmperfyKit.swift */; };
 		50C9D70628507573007F18D0 /* ClockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2321E7A3AC00F086F0 /* ClockTime.swift */; };
-		50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
 		50C9D70C2850759B007F18D0 /* PlayIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */; };
 		50C9D70D2850759B007F18D0 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* ToastView.swift */; };
 		50C9D70F2850759B007F18D0 /* BasicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863D2208CC1E0057A1A6 /* BasicButton.swift */; };
 		50C9D7102850759B007F18D0 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863B2208CB650057A1A6 /* OptionsButton.swift */; };
 		50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
-		50C9D7142850759B007F18D0 /* Corners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36725F8B3EB00B4B998 /* Corners.swift */; };
-		50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */; };
 		50C9D717285075E3007F18D0 /* UtilitiesExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D716285075E3007F18D0 /* UtilitiesExtensions.swift */; };
 		50C9D71828508005007F18D0 /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		50C9D71928508803007F18D0 /* LibraryEntityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */; };
@@ -538,8 +536,29 @@
 		637A28B52C79409C0082FACC /* MiniPlayerSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */; };
 		C0A1B0032EEE000000000003 /* MacWindowHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1B0022EEE000000000002 /* MacWindowHelper.swift */; };
 		638920F02C8C8E9000932EE8 /* SettingsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 638920EF2C8C8E9000932EE8 /* SettingsList.swift */; };
+		63AD7E4830A283A000BBC0E1 /* AppIconCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AD7E4730A283A000BBC0E1 /* AppIconCategory.swift */; };
+		63AD7E4A30A283B700BBC0E1 /* AppIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AD7E4930A283B700BBC0E1 /* AppIconOption.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
+		A1C400000000000000000102 /* AmperfyGreen.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000002 /* AmperfyGreen.icon */; };
+		A1C400000000000000000103 /* AmperfyOrange.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000003 /* AmperfyOrange.icon */; };
+		A1C400000000000000000104 /* AmperfyPurple.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000004 /* AmperfyPurple.icon */; };
+		A1C400000000000000000105 /* AmperfyRed.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000005 /* AmperfyRed.icon */; };
+		A1C400000000000000000106 /* AmperfyYellow.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000006 /* AmperfyYellow.icon */; };
+		A1C400000000000000000107 /* AmperfyMusicBlue.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000007 /* AmperfyMusicBlue.icon */; };
+		A1C400000000000000000108 /* AmperfyMusicGreen.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000008 /* AmperfyMusicGreen.icon */; };
+		A1C400000000000000000109 /* AmperfyMusicOrange.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000009 /* AmperfyMusicOrange.icon */; };
+		A1C40000000000000000010A /* AmperfyMusicPurple.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C40000000000000000000A /* AmperfyMusicPurple.icon */; };
+		A1C40000000000000000010B /* AmperfyMusicRed.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C40000000000000000000B /* AmperfyMusicRed.icon */; };
+		A1C40000000000000000010C /* AmperfyMusicYellow.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C40000000000000000000C /* AmperfyMusicYellow.icon */; };
+		A1C40000000000000000010D /* AmperfyPink.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C40000000000000000000D /* AmperfyPink.icon */; };
+		A1C40000000000000000010E /* AmperfyMusicPink.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C40000000000000000000E /* AmperfyMusicPink.icon */; };
+		A1C40000000000000000010F /* AmperfyMusicSingle.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C40000000000000000000F /* AmperfyMusicSingle.icon */; };
+		A1C400000000000000000110 /* AmperfyMusicSingleGradient.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000010 /* AmperfyMusicSingleGradient.icon */; };
+		A1C400000000000000000111 /* AmperfyTeal.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000011 /* AmperfyTeal.icon */; };
+		A1C400000000000000000112 /* AmperfyMusicTeal.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000012 /* AmperfyMusicTeal.icon */; };
+		F9A94F1437AE825A8E847487 /* AppIconSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768083A8CBFABC35772DCAED /* AppIconSettingsSection.swift */; };
+		FC37DE680FB3834C0B3233ED /* TextSizeSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4AEDAB7594899F5E00A721 /* TextSizeSettingsSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -602,7 +621,6 @@
 /* Begin PBXFileReference section */
 		09EB5F0D2F93B65400B1C71C /* ShareSongAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongAction.swift; sourceTree = "<group>"; };
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		5002565625E69DC700674CE1 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserPreCreatedArtistsTest.swift; sourceTree = "<group>"; };
 		5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncPopupVC.swift; sourceTree = "<group>"; };
 		50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDownloadPreparationHandler.swift; sourceTree = "<group>"; };
@@ -639,8 +657,6 @@
 		500DA64C2F087307005578C7 /* CarPlayLibraryTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayLibraryTabExtension.swift; sourceTree = "<group>"; };
 		500DA64E2F0873DB005578C7 /* CarPlayCachedTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayCachedTabExtension.swift; sourceTree = "<group>"; };
 		500DA6502F08750A005578C7 /* CarPlayCommonListExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayCommonListExtension.swift; sourceTree = "<group>"; };
-		500EB36725F8B3EB00B4B998 /* Corners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corners.swift; sourceTree = "<group>"; };
-		500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedGradientLayer.swift; sourceTree = "<group>"; };
 		501171292743F25300B7C08D /* PlayerUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerUtil.swift; sourceTree = "<group>"; };
 		5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayQueueHandler.swift; sourceTree = "<group>"; };
 		5011712D27453D1300B7C08D /* PlayQueueHandlerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayQueueHandlerTest.swift; sourceTree = "<group>"; };
@@ -715,6 +731,7 @@
 		50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDsParserDelegate.swift; sourceTree = "<group>"; };
 		50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefetchIdTester.swift; sourceTree = "<group>"; };
 		5000FACE000000000000AB01 /* AlbumSyncCoalescerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumSyncCoalescerTest.swift; sourceTree = "<group>"; };
+		5000FACE000000000000AB03 /* AlbumSongsBatchedSyncTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumSongsBatchedSyncTest.swift; sourceTree = "<group>"; };
 		503BAF332E4A1EAC00AE50B4 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
 		5040B2C2269C451A00911451 /* Amperfy v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v12.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C3269CD19600911451 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
@@ -1163,10 +1180,31 @@
 		637A28B42C79409B0082FACC /* MiniPlayerSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerSceneDelegate.swift; sourceTree = "<group>"; };
 		C0A1B0022EEE000000000002 /* MacWindowHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWindowHelper.swift; sourceTree = "<group>"; };
 		638920EF2C8C8E9000932EE8 /* SettingsList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsList.swift; sourceTree = "<group>"; };
+		63AD7E4730A283A000BBC0E1 /* AppIconCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconCategory.swift; sourceTree = "<group>"; };
+		63AD7E4930A283B700BBC0E1 /* AppIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconOption.swift; sourceTree = "<group>"; };
 		63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSceneDelegate.swift; sourceTree = "<group>"; };
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v39.xcdatamodel"; sourceTree = "<group>"; };
 		64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v46.xcdatamodel"; sourceTree = "<group>"; };
+		A1C400000000000000000002 /* AmperfyGreen.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyGreen.icon; sourceTree = "<group>"; };
+		A1C400000000000000000003 /* AmperfyOrange.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyOrange.icon; sourceTree = "<group>"; };
+		A1C400000000000000000004 /* AmperfyPurple.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyPurple.icon; sourceTree = "<group>"; };
+		A1C400000000000000000005 /* AmperfyRed.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyRed.icon; sourceTree = "<group>"; };
+		A1C400000000000000000006 /* AmperfyYellow.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyYellow.icon; sourceTree = "<group>"; };
+		A1C400000000000000000007 /* AmperfyMusicBlue.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicBlue.icon; sourceTree = "<group>"; };
+		A1C400000000000000000008 /* AmperfyMusicGreen.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicGreen.icon; sourceTree = "<group>"; };
+		A1C400000000000000000009 /* AmperfyMusicOrange.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicOrange.icon; sourceTree = "<group>"; };
+		A1C40000000000000000000A /* AmperfyMusicPurple.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicPurple.icon; sourceTree = "<group>"; };
+		A1C40000000000000000000B /* AmperfyMusicRed.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicRed.icon; sourceTree = "<group>"; };
+		A1C40000000000000000000C /* AmperfyMusicYellow.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicYellow.icon; sourceTree = "<group>"; };
+		A1C40000000000000000000D /* AmperfyPink.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyPink.icon; sourceTree = "<group>"; };
+		A1C40000000000000000000E /* AmperfyMusicPink.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicPink.icon; sourceTree = "<group>"; };
+		A1C40000000000000000000F /* AmperfyMusicSingle.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicSingle.icon; sourceTree = "<group>"; };
+		A1C400000000000000000010 /* AmperfyMusicSingleGradient.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicSingleGradient.icon; sourceTree = "<group>"; };
+		A1C400000000000000000011 /* AmperfyTeal.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyTeal.icon; sourceTree = "<group>"; };
+		A1C400000000000000000012 /* AmperfyMusicTeal.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicTeal.icon; sourceTree = "<group>"; };
+		768083A8CBFABC35772DCAED /* AppIconSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconSettingsSection.swift; sourceTree = "<group>"; };
+		AA4AEDAB7594899F5E00A721 /* TextSizeSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizeSettingsSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1213,6 +1251,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		378C2256545B2F4F1DDDCD55 /* Display */ = {
+			isa = PBXGroup;
+			children = (
+				63AD7E4630A2838800BBC0E1 /* AppIcon */,
+				5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */,
+				AA4AEDAB7594899F5E00A721 /* TextSizeSettingsSection.swift */,
+			);
+			path = Display;
+			sourceTree = "<group>";
+		};
 		50073BDB222EFEDC000130D8 /* Download */ = {
 			isa = PBXGroup;
 			children = (
@@ -1230,13 +1278,10 @@
 			children = (
 				5009863B2208CB650057A1A6 /* OptionsButton.swift */,
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
-				5002565625E69DC700674CE1 /* SpinnerViewController.swift */,
 				50675E6C25F61163005737FD /* BasicTableCell.swift */,
 				5005939028E42F66008C8DF6 /* BasicCollectionCell.swift */,
 				500B7D4821EDD6250083ED6F /* ViewCreator.swift */,
-				500EB36725F8B3EB00B4B998 /* Corners.swift */,
 				509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */,
-				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
 				501999DB26806B8600F72D37 /* ToastView.swift */,
 				50DE29EE2B90642E00ABA78E /* SelectionAccessory.swift */,
 				C6A1E0012F0A000100ABCDEF /* ReorderableListEditor.swift */,
@@ -1426,11 +1471,11 @@
 				50E77DB628D2163F00BDF882 /* SettingsView.swift */,
 				503BAF332E4A1EAC00AE50B4 /* SettingsTabView.swift */,
 				631C166C2C6D61110085F62E /* NavigationTarget.swift */,
-				5078AFB12B40CA5E0038FD17 /* DisplaySettingsView.swift */,
 				50AE79AB2C1CCBEC0085CBB3 /* DeveloperView.swift */,
 				50791E8428D36F1F006CE6E5 /* LibrarySettingsView.swift */,
 				504B441828D6F0920033982C /* LicenseSettingsView.swift */,
 				504B441C28D7A6330033982C /* XCallbackURLsSetttingsView.swift */,
+				378C2256545B2F4F1DDDCD55 /* Display */,
 				502041962E2A37D6003CE29A /* Player */,
 				50CFB59828D5006100A47D44 /* Artwork */,
 				50CFB59528D4848300A47D44 /* Swipe */,
@@ -1799,6 +1844,23 @@
 			isa = PBXGroup;
 			children = (
 				50D7709E2E4F1D1C0075D3BF /* AmperfyAppIcon.icon */,
+				A1C400000000000000000002 /* AmperfyGreen.icon */,
+				A1C400000000000000000003 /* AmperfyOrange.icon */,
+				A1C400000000000000000004 /* AmperfyPurple.icon */,
+				A1C400000000000000000005 /* AmperfyRed.icon */,
+				A1C400000000000000000006 /* AmperfyYellow.icon */,
+				A1C400000000000000000007 /* AmperfyMusicBlue.icon */,
+				A1C400000000000000000008 /* AmperfyMusicGreen.icon */,
+				A1C400000000000000000009 /* AmperfyMusicOrange.icon */,
+				A1C40000000000000000000A /* AmperfyMusicPurple.icon */,
+				A1C40000000000000000000B /* AmperfyMusicRed.icon */,
+				A1C40000000000000000000C /* AmperfyMusicYellow.icon */,
+				A1C40000000000000000000D /* AmperfyPink.icon */,
+				A1C40000000000000000000E /* AmperfyMusicPink.icon */,
+				A1C40000000000000000000F /* AmperfyMusicSingle.icon */,
+				A1C400000000000000000010 /* AmperfyMusicSingleGradient.icon */,
+				A1C400000000000000000011 /* AmperfyTeal.icon */,
+				A1C400000000000000000012 /* AmperfyMusicTeal.icon */,
 				508385EE21C5965E00C4BB32 /* Assets.xcassets */,
 				50B053AC27BFADB200D9C1ED /* UIImageAssetsExtension.swift */,
 			);
@@ -2158,6 +2220,7 @@
 			children = (
 				50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */,
 				5000FACE000000000000AB01 /* AlbumSyncCoalescerTest.swift */,
+				5000FACE000000000000AB03 /* AlbumSongsBatchedSyncTest.swift */,
 				50DB11A8266536190033BFFA /* Subsonic */,
 				50DB1180266501EC0033BFFA /* Ampache */,
 				50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */,
@@ -2184,6 +2247,16 @@
 				5086F8822239A2B700546F5A /* ScrobbleSyncer.swift */,
 			);
 			path = Player;
+			sourceTree = "<group>";
+		};
+		63AD7E4630A2838800BBC0E1 /* AppIcon */ = {
+			isa = PBXGroup;
+			children = (
+				63AD7E4730A283A000BBC0E1 /* AppIconCategory.swift */,
+				63AD7E4930A283B700BBC0E1 /* AppIconOption.swift */,
+				768083A8CBFABC35772DCAED /* AppIconSettingsSection.swift */,
+			);
+			path = AppIcon;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2367,6 +2440,23 @@
 				50C16C2621E7CBA500F086F0 /* GenericTableCell.xib in Resources */,
 				508FDE3821F1E14F005A0724 /* NewPlaylistTableHeader.xib in Resources */,
 				50D7709F2E4F1D1C0075D3BF /* AmperfyAppIcon.icon in Resources */,
+				A1C400000000000000000102 /* AmperfyGreen.icon in Resources */,
+				A1C400000000000000000103 /* AmperfyOrange.icon in Resources */,
+				A1C400000000000000000104 /* AmperfyPurple.icon in Resources */,
+				A1C400000000000000000105 /* AmperfyRed.icon in Resources */,
+				A1C400000000000000000106 /* AmperfyYellow.icon in Resources */,
+				A1C400000000000000000107 /* AmperfyMusicBlue.icon in Resources */,
+				A1C400000000000000000108 /* AmperfyMusicGreen.icon in Resources */,
+				A1C400000000000000000109 /* AmperfyMusicOrange.icon in Resources */,
+				A1C40000000000000000010A /* AmperfyMusicPurple.icon in Resources */,
+				A1C40000000000000000010B /* AmperfyMusicRed.icon in Resources */,
+				A1C40000000000000000010C /* AmperfyMusicYellow.icon in Resources */,
+				A1C40000000000000000010D /* AmperfyPink.icon in Resources */,
+				A1C40000000000000000010E /* AmperfyMusicPink.icon in Resources */,
+				A1C40000000000000000010F /* AmperfyMusicSingle.icon in Resources */,
+				A1C400000000000000000110 /* AmperfyMusicSingleGradient.icon in Resources */,
+				A1C400000000000000000111 /* AmperfyTeal.icon in Resources */,
+				A1C400000000000000000112 /* AmperfyMusicTeal.icon in Resources */,
 				5007CE4521EF639200BC5CBA /* PlaylistTableCell.xib in Resources */,
 				50CCD0572B6C38670073793B /* PlainDetailsVC.xib in Resources */,
 				508EBB282850C8D90053D9F0 /* Assets.xcassets in Resources */,
@@ -2466,6 +2556,7 @@
 				507414992EFFC62E007AEC5D /* PlayPausePlaybackIntent.swift in Sources */,
 				50B136FE2EFC36D500738475 /* RepeatTypeAppEnum.swift in Sources */,
 				50B136FF2EFC36D500738475 /* SearchAndPlayIntent.swift in Sources */,
+				63AD7E4830A283A000BBC0E1 /* AppIconCategory.swift in Sources */,
 				50AB3B402F02BC8600556CE4 /* FavoriteTypeAppEnum.swift in Sources */,
 				50B137002EFC36D500738475 /* ShuffleTypeAppEnum.swift in Sources */,
 				504B441D28D7A6330033982C /* XCallbackURLsSetttingsView.swift in Sources */,
@@ -2534,6 +2625,7 @@
 				50C0FFEE0000000000A00001 /* CustomHTTPHeadersView.swift in Sources */,
 				50C16C0621E241B200F086F0 /* SearchVC.swift in Sources */,
 				502041A12E2A3CDB003CE29A /* SliderView.swift in Sources */,
+				63AD7E4A30A283B700BBC0E1 /* AppIconOption.swift in Sources */,
 				502041A22E2A3CDB003CE29A /* EquilizerView.swift in Sources */,
 				502041A32E2A3CDB003CE29A /* EQPath.swift in Sources */,
 				502041A42E2A3CDB003CE29A /* Constants.swift in Sources */,
@@ -2572,7 +2664,6 @@
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */,
 				50B137022EFC85D700738475 /* AccountAppEntity.swift in Sources */,
-				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
 				5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */,
 				50AE79C22C20709C0085CBB3 /* LyricsView.swift in Sources */,
 				50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */,
@@ -2614,6 +2705,8 @@
 				5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */,
 				50AAB9F32F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift in Sources */,
 				5078AFB22B40CA5E0038FD17 /* DisplaySettingsView.swift in Sources */,
+				F9A94F1437AE825A8E847487 /* AppIconSettingsSection.swift in Sources */,
+				FC37DE680FB3834C0B3233ED /* TextSizeSettingsSection.swift in Sources */,
 				50DEEE07265E27070073FF20 /* DirectoryTableCell.swift in Sources */,
 				5019441B2B7A049A00082D2E /* PopupPlayer+Visuals.swift in Sources */,
 				505362D12C23682500846C53 /* AlbumsCollectionVC.swift in Sources */,
@@ -2623,7 +2716,6 @@
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
-				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,
 				50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */,
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
@@ -2643,7 +2735,6 @@
 				504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */,
 				508AA57B2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift in Sources */,
 				504B442028D8E7880033982C /* SupportSettingsView.swift in Sources */,
-				50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */,
 				500DA64D2F087307005578C7 /* CarPlayLibraryTabExtension.swift in Sources */,
 				63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */,
 				505CA20C2B88E9D300AA81CD /* FetchUpdateHandler.swift in Sources */,
@@ -2881,6 +2972,7 @@
 				50AE79B62C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift in Sources */,
 				50381FD32D9410AE002DD0E7 /* PrefetchIdTester.swift in Sources */,
 				5000FACE000000000000AB02 /* AlbumSyncCoalescerTest.swift in Sources */,
+				5000FACE000000000000AB04 /* AlbumSongsBatchedSyncTest.swift in Sources */,
 				50BE5D492850F4C900156FC6 /* ArtistTest.swift in Sources */,
 				50BE5D952850F51E00156FC6 /* CoreDataHelper.swift in Sources */,
 				50BE5D8D2850F50F00156FC6 /* PodcastsParserTest.swift in Sources */,
@@ -3088,6 +3180,7 @@
 		5083860D21C5965E00C4BB32 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=iphone*]" = "AmperfyGreen AmperfyOrange AmperfyPurple AmperfyRed AmperfyYellow AmperfyMusicBlue AmperfyMusicGreen AmperfyMusicOrange AmperfyMusicPurple AmperfyMusicRed AmperfyMusicYellow AmperfyPink AmperfyMusicPink AmperfyMusicSingle AmperfyMusicSingleGradient AmperfyTeal AmperfyMusicTeal";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -3127,6 +3220,7 @@
 		5083860E21C5965E00C4BB32 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=iphone*]" = "AmperfyGreen AmperfyOrange AmperfyPurple AmperfyRed AmperfyYellow AmperfyMusicBlue AmperfyMusicGreen AmperfyMusicOrange AmperfyMusicPurple AmperfyMusicRed AmperfyMusicYellow AmperfyPink AmperfyMusicPink AmperfyMusicSingle AmperfyMusicSingleGradient AmperfyTeal AmperfyMusicTeal";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AmperfyAppIcon;
 				CODE_SIGN_ENTITLEMENTS = Amperfy/Amperfy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";

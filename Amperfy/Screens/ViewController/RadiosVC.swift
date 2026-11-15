@@ -59,8 +59,7 @@ class RadiosVC: SingleFetchedResultsTableViewController<RadioMO> {
       placeholder: "Search in \"\(sceneTitle ?? "")\""
     )
     tableView.register(nibName: PlayableTableCell.typeName)
-    tableView.rowHeight = PlayableTableCell.rowHeight
-    tableView.estimatedRowHeight = PlayableTableCell.rowHeight
+    tableView.reloadOnTextSizeChange { PlayableTableCell.rowHeight }
     tableView.sectionHeaderHeight = 0.0
     tableView.estimatedSectionHeaderHeight = 0.0
     tableView.sectionFooterHeight = 0.0

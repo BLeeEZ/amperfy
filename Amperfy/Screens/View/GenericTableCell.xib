@@ -24,7 +24,6 @@
                                 <rect key="frame" x="0.0" y="0.0" width="48" height="48"/>
                                 <color key="backgroundColor" systemColor="systemRedColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="48" id="5oe-DH-jSb"/>
                                     <constraint firstAttribute="width" secondItem="kaN-9u-M2i" secondAttribute="height" multiplier="1:1" id="wD7-nl-i5l"/>
                                 </constraints>
                             </view>
@@ -34,58 +33,24 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="HDj-Db-Qbv">
                                         <rect key="frame" x="0.0" y="0.0" width="341" height="35"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WHk-4e-H8f" userLabel="Title Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="9" width="167.5" height="18"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="16" id="vsJ-7z-xj1">
-                                                        <variation key="widthClass=regular" constant="18"/>
-                                                    </constraint>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
-                                                <variation key="default">
-                                                    <mask key="constraints">
-                                                        <exclude reference="vsJ-7z-xj1"/>
-                                                    </mask>
-                                                </variation>
-                                                <variation key="widthClass=regular">
-                                                    <mask key="constraints">
-                                                        <include reference="vsJ-7z-xj1"/>
-                                                    </mask>
-                                                </variation>
-                                                <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                </variation>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hM0-yx-hsO" userLabel="Subtitle Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                                 <rect key="frame" x="174" y="9" width="167.5" height="18"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="15" id="dnN-rs-XET">
-                                                        <variation key="widthClass=regular" constant="18"/>
-                                                    </constraint>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                                 <color key="textColor" systemColor="secondaryLabelColor"/>
                                                 <nil key="highlightedColor"/>
-                                                <variation key="default">
-                                                    <mask key="constraints">
-                                                        <exclude reference="dnN-rs-XET"/>
-                                                    </mask>
-                                                </variation>
                                                 <variation key="widthClass=regular">
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <mask key="constraints">
-                                                        <include reference="dnN-rs-XET"/>
-                                                    </mask>
-                                                </variation>
-                                                <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 </variation>
                                             </label>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="35" id="y2Z-f4-QBV"/>
+                                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="35" id="y2Z-f4-QBV"/>
                                         </constraints>
                                         <variation key="default">
                                             <mask key="constraints">
@@ -99,15 +64,12 @@
                                         </variation>
                                         <variation key="userInterfaceIdiom=mac-widthClass=regular" alignment="center" axis="horizontal" distribution="fillEqually"/>
                                     </stackView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="5 Songs" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ah3-fC-zQQ" userLabel="Info Label" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                         <rect key="frame" x="349" y="9" width="200" height="18"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="15" id="1Hs-Po-1o2">
-                                                <variation key="widthClass=regular" constant="18"/>
-                                            </constraint>
                                             <constraint firstAttribute="width" constant="200" id="ser-uw-D7d"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                         <color key="textColor" systemColor="secondaryLabelColor"/>
                                         <nil key="highlightedColor"/>
                                         <variation key="default">
@@ -116,13 +78,13 @@
                                             </mask>
                                         </variation>
                                         <variation key="widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                             <mask key="constraints">
                                                 <include reference="ser-uw-D7d"/>
                                             </mask>
                                         </variation>
                                         <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         </variation>
                                     </label>
                                 </subviews>
@@ -159,6 +121,7 @@
                     <constraint firstItem="sEM-ZY-PBA" firstAttribute="leading" secondItem="JAm-cG-f5H" secondAttribute="trailing" id="KpN-2r-QYl"/>
                     <constraint firstItem="JAm-cG-f5H" firstAttribute="centerY" secondItem="OYQ-xE-eM6" secondAttribute="centerY" id="Y20-F4-UB5"/>
                     <constraint firstItem="sEM-ZY-PBA" firstAttribute="centerY" secondItem="OYQ-xE-eM6" secondAttribute="centerY" id="tNd-M9-X1j"/>
+                    <constraint firstItem="kaN-9u-M2i" firstAttribute="height" secondItem="OYQ-xE-eM6" secondAttribute="height" constant="-18" priority="999" id="img-Hg-RwH"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

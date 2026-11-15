@@ -62,6 +62,9 @@ struct AccountSettingsView: View {
     appDelegate.configureMainMenu()
 
     appDelegate.storage.settings.user.isOfflineMode = false
+    appDelegate.storage.settings.accounts.updateSetting(accountInfo) {
+      $0.clearInitialSyncCheckpoint()
+    }
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)
     let syncVC = AppStoryboard.Main.segueToSync(account: account)
@@ -304,6 +307,9 @@ struct AccountSettingsView: View {
     .sheet(isPresented: $isPwUpdateDialogVisible) {
       UpdatePasswordView(isVisible: $isPwUpdateDialogVisible)
     }
+    // MacOS workaround: reading the state here makes the body depend on it. Without this, setting
+    // isPwUpdateDialogVisible to false from the sheet (Cancel) does not dismiss it.
+    .onChange(of: isPwUpdateDialogVisible) { _, _ in }
   }
 }
 

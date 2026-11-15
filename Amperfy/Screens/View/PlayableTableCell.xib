@@ -21,18 +21,20 @@
                         <rect key="frame" x="32" y="15" width="48" height="40"/>
                         <color key="backgroundColor" systemColor="systemMintColor"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="48" id="PdF-S9-lw7"/>
+                            <constraint firstAttribute="width" secondItem="Uwb-Vy-dE7" secondAttribute="height" multiplier="1:1" id="art-Sq-R01"/>
                         </constraints>
                     </view>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="999" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="HnA-Bb-1UQ">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="999" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" translatesAutoresizingMaskIntoConstraints="NO" id="HnA-Bb-1UQ" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target" minimumScaleFactor="0.59999999999999998">
                         <rect key="frame" x="32" y="24" width="21" height="22"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="22" id="aX0-JY-siD"/>
                             <constraint firstAttribute="width" constant="21" id="jBq-gW-rGb"/>
                         </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
+                        <variation key="userInterfaceIdiom=mac">
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
+                        </variation>
                     </label>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mUX-sN-oa8">
                         <rect key="frame" x="82" y="16" width="507" height="38"/>
@@ -40,34 +42,19 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ZWf-gf-epS">
                                 <rect key="frame" x="4" y="0.0" width="503" height="38"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hPr-VQ-rTt" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="503" height="22"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="22" id="XXp-uK-dh5"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
-                                        <variation key="userInterfaceIdiom=mac">
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        </variation>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nJe-7h-3tU" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="22" width="503" height="16"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="16" id="Lp3-VV-zM5">
-                                                <variation key="widthClass=regular" constant="22"/>
-                                                <variation key="userInterfaceIdiom=mac-widthClass=regular" constant="16"/>
-                                            </constraint>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                                         <color key="textColor" systemColor="secondaryLabelColor"/>
                                         <nil key="highlightedColor"/>
                                         <variation key="widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        </variation>
-                                        <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         </variation>
                                     </label>
                                 </subviews>
@@ -78,7 +65,7 @@
                             <constraint firstItem="ZWf-gf-epS" firstAttribute="top" secondItem="mUX-sN-oa8" secondAttribute="top" id="OSW-Sd-lFS"/>
                             <constraint firstAttribute="trailing" secondItem="ZWf-gf-epS" secondAttribute="trailing" id="R2h-1K-uQJ"/>
                             <constraint firstAttribute="bottom" secondItem="ZWf-gf-epS" secondAttribute="bottom" id="To7-20-5Of"/>
-                            <constraint firstAttribute="height" constant="38" id="ayC-tn-eu2"/>
+                            <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="38" id="ayC-tn-eu2"/>
                             <constraint firstItem="ZWf-gf-epS" firstAttribute="leading" secondItem="mUX-sN-oa8" secondAttribute="leading" constant="4" id="jYK-RP-Dp9"/>
                         </constraints>
                     </view>
@@ -114,7 +101,7 @@
                             </constraint>
                         </constraints>
                     </imageView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99:59:59" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="XQO-xE-pLx" userLabel="Duration">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="99:59:59" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" translatesAutoresizingMaskIntoConstraints="NO" id="XQO-xE-pLx" userLabel="Duration" adjustsFontForContentSizeCategory="YES" customClass="ScaledLabel" customModule="Amperfy" customModuleProvider="target">
                         <rect key="frame" x="549" y="26.5" width="40" height="17"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="40" id="jIq-1R-vvd">
@@ -122,14 +109,14 @@
                                 <variation key="userInterfaceIdiom=mac-widthClass=regular" constant="40"/>
                             </constraint>
                         </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleSubhead"/>
                         <color key="textColor" systemColor="secondaryLabelColor"/>
                         <nil key="highlightedColor"/>
                         <variation key="widthClass=regular">
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                         </variation>
                         <variation key="userInterfaceIdiom=mac-widthClass=regular">
-                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                         </variation>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" preferredBehavioralStyle="pad" translatesAutoresizingMaskIntoConstraints="NO" id="SRF-Yt-kwz" userLabel="Options Button">
@@ -207,16 +194,16 @@
                     <constraint firstItem="euv-dS-9Rx" firstAttribute="trailing" secondItem="Uwb-Vy-dE7" secondAttribute="trailing" id="Trn-WR-LKv"/>
                     <constraint firstAttribute="trailingMargin" secondItem="SRF-Yt-kwz" secondAttribute="trailing" id="X7z-Kg-90N"/>
                     <constraint firstItem="mUX-sN-oa8" firstAttribute="left" secondItem="WOq-tb-OTF" secondAttribute="leftMargin" constant="66" id="XXa-cv-hEs"/>
-                    <constraint firstItem="Uwb-Vy-dE7" firstAttribute="top" secondItem="WOq-tb-OTF" secondAttribute="topMargin" id="b4X-h3-kb4"/>
                     <constraint firstItem="TYw-rj-zE1" firstAttribute="bottom" secondItem="HnA-Bb-1UQ" secondAttribute="bottom" id="c3a-Pp-tUE"/>
                     <constraint firstItem="euv-dS-9Rx" firstAttribute="top" secondItem="Uwb-Vy-dE7" secondAttribute="top" id="ciA-A3-97k"/>
                     <constraint firstItem="HnA-Bb-1UQ" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="cj6-KU-NTA"/>
                     <constraint firstItem="XQO-xE-pLx" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="evm-GL-FO9"/>
                     <constraint firstAttribute="trailingMargin" secondItem="XQO-xE-pLx" secondAttribute="trailing" id="ew4-ya-VWk"/>
                     <constraint firstAttribute="rightMargin" secondItem="4NS-Qv-02y" secondAttribute="right" id="gV9-QO-4Ah"/>
-                    <constraint firstAttribute="bottomMargin" secondItem="Uwb-Vy-dE7" secondAttribute="bottom" id="qSm-jS-v60"/>
                     <constraint firstItem="euv-dS-9Rx" firstAttribute="leading" secondItem="Uwb-Vy-dE7" secondAttribute="leading" id="rqn-Hl-suf"/>
                     <constraint firstItem="ZTB-B7-OZR" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="uNb-qq-0ME"/>
+                    <constraint firstItem="Uwb-Vy-dE7" firstAttribute="centerY" secondItem="WOq-tb-OTF" secondAttribute="centerY" id="art-Cy-R01"/>
+                    <constraint firstItem="Uwb-Vy-dE7" firstAttribute="height" secondItem="WOq-tb-OTF" secondAttribute="height" constant="-18" priority="999" id="art-Hg-R01"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

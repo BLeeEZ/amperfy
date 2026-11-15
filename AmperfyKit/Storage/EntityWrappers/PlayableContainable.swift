@@ -42,10 +42,11 @@ public struct DetailInfoType {
 
   public init(type: DetailType, settings: AmperfySettings) {
     self.type = type
-    self.isShowDetailedInfo = settings.user.isShowDetailedInfo
-    self.isShowAlbumDuration = settings.user.isShowAlbumDuration
-    self.isShowArtistDuration = settings.user.isShowArtistDuration
-    self.artistFilterSetting = settings.user.artistsFilterSetting
+    let userSettings = settings.user
+    self.isShowDetailedInfo = userSettings.isShowDetailedInfo
+    self.isShowAlbumDuration = userSettings.isShowAlbumDuration
+    self.isShowArtistDuration = userSettings.isShowArtistDuration
+    self.artistFilterSetting = userSettings.artistsFilterSetting
   }
 }
 
@@ -115,8 +116,6 @@ public protocol PlayableContainable {
   @MainActor
   func getArtworkCollection(theme: ThemePreference) -> ArtworkCollection
   @MainActor
-  func cachePlayables(downloadManager: DownloadManageable)
-  @MainActor
   func fetchFromServer(
     storage: PersistentStorage,
     librarySyncer: LibrarySyncer,
@@ -131,15 +130,6 @@ public protocol PlayableContainable {
 }
 
 extension PlayableContainable {
-  @MainActor
-  public func cachePlayables(downloadManager: DownloadManageable) {
-    for playable in playables {
-      if !playable.isCached {
-        downloadManager.download(object: playable)
-      }
-    }
-  }
-
   public func info(for api: ServerApiType?, details: DetailInfoType) -> String {
     infoDetails(for: api, details: details).joined(separator: " \(CommonString.oneMiddleDot) ")
   }

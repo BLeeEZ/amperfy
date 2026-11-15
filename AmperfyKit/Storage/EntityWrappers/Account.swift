@@ -92,14 +92,6 @@ public class Account {
     self.managedObject = managedObject
   }
 
-  func assignAccount(serverUrl: String, userName: String, apiType: BackenApiType) {
-    managedObject.serverUrl = serverUrl
-    managedObject.userName = userName
-
-    let info = Self.createInfo(serverUrl: serverUrl, userName: userName, apiType: apiType)
-    assignInfo(info: info)
-  }
-
   public func assignInfo(info: AccountInfo) {
     managedObject.serverHash = info.serverHash
     managedObject.userHash = info.userHash
