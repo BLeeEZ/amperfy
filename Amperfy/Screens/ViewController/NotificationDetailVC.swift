@@ -39,10 +39,7 @@ class NotificationDetailVC: UIViewController {
       systemItem: .close,
       primaryAction: UIAction { [weak self] _ in self?.pressedClose() }
     )
-    let barAppearance = UINavigationBarAppearance()
-    barAppearance.configureWithTransparentBackground()
-    navigationItem.standardAppearance = barAppearance
-    navigationItem.scrollEdgeAppearance = barAppearance
+    navigationItem.configureTransparentAppearance()
     // the scroll view starts below the navigation bar (safe area); the text view does not scroll,
     // an inset of its own would push the text out of its bounds
     descriptionTextView.contentInsetAdjustmentBehavior = .never

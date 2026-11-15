@@ -59,10 +59,22 @@ class ContextQueueNextSectionHeader: UIView {
     self.player = appDelegate.player
     player.addNotifier(notifier: self)
     self.playerHandler = PlayerUIHandler(player: player, style: .popupPlayer)
+    refreshShuffleAndRepeatVisibility()
+  }
+
+  /// The queue inspector (no popup player as root view, macOS only) is displayed next to the
+  /// player bar, which already offers shuffle and repeat. The popup player needs its own buttons.
+  private var isInQueueInspector: Bool {
+    rootView == nil
+  }
+
+  private func refreshShuffleAndRepeatVisibility() {
+    playerHandler?.isShuffleAndRepeatHidden = isInQueueInspector
   }
 
   func prepare(toWorkOnRootView: PopupPlayerVC?) {
     rootView = toWorkOnRootView
+    refreshShuffleAndRepeatVisibility()
     contextNameLabel.applyAmperfyStyle()
     refresh()
   }
@@ -78,24 +90,17 @@ class ContextQueueNextSectionHeader: UIView {
 
   func configureAutoplayButtonPosition() {
     autoplayTrailingConstraint.isActive = false
-    #if targetEnvironment(macCatalyst)
-      if appDelegate.isShowingMiniPlayer {
-        autoplayTrailingConstraint = autoplayButton.trailingAnchor.constraint(
-          equalTo: shuffleButton.leadingAnchor,
-          constant: -8.0
-        )
-      } else {
-        autoplayTrailingConstraint = autoplayButton.trailingAnchor.constraint(
-          equalTo: safeAreaLayoutGuide.trailingAnchor,
-          constant: -8.0
-        )
-      }
-    #else
+    if isInQueueInspector {
+      autoplayTrailingConstraint = autoplayButton.trailingAnchor.constraint(
+        equalTo: safeAreaLayoutGuide.trailingAnchor,
+        constant: -8.0
+      )
+    } else {
       autoplayTrailingConstraint = autoplayButton.trailingAnchor.constraint(
         equalTo: shuffleButton.leadingAnchor,
         constant: -8.0
       )
-    #endif
+    }
     NSLayoutConstraint.activate([
       autoplayTrailingConstraint,
     ])

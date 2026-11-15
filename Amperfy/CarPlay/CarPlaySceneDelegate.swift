@@ -109,7 +109,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       CPNowPlayingTemplate.shared.add(self)
       self.interfaceController = interfaceController
       self.interfaceController?.delegate = self
-      self.configureNowPlayingTemplate()
+      configureNowPlayingTemplate()
 
       accountNotificationHandler?
         .registerCallbackForActiveAccountChange { [weak self] accountInfo in
@@ -151,9 +151,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
           }
         }
 
-      if self.appDelegate.player.currentlyPlaying != nil, self.appDelegate.player.isPlaying {
-        self.updatePlayerQueueSection()
-        self.displayNowPlaying(immediately: true) {}
+      if appDelegate.player.currentlyPlaying != nil, appDelegate.player.isPlaying {
+        updatePlayerQueueSection()
+        displayNowPlaying(immediately: true) {}
       }
     }
   }

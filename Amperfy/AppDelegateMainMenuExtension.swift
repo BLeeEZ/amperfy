@@ -47,43 +47,34 @@ extension AppDelegate {
   private func buildMainMenu(with builder: any UIMenuBuilder) {
     guard builder.system == .main else { return }
 
+    // The mini player is a separate window, independent of the main window (macOS, iPadOS)
+    let miniPlayerMenu = UIMenu(options: .displayInline, children: [
+      UIAction(
+        title: isShowingMiniPlayer ? "Close Mini Player" : "Open Mini Player",
+        image: AmperfyImage.miniPlayer.asUIImage,
+        attributes: UIApplication.shared.supportsMultipleScenes ? [] : .disabled
+      ) { _ in
+        if self.isShowingMiniPlayer {
+          self.closeMiniPlayer()
+        } else {
+          self.showMiniPlayer()
+        }
+      },
+    ])
+    builder.insertChild(miniPlayerMenu, atStartOfMenu: .file)
+    // The main window can be closed while the mini player stays open
+    let openPlayerWindowMenu = UIMenu(options: .displayInline, children: [
+      UIAction(
+        title: "Open Player Window",
+        image: AmperfyImage.openPlayerWindow.asUIImage,
+        attributes: isMainWindowOpen ? .disabled : []
+      ) { _ in
+        self.openMainWindow()
+      },
+    ])
+    builder.insertChild(openPlayerWindowMenu, atStartOfMenu: .file)
+
     #if targetEnvironment(macCatalyst) // ok
-      // Add File menu
-      let fileMenus = [
-        UIMenu(options: .displayInline, children: [
-          UIAction(
-            title: "Open Player Window",
-            image: AmperfyImage.openPlayerWindow.asUIImage,
-            attributes: isMainOrMiniPlayerPlayerOpen ? .disabled : []
-          ) { _ in
-            self.openMainWindow()
-          },
-          UIKeyCommand(
-            title: "Close Player Window",
-            image: AmperfyImage.xmark.asUIImage,
-            action: #selector(closePlayerWindow),
-            input: "W",
-            modifierFlags: .command,
-            attributes: !isMainOrMiniPlayerPlayerOpen ? .disabled : []
-          ),
-        ]),
-        UIMenu(options: .displayInline, children: [
-          UIAction(
-            title: "Switch Library/Mini Player",
-            image: AmperfyImage.switchPlayerWindow.asUIImage
-          ) { _ in
-            if self.isShowingMiniPlayer {
-              self.closeMiniPlayer()
-              // mini player close will automatically (in scene disconnect) open Main again
-            } else {
-              self.closeMainWindow()
-              self.showMiniPlayer()
-            }
-          },
-        ]),
-      ]
-      builder.insertChild(fileMenus[1], atStartOfMenu: .file)
-      builder.insertChild(fileMenus[0], atStartOfMenu: .file)
       let openSettingsMenu = UIMenu(options: .displayInline, children: [
         UIKeyCommand(
           title: "Settings…",
@@ -300,16 +291,6 @@ extension AppDelegate {
   }
 
   @objc
-  func closePlayerWindow(sender: Any) {
-    if isMainWindowOpen {
-      closeMainWindow()
-    } else if isShowingMiniPlayer {
-      closeMiniPlayer()
-    }
-    rebuildMainMenu()
-  }
-
-  @objc
   func showSettings(sender: Any) {
     let settingsActivity = NSUserActivity(activityType: settingsWindowActivityType)
     UIApplication.shared.requestSceneSessionActivation(
@@ -455,32 +436,11 @@ extension AppDelegate {
       }
   }
 
-  var isMainOrMiniPlayerPlayerOpen: Bool {
-    isMainWindowOpen || isShowingMiniPlayer
-  }
-
   var isMainWindowOpen: Bool {
     !UIApplication.shared.connectedScenes
       .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
       .filter { ($0.rootViewController as? MainSceneHostingViewController) != nil }
       .isEmpty
-  }
-
-  func closeMainWindow() {
-    // Close all main sessions (this might be more than one with multiple tabs open)
-    UIApplication.shared.connectedScenes
-      .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
-      .filter { ($0.rootViewController as? MainSceneHostingViewController) != nil }
-      .compactMap { $0.windowScene?.session }
-      .forEach {
-        let options = UIWindowSceneDestructionRequestOptions()
-        options.windowDismissalAnimation = .standard
-        UIApplication.shared.requestSceneSessionDestruction(
-          $0,
-          options: options,
-          errorHandler: nil
-        )
-      }
   }
 
   func openMainWindow() {

@@ -41,6 +41,9 @@ class PlayerUIHandler: NSObject {
 
   private var player: PlayerFacade
   private var style: PlayerUIStyle
+  /// Only evaluated for the popup player style: hides the shuffle and repeat buttons when the
+  /// surrounding UI already offers them (queue inspector next to the macOS player bar)
+  var isShuffleAndRepeatHidden = false
 
   init(player: PlayerFacade, style: PlayerUIStyle) {
     self.player = player
@@ -215,11 +218,7 @@ class PlayerUIHandler: NSObject {
       config.image = image?
         .withConfiguration(UIImage.SymbolConfiguration(scale: .medium))
       repeatButton.configuration = config
-      #if targetEnvironment(macCatalyst)
-        repeatButton.isHidden = !appDelegate.isShowingMiniPlayer
-      #else
-        repeatButton.isHidden = false
-      #endif
+      repeatButton.isHidden = isShuffleAndRepeatHidden
     }
     repeatButton.isSelected = isSelected
   }
@@ -237,11 +236,7 @@ class PlayerUIHandler: NSObject {
       config.image = .shuffle
         .withConfiguration(UIImage.SymbolConfiguration(scale: .medium))
       shuffleButton.configuration = config
-      #if targetEnvironment(macCatalyst)
-        shuffleButton.isHidden = !appDelegate.isShowingMiniPlayer
-      #else
-        shuffleButton.isHidden = false
-      #endif
+      shuffleButton.isHidden = isShuffleAndRepeatHidden
     }
     shuffleButton.isEnabled = appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     shuffleButton.isSelected = player.isShuffle
