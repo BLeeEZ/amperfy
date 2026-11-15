@@ -158,11 +158,15 @@ public class AmperKit {
     playerAudioSessionHandler!.configureObserverForAudioSessionInterruption()
     backendAudioPlayer.triggerReinsertPlayableCB = curPlayer.play
     curPlayer.autoplayCB = { [weak self] song in
-      guard let self, let accountInfo = song.account?.info else { return [] }
-      return try await getMeta(accountInfo).librarySyncer.requestSimilarSongs(
+      guard let self, let account = song.account else { return [] }
+      let similarSongs = try await getMeta(account.info).librarySyncer.requestSimilarSongs(
         song: song,
         count: 99
       )
+      guard similarSongs.isEmpty else { return similarSongs }
+      // The server knows no similar songs: play random songs of the local library instead of stopping.
+      return storage.main.library.getRandomSongs(for: account, count: 50, onlyCached: false)
+        .filter { $0.managedObject.objectID != song.managedObject.objectID }
     }
     backendAudioPlayer.updateEqualizerEnabled(isEnabled: storage.settings.user.isEqualizerEnabled)
     backendAudioPlayer
