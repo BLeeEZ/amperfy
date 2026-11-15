@@ -47,6 +47,7 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
   ) {
     let filePath = try? fileManager.moveItemToTempDirectoryWithUniqueName(at: location)
     let fileMimeType = downloadTask.response?.mimeType
+    let statusCode = (downloadTask.response as? HTTPURLResponse)?.statusCode
 
     // didFinishDownloadingTo location
     // A file URL for the temporary file. Because the file is temporary, you must either open the file for
@@ -78,7 +79,8 @@ extension DownloadManager: URLSessionDelegate, URLSessionDownloadDelegate {
         await self.finishDownload(
           downloadRequest: taskInfo.request, task: downloadTask,
           fileURL: filePath,
-          fileMimeType: fileMimeType
+          fileMimeType: fileMimeType,
+          statusCode: statusCode
         )
       } else {
         await self.finishDownload(

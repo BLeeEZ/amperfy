@@ -356,10 +356,38 @@ public struct AccountSetting: Sendable, Codable {
     set { _homeSectionOrder = newValue }
   }
 
+  private var _initialSyncCompletedAlbumBatches: Set<Int>? = nil
+  public var initialSyncCompletedAlbumBatches: Set<Int>? {
+    get { _initialSyncCompletedAlbumBatches }
+    set { _initialSyncCompletedAlbumBatches = newValue }
+  }
+
+  private var _initialSyncAlbumCount: Int? = nil
+  public var initialSyncAlbumCount: Int? {
+    get { _initialSyncAlbumCount }
+    set { _initialSyncAlbumCount = newValue }
+  }
+
   private var _initialSyncCompletionStatus: SyncCompletionStatus = .defaultValue
   public var initialSyncCompletionStatus: SyncCompletionStatus {
     get { _initialSyncCompletionStatus }
     set { _initialSyncCompletionStatus = newValue }
+  }
+
+  public var isInitialSyncResumable: Bool {
+    initialSyncCompletionStatus == .aborted && initialSyncCompletedAlbumBatches != nil
+  }
+
+  public mutating func clearInitialSyncCheckpoint() {
+    initialSyncCompletedAlbumBatches = nil
+    initialSyncAlbumCount = nil
+  }
+
+  // optional: settings stored before this property existed must still decode
+  private var _isBulkSongSyncCompleted: Bool? = nil
+  public var isBulkSongSyncCompleted: Bool {
+    get { _isBulkSongSyncCompleted ?? false }
+    set { _isBulkSongSyncCompleted = newValue }
   }
 
   private var _isAutoDownloadLatestPodcastEpisodesActive: Bool = false

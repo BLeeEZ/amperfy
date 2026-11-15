@@ -130,38 +130,6 @@ public class LocalNotificationManager {
     }
   }
 
-  public func notifyDebug(title: String, body: String) {
-    Task {
-      await self.notifyDebugAndWait(title: title, body: body)
-    }
-  }
-
-  public func notifyDebugAndWait(title: String, body: String) async {
-    let content = UNMutableNotificationContent()
-    content.title = title
-    content.body = body
-    content.sound = .default
-    let trigger = UNTimeIntervalNotificationTrigger(
-      timeInterval: Self.notificationTimeInterval,
-      repeats: false
-    )
-    let request = UNNotificationRequest(
-      identifier: String.generateRandomString(ofLength: 15),
-      content: content,
-      trigger: trigger
-    )
-    await notify(request: request)
-  }
-
-  nonisolated public func listPendingNotifications() {
-    Task {
-      let notifications = await UNUserNotificationCenter.current().pendingNotificationRequests()
-      for notification in notifications {
-        print(notification)
-      }
-    }
-  }
-
   nonisolated private func notify(request: UNNotificationRequest) async {
     let settings = await UNUserNotificationCenter.current().notificationSettings()
     switch settings.authorizationStatus {

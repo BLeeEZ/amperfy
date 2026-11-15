@@ -127,11 +127,6 @@ extension View {
   }
 }
 
-extension UIColor {
-  static let slideOverBackgroundColor: UIColor = .systemBackground.withAlphaComponent(0.5)
-  static let hoveredBackgroundColor: UIColor = .systemGray2.withAlphaComponent(0.2)
-}
-
 extension UIButton.Configuration {
   static func player(isSelected: Bool) -> UIButton.Configuration {
     var config = UIButton.Configuration.tinted()
@@ -160,33 +155,40 @@ extension UIButton.Configuration {
   }
 }
 
+extension UIViewController {
+  /// macOS: shows or hides the title in the title bar of the view controller's window
+  public func setWindowTitle(isHidden: Bool) {
+    #if targetEnvironment(macCatalyst)
+      view.window?.windowScene?.titlebar?.titleVisibility = isHidden ? .hidden : .visible
+    #endif
+  }
+}
+
+extension UINavigationItem {
+  /// Transparent navigation bar without separator line
+  public func configureTransparentAppearance() {
+    let appearance = UINavigationBarAppearance()
+    appearance.configureWithTransparentBackground()
+    appearance.shadowColor = .clear
+    standardAppearance = appearance
+    compactAppearance = appearance
+    scrollEdgeAppearance = appearance
+    compactScrollEdgeAppearance = appearance
+  }
+}
+
 extension UIView {
-  static let forceTouchClickLimit: Float = 1.0
-
-  func normalizedForce(touches: Set<UITouch>) -> Float? {
-    guard is3DTouchAvailable, let touch = touches.first else { return nil }
-    let maximumForce = touch.maximumPossibleForce
-    let force = touch.force
-    let normalizedForce = (force / maximumForce)
-    return Float(normalizedForce)
-  }
-
-  func isForceClicked(_ touches: Set<UITouch>) -> Bool {
-    guard let force = normalizedForce(touches: touches) else { return false }
-    if force < UIView.forceTouchClickLimit {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  var is3DTouchAvailable: Bool {
-    forceTouchCapability() == .available
-  }
-
-  func forceTouchCapability() -> UIForceTouchCapability {
-    UIApplication.shared.mainWindow?.rootViewController?.traitCollection
-      .forceTouchCapability ?? .unknown
+  /// Centers the view in `container` and sizes it relative to the container. The default
+  /// multiplier lets the view fill the container. The view must already be in the same view
+  /// hierarchy as `container`.
+  public func constrainCentered(in container: UIView, sizeMultiplier: CGFloat = 1.0) {
+    translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      centerXAnchor.constraint(equalTo: container.centerXAnchor),
+      centerYAnchor.constraint(equalTo: container.centerYAnchor),
+      widthAnchor.constraint(equalTo: container.widthAnchor, multiplier: sizeMultiplier),
+      heightAnchor.constraint(equalTo: container.heightAnchor, multiplier: sizeMultiplier),
+    ])
   }
 
   public func setBackgroundBlur(style: UIBlurEffect.Style, alpha: CGFloat = 1.0) {
@@ -396,11 +398,6 @@ extension UITableViewController {
   )
     -> CellType {
     self.tableView.dequeueCell(for: tableView, at: indexPath)
-  }
-
-  func refreshAllVisibleCells() {
-    let visibleIndexPaths = tableView.visibleCells.compactMap { tableView.indexPath(for: $0) }
-    tableView.reconfigureRows(at: visibleIndexPaths)
   }
 
   func exectueAfterAnimation(body: @escaping () -> ()) {

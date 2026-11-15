@@ -152,6 +152,11 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
   func sync(genre: Genre) async throws {}
   func sync(artist: Artist) async throws {}
   func sync(album: Album) async throws {}
+  func syncSongsInBackground(
+    targets: [AlbumSyncTarget],
+    isCancelled: @escaping @Sendable () -> Bool
+  ) async {}
+  func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool { false }
   func sync(song: Song) async throws {}
   func sync(podcast: Podcast) async throws {}
   func syncNewestPodcastEpisodes() async throws {}
@@ -2881,5 +2886,128 @@ class MusicPlayerTest: XCTestCase {
     backendPlayer.responder?.didItemFinishedPlaying()
     XCTAssertTrue(testPlayer.isPlaying)
     XCTAssertEqual(testPlayer.currentlyPlaying?.id, playlistAllCached.playables[0].id)
+  }
+
+  @MainActor
+  private func startPlaybackAndSettle() async throws {
+    prepareWithAllSongsCached()
+    testPlayer.play()
+    // playback start hops through the main actor several times, so let it settle
+    // before injecting an error, otherwise the two interleave.
+    try await Task.sleep(nanoseconds: 500_000_000)
+  }
+
+  @MainActor
+  func testStreamError_capturesPlaybackPositionForRecovery() async throws {
+    try await startPlaybackAndSettle()
+    mockAudioStreamingPlayer.mockElapsedTime = 200.0
+
+    XCTAssertFalse(backendPlayer.isErrorOccurred)
+    XCTAssertEqual(backendPlayer.elapsedTimeBeforeErrorOccurred, 0.0)
+
+    backendPlayer.audioPlayerUnexpectedError(
+      player: mockAudioStreamingPlayer,
+      error: .codecError
+    )
+    try await Task.sleep(nanoseconds: 300_000_000)
+
+    XCTAssertTrue(backendPlayer.isErrorOccurred)
+    XCTAssertEqual(backendPlayer.elapsedTimeBeforeErrorOccurred, 200.0)
+  }
+
+  // -------------------------------------------------------------
+  // Player errors
+  //
+  // The automatic reinsert after an error (triggerReinsertPlayableCB) stays unwired as in
+  // setUp: the mock survives restartPlayer in its paused state, so a reinsert would resume
+  // it instead of starting a new item. Without it the tests match a failing streamed song,
+  // whose reinsert sets the play state only after the second error report was handled.
+
+  private func playCachedAndWaitForPlayerStart(_ playable: AbstractPlayable) async {
+    testPlayer.play(context: PlayContext(name: "", playables: [playable]))
+    // the player reports the start asynchronously, until then the item can't be continued
+    let end = Date().addingTimeInterval(3.0)
+    while !backendPlayer.canBeContinued {
+      guard Date() < end else {
+        XCTFail("the player did not report the start")
+        return
+      }
+      try? await Task.sleep(for: .milliseconds(20))
+    }
+  }
+
+  private func reportPlayerErrors(count: Int) async {
+    for _ in 0 ..< count {
+      backendPlayer.audioPlayerUnexpectedError(
+        player: mockAudioStreamingPlayer,
+        error: .networkError(.failure(NetworkError.serverError))
+      )
+    }
+    // the errors are handled in main actor tasks, queued before this one
+    await Task { @MainActor in }.value
+    try? await Task.sleep(for: .milliseconds(200))
+  }
+
+  func testPlayerError_TwoErrorsWhilePlaying_NextSongPlays() async {
+    await playCachedAndWaitForPlayerStart(songCached)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+
+    // AudioStreaming reports a failing entry twice (probe and main request)
+    await reportPlayerErrors(count: 2)
+    XCTAssertTrue(backendPlayer.isErrorOccurred)
+    XCTAssertFalse(testPlayer.isPlaying)
+
+    await playCachedAndWaitForPlayerStart(playlistAllCached.playables[1])
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+  }
+
+  func testPlayerError_OneErrorWhilePlaying_NextSongPlays() async {
+    await playCachedAndWaitForPlayerStart(songCached)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    await reportPlayerErrors(count: 1)
+    XCTAssertTrue(backendPlayer.isErrorOccurred)
+    XCTAssertFalse(testPlayer.isPlaying)
+
+    await playCachedAndWaitForPlayerStart(playlistAllCached.playables[1])
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+  }
+
+  func testPlayerError_ErrorWhilePaused_LaterSongPlays() async {
+    await playCachedAndWaitForPlayerStart(songCached)
+    testPlayer.pause()
+    XCTAssertFalse(testPlayer.isPlaying)
+
+    await reportPlayerErrors(count: 1)
+    XCTAssertTrue(backendPlayer.isErrorOccurred)
+
+    // stands in for the automatic reinsert: the first start after the error keeps the pause
+    await playCachedAndWaitForPlayerStart(playlistAllCached.playables[1])
+    XCTAssertFalse(testPlayer.isPlaying)
+    XCTAssertFalse(mockAudioStreamingPlayer.isPlaying)
+
+    await playCachedAndWaitForPlayerStart(playlistAllCached.playables[2])
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
+  }
+
+  func testPlayerError_FromReplacedPlayer_IsIgnored() async {
+    await playCachedAndWaitForPlayerStart(songCached)
+    XCTAssertTrue(testPlayer.isPlaying)
+
+    // a late report from a player instance that is no longer the active one
+    backendPlayer.audioPlayerUnexpectedError(
+      player: AudioStreaming.AudioPlayer(),
+      error: .networkError(.failure(NetworkError.serverError))
+    )
+    await Task { @MainActor in }.value
+    try? await Task.sleep(for: .milliseconds(200))
+
+    XCTAssertFalse(backendPlayer.isErrorOccurred)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
   }
 }

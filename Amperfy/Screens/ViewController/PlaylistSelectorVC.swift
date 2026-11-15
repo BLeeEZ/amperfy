@@ -305,7 +305,7 @@ class PlaylistSelectorVC: SingleSnapshotFetchedResultsTableViewController<Playli
       img.tintColor = isMarked ? appDelegate.storage.settings.accounts
         .getSetting(playlist.account?.info).read
         .themePreference
-        .asColor : .secondaryLabelColor
+        .asColor : .secondaryLabel
       cell.accessoryView = img
     } else {
       cell.accessoryView = nil

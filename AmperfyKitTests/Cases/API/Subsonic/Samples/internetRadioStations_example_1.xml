@@ -3,6 +3,6 @@
 <subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.9.0">
     <internetRadioStations>
         <internetRadioStation id="0" name="NRK P1" streamUrl="http://lyd.nrk.no/nrk_radio_p1_ostlandssendingen_mp3_m" homePageUrl="http://www.nrk.no/p1"/>
-        <internetRadioStation id="1" name="NRK P2" streamUrl="http://lyd.nrk.no/nrk_radio_p2_mp3_m" homePageUrl="http://p3.no"/>
+        <internetRadioStation id="1" name="NRK P2" streamUrl="http://lyd.nrk.no/nrk_radio_p2_mp3_m" homePageUrl="http://p3.no" coverArt="ra-1"/>
     </internetRadioStations>
 </subsonic-response>

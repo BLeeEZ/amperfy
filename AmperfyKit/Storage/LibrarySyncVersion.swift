@@ -63,10 +63,6 @@ public enum LibrarySyncVersion: Int, Comparable, CustomStringConvertible, Sendab
     }
   }
 
-  public var isNewestVersion: Bool {
-    self == Self.newestVersion
-  }
-
   public static let newestVersion: LibrarySyncVersion = .v21
   public static let defaultValue: LibrarySyncVersion = .v6
 

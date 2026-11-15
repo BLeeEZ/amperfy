@@ -109,6 +109,7 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }
 
     closeButtonPlaceholderView.isHidden = true
+    configureNavigationBar()
 
     setupTableView()
     fetchSongInfoAndUpdateViews()
@@ -180,6 +181,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    if isCoveringMainWindow {
+      setWindowTitle(isHidden: true)
+    }
     appDelegate.userStatistics.visited(.popupPlayer)
     becomeFirstResponder()
     changeDisplayStyleVisually(
@@ -194,6 +198,9 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
 
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
+    if isCoveringMainWindow {
+      setWindowTitle(isHidden: false)
+    }
     resignFirstResponder()
   }
 
@@ -291,63 +298,82 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
     }
   }
 
+  /// The mini player lives in its own window scene, independent of the main window
+  var isInMiniPlayerWindow: Bool {
+    view.window?.windowScene?.delegate is MiniPlayerSceneDelegate
+  }
+
   func closePopupPlayer() {
-    guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
+    // the mini player window is closed via its window controls, don't touch the main window
+    guard !isInMiniPlayerWindow,
+          let hostingSplitVC = AppDelegate.mainWindowHostVC
+    else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true)
   }
 
   func closePopupPlayerAndDisplayInLibraryTab(vc: UIViewController) {
-    #if targetEnvironment(macCatalyst)
-      if view.window?.windowScene?.delegate is MiniPlayerSceneDelegate {
-        displayInMainWindowAndCloseMiniPlayer(vc: vc)
-        return
-      }
-    #endif
+    if isInMiniPlayerWindow {
+      displayInMainWindow(vc: vc)
+      return
+    }
     guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
     hostingSplitVC.visualizePopupPlayer(direction: .close, animated: true, completion: { () in
       hostingSplitVC.pushNavLibrary(vc: vc)
     })
   }
 
-  #if targetEnvironment(macCatalyst)
-    /// The mini player lives in its own window scene: show the content in the main window (opening it if necessary)
-    /// and close the mini player afterwards, so it stays open if the main window can't be reached.
-    private func displayInMainWindowAndCloseMiniPlayer(vc: UIViewController) {
-      if appDelegate.isMainWindowOpen {
-        if let mainSession = AppDelegate.mainSceneDelegate?.window?.windowScene?.session {
-          UIApplication.shared.requestSceneSessionActivation(
-            mainSession,
-            userActivity: nil,
-            options: nil,
-            errorHandler: nil
-          )
-        }
-      } else {
-        appDelegate.openMainWindow()
+  /// Called from the mini player window: show the content in the main window (opening it if necessary).
+  /// The mini player window stays open.
+  private func displayInMainWindow(vc: UIViewController) {
+    if appDelegate.isMainWindowOpen {
+      if let mainSession = AppDelegate.mainSceneDelegate?.window?.windowScene?.session {
+        UIApplication.shared.requestSceneSessionActivation(
+          mainSession,
+          userActivity: nil,
+          options: nil,
+          errorHandler: nil
+        )
       }
-      Task { @MainActor [weak self] in
-        // a newly requested main window needs a moment until its content is loaded
-        for _ in 0 ..< 50 {
-          if let hostVC = AppDelegate.mainWindowHostVC, Self.isLibraryReady(hostVC: hostVC) {
-            // the main window's popup player might be expanded, it would cover the pushed screen
-            hostVC.visualizePopupPlayer(direction: .close, animated: true, completion: {
-              hostVC.pushNavLibrary(vc: vc)
-              // the main window exists by now, so closing the mini player won't open another one
-              self?.appDelegate.closeMiniPlayer()
-              self?.appDelegate.rebuildMainMenu()
-            })
-            return
-          }
-          try? await Task.sleep(nanoseconds: 100_000_000)
+    } else {
+      appDelegate.openMainWindow()
+    }
+    Task { @MainActor in
+      // a newly requested main window needs a moment until its content is loaded
+      for _ in 0 ..< 50 {
+        if let hostVC = AppDelegate.mainWindowHostVC, Self.isLibraryReady(hostVC: hostVC) {
+          // the main window's popup player might be expanded, it would cover the pushed screen
+          hostVC.visualizePopupPlayer(direction: .close, animated: true, completion: {
+            hostVC.pushNavLibrary(vc: vc)
+          })
+          return
         }
+        try? await Task.sleep(nanoseconds: 100_000_000)
       }
     }
+  }
 
-    private static func isLibraryReady(hostVC: MainSceneHostingViewController) -> Bool {
-      guard let splitVC = hostVC as? SplitVC else { return true }
-      return splitVC.viewController(for: .secondary) is UINavigationController
-    }
-  #endif
+  private static func isLibraryReady(hostVC: MainSceneHostingViewController) -> Bool {
+    guard let splitVC = hostVC as? SplitVC else { return true }
+    return splitVC.viewController(for: .secondary) is UINavigationController
+  }
+
+  /// The player covers the complete main window (macOS): the window title is hidden meanwhile
+  private var isCoveringMainWindow: Bool {
+    navigationController != nil && !isInMiniPlayerWindow
+  }
+
+  /// Presented inside a navigation controller (macOS: the player covers the complete main window
+  /// and there is no sheet grabber to dismiss it): offer the regular close button
+  private func configureNavigationBar() {
+    guard navigationController != nil else { return }
+    navigationItem.configureTransparentAppearance()
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      systemItem: .close,
+      primaryAction: UIAction { [weak self] _ in
+        self?.closePopupPlayer()
+      }
+    )
+  }
 
   func refreshUserQueueSectionHeader() {
     guard let userQueueSectionView = userQueueSectionHeader else { return }

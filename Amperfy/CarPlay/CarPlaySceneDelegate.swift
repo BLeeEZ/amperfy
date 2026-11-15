@@ -37,8 +37,6 @@ struct CarPlayShortPreference {
 
 @MainActor
 class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
-  static let maxTreeDepth = 4
-
   private let log = OSLog(subsystem: "Amperfy", category: "CarPlay")
   private static let assistantConfig = CPAssistantCellConfiguration(
     position: .top,
@@ -72,7 +70,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     _ templateApplicationScene: CPTemplateApplicationScene,
     didConnect interfaceController: CPInterfaceController
   ) {
-    Task { @MainActor in
+    Task { @MainActor [self] in
       os_log("CarPlay: didConnect", log: self.log, type: .info)
       appDelegate.notificationHandler.register(
         self,
@@ -111,7 +109,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       CPNowPlayingTemplate.shared.add(self)
       self.interfaceController = interfaceController
       self.interfaceController?.delegate = self
-      self.configureNowPlayingTemplate()
+      configureNowPlayingTemplate()
 
       accountNotificationHandler?
         .registerCallbackForActiveAccountChange { [weak self] accountInfo in
@@ -153,9 +151,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
           }
         }
 
-      if self.appDelegate.player.currentlyPlaying != nil, self.appDelegate.player.isPlaying {
-        self.updatePlayerQueueSection()
-        self.displayNowPlaying(immediately: true) {}
+      if appDelegate.player.currentlyPlaying != nil, appDelegate.player.isPlaying {
+        updatePlayerQueueSection()
+        displayNowPlaying(immediately: true) {}
       }
     }
   }
@@ -165,7 +163,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     _ templateApplicationScene: CPTemplateApplicationScene,
     didDisconnectInterfaceController interfaceController: CPInterfaceController
   ) {
-    Task { @MainActor in
+    Task { @MainActor [self] in
       os_log("CarPlay: didDisconnect", log: self.log, type: .info)
       guard activeAccountInfo != nil, activeAccount != nil else {
         os_log("CarPlay: no account available -> do nothing", log: self.log, type: .info)

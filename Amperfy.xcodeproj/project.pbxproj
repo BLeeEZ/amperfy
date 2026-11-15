@@ -54,6 +54,7 @@
 		50381FD12D8F1623002DD0E7 /* IDsParserDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */; };
 		50381FD32D9410AE002DD0E7 /* PrefetchIdTester.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */; };
 		5000FACE000000000000AB02 /* AlbumSyncCoalescerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5000FACE000000000000AB01 /* AlbumSyncCoalescerTest.swift */; };
+		5000FACE000000000000AB04 /* AlbumSongsBatchedSyncTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5000FACE000000000000AB03 /* AlbumSongsBatchedSyncTest.swift */; };
 		503BAF342E4A1EB000AE50B4 /* SettingsTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 503BAF332E4A1EAC00AE50B4 /* SettingsTabView.swift */; };
 		504262A52BF48ADF00B5EF38 /* CommonLibrarySyncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504262A42BF48ADF00B5EF38 /* CommonLibrarySyncer.swift */; };
 		504262B12BF5FBDE00B5EF38 /* Intents.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 50253F7A284A566700BCCFB2 /* Intents.intentdefinition */; settings = {ATTRIBUTES = (codegen, ); }; };
@@ -122,7 +123,6 @@
 		507BA5C92F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5C82F01CED000B4EA8B /* SetOnlineOfflineModeIntent.swift */; };
 		507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507BA5CA2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift */; };
 		507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */; };
-		507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */; };
 		507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE512B1E5848002BBB1D /* ID3TagEditor */; };
 		507DFE552B1E587B002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE542B1E587B002BBB1D /* Alamofire */; };
 		507DFE642B1E5A03002BBB1D /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 507DFE632B1E5A03002BBB1D /* Alamofire */; };
@@ -460,14 +460,11 @@
 		50C9D6ED284FADB8007F18D0 /* PlayerDisplayStyleType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EC284FADB8007F18D0 /* PlayerDisplayStyleType.swift */; };
 		50C9D6F028506EBC007F18D0 /* AmperfyKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D6EF28506EBC007F18D0 /* AmperfyKit.swift */; };
 		50C9D70628507573007F18D0 /* ClockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C16C2321E7A3AC00F086F0 /* ClockTime.swift */; };
-		50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5002565625E69DC700674CE1 /* SpinnerViewController.swift */; };
 		50C9D70C2850759B007F18D0 /* PlayIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */; };
-		50C9D70D2850759B007F18D0 /* NotificationBannerCustomization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */; };
+		50C9D70D2850759B007F18D0 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501999DB26806B8600F72D37 /* ToastView.swift */; };
 		50C9D70F2850759B007F18D0 /* BasicButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863D2208CC1E0057A1A6 /* BasicButton.swift */; };
 		50C9D7102850759B007F18D0 /* OptionsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5009863B2208CB650057A1A6 /* OptionsButton.swift */; };
 		50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50675E6C25F61163005737FD /* BasicTableCell.swift */; };
-		50C9D7142850759B007F18D0 /* Corners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36725F8B3EB00B4B998 /* Corners.swift */; };
-		50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */; };
 		50C9D717285075E3007F18D0 /* UtilitiesExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D716285075E3007F18D0 /* UtilitiesExtensions.swift */; };
 		50C9D71828508005007F18D0 /* CommonString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5029E0382235A8EC0027F96F /* CommonString.swift */; };
 		50C9D71928508803007F18D0 /* LibraryEntityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50048FFE2671EFBD00064433 /* LibraryEntityImage.swift */; };
@@ -545,8 +542,6 @@
 		63AD7E4A30A283B700BBC0E1 /* AppIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63AD7E4930A283B700BBC0E1 /* AppIconOption.swift */; };
 		63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DCDB792C674B5D00522F68 /* SettingsSceneDelegate.swift */; };
 		641708592C13BF5100BA2619 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641708582C13BF5100BA2619 /* Haptics.swift */; };
-		B5A5CE010000000000000001 /* ShareSongActionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CE010000000000000002 /* ShareSongActionTest.swift */; };
-		C0A1B0032EEE000000000003 /* MacWindowHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1B0022EEE000000000002 /* MacWindowHelper.swift */; };
 		A1C400000000000000000102 /* AmperfyGreen.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000002 /* AmperfyGreen.icon */; };
 		A1C400000000000000000103 /* AmperfyOrange.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000003 /* AmperfyOrange.icon */; };
 		A1C400000000000000000104 /* AmperfyPurple.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000004 /* AmperfyPurple.icon */; };
@@ -566,6 +561,8 @@
 		A1C400000000000000000112 /* AmperfyMusicTeal.icon in Resources */ = {isa = PBXBuildFile; fileRef = A1C400000000000000000012 /* AmperfyMusicTeal.icon */; };
 		F9A94F1437AE825A8E847487 /* AppIconSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 768083A8CBFABC35772DCAED /* AppIconSettingsSection.swift */; };
 		FC37DE680FB3834C0B3233ED /* TextSizeSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA4AEDAB7594899F5E00A721 /* TextSizeSettingsSection.swift */; };
+		B5A5CE010000000000000001 /* ShareSongActionTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CE010000000000000002 /* ShareSongActionTest.swift */; };
+		C0A1B0032EEE000000000003 /* MacWindowHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1B0022EEE000000000002 /* MacWindowHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -628,7 +625,6 @@
 /* Begin PBXFileReference section */
 		09EB5F0D2F93B65400B1C71C /* ShareSongAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongAction.swift; sourceTree = "<group>"; };
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
-		5002565625E69DC700674CE1 /* SpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinnerViewController.swift; sourceTree = "<group>"; };
 		5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserPreCreatedArtistsTest.swift; sourceTree = "<group>"; };
 		5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySyncPopupVC.swift; sourceTree = "<group>"; };
 		50048F9427590FAD0087EDFB /* PlayerDownloadPreparationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerDownloadPreparationHandler.swift; sourceTree = "<group>"; };
@@ -665,8 +661,6 @@
 		500DA64C2F087307005578C7 /* CarPlayLibraryTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayLibraryTabExtension.swift; sourceTree = "<group>"; };
 		500DA64E2F0873DB005578C7 /* CarPlayCachedTabExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayCachedTabExtension.swift; sourceTree = "<group>"; };
 		500DA6502F08750A005578C7 /* CarPlayCommonListExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarPlayCommonListExtension.swift; sourceTree = "<group>"; };
-		500EB36725F8B3EB00B4B998 /* Corners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corners.swift; sourceTree = "<group>"; };
-		500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedGradientLayer.swift; sourceTree = "<group>"; };
 		501171292743F25300B7C08D /* PlayerUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerUtil.swift; sourceTree = "<group>"; };
 		5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayQueueHandler.swift; sourceTree = "<group>"; };
 		5011712D27453D1300B7C08D /* PlayQueueHandlerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayQueueHandlerTest.swift; sourceTree = "<group>"; };
@@ -688,7 +682,7 @@
 		501944172B78F97F00082D2E /* LargeCurrentlyPlayingPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargeCurrentlyPlayingPlayerView.swift; sourceTree = "<group>"; };
 		5019441A2B7A049A00082D2E /* PopupPlayer+Visuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopupPlayer+Visuals.swift"; sourceTree = "<group>"; };
 		5019441C2B7ACB0800082D2E /* PopupPlayer+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PopupPlayer+Animations.swift"; sourceTree = "<group>"; };
-		501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBannerCustomization.swift; sourceTree = "<group>"; };
+		501999DB26806B8600F72D37 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		501A7D1E26808A9D0055A51B /* podcast_episodes.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcast_episodes.xml; sourceTree = "<group>"; };
 		501A7D1F26808A9D0055A51B /* podcasts.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = podcasts.xml; sourceTree = "<group>"; };
 		501A7D2226808AC10055A51B /* PodcastsParserTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastsParserTest.swift; sourceTree = "<group>"; };
@@ -741,6 +735,7 @@
 		50381FD02D8F1623002DD0E7 /* IDsParserDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDsParserDelegate.swift; sourceTree = "<group>"; };
 		50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefetchIdTester.swift; sourceTree = "<group>"; };
 		5000FACE000000000000AB01 /* AlbumSyncCoalescerTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumSyncCoalescerTest.swift; sourceTree = "<group>"; };
+		5000FACE000000000000AB03 /* AlbumSongsBatchedSyncTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumSongsBatchedSyncTest.swift; sourceTree = "<group>"; };
 		503BAF332E4A1EAC00AE50B4 /* SettingsTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTabView.swift; sourceTree = "<group>"; };
 		5040B2C2269C451A00911451 /* Amperfy v12.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v12.xcdatamodel"; sourceTree = "<group>"; };
 		5040B2C3269CD19600911451 /* LocalNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNotificationManager.swift; sourceTree = "<group>"; };
@@ -1197,8 +1192,6 @@
 		641708582C13BF5100BA2619 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		643A04712CD29AB20012DEA3 /* Amperfy v39.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v39.xcdatamodel"; sourceTree = "<group>"; };
 		64C433822E1391FA0082A165 /* Amperfy v46.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Amperfy v46.xcdatamodel"; sourceTree = "<group>"; };
-		B5A5CE010000000000000002 /* ShareSongActionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongActionTest.swift; sourceTree = "<group>"; };
-		C0A1B0022EEE000000000002 /* MacWindowHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWindowHelper.swift; sourceTree = "<group>"; };
 		A1C400000000000000000002 /* AmperfyGreen.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyGreen.icon; sourceTree = "<group>"; };
 		A1C400000000000000000003 /* AmperfyOrange.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyOrange.icon; sourceTree = "<group>"; };
 		A1C400000000000000000004 /* AmperfyPurple.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyPurple.icon; sourceTree = "<group>"; };
@@ -1218,6 +1211,8 @@
 		A1C400000000000000000012 /* AmperfyMusicTeal.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AmperfyMusicTeal.icon; sourceTree = "<group>"; };
 		768083A8CBFABC35772DCAED /* AppIconSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconSettingsSection.swift; sourceTree = "<group>"; };
 		AA4AEDAB7594899F5E00A721 /* TextSizeSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextSizeSettingsSection.swift; sourceTree = "<group>"; };
+		B5A5CE010000000000000002 /* ShareSongActionTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongActionTest.swift; sourceTree = "<group>"; };
+		C0A1B0022EEE000000000002 /* MacWindowHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacWindowHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1233,7 +1228,6 @@
 				509D55F8281274F500E0E0B5 /* VYPlayIndicator in Frameworks */,
 				507DFE4C2B1E57BE002BBB1D /* MarqueeLabel in Frameworks */,
 				507DFE522B1E5848002BBB1D /* ID3TagEditor in Frameworks */,
-				507DFE4F2B1E581D002BBB1D /* NotificationBannerSwift in Frameworks */,
 				50C9D61A284FA847007F18D0 /* AmperfyKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1292,14 +1286,11 @@
 			children = (
 				5009863B2208CB650057A1A6 /* OptionsButton.swift */,
 				5009863D2208CC1E0057A1A6 /* BasicButton.swift */,
-				5002565625E69DC700674CE1 /* SpinnerViewController.swift */,
 				50675E6C25F61163005737FD /* BasicTableCell.swift */,
 				5005939028E42F66008C8DF6 /* BasicCollectionCell.swift */,
 				500B7D4821EDD6250083ED6F /* ViewCreator.swift */,
-				500EB36725F8B3EB00B4B998 /* Corners.swift */,
 				509D55E6280FD5E000E0E0B5 /* PlayIndicator.swift */,
-				500EB36B25F8B42800B4B998 /* AnimatedGradientLayer.swift */,
-				501999DB26806B8600F72D37 /* NotificationBannerCustomization.swift */,
+				501999DB26806B8600F72D37 /* ToastView.swift */,
 				50DE29EE2B90642E00ABA78E /* SelectionAccessory.swift */,
 				C6A1E0012F0A000100ABCDEF /* ReorderableListEditor.swift */,
 			);
@@ -2241,6 +2232,7 @@
 			children = (
 				50381FD22D9410A0002DD0E7 /* PrefetchIdTester.swift */,
 				5000FACE000000000000AB01 /* AlbumSyncCoalescerTest.swift */,
+				5000FACE000000000000AB03 /* AlbumSongsBatchedSyncTest.swift */,
 				50DB11A8266536190033BFFA /* Subsonic */,
 				50DB1180266501EC0033BFFA /* Ampache */,
 				50E964AE25E8E25E00E3210F /* SubsonicVersionTest.swift */,
@@ -2313,7 +2305,6 @@
 			packageProductDependencies = (
 				509D55F7281274F500E0E0B5 /* VYPlayIndicator */,
 				507DFE4B2B1E57BE002BBB1D /* MarqueeLabel */,
-				507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */,
 				507DFE512B1E5848002BBB1D /* ID3TagEditor */,
 				507DFE542B1E587B002BBB1D /* Alamofire */,
 				507DFE8F2B1E7262002BBB1D /* CallbackURLKit */,
@@ -2419,7 +2410,6 @@
 				509D55F6281274F500E0E0B5 /* XCRemoteSwiftPackageReference "VYPlayIndicator" */,
 				50BE5DA3285713B100156FC6 /* XCRemoteSwiftPackageReference "CallbackURLKit" */,
 				507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */,
-				507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */,
 				507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
 				507DFE532B1E587B002BBB1D /* XCRemoteSwiftPackageReference "Alamofire" */,
 				50F40A392C9088B30097FE63 /* XCRemoteSwiftPackageReference "Ifrit" */,
@@ -2688,7 +2678,6 @@
 				508385EA21C5965B00C4BB32 /* LoginVC.swift in Sources */,
 				507BA5CB2F01CFA800B4EA8B /* OnlineOfflineModeAppEnum.swift in Sources */,
 				50B137022EFC85D700738475 /* AccountAppEntity.swift in Sources */,
-				50C9D7152850759B007F18D0 /* AnimatedGradientLayer.swift in Sources */,
 				5023D9B22BDAA48200310144 /* UpdateVC.swift in Sources */,
 				50AE79C22C20709C0085CBB3 /* LyricsView.swift in Sources */,
 				50CFB59228D483AD00A47D44 /* AddSwipeActionView.swift in Sources */,
@@ -2725,7 +2714,7 @@
 				50791E8128D365E9006CE6E5 /* UpdatePasswordView.swift in Sources */,
 				50C171582D107DC300C0C53A /* PlaylistAddIndexesVC.swift in Sources */,
 				5005939928E5C5E5008C8DF6 /* MultiPickerView.swift in Sources */,
-				50C9D70D2850759B007F18D0 /* NotificationBannerCustomization.swift in Sources */,
+				50C9D70D2850759B007F18D0 /* ToastView.swift in Sources */,
 				50BE5D9728511C3200156FC6 /* Amperfy.xcdatamodeld in Sources */,
 				5007CE4721EF6A8E00BC5CBA /* PlaylistDetailVC.swift in Sources */,
 				50AAB9F32F0154EB004A39C6 /* SeekToPlaybackTimeIntent.swift in Sources */,
@@ -2741,7 +2730,6 @@
 				5055AA5726835A9000096B8D /* PodcastEpisodeTableCell.swift in Sources */,
 				509001B62716C7F600A8056D /* AppDelegateAlertExtensions.swift in Sources */,
 				5007CE4421EF639200BC5CBA /* PlaylistTableCell.swift in Sources */,
-				50C9D7142850759B007F18D0 /* Corners.swift in Sources */,
 				50AAB9FB2F016071004A39C6 /* SeekTimeUnitAppEnum.swift in Sources */,
 				50AC4E5828D9D12D0091FF33 /* ObservableSettings.swift in Sources */,
 				50C9D7112850759B007F18D0 /* BasicTableCell.swift in Sources */,
@@ -2761,7 +2749,6 @@
 				504B441728D6EB370033982C /* ArtworkDisplaySettings.swift in Sources */,
 				508AA57B2B6A3DA700BE8117 /* CarPlayNowPlayingExtension.swift in Sources */,
 				504B442028D8E7880033982C /* SupportSettingsView.swift in Sources */,
-				50C9D7082850759B007F18D0 /* SpinnerViewController.swift in Sources */,
 				500DA64D2F087307005578C7 /* CarPlayLibraryTabExtension.swift in Sources */,
 				63DCDB7A2C674B5D00522F68 /* SettingsSceneDelegate.swift in Sources */,
 				505CA20C2B88E9D300AA81CD /* FetchUpdateHandler.swift in Sources */,
@@ -3001,6 +2988,7 @@
 				50AE79B62C1F65850085CBB3 /* SsLyricsBySongId1ParserTest.swift in Sources */,
 				50381FD32D9410AE002DD0E7 /* PrefetchIdTester.swift in Sources */,
 				5000FACE000000000000AB02 /* AlbumSyncCoalescerTest.swift in Sources */,
+				5000FACE000000000000AB04 /* AlbumSongsBatchedSyncTest.swift in Sources */,
 				50BE5D492850F4C900156FC6 /* ArtistTest.swift in Sources */,
 				50BE5D952850F51E00156FC6 /* CoreDataHelper.swift in Sources */,
 				50BE5D8D2850F50F00156FC6 /* PodcastsParserTest.swift in Sources */,
@@ -3517,14 +3505,6 @@
 				version = 4.5.3;
 			};
 		};
-		507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Daltron/NotificationBanner";
-			requirement = {
-				kind = exactVersion;
-				version = 3.2.0;
-			};
-		};
 		507DFE502B1E5848002BBB1D /* XCRemoteSwiftPackageReference "ID3TagEditor" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/chicio/ID3TagEditor";
@@ -3605,11 +3585,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 507DFE4A2B1E57BD002BBB1D /* XCRemoteSwiftPackageReference "MarqueeLabel" */;
 			productName = MarqueeLabel;
-		};
-		507DFE4E2B1E581D002BBB1D /* NotificationBannerSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 507DFE4D2B1E581D002BBB1D /* XCRemoteSwiftPackageReference "NotificationBanner" */;
-			productName = NotificationBannerSwift;
 		};
 		507DFE512B1E5848002BBB1D /* ID3TagEditor */ = {
 			isa = XCSwiftPackageProductDependency;

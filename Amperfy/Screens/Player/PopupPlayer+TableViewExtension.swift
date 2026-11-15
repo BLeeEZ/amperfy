@@ -331,13 +331,7 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
     animator: UIContextMenuInteractionCommitAnimating
   ) {
     animator.addCompletion {
-      if let identifier = configuration.identifier as? String,
-         let tvPreviewInfo = TableViewPreviewInfo.create(fromIdentifier: identifier),
-         let containerIdentifier = tvPreviewInfo.playableContainerIdentifier,
-         let container = self.appDelegate.storage.main.library
-         .getContainer(identifier: containerIdentifier) {
-        EntityPreviewActionBuilder(container: container, on: self).performPreviewTransition()
-      }
+      self.performEntityPreviewTransition(for: configuration)
     }
   }
 }

@@ -84,17 +84,8 @@ enum KeyboardCommands: CaseIterable {
     }
   }
 
-  /// The popup player can't be reached or dismissed on Mac (the mini player is not tappable there)
-  var isAvailable: Bool {
-    #if targetEnvironment(macCatalyst)
-      return self != .openClosePlayer
-    #else
-      return true
-    #endif
-  }
-
   static func isA(cmd: KeyboardCommand) -> KeyboardCommands? {
-    for cmdEnum in Self.allCases where cmdEnum.isAvailable {
+    for cmdEnum in Self.allCases {
       if cmdEnum.asCommand == cmd {
         return cmdEnum
       }
@@ -116,9 +107,32 @@ extension AppDelegate {
   }
 
   open override var keyCommands: [UIKeyCommand]? {
-    KeyboardCommands.allCases.filter(\.isAvailable).map { cmd in
+    KeyboardCommands.allCases.map { cmd in
       cmd.asUIKeyCommand(action: #selector(handleKeyCommand(sender:)))
     }
+  }
+
+  open override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+    super.pressesBegan(presses, with: event)
+    forwardCommandKeyChange(presses, isPressed: true)
+  }
+
+  open override func pressesEnded(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+    super.pressesEnded(presses, with: event)
+    forwardCommandKeyChange(presses, isPressed: false)
+  }
+
+  open override func pressesCancelled(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
+    super.pressesCancelled(presses, with: event)
+    forwardCommandKeyChange(presses, isPressed: false)
+  }
+
+  /// The mini player artwork indicates that cmd + click opens the mini player window
+  private func forwardCommandKeyChange(_ presses: Set<UIPress>, isPressed: Bool) {
+    guard presses.contains(where: {
+      $0.key?.keyCode == .keyboardLeftGUI || $0.key?.keyCode == .keyboardRightGUI
+    }) else { return }
+    Self.mainWindowHostVC?.miniPlayer?.commandKeyChanged(isPressed: isPressed)
   }
 
   @objc
@@ -347,6 +361,12 @@ extension PopupPlayerVC {
         modifierFlags: .shift,
         action: #selector(escapeKeyTapped)
       ),
+      // close the player (no effect in the mini player window)
+      UIKeyCommand(
+        input: UIKeyCommand.inputEscape,
+        modifierFlags: [],
+        action: #selector(closeKeyTapped)
+      ),
       // navigation
       UIKeyCommand(input: "h", modifierFlags: [], action: #selector(goBackKeyTapped)),
       UIKeyCommand(
@@ -371,6 +391,11 @@ extension PopupPlayerVC {
 
   override var canBecomeFirstResponder: Bool {
     true
+  }
+
+  @objc
+  func closeKeyTapped() {
+    closePopupPlayer()
   }
 
   @objc

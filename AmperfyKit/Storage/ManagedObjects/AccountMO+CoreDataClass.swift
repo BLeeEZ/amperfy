@@ -19,10 +19,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-public import Foundation
-public import CoreData
-
-public typealias AccountMOCoreDataClassSet = NSSet
+import CoreData
+import Foundation
 
 // MARK: - AccountMO
 

@@ -58,6 +58,20 @@ public class QuickActionsHandler {
     self.savedShortCutItem = savedShortCutItem
   }
 
+  /// Applies an online/offline mode quick action and returns true; other actions return false
+  public func applyModeShortCutItem(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
+    switch QuickActionType(rawValue: shortcutItem.type) {
+    case .offlineModeAction:
+      storage.settings.user.isOfflineMode = true
+      return true
+    case .onlineModeAction:
+      storage.settings.user.isOfflineMode = false
+      return true
+    case .none, .playMusicAction, .playPodcastAction, .searchAction:
+      return false
+    }
+  }
+
   public func handleSavedShortCutItemIfSaved() {
     if let savedShortCutItem = savedShortCutItem {
       _ = handleShortCutItem(shortcutItem: savedShortCutItem)

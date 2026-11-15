@@ -35,7 +35,6 @@ public class PlayMediaIntentHandler: NSObject,
     self.intentManager = intentManager
   }
 
-  @available(iOS 13.0, *)
   public func resolveMediaItems(for intent: INPlayMediaIntent) async
     -> [INPlayMediaMediaItemResolutionResult] {
     let mediaItemsToPlay = intentManager.handleIncomingPlayMediaIntent(playMediaIntent: intent)
@@ -46,31 +45,26 @@ public class PlayMediaIntentHandler: NSObject,
     }
   }
 
-  @available(iOS 13.0, *)
   public func resolvePlayShuffled(for intent: INPlayMediaIntent) async
     -> INBooleanResolutionResult {
     INBooleanResolutionResult.success(with: intent.playShuffled ?? false)
   }
 
-  @available(iOS 13.0, *)
   public func resolvePlaybackRepeatMode(for intent: INPlayMediaIntent) async
     -> INPlaybackRepeatModeResolutionResult {
     INPlaybackRepeatModeResolutionResult.success(with: intent.playbackRepeatMode)
   }
 
-  @available(iOS 13.0, *)
   public func resolveResumePlayback(for intent: INPlayMediaIntent) async
     -> INBooleanResolutionResult {
     INBooleanResolutionResult.success(with: intent.resumePlayback ?? true)
   }
 
-  @available(iOS 13.0, *)
   public func resolvePlaybackQueueLocation(for intent: INPlayMediaIntent) async
     -> INPlaybackQueueLocationResolutionResult {
     INPlaybackQueueLocationResolutionResult.success(with: intent.playbackQueueLocation)
   }
 
-  @available(iOS 13.0, *)
   public func resolvePlaybackSpeed(for intent: INPlayMediaIntent) async
     -> INPlayMediaPlaybackSpeedResolutionResult {
     INPlayMediaPlaybackSpeedResolutionResult.success(with: intent.playbackSpeed ?? 1.0)

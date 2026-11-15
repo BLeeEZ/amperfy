@@ -20,6 +20,7 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
 
 // MARK: - MOCK_AlbumSyncError
@@ -76,6 +77,12 @@ class AlbumSyncCoalescerTest: XCTestCase {
   var album: Album!
   var otherAlbum: Album!
   var isFirstCallerReturned = false
+  var claimedObjectIDs = [NSManagedObjectID]()
+  var albumSyncsFinishedBeforeExclusiveSync: Int?
+  var batchesFinishedBeforeAlbumSync: Int?
+  var exclusiveSyncsFinishedBeforeAlbumSync: Int?
+  var batchesFinishedBeforeExclusiveSync: Int?
+  var exclusiveSyncsFinishedBeforeBatch: Int?
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
@@ -83,6 +90,12 @@ class AlbumSyncCoalescerTest: XCTestCase {
     account = library.getAccount(info: TestAccountInfo.create1())
     operation = MOCK_GatedAlbumSyncOperation()
     isFirstCallerReturned = false
+    claimedObjectIDs = []
+    albumSyncsFinishedBeforeExclusiveSync = nil
+    batchesFinishedBeforeAlbumSync = nil
+    exclusiveSyncsFinishedBeforeAlbumSync = nil
+    batchesFinishedBeforeExclusiveSync = nil
+    exclusiveSyncsFinishedBeforeBatch = nil
     // Two distinct albums that share the same (empty) server id: an unsynced
     // album carries id "", so keying the coalescing on the server id would
     // wrongly merge them. See testDistinctAlbumsWithSameServerIdAreNotCoalesced.
@@ -232,5 +245,217 @@ class AlbumSyncCoalescerTest: XCTestCase {
     XCTAssertTrue(isFirstCallerReturned)
     XCTAssertEqual(operation.runCount, 1)
     XCTAssertEqual(operation.isCancelledAfterGate, [false])
+  }
+
+  /// A batch must leave out an album whose sync is in flight and await that
+  /// sync instead of syncing the album a second time.
+  func testBatchSkipsAlbumInFlightAndAwaitsIt() async throws {
+    let batchRan = expectation(description: "batch ran its operation")
+    let albumEntered = expectation(description: "album sync entered the operation")
+    operation.onEntered = { count in
+      if count == 1 { albumEntered.fulfill() }
+    }
+    let albumSync = startSync(of: album)
+    await fulfillment(of: [albumEntered], timeout: 2)
+
+    let albumObjectIDs = [album.managedObject.objectID, otherAlbum.managedObject.objectID]
+    let batch = Task { @MainActor in
+      await AlbumSyncCoalescer.sync(albumObjectIDs: albumObjectIDs) { claimedObjectIDs in
+        self.claimedObjectIDs = claimedObjectIDs
+        batchRan.fulfill()
+      }
+      self.isFirstCallerReturned = true
+    }
+    await fulfillment(of: [batchRan], timeout: 2)
+    XCTAssertEqual(claimedObjectIDs, [otherAlbum.managedObject.objectID])
+    XCTAssertFalse(isFirstCallerReturned)
+
+    operation.openGate()
+    try await albumSync.value
+    await batch.value
+    XCTAssertTrue(isFirstCallerReturned)
+    XCTAssertEqual(operation.runCount, 1)
+  }
+
+  /// An album sync that finds the album claimed by a batch must wait for the
+  /// batch and then sync the album itself, so its caller gets the album's own
+  /// result instead of the batch's.
+  func testAlbumSyncWaitsForBatchThenSyncsItself() async throws {
+    let batchOperation = MOCK_GatedAlbumSyncOperation()
+    let batchEntered = expectation(description: "batch entered the operation")
+    batchOperation.onEntered = { _ in batchEntered.fulfill() }
+    let albumObjectIDs = [album.managedObject.objectID]
+    let batch = Task { @MainActor in
+      await AlbumSyncCoalescer.sync(albumObjectIDs: albumObjectIDs) { _ in
+        try? await batchOperation.run()
+      }
+    }
+    await fulfillment(of: [batchEntered], timeout: 2)
+
+    operation.openGate()
+    operation.onEntered = { _ in
+      self.batchesFinishedBeforeAlbumSync = batchOperation.isCancelledAfterGate.count
+    }
+    let albumSyncJoined = expectation(description: "album sync joined")
+    let albumSync = startSync(of: album, joined: albumSyncJoined)
+    await fulfillment(of: [albumSyncJoined], timeout: 2)
+    XCTAssertEqual(operation.runCount, 0)
+
+    batchOperation.openGate()
+    await batch.value
+    try await albumSync.value
+    XCTAssertEqual(batchesFinishedBeforeAlbumSync, 1)
+    XCTAssertEqual(batchOperation.runCount, 1)
+    XCTAssertEqual(operation.runCount, 1)
+  }
+
+  /// An exclusive sync must only start once every album sync in flight has
+  /// finished, and an album sync started meanwhile, of any album, must wait
+  /// for it and then sync the album itself.
+  func testExclusiveSyncWaitsForAlbumSyncsInFlightAndBlocksNewOnes() async throws {
+    let operation = operation!
+    let otherAlbum = otherAlbum!
+    let exclusiveOperation = MOCK_GatedAlbumSyncOperation()
+    let otherOperation = MOCK_GatedAlbumSyncOperation()
+    otherOperation.openGate()
+    let albumEntered = expectation(description: "album sync entered the operation")
+    operation.onEntered = { count in
+      if count == 1 { albumEntered.fulfill() }
+    }
+    let albumSync = startSync(of: album)
+    await fulfillment(of: [albumEntered], timeout: 2)
+
+    let exclusiveJoined = expectation(description: "exclusive sync joined")
+    let exclusiveEntered = expectation(description: "exclusive sync entered the operation")
+    exclusiveOperation.onEntered = { _ in exclusiveEntered.fulfill() }
+    let exclusiveSync = Task { @MainActor in
+      exclusiveJoined.fulfill()
+      return try await AlbumSyncCoalescer.syncExclusively {
+        self.albumSyncsFinishedBeforeExclusiveSync = operation.isCancelledAfterGate.count
+        try await exclusiveOperation.run()
+        return 42
+      }
+    }
+    await fulfillment(of: [exclusiveJoined], timeout: 2)
+    XCTAssertEqual(exclusiveOperation.runCount, 0)
+
+    operation.openGate()
+    await fulfillment(of: [exclusiveEntered], timeout: 2)
+    otherOperation.onEntered = { _ in
+      self.exclusiveSyncsFinishedBeforeAlbumSync = exclusiveOperation.isCancelledAfterGate.count
+    }
+    let otherAlbumSyncJoined = expectation(description: "other album sync joined")
+    let otherAlbumSync = Task { @MainActor in
+      otherAlbumSyncJoined.fulfill()
+      try await AlbumSyncCoalescer.sync(otherAlbum) {
+        try await otherOperation.run()
+      }
+    }
+    await fulfillment(of: [otherAlbumSyncJoined], timeout: 2)
+    XCTAssertEqual(otherOperation.runCount, 0)
+
+    exclusiveOperation.openGate()
+    let result = try await exclusiveSync.value
+    try await otherAlbumSync.value
+    try await albumSync.value
+    XCTAssertEqual(result, 42)
+    XCTAssertEqual(albumSyncsFinishedBeforeExclusiveSync, 1)
+    XCTAssertEqual(exclusiveSyncsFinishedBeforeAlbumSync, 1)
+    XCTAssertEqual(operation.runCount, 1)
+    XCTAssertEqual(exclusiveOperation.runCount, 1)
+    XCTAssertEqual(otherOperation.runCount, 1)
+  }
+
+  /// An exclusive sync must also wait for a batch in flight, and a batch
+  /// started meanwhile must wait until the exclusive sync has finished.
+  func testExclusiveSyncWaitsForBatchAndBlocksNewBatches() async throws {
+    let batchOperation = MOCK_GatedAlbumSyncOperation()
+    let exclusiveOperation = MOCK_GatedAlbumSyncOperation()
+    let batchEntered = expectation(description: "batch entered the operation")
+    batchOperation.onEntered = { _ in batchEntered.fulfill() }
+    let albumObjectIDs = [album.managedObject.objectID]
+    let batch = Task { @MainActor in
+      await AlbumSyncCoalescer.sync(albumObjectIDs: albumObjectIDs) { _ in
+        try? await batchOperation.run()
+      }
+    }
+    await fulfillment(of: [batchEntered], timeout: 2)
+
+    let exclusiveJoined = expectation(description: "exclusive sync joined")
+    let exclusiveEntered = expectation(description: "exclusive sync entered the operation")
+    exclusiveOperation.onEntered = { _ in exclusiveEntered.fulfill() }
+    let exclusiveSync = Task { @MainActor in
+      exclusiveJoined.fulfill()
+      try await AlbumSyncCoalescer.syncExclusively {
+        self.batchesFinishedBeforeExclusiveSync = batchOperation.isCancelledAfterGate.count
+        try await exclusiveOperation.run()
+      }
+    }
+    await fulfillment(of: [exclusiveJoined], timeout: 2)
+
+    batchOperation.openGate()
+    await fulfillment(of: [exclusiveEntered], timeout: 2)
+    let otherAlbumObjectIDs = [otherAlbum.managedObject.objectID]
+    let secondBatchJoined = expectation(description: "second batch joined")
+    let secondBatch = Task { @MainActor in
+      secondBatchJoined.fulfill()
+      await AlbumSyncCoalescer.sync(albumObjectIDs: otherAlbumObjectIDs) { _ in
+        self.exclusiveSyncsFinishedBeforeBatch = exclusiveOperation.isCancelledAfterGate.count
+      }
+    }
+    await fulfillment(of: [secondBatchJoined], timeout: 2)
+
+    exclusiveOperation.openGate()
+    await batch.value
+    try await exclusiveSync.value
+    await secondBatch.value
+    XCTAssertEqual(batchesFinishedBeforeExclusiveSync, 1)
+    XCTAssertEqual(exclusiveSyncsFinishedBeforeBatch, 1)
+  }
+
+  /// An album sync started while an exclusive sync still waits for the syncs
+  /// in flight must wait for the exclusive sync as well, not slip in before it.
+  func testAlbumSyncStartedWhileExclusiveSyncWaitsIsBlocked() async throws {
+    let operation = operation!
+    let otherAlbum = otherAlbum!
+    let exclusiveOperation = MOCK_GatedAlbumSyncOperation()
+    let otherOperation = MOCK_GatedAlbumSyncOperation()
+    otherOperation.openGate()
+    let albumEntered = expectation(description: "album sync entered the operation")
+    operation.onEntered = { count in
+      if count == 1 { albumEntered.fulfill() }
+    }
+    let albumSync = startSync(of: album)
+    await fulfillment(of: [albumEntered], timeout: 2)
+
+    let exclusiveJoined = expectation(description: "exclusive sync joined")
+    let exclusiveSync = Task { @MainActor in
+      exclusiveJoined.fulfill()
+      try await AlbumSyncCoalescer.syncExclusively {
+        try await exclusiveOperation.run()
+      }
+    }
+    await fulfillment(of: [exclusiveJoined], timeout: 2)
+
+    otherOperation.onEntered = { _ in
+      self.exclusiveSyncsFinishedBeforeAlbumSync = exclusiveOperation.isCancelledAfterGate.count
+    }
+    let otherAlbumSyncJoined = expectation(description: "other album sync joined")
+    let otherAlbumSync = Task { @MainActor in
+      otherAlbumSyncJoined.fulfill()
+      try await AlbumSyncCoalescer.sync(otherAlbum) {
+        try await otherOperation.run()
+      }
+    }
+    await fulfillment(of: [otherAlbumSyncJoined], timeout: 2)
+    XCTAssertEqual(otherOperation.runCount, 0)
+
+    exclusiveOperation.openGate()
+    operation.openGate()
+    try await albumSync.value
+    try await exclusiveSync.value
+    try await otherAlbumSync.value
+    XCTAssertEqual(exclusiveSyncsFinishedBeforeAlbumSync, 1)
+    XCTAssertEqual(otherOperation.runCount, 1)
   }
 }

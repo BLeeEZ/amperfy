@@ -85,6 +85,7 @@ struct SwipeSettingsView: View {
             }) {
               AmperfyImage.plus.asImage
             }
+            .accessibilityLabel("Add Leading Swipe")
           }
         ) {
           ForEach(leading, id: \.self) { swipe in
@@ -110,6 +111,7 @@ struct SwipeSettingsView: View {
             }) {
               AmperfyImage.plus.asImage
             }
+            .accessibilityLabel("Add Trailing Swipe")
           }
         ) {
           ForEach(trailing, id: \.self) { swipe in
