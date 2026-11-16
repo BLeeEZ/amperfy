@@ -233,7 +233,6 @@ public protocol LibrarySyncer: Sendable {
 // MARK: - AbstractBackgroundLibrarySyncer
 
 protocol AbstractBackgroundLibrarySyncer {
-  var isActive: Bool { get }
   func stop()
 }
 

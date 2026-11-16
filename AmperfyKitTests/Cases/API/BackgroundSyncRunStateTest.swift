@@ -23,49 +23,78 @@
 import XCTest
 
 final class BackgroundSyncRunStateTest: XCTestCase {
+  private typealias RunEnd = BackgroundSyncRunState.RunEnd
+
   func testStartWhenIdleStartsARun() {
     var state = BackgroundSyncRunState()
     XCTAssertEqual(state.start(), 1)
     XCTAssertTrue(state.isCurrent(1))
   }
 
-  func testStartDuringACompletedRunStartsNoNewRun() {
+  func testStartWhileRunningContinuesTheCurrentRun() {
     var state = BackgroundSyncRunState()
     let run = state.start()!
     XCTAssertNil(state.start())
-    XCTAssertTrue(state.isCurrent(run))
-    XCTAssertNil(state.finishRun(run, isCompleted: true))
+    XCTAssertEqual(
+      state.finishRun(run, isCompleted: true, isOnlineAndConnected: true),
+      RunEnd(isCurrent: true, nextGeneration: nil)
+    )
     XCTAssertNil(state.current)
+    XCTAssertFalse(state.isEndedEarly)
   }
 
-  func testStartDuringARunThatEndedEarlyStartsANewRun() {
+  func testRunEndedEarlyWhileStillOfflineWaitsForReconnect() {
     var state = BackgroundSyncRunState()
     let run = state.start()!
-    // e.g. going online again while the run already decided to end because it was offline
-    XCTAssertNil(state.start())
-    let nextRun = state.finishRun(run, isCompleted: false)
-    XCTAssertEqual(nextRun, run + 1)
+    XCTAssertEqual(
+      state.finishRun(run, isCompleted: false, isOnlineAndConnected: false),
+      RunEnd(isCurrent: true, nextGeneration: nil)
+    )
+    XCTAssertTrue(state.isEndedEarly)
+    XCTAssertEqual(state.startAfterReconnect(), run + 1)
+    XCTAssertFalse(state.isEndedEarly)
+    // a second reconnect while the new run goes on starts nothing
+    XCTAssertNil(state.startAfterReconnect())
+  }
+
+  func testRunEndedEarlyWhenAlreadyOnlineAgainStartsTheNextRun() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    // the reconnect came while the run was still ending: it starts nothing itself
+    XCTAssertNil(state.startAfterReconnect())
+    XCTAssertEqual(
+      state.finishRun(run, isCompleted: false, isOnlineAndConnected: true),
+      RunEnd(isCurrent: true, nextGeneration: run + 1)
+    )
     XCTAssertTrue(state.isCurrent(run + 1))
-    // the new run ends early as well, without another start(): nothing follows
-    XCTAssertNil(state.finishRun(run + 1, isCompleted: false))
-    XCTAssertNil(state.current)
+    XCTAssertFalse(state.isEndedEarly)
   }
 
-  func testRunEndedEarlyWithoutStartStartsNoNewRun() {
+  func testCompletedRunDoesNotStartAfterReconnect() {
     var state = BackgroundSyncRunState()
     let run = state.start()!
-    XCTAssertNil(state.finishRun(run, isCompleted: false))
-    XCTAssertNil(state.current)
-    XCTAssertEqual(state.start(), run + 1)
+    _ = state.finishRun(run, isCompleted: true, isOnlineAndConnected: false)
+    XCTAssertNil(state.startAfterReconnect())
   }
 
-  func testStopEndsTheRun() {
+  func testStoppedRunNeitherNotifiesNorRestarts() {
     var state = BackgroundSyncRunState()
     let run = state.start()!
     state.stop()
     XCTAssertFalse(state.isCurrent(run))
-    XCTAssertNil(state.finishRun(run, isCompleted: false))
-    XCTAssertNil(state.current)
+    XCTAssertEqual(
+      state.finishRun(run, isCompleted: false, isOnlineAndConnected: true),
+      RunEnd(isCurrent: false, nextGeneration: nil)
+    )
+    XCTAssertNil(state.startAfterReconnect())
+  }
+
+  func testStopAfterEarlyEndPreventsTheRestart() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    _ = state.finishRun(run, isCompleted: false, isOnlineAndConnected: false)
+    state.stop()
+    XCTAssertNil(state.startAfterReconnect())
   }
 
   func testStopThenStartReplacesTheRunningOne() {
@@ -76,64 +105,16 @@ final class BackgroundSyncRunStateTest: XCTestCase {
     let newRun = state.start()!
     XCTAssertNotEqual(oldRun, newRun)
     XCTAssertFalse(state.isCurrent(oldRun))
-    XCTAssertFalse(state.isStartRequested)
-    // the old run ending neither ends nor restarts the new one
-    XCTAssertNil(state.finishRun(oldRun, isCompleted: false))
+    // the old run ending neither ends, notifies for nor restarts the new one
+    XCTAssertEqual(
+      state.finishRun(oldRun, isCompleted: false, isOnlineAndConnected: true),
+      RunEnd(isCurrent: false, nextGeneration: nil)
+    )
     XCTAssertTrue(state.isCurrent(newRun))
-    XCTAssertNil(state.finishRun(newRun, isCompleted: true))
-    XCTAssertNil(state.current)
-  }
-
-  func testRunEndedEarlyStartsAgainAfterReconnect() {
-    var state = BackgroundSyncRunState()
-    let run = state.start()!
-    XCTAssertNil(state.finishRun(run, isCompleted: false))
-    XCTAssertTrue(state.isEndedEarly)
-    XCTAssertEqual(state.startAfterReconnect(), run + 1)
-    XCTAssertFalse(state.isEndedEarly)
-    // a second reconnect while the new run goes on starts nothing
-    XCTAssertNil(state.startAfterReconnect())
-  }
-
-  func testCompletedRunDoesNotStartAfterReconnect() {
-    var state = BackgroundSyncRunState()
-    let run = state.start()!
-    XCTAssertNil(state.finishRun(run, isCompleted: true))
-    XCTAssertFalse(state.isEndedEarly)
-    XCTAssertNil(state.startAfterReconnect())
-  }
-
-  func testStoppedRunDoesNotStartAfterReconnect() {
-    var state = BackgroundSyncRunState()
-    let run = state.start()!
-    state.stop()
-    XCTAssertNil(state.finishRun(run, isCompleted: false))
-    XCTAssertFalse(state.isEndedEarly)
-    XCTAssertNil(state.startAfterReconnect())
-  }
-
-  func testStopAfterEarlyEndPreventsTheRestart() {
-    var state = BackgroundSyncRunState()
-    let run = state.start()!
-    XCTAssertNil(state.finishRun(run, isCompleted: false))
-    state.stop()
-    XCTAssertNil(state.startAfterReconnect())
-  }
-
-  func testReconnectWhileTheRunIsEndingEarlyStartsTheNextRun() {
-    var state = BackgroundSyncRunState()
-    let run = state.start()!
-    // the network is back while the run, which saw no network, is still ending
-    XCTAssertNil(state.startAfterReconnect())
-    XCTAssertEqual(state.finishRun(run, isCompleted: false), run + 1)
-    XCTAssertFalse(state.isEndedEarly)
-  }
-
-  func testReconnectDuringACompletedRunStartsNothing() {
-    var state = BackgroundSyncRunState()
-    let run = state.start()!
-    XCTAssertNil(state.startAfterReconnect())
-    XCTAssertNil(state.finishRun(run, isCompleted: true))
+    XCTAssertEqual(
+      state.finishRun(newRun, isCompleted: true, isOnlineAndConnected: true),
+      RunEnd(isCurrent: true, nextGeneration: nil)
+    )
     XCTAssertNil(state.current)
   }
 }
