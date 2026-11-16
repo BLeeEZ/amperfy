@@ -141,6 +141,7 @@ public class IntentManager {
   private let player: PlayerFacade
   private let networkMonitor: NetworkMonitorFacade
   private let eventLogger: EventLogger
+  private let switchOnlineOfflineModeCB: (Bool) -> ()
   private var lastResult: AmperfyMediaIntentItemResult?
 
   init(
@@ -151,7 +152,8 @@ public class IntentManager {
     getActiveAccountCallback: @escaping GetActiveAccountCallback,
     player: PlayerFacade,
     networkMonitor: NetworkMonitorFacade,
-    eventLogger: EventLogger
+    eventLogger: EventLogger,
+    switchOnlineOfflineModeCB: @escaping @MainActor (Bool) -> ()
   ) {
     self.storage = storage
     self.getLibrarySyncerCB = getLibrarySyncerCB
@@ -161,6 +163,7 @@ public class IntentManager {
     self.player = player
     self.networkMonitor = networkMonitor
     self.eventLogger = eventLogger
+    self.switchOnlineOfflineModeCB = switchOnlineOfflineModeCB
     self.documentation = [XCallbackActionDocu]()
   }
 
@@ -653,7 +656,7 @@ public class IntentManager {
         ))
         return
       }
-      self.storage.settings.user.isOfflineMode = offlineMode == 1
+      self.switchOnlineOfflineModeCB(offlineMode == 1)
       success(nil)
     }
 

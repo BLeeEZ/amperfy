@@ -29,6 +29,9 @@ class SingleFetchedResultsTableViewController<ResultType>: BasicFetchedResultsTa
   where ResultType: NSFetchRequestResult {
   public var resultUpdateHandler: FetchUpdatePerObjectHandler?
   let account: Account
+  override var listAccountInfo: AccountInfo? {
+    account.info
+  }
 
   init(style: UITableView.Style, account: Account) {
     self.account = account

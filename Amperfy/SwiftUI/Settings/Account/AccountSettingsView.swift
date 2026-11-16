@@ -57,12 +57,12 @@ struct AccountSettingsView: View {
     let meta = appDelegate.getMeta(accountInfo)
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
+    appDelegate.switchOnlineOfflineMode(isOfflineMode: false)
 
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.configureMainMenu()
 
-    appDelegate.storage.settings.user.isOfflineMode = false
     appDelegate.storage.settings.accounts.updateSetting(accountInfo) {
       $0.clearInitialSyncCheckpoint()
     }
@@ -124,7 +124,10 @@ struct AccountSettingsView: View {
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.configureMainMenu()
 
-    appDelegate.storage.settings.user.isOfflineMode = false
+    // stored now so the next account's window is built online; posted after player.logout, as
+    // the player view reloads the current song's lyrics on it (this account's screens skip it)
+    let isSwitchedOnline = appDelegate.storeOnlineOfflineMode(isOfflineMode: false)
+    defer { if isSwitchedOnline { appDelegate.postOfflineModeChanged() } }
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)
     if let newActiveAccountInfo = appDelegate.storage.settings.accounts.active {
