@@ -34,10 +34,7 @@ final class HomeVC: UICollectionViewController {
 
   private static let itemWidth: CGFloat = 160.0
 
-  private var userButton: UIButton?
-  private var userBarButtonItem: UIBarButtonItem?
   private let account: Account
-  private var accountNotificationHandler: AccountNotificationHandler?
   private let sharedHome: HomeManager
 
   // MARK: - Init
@@ -71,18 +68,7 @@ final class HomeVC: UICollectionViewController {
     collectionView.contentInsetAdjustmentBehavior = .scrollableAxes
     title = "Home"
 
-    accountNotificationHandler = AccountNotificationHandler(
-      storage: appDelegate.storage,
-      notificationHandler: appDelegate.notificationHandler
-    )
-    accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
-      guard let self else { return }
-      setupUserNavButton(
-        currentAccount: account,
-        userButton: &userButton,
-        userBarButtonItem: &userBarButtonItem
-      )
-    }
+    setupUserNavButton()
 
     registerForTraitChanges(
       [UITraitPreferredContentSizeCategory.self],

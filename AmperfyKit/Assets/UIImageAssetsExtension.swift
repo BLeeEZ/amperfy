@@ -224,6 +224,7 @@ public struct AmperfyImage: Sendable {
   public static let server = Self("server.rack")
   public static let serverUrl = Self("globe")
   public static let settings = Self("gear")
+  public static let settingsFilled = Self("gearshape.fill")
   public static let shuffle = Self("shuffle")
   public static let shuffleMenu = Self("shuffle")
   public static let instantMix = Self("point.3.filled.connected.trianglepath.dotted")
@@ -363,6 +364,8 @@ extension UIImage {
   public static let server = UIImage.create(systemName: AmperfyImage.server.systemName)
   public static let serverUrl = UIImage.create(systemName: AmperfyImage.serverUrl.systemName)
   public static let settings = UIImage.create(systemName: AmperfyImage.settings.systemName)
+  public static let settingsFilled = UIImage
+    .create(systemName: AmperfyImage.settingsFilled.systemName)
   public static let shuffle = UIImage.create(systemName: AmperfyImage.shuffle.systemName)
   public static let instantMix = UIImage.create(systemName: AmperfyImage.instantMix.systemName)
   public static let infinity = UIImage.create(systemName: AmperfyImage.infinity.systemName)

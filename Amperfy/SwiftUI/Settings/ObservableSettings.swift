@@ -78,6 +78,8 @@ final class Settings: ObservableObject {
   @Published
   var activeAccountInfo: AccountInfo?
   @Published
+  var accounts: [AccountInfo] = []
+  @Published
   var themePreference: ThemePreference = .defaultValue
   @Published
   var appearanceMode: UIUserInterfaceStyle = .unspecified
