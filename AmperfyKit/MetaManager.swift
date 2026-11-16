@@ -287,13 +287,12 @@ public class MetaManager {
     // Already started at launch while its initial sync was resumed: only the background
     // library sync and the duplicate resolver, which waited for the resume, are left
     guard !isStarted else {
-      duplicateEntitiesResolver.start()
+      startDuplicateEntitiesResolverIfNoResumePending()
       startBackgroundLibrarySyncerIfNoResumePending()
       return
     }
     isStarted = true
-    // the initial sync has ended, it can't write alongside anymore
-    duplicateEntitiesResolver.start()
+    startDuplicateEntitiesResolverIfNoResumePending()
     playableDownloadManager.start()
     artworkDownloadManager.start()
     startBackgroundLibrarySyncerIfNoResumePending()
@@ -319,6 +318,14 @@ public class MetaManager {
     let scrobbler = createScrobbleSyncer(player: player)
     player.addNotifier(notifier: scrobbler)
     scrobbler.start()
+  }
+
+  /// The initial sync has ended: it can't write alongside the resolver anymore. One that was
+  /// aborted with a checkpoint is resumed later, the resolver waits for that.
+  private func startDuplicateEntitiesResolverIfNoResumePending() {
+    guard !storage.settings.accounts.getSetting(account.info).read.isInitialSyncResumable
+    else { return }
+    duplicateEntitiesResolver.start()
   }
 
   private func startBackgroundLibrarySyncerIfNoResumePending() {
