@@ -211,8 +211,20 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       if !Task.isCancelled {
         saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
       }
-      // The parsed batches may have created duplicates, also when the sync was skipped
-      try? await deleteDuplicatedArtistsAndAlbums()
+      // Skip: the parsed batches may have created duplicates. A failed sync is resumed later,
+      // the resume removes them at the end of its album phase
+      if Task.isCancelled {
+        do {
+          try await deleteDuplicatedArtistsAndAlbums()
+        } catch {
+          os_log(
+            "Delete duplicates after skip failed: %s",
+            log: self.log,
+            type: .error,
+            error.localizedDescription
+          )
+        }
+      }
       throw error
     }
 
