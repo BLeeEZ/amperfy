@@ -59,8 +59,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       try await super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: 0)
     let genreResponse = try await subsonicServerApi.requestGenres()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context
@@ -91,8 +93,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       )
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
     let artistsResponse = try await subsonicServerApi.requestArtists()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -136,6 +140,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
     let remainingAlbumBatches = Array(0 ... pollCountArtist)
       .filter { !completedAlbumBatches.contains($0) }
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: remainingAlbumBatches.count)
 
     var albumBatchIterator = remainingAlbumBatches.makeIterator()
@@ -208,6 +213,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       throw error
     }
 
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       // Delete duplicated artists due to concurrence
@@ -241,8 +247,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       }
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: 0)
     let playlistsResponse = try await subsonicServerApi.requestPlaylists()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context
@@ -264,8 +272,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
       return
     }
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
     let podcastsResponse = try await subsonicServerApi.requestPodcasts()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context

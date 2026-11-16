@@ -54,8 +54,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
   func syncInitial(statusNotifyier: SyncCallbacks?) async throws {
     try await super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
     let auth = try await ampacheXmlServerApi.requesetLibraryMetaData()
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: auth.genreCount)
     let genreResponse = try await ampacheXmlServerApi.requestGenres()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context
@@ -84,6 +86,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       )
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: auth.artistCount)
     let pollCountArtist = max(
       1,
@@ -94,6 +97,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         taskGroup.addTask { @MainActor @Sendable in
           let artistsResponse = try await self.ampacheXmlServerApi
             .requestArtists(startIndex: index * AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+          try Task.checkCancellation()
           try await self.storage.async.perform { asyncCompanion in
             let accountAsync = Account(
               managedObject: asyncCompanion.context
@@ -125,6 +129,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       try await taskGroup.waitForAll()
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: auth.albumCount)
     let pollCountAlbum = max(
       1,
@@ -135,6 +140,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         taskGroup.addTask { @MainActor @Sendable in
           let albumsResponse = try await self.ampacheXmlServerApi
             .requestAlbums(startIndex: index * AmpacheXmlServerApi.maxItemCountToPollAtOnce)
+          try Task.checkCancellation()
           try await self.storage.async.perform { asyncCompanion in
             let accountAsync = Account(
               managedObject: asyncCompanion.context
@@ -166,8 +172,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       try await taskGroup.waitForAll()
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: auth.playlistCount)
     let playlistsResponse = try await ampacheXmlServerApi.requestPlaylists()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context
@@ -187,8 +195,10 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
 
     let isSupported = try await ampacheXmlServerApi.requestServerPodcastSupport()
     guard isSupported else { return }
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: auth.podcastCount)
     let podcastsResponse = try await ampacheXmlServerApi.requestPodcasts()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context

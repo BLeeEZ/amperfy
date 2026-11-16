@@ -79,6 +79,9 @@ class SyncVC: UIViewController {
       do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
           .syncInitial(statusNotifyier: self)
+        // Skip already finished the sync and stored .skipped: a sync that still completed
+        // afterwards must not overwrite it
+        guard !self.syncFinished else { return }
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .completed
         }
