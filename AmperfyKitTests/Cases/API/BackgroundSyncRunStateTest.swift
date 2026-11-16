@@ -83,4 +83,57 @@ final class BackgroundSyncRunStateTest: XCTestCase {
     XCTAssertNil(state.finishRun(newRun, isCompleted: true))
     XCTAssertNil(state.current)
   }
+
+  func testRunEndedEarlyStartsAgainAfterReconnect() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    XCTAssertNil(state.finishRun(run, isCompleted: false))
+    XCTAssertTrue(state.isEndedEarly)
+    XCTAssertEqual(state.startAfterReconnect(), run + 1)
+    XCTAssertFalse(state.isEndedEarly)
+    // a second reconnect while the new run goes on starts nothing
+    XCTAssertNil(state.startAfterReconnect())
+  }
+
+  func testCompletedRunDoesNotStartAfterReconnect() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    XCTAssertNil(state.finishRun(run, isCompleted: true))
+    XCTAssertFalse(state.isEndedEarly)
+    XCTAssertNil(state.startAfterReconnect())
+  }
+
+  func testStoppedRunDoesNotStartAfterReconnect() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    state.stop()
+    XCTAssertNil(state.finishRun(run, isCompleted: false))
+    XCTAssertFalse(state.isEndedEarly)
+    XCTAssertNil(state.startAfterReconnect())
+  }
+
+  func testStopAfterEarlyEndPreventsTheRestart() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    XCTAssertNil(state.finishRun(run, isCompleted: false))
+    state.stop()
+    XCTAssertNil(state.startAfterReconnect())
+  }
+
+  func testReconnectWhileTheRunIsEndingEarlyStartsTheNextRun() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    // the network is back while the run, which saw no network, is still ending
+    XCTAssertNil(state.startAfterReconnect())
+    XCTAssertEqual(state.finishRun(run, isCompleted: false), run + 1)
+    XCTAssertFalse(state.isEndedEarly)
+  }
+
+  func testReconnectDuringACompletedRunStartsNothing() {
+    var state = BackgroundSyncRunState()
+    let run = state.start()!
+    XCTAssertNil(state.startAfterReconnect())
+    XCTAssertNil(state.finishRun(run, isCompleted: true))
+    XCTAssertNil(state.current)
+  }
 }

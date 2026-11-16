@@ -36,6 +36,9 @@ struct BackgroundSyncRunState: Sendable {
   private(set) var current: Int?
   /// start() was called while the current run was going
   private(set) var isStartRequested = false
+  /// The last run ended early (offline mode, no network) without being stopped: it is started
+  /// again once the app is online and connected
+  private(set) var isEndedEarly = false
   private var lastGeneration = 0
 
   /// Returns the generation of the run to start, nil if the current run goes on
@@ -47,12 +50,26 @@ struct BackgroundSyncRunState: Sendable {
     lastGeneration += 1
     current = lastGeneration
     isStartRequested = false
+    isEndedEarly = false
     return lastGeneration
   }
 
   mutating func stop() {
     current = nil
     isStartRequested = false
+    isEndedEarly = false
+  }
+
+  /// Called when the app is online and connected again. Returns the generation of the run to
+  /// start if the last run ended early. While a run is going it may be about to end early, the
+  /// request then makes finishRun start the next run.
+  mutating func startAfterReconnect() -> Int? {
+    guard current == nil else {
+      isStartRequested = true
+      return nil
+    }
+    guard isEndedEarly else { return nil }
+    return start()
   }
 
   func isCurrent(_ runGeneration: Int) -> Bool {
@@ -67,13 +84,17 @@ struct BackgroundSyncRunState: Sendable {
     let isRestartNeeded = !isCompleted && isStartRequested
     current = nil
     isStartRequested = false
-    return isRestartNeeded ? start() : nil
+    if isRestartNeeded {
+      return start()
+    }
+    isEndedEarly = !isCompleted
+    return nil
   }
 }
 
 // MARK: - BackgroundLibrarySyncer
 
-public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sendable {
+public final class BackgroundLibrarySyncer: NSObject, AbstractBackgroundLibrarySyncer, Sendable {
   private let storage: AsyncCoreDataAccessWrapper
   private let accountObjectId: NSManagedObjectID
   private let settings: AmperfySettings
@@ -105,7 +126,8 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     librarySyncer: LibrarySyncer,
     playableDownloadManager: DownloadManageable,
     autoDownloadLibrarySyncer: AutoDownloadLibrarySyncer,
-    eventLogger: EventLogger
+    eventLogger: EventLogger,
+    notificationHandler: EventNotificationHandler
   ) {
     self.storage = storage
     self.accountObjectId = account.managedObject.objectID
@@ -115,6 +137,26 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     self.playableDownloadManager = playableDownloadManager
     self.autoDownloadLibrarySyncer = autoDownloadLibrarySyncer
     self.eventLogger = eventLogger
+    super.init()
+    for name in [Notification.Name.offlineModeChanged, .networkStatusChanged] {
+      notificationHandler.register(
+        self,
+        selector: #selector(connectivityChanged(notification:)),
+        name: name,
+        object: nil
+      )
+    }
+  }
+
+  /// A run that ended because the app was offline or had no network goes on once both are back
+  @objc
+  private func connectivityChanged(notification: Notification) {
+    guard isOnlineAndConnected else { return }
+    state.withLock { state in
+      guard let runGeneration = state.run.startAfterReconnect() else { return }
+      os_log("restart after reconnect", log: self.log, type: .info)
+      startRun(runGeneration, isContinuation: true, state: &state)
+    }
   }
 
   /// A run is requested. A stopped run may still be finishing its current step.
@@ -123,17 +165,18 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   public func start() {
     state.withLock { state in
       guard let runGeneration = state.run.start() else { return }
-      startRun(runGeneration, state: &state)
+      startRun(runGeneration, isContinuation: false, state: &state)
     }
   }
 
   /// Must be called under the lock. A stopped run may still be finishing: the new run waits for
-  /// it, so two runs never overlap.
-  private func startRun(_ runGeneration: Int, state: inout LockedState) {
+  /// it, so two runs never overlap. A continuation goes on with the album songs of a run that
+  /// ended early, the newest library elements were already synced by that run.
+  private func startRun(_ runGeneration: Int, isContinuation: Bool, state: inout LockedState) {
     let previousTask = state.task
     state.task = Task {
       await previousTask?.value
-      await self.syncAlbumSongs(runGeneration: runGeneration)
+      await self.syncAlbumSongs(runGeneration: runGeneration, isContinuation: isContinuation)
     }
   }
 
@@ -144,15 +187,18 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
   /// The run has to end: it was stopped or replaced, the app is in offline mode or there is no
   /// network
   private func shouldStop(_ runGeneration: Int) -> Bool {
-    !state.withLock { $0.run.isCurrent(runGeneration) } || !settings.user.isOnlineMode ||
-      !networkMonitor.isConnectedToNetwork
+    !state.withLock { $0.run.isCurrent(runGeneration) } || !isOnlineAndConnected
   }
 
-  private func syncAlbumSongs(runGeneration: Int) async {
+  private var isOnlineAndConnected: Bool {
+    settings.user.isOnlineMode && networkMonitor.isConnectedToNetwork
+  }
+
+  private func syncAlbumSongs(runGeneration: Int, isContinuation: Bool) async {
     let isRunEnded = { @Sendable in self.shouldStop(runGeneration) }
     os_log("start", log: self.log, type: .info)
 
-    if !isRunEnded() {
+    if !isContinuation, !isRunEnded() {
       do {
         try await autoDownloadLibrarySyncer
           .syncNewestLibraryElements(offset: 0, count: AmperKit.newestElementsFetchCount)
@@ -174,9 +220,13 @@ public final class BackgroundLibrarySyncer: AbstractBackgroundLibrarySyncer, Sen
     // songs may have been synced, also by a run that ended early
     notifyLibrarySongsSynced()
     state.withLock { state in
-      guard let nextGeneration = state.run.finishRun(runGeneration, isCompleted: isCompleted)
-      else { return }
-      self.startRun(nextGeneration, state: &state)
+      var nextGeneration = state.run.finishRun(runGeneration, isCompleted: isCompleted)
+      // online and connected again before this run ended: no notification will come for it
+      if nextGeneration == nil, state.run.isEndedEarly, self.isOnlineAndConnected {
+        nextGeneration = state.run.startAfterReconnect()
+      }
+      guard let nextGeneration else { return }
+      self.startRun(nextGeneration, isContinuation: true, state: &state)
     }
     os_log("stopped", log: self.log, type: .info)
   }
