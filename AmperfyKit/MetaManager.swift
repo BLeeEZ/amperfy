@@ -109,7 +109,7 @@ public class MetaManager {
     self.localNotificationManager = localNotificationManager
     notificationHandler.register(
       self,
-      selector: #selector(startBackgroundSyncsIfOnline),
+      selector: #selector(startScrobbleUploadIfOnline),
       name: .offlineModeChanged,
       object: nil
     )
@@ -329,12 +329,11 @@ public class MetaManager {
     backgroundLibrarySyncer.start()
   }
 
-  /// The background library sync and the scrobble upload end in offline mode: going online starts
-  /// them again
+  /// The scrobble upload ends in offline mode: going online starts it again. The background
+  /// library sync observes the mode itself and goes on with a run that ended early
   @objc
-  private func startBackgroundSyncsIfOnline() {
+  private func startScrobbleUploadIfOnline() {
     guard isStarted, storage.settings.user.isOnlineMode else { return }
-    startBackgroundLibrarySyncerIfNoResumePending()
     scrobbleSyncer?.start()
   }
 
