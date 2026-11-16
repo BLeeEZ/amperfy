@@ -195,7 +195,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             self.saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
           }
 
-          if let nextBatchIndex = albumBatchIterator.next() {
+          // a cancelled sync (Skip) requests no further batches
+          if !Task.isCancelled, let nextBatchIndex = albumBatchIterator.next() {
             taskGroup.addTask { @MainActor @Sendable in
               let response = try await self.subsonicServerApi.requestAlbums(
                 offset: nextBatchIndex * Self.maxItemCountToPollAtOnce,
@@ -210,42 +211,12 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       if !Task.isCancelled {
         saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
       }
+      // The parsed batches may have created duplicates, also when the sync was skipped
+      try? await deleteDuplicatedArtistsAndAlbums()
       throw error
     }
 
-    try Task.checkCancellation()
-    try await storage.async.perform { asyncCompanion in
-      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      // Delete duplicated artists due to concurrence
-      let allArtists = asyncCompanion.library.getArtists(for: accountAsync)
-      var uniqueArtists: [String: Artist] = [:]
-      for artist in allArtists {
-        if uniqueArtists[artist.id] != nil {
-          let artistAlbums = artist.albums
-          artistAlbums.forEach { $0.artist = uniqueArtists[artist.id] }
-          os_log(
-            "Delete multiple Artist <%s> with id %s",
-            log: self.log,
-            type: .info,
-            artist.name,
-            artist.id
-          )
-          asyncCompanion.library.deleteArtist(artist: artist)
-        } else {
-          uniqueArtists[artist.id] = artist
-        }
-      }
-      // Delete duplicated albums due to concurrence
-      let albums = asyncCompanion.library.getAlbums(for: accountAsync)
-      var uniqueAlbums: [String: Album] = [:]
-      for album in albums {
-        if uniqueAlbums[album.id] != nil {
-          asyncCompanion.library.deleteAlbum(album: album)
-        } else {
-          uniqueAlbums[album.id] = album
-        }
-      }
-    }
+    try await deleteDuplicatedArtistsAndAlbums()
 
     try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: 0)
@@ -305,6 +276,43 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       parserDelegate.performPostParseOperations()
     }
     storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
+  }
+
+  /// Parallel album batches can create the same artist or album twice
+  @MainActor
+  private func deleteDuplicatedArtistsAndAlbums() async throws {
+    try await storage.async.perform { asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      // Delete duplicated artists due to concurrence
+      let allArtists = asyncCompanion.library.getArtists(for: accountAsync)
+      var uniqueArtists: [String: Artist] = [:]
+      for artist in allArtists {
+        if uniqueArtists[artist.id] != nil {
+          let artistAlbums = artist.albums
+          artistAlbums.forEach { $0.artist = uniqueArtists[artist.id] }
+          os_log(
+            "Delete multiple Artist <%s> with id %s",
+            log: self.log,
+            type: .info,
+            artist.name,
+            artist.id
+          )
+          asyncCompanion.library.deleteArtist(artist: artist)
+        } else {
+          uniqueArtists[artist.id] = artist
+        }
+      }
+      // Delete duplicated albums due to concurrence
+      let albums = asyncCompanion.library.getAlbums(for: accountAsync)
+      var uniqueAlbums: [String: Album] = [:]
+      for album in albums {
+        if uniqueAlbums[album.id] != nil {
+          asyncCompanion.library.deleteAlbum(album: album)
+        } else {
+          uniqueAlbums[album.id] = album
+        }
+      }
+    }
   }
 
   @MainActor
