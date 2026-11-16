@@ -227,6 +227,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       }
       throw error
     }
+    // All album batches are done: a sync killed or failing in a later step resumes after the
+    // album phase instead of fetching the batches since the last interval checkpoint again
+    if !Task.isCancelled {
+      saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
+    }
 
     try await deleteDuplicatedArtistsAndAlbums()
 
