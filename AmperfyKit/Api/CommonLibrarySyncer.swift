@@ -263,6 +263,33 @@ class CommonLibrarySyncer {
     return false
   }
 
+  /// Throws `error`. If `isNotAvailable` classifies it as the album being gone from the server,
+  /// the album is marked as deleted and a 'no longer available' error naming it is thrown
+  /// instead. Thrown outside the storage block, which swallows errors thrown inside it.
+  @MainActor
+  func throwAlbumError(
+    _ error: Error,
+    albumObjectId: NSManagedObjectID,
+    isNotAvailable: (ResponseError) -> Bool
+  ) async throws {
+    guard let responseError = error as? ResponseError, isNotAvailable(responseError)
+    else { throw error }
+    let albumName = try await storage.async.performAndGet { asyncCompanion in
+      let albumAsync = Album(
+        managedObject: asyncCompanion.context.object(with: albumObjectId) as! AlbumMO
+      )
+      albumAsync.markAsRemoteDeleted()
+      return albumAsync.name
+    }
+    throw ResponseError(
+      type: .resource,
+      statusCode: responseError.statusCode,
+      message: "Album \"\(albumName)\" is no longer available on the server.",
+      cleansedURL: responseError.cleansedURL,
+      data: responseError.data
+    )
+  }
+
   @MainActor
   func syncAlbumSongsBatched<Payload: Sendable>(
     targets: [AlbumSyncTarget],

@@ -386,25 +386,11 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let albumObjectId = album.managedObject.objectID
 
     func handleNotAvailableAlbum(error: Error) async throws {
-      try await storage.async.perform { asyncCompanion in
-        if let responseError = error as? ResponseError,
-           let ampacheError = responseError.asAmpacheError, !ampacheError.isRemoteAvailable {
-          let albumAsync = Album(
-            managedObject: asyncCompanion.context
-              .object(with: albumObjectId) as! AlbumMO
-          )
-          let reportError = ResponseError(
-            type: .resource,
-            statusCode: responseError.statusCode,
-            message: "Album \"\(albumAsync.name)\" is no longer available on the server.",
-            cleansedURL: responseError.cleansedURL,
-            data: responseError.data
-          )
-          albumAsync.markAsRemoteDeleted()
-          throw reportError
-        }
-      }
-      throw error
+      try await throwAlbumError(
+        error,
+        albumObjectId: albumObjectId,
+        isNotAvailable: { $0.asAmpacheError?.isRemoteAvailable == false }
+      )
     }
 
     do {
