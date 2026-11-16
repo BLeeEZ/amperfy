@@ -59,8 +59,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       try await super.createCachedItemRepresentationsInCoreData(statusNotifyier: statusNotifyier)
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .genre, totalCount: 0)
     let genreResponse = try await subsonicServerApi.requestGenres()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = Account(
         managedObject: asyncCompanion.context
@@ -91,8 +93,10 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       )
     }
 
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .artist, totalCount: 0)
     let artistsResponse = try await subsonicServerApi.requestArtists()
+    try Task.checkCancellation()
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
@@ -136,6 +140,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     }
     let remainingAlbumBatches = Array(0 ... pollCountArtist)
       .filter { !completedAlbumBatches.contains($0) }
+    try Task.checkCancellation()
     statusNotifyier?.notifySyncStarted(ofType: .album, totalCount: remainingAlbumBatches.count)
 
     var albumBatchIterator = remainingAlbumBatches.makeIterator()
@@ -190,7 +195,8 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
             self.saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
           }
 
-          if let nextBatchIndex = albumBatchIterator.next() {
+          // a cancelled sync (Skip) requests no further batches
+          if !Task.isCancelled, let nextBatchIndex = albumBatchIterator.next() {
             taskGroup.addTask { @MainActor @Sendable in
               let response = try await self.subsonicServerApi.requestAlbums(
                 offset: nextBatchIndex * Self.maxItemCountToPollAtOnce,
@@ -205,9 +211,93 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
       if !Task.isCancelled {
         saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
       }
+      // Skip: the parsed batches may have created duplicates. A failed sync is resumed later,
+      // the resume removes them at the end of its album phase
+      if Task.isCancelled {
+        do {
+          try await deleteDuplicatedArtistsAndAlbums()
+        } catch {
+          os_log(
+            "Delete duplicates after skip failed: %s",
+            log: self.log,
+            type: .error,
+            error.localizedDescription
+          )
+        }
+      }
       throw error
     }
+    // All album batches are done: a sync killed or failing in a later step resumes after the
+    // album phase instead of fetching the batches since the last interval checkpoint again
+    if !Task.isCancelled {
+      saveInitialSyncCheckpoint(completedAlbumBatches, albumCount: remoteAlbumCount)
+    }
 
+    try await deleteDuplicatedArtistsAndAlbums()
+
+    try Task.checkCancellation()
+    statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: 0)
+    let playlistsResponse = try await subsonicServerApi.requestPlaylists()
+    try Task.checkCancellation()
+    try await storage.async.perform { asyncCompanion in
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: self.accountObjectId) as! AccountMO
+      )
+      let parserDelegate = SsPlaylistParserDelegate(
+        performanceMonitor: self.performanceMonitor, account: accountAsync,
+        library: asyncCompanion.library
+      )
+      try self.parse(
+        response: playlistsResponse,
+        delegate: parserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+    }
+
+    let isSupported = try await subsonicServerApi.requestServerPodcastSupport()
+    guard isSupported else {
+      storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
+      return
+    }
+    try Task.checkCancellation()
+    statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
+    let podcastsResponse = try await subsonicServerApi.requestPodcasts()
+    try Task.checkCancellation()
+    try await storage.async.perform { asyncCompanion in
+      let accountAsync = Account(
+        managedObject: asyncCompanion.context
+          .object(with: self.accountObjectId) as! AccountMO
+      )
+      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
+      try self.parse(
+        response: podcastsResponse,
+        delegate: idParserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: idParserDelegate.prefetchIDs
+      )
+
+      let parserDelegate = SsPodcastParserDelegate(
+        performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
+        library: asyncCompanion.library,
+        parseNotifier: statusNotifyier
+      )
+      try self.parse(
+        response: podcastsResponse,
+        delegate: parserDelegate,
+        isThrowingErrorsAllowed: false
+      )
+      parserDelegate.performPostParseOperations()
+    }
+    storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
+  }
+
+  /// Parallel album batches can create the same artist or album twice
+  @MainActor
+  private func deleteDuplicatedArtistsAndAlbums() async throws {
     try await storage.async.perform { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       // Delete duplicated artists due to concurrence
@@ -240,61 +330,6 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
         }
       }
     }
-
-    statusNotifyier?.notifySyncStarted(ofType: .playlist, totalCount: 0)
-    let playlistsResponse = try await subsonicServerApi.requestPlaylists()
-    try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
-      let parserDelegate = SsPlaylistParserDelegate(
-        performanceMonitor: self.performanceMonitor, account: accountAsync,
-        library: asyncCompanion.library
-      )
-      try self.parse(
-        response: playlistsResponse,
-        delegate: parserDelegate,
-        isThrowingErrorsAllowed: false
-      )
-    }
-
-    let isSupported = try await subsonicServerApi.requestServerPodcastSupport()
-    guard isSupported else {
-      storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
-      return
-    }
-    statusNotifyier?.notifySyncStarted(ofType: .podcast, totalCount: 0)
-    let podcastsResponse = try await subsonicServerApi.requestPodcasts()
-    try await storage.async.perform { asyncCompanion in
-      let accountAsync = Account(
-        managedObject: asyncCompanion.context
-          .object(with: self.accountObjectId) as! AccountMO
-      )
-      let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
-      try self.parse(
-        response: podcastsResponse,
-        delegate: idParserDelegate,
-        isThrowingErrorsAllowed: false
-      )
-      let prefetch = asyncCompanion.library.getElements(
-        account: accountAsync,
-        prefetchIDs: idParserDelegate.prefetchIDs
-      )
-
-      let parserDelegate = SsPodcastParserDelegate(
-        performanceMonitor: self.performanceMonitor, prefetch: prefetch, account: accountAsync,
-        library: asyncCompanion.library,
-        parseNotifier: statusNotifyier
-      )
-      try self.parse(
-        response: podcastsResponse,
-        delegate: parserDelegate,
-        isThrowingErrorsAllowed: false
-      )
-      parserDelegate.performPostParseOperations()
-    }
-    storage.settings.accounts.updateSetting(accountInfo) { $0.clearInitialSyncCheckpoint() }
   }
 
   @MainActor
@@ -404,25 +439,11 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     let albumObjectId = album.managedObject.objectID
 
     func handleNotAvailableAlbum(error: Error) async throws {
-      try await storage.async.perform { asyncCompanion in
-        if let responseError = error as? ResponseError,
-           let subsonicError = responseError.asSubsonicError, !subsonicError.isRemoteAvailable {
-          let albumAsync = Album(
-            managedObject: asyncCompanion.context
-              .object(with: albumObjectId) as! AlbumMO
-          )
-          let reportError = ResponseError(
-            type: .resource,
-            statusCode: responseError.statusCode,
-            message: "Album \"\(albumAsync.name)\" is no longer available on the server.",
-            cleansedURL: responseError.cleansedURL,
-            data: responseError.data
-          )
-          albumAsync.markAsRemoteDeleted()
-          throw reportError
-        }
-      }
-      throw error
+      try await throwAlbumError(
+        error,
+        albumObjectId: albumObjectId,
+        isNotAvailable: { $0.asSubsonicError?.isRemoteAvailable == false }
+      )
     }
 
     var albumResponse: APIDataResponse?

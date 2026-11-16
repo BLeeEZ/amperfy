@@ -333,6 +333,8 @@ extension UIImage {
   public static let minus = UIImage.create(systemName: AmperfyImage.minus.systemName)
   public static let musicLibrary = UIImage.create(systemName: AmperfyImage.musicLibrary.systemName)
   public static let musicalNotes = UIImage.create(systemName: AmperfyImage.musicalNotes.systemName)
+  public static let offlineMode = UIImage.create(systemName: AmperfyImage.offlineMode.systemName)
+  public static let onlineMode = UIImage.create(systemName: AmperfyImage.onlineMode.systemName)
   public static let openMiniPlayerWindow = UIImage
     .create(systemName: AmperfyImage.openMiniPlayerWindow.systemName)
   public static let pause = UIImage.create(systemName: AmperfyImage.pause.systemName)
