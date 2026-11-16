@@ -3010,4 +3010,173 @@ class MusicPlayerTest: XCTestCase {
     XCTAssertTrue(testPlayer.isPlaying)
     XCTAssertTrue(mockAudioStreamingPlayer.isPlaying)
   }
+
+  // MARK: - Autoplay: similar songs are queued when the last song starts
+
+  private final class AutoplayCalls {
+    var count = 0
+  }
+
+  private func withAutoplay(enabled: Bool = true, _ body: () async throws -> ()) async rethrows {
+    let key = PersistentStorage.UserDefaultsKey.SettingsUser.rawValue
+    let saved = UserDefaults.standard.data(forKey: key)
+    defer { UserDefaults.standard.set(saved, forKey: key) }
+    storage.settings.user.isAutoplayEnabled = enabled
+    try await body()
+  }
+
+  private func autoplaySimilarSongs() -> [Song] {
+    playlistAllCached.playables.compactMap { $0.asSong }.filter { $0 != songCached }.prefix(3).map { $0 }
+  }
+
+  private func waitUntil(timeout: TimeInterval = 2.0, _ condition: () -> Bool) async {
+    let end = Date().addingTimeInterval(timeout)
+    while !condition(), Date() < end {
+      try? await Task.sleep(nanoseconds: 10_000_000)
+    }
+  }
+
+  func testAutoplay_LastSongStarts_SimilarSongsQueuedBeforeItEnds() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in calls.count += 1; return similar }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      await waitUntil { self.testQueueHandler.nextQueueCount == similar.count }
+      XCTAssertEqual(testQueueHandler.nextQueueCount, similar.count)
+      XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
+      XCTAssertEqual(calls.count, 1)
+
+      backendPlayer.responder?.didItemFinishedPlaying()
+      XCTAssertEqual(testPlayer.currentlyPlaying, similar[0])
+      try? await Task.sleep(nanoseconds: 100_000_000)
+      XCTAssertEqual(calls.count, 1)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, similar.count - 1)
+    }
+  }
+
+  func testAutoplay_SongEndsWhileRequestPending_RequestedAndQueuedOnce() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in
+        calls.count += 1
+        try await Task.sleep(nanoseconds: 200_000_000)
+        return similar
+      }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      backendPlayer.responder?.didItemFinishedPlaying()
+      await waitUntil { self.testPlayer.currentlyPlaying == similar[0] }
+      XCTAssertEqual(testPlayer.currentlyPlaying, similar[0])
+      try? await Task.sleep(nanoseconds: 300_000_000)
+      XCTAssertEqual(calls.count, 1)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, similar.count - 1)
+    }
+  }
+
+  func testAutoplay_UserAddsSongWhileRequestPending_ResultDiscarded() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      testMusicPlayer.autoplayCB = { _ in
+        try await Task.sleep(nanoseconds: 200_000_000)
+        return similar
+      }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      testPlayer.appendContextQueue(playables: [similar[1]])
+      try? await Task.sleep(nanoseconds: 400_000_000)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, 1)
+    }
+  }
+
+  func testAutoplay_RequestFailsWhileSongPlays_RequestedAgainAtEnd() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in
+        calls.count += 1
+        if calls.count == 1 { throw BackendError.notSupported }
+        return similar
+      }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      await waitUntil { calls.count == 1 }
+      try? await Task.sleep(nanoseconds: 50_000_000)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, 0)
+      XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
+
+      backendPlayer.responder?.didItemFinishedPlaying()
+      await waitUntil { self.testPlayer.currentlyPlaying == similar[0] }
+      XCTAssertEqual(testPlayer.currentlyPlaying, similar[0])
+      XCTAssertEqual(calls.count, 2)
+    }
+  }
+
+  func testAutoplay_RepeatAllWithOneSong_NoRequest() async {
+    await withAutoplay {
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in calls.count += 1; return self.autoplaySimilarSongs() }
+      testPlayer.setRepeatMode(.all)
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      try? await Task.sleep(nanoseconds: 200_000_000)
+      XCTAssertEqual(calls.count, 0)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, 0)
+      testPlayer.setRepeatMode(.off)
+    }
+  }
+
+  func testAutoplay_Disabled_NoRequest() async {
+    await withAutoplay(enabled: false) {
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in calls.count += 1; return self.autoplaySimilarSongs() }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      try? await Task.sleep(nanoseconds: 200_000_000)
+      XCTAssertEqual(calls.count, 0)
+    }
+  }
+
+  func testAutoplay_NextSongInQueue_NoRequest() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in calls.count += 1; return similar }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached, similar[0]]))
+      try? await Task.sleep(nanoseconds: 200_000_000)
+      XCTAssertEqual(calls.count, 0)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, 1)
+    }
+  }
+
+  func testAutoplay_SongEndedAndUserQueuesSongWhileRequestPending_QueuedSongPlays() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      testMusicPlayer.autoplayCB = { _ in
+        try await Task.sleep(nanoseconds: 200_000_000)
+        return similar
+      }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      backendPlayer.responder?.didItemFinishedPlaying()
+      testPlayer.appendContextQueue(playables: [similar[1]])
+      await waitUntil { self.testPlayer.currentlyPlaying == similar[1] }
+      XCTAssertEqual(testPlayer.currentlyPlaying, similar[1])
+      XCTAssertEqual(testQueueHandler.nextQueueCount, 0)
+    }
+  }
+
+  func testAutoplay_SongRestartedWhileOldRequestPending_NewPlaybackNotSkipped() async {
+    await withAutoplay {
+      let similar = autoplaySimilarSongs()
+      let calls = AutoplayCalls()
+      testMusicPlayer.autoplayCB = { _ in
+        calls.count += 1
+        try await Task.sleep(nanoseconds: 200_000_000)
+        return similar
+      }
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      backendPlayer.responder?.didItemFinishedPlaying()
+      testPlayer.play(context: PlayContext(name: "", playables: [songCached]))
+      try? await Task.sleep(nanoseconds: 500_000_000)
+      XCTAssertEqual(testPlayer.currentlyPlaying, songCached)
+      XCTAssertEqual(calls.count, 2)
+      XCTAssertEqual(testQueueHandler.nextQueueCount, similar.count)
+    }
+  }
 }

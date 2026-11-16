@@ -59,6 +59,18 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   /// different item if the recovery fails or the user plays something else.
   private var errorResumePoint: (playable: AbstractPlayable, time: Double)?
   var autoplayCB: (@MainActor (Song) async throws -> [Song])?
+  /// Similar songs requested as soon as the last song of the queue starts playing, so they
+  /// show up in the queue before that song ends (see `prefetchAutoplayIfNeeded`).
+  @MainActor
+  private final class AutoplayPrefetch {
+    let song: Song
+    /// Set by `playNext()` when the song ended before the request finished:
+    /// the request then continues playback itself.
+    var isSongFinished = false
+    init(song: Song) { self.song = song }
+  }
+
+  private var autoplayPrefetch: AutoplayPrefetch?
 
   private var playerStatus: PlayerStatusPersistent
   private var queueHandler: PlayQueueHandler
@@ -112,6 +124,8 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
   }
 
   private func insertIntoPlayer(playable: AbstractPlayable) {
+    // a request for the previous playback must not continue or extend this one
+    autoplayPrefetch = nil
     userStatistics.playedItem(
       repeatMode: playerStatus.repeatMode,
       isShuffle: playerStatus.isShuffle
@@ -129,6 +143,65 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
     handleRadioStartIfNeeded()
     notifyItemStartedPlayingFromBeginning()
     notifyItemStartedPlaying()
+    prefetchAutoplayIfNeeded()
+  }
+
+  /// True if `song` is playing and will continue with autoplay once it ends
+  /// (same conditions as `didItemFinishedPlaying` → `playNext`).
+  private func isAutoplayPending(for song: Song) -> Bool {
+    settings.user.isAutoplayEnabled &&
+      !settings.user.isPlaybackStartOnlyOnPlay &&
+      !isShouldPauseAfterFinishedPlaying &&
+      playerStatus.repeatMode == .off &&
+      !backendAudioPlayer.isOfflineMode &&
+      autoplayCB != nil &&
+      nextPlayerIndex == nil &&
+      currentlyPlaying?.asSong == song
+  }
+
+  private func prefetchAutoplayIfNeeded() {
+    guard let song = currentlyPlaying?.asSong,
+          let cb = autoplayCB,
+          isAutoplayPending(for: song),
+          autoplayPrefetch?.song != song
+    else { return }
+    let prefetch = AutoplayPrefetch(song: song)
+    autoplayPrefetch = prefetch
+    Task { @MainActor [weak self] in
+      let similarSongs = (try? await cb(song)) ?? []
+      guard let self, autoplayPrefetch === prefetch else { return }
+      autoplayPrefetch = nil
+      if prefetch.isSongFinished {
+        // the song ended while waiting: continue the way playNext() would have
+        guard currentlyPlaying?.asSong == song else { return }
+        if let nextPlayerIndex {
+          // the user queued something meanwhile: play that instead
+          play(playerIndex: nextPlayerIndex)
+          return
+        }
+        guard !similarSongs.isEmpty else { requestAutoplay(after: song, cb: cb); return }
+        queueHandler.appendContextQueue(playables: similarSongs)
+        play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+      } else if !similarSongs.isEmpty, isAutoplayPending(for: song) {
+        queueHandler.appendContextQueue(playables: similarSongs)
+        notifyPlaylistUpdated()
+      }
+      // if nothing was queued, playNext() requests the similar songs again when the song ends
+    }
+  }
+
+  private func requestAutoplay(after song: Song, cb: @escaping @MainActor (Song) async throws -> [Song]) {
+    Task { @MainActor [weak self] in
+      guard let self else { return }
+      do {
+        let similarSongs = try await cb(song)
+        guard !similarSongs.isEmpty else { stop(); return }
+        queueHandler.appendContextQueue(playables: similarSongs)
+        play(playerIndex: PlayerIndex(queueType: .next, index: 0))
+      } catch {
+        stop()
+      }
+    }
   }
 
   // BackendAudioPlayerNotifiable
@@ -218,16 +291,11 @@ public class AudioPlayer: NSObject, BackendAudioPlayerNotifiable {
               let song = currentlyPlaying?.asSong,
               let cb = autoplayCB,
               !backendAudioPlayer.isOfflineMode {
-      Task { @MainActor [weak self] in
-        guard let self else { return }
-        do {
-          let similarSongs = try await cb(song)
-          guard !similarSongs.isEmpty else { stop(); return }
-          queueHandler.appendContextQueue(playables: similarSongs)
-          play(playerIndex: PlayerIndex(queueType: .next, index: 0))
-        } catch {
-          stop()
-        }
+      if let prefetch = autoplayPrefetch, prefetch.song == song {
+        // the request started with this song is still running and will continue playback
+        prefetch.isSongFinished = true
+      } else {
+        requestAutoplay(after: song, cb: cb)
       }
     } else {
       stop()
