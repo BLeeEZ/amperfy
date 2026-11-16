@@ -331,15 +331,4 @@ class SettingsHostVC: UIViewController {
       .getSetting(accountInfo).read
       .isScrobbleStreamedItems
   }
-
-  @IBSegueAction
-  func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {
-    UIHostingController(
-      coder: coder,
-      rootView:
-      SettingsView()
-        .environmentObject(settings)
-        .environment(\.managedObjectContext, appDelegate.storage.main.context)
-    )
-  }
 }
