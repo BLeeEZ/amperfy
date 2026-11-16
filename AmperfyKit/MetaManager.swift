@@ -284,12 +284,15 @@ public class MetaManager {
   public func startManagerAfterSync(player: PlayerFacade) {
     os_log("Start background manager after sync", log: self.log, type: .info)
     // Already started at launch while its initial sync was resumed: only the background
-    // library sync is left
+    // library sync and the duplicate resolver, which waited for the resume, are left
     guard !isStarted else {
+      duplicateEntitiesResolver.start()
       startBackgroundLibrarySyncerIfNoResumePending()
       return
     }
     isStarted = true
+    // the initial sync has ended, it can't write alongside anymore
+    duplicateEntitiesResolver.start()
     playableDownloadManager.start()
     artworkDownloadManager.start()
     startBackgroundLibrarySyncerIfNoResumePending()
