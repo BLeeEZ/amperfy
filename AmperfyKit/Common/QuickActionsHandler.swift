@@ -29,6 +29,7 @@ public class QuickActionsHandler {
   private let player: PlayerFacade
   private let application: UIApplication
   private let displaySearchTabCB: () -> ()
+  private let switchOnlineOfflineModeCB: (Bool) -> ()
 
   private var savedShortCutItem: UIApplicationShortcutItem?
 
@@ -36,13 +37,23 @@ public class QuickActionsHandler {
     storage: PersistentStorage,
     player: PlayerFacade,
     application: UIApplication,
-    displaySearchTabCB: @escaping @MainActor () -> ()
+    notificationHandler: EventNotificationHandler,
+    displaySearchTabCB: @escaping @MainActor () -> (),
+    switchOnlineOfflineModeCB: @escaping @MainActor (Bool) -> ()
   ) {
     self.storage = storage
     self.player = player
     self.application = application
     self.displaySearchTabCB = displaySearchTabCB
+    self.switchOnlineOfflineModeCB = switchOnlineOfflineModeCB
     self.player.addNotifier(notifier: self)
+    // the mode action offers the other mode
+    notificationHandler.register(
+      self,
+      selector: #selector(configureQuickActions),
+      name: .offlineModeChanged,
+      object: nil
+    )
   }
 
   // List of known shortcut actions.
@@ -62,10 +73,10 @@ public class QuickActionsHandler {
   public func applyModeShortCutItem(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
     switch QuickActionType(rawValue: shortcutItem.type) {
     case .offlineModeAction:
-      storage.settings.user.isOfflineMode = true
+      switchOnlineOfflineModeCB(true)
       return true
     case .onlineModeAction:
-      storage.settings.user.isOfflineMode = false
+      switchOnlineOfflineModeCB(false)
       return true
     case .none, .playMusicAction, .playPodcastAction, .searchAction:
       return false
@@ -79,6 +90,7 @@ public class QuickActionsHandler {
     }
   }
 
+  @objc
   public func configureQuickActions() {
     var quickActions = [UIApplicationShortcutItem]()
 
@@ -164,10 +176,8 @@ public class QuickActionsHandler {
         } else {
           player.play()
         }
-      case .offlineModeAction:
-        storage.settings.user.isOfflineMode = true
-      case .onlineModeAction:
-        storage.settings.user.isOfflineMode = false
+      case .offlineModeAction, .onlineModeAction:
+        _ = applyModeShortCutItem(shortcutItem)
       }
     }
     return true

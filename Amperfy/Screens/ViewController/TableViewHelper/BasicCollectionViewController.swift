@@ -37,6 +37,12 @@ class BasicCollectionViewController: UICollectionViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     collectionView.keyboardDismissMode = .onDrag
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(refreshOfflineMode),
+      name: .offlineModeChanged,
+      object: nil
+    )
 
     guard let sceneTitle else { return }
     setNavBarTitle(title: sceneTitle)
@@ -44,6 +50,25 @@ class BasicCollectionViewController: UICollectionViewController {
 
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
+    applyOfflineMode()
+  }
+
+  /// The account of the listed items (each list returns its own; the base falls back to the
+  /// active one): the lists of an account that is resynced or logged out don't follow a switch
+  var listAccountInfo: AccountInfo? {
+    appDelegate.storage.settings.accounts.active
+  }
+
+  @objc
+  private func refreshOfflineMode() {
+    // a hidden list applies it in viewIsAppearing
+    guard viewIfLoaded?.window != nil, appDelegate.isAccountStarted(listAccountInfo)
+    else { return }
+    applyOfflineMode()
+  }
+
+  /// Offline mode lists only cached items
+  func applyOfflineMode() {
     if searchController.searchBar.scopeButtonTitles?.count ?? 0 > 1,
        appDelegate.storage.settings.user.isOfflineMode {
       searchController.searchBar.selectedScopeButtonIndex = 1
@@ -138,6 +163,9 @@ class SingleSnapshotFetchedResultsCollectionViewController<ResultType>:
   var diffableDataSource: BasicUICollectionViewDiffableDataSource?
   var snapshotDidChange: (() -> ())?
   let account: Account
+  override var listAccountInfo: AccountInfo? {
+    account.info
+  }
 
   init(collectionViewLayout: UICollectionViewLayout, account: Account) {
     self.account = account

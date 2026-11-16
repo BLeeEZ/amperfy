@@ -282,12 +282,15 @@ class BackendAudioPlayer: NSObject {
        duration > 0 {
       let remainingTime = duration - elapsedTime
       if remainingTime > 0, remainingTime < 10 {
-        nextPreloadedPlayable = nextPlayablePreloadCB?()
-        guard let nextPreloadedPlayable = nextPreloadedPlayable else { return }
+        // offline, a song that is not downloaded isn't preloaded: going online preloads its stream
+        guard let nextPreloadedPlayable = nextPlayablePreloadCB?(),
+              nextPreloadedPlayable.isCached || !isOfflineMode
+        else { return }
+        self.nextPreloadedPlayable = nextPreloadedPlayable
         os_log(.default, "Preloading: %s", nextPreloadedPlayable.displayString)
         if nextPreloadedPlayable.isCached {
           insertCachedPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-        } else if !isOfflineMode {
+        } else {
           Task { @MainActor in
             do {
               try await insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
@@ -524,8 +527,10 @@ class BackendAudioPlayer: NSObject {
     streamTimeOffset = 0.0
     streamRestartRequest += 1
     shouldPlayAfterStreamRestart = nil
+    // offline, a stream preloaded before the switch only plays if the song was downloaded since,
+    // like a song that is already streaming; otherwise the player stops at it
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
-       nextPreloadedPlayable == playable {
+       nextPreloadedPlayable == playable, nextPreloadedPlayable.isCached || !isOfflineMode {
       // Do nothing next preloaded playable has already been queued to player
       os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)
       currentPreparedUrl = ""

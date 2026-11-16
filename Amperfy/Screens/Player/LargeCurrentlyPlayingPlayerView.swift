@@ -209,7 +209,8 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
 
   @objc
   private func refreshOfflineMode() {
-    refreshRating()
+    // the heart of both player styles and the large one's rating depend on the mode
+    rootView?.refreshCurrentlyPlayingInfoView()
   }
 
   private func setupRatingView() {

@@ -108,7 +108,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return self.storage.main.library.getAccount(info: activeAccountInfo)
       },
       player: player, networkMonitor: networkMonitor,
-      eventLogger: eventLogger
+      eventLogger: eventLogger,
+      switchOnlineOfflineModeCB: self.switchOnlineOfflineMode
     )
   }()
 
@@ -117,7 +118,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       storage: self.storage,
       player: self.player,
       application: UIApplication.shared,
-      displaySearchTabCB: self.displaySearchTab
+      notificationHandler: self.notificationHandler,
+      displaySearchTabCB: self.displaySearchTab,
+      switchOnlineOfflineModeCB: self.switchOnlineOfflineMode
     )
   }()
 
@@ -233,6 +236,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   var isNormalInteraction: Bool {
     storage.settings.accounts.active != nil && !libraryUpdater
       .isVisualUpadateNeeded
+  }
+
+  /// False until the account's managers run (launch, end of its initial sync): Resync and Logout
+  /// stop them before going online, then replace their screens or close their windows
+  func isAccountStarted(_ accountInfo: AccountInfo?) -> Bool {
+    guard let accountInfo else { return false }
+    return AmperKit.shared.allActiveMetas[accountInfo]?.isStarted ?? false
   }
 
   /// Only the first main window of a launch may resume an interrupted initial sync
@@ -352,8 +362,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       )
   }
 
+  /// Stores the mode and, when it changed, posts .offlineModeChanged to what depends on it.
+  /// Logout calls the two steps separately
   func switchOnlineOfflineMode(isOfflineMode: Bool) {
+    guard storeOnlineOfflineMode(isOfflineMode: isOfflineMode) else { return }
+    postOfflineModeChanged()
+  }
+
+  /// Stores the mode without posting it, false when it doesn't change. Logout stores it before
+  /// the next account's window is built and posts it at its end, after the player dropped the
+  /// logged-out account's songs; that account's lists and Home skip it (not started)
+  func storeOnlineOfflineMode(isOfflineMode: Bool) -> Bool {
+    guard appDelegate.storage.settings.user.isOfflineMode != isOfflineMode else { return false }
     appDelegate.storage.settings.user.isOfflineMode = isOfflineMode
+    return true
+  }
+
+  func postOfflineModeChanged() {
     appDelegate.notificationHandler.post(
       name: .offlineModeChanged,
       object: nil,

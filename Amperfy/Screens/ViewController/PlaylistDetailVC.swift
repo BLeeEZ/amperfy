@@ -210,10 +210,6 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
-    if appDelegate.storage.settings.user.isOfflineMode {
-      tableView.isEditing = false
-    }
-    refreshBarButtons()
     Task { @MainActor in
       do {
         try await playlist.fetch(
@@ -227,6 +223,15 @@ class PlaylistDetailVC: SingleSnapshotFetchedResultsTableViewController<Playlist
       }
       self.detailOperationsView?.refresh()
     }
+  }
+
+  /// The rows, their play context and the Edit button follow the mode together
+  override func applyOfflineMode() {
+    super.applyOfflineMode()
+    if appDelegate.storage.settings.user.isOfflineMode {
+      tableView.isEditing = false
+    }
+    refreshBarButtons()
   }
 
   func refreshBarButtons() {
