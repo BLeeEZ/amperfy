@@ -51,10 +51,13 @@ class SyncVC: UIViewController {
     progressInfo.text = ""
     progressLabel.text = String(format: "%.1f", 0.0) + "%"
     appDelegate.isKeepScreenAlive = true
+    // A swipe would close the sheet while the sync goes on, with no way to Skip it
+    isModalInPresentation = true
   }
 
   override func viewDidAppear(_ animated: Bool) {
-    // Called again after a cancelled swipe on the sheet: only one sync, the one Skip cancels
+    super.viewDidAppear(animated)
+    // runs on every appearance: only one sync, the one Skip cancels
     guard syncTask == nil else { return }
     syncTask = Task { @MainActor in
       self.appDelegate.eventLogger.supressAlerts = true
@@ -136,7 +139,10 @@ class SyncVC: UIViewController {
           .themePreference.asColor
       )
     appDelegate.applyAppThemeToAlreadyLoadedViews()
-    guard let mainScene = AppDelegate.mainSceneDelegate else { return }
+    // the window that shows this screen: with several windows the most active one can be another,
+    // which would leave this sheet open, and it can't be swiped away
+    let ownScene = view.window?.windowScene?.delegate as? SceneDelegate
+    guard let mainScene = ownScene ?? AppDelegate.mainSceneDelegate else { return }
     mainScene
       .replaceMainRootViewController(vc: AppStoryboard.Main.segueToMainWindow(account: account))
   }
