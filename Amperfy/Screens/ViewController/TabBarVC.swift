@@ -125,9 +125,6 @@ class TabBarVC: UITabBarController {
 
     heightConstraint = miniPlayer!.glassContainer.heightAnchor.constraint(equalToConstant: 48.0)
     heightConstraint?.isActive = true
-    compactWidthConstraint = miniPlayer!.glassContainer.widthAnchor
-      .constraint(equalTo: miniPlayer!.glassContainer.superview!.widthAnchor)
-
     miniPlayer!.tabAccessoryTraitChangeCB = configureTraitChangesForMiniPlayer
     configureTraitChangesForMiniPlayer()
 
@@ -147,9 +144,9 @@ class TabBarVC: UITabBarController {
 
   private func mainContent() -> UIView {
     // Attempt to find the main content view controller's view if the sidebar is visible.
-    // Fallback to self.view.safeAreaLayoutGuide.leadingAnchor otherwise.
-    if traitCollection.horizontalSizeClass == .regular, let selectedViewController {
-      return selectedViewController.view
+    if let contentView = selectedViewController?.viewIfLoaded,
+       contentView.isDescendant(of: view) {
+      return contentView
     }
     return view
   }
@@ -158,45 +155,46 @@ class TabBarVC: UITabBarController {
   var regularWidthConstraint: NSLayoutConstraint?
   var heightConstraint: NSLayoutConstraint?
   var compactWidthConstraint: NSLayoutConstraint?
+  private weak var centeredContentView: UIView?
 
   func configureTraitChangesForMiniPlayer() {
-    guard let miniPlayer else { return }
-    let isInline = miniPlayer.glassContainer.traitCollection.tabAccessoryEnvironment == .inline
+    guard let miniPlayer, let accessoryContainer = miniPlayer.glassContainer.superview
+    else { return }
 
     if traitCollection.horizontalSizeClass == .regular {
-      centerConstraint = miniPlayer.glassContainer.safeAreaLayoutGuide.centerXAnchor.constraint(
-        equalTo: mainContent().safeAreaLayoutGuide.centerXAnchor,
-        constant: 0
-      )
       let mainContentView = mainContent()
-      var playerWidth = mainContentView.frame.width - mainContentView.safeAreaInsets
-        .left - mainContentView.safeAreaInsets.right
-      playerWidth = min(playerWidth, 600)
+      let playerWidth = min(mainContentView.safeAreaLayoutGuide.layoutFrame.width, 600)
       compactWidthConstraint?.isActive = false
-      regularWidthConstraint?.isActive = false
-      regularWidthConstraint = miniPlayer.glassContainer.widthAnchor
-        .constraint(equalToConstant: playerWidth)
+      if centeredContentView !== mainContentView || centerConstraint == nil {
+        centerConstraint?.isActive = false
+        centeredContentView = mainContentView
+        centerConstraint = miniPlayer.glassContainer.safeAreaLayoutGuide.centerXAnchor.constraint(
+          equalTo: mainContentView.safeAreaLayoutGuide.centerXAnchor
+        )
+      }
+      if regularWidthConstraint == nil {
+        regularWidthConstraint = miniPlayer.glassContainer.widthAnchor
+          .constraint(equalToConstant: playerWidth)
+      }
+      regularWidthConstraint?.constant = playerWidth
       regularWidthConstraint?.isActive = true
       centerConstraint?.isActive = true
       heightConstraint?.constant = 60.0
-    } else if isInline {
-      heightConstraint?.constant = 48.0
-      centerConstraint?.isActive = false
-      regularWidthConstraint?.isActive = false
-      compactWidthConstraint?.isActive = true
     } else {
       heightConstraint?.constant = 48.0
       centerConstraint?.isActive = false
       regularWidthConstraint?.isActive = false
+      if compactWidthConstraint?.secondItem !== accessoryContainer {
+        compactWidthConstraint?.isActive = false
+        compactWidthConstraint = miniPlayer.glassContainer.widthAnchor
+          .constraint(equalTo: accessoryContainer.widthAnchor)
+      }
       compactWidthConstraint?.isActive = true
     }
-
-    miniPlayer.glassContainer.setNeedsLayout()
-    miniPlayer.glassContainer.layoutIfNeeded()
   }
 
-  override func viewWillLayoutSubviews() {
-    super.viewWillLayoutSubviews()
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
     configureTraitChangesForMiniPlayer()
   }
 
