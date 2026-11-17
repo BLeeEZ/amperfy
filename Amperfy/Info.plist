@@ -68,6 +68,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_amperfy-lnp._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Amperfy needs access to your local network to connect to a music server running at home.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>INPlayMediaIntent</string>

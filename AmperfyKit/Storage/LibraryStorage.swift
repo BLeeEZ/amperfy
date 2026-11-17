@@ -3081,7 +3081,12 @@ public class LibraryStorage: PlayableFileCachable {
   public func saveContext() {
     if context.hasChanges {
       do {
-        try context.obtainPermanentIDs(for: Array(context.insertedObjects))
+        // Fetched results controllers on the main context get the changes of the save while new
+        // objects still have temporary IDs, which can't be resolved after the save (#920).
+        // Background contexts get their IDs assigned by the save.
+        if context.concurrencyType == .mainQueueConcurrencyType {
+          try context.obtainPermanentIDs(for: Array(context.insertedObjects))
+        }
         try context.save()
       } catch {
         // Log the error and attempt recovery instead of crashing

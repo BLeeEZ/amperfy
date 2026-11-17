@@ -133,5 +133,60 @@ extension UIViewController {
       }
     )
     navigationItem.leftBarButtonItem?.accessibilityLabel = "Settings"
+    refreshOfflineBarButton()
+  }
+
+  private static let offlineBarButtonTag = 0x0FF1
+
+  /// Shows the offline button next to the back or user button while offline mode is active.
+  func refreshOfflineBarButton() {
+    var items = (navigationItem.leftBarButtonItems ?? [])
+      .filter { $0.tag != UIViewController.offlineBarButtonTag }
+    if appDelegate.storage.settings.user.isOfflineMode {
+      let goOnline = UIAction(title: "Go Online", image: .onlineMode) { [weak self] _ in
+        self?.appDelegate.switchOnlineOfflineMode(isOfflineMode: false)
+      }
+      let offlineButton = UIBarButtonItem(
+        title: "Offline Mode",
+        image: .offlineMode,
+        menu: UIMenu(title: "Offline Mode is active", children: [goOnline])
+      )
+      offlineButton.tag = UIViewController.offlineBarButtonTag
+      items.append(offlineButton)
+      navigationItem.leftItemsSupplementBackButton = true
+    }
+    navigationItem.leftBarButtonItems = items
+  }
+}
+
+// MARK: - OfflineIndicatingNavigationController
+
+/// Shows the offline button in the navigation bar of every screen while offline mode is active.
+/// Used for the main navigation stacks (tabs, split view detail); sidebar and modal sheets keep a plain UINavigationController.
+class OfflineIndicatingNavigationController: UINavigationController {
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    viewControllers.forEach { $0.refreshOfflineBarButton() }
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(offlineModeChanged),
+      name: .offlineModeChanged,
+      object: nil
+    )
+  }
+
+  override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+    viewController.refreshOfflineBarButton()
+    super.pushViewController(viewController, animated: animated)
+  }
+
+  override func setViewControllers(_ viewControllers: [UIViewController], animated: Bool) {
+    viewControllers.forEach { $0.refreshOfflineBarButton() }
+    super.setViewControllers(viewControllers, animated: animated)
+  }
+
+  @objc
+  private func offlineModeChanged() {
+    viewControllers.forEach { $0.refreshOfflineBarButton() }
   }
 }

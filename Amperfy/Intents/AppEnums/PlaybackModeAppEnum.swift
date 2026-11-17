@@ -22,7 +22,6 @@
 import AppIntents
 import Foundation
 
-@available(iOS 16.0, macOS 13.0, watchOS 9.0, tvOS 16.0, *)
 enum PlaybackModeAppEnum: Int, AppEnum {
   case music = 0
   case podcast = 1

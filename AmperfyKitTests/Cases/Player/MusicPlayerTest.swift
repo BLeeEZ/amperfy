@@ -23,6 +23,7 @@
 @preconcurrency @testable import AudioStreaming
 import AVFoundation
 import CoreData
+import UIKit
 import XCTest
 
 // MARK: - MOCK_AudioStreamingPlayer
@@ -63,11 +64,15 @@ class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
     }
   }
 
+  private var playedUrl = ""
+  private(set) var queuedUrls = [URL]()
+
   override func play(url: URL) {
     Self.delegateBackup = delegate
     mockElapsedTime = 0.0
     isPlaying = true
     isStopped = false
+    playedUrl = url.absoluteString
     let currId = url.absoluteString
     Task { @MainActor [currId] in
       let entryID = AudioEntryId(id: currId)
@@ -87,7 +92,21 @@ class MOCK_AudioStreamingPlayer: AudioStreamingPlayer {
     isStopped = true
   }
 
-  override func queue(url: URL) {}
+  override func queue(url: URL) {
+    queuedUrls.append(url)
+  }
+
+  /// Reports the end of the entry that was played last
+  func finishPlaying() {
+    Self.delegateBackup?.audioPlayerDidFinishPlaying(
+      player: AudioStreaming.AudioPlayer(),
+      entryId: AudioEntryId(id: playedUrl),
+      stopReason: .eof,
+      progress: 0,
+      duration: 0
+    )
+  }
+
   override func seek(to time: Double) {
     mockElapsedTime = time
   }
@@ -348,6 +367,7 @@ class MusicPlayerTest: XCTestCase {
   var playlistThreeCached: Playlist!
   var playlistAllCached: Playlist!
   let fillCount = 5
+  private var switchedOfflineModes = [Bool]()
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
@@ -743,6 +763,174 @@ class MusicPlayerTest: XCTestCase {
       (songDownloader.downloadables.first! as! AbstractPlayable).asSong!,
       songToDownload
     )
+  }
+
+  // MARK: - Offline mode
+
+  /// The settings (UserDefaults) and .offlineModeChanged (NotificationCenter) are shared with the
+  /// host app: the stored settings are restored afterwards and announced again
+  private func preserveStoredUserSettings() {
+    let userKey = PersistentStorage.UserDefaultsKey.SettingsUser.rawValue
+    let savedUserData = UserDefaults.standard.data(forKey: userKey)
+    addTeardownBlock { @MainActor in
+      UserDefaults.standard.set(savedUserData, forKey: userKey)
+      EventNotificationHandler().post(name: .offlineModeChanged, object: nil, userInfo: nil)
+    }
+  }
+
+  private func createPlayerNotificationAdapter(
+    isOfflineModeStored: Bool
+  )
+    -> PlayerNotificationAdapter {
+    preserveStoredUserSettings()
+    storage.settings.user.isOfflineMode = isOfflineModeStored
+    return PlayerNotificationAdapter(
+      notificationHandler: EventNotificationHandler(),
+      player: testPlayer,
+      settings: storage.settings
+    )
+  }
+
+  /// Like AppDelegate.switchOnlineOfflineMode
+  private func switchOnlineOfflineMode(isOfflineMode: Bool) {
+    storage.settings.user.isOfflineMode = isOfflineMode
+    EventNotificationHandler().post(name: .offlineModeChanged, object: nil, userInfo: nil)
+  }
+
+  func testOfflineMode_PlayerFollowsStoredModeAtCreationAndOnSwitch() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: true)
+    XCTAssertTrue(testPlayer.isOfflineMode)
+    switchOnlineOfflineMode(isOfflineMode: false)
+    XCTAssertFalse(testPlayer.isOfflineMode)
+    switchOnlineOfflineMode(isOfflineMode: true)
+    XCTAssertTrue(testPlayer.isOfflineMode)
+    withExtendedLifetime(adapter) {}
+  }
+
+  func testOfflineModeSwitch_SongToDownload_IsNotStreamed() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: false)
+    switchOnlineOfflineMode(isOfflineMode: true)
+    // didStartPlaying is also reported for a song that offline mode doesn't play
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "item is handled")
+    testPlayer.isAutoCachePlayedItems = true
+    testPlayer.appendContextQueue(playables: [songToDownload])
+    testPlayer.play()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertFalse(testPlayer.isPlaying)
+    XCTAssertTrue(songDownloader.isNoDownloadRequested())
+    withExtendedLifetime(adapter) {}
+  }
+
+  func testOnlineModeSwitch_SongToDownload_IsStreamed() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: true)
+    switchOnlineOfflineMode(isOfflineMode: false)
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "item is handled")
+    testPlayer.isAutoCachePlayedItems = true
+    testPlayer.appendContextQueue(playables: [songToDownload])
+    testPlayer.play()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(songDownloader.downloadables.count, 1)
+    withExtendedLifetime(adapter) {}
+  }
+
+  /// The next song is preloaded in the last 10 s of a song, checked every second
+  private func playCachedSongIntoItsLastSeconds(followedBy nextSong: Song) {
+    songCached.remoteDuration = 60
+    testPlayer.isAutoCachePlayedItems = true
+    testPlayer.appendContextQueue(playables: [songCached, nextSong])
+    testPlayer.play()
+    mockAudioStreamingPlayer.mockElapsedTime = 55
+  }
+
+  private func waitForPreloadCheck() {
+    let nothing = expectation(description: "only waits")
+    nothing.isInverted = true
+    wait(for: [nothing], timeout: 2.0)
+  }
+
+  func testOfflineMode_LastSeconds_NextSongToDownload_PlayerStopsAtIt() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: true)
+    playCachedSongIntoItsLastSeconds(followedBy: songToDownload)
+    waitForPreloadCheck()
+    XCTAssertTrue(mockAudioStreamingPlayer.queuedUrls.isEmpty)
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "next song is handled")
+    mockAudioStreamingPlayer.finishPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertEqual(testPlayer.currentlyPlaying, songToDownload)
+    XCTAssertFalse(testPlayer.isPlaying)
+    withExtendedLifetime(adapter) {}
+  }
+
+  func testOnlineModeSwitch_LastSeconds_NextSongToDownload_IsPreloaded() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: true)
+    playCachedSongIntoItsLastSeconds(followedBy: songToDownload)
+    waitForPreloadCheck()
+    switchOnlineOfflineMode(isOfflineMode: false)
+    waitForPreloadCheck()
+    XCTAssertEqual(mockAudioStreamingPlayer.queuedUrls.count, 1)
+    XCTAssertEqual(
+      (songDownloader.downloadables.first as? AbstractPlayable)?.asSong,
+      songToDownload
+    )
+    withExtendedLifetime(adapter) {}
+  }
+
+  func testOfflineModeSwitch_LastSeconds_PreloadedSongToDownload_DoesNotStart() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: false)
+    playCachedSongIntoItsLastSeconds(followedBy: songToDownload)
+    waitForPreloadCheck()
+    XCTAssertEqual(mockAudioStreamingPlayer.queuedUrls.count, 1)
+    switchOnlineOfflineMode(isOfflineMode: true)
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "next song is handled")
+    mockAudioStreamingPlayer.finishPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertEqual(testPlayer.currentlyPlaying, songToDownload)
+    XCTAssertFalse(testPlayer.isPlaying)
+    XCTAssertTrue(mockAudioStreamingPlayer.isStopped)
+    withExtendedLifetime(adapter) {}
+  }
+
+  func testOfflineModeSwitch_LastSeconds_PreloadedStreamDownloadedSince_Plays() {
+    let adapter = createPlayerNotificationAdapter(isOfflineModeStored: false)
+    playCachedSongIntoItsLastSeconds(followedBy: songToDownload)
+    waitForPreloadCheck()
+    XCTAssertEqual(mockAudioStreamingPlayer.queuedUrls.count, 1)
+    markAsCached(playable: songToDownload)
+    switchOnlineOfflineMode(isOfflineMode: true)
+    mockMusicPlayable.expectationDidStartPlaying = expectation(description: "next song is handled")
+    mockAudioStreamingPlayer.finishPlaying()
+    wait(for: [mockMusicPlayable.expectationDidStartPlaying!], timeout: 2.0)
+    XCTAssertEqual(testPlayer.currentlyPlaying, songToDownload)
+    XCTAssertTrue(testPlayer.isPlaying)
+    XCTAssertEqual(testPlayer.playType, .stream)
+    withExtendedLifetime(adapter) {}
+  }
+
+  func testQuickActions_ModeActions_SwitchThroughTheCallback() {
+    preserveStoredUserSettings()
+    let storedOfflineMode = storage.settings.user.isOfflineMode
+    let quickActionsHandler = QuickActionsHandler(
+      storage: storage,
+      player: testPlayer,
+      application: UIApplication.shared,
+      notificationHandler: EventNotificationHandler(),
+      displaySearchTabCB: {},
+      switchOnlineOfflineModeCB: { self.switchedOfflineModes.append($0) }
+    )
+    func shortcutItem(_ type: QuickActionsHandler.QuickActionType) -> UIApplicationShortcutItem {
+      UIApplicationShortcutItem(type: type.rawValue, localizedTitle: "")
+    }
+    // at launch
+    XCTAssertTrue(quickActionsHandler.applyModeShortCutItem(shortcutItem(.offlineModeAction)))
+    // while running
+    XCTAssertTrue(
+      quickActionsHandler
+        .handleShortCutItem(shortcutItem: shortcutItem(.onlineModeAction))
+    )
+    XCTAssertFalse(quickActionsHandler.applyModeShortCutItem(shortcutItem(.searchAction)))
+    XCTAssertEqual(switchedOfflineModes, [true, false])
+    XCTAssertEqual(storage.settings.user.isOfflineMode, storedOfflineMode)
   }
 
   func testPlaySong_Cached() {

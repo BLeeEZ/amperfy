@@ -49,8 +49,12 @@ class SplitVC: UISplitViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    // plain navigation: the offline button is shown in the secondary column only
     setViewController(
-      embeddInNavigation(vc: AppStoryboard.Main.segueToSideBar(account: account)),
+      UINavigationController(
+        rootViewController: AppStoryboard.Main
+          .segueToSideBar(account: account)
+      ),
       for: .primary
     )
     setViewController(defaultSecondaryVC, for: .secondary)
@@ -149,7 +153,7 @@ class SplitVC: UISplitViewController {
   }
 
   func embeddInNavigation(vc: UIViewController) -> UINavigationController {
-    UINavigationController(rootViewController: vc)
+    OfflineIndicatingNavigationController(rootViewController: vc)
   }
 
   var defaultSecondaryVC: UINavigationController {

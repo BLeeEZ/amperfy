@@ -47,6 +47,12 @@ class SettingsHostVC: UIViewController {
       settings.activeAccountInfo = accountInfo
       refreshAccountSettings(accountInfo: accountInfo)
     }
+    appDelegate.notificationHandler.register(
+      self,
+      selector: #selector(applyOfflineMode),
+      name: .offlineModeChanged,
+      object: nil
+    )
 
     // the account list in the general settings follows added and removed accounts
     settings.accounts = appDelegate.storage.settings.accounts.allAccounts
@@ -107,10 +113,8 @@ class SettingsHostVC: UIViewController {
       extendSafeAreaToAccountForMiniPlayer()
     }
 
-    settings.isOfflineMode = appDelegate.storage.settings.user.isOfflineMode
+    applyOfflineMode()
     changesAgent.append(settings.$isOfflineMode.sink(receiveValue: { newValue in
-      let hasValueChanged = self.appDelegate.storage.settings.user.isOfflineMode != newValue
-      guard hasValueChanged else { return }
       self.appDelegate.switchOnlineOfflineMode(isOfflineMode: newValue)
     }))
 
@@ -316,6 +320,12 @@ class SettingsHostVC: UIViewController {
     }))
   }
 
+  /// The checkbox also follows a switch made elsewhere (quick action, Shortcuts, another window)
+  @objc
+  private func applyOfflineMode() {
+    settings.isOfflineMode = appDelegate.storage.settings.user.isOfflineMode
+  }
+
   // account is changed via the active account changed callback
   func refreshAccountSettings(accountInfo: AccountInfo?) {
     settings.activeAccountInfo = accountInfo
@@ -336,16 +346,5 @@ class SettingsHostVC: UIViewController {
     settings.isScrobbleStreamedItems = appDelegate.storage.settings.accounts
       .getSetting(accountInfo).read
       .isScrobbleStreamedItems
-  }
-
-  @IBSegueAction
-  func segueToSwiftUI(_ coder: NSCoder) -> UIViewController? {
-    UIHostingController(
-      coder: coder,
-      rootView:
-      SettingsView()
-        .environmentObject(settings)
-        .environment(\.managedObjectContext, appDelegate.storage.main.context)
-    )
   }
 }
