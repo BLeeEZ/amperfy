@@ -349,7 +349,7 @@ public class MetaManager {
   }
 
   public func stopManager() {
-    os_log("Start meta managers", log: self.log, type: .info)
+    os_log("Stop meta managers", log: self.log, type: .info)
     isStarted = false
     scrobbleSyncer?.stop()
     scrobbleSyncer = nil
