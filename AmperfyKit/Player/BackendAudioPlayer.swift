@@ -767,14 +767,6 @@ class BackendAudioPlayer: NSObject {
           url: radioUrl,
           session: radioPlaylistSession
         )
-        try checkIsLatestPlayRequest()
-        // a radio preloaded as the next item doesn't change what is playing now
-        if queueType == .play {
-          playType = .stream
-        } else {
-          perloadedPlayType = .stream
-        }
-        ClientCertificateManager.shared.activeStreamingCertificateAccountIdent = nil
         return streamUrl
       } else {
         if queueType == .play {
@@ -810,6 +802,16 @@ class BackendAudioPlayer: NSObject {
     }
     // a preload requested before a stream restart would be queued behind the new stream
     guard queueType == .play || request == streamRestartRequest else { return }
+    // set only now: the playlist request can take long, a dropped radio preload must not change
+    // the play type of a newer preload or the certificate of the song that is playing now
+    if playable.isRadio {
+      if queueType == .play {
+        playType = .stream
+        ClientCertificateManager.shared.activeStreamingCertificateAccountIdent = nil
+      } else {
+        perloadedPlayType = .stream
+      }
+    }
 
     if queueType == .play {
       os_log(
