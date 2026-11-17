@@ -72,7 +72,7 @@ class DirectoriesVC: MultiSourceTableViewController {
 
     let playShuffleInfoConfig = PlayShuffleInfoConfiguration(
       infoCB: {
-        "\(self.songsFetchedResultsController.fetchedObjects?.count ?? 0) Song\((self.songsFetchedResultsController.fetchedObjects?.count) == 1 ? "" : "s")"
+        "\(self.songsFetchedResultsController.fetchedObjectsCount) Song\(self.songsFetchedResultsController.fetchedObjectsCount == 1 ? "" : "s")"
       },
       playContextCb: { () in PlayContext(
         containable: self.directory,
@@ -168,8 +168,8 @@ class DirectoriesVC: MultiSourceTableViewController {
   }
 
   func updateContentUnavailable() {
-    if subdirectoriesFetchedResultsController.fetchedObjects?.count ?? 0 == 0,
-       songsFetchedResultsController.fetchedObjects?.count ?? 0 == 0 {
+    if subdirectoriesFetchedResultsController.fetchedObjectsCount == 0,
+       songsFetchedResultsController.fetchedObjectsCount == 0 {
       if subdirectoriesFetchedResultsController.isSearchActive {
         contentUnavailableConfiguration = UIContentUnavailableConfiguration.search()
       } else {

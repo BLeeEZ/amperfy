@@ -128,7 +128,7 @@ class AlbumsCommonVCInteractions {
   }
 
   public var isContentUnavailable: Bool {
-    fetchedResultsController.fetchedObjects?.count ?? 0 == 0
+    fetchedResultsController.fetchedObjectsCount == 0
   }
 
   func updateContentUnavailable() {
@@ -556,7 +556,7 @@ class AlbumsCommonVCInteractions {
   func createPlayShuffleInfoConfig() -> PlayShuffleInfoConfiguration {
     PlayShuffleInfoConfiguration(
       infoCB: {
-        "\(self.fetchedResultsController.fetchedObjects?.count ?? 0) Album\((self.fetchedResultsController.fetchedObjects?.count ?? 0) == 1 ? "" : "s")"
+        "\(self.fetchedResultsController.fetchedObjectsCount) Album\(self.fetchedResultsController.fetchedObjectsCount == 1 ? "" : "s")"
       },
       playContextCb: handleHeaderPlay,
       player: appDelegate.player,
