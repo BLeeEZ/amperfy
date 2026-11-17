@@ -41,10 +41,6 @@ class PopupPlayerVC: UIViewController, UIScrollViewDelegate {
   weak var controlPlaceholderHeightConstraint: NSLayoutConstraint!
   private let safetyMarginOnBottom = 20.0
   internal var artworkGradientColors = [UIColor]()
-  internal var artworkPaletteFallbackColors = [UIColor]()
-  internal let artworkPaletteState = ArtworkPaletteCoordinator()
-  internal let artworkPaletteWorker = ArtworkPaletteWorker()
-  internal var artworkPaletteTask: Task<(), Never>?
 
   lazy var tableViewKeyCommandsController = TableViewKeyCommandsController(
     tableView: tableView,
