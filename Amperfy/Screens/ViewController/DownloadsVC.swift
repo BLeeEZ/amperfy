@@ -20,6 +20,7 @@
 //
 
 import AmperfyKit
+import CoreData
 import Foundation
 import UIKit
 

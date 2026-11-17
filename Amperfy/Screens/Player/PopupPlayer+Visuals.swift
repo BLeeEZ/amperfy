@@ -60,6 +60,7 @@ extension PopupPlayerVC {
     config.baseForegroundColor = .label
     button.isEnabled = true
     button.configuration = config
+    button.accessibilityLabel = "Options"
 
     if let currentlyPlaying = appDelegate.player.currentlyPlaying,
        let rootView = rootView {
@@ -80,21 +81,26 @@ extension PopupPlayerVC {
       if let playableInfo = player.currentlyPlaying,
          playableInfo.isSong {
         config.image = playableInfo.isFavorite ? .heartFill : .heartEmpty
+        button.accessibilityLabel = playableInfo
+          .isFavorite ? "Remove from Favorites" : "Add to Favorites"
         config.baseForegroundColor = appDelegate.storage.settings.user
           .isOnlineMode ? .redHeart : .label
         button.isEnabled = appDelegate.storage.settings.user.isOnlineMode
       } else if let playableInfo = player.currentlyPlaying,
                 let radio = playableInfo.asRadio {
         config.image = .followLink
+        button.accessibilityLabel = "Open Radio Website"
         config.baseForegroundColor = .label
         button.isEnabled = radio.siteURL != nil
       } else {
         config.image = .heartEmpty
+        button.accessibilityLabel = "Add to Favorites"
         config.baseForegroundColor = .redHeart
         button.isEnabled = false
       }
     case .podcast:
       config.image = .info
+      button.accessibilityLabel = "Podcast Info"
       config.preferredSymbolConfigurationForImage = UIImage.SymbolConfiguration(scale: .large)
       config.baseForegroundColor = .label
       button.isEnabled = true

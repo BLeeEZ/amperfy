@@ -39,48 +39,75 @@ class MiniPlayerView: UIView {
     view.backgroundColor = .black.withAlphaComponent(0.4)
     view.isHidden = true
 
-    let imageView = UIImageView()
-    imageView.translatesAutoresizingMaskIntoConstraints = false
-    imageView.contentMode = .scaleAspectFit
-    imageView.tintColor = .white
-    imageView.image = .miniPlayer.withRenderingMode(.alwaysTemplate)
-
-    view.addSubview(imageView)
-    NSLayoutConstraint.activate([
-      imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-      imageView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
-      imageView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.8),
-    ])
+    view.addSubview(artworkOverlayIcon)
+    artworkOverlayIcon.constrainCentered(in: view, sizeMultiplier: 0.5)
 
     return view
   }()
 
+  fileprivate lazy var artworkOverlayIcon: UIImageView = {
+    let imageView = UIImageView()
+    imageView.contentMode = .scaleAspectFit
+    imageView.tintColor = .white
+    imageView.image = .expandPlayer.withRenderingMode(.alwaysTemplate)
+    return imageView
+  }()
+
+  private static let artworkHoverScale: CGFloat = 1.08
+  private var isArtworkHovered = false {
+    didSet {
+      guard isArtworkHovered != oldValue else { return }
+      // subtle scale effect while the pointer is on the artwork
+      let scale = isArtworkHovered ? Self.artworkHoverScale : 1.0
+      UIView.animate(
+        withDuration: 0.15,
+        delay: 0,
+        options: [.beginFromCurrentState, .curveEaseOut, .allowUserInteraction]
+      ) {
+        self.artworkImage.transform = CGAffineTransform(scaleX: scale, y: scale)
+      }
+    }
+  }
+
+  /// Command key is held: a click on the artwork opens the mini player in its own window
+  private var isCommandKeyPressed = false
+
+  /// A separate mini player window requires multi window support (macOS, iPadOS)
+  private var isOpeningMiniPlayerWindow: Bool {
+    isCommandKeyPressed && UIApplication.shared.supportsMultipleScenes
+  }
+
+  private func refreshArtworkOverlay() {
+    artworkOverlay.isHidden = !isArtworkHovered
+    let icon: UIImage = isOpeningMiniPlayerWindow ? .openMiniPlayerWindow : .expandPlayer
+    artworkOverlayIcon.image = icon.withRenderingMode(.alwaysTemplate)
+  }
+
+  /// Called when the command key is pressed or released while the pointer rests on the artwork
+  public func commandKeyChanged(isPressed: Bool) {
+    isCommandKeyPressed = isPressed
+    refreshArtworkOverlay()
+  }
+
   fileprivate lazy var artworkImage: LibraryEntityImage = {
     let imageView = LibraryEntityImage(frame: .zero)
     imageView.backgroundColor = .clear
-    #if targetEnvironment(macCatalyst) // ok
-      artworkOverlay.translatesAutoresizingMaskIntoConstraints = false
-      imageView.addSubview(artworkOverlay)
-      NSLayoutConstraint.activate([
-        artworkOverlay.centerXAnchor.constraint(equalTo: imageView.centerXAnchor),
-        artworkOverlay.centerYAnchor.constraint(equalTo: imageView.centerYAnchor),
-        artworkOverlay.widthAnchor.constraint(equalTo: imageView.widthAnchor),
-        artworkOverlay.heightAnchor.constraint(equalTo: imageView.heightAnchor),
-      ])
+    imageView.addSubview(artworkOverlay)
+    artworkOverlay.constrainCentered(in: imageView)
 
-      imageView.isUserInteractionEnabled = true
-      let miniPlayerHoverGesture = UIHoverGestureRecognizer(
-        target: self,
-        action: #selector(artworkHovered(_:))
-      )
-      let miniPlayerTapGesture = UITapGestureRecognizer(
-        target: self,
-        action: #selector(artworkClicked(_:))
-      )
-      imageView.addGestureRecognizer(miniPlayerTapGesture)
-      imageView.addGestureRecognizer(miniPlayerHoverGesture)
-    #endif
+    imageView.isUserInteractionEnabled = true
+    // pointer (macOS, iPadOS with a mouse or trackpad): indicate that a click opens the player
+    let miniPlayerHoverGesture = UIHoverGestureRecognizer(
+      target: self,
+      action: #selector(artworkHovered(_:))
+    )
+    imageView.addGestureRecognizer(miniPlayerHoverGesture)
+    // click: open the player, cmd + click: open the mini player in its own window
+    let miniPlayerTapGesture = UITapGestureRecognizer(
+      target: self,
+      action: #selector(artworkClicked(_:))
+    )
+    imageView.addGestureRecognizer(miniPlayerTapGesture)
     return imageView
   }()
 
@@ -113,21 +140,30 @@ class MiniPlayerView: UIView {
   @objc
   func artworkHovered(_ sender: UIHoverGestureRecognizer) {
     switch sender.state {
-    case .began:
-      artworkOverlay.isHidden = false
+    case .began, .changed:
+      isArtworkHovered = true
+      isCommandKeyPressed = sender.modifierFlags.contains(.command)
     case .cancelled, .ended, .failed:
-      artworkOverlay.isHidden = true
+      isArtworkHovered = false
     default:
       break
     }
+    refreshArtworkOverlay()
   }
 
   @objc
   func artworkClicked(_ sender: UITapGestureRecognizer) {
     switch sender.state {
     case .ended:
-      appDelegate.closeMainWindow()
-      appDelegate.showMiniPlayer()
+      isCommandKeyPressed = sender.modifierFlags.contains(.command)
+      let openInOwnWindow = isOpeningMiniPlayerWindow
+      isArtworkHovered = false
+      refreshArtworkOverlay()
+      if openInOwnWindow {
+        appDelegate.showMiniPlayer()
+      } else {
+        openPlayerView()
+      }
     default:
       break
     }
@@ -191,6 +227,7 @@ class MiniPlayerView: UIView {
     )
     button.imageView?.tintColor = .label
     button.showsMenuAsPrimaryAction = true
+    button.accessibilityLabel = "More"
     return button
   }()
 
@@ -285,6 +322,7 @@ class MiniPlayerView: UIView {
     let button = UIButton(configuration: config)
     button.tintColor = .label
     button.addTarget(self, action: #selector(Self.lyricsPressed), for: .touchUpInside)
+    button.accessibilityLabel = "Lyrics"
     return button
   }()
 
@@ -337,6 +375,7 @@ class MiniPlayerView: UIView {
     let button = UIButton(configuration: config)
     button.tintColor = .label
     button.addTarget(self, action: #selector(Self.airplayButtonPushed), for: .touchUpInside)
+    button.accessibilityLabel = "AirPlay"
     return button
   }()
 
@@ -355,6 +394,7 @@ class MiniPlayerView: UIView {
     let button = UIButton(configuration: config)
     button.tintColor = .label
     button.addTarget(self, action: #selector(Self.volumeButtonPushed), for: .touchUpInside)
+    button.accessibilityLabel = "Volume"
     return button
   }()
 
@@ -628,8 +668,10 @@ class MiniPlayerView: UIView {
     let miniPlayerGotTouchedView = UIView()
     let tapGesture = UITapGestureRecognizer(target: self, action: #selector(miniPlayerGotTouched))
     addGestureRecognizer(tapGesture)
-
     miniPlayerGotTouchedView.translatesAutoresizingMaskIntoConstraints = false
+    miniPlayerGotTouchedView.isAccessibilityElement = true
+    miniPlayerGotTouchedView.accessibilityLabel = "Open Player"
+    miniPlayerGotTouchedView.accessibilityTraits = .button
     artworkImage.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -716,13 +758,21 @@ class MiniPlayerView: UIView {
   public func openPlayerView(completion: (() -> ())? = nil) {
     guard let hostVC = AppDelegate.mainWindowHostVC as? UIViewController else { return }
     let popupPlayer = PopupPlayerVC()
-    popupPlayer.modalPresentationStyle = .pageSheet
-    if let sheet = popupPlayer.sheetPresentationController {
-      sheet.detents = [.large()]
-      sheet.prefersGrabberVisible = true
-      sheet.preferredCornerRadius = 24
-    }
-    hostVC.present(popupPlayer, animated: true, completion: completion)
+    #if targetEnvironment(macCatalyst)
+      // cover the complete window content, like the Music app does. The navigation bar offers
+      // the close button
+      let navController = UINavigationController(rootViewController: popupPlayer)
+      navController.modalPresentationStyle = .fullScreen
+      hostVC.present(navController, animated: true, completion: completion)
+    #else
+      popupPlayer.modalPresentationStyle = .pageSheet
+      if let sheet = popupPlayer.sheetPresentationController {
+        sheet.detents = [.large()]
+        sheet.prefersGrabberVisible = true
+        sheet.preferredCornerRadius = 24
+      }
+      hostVC.present(popupPlayer, animated: true, completion: completion)
+    #endif
   }
 
   @objc

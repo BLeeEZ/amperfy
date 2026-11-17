@@ -20,7 +20,10 @@
 //
 
 @testable import AmperfyKit
+import CoreData
 import XCTest
+
+// MARK: - PlaylistTest
 
 @MainActor
 class PlaylistTest: XCTestCase {
@@ -630,5 +633,38 @@ class PlaylistTest: XCTestCase {
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 2, seedIndex: 3)
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 3, seedIndex: 4)
     checkPlaylistIndexEqualSeedIndex(playlistIndex: 4, seedIndex: 2)
+  }
+
+  func testAppendedSongsReachTheItemListWithResolvableIDs() {
+    let context = cdHelper.persistentContainer.viewContext
+    let itemsController = PlaylistItemsFetchedResultsController(
+      forPlaylist: testPlaylist,
+      coreDataCompanion: CoreDataCompanion(context: context),
+      isGroupedInAlphabeticSections: false
+    )
+    let snapshotRecorder = SnapshotRecorder()
+    itemsController.delegate = snapshotRecorder
+    itemsController.fetch()
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[5].id)
+    else { XCTFail(); return }
+    testPlaylist.append(playables: [song])
+    XCTAssertEqual(snapshotRecorder.itemIDs.count, 6)
+    for itemID in snapshotRecorder.itemIDs {
+      XCTAssertNotNil(try? context.existingObject(with: itemID))
+    }
+  }
+}
+
+// MARK: - SnapshotRecorder
+
+@MainActor
+private final class SnapshotRecorder: NSObject, @preconcurrency NSFetchedResultsControllerDelegate {
+  var itemIDs = [NSManagedObjectID]()
+
+  func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference
+  ) {
+    itemIDs = snapshot.itemIdentifiers.compactMap { $0 as? NSManagedObjectID }
   }
 }

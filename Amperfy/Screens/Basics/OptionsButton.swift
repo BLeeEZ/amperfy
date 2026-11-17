@@ -28,10 +28,14 @@ extension UIBarButtonItem {
   }
 
   static func createOptionsBarButton() -> UIBarButtonItem {
-    UIBarButtonItem(image: .ellipsis, menu: nil)
+    let item = UIBarButtonItem(image: .ellipsis, menu: nil)
+    item.accessibilityLabel = "Options"
+    return item
   }
 
   static func createSortBarButton() -> UIBarButtonItem {
-    UIBarButtonItem(image: .filter, menu: nil)
+    let item = UIBarButtonItem(image: .filter, menu: nil)
+    item.accessibilityLabel = "Sort and Filter"
+    return item
   }
 }

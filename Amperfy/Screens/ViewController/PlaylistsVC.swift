@@ -224,10 +224,6 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
   override func viewIsAppearing(_ animated: Bool) {
     super.viewIsAppearing(animated)
     extendSafeAreaToAccountForMiniPlayer()
-    if appDelegate.storage.settings.user.isOfflineMode {
-      isEditing = false
-    }
-    updateRightBarButtonItems()
     updateContentUnavailable()
     guard appDelegate.storage.settings.user.isOnlineMode else { return }
     Task { @MainActor in do {
@@ -236,6 +232,15 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
     } catch {
       self.appDelegate.eventLogger.report(topic: "Playlists Sync", error: error)
     }}
+  }
+
+  /// The rows and the Edit button follow the mode together
+  override func applyOfflineMode() {
+    super.applyOfflineMode()
+    if appDelegate.storage.settings.user.isOfflineMode {
+      isEditing = false
+    }
+    updateRightBarButtonItems()
   }
 
   func updateRightBarButtonItems() {
@@ -358,7 +363,8 @@ class PlaylistsVC: SingleSnapshotFetchedResultsTableViewController<PlaylistMO> {
         }
         self.appDelegate.eventLogger.info(
           topic: "Sync All Playlists",
-          message: "All playlists have been synced."
+          message: "All playlists have been synced.",
+          toast: AlertToastText(title: "Playlists", subtitle: "All playlists synced")
         )
       } catch {
         self.appDelegate.eventLogger.report(topic: "Sync All Playlists", error: error)

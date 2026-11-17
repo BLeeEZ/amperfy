@@ -41,6 +41,9 @@ class PlayerUIHandler: NSObject {
 
   private var player: PlayerFacade
   private var style: PlayerUIStyle
+  /// Only evaluated for the popup player style: hides the shuffle and repeat buttons when the
+  /// surrounding UI already offers them (queue inspector next to the macOS player bar)
+  var isShuffleAndRepeatHidden = false
 
   init(player: PlayerFacade, style: PlayerUIStyle) {
     self.player = player
@@ -117,9 +120,16 @@ class PlayerUIHandler: NSObject {
 
     button.setImage(buttonImg, for: UIControl.State.normal)
     button.configuration?.image = buttonImg
+    if player.isPlaying {
+      button.accessibilityLabel = player.isStopInsteadOfPause ? "Stop" : "Pause"
+    } else {
+      button.accessibilityLabel = "Play"
+    }
   }
 
   func refreshSkipButtons(skipBackwardButton: UIButton, skipForwardButton: UIButton) {
+    skipBackwardButton.accessibilityLabel = "Skip Back 10 Seconds"
+    skipForwardButton.accessibilityLabel = "Skip Forward 10 Seconds"
     switch player.playerMode {
     case .music:
       skipBackwardButton.isHidden = !appDelegate.storage.settings.user.isShowMusicPlayerSkipButtons
@@ -148,9 +158,13 @@ class PlayerUIHandler: NSObject {
     case .music:
       previouseImg = UIImage.backwardFill
       nextImg = UIImage.forwardFill
+      previousButton.accessibilityLabel = "Previous Song"
+      nextButton.accessibilityLabel = "Next Song"
     case .podcast:
       previouseImg = UIImage.goBackward15
       nextImg = UIImage.goForward30
+      previousButton.accessibilityLabel = "Skip Back 15 Seconds"
+      nextButton.accessibilityLabel = "Skip Forward 30 Seconds"
     }
 
     switch style {
@@ -184,10 +198,13 @@ class PlayerUIHandler: NSObject {
     switch player.repeatMode {
     case .off:
       image = .repeatMenu
+      repeatButton.accessibilityLabel = "Repeat Off"
     case .all:
       image = .repeatAll
+      repeatButton.accessibilityLabel = "Repeat All"
     case .single:
       image = .repeatOne
+      repeatButton.accessibilityLabel = "Repeat One"
     }
 
     switch style {
@@ -201,16 +218,13 @@ class PlayerUIHandler: NSObject {
       config.image = image?
         .withConfiguration(UIImage.SymbolConfiguration(scale: .medium))
       repeatButton.configuration = config
-      #if targetEnvironment(macCatalyst)
-        repeatButton.isHidden = !appDelegate.isShowingMiniPlayer
-      #else
-        repeatButton.isHidden = false
-      #endif
+      repeatButton.isHidden = isShuffleAndRepeatHidden
     }
     repeatButton.isSelected = isSelected
   }
 
   func refreshShuffleButton(shuffleButton: UIButton) {
+    shuffleButton.accessibilityLabel = player.isShuffle ? "Shuffle On" : "Shuffle Off"
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:
       shuffleButton.configuration?.image = .shuffle
@@ -222,11 +236,7 @@ class PlayerUIHandler: NSObject {
       config.image = .shuffle
         .withConfiguration(UIImage.SymbolConfiguration(scale: .medium))
       shuffleButton.configuration = config
-      #if targetEnvironment(macCatalyst)
-        shuffleButton.isHidden = !appDelegate.isShowingMiniPlayer
-      #else
-        shuffleButton.isHidden = false
-      #endif
+      shuffleButton.isHidden = isShuffleAndRepeatHidden
     }
     shuffleButton.isEnabled = appDelegate.storage.settings.user.isPlayerShuffleButtonEnabled
     shuffleButton.isSelected = player.isShuffle
@@ -234,6 +244,7 @@ class PlayerUIHandler: NSObject {
 
   func refreshAutoplayButton(autoplayButton: UIButton) {
     let isActive = appDelegate.storage.settings.user.isAutoplayEnabled
+    autoplayButton.accessibilityLabel = isActive ? "Autoplay On" : "Autoplay Off"
 
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:
@@ -253,6 +264,7 @@ class PlayerUIHandler: NSObject {
 
   func refreshDisplayPlaylistButton(displayPlaylistButton: UIButton) {
     let isSelected = appDelegate.storage.settings.user.playerDisplayStyle == .compact
+    displayPlaylistButton.accessibilityLabel = "Queue"
 
     switch style {
     case .miniPlayeriOS, .miniPlayerMac:

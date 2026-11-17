@@ -145,11 +145,6 @@ class LibrarySyncPopupVC: UIViewController {
     icon = customIcon != nil ? customIcon! : .info
   }
 
-  func useOptionalButton(text: String, onPressed: ((Bool) -> ())? = nil) {
-    optionalButtonText = text
-    optionalButtonOnPressed = onPressed
-  }
-
   private func animateIconRotation() {
     UIView.animate(withDuration: 5, delay: 0, options: .repeat, animations: ({
       self.iconImage.transform = CGAffineTransform(rotationAngle: CGFloat.pi)

@@ -28,6 +28,7 @@ struct AccountSettingsView: View {
   enum Destination: Hashable {
     case serverURLs
     case customHTTPHeaders
+    case clientCertificate
   }
 
   let splitPercentage = 0.25
@@ -56,12 +57,12 @@ struct AccountSettingsView: View {
     let meta = appDelegate.getMeta(accountInfo)
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
+    appDelegate.switchOnlineOfflineMode(isOfflineMode: false)
 
     // reset quick actions
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.configureMainMenu()
 
-    appDelegate.storage.settings.user.isOfflineMode = false
     appDelegate.storage.settings.accounts.updateSetting(accountInfo) {
       $0.clearInitialSyncCheckpoint()
     }
@@ -100,6 +101,18 @@ struct AccountSettingsView: View {
     meta.stopManager()
     appDelegate.resetMeta(accountInfo)
 
+    // remove the client certificate and the session cookies of the server (e.g. set by a proxy
+    // in front of it)
+    try? ClientCertificateManager.shared.removeCertificate(
+      tag: ClientCertificateManager.accountTag(for: accountInfo.ident)
+    )
+    if let credentials = appDelegate.storage.settings.accounts.getSetting(accountInfo).read
+      .loginCredentials,
+      let serverUrl = URL(string: credentials.activeBackendServerUrl) {
+      HTTPCookieStorage.shared.cookies(for: serverUrl)?
+        .forEach { HTTPCookieStorage.shared.deleteCookie($0) }
+    }
+
     // delete cached files
     CacheFileManager.shared.deleteAccountCache(accountInfo: accountInfo)
     // reset login credentials -> at new start the login view is presented to auth and resync library
@@ -111,7 +124,10 @@ struct AccountSettingsView: View {
     appDelegate.quickActionsManager.configureQuickActions()
     appDelegate.configureMainMenu()
 
-    appDelegate.storage.settings.user.isOfflineMode = false
+    // stored now so the next account's window is built online; posted after player.logout, as
+    // the player view reloads the current song's lyrics on it (this account's screens skip it)
+    let isSwitchedOnline = appDelegate.storeOnlineOfflineMode(isOfflineMode: false)
+    defer { if isSwitchedOnline { appDelegate.postOfflineModeChanged() } }
     let account = appDelegate.storage.main.library.getAccount(info: accountInfo)
     appDelegate.player.logout(account: account)
     if let newActiveAccountInfo = appDelegate.storage.settings.accounts.active {
@@ -241,6 +257,9 @@ struct AccountSettingsView: View {
             NavigationLink(value: Destination.customHTTPHeaders) {
               Text("Custom HTTP Headers")
             }
+            NavigationLink(value: Destination.clientCertificate) {
+              Text("Client Certificate (mTLS)")
+            }
           }
 
           SettingsSection {
@@ -301,6 +320,12 @@ struct AccountSettingsView: View {
           ) { updated in
             saveHTTPHeaders(updated, accountInfo: activeAccountInfo)
           }
+        }
+      case .clientCertificate:
+        if let activeAccountInfo = settings.activeAccountInfo {
+          ClientCertificateSettingsView(
+            certTag: ClientCertificateManager.accountTag(for: activeAccountInfo.ident)
+          )
         }
       }
     }

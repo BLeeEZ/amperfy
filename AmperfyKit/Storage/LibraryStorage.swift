@@ -1496,12 +1496,13 @@ public class LibraryStorage: PlayableFileCachable {
   }
 
   func getAlbumWithoutSyncedSongs(
+    for account: Account,
     fetchLimit: Int,
     excluding excludedObjectIDs: Set<NSManagedObjectID> = Set()
   )
     -> [Album] {
     let fetchRequest: NSFetchRequest<AlbumMO> = AlbumMO.fetchRequest()
-    var predicates = [albumWithoutSyncedSongsPredicate]
+    var predicates = [getFetchPredicate(forAccount: account), albumWithoutSyncedSongsPredicate]
     if !excludedObjectIDs.isEmpty {
       predicates.append(NSPredicate(format: "NOT (SELF IN %@)", Array(excludedObjectIDs)))
     }
@@ -3080,6 +3081,12 @@ public class LibraryStorage: PlayableFileCachable {
   public func saveContext() {
     if context.hasChanges {
       do {
+        // Fetched results controllers on the main context get the changes of the save while new
+        // objects still have temporary IDs, which can't be resolved after the save (#920).
+        // Background contexts get their IDs assigned by the save.
+        if context.concurrencyType == .mainQueueConcurrencyType {
+          try context.obtainPermanentIDs(for: Array(context.insertedObjects))
+        }
         try context.save()
       } catch {
         // Log the error and attempt recovery instead of crashing

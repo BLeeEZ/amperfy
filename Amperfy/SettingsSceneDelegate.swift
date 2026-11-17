@@ -107,6 +107,14 @@ class SettingsSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     os_log("Settings: openURLContexts", log: self.log, type: .info)
+    // The system delivers a URL to whichever scene is frontmost, so
+    // x-callback-urls must be handled here as well as in the main scene.
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
+    for URLContext in URLContexts {
+      _ = appDelegate.intentManager.handleIncoming(url: URLContext.url)
+    }
   }
 
   // This is the NSUserActivity that will be used to restore state when the Scene reconnects.

@@ -23,11 +23,35 @@ import Foundation
 
 // MARK: - PlayerNotificationAdapter
 
+/// Posts the player events and keeps the player in the stored online/offline mode
+@MainActor
 class PlayerNotificationAdapter {
   let notificationHandler: EventNotificationHandler
+  private var player: PlayerFacade
+  private let settings: AmperfySettings
 
-  init(notificationHandler: EventNotificationHandler) {
+  init(
+    notificationHandler: EventNotificationHandler,
+    player: PlayerFacade,
+    settings: AmperfySettings
+  ) {
     self.notificationHandler = notificationHandler
+    self.player = player
+    self.settings = settings
+    applyOfflineMode()
+    notificationHandler.register(
+      self,
+      selector: #selector(applyOfflineMode),
+      name: .offlineModeChanged,
+      object: nil
+    )
+  }
+
+  /// Offline, the player neither streams, preloads a stream nor autoplays; a song already
+  /// streaming plays to its end
+  @objc
+  private func applyOfflineMode() {
+    player.isOfflineMode = settings.user.isOfflineMode
   }
 }
 

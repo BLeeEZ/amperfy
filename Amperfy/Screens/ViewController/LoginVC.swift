@@ -20,6 +20,7 @@
 //
 
 import AmperfyKit
+import Network
 import SwiftUI
 import UIKit
 
@@ -51,6 +52,57 @@ extension UITextField {
     leftViewMode = .always
 
     backgroundColor = .clear
+  }
+}
+
+// MARK: - LocalNetworkAuthorization
+
+/// Triggers the local network permission prompt by browsing for a Bonjour service.
+/// iOS only asks on the first local network access, which would otherwise be the login request itself.
+@MainActor
+final class LocalNetworkAuthorization {
+  static let shared = LocalNetworkAuthorization()
+  // Must be listed in NSBonjourServices in Info.plist
+  private static let serviceType = "_amperfy-lnp._tcp"
+
+  private(set) var isDenied = false
+  private var browser: NWBrowser?
+
+  func trigger() {
+    guard browser == nil else { return }
+    // access may have been changed in Settings since the last browse: the new state reports it
+    isDenied = false
+    let browser = NWBrowser(
+      for: .bonjour(type: Self.serviceType, domain: nil),
+      using: NWParameters()
+    )
+    browser.stateUpdateHandler = { [weak self] state in
+      MainActor.assumeIsolated {
+        guard let self else { return }
+        switch state {
+        case let .waiting(error):
+          self.isDenied = Self.isPolicyDenied(error)
+        case .ready:
+          self.isDenied = false
+        case let .failed(error):
+          self.isDenied = Self.isPolicyDenied(error)
+          self.stop()
+        default:
+          break
+        }
+      }
+    }
+    browser.start(queue: .main)
+    self.browser = browser
+  }
+
+  func stop() {
+    browser?.cancel()
+    browser = nil
+  }
+
+  private static func isPolicyDenied(_ error: NWError) -> Bool {
+    error == .dns(DNSServiceErrorType(kDNSServiceErr_PolicyDenied))
   }
 }
 
@@ -97,67 +149,61 @@ class LoginVC: UIViewController {
     let textField = UITextField()
     textField.configuteForLogin(image: .serverUrl)
     textField.placeholder = "https://localhost/ampache"
+    textField.accessibilityLabel = "Server URL"
     textField.textContentType = .URL
     textField.keyboardType = .URL
+    textField.returnKeyType = .done
     textField.autocorrectionType = .no
     textField.autocapitalizationType = .none
     textField.addTarget(
       self,
-      action: #selector(Self.serverUrlActionPressed),
+      action: #selector(Self.dismissKeyboard),
       for: .primaryActionTriggered
     )
     return textField
   }()
-
-  @IBAction
-  func serverUrlActionPressed() {
-    serverUrlTF.resignFirstResponder()
-    login()
-  }
 
   fileprivate lazy var usernameTF: UITextField = {
     let textField = UITextField()
     textField.configuteForLogin(image: .userPerson)
     textField.placeholder = "Username"
+    textField.accessibilityLabel = "Username"
     textField.textContentType = .username
     textField.keyboardType = .default
+    textField.returnKeyType = .done
     textField.autocorrectionType = .no
     textField.autocapitalizationType = .none
     textField.addTarget(
       self,
-      action: #selector(Self.usernameActionPressed),
+      action: #selector(Self.dismissKeyboard),
       for: .primaryActionTriggered
     )
     return textField
   }()
-
-  @IBAction
-  func usernameActionPressed() {
-    usernameTF.resignFirstResponder()
-    login()
-  }
 
   fileprivate lazy var passwordTF: UITextField = {
     let textField = UITextField()
     textField.configuteForLogin(image: .password)
     textField.placeholder = "Password"
+    textField.accessibilityLabel = "Password"
     textField.textContentType = .password
     textField.keyboardType = .default
+    textField.returnKeyType = .done
     textField.isSecureTextEntry = true
     textField.autocorrectionType = .no
     textField.autocapitalizationType = .none
     textField.addTarget(
       self,
-      action: #selector(Self.passwordActionPressed),
+      action: #selector(Self.dismissKeyboard),
       for: .primaryActionTriggered
     )
     return textField
   }()
 
-  @IBAction
-  func passwordActionPressed() {
-    passwordTF.resignFirstResponder()
-    login()
+  /// Return only dismisses the keyboard; the login is started with the Login button.
+  @objc
+  func dismissKeyboard() {
+    view.endEditing(true)
   }
 
   fileprivate lazy var apiSelectorButton: UIButton = {
@@ -180,34 +226,55 @@ class LoginVC: UIViewController {
     return button
   }()
 
-  fileprivate lazy var httpHeadersButton: UIButton = {
+  fileprivate lazy var advancedLabel: UILabel = {
+    let label = UILabel()
+    label.text = "Advanced:"
+    label.font = .systemFont(ofSize: Self.fontSize)
+    label.textColor = .hardLabelColor
+    return label
+  }()
+
+  fileprivate lazy var advancedButton: UIButton = {
     var config = UIButton.Configuration.glass()
     let button = UIButton(configuration: config)
-    button.setTitle("Custom HTTP Headers", for: .normal)
-    button.accessibilityLabel = "Custom HTTP Headers"
-    button.addTarget(self, action: #selector(Self.httpHeadersPressed), for: .touchUpInside)
+    button.setTitle("None", for: .normal)
+    button.accessibilityLabel = "Advanced network access options"
+    button.addTarget(self, action: #selector(Self.advancedPressed), for: .touchUpInside)
     button.preferredBehavioralStyle = .pad
     return button
   }()
 
   @IBAction
-  func httpHeadersPressed() {
-    let editor = CustomHTTPHeadersView(headers: httpHeaders) { [weak self] updated in
-      self?.httpHeaders = updated
-    }
+  func advancedPressed() {
     let hostingController = UIHostingController(rootView: AnyView(EmptyView()))
-    hostingController.rootView = AnyView(NavigationStack {
-      editor
-        .toolbar {
-          ToolbarItem(placement: .confirmationAction) {
-            Button("Done") { [weak hostingController] in
-              hostingController?.dismiss(animated: true)
-            }
-          }
-        }
-    })
+    hostingController.rootView = AnyView(
+      AdvancedLoginOptionsView(
+        headers: httpHeaders,
+        onHeadersChange: { [weak self] updated in self?.httpHeaders = updated },
+        onDismiss: { [weak self] in self?.updateAdvancedSummary() },
+        onDone: { [weak hostingController] in hostingController?.dismiss(animated: true) }
+      )
+    )
     hostingController.modalPresentationStyle = .formSheet
     present(hostingController, animated: true)
+  }
+
+  static func advancedSummaryTitle(hasHeaders: Bool, hasCertificate: Bool) -> String {
+    switch (hasHeaders, hasCertificate) {
+    case (false, false): "None"
+    case (true, false): "Headers"
+    case (false, true): "Certificate"
+    case (true, true): "Headers + Certificate"
+    }
+  }
+
+  func updateAdvancedSummary() {
+    let hasCert = ClientCertificateManager.shared
+      .hasCertificate(tag: ClientCertificateManager.loginTag)
+    advancedButton.setTitle(
+      Self.advancedSummaryTitle(hasHeaders: !httpHeaders.isEmpty, hasCertificate: hasCert),
+      for: .normal
+    )
   }
 
   // Close button shown when presented as a sheet/modal
@@ -245,7 +312,8 @@ class LoginVC: UIViewController {
     self.passwordTF.translatesAutoresizingMaskIntoConstraints = false
     apiLabel.translatesAutoresizingMaskIntoConstraints = false
     self.apiSelectorButton.translatesAutoresizingMaskIntoConstraints = false
-    self.httpHeadersButton.translatesAutoresizingMaskIntoConstraints = false
+    self.advancedButton.translatesAutoresizingMaskIntoConstraints = false
+    advancedLabel.translatesAutoresizingMaskIntoConstraints = false
 
     let view = UIView()
     view.addSubview(serverUrlTF)
@@ -253,7 +321,8 @@ class LoginVC: UIViewController {
     view.addSubview(passwordTF)
     view.addSubview(apiLabel)
     view.addSubview(apiSelectorButton)
-    view.addSubview(httpHeadersButton)
+    view.addSubview(advancedLabel)
+    view.addSubview(advancedButton)
 
     let padding: CGFloat = 0
     let elementHeight: CGFloat = 40
@@ -322,19 +391,25 @@ class LoginVC: UIViewController {
       ),
       apiSelectorButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
-      httpHeadersButton.safeAreaLayoutGuide.topAnchor.constraint(
+      advancedLabel.safeAreaLayoutGuide.topAnchor.constraint(
         equalTo: apiSelectorButton.bottomAnchor,
         constant: spaceInBetween
       ),
-      httpHeadersButton.safeAreaLayoutGuide.leadingAnchor.constraint(
+      advancedLabel.safeAreaLayoutGuide.leadingAnchor.constraint(
         equalTo: view.safeAreaLayoutGuide.leadingAnchor,
         constant: padding
       ),
-      httpHeadersButton.safeAreaLayoutGuide.trailingAnchor.constraint(
+      advancedLabel.heightAnchor.constraint(equalToConstant: elementHeight),
+
+      advancedButton.safeAreaLayoutGuide.topAnchor.constraint(
+        equalTo: apiSelectorButton.bottomAnchor,
+        constant: spaceInBetween
+      ),
+      advancedButton.safeAreaLayoutGuide.trailingAnchor.constraint(
         equalTo: view.safeAreaLayoutGuide.trailingAnchor,
         constant: -padding
       ),
-      httpHeadersButton.heightAnchor.constraint(equalToConstant: elementHeight),
+      advancedButton.heightAnchor.constraint(equalToConstant: elementHeight),
 
       view.heightAnchor
         .constraint(equalToConstant: (5 * elementHeight) + (4 * spaceInBetween) + (2 * padding)),
@@ -350,6 +425,10 @@ class LoginVC: UIViewController {
   var formLeadingConstraing: NSLayoutConstraint?
   var formTrailingConstraing: NSLayoutConstraint?
   var formWitdhConstraing: NSLayoutConstraint?
+  var formCenterYConstraint: NSLayoutConstraint?
+  var iconCenterYConstraint: NSLayoutConstraint?
+  /// How far the form is currently lifted to stay clear of the keyboard (<= 0).
+  private var keyboardAvoidanceOffset: CGFloat = 0
 
   public lazy var mainContainerView: UIView = {
     self.formView.translatesAutoresizingMaskIntoConstraints = false
@@ -460,6 +539,11 @@ class LoginVC: UIViewController {
         self.appDelegate.storage.settings.accounts.login(credentials)
         meta.backendApi.provideCredentials(credentials: credentials)
 
+        try? ClientCertificateManager.shared.moveCertificate(
+          from: ClientCertificateManager.loginTag,
+          to: ClientCertificateManager.accountTag(for: accountInfo.ident)
+        )
+
         self.appDelegate.notificationHandler.post(name: .accountAdded, object: nil, userInfo: nil)
         self.appDelegate.notificationHandler.post(
           name: .accountActiveChanged,
@@ -482,6 +566,10 @@ class LoginVC: UIViewController {
       } catch {
         if error is AuthenticationError {
           self.showErrorMsg(message: error.localizedDescription)
+        } else if LocalNetworkAuthorization.shared.isDenied {
+          self.showErrorMsg(
+            message: "Not able to login! Access to the local network is denied. If your server is in your local network, allow access in Settings > Privacy & Security > Local Network."
+          )
         } else {
           self.showErrorMsg(message: "Not able to login!")
         }
@@ -520,6 +608,8 @@ class LoginVC: UIViewController {
       }),
     ])
 
+    updateAdvancedSummary()
+
     view.backgroundColor = .systemBackground
 
     amperfyLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -545,6 +635,14 @@ class LoginVC: UIViewController {
     formTrailingConstraing?.priority = .defaultHigh
     formWitdhConstraing = formGlassContainer.widthAnchor.constraint(lessThanOrEqualToConstant: 600)
     formWitdhConstraing?.priority = .required
+    formCenterYConstraint = formGlassContainer.centerYAnchor.constraint(
+      equalTo: view.centerYAnchor,
+      constant: 0
+    )
+    iconCenterYConstraint = iconView.centerYAnchor.constraint(
+      equalTo: view.centerYAnchor,
+      constant: 0
+    )
 
     iconView.addConstraint(NSLayoutConstraint(
       item: iconView,
@@ -561,7 +659,7 @@ class LoginVC: UIViewController {
       amperfyLabel.heightAnchor.constraint(equalToConstant: 60),
 
       formGlassContainer.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
-      formGlassContainer.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
+      formCenterYConstraint!,
       formWitdhConstraing!,
       formLeadingConstraing!,
       formTrailingConstraing!,
@@ -575,7 +673,7 @@ class LoginVC: UIViewController {
       loginGlassContainer.heightAnchor.constraint(equalToConstant: 40),
 
       iconView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 0),
-      iconView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 0),
+      iconCenterYConstraint!,
       iconView.heightAnchor.constraint(equalTo: formGlassContainer.heightAnchor, constant: 40),
 
       // Close button top-right
@@ -590,6 +688,62 @@ class LoginVC: UIViewController {
     let isModal = presentingViewController != nil || navigationController?
       .presentingViewController != nil
     closeButton.isHidden = !isModal
+
+    let tapGesture = UITapGestureRecognizer(
+      target: self,
+      action: #selector(Self.dismissKeyboard)
+    )
+    // Let taps still reach the buttons underneath
+    tapGesture.cancelsTouchesInView = false
+    view.addGestureRecognizer(tapGesture)
+
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(Self.keyboardWillChangeFrame(_:)),
+      name: UIResponder.keyboardWillChangeFrameNotification,
+      object: nil
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(Self.keyboardWillHide(_:)),
+      name: UIResponder.keyboardWillHideNotification,
+      object: nil
+    )
+  }
+
+  @objc
+  private func keyboardWillChangeFrame(_ notification: Notification) {
+    guard let userInfo = notification.userInfo,
+          let endFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?
+          .cgRectValue
+    else { return }
+
+    let keyboardTop = view.convert(endFrame, from: nil).minY
+    // Keep the login button (lowest element) above the keyboard.
+    let overlap = loginGlassContainer.frame.maxY + 16 - keyboardTop
+    applyKeyboardAvoidance(offset: min(0, keyboardAvoidanceOffset - overlap), userInfo: userInfo)
+  }
+
+  @objc
+  private func keyboardWillHide(_ notification: Notification) {
+    applyKeyboardAvoidance(offset: 0, userInfo: notification.userInfo)
+  }
+
+  private func applyKeyboardAvoidance(offset: CGFloat, userInfo: [AnyHashable: Any]?) {
+    guard offset != keyboardAvoidanceOffset else { return }
+    keyboardAvoidanceOffset = offset
+    formCenterYConstraint?.constant = offset
+    iconCenterYConstraint?.constant = offset
+
+    let duration = userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+    let curveRaw = userInfo?[UIResponder.keyboardAnimationCurveUserInfoKey] as? UInt
+      ?? UInt(UIView.AnimationCurve.easeInOut.rawValue)
+    UIView.animate(
+      withDuration: duration,
+      delay: 0,
+      options: UIView.AnimationOptions(rawValue: curveRaw << 16),
+      animations: { self.view.layoutIfNeeded() }
+    )
   }
 
   override func updateProperties() {
@@ -635,6 +789,17 @@ class LoginVC: UIViewController {
       usernameTF.text = credentials.username
       httpHeaders = credentials.httpHeaders
     }
+    updateAdvancedSummary()
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    LocalNetworkAuthorization.shared.trigger()
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    LocalNetworkAuthorization.shared.stop()
   }
 
   override func viewWillAppear(_ animated: Bool) {

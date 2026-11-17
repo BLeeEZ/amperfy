@@ -107,6 +107,12 @@ public class MetaManager {
     self.eventLogger = eventLogger
     self.notificationHandler = notificationHandler
     self.localNotificationManager = localNotificationManager
+    notificationHandler.register(
+      self,
+      selector: #selector(startScrobbleUploadIfOnline),
+      name: .offlineModeChanged,
+      object: nil
+    )
   }
 
   private var scrobbleSyncer: ScrobbleSyncer?
@@ -146,7 +152,8 @@ public class MetaManager {
       notificationHandler: notificationHandler,
       urlCleanser: backendApi,
       limitCacheSize: true,
-      isFailWithPopupError: true
+      isFailWithPopupError: true,
+      clientCertificateAccountIdent: account.ident
     )
 
     let configuration = URLSessionConfiguration
@@ -192,7 +199,8 @@ public class MetaManager {
       notificationHandler: notificationHandler,
       urlCleanser: backendApi,
       limitCacheSize: false,
-      isFailWithPopupError: false
+      isFailWithPopupError: false,
+      clientCertificateAccountIdent: account.ident
     )
 
     let validationCB: PreDownloadIsValidCB =
@@ -257,11 +265,13 @@ public class MetaManager {
     )
     return BackgroundLibrarySyncer(
       storage: storage.async,
+      account: account,
       settings: storage.settings,
       networkMonitor: networkMonitor,
       librarySyncer: librarySyncer,
       playableDownloadManager: playableDownloadManager, autoDownloadLibrarySyncer: autoSyncer,
-      eventLogger: eventLogger
+      eventLogger: eventLogger,
+      notificationHandler: notificationHandler
     )
   }()
 
@@ -276,17 +286,19 @@ public class MetaManager {
     )
   }()
 
-  private var isStarted = false
+  public private(set) var isStarted = false
 
   public func startManagerAfterSync(player: PlayerFacade) {
     os_log("Start background manager after sync", log: self.log, type: .info)
     // Already started at launch while its initial sync was resumed: only the background
-    // library sync is left
+    // library sync and the duplicate resolver, which waited for the resume, are left
     guard !isStarted else {
+      startDuplicateEntitiesResolverIfNoResumePending()
       startBackgroundLibrarySyncerIfNoResumePending()
       return
     }
     isStarted = true
+    startDuplicateEntitiesResolverIfNoResumePending()
     playableDownloadManager.start()
     artworkDownloadManager.start()
     startBackgroundLibrarySyncerIfNoResumePending()
@@ -314,10 +326,26 @@ public class MetaManager {
     scrobbler.start()
   }
 
+  /// The initial sync has ended: it can't write alongside the resolver anymore. One that was
+  /// aborted with a checkpoint is resumed later, the resolver waits for that.
+  private func startDuplicateEntitiesResolverIfNoResumePending() {
+    guard !storage.settings.accounts.getSetting(account.info).read.isInitialSyncResumable
+    else { return }
+    duplicateEntitiesResolver.start()
+  }
+
   private func startBackgroundLibrarySyncerIfNoResumePending() {
     guard !storage.settings.accounts.getSetting(account.info).read.isInitialSyncResumable
     else { return }
     backgroundLibrarySyncer.start()
+  }
+
+  /// The scrobble upload ends in offline mode: going online starts it again. The background
+  /// library sync observes the mode itself and goes on with a run that ended early
+  @objc
+  private func startScrobbleUploadIfOnline() {
+    guard isStarted, storage.settings.user.isOnlineMode else { return }
+    scrobbleSyncer?.start()
   }
 
   public func stopManager() {

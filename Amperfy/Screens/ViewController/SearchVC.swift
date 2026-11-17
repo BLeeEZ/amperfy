@@ -85,6 +85,9 @@ class SearchVC: BasicTableViewController {
   private var accountObjectId: NSManagedObjectID?
   private let account: Account
   private var accountNotificationHandler: AccountNotificationHandler?
+  override var listAccountInfo: AccountInfo? {
+    account.info
+  }
 
   init(account: Account) {
     self.account = account
@@ -235,6 +238,11 @@ class SearchVC: BasicTableViewController {
       placeholder: "Search in \"Library\"",
       scopeButtonTitles: ["All", "Cached"]
     )
+    // the scope bar exists only from here: on its first appearance the base could not select Cached
+    if appDelegate.storage.settings.user.isOfflineMode,
+       !searchController.searchBar.isCachedScopeSelected {
+      applyOfflineMode()
+    }
   }
 
   public func activateSearchBar() {

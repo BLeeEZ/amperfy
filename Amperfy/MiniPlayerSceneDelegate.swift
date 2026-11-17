@@ -1,5 +1,5 @@
 //
-//  SettingsSceneDelegate.swift
+//  MiniPlayerSceneDelegate.swift
 //  Amperfy
 //
 //  Created by David Klopp on 24.08.24.
@@ -51,9 +51,7 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     appDelegate.applyTextSize()
     window?.backgroundColor = .secondarySystemBackground
 
-    #if targetEnvironment(macCatalyst)
-      windowScene.title = Self.sceneTitle
-    #endif
+    windowScene.title = Self.sceneTitle
 
     window?.rootViewController = PopupPlayerVC()
     window?.makeKeyAndVisible()
@@ -78,9 +76,6 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
     // The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
     os_log("MiniPlayer: sceneDidDisconnect", log: self.log, type: .info)
     appDelegate.rebuildMainMenu()
-    if !appDelegate.isMainWindowOpen {
-      appDelegate.openMainWindow()
-    }
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {
@@ -119,6 +114,14 @@ class MiniPlayerSceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     os_log("MiniPlayer: openURLContexts", log: self.log, type: .info)
+    // The system delivers a URL to whichever scene is frontmost, so
+    // x-callback-urls must be handled here as well as in the main scene.
+    guard appDelegate.isNormalInteraction else {
+      return
+    }
+    for URLContext in URLContexts {
+      _ = appDelegate.intentManager.handleIncoming(url: URLContext.url)
+    }
   }
 
   // This is the NSUserActivity that will be used to restore state when the Scene reconnects.

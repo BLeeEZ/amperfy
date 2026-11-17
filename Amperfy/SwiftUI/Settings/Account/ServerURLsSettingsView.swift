@@ -132,6 +132,7 @@ struct ServerURLsSettingsView: View {
         }) {
           AmperfyImage.plus.asImage
         }
+        .accessibilityLabel("Add Server URL")
       }
     }
     .onAppear {

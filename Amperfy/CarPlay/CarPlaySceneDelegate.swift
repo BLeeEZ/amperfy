@@ -70,7 +70,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     _ templateApplicationScene: CPTemplateApplicationScene,
     didConnect interfaceController: CPInterfaceController
   ) {
-    Task { @MainActor in
+    Task { @MainActor [self] in
       os_log("CarPlay: didConnect", log: self.log, type: .info)
       appDelegate.notificationHandler.register(
         self,
@@ -109,7 +109,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
       CPNowPlayingTemplate.shared.add(self)
       self.interfaceController = interfaceController
       self.interfaceController?.delegate = self
-      self.configureNowPlayingTemplate()
+      configureNowPlayingTemplate()
 
       accountNotificationHandler?
         .registerCallbackForActiveAccountChange { [weak self] accountInfo in
@@ -151,9 +151,9 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
           }
         }
 
-      if self.appDelegate.player.currentlyPlaying != nil, self.appDelegate.player.isPlaying {
-        self.updatePlayerQueueSection()
-        self.displayNowPlaying(immediately: true) {}
+      if appDelegate.player.currentlyPlaying != nil, appDelegate.player.isPlaying {
+        updatePlayerQueueSection()
+        displayNowPlaying(immediately: true) {}
       }
     }
   }
@@ -163,7 +163,7 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     _ templateApplicationScene: CPTemplateApplicationScene,
     didDisconnectInterfaceController interfaceController: CPInterfaceController
   ) {
-    Task { @MainActor in
+    Task { @MainActor [self] in
       os_log("CarPlay: didDisconnect", log: self.log, type: .info)
       guard activeAccountInfo != nil, activeAccount != nil else {
         os_log("CarPlay: no account available -> do nothing", log: self.log, type: .info)
@@ -713,7 +713,19 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
   @objc
   private func refreshOfflineMode() {
     os_log("CarPlay: OfflineModeChanged", log: self.log, type: .info)
-    guard let templates = interfaceController?.templates else { return }
+    // lists that are not on screen are built again with the new mode when they appear
+    playlistFetchController = nil
+    podcastFetchController = nil
+    genresFetchController = nil
+    artistsFetchController = nil
+    artistsFavoritesFetchController = nil
+    albumsFetchController = nil
+    albumsFavoritesFetchController = nil
+    albumsNewestFetchController = nil
+    albumsRecentFetchController = nil
+    songsFavoritesFetchController = nil
+    // no account after the last one is logged out: CarPlay shows Disconnected
+    guard activeAccount != nil, let templates = interfaceController?.templates else { return }
 
     sharedHome?.createFetchController()
 

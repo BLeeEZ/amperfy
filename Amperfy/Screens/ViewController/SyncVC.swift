@@ -79,6 +79,9 @@ class SyncVC: UIViewController {
       do {
         try await self.appDelegate.getMeta(account.info).librarySyncer
           .syncInitial(statusNotifyier: self)
+        // Skip already finished the sync and stored .skipped: a sync that still completed
+        // afterwards must not overwrite it
+        guard !self.syncFinished else { return }
         self.appDelegate.storage.settings.accounts.updateSetting(account.info) { accountSettings in
           accountSettings.initialSyncCompletionStatus = .completed
         }
@@ -98,7 +101,9 @@ class SyncVC: UIViewController {
     }
   }
 
-  private func finishSync() {
+  /// `cancelledSyncTask`: the account's background managers start only once this skipped sync has
+  /// ended, so they don't write to the library while its last step still does
+  private func finishSync(cancelledSyncTask: Task<(), Never>? = nil) {
     guard !syncFinished else { return }
 
     syncFinished = true
@@ -110,7 +115,18 @@ class SyncVC: UIViewController {
     appDelegate.storage.settings.app.librarySyncVersion = .newestVersion
     appDelegate.storage.settings.app.isLibrarySynced = true
     appDelegate.startManagerAfterSync()
-    appDelegate.getMeta(account.info).startManagerAfterSync(player: appDelegate.player)
+    if let cancelledSyncTask {
+      let account = account!
+      Task { @MainActor in
+        await cancelledSyncTask.value
+        // the account may have been switched or logged out meanwhile
+        guard self.appDelegate.storage.settings.accounts.active == account.info else { return }
+        self.appDelegate.getMeta(account.info)
+          .startManagerAfterSync(player: self.appDelegate.player)
+      }
+    } else {
+      appDelegate.getMeta(account.info).startManagerAfterSync(player: appDelegate.player)
+    }
     appDelegate.isKeepScreenAlive = false
     appDelegate.eventLogger.supressAlerts = false
 
@@ -147,7 +163,7 @@ class SyncVC: UIViewController {
           accountSettings.initialSyncCompletionStatus = .skipped
           accountSettings.clearInitialSyncCheckpoint()
         }
-      self.finishSync()
+      self.finishSync(cancelledSyncTask: self.syncTask)
     })
     let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
     alert.addAction(skip)
