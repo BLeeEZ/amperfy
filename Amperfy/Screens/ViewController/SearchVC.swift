@@ -79,12 +79,9 @@ class SearchVC: BasicTableViewController {
   fileprivate var playlists: [Playlist] = []
   fileprivate var songs: [Song] = []
 
-  private var userButton: UIButton?
-  private var userBarButtonItem: UIBarButtonItem?
   private var isSearchActive = false
   private var accountObjectId: NSManagedObjectID?
   private let account: Account
-  private var accountNotificationHandler: AccountNotificationHandler?
   override var listAccountInfo: AccountInfo? {
     account.info
   }
@@ -211,18 +208,7 @@ class SearchVC: BasicTableViewController {
       }
     }
     updateContentUnavailable()
-    accountNotificationHandler = AccountNotificationHandler(
-      storage: appDelegate.storage,
-      notificationHandler: appDelegate.notificationHandler
-    )
-    accountNotificationHandler?.registerCallbackForActiveAccountChange { [weak self] accountInfo in
-      guard let self else { return }
-      setupUserNavButton(
-        currentAccount: account,
-        userButton: &userButton,
-        userBarButtonItem: &userBarButtonItem
-      )
-    }
+    setupUserNavButton()
   }
 
   override func viewWillAppear(_ animated: Bool) {

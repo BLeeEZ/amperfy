@@ -54,6 +54,17 @@ class SettingsHostVC: UIViewController {
       object: nil
     )
 
+    // the account list in the general settings follows added and removed accounts
+    settings.accounts = appDelegate.storage.settings.accounts.allAccounts
+    for name in [Notification.Name.accountAdded, .accountDeleted] {
+      appDelegate.notificationHandler.register(
+        self,
+        selector: #selector(accountListChanged),
+        name: name,
+        object: nil
+      )
+    }
+
     self.isForOwnWindow = isForOwnWindow
 
     var settingsRootView: AnyView? = nil
@@ -87,6 +98,11 @@ class SettingsHostVC: UIViewController {
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+  }
+
+  @objc
+  private func accountListChanged() {
+    settings.accounts = appDelegate.storage.settings.accounts.allAccounts
   }
 
   override func viewIsAppearing(_ animated: Bool) {

@@ -46,6 +46,57 @@ struct SettingsView: View {
     appDelegate.configureLockScreenPrevention()
   }
 
+  /// On iPhone and iPad Settings is a sheet on the main window. The account switch and the sync
+  /// after a login replace the main window's root, so the sheet is closed first and the action
+  /// runs on the main window, as it did from the former account menu.
+  func performOnMainWindow(_ action: @escaping (UIViewController?) -> ()) {
+    let mainRoot = AppDelegate.mainSceneDelegate?.window?.rootViewController
+    if let mainRoot, mainRoot.presentedViewController != nil {
+      mainRoot.dismiss(animated: true) { action(mainRoot) }
+    } else {
+      action(mainRoot)
+    }
+  }
+
+  func addAccountPressed() {
+    performOnMainWindow { mainRoot in
+      let loginVC = AppStoryboard.Main.segueToLogin()
+      loginVC.modalPresentationStyle = .formSheet
+      AppDelegate.topViewController(base: mainRoot)?.present(loginVC, animated: true)
+    }
+  }
+
+  func accountRow(_ accountInfo: AccountInfo) -> some View {
+    let accounts = appDelegate.storage.settings.accounts
+    let credentials = accounts.getSetting(accountInfo).read.loginCredentials
+    let isActive = (accountInfo == settings.activeAccountInfo)
+    return Button {
+      guard !isActive else { return }
+      performOnMainWindow { _ in
+        appDelegate.switchAccount(accountInfo: accountInfo)
+      }
+    } label: {
+      HStack {
+        Label {
+          VStack(alignment: .leading) {
+            Text(credentials?.username ?? "Unknown")
+            if let url = credentials?.displayServerUrl {
+              SecondaryText(url)
+            }
+          }
+        } icon: {
+          AmperfyImage.account.asImage
+        }
+        Spacer()
+        if isActive {
+          AmperfyImage.check.asImage
+        }
+      }
+      .contentShape(Rectangle())
+    }
+    .buttonStyle(.plain)
+  }
+
   func navigationLink(_ item: NavigationTarget) -> some View {
     NavigationLink(value: item) {
       Text(item.displayName)
@@ -55,6 +106,19 @@ struct SettingsView: View {
   var body: some View {
     let list =
       SettingsList {
+        SettingsSection {
+          ForEach(settings.accounts, id: \.self) { accountInfo in
+            accountRow(accountInfo)
+          }
+          Button(action: addAccountPressed) {
+            Label {
+              Text("Add Account")
+            } icon: {
+              AmperfyImage.userCirclePlus.asImage
+            }
+          }
+        }
+
         SettingsSection {
           SettingsRow(title: "Version") {
             SecondaryText(AppDelegate.version)
