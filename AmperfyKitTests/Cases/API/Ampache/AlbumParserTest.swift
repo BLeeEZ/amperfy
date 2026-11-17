@@ -37,6 +37,11 @@ class AlbumParserTest: AbstractAmpacheTest {
     )
   }
 
+  override func adjustmentsForSecondParsingDelegate() {
+    // the second parsing finds the artworks prefetched and has to store their URL again
+    library.getArtworks(for: account).forEach { $0.url = nil }
+  }
+
   override func checkCorrectParsing() {
     prefetchIdTester.checkPrefetchIdCounts(
       artworkCount: 3,
@@ -72,6 +77,10 @@ class AlbumParserTest: AbstractAmpacheTest {
     XCTAssertEqual(album.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(album.artwork?.id, "12")
     XCTAssertEqual(album.artwork?.type, "album")
+    XCTAssertEqual(
+      album.artwork?.url,
+      "https://music.com.au/image.php?object_id=12&object_type=album"
+    )
 
     album = albums[1]
     XCTAssertEqual(album.account?.serverHash, TestAccountInfo.test1ServerHash)
@@ -93,6 +102,10 @@ class AlbumParserTest: AbstractAmpacheTest {
     XCTAssertEqual(album.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(album.artwork?.id, "98")
     XCTAssertEqual(album.artwork?.type, "album")
+    XCTAssertEqual(
+      album.artwork?.url,
+      "https://music.com.au/image.php?object_id=98&object_type=album"
+    )
 
     album = albums[2]
     XCTAssertEqual(album.account?.serverHash, TestAccountInfo.test1ServerHash)
@@ -117,5 +130,9 @@ class AlbumParserTest: AbstractAmpacheTest {
     XCTAssertEqual(album.artwork?.account?.userHash, TestAccountInfo.test1UserHash)
     XCTAssertEqual(album.artwork?.id, "99")
     XCTAssertEqual(album.artwork?.type, "album")
+    XCTAssertEqual(
+      album.artwork?.url,
+      "https://music.com.au/image.php?object_id=99&object_type=album"
+    )
   }
 }
