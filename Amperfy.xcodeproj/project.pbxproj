@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CC2E3AA97CCEC560A3CD1AB6 /* RadioPlaylistResolverTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184C35D13DD08532BF5EA7F4 /* RadioPlaylistResolverTest.swift */; };
+		D2BE9B0489C54422A3CBBB00 /* RadioPlaylistResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40F3BFBB114E57C78DD924 /* RadioPlaylistResolver.swift */; };
 		09EB5F102F93B96E00B1C71C /* ShareSongAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09EB5F0D2F93B65400B1C71C /* ShareSongAction.swift */; };
 		43FBE27F250D4DFD00D5F9B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */; };
 		5003D8FB267B3390006946BF /* LibrarySyncPopupVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5003D8FA267B3390006946BF /* LibrarySyncPopupVC.swift */; };
@@ -623,6 +625,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		184C35D13DD08532BF5EA7F4 /* RadioPlaylistResolverTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioPlaylistResolverTest.swift; sourceTree = "<group>"; };
+		BB40F3BFBB114E57C78DD924 /* RadioPlaylistResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioPlaylistResolver.swift; sourceTree = "<group>"; };
 		09EB5F0D2F93B65400B1C71C /* ShareSongAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSongAction.swift; sourceTree = "<group>"; };
 		43FBE27E250D4DFD00D5F9B3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		5003D8F62678DD39006946BF /* SsAlbumParserPreCreatedArtistsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SsAlbumParserPreCreatedArtistsTest.swift; sourceTree = "<group>"; };
@@ -1658,6 +1662,7 @@
 			children = (
 				5095F98B23C8389E008B0805 /* MusicPlayerTest.swift */,
 				5011712D27453D1300B7C08D /* PlayQueueHandlerTest.swift */,
+				184C35D13DD08532BF5EA7F4 /* RadioPlaylistResolverTest.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -2248,6 +2253,7 @@
 				5011712F27565B2A00B7C08D /* PlayerFacade.swift */,
 				50C9D6E5284FABCB007F18D0 /* AudioPlayer.swift */,
 				508FDE4921F44E91005A0724 /* BackendAudioPlayer.swift */,
+				BB40F3BFBB114E57C78DD924 /* RadioPlaylistResolver.swift */,
 				501171292743F25300B7C08D /* PlayerUtil.swift */,
 				5011712B2744FDD700B7C08D /* PlayQueueHandler.swift */,
 				501171312756778300B7C08D /* RemoteCommandCenterHandler.swift */,
@@ -2950,6 +2956,7 @@
 				50C9D669284FAA0B007F18D0 /* AmpacheXmlParser.swift in Sources */,
 				50C9D6A3284FAA77007F18D0 /* MigrationPolicyV4toV5.swift in Sources */,
 				50C9D6DD284FAB88007F18D0 /* BackendAudioPlayer.swift in Sources */,
+				D2BE9B0489C54422A3CBBB00 /* RadioPlaylistResolver.swift in Sources */,
 				50C9D693284FAA6C007F18D0 /* DirectoryMO+CoreDataProperties.swift in Sources */,
 				50C9D6ED284FADB8007F18D0 /* PlayerDisplayStyleType.swift in Sources */,
 				50C9D6B4284FAA87007F18D0 /* AbstractPlayable.swift in Sources */,
@@ -3002,6 +3009,7 @@
 				50BE5D6E2850F4FB00156FC6 /* SsPlaylistsParserTest.swift in Sources */,
 				50BE5D862850F50F00156FC6 /* PlaylistSongsParserTest.swift in Sources */,
 				50BE5D532850F4E700156FC6 /* MusicPlayerTest.swift in Sources */,
+				CC2E3AA97CCEC560A3CD1AB6 /* RadioPlaylistResolverTest.swift in Sources */,
 				50BE5D732850F4FB00156FC6 /* SsPodcastParserTest.swift in Sources */,
 				50BE5D722850F4FB00156FC6 /* SsSongExample1ParserTest.swift in Sources */,
 				50BE5D912850F50F00156FC6 /* GenreParserTest.swift in Sources */,

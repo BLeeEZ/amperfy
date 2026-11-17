@@ -97,7 +97,12 @@ class BackendAudioPlayer: NSObject {
   private var currentPreparedUrl: String = ""
   private var currentPlayUrl: String = ""
   private var nextPreloadedPlayable: AbstractPlayable?
+  /// Set once the preloaded playable is queued in the player, empty while its URL is generated
   private var nextPreloadedUrl: String = ""
+  /// A preload that failed isn't repeated on every timer tick until the next play request
+  private var failedPreloadPlayable: AbstractPlayable?
+  /// Session for reading radio playlists, replaced in tests
+  var radioPlaylistSession: URLSession = .shared
   /// Duration from the server metadata, used while the player can't determine it
   /// (e.g. transcoded MP3 streams without Content-Length)
   private var currentMetadataDuration: Double = 0.0
@@ -106,6 +111,9 @@ class BackendAudioPlayer: NSObject {
   private var streamTimeOffset: Double = 0.0
   /// Invalidates pending stream restarts once a newer one or another playable is requested
   private var streamRestartRequest = 0
+  /// Identifies the latest play request, an async preparation of an older one must not change
+  /// the player
+  private var playRequestID = 0
   /// Play state to restore after a stream restart; nil if no restart is pending
   private var shouldPlayAfterStreamRestart: Bool?
   private var isPreviousPlaylableFinshed = true
@@ -282,27 +290,46 @@ class BackendAudioPlayer: NSObject {
        duration > 0 {
       let remainingTime = duration - elapsedTime
       if remainingTime > 0, remainingTime < 10 {
-        // offline, a song that is not downloaded isn't preloaded: going online preloads its stream
-        guard let nextPreloadedPlayable = nextPlayablePreloadCB?(),
-              nextPreloadedPlayable.isCached || !isOfflineMode
-        else { return }
-        self.nextPreloadedPlayable = nextPreloadedPlayable
-        os_log(.default, "Preloading: %s", nextPreloadedPlayable.displayString)
-        if nextPreloadedPlayable.isCached {
-          insertCachedPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-        } else {
-          Task { @MainActor in
-            do {
-              try await insertStreamPlayable(playable: nextPreloadedPlayable, queueType: .queue)
-              if self.isAutoCachePlayedItems, nextPreloadedPlayable.isDownloadAvailable,
-                 let accountInfo = nextPreloadedPlayable.account?.info {
-                self.getPlayableDownloaderCB(accountInfo).download(object: nextPreloadedPlayable)
-              }
-            } catch {
-              self.nextPreloadedPlayable = nil
-              self.eventLogger.report(topic: "Player", error: error)
-            }
+        preloadNextPlayable()
+      }
+    }
+  }
+
+  func preloadNextPlayable() {
+    // offline, a song that is not downloaded isn't preloaded: going online preloads its stream
+    guard let playable = nextPlayablePreloadCB?(), playable != failedPreloadPlayable,
+          playable.isCached || !isOfflineMode
+    else { return }
+    nextPreloadedPlayable = playable
+    os_log(.default, "Preloading: %s", playable.displayString)
+    if playable.isCached {
+      insertCachedPlayable(playable: playable, queueType: .queue)
+    } else {
+      let requestID = playRequestID
+      let request = streamRestartRequest
+      Task { @MainActor in
+        do {
+          try await insertStreamPlayable(
+            playable: playable,
+            queueType: .queue,
+            playRequestID: requestID,
+            streamRestartRequest: request
+          )
+          if self.isAutoCachePlayedItems, playable.isDownloadAvailable,
+             let accountInfo = playable.account?.info {
+            self.getPlayableDownloaderCB(accountInfo).download(object: playable)
           }
+        } catch {
+          if self.nextPreloadedPlayable == playable {
+            self.nextPreloadedPlayable = nil
+            self.failedPreloadPlayable = playable
+          }
+          // a broken radio playlist is reported once the radio is played
+          self.eventLogger.report(
+            topic: "Player",
+            error: error,
+            displayPopup: !(error is RadioPlaylistResolver.InvalidPlaylistError)
+          )
         }
       }
     }
@@ -312,7 +339,8 @@ class BackendAudioPlayer: NSObject {
   private func itemFinishedPlaying() {
     isTriggerReinsertPlayableAllowed = true
     isPreviousPlaylableFinshed = true
-    if nextPreloadedPlayable != nil {
+    // a preload still generating its URL (e.g. a slow radio playlist) has nothing queued yet
+    if nextPreloadedPlayable != nil, !nextPreloadedUrl.isEmpty {
       isPlaying = true
       startTimers()
     } else {
@@ -522,15 +550,20 @@ class BackendAudioPlayer: NSObject {
   }
 
   private func handleRequest(playable: AbstractPlayable) {
+    playRequestID += 1
+    failedPreloadPlayable = nil
     currentMetadataDuration = Double(playable.duration)
     currentPlayable = playable
     streamTimeOffset = 0.0
     streamRestartRequest += 1
     shouldPlayAfterStreamRestart = nil
+    // a preload whose URL is still generated (e.g. a slow radio playlist) isn't queued yet, it
+    // is requested again below and the late preload is dropped.
     // offline, a stream preloaded before the switch only plays if the song was downloaded since,
     // like a song that is already streaming; otherwise the player stops at it
     if isPreviousPlaylableFinshed, let nextPreloadedPlayable = nextPreloadedPlayable,
-       nextPreloadedPlayable == playable, nextPreloadedPlayable.isCached || !isOfflineMode {
+       nextPreloadedPlayable == playable, !nextPreloadedUrl.isEmpty,
+       nextPreloadedPlayable.isCached || !isOfflineMode {
       // Do nothing next preloaded playable has already been queued to player
       os_log(.default, "Play Preloaded: %s", nextPreloadedPlayable.displayString)
       currentPreparedUrl = ""
@@ -594,11 +627,17 @@ class BackendAudioPlayer: NSObject {
         }
       }
 
+      let requestID = playRequestID
+      let request = streamRestartRequest
       Task { @MainActor in
         do {
           currentReplayGainValue = playable.replayGainTrackGain
           applyReplayGain()
-          try await insertStreamPlayable(playable: playable)
+          try await insertStreamPlayable(
+            playable: playable,
+            playRequestID: requestID,
+            streamRestartRequest: request
+          )
           isPlaying = shouldPlaybackStart
           if self.isAutoCachePlayedItems, !playable.isRadio,
              let accountInfo = playable.account?.info {
@@ -606,6 +645,13 @@ class BackendAudioPlayer: NSObject {
           }
           self.responder?.notifyItemPreparationFinished()
         } catch {
+          // a newer request replaced this one and reports its own result
+          guard requestID == playRequestID else { return }
+          if error is RadioPlaylistResolver.InvalidPlaylistError {
+            reactToInvalidRadioUrl(playableDisplayTitle: playable.displayString)
+            self.eventLogger.report(topic: "Player", error: error, displayPopup: false)
+            return
+          }
           self.responder?.notifyErrorOccurred(error: error)
           self.responder?.notifyItemPreparationFinished()
           self.eventLogger.report(topic: "Player", error: error)
@@ -647,10 +693,12 @@ class BackendAudioPlayer: NSObject {
     currentPlayUrl = ""
     nextPreloadedPlayable = nil
     nextPreloadedUrl = ""
+    failedPreloadPlayable = nil
     currentMetadataDuration = 0.0
     currentPlayable = nil
     streamTimeOffset = 0.0
     streamRestartRequest += 1
+    playRequestID += 1
     shouldPlayAfterStreamRestart = nil
     playType = nil
     perloadedPlayType = nil
@@ -686,24 +734,39 @@ class BackendAudioPlayer: NSObject {
     insert(playable: playable, withUrl: fileURL, queueType: queueType)
   }
 
+  /// `requestID` and `request` are taken when the request is made, the task running this may
+  /// only start after a newer request
   @MainActor
   private func insertStreamPlayable(
     playable: AbstractPlayable,
-    queueType: BackendAudioQueueType = .play
+    queueType: BackendAudioQueueType = .play,
+    playRequestID requestID: Int,
+    streamRestartRequest request: Int
   ) async throws {
+    // a newer play request replaced this one or the player stopped while the URL was generated
+    // (e.g. a slow radio playlist), it must not take over the player
+    @MainActor
+    func checkIsLatestPlayRequest() throws {
+      if queueType == .play, requestID != playRequestID {
+        throw CancellationError()
+      }
+    }
     let streamingMaxBitrate = streamingMaxBitrates.getActive(networkMonitor: networkMonitor)
     let streamingTranscodingFormat = streamingTranscodings.getActive(networkMonitor: networkMonitor)
     var httpHeaders: [String: String] = [:]
     @MainActor
     func provideUrl() async throws -> URL {
       if let radio = playable.asRadio {
-        guard let streamUrlString = radio.url,
-              let streamUrl = URL(string: streamUrlString)
+        guard let radioUrlString = radio.url,
+              let radioUrl = URL(string: radioUrlString)
         else {
           throw BackendError.invalidUrl
         }
-        playType = .stream
-        ClientCertificateManager.shared.activeStreamingCertificateAccountIdent = nil
+        // stations are often set up with a .m3u or .pls link that only names the stream
+        let streamUrl = try await RadioPlaylistResolver.resolve(
+          url: radioUrl,
+          session: radioPlaylistSession
+        )
         return streamUrl
       } else {
         if queueType == .play {
@@ -731,10 +794,24 @@ class BackendAudioPlayer: NSObject {
         )
       }
     }
-    let request = streamRestartRequest
     let streamUrl = try await provideUrl()
+    try checkIsLatestPlayRequest()
+    // the preload might have been invalidated or replaced while the URL was generated
+    if queueType == .queue, nextPreloadedPlayable != playable {
+      return
+    }
     // a preload requested before a stream restart would be queued behind the new stream
     guard queueType == .play || request == streamRestartRequest else { return }
+    // set only now: the playlist request can take long, a dropped radio preload must not change
+    // the play type of a newer preload or the certificate of the song that is playing now
+    if playable.isRadio {
+      if queueType == .play {
+        playType = .stream
+        ClientCertificateManager.shared.activeStreamingCertificateAccountIdent = nil
+      } else {
+        perloadedPlayType = .stream
+      }
+    }
 
     if queueType == .play {
       os_log(
