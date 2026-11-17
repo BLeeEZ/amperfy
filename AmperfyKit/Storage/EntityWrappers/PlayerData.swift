@@ -193,7 +193,7 @@ extension PlayerData: PlayerStatusPersistent {
 
   func setShuffle(_ newValue: Bool) {
     if newValue {
-      shuffledContextPlaylist.shuffle()
+      shuffledContextPlaylist.shuffle(keepingFirst: currentItem)
       if let curPlayable = currentItem,
          let indexOfCurrentItemInShuffledPlaylist = shuffledContextPlaylist
          .getFirstIndex(playable: curPlayable) {
