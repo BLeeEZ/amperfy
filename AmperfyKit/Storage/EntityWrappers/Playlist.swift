@@ -79,18 +79,28 @@ public class Playlist: Identifyable {
     managedObject.items.compactMap { AbstractPlayable(managedObject: $0.playable) }
   }
 
+  // The Swift Array getter bridges the whole ordered Core Data relationship.
+  // Indexed player/UI lookups only need the underlying ordered set.
+  private var orderedItems: NSOrderedSet {
+    managedObject.value(forKey: #keyPath(PlaylistMO.items)) as! NSOrderedSet
+  }
+
   public func getPlayable(at: Int) -> AbstractPlayable? {
-    guard at < managedObject.items.count else { return nil }
-    return AbstractPlayable(managedObject: managedObject.items[at].playable)
+    let items = orderedItems
+    guard at >= 0, at < items.count,
+          let item = items.object(at: at) as? PlaylistItemMO else { return nil }
+    return AbstractPlayable(managedObject: item.playable)
   }
 
   public func getPlayables(from: Int, to: Int? = nil) -> [AbstractPlayable] {
-    guard !managedObject.items.isEmpty else { return [AbstractPlayable]() }
-    let end = to ?? managedObject.items.count - 1
+    let items = orderedItems
+    let end = to ?? items.count - 1
     guard from >= 0, end >= 0, from <= end,
-          end < managedObject.items.count else { return [AbstractPlayable]() }
-    return managedObject.items[from ... end]
-      .compactMap { AbstractPlayable(managedObject: $0.playable) }
+          end < items.count else { return [AbstractPlayable]() }
+    return (from ... end).compactMap { index in
+      guard let item = items.object(at: index) as? PlaylistItemMO else { return nil }
+      return AbstractPlayable(managedObject: item.playable)
+    }
   }
 
   /// returns number of playables that are already contained in playlist
@@ -472,20 +482,15 @@ public class Playlist: Identifyable {
   }
 
   public func shuffle() {
-    guard !managedObject.items.isEmpty else { return }
+    let shuffledItems = managedObject.items.shuffled()
+    guard !shuffledItems.isEmpty else { return }
 
-    var shuffeldIndexes = [Int]()
-    shuffeldIndexes += 0 ... Int(managedObject.items.count - 1)
-    shuffeldIndexes = shuffeldIndexes.shuffled()
-    assert(shuffeldIndexes.count == managedObject.items.count)
-
-    let orgItems = managedObject.items.compactMap { AbstractPlayable(managedObject: $0.playable) }
-    assert(shuffeldIndexes.count == orgItems.count)
-    managedObject.removeAllItems()
-    for i in 0 ..< orgItems.count {
-      createAndAppendPlaylistItem(for: orgItems[shuffeldIndexes[i]])
+    // Reuse entries to preserve duplicate occurrences and avoid orphaned metadata.
+    for (index, item) in shuffledItems.enumerated() {
+      item.order = Int32(index + 1) * PlaylistItemMO.orderDistance
     }
-    assert(shuffeldIndexes.count == managedObject.items.count)
+    // The Core Data setter expects NSOrderedSet, despite the Swift Array getter.
+    managedObject.setValue(NSOrderedSet(array: shuffledItems), forKey: #keyPath(PlaylistMO.items))
     library.saveContext()
   }
 
