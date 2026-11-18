@@ -48,6 +48,9 @@ public class AutoDownloadLibrarySyncer {
     offset: Int = 0,
     count: Int = AmperKit.newestElementsFetchCount
   ) async throws {
+    // the background library sync can get here after the mode was switched to offline, e.g. at
+    // a launch from the "Start in Offline Mode" quick action
+    guard storage.settings.user.isOnlineMode else { return }
     let oldNewestAlbums = Set(storage.main.library.getNewestAlbums(
       for: account,
       offset: 0,
@@ -90,6 +93,8 @@ public class AutoDownloadLibrarySyncer {
   /// return: new synced podcast episodes if an initial sync already occued. If this is the initial sync no episods are returned
   @MainActor
   public func syncNewestPodcastEpisodes() async throws -> [PodcastEpisode] {
+    // the background app refresh calls this in offline mode too
+    guard storage.settings.user.isOnlineMode else { return [] }
     let oldNewestEpisodes = Set(storage.main.library.getNewestPodcastEpisode(
       for: account,
       count: 20
