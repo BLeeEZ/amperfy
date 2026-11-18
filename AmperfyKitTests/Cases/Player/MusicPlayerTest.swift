@@ -166,7 +166,10 @@ class MOCK_AlertDisplayable: AlertDisplayable {
 
 // MARK: - MOCK_LibrarySyncer
 
-final class MOCK_LibrarySyncer: LibrarySyncer {
+final class MOCK_LibrarySyncer: LibrarySyncer, @unchecked Sendable {
+  private(set) var syncNewestAlbumsCount = 0
+  private(set) var syncNewestPodcastEpisodesCount = 0
+
   func syncInitial(statusNotifyier: SyncCallbacks?) async throws {}
   func sync(genre: Genre) async throws {}
   func sync(artist: Artist) async throws {}
@@ -178,8 +181,8 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
   func syncAllSongs(isCancelled: @escaping @Sendable () -> Bool) async throws -> Bool { false }
   func sync(song: Song) async throws {}
   func sync(podcast: Podcast) async throws {}
-  func syncNewestPodcastEpisodes() async throws {}
-  func syncNewestAlbums(offset: Int, count: Int) async throws {}
+  func syncNewestPodcastEpisodes() async throws { syncNewestPodcastEpisodesCount += 1 }
+  func syncNewestAlbums(offset: Int, count: Int) async throws { syncNewestAlbumsCount += 1 }
   func syncRecentAlbums(offset: Int, count: Int) async throws {}
   func syncFavoriteLibraryElements() async throws {}
   func syncRadios() async throws {}
