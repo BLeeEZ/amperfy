@@ -867,12 +867,12 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          let playlistFetchController = playlistFetchController,
          controller == playlistFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: playlistFetchController", log: self.log, type: .info)
-        playlistTab.updateSections(createPlaylistsSections())
+        playlistTab.updateSectionsIfChanged(createPlaylistsSections())
       }
       if templates.contains(podcastSection), let podcastFetchController = podcastFetchController,
          controller == podcastFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: podcastFetchController", log: self.log, type: .info)
-        podcastSection.updateSections(createPodcastsSections(
+        podcastSection.updateSectionsIfChanged(createPodcastsSections(
           from: podcastFetchController,
           onlyCached: isOfflineMode
         ))
@@ -881,7 +881,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          let podcastCachedFetchController = podcastCachedFetchController,
          controller == podcastCachedFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: podcastCachedFetchController", log: self.log, type: .info)
-        podcastCachedSection.updateSections(createPodcastsSections(
+        podcastCachedSection.updateSectionsIfChanged(createPodcastsSections(
           from: podcastCachedFetchController,
           onlyCached: true
         ))
@@ -891,7 +891,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          controller == radiosFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: radiosFetchController", log: self.log, type: .info)
         radioSection
-          .updateSections(createRadioSections(from: radiosFetchController))
+          .updateSectionsIfChanged(createRadioSections(from: radiosFetchController))
       }
       if templates.contains(genresSection),
          let genresFetchController = genresFetchController,
@@ -901,7 +901,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        genresSection.updateSections(createGenreSections(
+        genresSection.updateSectionsIfChanged(createGenreSections(
           from: genresFetchController,
           onlyCached: isOfflineMode
         ))
@@ -914,7 +914,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        genresCachedSection.updateSections(createGenreSections(
+        genresCachedSection.updateSectionsIfChanged(createGenreSections(
           from: genresCachedFetchController,
           onlyCached: true
         ))
@@ -927,7 +927,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        artistsSection.updateSections(createArtistItems(
+        artistsSection.updateSectionsIfChanged(createArtistItems(
           from: artistsFetchController,
           onlyCached: isOfflineMode
         ))
@@ -940,7 +940,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        artistsCachedSection.updateSections(createArtistItems(
+        artistsCachedSection.updateSectionsIfChanged(createArtistItems(
           from: artistsCachedFetchController,
           onlyCached: true
         ))
@@ -953,7 +953,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        artistsFavoriteSection.updateSections(createArtistItems(
+        artistsFavoriteSection.updateSectionsIfChanged(createArtistItems(
           from: artistsFavoritesFetchController,
           onlyCached: isOfflineMode
         ))
@@ -966,7 +966,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        artistsFavoriteCachedSection.updateSections(createArtistItems(
+        artistsFavoriteCachedSection.updateSectionsIfChanged(createArtistItems(
           from: artistsFavoritesCachedFetchController,
           onlyCached: true
         ))
@@ -979,7 +979,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsSection.updateSections(createAlbumItems(
+        albumsSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsFetchController,
           onlyCached: isOfflineMode
         ))
@@ -992,7 +992,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsCachedSection.updateSections(createAlbumItems(
+        albumsCachedSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsCachedFetchController,
           onlyCached: true
         ))
@@ -1005,7 +1005,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsFavoriteSection.updateSections(createAlbumItems(
+        albumsFavoriteSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsFavoritesFetchController,
           onlyCached: isOfflineMode
         ))
@@ -1018,7 +1018,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsFavoriteCachedSection.updateSections(createAlbumItems(
+        albumsFavoriteCachedSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsFavoritesCachedFetchController,
           onlyCached: true
         ))
@@ -1027,7 +1027,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          let albumsNewestFetchController = albumsNewestFetchController,
          controller == albumsNewestFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: albumsNewestFetchController", log: self.log, type: .info)
-        albumsNewestSection.updateSections(createAlbumItems(
+        albumsNewestSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsNewestFetchController,
           onlyCached: isOfflineMode
         ))
@@ -1040,7 +1040,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsNewestCachedSection.updateSections(createAlbumItems(
+        albumsNewestCachedSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsNewestCachedFetchController,
           onlyCached: true
         ))
@@ -1049,7 +1049,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          let albumsRecentFetchController = albumsRecentFetchController,
          controller == albumsRecentFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: albumsRecentFetchController", log: self.log, type: .info)
-        albumsRecentSection.updateSections(createAlbumItems(
+        albumsRecentSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsRecentFetchController,
           onlyCached: isOfflineMode
         ))
@@ -1062,7 +1062,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           log: self.log,
           type: .info
         )
-        albumsRecentCachedSection.updateSections(createAlbumItems(
+        albumsRecentCachedSection.updateSectionsIfChanged(createAlbumItems(
           from: albumsRecentCachedFetchController,
           onlyCached: true
         ))
@@ -1072,7 +1072,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          controller == songsFavoritesFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: songsFavoritesFetchController", log: self.log, type: .info)
         songsFavoriteSection
-          .updateSections(
+          .updateSectionsIfChanged(
             [CPListSection(items: createSongItems(from: songsFavoritesFetchController))]
           )
       }
@@ -1085,7 +1085,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
           type: .info
         )
         songsFavoriteCachedSection
-          .updateSections(
+          .updateSectionsIfChanged(
             [CPListSection(items: createSongItems(from: songsFavoritesCachedFetchController))]
           )
       }
@@ -1095,7 +1095,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          controller == playlistDetailFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: playlistDetailSection", log: self.log, type: .info)
         playlistDetailSection
-          .updateSections(
+          .updateSectionsIfChanged(
             [CPListSection(items: createPlaylistDetailItems(from: playlistDetailFetchController))]
           )
       }
@@ -1104,7 +1104,7 @@ extension CarPlaySceneDelegate: @preconcurrency NSFetchedResultsControllerDelega
          controller == podcastDetailFetchController.fetchResultsController {
         os_log("CarPlay: FetchedResults: podcastDetailSection", log: self.log, type: .info)
         podcastDetailSection
-          .updateSections(
+          .updateSectionsIfChanged(
             [CPListSection(items: createPodcastDetailItems(from: podcastDetailFetchController))]
           )
       }
@@ -1366,5 +1366,44 @@ extension CarPlaySceneDelegate: CPInterfaceControllerDelegate {
         podcastDetailSection = nil
       }
     }
+  }
+}
+
+// MARK: - CPListTemplate
+
+extension CPListTemplate {
+  /// Replacing the sections resets the focus of the rotary knob / touchpad selection in CarPlay.
+  /// Background changes (library sync, artwork or song downloads) often produce the same visible content,
+  /// so only replace the sections if something the user can see has actually changed.
+  func updateSectionsIfChanged(_ newSections: [CPListSection]) {
+    guard Self.signature(of: sections) != Self.signature(of: newSections) else { return }
+    updateSections(newSections)
+  }
+
+  private static func signature(of sections: [CPListSection]) -> [String] {
+    var signature = [String]()
+    for section in sections {
+      signature.append("S|\(section.header ?? "")|\(section.sectionIndexTitle ?? "")")
+      for item in section.items {
+        if let listItem = item as? CPListItem {
+          let userInfo = listItem.userInfo as? [String: Any]
+          let objectID = userInfo?[
+            CarPlaySceneDelegate.CarPlayListUserInfoKeys.artworkOwnerObjectID.rawValue
+          ] as? NSManagedObjectID
+          let objectURI = objectID?.uriRepresentation().absoluteString ?? ""
+          signature.append(
+            "I|\(listItem.text ?? "")|\(listItem.detailText ?? "")" +
+              "|\(listItem.accessoryType.rawValue)|\(listItem.isPlaying)|\(objectURI)"
+          )
+        } else if let imageRowItem = item as? CPListImageRowItem {
+          let elementTitles = imageRowItem.elements
+            .map { "\($0.title ?? "")/\($0.subtitle ?? "")" }
+          signature.append("R|\(imageRowItem.text ?? "")|\(elementTitles.joined(separator: ","))")
+        } else {
+          signature.append("?|\(item.text ?? "")")
+        }
+      }
+    }
+    return signature
   }
 }
