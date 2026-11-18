@@ -86,6 +86,18 @@ public class Song: AbstractPlayable, Identifyable {
     }
   }
 
+  public var composer: String? {
+    get {
+      guard let composer = managedObject.composer,
+            !composer.isEmpty else { return nil }
+      return composer
+    }
+    set {
+      let composer = newValue?.trimmingCharacters(in: .whitespacesAndNewlines)
+      managedObject.composer = composer?.isEmpty == true ? nil : composer
+    }
+  }
+
   public var isOrphaned: Bool {
     guard let album = album else { return true }
     return album.isOrphaned
@@ -117,6 +129,8 @@ public class Song: AbstractPlayable, Identifyable {
     info += "album: \(albumName),"
     let genreName = genre?.name ?? "-"
     info += " genre: \(genreName),"
+    let composerInfo = composer ?? "-"
+    info += " composer: \(composerInfo),"
 
     info += " id: \(id),"
     info += " track: \(track),"
@@ -148,6 +162,9 @@ public class Song: AbstractPlayable, Identifyable {
       }
       if let genre = genre {
         infoContent.append("Genre: \(genre.name)")
+      }
+      if let composer = composer {
+        infoContent.append("Composer: \(composer)")
       }
       if details.isShowDetailedInfo {
         if bitrate > 0 {

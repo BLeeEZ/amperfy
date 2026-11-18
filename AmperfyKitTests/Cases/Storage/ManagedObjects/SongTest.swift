@@ -49,6 +49,7 @@ class SongTest: XCTestCase {
     XCTAssertEqual(song.title, "Unknown Title")
     XCTAssertEqual(song.track, 0)
     XCTAssertEqual(song.url, nil)
+    XCTAssertNil(song.composer)
     XCTAssertEqual(song.album, nil)
     XCTAssertEqual(song.artist, nil)
     XCTAssertNil(song.addedDate)
@@ -119,6 +120,17 @@ class SongTest: XCTestCase {
     library.saveContext()
     guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
     XCTAssertEqual(songFetched.url, testUrl)
+  }
+
+  func testComposer() {
+    testSong.composer = "  Florence Price  "
+    XCTAssertEqual(testSong.composer, "Florence Price")
+    library.saveContext()
+    guard let songFetched = library.getSong(for: account, id: testId) else { XCTFail(); return }
+    XCTAssertEqual(songFetched.composer, "Florence Price")
+
+    songFetched.composer = ""
+    XCTAssertNil(songFetched.composer)
   }
 
   func testArtworkAndImage() {
