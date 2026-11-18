@@ -43,7 +43,9 @@
                                 <constraint firstItem="BiX-ge-9XM" firstAttribute="bottom" secondItem="4sr-YU-gYi" secondAttribute="bottom" id="B6c-oA-2gs"/>
                                 <constraint firstItem="4sr-YU-gYi" firstAttribute="centerX" secondItem="ia9-ph-a9C" secondAttribute="centerX" id="QAU-Hs-QvW"/>
                                 <constraint firstItem="4sr-YU-gYi" firstAttribute="leading" secondItem="ia9-ph-a9C" secondAttribute="leading" priority="750" constant="50" id="T6t-e0-8me"/>
-                                <constraint firstItem="4sr-YU-gYi" firstAttribute="centerY" secondItem="ia9-ph-a9C" secondAttribute="centerY" priority="750" id="dVP-va-0hv"/>
+                                <constraint firstItem="4sr-YU-gYi" firstAttribute="centerY" secondItem="ia9-ph-a9C" secondAttribute="centerY" id="dVP-va-0hv"/>
+                                <constraint firstItem="4sr-YU-gYi" firstAttribute="height" relation="lessThanOrEqual" secondItem="ia9-ph-a9C" secondAttribute="height" id="M5K-Tk-GPs"/>
+                                <constraint firstItem="4sr-YU-gYi" firstAttribute="width" relation="lessThanOrEqual" secondItem="ia9-ph-a9C" secondAttribute="width" id="yaK-ag-woI"/>
                                 <constraint firstItem="BiX-ge-9XM" firstAttribute="top" secondItem="4sr-YU-gYi" secondAttribute="top" id="glo-0W-C47"/>
                                 <constraint firstItem="BiX-ge-9XM" firstAttribute="trailing" secondItem="4sr-YU-gYi" secondAttribute="trailing" id="jWK-OV-3vX"/>
                                 <constraint firstItem="BiX-ge-9XM" firstAttribute="leading" secondItem="4sr-YU-gYi" secondAttribute="leading" id="nDc-KS-A7b"/>
