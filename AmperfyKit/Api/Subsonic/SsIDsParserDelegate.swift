@@ -87,6 +87,16 @@ class SsIDsParserDelegate: SsNotifiableXmlParser {
       prefetchIDs.localArtistNames.insert(artistName)
     }
 
+    // OpenSubsonic multi-artist: <artists id="...">
+    if elementName == "artists", let artistId = attributeDict["id"] {
+      prefetchIDs.artistIDs.insert(artistId)
+    }
+
+    // OpenSubsonic album-artist: <albumArtists id="...">
+    if elementName == "albumArtists", let artistId = attributeDict["id"] {
+      prefetchIDs.artistIDs.insert(artistId)
+    }
+
     if let albumId = attributeDict["albumId"] {
       prefetchIDs.albumIDs.insert(albumId)
     }
