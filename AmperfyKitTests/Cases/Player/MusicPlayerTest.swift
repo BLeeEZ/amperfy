@@ -209,6 +209,8 @@ final class MOCK_LibrarySyncer: LibrarySyncer {
   func setFavorite(album: Album, isFavorite: Bool) async throws {}
   func setFavorite(artist: Artist, isFavorite: Bool) async throws {}
   func parseLyrics(relFilePath: URL) async throws -> LyricsList { LyricsList() }
+  func requestDepiction(artist: Artist) async throws -> String? { nil }
+  func requestDepiction(album: Album) async throws -> String? { nil }
 }
 
 // MARK: - MOCK_DownloadManagerDelegate
