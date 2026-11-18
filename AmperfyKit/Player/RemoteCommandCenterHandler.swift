@@ -31,6 +31,8 @@ public class RemoteCommandCenterHandler {
   private let getLibrarySyncerCB: GetLibrarySyncerCallback
   private let eventLogger: EventLogger
   private let remoteCommandCenter: MPRemoteCommandCenter
+  private var seekTimer: Timer?
+  private var seekStartDate = Date()
 
   init(
     musicPlayer: PlayerFacade,
@@ -125,6 +127,21 @@ public class RemoteCommandCenterHandler {
       return .success
     })
 
+    // Pressing and holding next/previous (e.g. CarPlay, steering wheel, headphones) fast-forwards/rewinds
+    remoteCommandCenter.seekForwardCommand.isEnabled = true
+    remoteCommandCenter.seekForwardCommand.addTarget(handler: { event in
+      guard let command = event as? MPSeekCommandEvent else { return .noSuchContent }
+      self.handleSeek(command, isForward: true)
+      return .success
+    })
+
+    remoteCommandCenter.seekBackwardCommand.isEnabled = true
+    remoteCommandCenter.seekBackwardCommand.addTarget(handler: { event in
+      guard let command = event as? MPSeekCommandEvent else { return .noSuchContent }
+      self.handleSeek(command, isForward: false)
+      return .success
+    })
+
     remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
     remoteCommandCenter.changePlaybackRateCommand.supportedPlaybackRates = PlaybackRate.allCases
       .map { NSNumber(value: $0.asDouble) }
@@ -214,6 +231,8 @@ public class RemoteCommandCenterHandler {
       remoteCommandCenter.likeCommand.isEnabled = true
       remoteCommandCenter.likeCommand.isActive = currentItem.isFavorite
       remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
+      remoteCommandCenter.seekForwardCommand.isEnabled = true
+      remoteCommandCenter.seekBackwardCommand.isEnabled = true
       remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
     case .podcastEpisode:
       remoteCommandCenter.playCommand.isEnabled = true
@@ -229,6 +248,8 @@ public class RemoteCommandCenterHandler {
       remoteCommandCenter.likeCommand.isEnabled = false
       remoteCommandCenter.likeCommand.isActive = false
       remoteCommandCenter.changePlaybackPositionCommand.isEnabled = true
+      remoteCommandCenter.seekForwardCommand.isEnabled = true
+      remoteCommandCenter.seekBackwardCommand.isEnabled = true
       remoteCommandCenter.changePlaybackRateCommand.isEnabled = true
     case .radio:
       remoteCommandCenter.playCommand.isEnabled = true
@@ -244,10 +265,63 @@ public class RemoteCommandCenterHandler {
       remoteCommandCenter.likeCommand.isEnabled = false
       remoteCommandCenter.likeCommand.isActive = false
       remoteCommandCenter.changePlaybackPositionCommand.isEnabled = false
+      remoteCommandCenter.seekForwardCommand.isEnabled = false
+      remoteCommandCenter.seekBackwardCommand.isEnabled = false
       remoteCommandCenter.changePlaybackRateCommand.isEnabled = false
     }
     updateShuffle()
     updateRepeat()
+  }
+
+  private static let seekTickInterval: TimeInterval = 0.25
+
+  /// Behaves like Apple Music: fast-forward plays the audio faster (2x, 4x, 8x the longer the button is held),
+  /// rewind jumps backwards in steps that grow the longer the button is held.
+  /// Streamed (not cached) items can't be buffered fast enough for the higher speeds,
+  /// so they fast-forward by jumping as well.
+  private func handleSeek(_ command: MPSeekCommandEvent, isForward: Bool) {
+    stopSeeking()
+    guard command.type == .beginSeeking else { return }
+    seekStartDate = Date()
+    let isCached = musicPlayer.currentlyPlaying?.isCached ?? false
+    let isSpeedingUp = isForward && isCached
+    seekTimer = Timer.scheduledTimer(
+      withTimeInterval: Self.seekTickInterval,
+      repeats: true
+    ) { [weak self] _ in
+      Task { @MainActor in
+        self?.seekTick(isForward: isForward, isSpeedingUp: isSpeedingUp)
+      }
+    }
+    seekTick(isForward: isForward, isSpeedingUp: isSpeedingUp)
+  }
+
+  private func seekTick(isForward: Bool, isSpeedingUp: Bool) {
+    let heldSeconds = Date().timeIntervalSince(seekStartDate)
+    let stage = heldSeconds < 2 ? 0 : (heldSeconds < 5 ? 1 : 2)
+    if isSpeedingUp {
+      backendAudioPlayer.setTemporaryPlaybackSpeed([2.0, 4.0, 8.0][stage])
+      return
+    }
+    // Jumps have to outpace the audio that keeps playing at normal speed
+    let step = [8.0, 16.0, 32.0][stage] * Self.seekTickInterval
+    let duration = musicPlayer.duration
+    var target = musicPlayer.elapsedTime + (isForward ? step : -step)
+    if duration > 0 {
+      target = min(target, duration - 1)
+    }
+    target = max(target, 0)
+    musicPlayer.seek(toSecond: target)
+    if target <= 0 || (duration > 0 && target >= duration - 1) {
+      stopSeeking()
+    }
+  }
+
+  private func stopSeeking() {
+    guard let seekTimer else { return }
+    seekTimer.invalidate()
+    self.seekTimer = nil
+    backendAudioPlayer.setTemporaryPlaybackSpeed(nil)
   }
 
   private func updateShuffle() {
