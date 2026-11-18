@@ -119,7 +119,7 @@ struct PlayerSettingsView: View {
               isOn: $settings.isAutoplayEnabled
             )
           },
-          footer: "When the queue ends, automatically continue playback using Instant Mix to find similar songs."
+          footer: "When the last song of the queue starts playing, similar songs (Instant Mix) are added to the queue so that playback continues after it ends."
         )
 
         // Streaming Format Settings
