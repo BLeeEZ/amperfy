@@ -161,6 +161,97 @@ class DownloadTest: XCTestCase {
     XCTAssertNotNil(library.getDownload(account: account2, id: otherAccountFinished.id))
   }
 
+  /// Saved, so its unique ID (object ID URI) is permanent before a download refers to it.
+  private func createUncachedArtwork(id: String) -> Artwork {
+    let artwork = library.createArtwork(account: account)
+    artwork.remoteInfo = ArtworkRemoteInfo(id: id, type: "")
+    artwork.status = .NotChecked
+    library.saveContext()
+    return artwork
+  }
+
+  @discardableResult
+  private func createDownload(for artwork: Artwork) -> Download {
+    let download = library.createDownload(account: account, id: artwork.uniqueID)
+    download.element = artwork
+    return download
+  }
+
+  private func createRequestManager() -> DownloadRequestManager {
+    DownloadRequestManager(
+      accountObjectId: account.managedObject.objectID,
+      storage: AsyncCoreDataAccessWrapper(persistentContainer: cdHelper.persistentContainer),
+      getDownloadDelegateCB: { MOCK_DownloadManagerDelegate() }
+    )
+  }
+
+  func testAddArtworkRequestsOnlyTransientlyFailedDownloadAgain() async {
+    let failedArtwork = createUncachedArtwork(id: "failed")
+    let failed = createDownload(for: failedArtwork)
+    failed.error = .fetchFailed
+    let offlineArtwork = createUncachedArtwork(id: "offline")
+    createDownload(for: offlineArtwork).error = .noConnectivity
+    let pendingArtwork = createUncachedArtwork(id: "pending")
+    createDownload(for: pendingArtwork)
+    let apiErrorArtwork = createUncachedArtwork(id: "apiError")
+    createDownload(for: apiErrorArtwork).error = .apiErrorResponse
+    let canceledArtwork = createUncachedArtwork(id: "canceled")
+    createDownload(for: canceledArtwork).isCanceled = true
+    library.saveContext()
+    let requestManager = createRequestManager()
+
+    let failedRequest = await requestManager.add(downloadInfo: failedArtwork.threadSafeInfo!)
+    let offlineRequest = await requestManager.add(downloadInfo: offlineArtwork.threadSafeInfo!)
+    let pendingRequest = await requestManager.add(downloadInfo: pendingArtwork.threadSafeInfo!)
+    let apiErrorRequest = await requestManager
+      .add(downloadInfo: apiErrorArtwork.threadSafeInfo!)
+    let canceledRequest = await requestManager
+      .add(downloadInfo: canceledArtwork.threadSafeInfo!)
+
+    XCTAssertEqual(failedRequest?.objectID, failed.managedObject.objectID)
+    XCTAssertNotNil(offlineRequest)
+    XCTAssertNil(pendingRequest)
+    XCTAssertNil(apiErrorRequest)
+    XCTAssertNil(canceledRequest)
+    let freshContext = cdHelper.persistentContainer.newBackgroundContext()
+    let freshFailed = freshContext.performAndWait {
+      freshContext.object(with: failed.managedObject.objectID) as! DownloadMO
+    }
+    freshContext.performAndWait { XCTAssertNil(freshFailed.errorDate) }
+  }
+
+  func testClearAllDownloadsIfAllHaveFinishedIgnoresFailedNotStartedDownloads() async {
+    // a suspended download loses its start date; it may fail afterwards
+    let failedArtwork = createUncachedArtwork(id: "failed")
+    let failed = createDownload(for: failedArtwork)
+    failed.error = .fetchFailed
+    let finishedArtwork = createUncachedArtwork(id: "finished")
+    let finished = createDownload(for: finishedArtwork)
+    finished.startDate = Date()
+    finished.finishDate = Date()
+    library.saveContext()
+
+    await createRequestManager().clearAllDownloadsIfAllHaveFinished()
+
+    XCTAssertNil(library.getDownload(account: account, id: failed.id))
+    XCTAssertNil(library.getDownload(account: account, id: finished.id))
+  }
+
+  func testClearAllDownloadsIfAllHaveFinishedKeepsAllWhileOneIsPending() async {
+    let pendingArtwork = createUncachedArtwork(id: "pending")
+    let pending = createDownload(for: pendingArtwork)
+    let finishedArtwork = createUncachedArtwork(id: "finished")
+    let finished = createDownload(for: finishedArtwork)
+    finished.startDate = Date()
+    finished.finishDate = Date()
+    library.saveContext()
+
+    await createRequestManager().clearAllDownloadsIfAllHaveFinished()
+
+    XCTAssertNotNil(library.getDownload(account: account, id: pending.id))
+    XCTAssertNotNil(library.getDownload(account: account, id: finished.id))
+  }
+
   func testDeleteCacheRemovesDownloadRecords() {
     let cached = createUncachedSong(id: "cached", account: account)
     cached.relFilePath = URL(string: "cached.mp3")
