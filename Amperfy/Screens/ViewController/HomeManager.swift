@@ -33,12 +33,14 @@ struct HomeItem: Hashable, @unchecked Sendable {
   let id: String
   var playableContainable: PlayableContainable
   /// Not part of the identity: a changed value only makes the cell reconfigure (no flicker),
-  /// e.g. when a playlist cover gets created after the item was first shown.
+  /// e.g. when a playlist cover gets created or the server cover changes after the item was
+  /// first shown.
   let artworkFingerprint: [NSManagedObjectID]
 
   init(section: HomeSection, playableContainable: PlayableContainable) {
     if let playlist = playableContainable as? Playlist {
-      self.artworkFingerprint = playlist.managedObject.artworkItems.map(\.objectID)
+      self.artworkFingerprint = playlist.managedObject.artworkItems.map(\.objectID) +
+        [playlist.managedObject.artwork?.objectID].compactMap { $0 }
     } else {
       self.artworkFingerprint = []
     }
