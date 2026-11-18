@@ -92,6 +92,17 @@ class BackendAudioPlayer: NSObject {
   private let fileManager = CacheFileManager.shared
   private var audioSessionHandler: AudioSessionHandler
   private var isTriggerReinsertPlayableAllowed = true
+  /// Waiting times before the next attempt to start again after the audio system refused
+  /// to start the player, e.g. because navigation still held the audio session.
+  /// The last entry is the final attempt. Internal for tests.
+  var audioStartRetryDelays: [Duration] = [
+    .seconds(1), .seconds(2), .seconds(4), .seconds(8), .seconds(15), .seconds(30),
+  ]
+  /// Index into `audioStartRetryDelays`. Reset by a successful start and by `stop()`, but
+  /// not by `requestToPlay`: the retry itself goes through it, so a reset there would make
+  /// the retries endless.
+  private var audioStartRetryCount = 0
+  private var audioStartRetryTask: Task<(), Never>?
   private var wasPlayingBeforeErrorOccurred: Bool = false
   private var userDefinedPlaybackRate: PlaybackRate = .one
   private var currentPreparedUrl: String = ""
@@ -343,13 +354,53 @@ class BackendAudioPlayer: NSObject {
     restartPlayer()
     eventLogger.report(topic: "Player Status", error: error)
     responder?.notifyErrorOccurred(error: error)
-    if isTriggerReinsertPlayableAllowed {
+    if Self.isAudioSystemStartError(error) {
+      // The item itself is fine, the audio system was just not available. Starting again
+      // right away would most likely fail the same way, so wait a bit, but keep the play
+      // state and don't use up the one reinsert per item meant for broken items.
+      if wasPlayingBeforeErrorOccurred {
+        scheduleAudioStartRetry()
+      }
+    } else if isTriggerReinsertPlayableAllowed {
       isTriggerReinsertPlayableAllowed = false
       triggerReinsertPlayableCB?()
     }
   }
 
+  private static func isAudioSystemStartError(_ error: Error) -> Bool {
+    guard let playerError = error as? AudioStreaming.AudioPlayerError,
+          case let .audioSystemError(systemError) = playerError else { return false }
+    return systemError == .playerStartError || systemError == .engineFailure
+  }
+
+  private func scheduleAudioStartRetry() {
+    cancelAudioStartRetry()
+    guard audioStartRetryCount < audioStartRetryDelays.count else {
+      os_log(.default, "Audio start: giving up after %d retries", audioStartRetryCount)
+      audioStartRetryCount = 0
+      return
+    }
+    let delay = audioStartRetryDelays[audioStartRetryCount]
+    audioStartRetryCount += 1
+    os_log(.default, "Audio start: retry %d in %s", audioStartRetryCount, "\(delay)")
+    audioStartRetryTask = Task { @MainActor [weak self] in
+      try? await Task.sleep(for: delay)
+      guard let self, !Task.isCancelled else { return }
+      audioStartRetryTask = nil
+      triggerReinsertPlayableCB?()
+    }
+  }
+
+  /// Any pause, stop or new request supersedes a pending retry
+  private func cancelAudioStartRetry() {
+    audioStartRetryTask?.cancel()
+    audioStartRetryTask = nil
+  }
+
   func continuePlay() {
+    // Another app (e.g. navigation or a call) may have taken the audio session while
+    // paused. The session must be active again before the engine can start.
+    audioSessionHandler.configureBackgroundPlayback()
     if shouldPlayAfterStreamRestart != nil {
       shouldPlayAfterStreamRestart = true
     }
@@ -361,6 +412,7 @@ class BackendAudioPlayer: NSObject {
   }
 
   func pause() {
+    cancelAudioStartRetry()
     if shouldPlayAfterStreamRestart != nil {
       shouldPlayAfterStreamRestart = false
     }
@@ -371,6 +423,8 @@ class BackendAudioPlayer: NSObject {
   }
 
   func stop() {
+    cancelAudioStartRetry()
+    audioStartRetryCount = 0
     isPlaying = false
     clearPlayer()
     audioAnalyzer.stop()
@@ -518,6 +572,7 @@ class BackendAudioPlayer: NSObject {
     // `handleError` updating this value. Reset it so that path never reports the
     // position of an earlier error.
     elapsedTimeBeforeErrorOccurred = 0.0
+    cancelAudioStartRetry()
     handleRequest(playable: playable)
   }
 
@@ -972,6 +1027,7 @@ extension BackendAudioPlayer: AudioStreaming.AudioPlayerDelegate {
       // Playback is running again and every reader of `shouldPlaybackStart` has
       // had its turn, so it is safe to leave the error state here.
       clearErrorState()
+      audioStartRetryCount = 0
     }
   }
 

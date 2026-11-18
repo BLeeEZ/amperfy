@@ -121,7 +121,8 @@ public class AudioSessionHandler {
       try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
       try AVAudioSession.sharedInstance().setActive(true)
     } catch {
-      eventLogger?.report(topic: "Audio Session", error: error)
+      // no popup: this is retried, e.g. while navigation holds the audio session
+      eventLogger?.report(topic: "Audio Session", error: error, displayPopup: false)
     }
   }
 }
