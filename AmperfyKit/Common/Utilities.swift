@@ -194,6 +194,13 @@ extension String {
   }
 }
 
+extension Character {
+  /// ' or the ’ and ‘ that the iOS keyboard types and tags use for it (#787).
+  var isSearchApostrophe: Bool {
+    self == "'" || self == "\u{2019}" || self == "\u{2018}"
+  }
+}
+
 extension Dictionary where Value: Equatable {
   public func findKey(forValue val: Value) -> Key? {
     first(where: { $1 == val })?.key

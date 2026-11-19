@@ -48,7 +48,7 @@ extension CoreDataIdentifyable {
   static func getIdentifierBasedSearchPredicate(searchText: String) -> NSPredicate {
     var predicate = NSPredicate(value: true)
     if !searchText.isEmpty {
-      predicate = NSPredicate(format: "%K contains[cd] %@", Self.identifierKeyString, searchText)
+      predicate = .searchContains(key: Self.identifierKeyString, searchText: searchText)
     }
     return predicate
   }
@@ -68,5 +68,45 @@ extension CoreDataIdentifyable {
       ),
     ]
     return fetchRequest
+  }
+}
+
+// MARK: - NSPredicate
+
+extension NSPredicate {
+  /// `key contains[cd] searchText`, also finding the text with its apostrophes all ', all ’, or
+  /// smart quoted (’ after a letter or digit, ‘ elsewhere), as tags usually write them (#787).
+  static func searchContains(key: String, searchText: String) -> NSPredicate {
+    func keyContains(_ text: String) -> NSPredicate {
+      NSPredicate(format: "%K contains[cd] %@", key, text)
+    }
+    guard searchText.contains(where: \.isSearchApostrophe) else {
+      return keyContains(searchText)
+    }
+    let smartQuoted = zip([" "] + searchText, searchText).map { previous, character -> Character in
+      guard character.isSearchApostrophe else { return character }
+      return previous.isLetter || previous.isNumber ? "\u{2019}" : "\u{2018}"
+    }
+    var variants = [String]()
+    for variant in [
+      searchText,
+      String(searchText.map { $0.isSearchApostrophe ? "'" : $0 }),
+      String(searchText.map { $0.isSearchApostrophe ? "\u{2019}" : $0 }),
+      String(smartQuoted),
+    ] where !variants.contains(variant) {
+      variants.append(variant)
+    }
+    let anyVariant = NSCompoundPredicate(orPredicateWithSubpredicates: variants.map(keyContains))
+    // Every variant contains the longest part between apostrophes. SQLite checks it first, so it
+    // runs the variants only on the rows that contain it. A single character filters too few rows
+    // to pay off.
+    let parts = searchText.split(whereSeparator: \.isSearchApostrophe)
+    guard let longestPart = parts.max(by: { $0.count < $1.count }), longestPart.count > 1 else {
+      return anyVariant
+    }
+    return NSCompoundPredicate(andPredicateWithSubpredicates: [
+      keyContains(String(longestPart)),
+      anyVariant,
+    ])
   }
 }

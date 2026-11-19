@@ -302,4 +302,26 @@ class ArtistTest: XCTestCase {
     // "All" keeps showing the stored song count (own songs only)
     XCTAssertEqual(countInfo(variousArtists, type: .short, filter: .all), ["1 Album"])
   }
+
+  func testSearchArtistsMatchesAnyApostropheKind() {
+    let ascii = library.createArtist(account: account)
+    ascii.id = "ascii"
+    ascii.name = "Guns N' Roses"
+    let typographic = library.createArtist(account: account)
+    typographic.id = "typographic"
+    typographic.name = "Sinéad O\u{2019}Connor"
+    library.saveContext()
+    func foundIds(_ searchText: String) -> [String] {
+      library.searchArtists(
+        for: account,
+        searchText: searchText,
+        onlyCached: false,
+        displayFilter: .all
+      ).map(\.id).sorted()
+    }
+
+    // #787: the iOS keyboard types ’ where the tag has ', and the other way around
+    XCTAssertEqual(foundIds("guns n\u{2019} roses"), ["ascii"])
+    XCTAssertEqual(foundIds("sinead o'connor"), ["typographic"])
+  }
 }

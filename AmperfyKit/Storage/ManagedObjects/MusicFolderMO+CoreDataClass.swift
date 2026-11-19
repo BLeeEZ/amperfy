@@ -63,11 +63,7 @@ public class MusicFolderMO: NSManagedObject {
   static func getSearchPredicate(searchText: String) -> NSPredicate {
     var predicate = NSPredicate(value: true)
     if !searchText.isEmpty {
-      predicate = NSPredicate(
-        format: "%K contains[cd] %@",
-        #keyPath(MusicFolderMO.name),
-        searchText
-      )
+      predicate = .searchContains(key: #keyPath(MusicFolderMO.name), searchText: searchText)
     }
     return predicate
   }
