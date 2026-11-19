@@ -186,6 +186,7 @@ public struct AmperfyImage: Sendable {
   public static let home = Self("house.fill")
   public static let info = Self("info.circle")
   public static let isSelected = Self("checkmark.circle.fill")
+  public static let letterPicker = Self("textformat.abc")
   public static let listBullet = Self("list.bullet")
   public static let login = Self("arrow.right.to.line")
   public static let lyrics = Self("quote.bubble")
@@ -327,6 +328,8 @@ extension UIImage {
   public static let home = UIImage.create(systemName: AmperfyImage.home.systemName)
   public static let info = UIImage.create(systemName: AmperfyImage.info.systemName)
   public static let isSelected = UIImage.create(systemName: AmperfyImage.isSelected.systemName)
+  public static let letterPicker = UIImage
+    .create(systemName: AmperfyImage.letterPicker.systemName)
   public static let listBullet = UIImage.create(systemName: AmperfyImage.listBullet.systemName)
   public static let login = UIImage.create(systemName: AmperfyImage.login.systemName)
   public static let lyrics = UIImage.create(systemName: AmperfyImage.lyrics.systemName)
