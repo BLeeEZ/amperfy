@@ -26,7 +26,7 @@ import UIKit
 class CurrentlyPlayingTableCell: BasicTableCell {
   static let rowHeight: CGFloat = 94.0
 
-  private var rootView: PopupPlayerVC?
+  private weak var rootView: PopupPlayerVC?
 
   @IBOutlet
   weak var artworkImage: LibraryEntityImage!

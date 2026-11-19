@@ -32,7 +32,7 @@ typealias GetPlayerIndexCallback = () -> PlayerIndex?
 @MainActor
 class EntityPreviewActionBuilder {
   private var entityContainer: PlayableContainable
-  private var rootView: UIViewController
+  private weak var rootView: UIViewController?
   private var playContextCb: GetPlayContextCallback?
   private var playerIndexCb: GetPlayerIndexCallback?
   private var appDelegate: AppDelegate
@@ -185,32 +185,32 @@ class EntityPreviewActionBuilder {
         showArtist()
       }
     } else if let album = entityContainer as? Album, let account = album.account {
-      rootView.navigationController?.pushViewController(
+      rootView?.navigationController?.pushViewController(
         AppStoryboard.Main.segueToAlbumDetail(account: account, album: album),
         animated: true
       )
     } else if let artist = entityContainer as? Artist, let account = artist.account {
-      rootView.navigationController?.pushViewController(
+      rootView?.navigationController?.pushViewController(
         AppStoryboard.Main.segueToArtistDetail(account: account, artist: artist),
         animated: true
       )
     } else if let genre = entityContainer as? Genre, let account = genre.account {
-      rootView.navigationController?.pushViewController(
+      rootView?.navigationController?.pushViewController(
         AppStoryboard.Main.segueToGenreDetail(account: account, genre: genre),
         animated: true
       )
     } else if let playlist = entityContainer as? Playlist, let account = playlist.account {
-      rootView.navigationController?.pushViewController(
+      rootView?.navigationController?.pushViewController(
         AppStoryboard.Main.segueToPlaylistDetail(account: account, playlist: playlist),
         animated: true
       )
     } else if let podcast = entityContainer as? Podcast, let account = podcast.account {
-      rootView.navigationController?.pushViewController(
+      rootView?.navigationController?.pushViewController(
         AppStoryboard.Main.segueToPodcastDetail(account: account, podcast: podcast),
         animated: true
       )
     } else if let directory = entityContainer as? Directory, let account = directory.account {
-      rootView.navigationController?.pushViewController(
+      rootView?.navigationController?.pushViewController(
         AppStoryboard.Main.segueToDirectories(account: account, directory: directory),
         animated: true
       )
@@ -627,7 +627,7 @@ class EntityPreviewActionBuilder {
       let selectPlaylistVC = AppStoryboard.Main
         .segueToPlaylistSelector(account: account, itemsToAdd: self.entityPlayables.filterSongs())
       let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-      self.rootView.present(selectPlaylistNav, animated: true)
+      self.rootView?.present(selectPlaylistNav, animated: true)
     }
   }
 
@@ -649,7 +649,7 @@ class EntityPreviewActionBuilder {
     )
     if let popupPlayer = rootView as? PopupPlayerVC {
       popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: albumDetailVC)
-    } else if let navController = rootView.navigationController {
+    } else if let navController = rootView?.navigationController {
       navController.pushViewController(albumDetailVC, animated: true)
     } else {
       guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
@@ -679,7 +679,7 @@ class EntityPreviewActionBuilder {
       )
       if let popupPlayer = rootView as? PopupPlayerVC {
         popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: artistDetailVC)
-      } else if let navController = rootView.navigationController {
+      } else if let navController = rootView?.navigationController {
         navController.pushViewController(artistDetailVC, animated: true)
       } else {
         guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
@@ -694,7 +694,7 @@ class EntityPreviewActionBuilder {
       )
       if let popupPlayer = rootView as? PopupPlayerVC {
         popupPlayer.closePopupPlayerAndDisplayInLibraryTab(vc: podcastDetailVC)
-      } else if let navController = rootView.navigationController {
+      } else if let navController = rootView?.navigationController {
         navController.pushViewController(podcastDetailVC, animated: true)
       } else {
         guard let hostingSplitVC = AppDelegate.mainWindowHostVC else { return }
@@ -733,7 +733,7 @@ class EntityPreviewActionBuilder {
       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
         // do nothing
       }))
-      self.rootView.present(alert, animated: true, completion: nil)
+      self.rootView?.present(alert, animated: true, completion: nil)
     }
   }
 
@@ -763,7 +763,7 @@ class EntityPreviewActionBuilder {
       alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { _ in
         // do nothing
       }))
-      self.rootView.present(alert, animated: true, completion: nil)
+      self.rootView?.present(alert, animated: true, completion: nil)
     }
   }
 
@@ -781,7 +781,7 @@ class EntityPreviewActionBuilder {
           .playableDownloadManager
       }
 
-      guard let self else { return }
+      guard let self, let rootView = rootView else { return }
       // Note: This is strongly coupled, I could protocolize and inject. But this is simplest and the project doesn't seem to do DI/tests for this target.
       ShareSongAction.share(
         playable: playable,
@@ -811,6 +811,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func showPodcastDetails() {
+    guard let rootView else { return }
     var descriptionVC: PlainDetailsVC?
     if let playable = entityContainer as? AbstractPlayable,
        let podcastEpisode = playable.asPodcastEpisode {
@@ -839,6 +840,7 @@ class EntityPreviewActionBuilder {
   }
 
   private func showLyrics(lyricsRelFilePath: URL, lyricsAccount: Account) {
+    guard let rootView else { return }
     let lyricsVC = PlainDetailsVC()
     lyricsVC.display(
       lyricsRelFilePath: lyricsRelFilePath,

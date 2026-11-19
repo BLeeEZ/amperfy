@@ -178,7 +178,7 @@ extension PopupPlayerVC: UITableViewDataSource, UITableViewDelegate {
         playable: playable,
         playContextCb: { _ in PlayContext() },
         rootView: self,
-        playerIndexCb: convertCellViewToPlayerIndex
+        playerIndexCb: { [weak self] cell in self?.convertCellViewToPlayerIndex(cell: cell) }
       )
       cell.backgroundColor = UIColor.clear
       cell.maskCell(fromTop: 0.0)
