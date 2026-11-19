@@ -125,7 +125,7 @@ class LargeCurrentlyPlayingPlayerView: UIView, UIGestureRecognizerDelegate {
     right: UIView.defaultMarginX
   )
 
-  private var rootView: PopupPlayerVC?
+  private weak var rootView: PopupPlayerVC?
   private var lyricsView: LyricsView?
   private var visualizerHostingView: SwiftUIContentView?
   private var displayElement: LargeDisplayElement = .artwork

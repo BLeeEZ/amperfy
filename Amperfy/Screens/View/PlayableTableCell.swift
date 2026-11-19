@@ -92,7 +92,7 @@ class PlayableTableCell: BasicTableCell {
   private var playContextCb: GetPlayContextFromTableCellCallback?
   private var playable: AbstractPlayable?
   private var download: Download?
-  private var rootView: UIViewController?
+  private weak var rootView: UIViewController?
   private var playIndicator: PlayIndicator?
   private var isDislayAlbumTrackNumberStyle: Bool = false
   private var displayMode: DisplayMode = .normal

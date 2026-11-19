@@ -36,7 +36,7 @@ class PlayerControlView: UIView {
   )
 
   private var player: PlayerFacade!
-  private var rootView: PopupPlayerVC?
+  private weak var rootView: PopupPlayerVC?
   private var playerHandler: PlayerUIHandler?
 
   @IBOutlet
@@ -103,7 +103,7 @@ class PlayerControlView: UIView {
     refreshPlayer()
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,
-      menuCreateCB: createPlayerOptionsMenu
+      menuCreateCB: { [weak self] in self?.createPlayerOptionsMenu() ?? [] }
     )
 
     registerForTraitChanges(
@@ -187,8 +187,9 @@ class PlayerControlView: UIView {
     sliderMenuView.slider.maximumValue = 100
     sliderMenuView.slider.value = appDelegate.player.volume * 100
 
-    sliderMenuView.sliderValueChangedCB = {
-      self.appDelegate.player.volume = Float(sliderMenuView.slider.value) / 100.0
+    sliderMenuView.sliderValueChangedCB = { [weak self, weak sliderMenuView] in
+      guard let self, let sliderMenuView else { return }
+      appDelegate.player.volume = Float(sliderMenuView.slider.value) / 100.0
     }
 
     popoverContentController.modalPresentationStyle = .popover
@@ -212,7 +213,7 @@ class PlayerControlView: UIView {
     playerHandler?.refreshDisplayPlaylistButton(displayPlaylistButton: displayPlaylistButton)
     playerHandler?.refreshPlayerOptions(
       optionsButton: optionsButton,
-      menuCreateCB: createPlayerOptionsMenu
+      menuCreateCB: { [weak self] in self?.createPlayerOptionsMenu() ?? [] }
     )
   }
 
@@ -256,8 +257,8 @@ class PlayerControlView: UIView {
       UIAction(
         title: playbackRate.description,
         image: playbackRate == playerPlaybackRate ? .check : nil,
-        handler: { _ in
-          self.player.setPlaybackRate(playbackRate)
+        handler: { [weak self] _ in
+          self?.player.setPlaybackRate(playbackRate)
         }
       )
     }
@@ -277,9 +278,10 @@ class PlayerControlView: UIView {
           title: visualizerType.displayName,
           image: UIImage(systemName: visualizerType.iconName),
           state: visualizerType == currentType ? .on : .off,
-          handler: { _ in
-            self.appDelegate.storage.settings.user.selectedVisualizerType = visualizerType
-            self.rootView?.largeCurrentlyPlayingView?.showVisualizer()
+          handler: { [weak self] _ in
+            guard let self else { return }
+            appDelegate.storage.settings.user.selectedVisualizerType = visualizerType
+            rootView?.largeCurrentlyPlayingView?.showVisualizer()
           }
         )
       }
@@ -295,15 +297,19 @@ class PlayerControlView: UIView {
     var menuActions = [UIMenuElement]()
     if player.currentlyPlaying != nil || player.prevQueueCount > 0 || player
       .userQueueCount > 0 || player.nextQueueCount > 0 {
-      let clearPlayer = UIAction(title: "Clear Player", image: .clear, handler: { _ in
-        self.player.clearQueues()
+      let clearPlayer = UIAction(title: "Clear Player", image: .clear, handler: { [weak self] _ in
+        self?.player.clearQueues()
       })
       menuActions.append(clearPlayer)
     }
     if player.userQueueCount > 0 {
-      let clearUserQueue = UIAction(title: "Clear User Queue", image: .playlistX, handler: { _ in
-        self.rootView?.clearUserQueue()
-      })
+      let clearUserQueue = UIAction(
+        title: "Clear User Queue",
+        image: .playlistX,
+        handler: { [weak self] _ in
+          self?.rootView?.clearUserQueue()
+        }
+      )
       menuActions.append(clearUserQueue)
     }
 
@@ -313,22 +319,32 @@ class PlayerControlView: UIView {
     if rootView?.largeCurrentlyPlayingView?.isLyricsButtonAllowedToDisplay ?? false {
       if !appDelegate.storage.settings.user.isPlayerLyricsDisplayed ||
         appDelegate.storage.settings.user.playerDisplayStyle != .large {
-        let showLyricsAction = UIAction(title: "Show Lyrics", image: .lyrics, handler: { _ in
-          if !self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
-            self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
-            self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
-            self.rootView?.largeCurrentlyPlayingView?.display(element: .lyrics)
+        let showLyricsAction = UIAction(
+          title: "Show Lyrics",
+          image: .lyrics,
+          handler: { [weak self] _ in
+            guard let self else { return }
+            if !appDelegate.storage.settings.user.isPlayerLyricsDisplayed {
+              appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
+              appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
+              rootView?.largeCurrentlyPlayingView?.display(element: .lyrics)
+            }
+            if appDelegate.storage.settings.user.playerDisplayStyle != .large {
+              displayPlaylistPressed()
+            }
           }
-          if self.appDelegate.storage.settings.user.playerDisplayStyle != .large {
-            self.displayPlaylistPressed()
-          }
-        })
+        )
         menuActions.append(showLyricsAction)
       } else {
-        let hideLyricsAction = UIAction(title: "Hide Lyrics", image: .lyrics, handler: { _ in
-          self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
-          self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
-        })
+        let hideLyricsAction = UIAction(
+          title: "Hide Lyrics",
+          image: .lyrics,
+          handler: { [weak self] _ in
+            guard let self else { return }
+            appDelegate.storage.settings.user.isPlayerLyricsDisplayed.toggle()
+            rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
+          }
+        )
         menuActions.append(hideLyricsAction)
       }
     }
@@ -338,14 +354,15 @@ class PlayerControlView: UIView {
       let showVisualizerAction = UIAction(
         title: "Show Audio Visualizer",
         image: .audioVisualizer,
-        handler: { _ in
-          if !self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed {
-            self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = true
-            self.appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
-            self.rootView?.largeCurrentlyPlayingView?.display(element: .visualizer)
+        handler: { [weak self] _ in
+          guard let self else { return }
+          if !appDelegate.storage.settings.user.isPlayerVisualizerDisplayed {
+            appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = true
+            appDelegate.storage.settings.user.isPlayerLyricsDisplayed = false
+            rootView?.largeCurrentlyPlayingView?.display(element: .visualizer)
           }
-          if self.appDelegate.storage.settings.user.playerDisplayStyle != .large {
-            self.displayPlaylistPressed()
+          if appDelegate.storage.settings.user.playerDisplayStyle != .large {
+            displayPlaylistPressed()
           }
         }
       )
@@ -354,9 +371,10 @@ class PlayerControlView: UIView {
       let hideVisualizerAction = UIAction(
         title: "Hide Audio Visualizer",
         image: .audioVisualizer,
-        handler: { _ in
-          self.appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
-          self.rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
+        handler: { [weak self] _ in
+          guard let self else { return }
+          appDelegate.storage.settings.user.isPlayerVisualizerDisplayed = false
+          rootView?.largeCurrentlyPlayingView?.display(element: .artwork)
         }
       )
       menuActions.append(hideVisualizerAction)
@@ -372,13 +390,14 @@ class PlayerControlView: UIView {
         let addContextToPlaylist = UIAction(
           title: "Add Context Queue to Playlist",
           image: .playlistPlus,
-          handler: { _ in
-            var itemsToAdd = self.player.getAllPrevQueueItems().filterSongs()
-            if let currentlyPlaying = self.player.currentlyPlaying,
+          handler: { [weak self] _ in
+            guard let self else { return }
+            var itemsToAdd = player.getAllPrevQueueItems().filterSongs()
+            if let currentlyPlaying = player.currentlyPlaying,
                let currentSong = currentlyPlaying.asSong {
               itemsToAdd.append(currentSong)
             }
-            itemsToAdd.append(contentsOf: self.player.getAllNextQueueItems().filterSongs())
+            itemsToAdd.append(contentsOf: player.getAllNextQueueItems().filterSongs())
             // allow add to playlist only if all songs belong to the same account
             guard let firstItemAccount = itemsToAdd.first?.account,
                   itemsToAdd.count == itemsToAdd.filter({ $0.account == firstItemAccount }).count
@@ -386,7 +405,7 @@ class PlayerControlView: UIView {
             let selectPlaylistVC = AppStoryboard.Main
               .segueToPlaylistSelector(account: firstItemAccount, itemsToAdd: itemsToAdd)
             let selectPlaylistNav = UINavigationController(rootViewController: selectPlaylistVC)
-            self.rootView?.present(selectPlaylistNav, animated: true, completion: nil)
+            rootView?.present(selectPlaylistNav, animated: true, completion: nil)
           }
         )
         menuActions.append(addContextToPlaylist)
@@ -399,18 +418,18 @@ class PlayerControlView: UIView {
       let scrollToCurrentlyPlaying = UIAction(
         title: "Scroll to currently playing",
         image: .squareArrow,
-        handler: { _ in
-          self.rootView?.scrollToCurrentlyPlayingRow()
+        handler: { [weak self] _ in
+          self?.rootView?.scrollToCurrentlyPlayingRow()
         }
       )
       menuActions.append(scrollToCurrentlyPlaying)
     case .large: break
     }
 
-    let playerInfo = UIAction(title: "Player Info", image: .info, handler: { _ in
-      guard let rootView = self.rootView else { return }
+    let playerInfo = UIAction(title: "Player Info", image: .info, handler: { [weak self] _ in
+      guard let self, let rootView = rootView else { return }
       let detailVC = PlainDetailsVC()
-      detailVC.display(player: self.player, on: rootView)
+      detailVC.display(player: player, on: rootView)
       rootView.present(detailVC, animated: true)
     })
     menuActions.append(playerInfo)

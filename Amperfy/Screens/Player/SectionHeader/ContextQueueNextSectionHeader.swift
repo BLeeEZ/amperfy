@@ -35,7 +35,7 @@ class ContextQueueNextSectionHeader: UIView {
   )
 
   private var player: PlayerFacade!
-  private var rootView: PopupPlayerVC?
+  private weak var rootView: PopupPlayerVC?
   private var playerHandler: PlayerUIHandler?
 
   @IBOutlet
