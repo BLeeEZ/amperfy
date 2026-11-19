@@ -36,11 +36,15 @@ extension SongMO: CoreDataIdentifyable {
 
   static func getTitleAndArtistSearchPredicate(searchText: String) -> NSPredicate {
     guard !searchText.isEmpty else { return NSPredicate(value: true) }
-    let searchWords = searchText.split(whereSeparator: \.isWhitespace).map { String($0) }
+    let words = searchText.split(whereSeparator: \.isWhitespace).map { String($0) }
+    // Words with an apostrophe need more checks: put them last, so SQLite runs them only on the
+    // rows the other words matched. The order of an AND doesn't change the result.
+    let searchWords = words.filter { !$0.contains(where: \.isSearchApostrophe) } +
+      words.filter { $0.contains(where: \.isSearchApostrophe) }
     return NSCompoundPredicate(andPredicateWithSubpredicates: searchWords.map { searchWord in
       NSCompoundPredicate(orPredicateWithSubpredicates: [
-        NSPredicate(format: "%K contains[cd] %@", #keyPath(SongMO.title), searchWord),
-        NSPredicate(format: "%K contains[cd] %@", #keyPath(SongMO.artist.name), searchWord),
+        .searchContains(key: #keyPath(SongMO.title), searchText: searchWord),
+        .searchContains(key: #keyPath(SongMO.artist.name), searchText: searchWord),
       ])
     })
   }

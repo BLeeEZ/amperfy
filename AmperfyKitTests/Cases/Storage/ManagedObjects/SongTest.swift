@@ -211,4 +211,51 @@ class SongTest: XCTestCase {
     XCTAssertFalse(playlist1.isCached)
     XCTAssertFalse(playlist2.isCached)
   }
+
+  func testSearchSongsMatchesAnyApostropheKind() {
+    let artist = library.createArtist(account: account)
+    artist.name = "Anna O'Brien"
+    func addSong(_ id: String, title: String, artist: Artist? = nil) {
+      let song = library.createSong(account: account)
+      song.id = id
+      song.title = title
+      song.artist = artist
+      song.size = 1
+    }
+    addSong("ascii", title: "I'm Ready")
+    addSong("similar", title: "I Must Be Ready")
+    addSong("typographic", title: "Don\u{2019}t Stop")
+    addSong("asciiRock", title: "Rock 'n' Roll")
+    addSong("rightRock", title: "Rock \u{2019}n\u{2019} Roll Nights")
+    addSong("smartRock", title: "Rock \u{2018}n\u{2019} Roll Train")
+    addSong("byArtist", title: "Echoes", artist: artist)
+    library.saveContext()
+    func foundIds(_ searchText: String) -> [String] {
+      library.searchSongs(
+        for: account,
+        searchText: searchText,
+        onlyCached: false,
+        displayFilter: .all
+      ).map(\.id).sorted()
+    }
+
+    // #787: the iOS keyboard types ’ or ‘ where the tag has '
+    XCTAssertEqual(foundIds("I\u{2019}m Ready"), ["ascii"])
+    XCTAssertEqual(foundIds("I\u{2018}m ready"), ["ascii"])
+    // A straight ', pasted or typed without Smart Punctuation, finds a title tagged with ’
+    XCTAssertEqual(foundIds("don't"), ["typographic"])
+    // Tags write 'n', ’n’ or ‘n’, and iOS types ‘n’
+    let rocks = ["asciiRock", "rightRock", "smartRock"]
+    XCTAssertEqual(foundIds("rock 'n' roll"), rocks)
+    XCTAssertEqual(foundIds("rock \u{2018}n\u{2019} roll"), rocks)
+    XCTAssertEqual(foundIds("o\u{2019}brien"), ["byArtist"])
+  }
+
+  func testSearchWithoutApostropheIsPlainContains() {
+    XCTAssertEqual(
+      SongMO.getTitleAndArtistSearchPredicate(searchText: "go home").predicateFormat,
+      #"(title CONTAINS[cd] "go" OR artist.name CONTAINS[cd] "go") AND "# +
+        #"(title CONTAINS[cd] "home" OR artist.name CONTAINS[cd] "home")"#
+    )
+  }
 }
