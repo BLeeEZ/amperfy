@@ -197,7 +197,8 @@ extension CarPlaySceneDelegate: CPNowPlayingTemplateObserver {
       libraryEntity: playable,
       themePreference: getPreference(playable.account?.info).theme,
       artworkDisplayPreference: getPreference(playable.account?.info).artworkDisplayPreference,
-      useCache: false
+      useCache: false,
+      maxPixelSize: listImagePixelSize
     )
     let listItem = CPListItem(
       text: playable.title,

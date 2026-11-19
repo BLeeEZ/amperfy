@@ -65,6 +65,19 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
     interfaceController?.carTraitCollection ?? UITraitCollection.maxDisplayScale
   }
 
+  /// Pixel size the list artworks are decoded with. Full size covers are sent to the
+  /// CarPlayTemplateUIHost process for every list image and get both processes killed for
+  /// using too much memory.
+  var listImagePixelSize: Int {
+    let maxImageSize = [
+      CPListItem.maximumImageSize,
+      CPListImageRowItemRowElement.maximumImageSize,
+    ].map { max($0.width, $0.height) }.max() ?? 0
+    // fallback in case CarPlay reports no size
+    let imageSize = maxImageSize > 0 ? maxImageSize : 100
+    return Int((imageSize * max(traits.displayScale, 1)).rounded(.up))
+  }
+
   /// CarPlay connected
   nonisolated func templateApplicationScene(
     _ templateApplicationScene: CPTemplateApplicationScene,
@@ -481,7 +494,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
         libraryEntity: container.entity,
         themePreference: getPreference(activeAccountInfo).theme,
         artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-        useCache: false
+        useCache: false,
+        maxPixelSize: listImagePixelSize
       )
       for rowImage in imageRowImages {
         rowImage.image = image.carPlayImage(carTraitCollection: traits)
@@ -503,7 +517,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             libraryEntity: container.entity,
             themePreference: getPreference(activeAccountInfo).theme,
             artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-            useCache: false
+            useCache: false,
+            maxPixelSize: listImagePixelSize
           )
           let newElement = CPListImageRowItemRowElement(
             image: image.carPlayImage(carTraitCollection: traits),
@@ -603,7 +618,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
                   themePreference: getPreference(activeAccountInfo).theme,
                   artworkDisplayPreference: getPreference(activeAccountInfo)
                     .artworkDisplayPreference,
-                  useCache: false
+                  useCache: false,
+                  maxPixelSize: listImagePixelSize
                 ).carPlayImage(carTraitCollection: traits)
               )
             }

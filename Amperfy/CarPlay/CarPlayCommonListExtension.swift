@@ -174,7 +174,8 @@ extension CarPlaySceneDelegate {
         libraryEntity: artist,
         themePreference: getPreference(activeAccountInfo).theme,
         artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-        useCache: false
+        useCache: false,
+        maxPixelSize: listImagePixelSize
       ).carPlayImage(carTraitCollection: traits),
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
@@ -260,7 +261,8 @@ extension CarPlaySceneDelegate {
         libraryEntity: album,
         themePreference: getPreference(activeAccountInfo).theme,
         artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-        useCache: false
+        useCache: false,
+        maxPixelSize: listImagePixelSize
       ).carPlayImage(carTraitCollection: traits),
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
@@ -382,7 +384,8 @@ extension CarPlaySceneDelegate {
             libraryEntity: podcast,
             themePreference: getPreference(activeAccountInfo).theme,
             artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-            useCache: false
+            useCache: false,
+            maxPixelSize: listImagePixelSize
           ).carPlayImage(carTraitCollection: traits),
           accessoryImage: nil,
           accessoryType: .disclosureIndicator
@@ -454,7 +457,8 @@ extension CarPlaySceneDelegate {
             libraryEntity: genre,
             themePreference: getPreference(activeAccountInfo).theme,
             artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-            useCache: false
+            useCache: false,
+            maxPixelSize: listImagePixelSize
           ).carPlayImage(carTraitCollection: traits),
           accessoryImage: nil,
           accessoryType: .none
@@ -640,7 +644,8 @@ extension CarPlaySceneDelegate {
         libraryEntity: playable,
         themePreference: getPreference(activeAccountInfo).theme,
         artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-        useCache: false
+        useCache: false,
+        maxPixelSize: listImagePixelSize
       )
   }
 

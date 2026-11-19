@@ -20,6 +20,7 @@
 //
 
 import CoreData
+import ImageIO
 import UIKit
 
 extension LibraryEntityImage {
@@ -28,7 +29,8 @@ extension LibraryEntityImage {
     libraryEntity: AbstractLibraryEntity,
     themePreference: ThemePreference,
     artworkDisplayPreference: ArtworkDisplayPreference,
-    useCache: Bool
+    useCache: Bool,
+    maxPixelSize: Int? = nil
   )
     -> UIImage {
     if let artworkImagePath = libraryEntity.imagePath(
@@ -36,7 +38,10 @@ extension LibraryEntityImage {
     ) {
       if useCache, let cachedImg = Self.cache.object(forKey: artworkImagePath as NSString) {
         return cachedImg
-      } else if let directlyLoadedImage = UIImage(named: artworkImagePath) {
+      } else if let directlyLoadedImage = loadImage(
+        imagePath: artworkImagePath,
+        maxPixelSize: maxPixelSize
+      ) {
         return directlyLoadedImage
       }
     }
@@ -44,6 +49,31 @@ extension LibraryEntityImage {
       theme: themePreference,
       artworkType: libraryEntity.getDefaultArtworkType()
     )
+  }
+
+  /// `UIImage(named:)` at full size, or decoded scaled down to `maxPixelSize` without being kept in
+  /// the system image cache (e.g. for the many small CarPlay list images).
+  private static func loadImage(imagePath: String, maxPixelSize: Int?) -> UIImage? {
+    guard let maxPixelSize else { return UIImage(named: imagePath) }
+    return decodeScaledImage(imagePath: imagePath, maxPixelSize: maxPixelSize) ??
+      // formats ImageIO can not scale, at full size
+      UIImage(contentsOfFile: imagePath)
+  }
+
+  private static func decodeScaledImage(imagePath: String, maxPixelSize: Int) -> UIImage? {
+    let options: [CFString: Any] = [
+      kCGImageSourceCreateThumbnailFromImageAlways: true,
+      kCGImageSourceCreateThumbnailWithTransform: true,
+      kCGImageSourceShouldCacheImmediately: true,
+      kCGImageSourceThumbnailMaxPixelSize: maxPixelSize,
+    ]
+    guard let source = CGImageSourceCreateWithURL(
+      URL(fileURLWithPath: imagePath) as CFURL,
+      [kCGImageSourceShouldCache: false] as CFDictionary
+    ),
+      let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+    else { return nil }
+    return UIImage(cgImage: cgImage)
   }
 }
 

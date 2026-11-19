@@ -196,7 +196,8 @@ extension CarPlaySceneDelegate {
           libraryEntity: libEntity,
           themePreference: getPreference(activeAccountInfo).theme,
           artworkDisplayPreference: getPreference(activeAccountInfo).artworkDisplayPreference,
-          useCache: false
+          useCache: false,
+          maxPixelSize: listImagePixelSize
         )
         if let entityArtwork = libEntity.artwork, let accountInfo = entityArtwork.account?.info {
           artwork = entityArtwork
