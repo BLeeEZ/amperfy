@@ -48,7 +48,9 @@ public class FuzzySearcher {
     }
 
     let fuse = Fuse()
-    let foldedSearch = search.folding(options: foldOptions, locale: nil)
+    // Skip folding apostrophes when the search has none: they can't change a rank then
+    let isFoldingApostrophes = search.contains(where: \.isSearchApostrophe)
+    let foldedSearch = fold(search, apostrophes: isFoldingApostrophes)
     let searchWords = splitInWords(foldedSearch)
     guard !searchWords.isEmpty else {
       return findBestFuzzyMatch(in: items, search: search, searchableText: searchableText)
@@ -58,7 +60,7 @@ public class FuzzySearcher {
 
     var matches = [(item: PlayableContainable, rank: Int, name: String, score: Double)]()
     for item in items {
-      let foldedName = item.name.folding(options: foldOptions, locale: nil)
+      let foldedName = fold(item.name, apostrophes: isFoldingApostrophes)
       let text = searchableText(item)
 
       let rank: Int
@@ -87,6 +89,12 @@ public class FuzzySearcher {
       if $0.rank < 4 { return $0.name < $1.name }
       return $0.score < $1.score
     }.map(\.item)
+  }
+
+  /// Folds case and diacritics, and with `apostrophes` also the apostrophe kind (#787).
+  nonisolated private static func fold(_ text: String, apostrophes: Bool) -> String {
+    let folded = text.folding(options: foldOptions, locale: nil)
+    return apostrophes ? String(folded.map { $0.isSearchApostrophe ? "'" : $0 }) : folded
   }
 
   nonisolated private static func splitInWords(_ text: String) -> [String] {

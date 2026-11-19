@@ -258,4 +258,14 @@ class SongTest: XCTestCase {
         #"(title CONTAINS[cd] "home" OR artist.name CONTAINS[cd] "home")"#
     )
   }
+
+  func testSearchRanksExactTitleFirstWithAnyApostropheKind() {
+    let songs = ["Baby Don't Cry", "Don't"].map { title in
+      let song = library.createSong(account: account)
+      song.title = title
+      return song
+    }
+    let ranked = FuzzySearcher.findBestMatch(in: songs, search: "Don\u{2019}t", isTokenized: true)
+    XCTAssertEqual(ranked.map(\.name), ["Don't", "Baby Don't Cry"])
+  }
 }
