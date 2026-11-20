@@ -91,6 +91,11 @@ class SsIDsParserDelegate: SsNotifiableXmlParser {
       prefetchIDs.albumIDs.insert(albumId)
     }
 
+    // getNewestPodcasts returns episodes without their <channel>
+    if elementName == "episode", let channelId = attributeDict["channelId"] {
+      prefetchIDs.podcastIDs.insert(channelId)
+    }
+
     if let coverArtId = attributeDict["coverArt"] {
       let remoteInfo = ArtworkRemoteInfo(id: coverArtId, type: "")
       prefetchIDs.artworkIDs.insert(remoteInfo)

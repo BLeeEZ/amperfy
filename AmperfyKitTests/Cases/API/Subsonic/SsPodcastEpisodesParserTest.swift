@@ -22,6 +22,8 @@
 @testable import AmperfyKit
 import XCTest
 
+// MARK: - SsPodcastEpisodesParserTest
+
 class SsPodcastEpisodesParserTest: AbstractSsParserTest {
   var testPodcast: Podcast?
 
@@ -139,5 +141,54 @@ class SsPodcastEpisodesParserTest: AbstractSsParserTest {
     // denormalized value -> will be updated at save context
     library.saveContext()
     XCTAssertEqual(podcast.episodeCount, 2)
+  }
+}
+
+// MARK: - SsNewestPodcastEpisodesParserTest
+
+class SsNewestPodcastEpisodesParserTest: AbstractSsParserTest {
+  var podcast1: Podcast!
+  var podcast2: Podcast!
+
+  override func setUp() async throws {
+    try await super.setUp()
+    xmlData = Data("""
+    <subsonic-response xmlns="http://subsonic.org/restapi" status="ok" version="1.13.0">
+      <newestPodcasts>
+        <episode id="34" channelId="1" title="Episode 34"/>
+        <episode id="35" channelId="2" title="Episode 35"/>
+      </newestPodcasts>
+    </subsonic-response>
+    """.utf8)
+    // podcasts are synced before the newest episodes
+    podcast1 = library.createPodcast(account: account)
+    podcast1.id = "1"
+    podcast2 = library.createPodcast(account: account)
+    podcast2.id = "2"
+    // episode 34 was already linked by opening its podcast
+    let episode34 = library.createPodcastEpisode(account: account)
+    episode34.id = "34"
+    episode34.podcast = podcast1
+  }
+
+  override func createParserDelegate() {
+    let prefetch = library.getElements(
+      account: account,
+      prefetchIDs: ssIdParserDelegate.prefetchIDs
+    )
+    ssParserDelegate = SsPodcastEpisodeParserDelegate(
+      performanceMonitor: MOCK_PerformanceMonitor(),
+      podcast: nil, prefetch: prefetch, account: account,
+      library: library
+    )
+  }
+
+  override func checkCorrectParsing() {
+    ssParserDelegate?.performPostParseOperations()
+    prefetchIdTester.checkPrefetchIdCounts(podcastEpisodeCount: 2, podcastCount: 2)
+    XCTAssertEqual(library.getPodcastEpisode(for: account, id: "34")?.podcast, podcast1)
+    XCTAssertEqual(library.getPodcastEpisode(for: account, id: "35")?.podcast, podcast2)
+    XCTAssertEqual(podcast1.episodes.map(\.id), ["34"])
+    XCTAssertEqual(podcast2.episodes.map(\.id), ["35"])
   }
 }
