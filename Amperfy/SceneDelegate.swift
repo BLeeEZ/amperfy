@@ -99,6 +99,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       // Save it off for later when we become active.
       appDelegate.quickActionsManager.savedShortCutItemForLaterUse(savedShortCutItem: shortcutItem)
     }
+    // A URL that launches the app or connects this scene comes in connectionOptions, not through
+    // scene(_:openURLContexts:). Like the mode quick action, it is handled right away, as an
+    // x-callback setOfflineMode URL sets the mode that decides below whether an interrupted
+    // initial sync is resumed
+    if appDelegate.isNormalInteraction {
+      for URLContext in connectionOptions.urlContexts {
+        _ = appDelegate.intentManager.handleIncoming(url: URLContext.url)
+      }
+    }
     // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
     // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
     // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
