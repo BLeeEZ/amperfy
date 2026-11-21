@@ -255,6 +255,7 @@ public class Playlist: Identifyable {
     createAndAppendPlaylistItem(for: playable)
     updateChangeDate()
     updateDuration(byIncreasingDuration: playable.duration)
+    managedObject.updateSongCount()
     updateArtworkItems()
     library.saveContext()
   }
@@ -265,6 +266,7 @@ public class Playlist: Identifyable {
     }
     updateChangeDate()
     updateDuration(byIncreasingDuration: playablesToAppend.reduce(0) { $0 + $1.duration })
+    managedObject.updateSongCount()
     updateArtworkItems()
     library.saveContext()
   }
@@ -407,6 +409,7 @@ public class Playlist: Identifyable {
 
     updateChangeDate()
     updateDuration(byIncreasingDuration: playablesToInsert.reduce(0) { $0 + $1.duration })
+    managedObject.updateSongCount()
     if insertIndex < Self.artworkItemMaxLookCount {
       updateArtworkItems()
     }
@@ -448,6 +451,7 @@ public class Playlist: Identifyable {
 
     updateChangeDate()
     updateDuration(byReducingDuration: Int(itemToBeRemovedMO.playable.combinedDuration))
+    managedObject.updateSongCount()
     if index < Self.artworkItemMaxLookCount {
       updateArtworkItems()
     }
@@ -474,6 +478,7 @@ public class Playlist: Identifyable {
 
   public func removeAllItems() {
     managedObject.removeAllItems()
+    managedObject.updateSongCount()
     updateChangeDate()
     updateArtworkItems()
     managedObject.duration = 0

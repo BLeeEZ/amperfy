@@ -771,6 +771,34 @@ class PlaylistTest: XCTestCase {
       XCTAssertNotNil(try? context.existingObject(with: itemID))
     }
   }
+
+  func testSongCountIsUpToDateWhenTheItemListChanges() {
+    // The playlist detail header reads songCount when its item list changes during a save.
+    testPlaylist.removeAllItems()
+    let itemsController = PlaylistItemsFetchedResultsController(
+      forPlaylist: testPlaylist,
+      coreDataCompanion: CoreDataCompanion(context: cdHelper.persistentContainer.viewContext),
+      isGroupedInAlphabeticSections: false
+    )
+    let snapshotRecorder = SnapshotRecorder()
+    var songCount: Int?
+    snapshotRecorder.snapshotDidChange = { songCount = self.testPlaylist.songCount }
+    itemsController.delegate = snapshotRecorder
+    itemsController.fetch()
+    guard let song = library.getSong(for: account, id: cdHelper.seeder.songs[5].id)
+    else { XCTFail(); return }
+
+    testPlaylist.append(playable: song)
+    XCTAssertEqual(songCount, 1)
+    testPlaylist.append(playables: [song, song])
+    XCTAssertEqual(songCount, 3)
+    testPlaylist.insert(playables: [song], index: 0)
+    XCTAssertEqual(songCount, 4)
+    testPlaylist.remove(at: 0)
+    XCTAssertEqual(songCount, 3)
+    testPlaylist.removeAllItems()
+    XCTAssertEqual(songCount, 0)
+  }
 }
 
 // MARK: - SnapshotRecorder
@@ -778,12 +806,14 @@ class PlaylistTest: XCTestCase {
 @MainActor
 private final class SnapshotRecorder: NSObject, @preconcurrency NSFetchedResultsControllerDelegate {
   var itemIDs = [NSManagedObjectID]()
+  var snapshotDidChange: (() -> ())?
 
   func controller(
     _ controller: NSFetchedResultsController<NSFetchRequestResult>,
     didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference
   ) {
     itemIDs = snapshot.itemIdentifiers.compactMap { $0 as? NSManagedObjectID }
+    snapshotDidChange?()
   }
 }
 
