@@ -37,9 +37,12 @@ public final class PlaylistMO: NSManagedObject {
     changedValues().keys.contains(#keyPath(items))
   }
 
-  fileprivate func updateSongCount() {
-    guard Int16(clamping: items.count) != songCount else { return }
-    songCount = Int16(clamping: items.count)
+  // Also called by the Playlist methods that add or remove items: fetched results controllers on
+  // the main context get the item changes of a save before willSave runs.
+  func updateSongCount() {
+    let itemCount = Int16(clamping: items.count)
+    guard itemCount != songCount else { return }
+    songCount = itemCount
   }
 
   public func removeAllItems() {
