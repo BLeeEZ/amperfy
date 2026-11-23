@@ -61,7 +61,7 @@ class UpdateVC: UIViewController {
       self.activitySpinner.isHidden = true
       self.progressLabel.isHidden = true
 
-      self.appDelegate.isKeepScreenAlive = false
+      self.appDelegate.configureLockScreenPrevention()
       self.appDelegate.eventLogger.supressAlerts = false
       self.appDelegate.startManagerForNormalOperation()
 

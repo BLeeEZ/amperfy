@@ -127,7 +127,7 @@ class SyncVC: UIViewController {
     } else {
       appDelegate.getMeta(account.info).startManagerAfterSync(player: appDelegate.player)
     }
-    appDelegate.isKeepScreenAlive = false
+    appDelegate.configureLockScreenPrevention()
     appDelegate.eventLogger.supressAlerts = false
 
     appDelegate
