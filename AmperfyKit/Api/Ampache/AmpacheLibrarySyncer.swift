@@ -839,7 +839,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await ampacheXmlServerApi.requestNewestAlbums(offset: offset, count: count)
-    try await storage.async.perform { asyncCompanion in
+    try await performAlbumListWrite { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
@@ -874,7 +874,7 @@ class AmpacheLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await ampacheXmlServerApi.requestRecentAlbums(offset: offset, count: count)
-    try await storage.async.perform { asyncCompanion in
+    try await performAlbumListWrite { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = IDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(

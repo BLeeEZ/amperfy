@@ -739,7 +739,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     os_log("Sync newest albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await subsonicServerApi.requestNewestAlbums(offset: offset, count: count)
-    try await storage.async.perform { asyncCompanion in
+    try await performAlbumListWrite { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
@@ -774,7 +774,7 @@ class SubsonicLibrarySyncer: CommonLibrarySyncer, LibrarySyncer {
     guard isSyncAllowed else { return }
     os_log("Sync recent albums: offset: %i count: %i", log: log, type: .info, offset, count)
     let response = try await subsonicServerApi.requestRecentAlbums(offset: offset, count: count)
-    try await storage.async.perform { asyncCompanion in
+    try await performAlbumListWrite { asyncCompanion in
       let accountAsync = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
       let idParserDelegate = SsIDsParserDelegate(performanceMonitor: self.performanceMonitor)
       try self.parse(
