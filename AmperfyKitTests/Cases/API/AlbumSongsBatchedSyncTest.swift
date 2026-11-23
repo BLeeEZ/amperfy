@@ -96,6 +96,29 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
     cdHelper.persistentContainer.viewContext.refreshAllObjects()
   }
 
+  /// Writes an album list the way syncNewestAlbums does: looks the album up by id through the
+  /// prefetch and creates it if it was not found. `afterLookUp` runs in between.
+  private func writeAlbumList(
+    albumID: String,
+    afterLookUp: @escaping @Sendable () -> ()
+  ) async throws {
+    let accountObjectID = account.managedObject.objectID
+    try await syncer.performAlbumListWrite { asyncCompanion in
+      let accountAsync = asyncCompanion.library.getAccount(managedObjectId: accountObjectID)
+      var prefetchIDs = LibraryStorage.PrefetchIdContainer()
+      prefetchIDs.albumIDs = [albumID]
+      let prefetch = asyncCompanion.library.getElements(
+        account: accountAsync,
+        prefetchIDs: prefetchIDs
+      )
+      afterLookUp()
+      if prefetch.prefetchedAlbumDict[albumID] == nil {
+        let album = asyncCompanion.library.createAlbum(account: accountAsync)
+        album.id = albumID
+      }
+    }
+  }
+
   func testWrittenAlbumIsSynced() async {
     let album = createUnsyncedAlbum(id: "written")
     await syncAlbums([album])
@@ -186,5 +209,25 @@ class AlbumSongsBatchedSyncTest: XCTestCase {
     )
     XCTAssertTrue(fetchedIDs.contains("ownAccount"))
     XCTAssertFalse(fetchedIDs.contains("otherAccount"))
+  }
+
+  /// At launch Home and the background sync usually write the newest albums at the same time: an
+  /// album new to the library must still be created only once. The first write waits after its
+  /// lookup until the second one has looked the album up as well, for at most a second: unless
+  /// the writes run one at a time, neither finds the album and both create it.
+  func testOverlappingNewestAlbumsWritesCreateNewAlbumOnce() async throws {
+    library.saveContext()
+    let firstLookedUp = expectation(description: "first write looked the album up")
+    let secondLookedUp = DispatchSemaphore(value: 0)
+    let firstWrite = Task { @MainActor in
+      try await self.writeAlbumList(albumID: "newAlbum") {
+        firstLookedUp.fulfill()
+        _ = secondLookedUp.wait(timeout: .now() + 1)
+      }
+    }
+    await fulfillment(of: [firstLookedUp], timeout: 2)
+    try await writeAlbumList(albumID: "newAlbum") { secondLookedUp.signal() }
+    try await firstWrite.value
+    XCTAssertEqual(library.getAlbums(for: account).filter { $0.id == "newAlbum" }.count, 1)
   }
 }

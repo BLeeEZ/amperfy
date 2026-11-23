@@ -83,6 +83,8 @@ class AlbumSyncCoalescerTest: XCTestCase {
   var exclusiveSyncsFinishedBeforeAlbumSync: Int?
   var batchesFinishedBeforeExclusiveSync: Int?
   var exclusiveSyncsFinishedBeforeBatch: Int?
+  var listSyncsFinishedBeforeExclusiveSync: Int?
+  var exclusiveSyncsFinishedBeforeListSync: Int?
 
   override func setUp() async throws {
     cdHelper = CoreDataHelper()
@@ -96,6 +98,8 @@ class AlbumSyncCoalescerTest: XCTestCase {
     exclusiveSyncsFinishedBeforeAlbumSync = nil
     batchesFinishedBeforeExclusiveSync = nil
     exclusiveSyncsFinishedBeforeBatch = nil
+    listSyncsFinishedBeforeExclusiveSync = nil
+    exclusiveSyncsFinishedBeforeListSync = nil
     // Two distinct albums that share the same (empty) server id: an unsynced
     // album carries id "", so keying the coalescing on the server id would
     // wrongly merge them. See testDistinctAlbumsWithSameServerIdAreNotCoalesced.
@@ -457,5 +461,145 @@ class AlbumSyncCoalescerTest: XCTestCase {
     try await otherAlbumSync.value
     XCTAssertEqual(exclusiveSyncsFinishedBeforeAlbumSync, 1)
     XCTAssertEqual(otherOperation.runCount, 1)
+  }
+
+  /// An album list write, such as the newest albums, must not wait for album
+  /// syncs or batches in flight: they include network requests, and it only has
+  /// to run apart from other album list writes and exclusive writes, which may
+  /// create the same albums.
+  func testAlbumListSyncDoesNotWaitForAlbumSyncsInFlight() async throws {
+    let batchOperation = MOCK_GatedAlbumSyncOperation()
+    let listOperation = MOCK_GatedAlbumSyncOperation()
+    listOperation.openGate()
+    let albumEntered = expectation(description: "album sync entered the operation")
+    operation.onEntered = { count in
+      if count == 1 { albumEntered.fulfill() }
+    }
+    let albumSync = startSync(of: album)
+    let batchEntered = expectation(description: "batch entered the operation")
+    batchOperation.onEntered = { _ in batchEntered.fulfill() }
+    let otherAlbumObjectIDs = [otherAlbum.managedObject.objectID]
+    let batch = Task { @MainActor in
+      await AlbumSyncCoalescer.sync(albumObjectIDs: otherAlbumObjectIDs) { _ in
+        try? await batchOperation.run()
+      }
+    }
+    await fulfillment(of: [albumEntered, batchEntered], timeout: 2)
+
+    let listSyncFinished = expectation(description: "album list sync finished")
+    let listSync = Task { @MainActor in
+      try await AlbumSyncCoalescer.syncAlbumList {
+        try await listOperation.run()
+      }
+      listSyncFinished.fulfill()
+    }
+    await fulfillment(of: [listSyncFinished], timeout: 2)
+    XCTAssertEqual(listOperation.runCount, 1)
+
+    operation.openGate()
+    batchOperation.openGate()
+    try await listSync.value
+    try await albumSync.value
+    await batch.value
+  }
+
+  /// An exclusive write that still waits for a batch in flight must not hold up
+  /// an album list write: the list write would otherwise wait for that batch,
+  /// including its network requests. The exclusive write then waits for the
+  /// list write instead.
+  func testAlbumListSyncDoesNotWaitForPendingExclusiveSync() async throws {
+    let batchOperation = MOCK_GatedAlbumSyncOperation()
+    let exclusiveOperation = MOCK_GatedAlbumSyncOperation()
+    let listOperation = MOCK_GatedAlbumSyncOperation()
+    exclusiveOperation.openGate()
+    let batchEntered = expectation(description: "batch entered the operation")
+    batchOperation.onEntered = { _ in batchEntered.fulfill() }
+    let albumObjectIDs = [album.managedObject.objectID]
+    let batch = Task { @MainActor in
+      await AlbumSyncCoalescer.sync(albumObjectIDs: albumObjectIDs) { _ in
+        try? await batchOperation.run()
+      }
+    }
+    await fulfillment(of: [batchEntered], timeout: 2)
+
+    let exclusiveJoined = expectation(description: "exclusive sync joined")
+    let exclusiveSync = Task { @MainActor in
+      exclusiveJoined.fulfill()
+      try await AlbumSyncCoalescer.syncExclusively {
+        self.listSyncsFinishedBeforeExclusiveSync = listOperation.isCancelledAfterGate.count
+        try await exclusiveOperation.run()
+      }
+    }
+    await fulfillment(of: [exclusiveJoined], timeout: 2)
+
+    let listEntered = expectation(description: "album list sync entered the operation")
+    listOperation.onEntered = { _ in listEntered.fulfill() }
+    let listSync = Task { @MainActor in
+      try await AlbumSyncCoalescer.syncAlbumList {
+        try await listOperation.run()
+      }
+    }
+    await fulfillment(of: [listEntered], timeout: 2)
+    XCTAssertEqual(exclusiveOperation.runCount, 0)
+
+    batchOperation.openGate()
+    await batch.value
+    listOperation.openGate()
+    try await listSync.value
+    try await exclusiveSync.value
+    XCTAssertEqual(listSyncsFinishedBeforeExclusiveSync, 1)
+    XCTAssertEqual(exclusiveOperation.runCount, 1)
+  }
+
+  /// An exclusive write, such as a bulk song page, may create albums as well: it
+  /// must wait for an album list write in flight, and an album list write started
+  /// while its operation runs must wait until it has finished.
+  func testExclusiveSyncAndAlbumListSyncsWaitForEachOther() async throws {
+    let listOperation = MOCK_GatedAlbumSyncOperation()
+    let exclusiveOperation = MOCK_GatedAlbumSyncOperation()
+    let otherListOperation = MOCK_GatedAlbumSyncOperation()
+    otherListOperation.openGate()
+    let listEntered = expectation(description: "album list sync entered the operation")
+    listOperation.onEntered = { _ in listEntered.fulfill() }
+    let listSync = Task { @MainActor in
+      try await AlbumSyncCoalescer.syncAlbumList {
+        try await listOperation.run()
+      }
+    }
+    await fulfillment(of: [listEntered], timeout: 2)
+
+    let exclusiveJoined = expectation(description: "exclusive sync joined")
+    let exclusiveEntered = expectation(description: "exclusive sync entered the operation")
+    exclusiveOperation.onEntered = { _ in exclusiveEntered.fulfill() }
+    let exclusiveSync = Task { @MainActor in
+      exclusiveJoined.fulfill()
+      try await AlbumSyncCoalescer.syncExclusively {
+        self.listSyncsFinishedBeforeExclusiveSync = listOperation.isCancelledAfterGate.count
+        try await exclusiveOperation.run()
+      }
+    }
+    await fulfillment(of: [exclusiveJoined], timeout: 2)
+
+    listOperation.openGate()
+    await fulfillment(of: [exclusiveEntered], timeout: 2)
+    otherListOperation.onEntered = { _ in
+      self.exclusiveSyncsFinishedBeforeListSync = exclusiveOperation.isCancelledAfterGate.count
+    }
+    let otherListJoined = expectation(description: "other album list sync joined")
+    let otherListSync = Task { @MainActor in
+      otherListJoined.fulfill()
+      try await AlbumSyncCoalescer.syncAlbumList {
+        try await otherListOperation.run()
+      }
+    }
+    await fulfillment(of: [otherListJoined], timeout: 2)
+
+    exclusiveOperation.openGate()
+    try await listSync.value
+    try await exclusiveSync.value
+    try await otherListSync.value
+    XCTAssertEqual(listSyncsFinishedBeforeExclusiveSync, 1)
+    XCTAssertEqual(exclusiveSyncsFinishedBeforeListSync, 1)
+    XCTAssertEqual(otherListOperation.runCount, 1)
   }
 }

@@ -43,6 +43,13 @@ enum AlbumSyncCoalescer {
   /// A write that may touch songs of any album, such as a bulk song page. While
   /// it is pending or running, every album sync waits for it.
   private static var exclusiveSync: Task<(), Never>?
+  /// `exclusiveSync` once its operation runs. Album list writes wait for it only
+  /// then, not while it still waits for the album syncs in flight.
+  private static var exclusiveWrite: Task<(), Never>?
+  /// A write of an album list, such as the newest or recent albums. It runs
+  /// apart from other album list writes and exclusive writes, but not from
+  /// album syncs.
+  private static var albumListSync: Task<(), Never>?
 
   static func sync(
     _ album: Album,
@@ -100,8 +107,9 @@ enum AlbumSyncCoalescer {
   }
 
   /// Exclusive variant for a write that may touch songs of any album: it waits
-  /// until no album sync is in flight, and album syncs started meanwhile wait
-  /// until it has finished.
+  /// until no album sync or album list write is in flight. Album syncs started
+  /// meanwhile wait until it has finished, and so do album list writes started
+  /// once its operation runs.
   static func syncExclusively<Result: Sendable>(
     operation: @escaping @MainActor @Sendable () async throws -> Result
   ) async throws
@@ -110,17 +118,52 @@ enum AlbumSyncCoalescer {
       await pendingSync.value
     }
     let syncTask = Task { @MainActor in
-      defer { Self.exclusiveSync = nil }
+      defer {
+        Self.exclusiveSync = nil
+        Self.exclusiveWrite = nil
+      }
       while let albumSync = runningSyncs.values.first {
         _ = try? await albumSync.value
       }
       while let batchSync = batchSyncs.values.first {
         await batchSync.value
       }
+      while let listSync = albumListSync {
+        await listSync.value
+      }
+      // No suspension until the operation runs, so no album list write can
+      // start in between.
+      Self.exclusiveWrite = Self.exclusiveSync
       return try await operation()
     }
     exclusiveSync = Task { @MainActor in _ = try? await syncTask.value }
     return try await syncTask.value
+  }
+
+  /// Album list variant for a write that looks albums up by id and creates the
+  /// ones it does not find, such as the newest or recent albums: it waits until
+  /// no other album list write or exclusive write runs. Each write uses its own
+  /// context and cannot see the albums another one has not saved yet, so two
+  /// overlapping writes would both create every new album on both lists. It
+  /// does not wait for album syncs, which include network requests, nor for an
+  /// exclusive write that still waits for them.
+  /// Album syncs write the songs of albums that already exist, but may create
+  /// their new artists and genres, so a list write and an album sync can still
+  /// both create the same new artist or genre. It must not run inside an
+  /// exclusive write or another album list write, and its operation must not
+  /// call into this coalescer.
+  static func syncAlbumList(
+    operation: @escaping @MainActor @Sendable () async throws -> ()
+  ) async throws {
+    while let pendingSync = exclusiveWrite ?? albumListSync {
+      await pendingSync.value
+    }
+    let syncTask = Task { @MainActor in
+      defer { Self.albumListSync = nil }
+      try await operation()
+    }
+    albumListSync = Task { @MainActor in _ = try? await syncTask.value }
+    try await syncTask.value
   }
 }
 
@@ -288,6 +331,18 @@ class CommonLibrarySyncer {
       cleansedURL: responseError.cleansedURL,
       data: responseError.data
     )
+  }
+
+  /// Runs `body` like `storage.async.perform`, for a write of an album list such as the newest or
+  /// recent albums, through `AlbumSyncCoalescer.syncAlbumList`. Only the write waits: the list is
+  /// requested beforehand.
+  @MainActor
+  func performAlbumListWrite(
+    body: @escaping @Sendable (_ asyncCompanion: CoreDataCompanion) throws -> ()
+  ) async throws {
+    try await AlbumSyncCoalescer.syncAlbumList {
+      try await self.storage.async.perform(body: body)
+    }
   }
 
   @MainActor
