@@ -128,11 +128,20 @@ final class DownloadRequestManager: Sendable {
   nonisolated private func addLowPrio(object: Downloadable, library: LibraryStorage) -> Download? {
     let account = library.getAccount(managedObjectId: accountObjectId)
     if let existingDownload = library.getDownload(account: account, id: object.uniqueID) {
-      // reset and return existing downloads only for playables
-      // existing artworks are ignored -> nil
-      if let threadSafeInfo = object.threadSafeInfo,
-         threadSafeInfo.type == .playable,
-         existingDownload.errorDate != nil || !object.isCached {
+      // playables: reset and return failed or uncached downloads
+      // artworks: reset and return only downloads that failed for a transient reason
+      // (timeout, no network); pending ones are already queued, permanent errors
+      // (API error, empty file) and canceled ones would only fail again on every display
+      let isRetryNeeded = switch object.threadSafeInfo?.type {
+      case .playable: existingDownload.errorDate != nil || !object.isCached
+      case .artwork:
+        switch existingDownload.error {
+        case .fetchFailed, .noConnectivity: true
+        default: false
+        }
+      case nil, .unknown: false
+      }
+      if isRetryNeeded {
         existingDownload.reset()
         library.saveContext()
         return existingDownload
@@ -235,21 +244,31 @@ final class DownloadRequestManager: Sendable {
 
   func clearAllDownloadsAsyncIfAllHaveFinished() {
     Task {
-      let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
-      let notStartedDownloadCount = try? await storage.performAndGet { asyncCompanion in
-        let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-        let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-        request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-          NSPredicate(format: downloadPredicateFormat),
-          NSPredicate(format: "%K == nil", #keyPath(DownloadMO.startDate)),
-          asyncCompanion.library.getFetchPredicate(forAccount: account),
-        ])
-        return (try? asyncCompanion.context.count(for: request)) ?? 0
-      }
+      await clearAllDownloadsIfAllHaveFinished()
+    }
+  }
 
-      if notStartedDownloadCount == 0 {
-        await clearAllDownloads()
-      }
+  func clearAllDownloadsIfAllHaveFinished() async {
+    let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
+    // count and delete in one block, a download added in between would be deleted while queued
+    try? await storage.perform { asyncCompanion in
+      let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
+      let request: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+      // pending = neither finished nor failed (same as getRequestedDownloads);
+      // the start date is no indicator, a suspend resets it
+      request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+        NSPredicate(format: downloadPredicateFormat),
+        NSPredicate(format: "%K == nil", #keyPath(DownloadMO.finishDate)),
+        NSPredicate(format: "%K == nil", #keyPath(DownloadMO.errorDate)),
+        asyncCompanion.library.getFetchPredicate(forAccount: account),
+      ])
+      let pendingDownloadCount = (try? asyncCompanion.context.count(for: request)) ?? 0
+      guard pendingDownloadCount == 0 else { return }
+      Self.deleteAllDownloads(
+        predicateFormat: downloadPredicateFormat,
+        account: account,
+        asyncCompanion: asyncCompanion
+      )
     }
   }
 
@@ -257,16 +276,28 @@ final class DownloadRequestManager: Sendable {
     let downloadPredicateFormat = await getDownloadDelegateCB().requestPredicate.predicateFormat
     try? await storage.perform { asyncCompanion in
       let account = asyncCompanion.library.getAccount(managedObjectId: self.accountObjectId)
-      let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
-      fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-        NSPredicate(format: downloadPredicateFormat),
-        asyncCompanion.library.getFetchPredicate(forAccount: account),
-      ])
-      let results = try? asyncCompanion.context.fetch(fetchRequest)
-      let downloads = results?.compactMap { Download(managedObject: $0) }
-      downloads?.forEach { asyncCompanion.library.deleteDownload($0) }
-      asyncCompanion.saveContext()
+      Self.deleteAllDownloads(
+        predicateFormat: downloadPredicateFormat,
+        account: account,
+        asyncCompanion: asyncCompanion
+      )
     }
+  }
+
+  nonisolated private static func deleteAllDownloads(
+    predicateFormat: String,
+    account: Account,
+    asyncCompanion: CoreDataCompanion
+  ) {
+    let fetchRequest: NSFetchRequest<DownloadMO> = DownloadMO.creationDateSortedFetchRequest
+    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+      NSPredicate(format: predicateFormat),
+      asyncCompanion.library.getFetchPredicate(forAccount: account),
+    ])
+    let results = try? asyncCompanion.context.fetch(fetchRequest)
+    let downloads = results?.compactMap { Download(managedObject: $0) }
+    downloads?.forEach { asyncCompanion.library.deleteDownload($0) }
+    asyncCompanion.saveContext()
   }
 
   func cancelDownloads() async {
