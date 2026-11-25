@@ -96,7 +96,10 @@ public class Download: NSObject {
     set { newValue ? (startDate = Date()) : (finishDate = Date()) }
   }
 
+  /// Resets the start date of an unfinished download so it is requested again.
+  /// A download that already finished keeps its dates.
   public func suspend() {
+    guard finishDate == nil else { return }
     if startDate != nil { startDate = nil }
   }
 

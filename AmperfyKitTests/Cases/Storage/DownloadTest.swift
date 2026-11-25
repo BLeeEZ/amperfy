@@ -252,6 +252,50 @@ class DownloadTest: XCTestCase {
     XCTAssertNotNil(library.getDownload(account: account, id: finished.id))
   }
 
+  func testClearAllDownloadsIfAllHaveFinishedIgnoresFinishedNotStartedDownloads() async {
+    // finished downloads without a start date were left behind by a suspend
+    let finishedArtwork = createUncachedArtwork(id: "finished")
+    let finished = createDownload(for: finishedArtwork)
+    finished.finishDate = Date()
+    library.saveContext()
+
+    await createRequestManager().clearAllDownloadsIfAllHaveFinished()
+
+    XCTAssertNil(library.getDownload(account: account, id: finished.id))
+  }
+
+  func testClearAllDownloadsIfAllHaveFinishedKeepsAllWhileOneIsUnfinished() async {
+    // started before the app was terminated, never finished
+    let unfinishedArtwork = createUncachedArtwork(id: "unfinished")
+    let unfinished = createDownload(for: unfinishedArtwork)
+    unfinished.startDate = Date()
+    let finishedArtwork = createUncachedArtwork(id: "finished")
+    let finished = createDownload(for: finishedArtwork)
+    finished.startDate = Date()
+    finished.finishDate = Date()
+    library.saveContext()
+
+    await createRequestManager().clearAllDownloadsIfAllHaveFinished()
+
+    XCTAssertNotNil(library.getDownload(account: account, id: unfinished.id))
+    XCTAssertNotNil(library.getDownload(account: account, id: finished.id))
+  }
+
+  func testSuspendKeepsStartDateOfFinishedDownload() {
+    let artwork = createUncachedArtwork(id: "artwork")
+    let finished = createDownload(for: artwork)
+    finished.startDate = Date()
+    finished.finishDate = Date()
+    let running = createDownload(for: createUncachedArtwork(id: "running"))
+    running.startDate = Date()
+
+    finished.suspend()
+    running.suspend()
+
+    XCTAssertNotNil(finished.startDate)
+    XCTAssertNil(running.startDate)
+  }
+
   func testDeleteCacheRemovesDownloadRecords() {
     let cached = createUncachedSong(id: "cached", account: account)
     cached.relFilePath = URL(string: "cached.mp3")
